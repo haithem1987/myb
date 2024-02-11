@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  myb.usermanager:
+    image: ${DOCKER_REGISTRY-}m.y.b.usermanager-kh
+    build:
+      context: .
+      dockerfile: src/services/user-manager/Myb.UserManager/Dockerfile

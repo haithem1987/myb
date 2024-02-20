@@ -13,33 +13,43 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "unit-tests", "unit-tests", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "end-2-end-tests", "end-2-end-tests", "{5AA3E09D-7291-47A7-8584-854EF377145C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager", "src\services\user-manager\Myb.UserManager\Myb.UserManager.csproj", "{B219F962-51FE-4BC8-8CC7-C438151191DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager", "src\services\user-manager\Myb.UserManager\Myb.UserManager.csproj", "{B219F962-51FE-4BC8-8CC7-C438151191DD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "user-manager", "user-manager", "{DAD554DD-99A4-4597-9775-033EB5EFB2FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.Infra", "src\services\user-manager\Myb.UserManager.Infra\Myb.UserManager.Infra.csproj", "{A723FB74-A0B7-4A93-A278-78EAFE0315DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Infra", "src\services\user-manager\Myb.UserManager.Infra\Myb.UserManager.Infra.csproj", "{A723FB74-A0B7-4A93-A278-78EAFE0315DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.Models", "src\services\user-manager\Myb.UserManager.Models\Myb.UserManager.Models.csproj", "{9A2E1DD5-18AF-40B8-90E0-CDAFF091F193}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Models", "src\services\user-manager\Myb.UserManager.Models\Myb.UserManager.Models.csproj", "{9A2E1DD5-18AF-40B8-90E0-CDAFF091F193}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.Data", "src\services\user-manager\Myb.UserManager.Data\Myb.UserManager.Data.csproj", "{A92D041B-A5F6-4F9E-8ADF-1711CE504982}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Sevices", "src\services\user-manager\Myb.UserManager.Sevices\Myb.UserManager.Sevices.csproj", "{6F9CFAB1-AFD8-4CC8-9D07-D2FBD5F3EFE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.Sevices", "src\services\user-manager\Myb.UserManager.Sevices\Myb.UserManager.Sevices.csproj", "{6F9CFAB1-AFD8-4CC8-9D07-D2FBD5F3EFE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.E2e.Tests", "src\tests\end-2-end-tests\Myb.UserManager.E2e.Tests\Myb.UserManager.E2e.Tests.csproj", "{2AD08088-5061-4832-A118-E34A578123C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.E2e.Tests", "src\tests\end-2-end-tests\Myb.UserManager.E2e.Tests\Myb.UserManager.E2e.Tests.csproj", "{2AD08088-5061-4832-A118-E34A578123C9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Tests\Myb.UserManager.Tests.csproj", "{9424DE50-5952-4AA9-8848-CCE77EC81E11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Tests\Myb.UserManager.Tests.csproj", "{9424DE50-5952-4AA9-8848-CCE77EC81E11}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "user-manager", "user-manager", "{397B529E-5E18-4CD5-80AD-BA0DF243ADE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.Data.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Data.Tests\Myb.UserManager.Data.Tests.csproj", "{6221A9C6-6CDA-42E5-83D4-C79AE95A9A66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Data.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Data.Tests\Myb.UserManager.Data.Tests.csproj", "{6221A9C6-6CDA-42E5-83D4-C79AE95A9A66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.Infra.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Infra.Tests\Myb.UserManager.Infra.Tests.csproj", "{3DC8AD9E-491F-4E36-975E-125A1A307141}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Infra.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Infra.Tests\Myb.UserManager.Infra.Tests.csproj", "{3DC8AD9E-491F-4E36-975E-125A1A307141}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.Models.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Models.Tests\Myb.UserManager.Models.Tests.csproj", "{AD37796B-27A8-4306-ACE1-DBD332D3C7ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Models.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Models.Tests\Myb.UserManager.Models.Tests.csproj", "{AD37796B-27A8-4306-ACE1-DBD332D3C7ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.UserManager.Sevices.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Sevices.Tests\Myb.UserManager.Sevices.Tests.csproj", "{E5CDB1A8-6444-42C4-9F78-2C563EFDDE8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Sevices.Tests", "src\tests\unit-tests\user-manager\Myb.UserManager.Sevices.Tests\Myb.UserManager.Sevices.Tests.csproj", "{E5CDB1A8-6444-42C4-9F78-2C563EFDDE8E}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{C1651E56-3CE5-4850-BE64-D30CB044990E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.EntityFrameWork.Infra", "..\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj", "{098FAFB6-FB48-4DB9-B3F5-CB25F12B076F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Client", "..\Myb.UserManager.Client\Myb.UserManager.Client.csproj", "{4F51B3F4-1461-44C8-A9BC-82264C075F66}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Common.GraphQL.Infra", "..\Myb.Common.GraphQL.Infra\Myb.Common.GraphQL.Infra.csproj", "{536D988E-7905-449C-BA61-14C23F6927C4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Common.Models", "..\Myb.Common.Models\Myb.Common.Models.csproj", "{462307C7-FECA-41DB-8AA4-483C67B2E443}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Common.Repositories", "..\Myb.Common.Repositories\Myb.Common.Repositories.csproj", "{AEE9EB8B-2131-4664-A542-FC80D1EC8BA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Common.Utils", "..\Myb.Common.Utils\Myb.Common.Utils.csproj", "{A6AB8387-FF99-47B8-AB96-C940D1323FB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,10 +69,6 @@ Global
 		{9A2E1DD5-18AF-40B8-90E0-CDAFF091F193}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A2E1DD5-18AF-40B8-90E0-CDAFF091F193}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A2E1DD5-18AF-40B8-90E0-CDAFF091F193}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A92D041B-A5F6-4F9E-8ADF-1711CE504982}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A92D041B-A5F6-4F9E-8ADF-1711CE504982}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A92D041B-A5F6-4F9E-8ADF-1711CE504982}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A92D041B-A5F6-4F9E-8ADF-1711CE504982}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6F9CFAB1-AFD8-4CC8-9D07-D2FBD5F3EFE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F9CFAB1-AFD8-4CC8-9D07-D2FBD5F3EFE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F9CFAB1-AFD8-4CC8-9D07-D2FBD5F3EFE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -95,6 +101,30 @@ Global
 		{C1651E56-3CE5-4850-BE64-D30CB044990E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1651E56-3CE5-4850-BE64-D30CB044990E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1651E56-3CE5-4850-BE64-D30CB044990E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{098FAFB6-FB48-4DB9-B3F5-CB25F12B076F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{098FAFB6-FB48-4DB9-B3F5-CB25F12B076F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{098FAFB6-FB48-4DB9-B3F5-CB25F12B076F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{098FAFB6-FB48-4DB9-B3F5-CB25F12B076F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F51B3F4-1461-44C8-A9BC-82264C075F66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F51B3F4-1461-44C8-A9BC-82264C075F66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F51B3F4-1461-44C8-A9BC-82264C075F66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F51B3F4-1461-44C8-A9BC-82264C075F66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{536D988E-7905-449C-BA61-14C23F6927C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{536D988E-7905-449C-BA61-14C23F6927C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{536D988E-7905-449C-BA61-14C23F6927C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{536D988E-7905-449C-BA61-14C23F6927C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{462307C7-FECA-41DB-8AA4-483C67B2E443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{462307C7-FECA-41DB-8AA4-483C67B2E443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{462307C7-FECA-41DB-8AA4-483C67B2E443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{462307C7-FECA-41DB-8AA4-483C67B2E443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEE9EB8B-2131-4664-A542-FC80D1EC8BA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEE9EB8B-2131-4664-A542-FC80D1EC8BA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEE9EB8B-2131-4664-A542-FC80D1EC8BA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEE9EB8B-2131-4664-A542-FC80D1EC8BA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6AB8387-FF99-47B8-AB96-C940D1323FB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6AB8387-FF99-47B8-AB96-C940D1323FB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6AB8387-FF99-47B8-AB96-C940D1323FB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6AB8387-FF99-47B8-AB96-C940D1323FB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -106,7 +136,6 @@ Global
 		{DAD554DD-99A4-4597-9775-033EB5EFB2FA} = {37E15B0B-E56E-4E11-94F2-21C4193E2CB0}
 		{A723FB74-A0B7-4A93-A278-78EAFE0315DE} = {DAD554DD-99A4-4597-9775-033EB5EFB2FA}
 		{9A2E1DD5-18AF-40B8-90E0-CDAFF091F193} = {DAD554DD-99A4-4597-9775-033EB5EFB2FA}
-		{A92D041B-A5F6-4F9E-8ADF-1711CE504982} = {DAD554DD-99A4-4597-9775-033EB5EFB2FA}
 		{6F9CFAB1-AFD8-4CC8-9D07-D2FBD5F3EFE0} = {DAD554DD-99A4-4597-9775-033EB5EFB2FA}
 		{2AD08088-5061-4832-A118-E34A578123C9} = {5AA3E09D-7291-47A7-8584-854EF377145C}
 		{9424DE50-5952-4AA9-8848-CCE77EC81E11} = {397B529E-5E18-4CD5-80AD-BA0DF243ADE4}
@@ -115,6 +144,12 @@ Global
 		{3DC8AD9E-491F-4E36-975E-125A1A307141} = {397B529E-5E18-4CD5-80AD-BA0DF243ADE4}
 		{AD37796B-27A8-4306-ACE1-DBD332D3C7ED} = {397B529E-5E18-4CD5-80AD-BA0DF243ADE4}
 		{E5CDB1A8-6444-42C4-9F78-2C563EFDDE8E} = {397B529E-5E18-4CD5-80AD-BA0DF243ADE4}
+		{098FAFB6-FB48-4DB9-B3F5-CB25F12B076F} = {DAD554DD-99A4-4597-9775-033EB5EFB2FA}
+		{4F51B3F4-1461-44C8-A9BC-82264C075F66} = {DAD554DD-99A4-4597-9775-033EB5EFB2FA}
+		{536D988E-7905-449C-BA61-14C23F6927C4} = {98C61478-44B0-4A55-A735-0BC13CA54212}
+		{462307C7-FECA-41DB-8AA4-483C67B2E443} = {98C61478-44B0-4A55-A735-0BC13CA54212}
+		{AEE9EB8B-2131-4664-A542-FC80D1EC8BA6} = {98C61478-44B0-4A55-A735-0BC13CA54212}
+		{A6AB8387-FF99-47B8-AB96-C940D1323FB1} = {98C61478-44B0-4A55-A735-0BC13CA54212}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {34C7383E-9796-48B2-8928-9E1E96C528F0}

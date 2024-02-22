@@ -8,7 +8,7 @@ namespace Myb.UserManager.Infra.Extensions
     {
         public static void RegisterServices(this IServiceCollection services)
         {
-            services.AddSingleton<IUserService,UserService>();
+            services.AddScoped<IUserService,UserService>();
         }
     }
 }

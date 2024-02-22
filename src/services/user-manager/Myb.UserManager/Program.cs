@@ -13,9 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure the HTTP request pipeline.
 
 builder.Services.AddPooledDbContextFactory<UserContext>(options=>options.UseNpgsql(""));
-builder.Services.RegisterServices();
 
 builder.Services.RegisterGraphQl<UserContext, UserQuery, UserMutation>();
+builder.Services.RegisterServices();
+
 var app = builder.Build();
 app.UseHttpsRedirection();
 app.MapGraphQL();

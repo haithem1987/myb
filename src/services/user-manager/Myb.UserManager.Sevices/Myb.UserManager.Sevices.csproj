@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Myb.Common.Repositories\Myb.Common.Repositories.csproj" />
-    <ProjectReference Include="..\..\..\..\..\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj" />
+    <ProjectReference Include="..\..\..\common\Myb.Common.Repositories\Myb.Common.Repositories.csproj" />
+    <ProjectReference Include="..\..\..\common\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj" />
+    <ProjectReference Include="..\Myb.UserManager.Models\Myb.UserManager.Models.csproj" />
   </ItemGroup>
 
 </Project>

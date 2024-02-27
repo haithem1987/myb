@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Myb.Common.GraphQL.Infra\Myb.Common.GraphQL.Infra.csproj" />
-    <ProjectReference Include="..\..\..\..\..\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj" />
+    <ProjectReference Include="..\..\..\common\Myb.Common.GraphQL.Infra\Myb.Common.GraphQL.Infra.csproj" />
+    <ProjectReference Include="..\..\..\common\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj" />
     <ProjectReference Include="..\Myb.UserManager.Infra\Myb.UserManager.Infra.csproj" />
     <ProjectReference Include="..\Myb.UserManager.Models\Myb.UserManager.Models.csproj" />
     <ProjectReference Include="..\Myb.UserManager.Sevices\Myb.UserManager.Sevices.csproj" />

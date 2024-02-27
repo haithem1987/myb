@@ -11,12 +11,11 @@
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.8.1" />
     <PackageReference Include="HotChocolate.Types" Version="13.8.1" />
     <PackageReference Include="HotChocolate.Types.Json" Version="13.8.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\common\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj" />
-    <ProjectReference Include="..\Myb.UserManager.Models\Myb.UserManager.Models.csproj" />
-    <ProjectReference Include="..\Myb.UserManager.Sevices\Myb.UserManager.Sevices.csproj" />
+    <ProjectReference Include="..\Myb.Common.Repositories\Myb.Common.Repositories.csproj" />
   </ItemGroup>
 
 </Project>

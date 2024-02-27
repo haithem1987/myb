@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\common\Myb.Common.Models\Myb.Common.Models.csproj" />
-  </ItemGroup>
-
 </Project>

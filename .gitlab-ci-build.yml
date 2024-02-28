@@ -1,7 +1,6 @@
 variables:
    
    IMAGE_NAME: "bassem001/tester_myb"  # Docker Hub registry
-   DOCKERFILE_PATH: \M.Y.B\src\services\user-manager\Myb.UserManager\Dockerfile
    DOCKERFILE_PATH: src/services/user-manager/Myb.UserManager/Dockerfile
 
 stages:

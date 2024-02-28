@@ -1,0 +1,14 @@
+stages:
+  - pull_request
+ 
+
+pull_request:
+  stage: pull_request
+  script:
+    - echo "Running PR stage"
+    - dotnet restore
+    - dotnet build
+    - dotnet test
+  only:
+    - merge_requests
+ 

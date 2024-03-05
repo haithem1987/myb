@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Myb.Common.Authentification.Extensions;
 using Myb.UserManager.EntityFrameWork.Infra;
 using Myb.UserManager.Infra.GraphQl.Mutations;
 using Myb.UserManager.Infra.GraphQl.Querys;
@@ -8,7 +12,11 @@ using Myb.UserManager.Infra.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddHttpClient();
+builder.Services.AddControllers();
+builder.Services.AddServices();
+builder.AddKeycloakSettings();
+builder.AddKeycloakAuthorization();
 
 // Configure the HTTP request pipeline.
 
@@ -18,6 +26,8 @@ builder.Services.RegisterGraphQl<UserContext, UserQuery, UserMutation>();
 builder.Services.RegisterServices();
 
 var app = builder.Build();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapGraphQL();
 app.Run();

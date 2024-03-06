@@ -1,8 +1,9 @@
 using Myb.Common.Authentification.Dtos;
 
-namespace Myb.Common.Authentification.Interfaces;
-
-public interface IKeycloakTokenService
+namespace Myb.Common.Authentification.Interfaces
 {
-    Task<KeycloakTokenResponseDto?> GetTokenResponseAsync(KeycloakUserDto keycloakUserDto);
+    public interface IKeycloakTokenService
+    {
+        Task<KeycloakTokenResponseDto?> GetTokenResponseAsync(KeycloakUserDto keycloakUserDto);
+    }
 }

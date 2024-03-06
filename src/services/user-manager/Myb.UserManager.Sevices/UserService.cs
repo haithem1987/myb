@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Myb.Common.Authentification.Dtos;
 using Myb.Common.Authentification.Exceptions;
 using Myb.Common.Authentification.Interfaces;
@@ -47,25 +46,19 @@ namespace Myb.UserManager.Sevices
             return result.Entity;
         }
         
-        [HttpPost("token")]
-        public async Task<IActionResult> AuthorizeAsync([FromBody] KeycloakUserDto keycloakUserDto)
+        public async Task<KeycloakTokenResponseDto> AuthorizeAsync(KeycloakUserDto keycloakUserDto)
         {
             try
             {
                 var response = await _keycloakTokenService.GetTokenResponseAsync(keycloakUserDto)
                     .ConfigureAwait(false);
-
-                return new OkObjectResult(response);
+                return response;
             }
-            catch (KeycloakException)
+            catch (KeycloakException ex)
             {
-
-                return new BadRequestObjectResult("Authorization has failed!");
+                throw;
             }
-            catch (Exception)
-            {
-                return new BadRequestObjectResult("An error has occured!");
-            }
+         
         }
 
     }

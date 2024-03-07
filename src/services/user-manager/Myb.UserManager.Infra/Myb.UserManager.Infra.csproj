@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\common\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj" />
     <ProjectReference Include="..\Myb.UserManager.Models\Myb.UserManager.Models.csproj" />
     <ProjectReference Include="..\Myb.UserManager.Sevices\Myb.UserManager.Sevices.csproj" />
   </ItemGroup>

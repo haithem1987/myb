@@ -12,6 +12,8 @@ namespace Myb.UserManager.Models
         [Required]
         public string Name { get; set; }
         [Browsable(false)]
+        public string Username { get; set; }
+        public string Password { get; set; }
         public virtual ICollection<UserRole> Roles { get; set; } = new List<UserRole>();
     }
 }

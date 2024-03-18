@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Myb.Common.Utils.Extensions
+namespace Myb.Common.Authentification.Extensions
 {
     public static class ObjectExtensions
     {

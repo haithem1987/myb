@@ -1,4 +1,8 @@
-﻿using Myb.Common.Repositories;
+﻿using Microsoft.AspNetCore.Mvc;
+using Myb.Common.Authentification.Dtos;
+using Myb.Common.Authentification.Exceptions;
+using Myb.Common.Authentification.Interfaces;
+using Myb.Common.Repositories;
 using Myb.UserManager.EntityFrameWork.Infra;
 using Myb.UserManager.Models;
 
@@ -7,10 +11,12 @@ namespace Myb.UserManager.Sevices
     public class UserService : IUserService 
     {
         private readonly IGenericRepository<int,User, UserContext> _genericRepo;
+        private readonly IKeycloakTokenService _keycloakTokenService; 
 
-        public UserService(IGenericRepository<int, User, UserContext> genericRepository)
+        public UserService(IGenericRepository<int, User, UserContext> genericRepository ,IKeycloakTokenService keycloakTokenService)
         {
             _genericRepo = genericRepository;
+            _keycloakTokenService = keycloakTokenService;
         }
         public User? GetById(int id)
         {
@@ -39,5 +45,21 @@ namespace Myb.UserManager.Sevices
             var result = await _genericRepo.DeleteAsync(id);
             return result.Entity;
         }
+        
+        public async Task<KeycloakTokenResponseDto> AuthorizeAsync(KeycloakUserDto keycloakUserDto)
+        {
+            try
+            {
+                var response = await _keycloakTokenService.GetTokenResponseAsync(keycloakUserDto)
+                    .ConfigureAwait(false);
+                return response;
+            }
+            catch (KeycloakException ex)
+            {
+                throw;
+            }
+         
+        }
+
     }
 }

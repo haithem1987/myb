@@ -16,6 +16,8 @@ namespace Myb.UserManager.Infra.GraphQl.Querys
         public User? GetUserById([Service] IUserService userService,int id) => userService.GetById(id);
         public IEnumerable<User?> GetUserByIds([Service] IUserService userService, int[] ids) =>
             userService.GetUsersByIds(ids);
+        public String GetMessage([Service] IUserService userService) =>
+            userService.GetMessage();
         public KeycloakTokenResponseDto GetToken([Service] IUserService userService,  KeycloakUserDto keycloakUserDto) =>
             userService.AuthorizeAsync(keycloakUserDto).GetAwaiter().GetResult();
 

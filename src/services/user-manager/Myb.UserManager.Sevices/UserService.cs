@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+
+using HotChocolate.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Myb.Common.Authentification.Dtos;
 using Myb.Common.Authentification.Exceptions;
 using Myb.Common.Authentification.Interfaces;
@@ -18,6 +21,7 @@ namespace Myb.UserManager.Sevices
             _genericRepo = genericRepository;
             _keycloakTokenService = keycloakTokenService;
         }
+
         public User? GetById(int id)
         {
             return _genericRepo.GetById(id);
@@ -30,6 +34,7 @@ namespace Myb.UserManager.Sevices
         {
             return _genericRepo.GetByIds(ids);
         }
+
         public async Task<User?> Add(User user)
         {
             var result = await _genericRepo.InsertAsync(user);
@@ -59,6 +64,11 @@ namespace Myb.UserManager.Sevices
                 throw;
             }
          
+        }
+        [Authorize(Roles = new [] { "Guest" })]
+        public string GetMessage()
+        {
+            return "Hello from UserService!";
         }
 
     }

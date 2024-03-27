@@ -18,5 +18,6 @@ namespace Myb.UserManager.Sevices
         IEnumerable<User?> GetUsersByIds(IEnumerable<int> ids);
         Task<User?> Update(User user);
         Task<KeycloakTokenResponseDto> AuthorizeAsync(KeycloakUserDto keycloakUserDto);
+        String GetMessage();
     }
 }

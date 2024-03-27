@@ -46,9 +46,6 @@ namespace Myb.Common.Authentification.Extensions
                     options.Authority = "https://www.keycloak.forlink-group.com/realms/MYB";
                     options.SaveToken = false;
                     options.RequireHttpsMetadata = false; 
-
- 
-
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateIssuer = true,
@@ -58,6 +55,9 @@ namespace Myb.Common.Authentification.Extensions
                         ValidIssuer = "https://www.keycloak.forlink-group.com/realms/MYB"
                     };
                 }); 
+            
+            builder.Services.AddAuthorization();
+
         } 
     }
 }

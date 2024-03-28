@@ -13,7 +13,6 @@ builder.AddKeycloakSettings();
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddServices();
-builder.AddKeycloakAuthorization();
 
 // Configure the HTTP request pipeline.
 
@@ -21,6 +20,8 @@ builder.Services.AddPooledDbContextFactory<UserContext>(options=>options.UseNpgs
 
 builder.Services.RegisterGraphQl<UserContext, UserQuery, UserMutation>();
 builder.Services.RegisterServices();
+builder.AddKeycloakAuthorization();
+
 
 var app = builder.Build();
 app.UseAuthentication();

@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'myb.front',
+  displayName: 'myb-front',
   preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../coverage/apps/myb.front',
+  coverageDirectory: '../../coverage/apps/myb-front',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

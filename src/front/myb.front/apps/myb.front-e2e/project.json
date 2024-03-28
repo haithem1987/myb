@@ -1,9 +1,9 @@
 {
-  "name": "myb.front-e2e",
+  "name": "myb-front-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "sourceRoot": "apps/myb.front-e2e/src",
+  "sourceRoot": "apps/myb-front-e2e/src",
   "targets": {},
   "tags": [],
-  "implicitDependencies": ["myb.front"]
+  "implicitDependencies": ["myb-front"]
 }

@@ -1,0 +1,9 @@
+{
+  "name": "auth",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/auth/src",
+  "prefix": "myb-front",
+  "tags": [],
+  "projectType": "library",
+  "targets": {}
+}

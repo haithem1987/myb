@@ -1,0 +1,9 @@
+{
+  "name": "UserModel",
+  "$schema": "../../../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/auth/src/lib/Models/UserModel/src",
+  "prefix": "myb-front",
+  "tags": [],
+  "projectType": "library",
+  "targets": {}
+}

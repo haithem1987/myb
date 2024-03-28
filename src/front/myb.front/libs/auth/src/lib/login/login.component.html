@@ -1,0 +1,39 @@
+
+<mat-card>
+  <mat-grid-list cols="4" rowHeight="300px">
+        <mat-grid-tile colspan="2" rowspan="2" class="left-container">
+        <div  >
+          <h1 class="logo">M.Y.B</h1>
+              <h1 class="mat-headline-1"> Manage  <br><span class="title"> Your Business</span></h1>
+                 <img mat-card-image  class="img"[src]="'https://s3-alpha-sig.figma.com/img/c4f0/00a8/d87f0e9d728a13059a15127bf4122e10?Expires=1710720000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=bcBUYmDC6WIBp1VTTE7ABLJ0CYnV4oflDYuSU-Q9QfumU57EVNJvhPwJZZIA9CjwlGV9NGwdYABsH5Hlu8GFfQwgqFsyNF8-~cYV-7MqDMrbxlPrg7Hhd8VSbmTQTXlEtiQxVgICW~0lSX-5aWGm8DRfQpwFUbQFcHoo8rFJxfnpYmITjjpYSnLWvPU12W5163ABfWCGlnbfTVCaJTH7V4GrAbgYJT4T8sV~aGyZhYGnW2WWJ0nJ4HqK-3G0s8YNqOlxwM2VtciCP4MfjdKNH9fQcPXemZ3uKbPSHJ~65mFVZGNptFG~yGDH1cStx54lz6fwA-NZUh5tENLqhk4g5Q__'" alt="Image">
+        </div>
+        </mat-grid-tile>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <mat-grid-tile colspan="2" rowspan="2">
+           <div class="form">
+              <h1 class="wlc">Welcome back !</h1>
+                <p>Email adress</p>
+                <mat-form-field appearance="outline" >
+                  <input matInput >
+                </mat-form-field>
+
+                <p>Password</p>
+                <mat-form-field appearance="outline">
+                  <input matInput  type="password">
+                </mat-form-field>
+                <button mat-raised-button color="primary">Login</button>
+
+                <p>Dont have account ? <span class="register">Register</span></p>
+                <div class="divider-container">
+                  <mat-divider class="flex-divider"></mat-divider>
+                  <p class="word">OR</p>
+                  <mat-divider class="flex-divider"></mat-divider>
+                </div>
+            </div>
+            
+          </mat-grid-tile>
+          
+      </form>
+    
+  </mat-grid-list>
+</mat-card>

@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Myb.Common.Authentification.Services;
 using Myb.Common.Authentification.Interfaces;
 using Myb.Common.Authentification.Settings;
+using System.Text;
 namespace Myb.Common.Authentification.Extensions
 {
     public static class ServiceCollectionExtensions
@@ -30,33 +31,23 @@ namespace Myb.Common.Authentification.Extensions
         } 
         public static void AddKeycloakAuthorization(this WebApplicationBuilder builder)
         {
-            IdentityModelEventSource.ShowPII = true; 
-
- 
-
-            builder.Services
-                .AddAuthentication(option =>
-                {
-                    option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                    option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                }) 
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    options.Authority = "https://www.keycloak.forlink-group.com/realms/MYB";
-                    options.SaveToken = false;
-                    options.RequireHttpsMetadata = false; 
-                    options.TokenValidationParameters = new TokenValidationParameters()
+                  
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
+                        ValidIssuer = "https://www.keycloak.forlink-group.com/realms/MYB",
                         ValidateIssuer = true,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
+                        ValidAudience = "MYB_BACK",
+                        ValidateAudience = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("eSruikrc7UE9S1KkKGA3I8NVesi1K4pf")),
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = "https://www.keycloak.forlink-group.com/realms/MYB"
+                        //ClockSkew = TimeSpan.Zero // enable this line to validate the expiration time below 5mins
                     };
-                }); 
-            
-            builder.Services.AddAuthorization();
+
+                });
+             builder.Services.AddAuthorization();
 
         } 
     }

@@ -23,9 +23,11 @@ namespace Myb.Common.GraphQL.Infra
             serviceCollection.AddScoped(typeof(IGenericRepository<,,>), typeof(GenericRepository<,,>));
 
             serviceCollection.AddGraphQLServer()
+                .AddAuthorization()
                 .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true)
                 .AddSorting()
                 .AddFiltering()
+                //.AddAuthorizationCore()
                 .RegisterDbContext<TDbContext>()
                 .AddQueryType<TQuery>()
                 .AddMutationType<TMutation>();

@@ -7,12 +7,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Myb.Common.Authentification.Dtos;
+using HotChocolate.Authorization;
 
 namespace Myb.UserManager.Infra.GraphQl.Querys
 {
     public class UserQuery
     {
         public IEnumerable<User?> GetUsers([Service] IUserService userService) => userService.GetAll();
+        [Authorize]
+        public User GetUser() => new User() { Name="Koutaiba",Username="Kout1999"};
+
         public User? GetUserById([Service] IUserService userService,int id) => userService.GetById(id);
         public IEnumerable<User?> GetUserByIds([Service] IUserService userService, int[] ids) =>
             userService.GetUsersByIds(ids);

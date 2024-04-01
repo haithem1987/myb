@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Myb.Common.Authentification.Dtos;
 using HotChocolate.Authorization;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace Myb.UserManager.Infra.GraphQl.Querys
 {
@@ -22,6 +24,20 @@ namespace Myb.UserManager.Infra.GraphQl.Querys
             userService.GetUsersByIds(ids);
         public String GetMessage([Service] IUserService userService) =>
             userService.GetMessage();
+        public string? GetMe(ClaimsPrincipal? user)
+        {
+            return user?.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+        [Authorize]
+        public string Welcome()
+        {
+            return "Welcome To Custom Authentication Servies In GraphQL In Pure Code First";
+        }
+        [Authorize]
+        public List<string> Authorized([Service] IHttpContextAccessor contextAccessor)
+        {
+            return contextAccessor.HttpContext.User.Claims.Select(x => $"{x.Type} : {x.Value}").ToList();
+        }
         public KeycloakTokenResponseDto GetToken([Service] IUserService userService,  KeycloakUserDto keycloakUserDto) =>
             userService.AuthorizeAsync(keycloakUserDto).GetAwaiter().GetResult();
 

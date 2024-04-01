@@ -8,6 +8,7 @@ using Myb.Common.Authentification.Services;
 using Myb.Common.Authentification.Interfaces;
 using Myb.Common.Authentification.Settings;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 namespace Myb.Common.Authentification.Extensions
 {
     public static class ServiceCollectionExtensions
@@ -31,21 +32,43 @@ namespace Myb.Common.Authentification.Extensions
         } 
         public static void AddKeycloakAuthorization(this WebApplicationBuilder builder)
         {
+            var keycloakSettings = builder.Configuration.GetSection("Keycloak");
+            KeycloakSettings settings = new KeycloakSettings()
+            {
+                BaseUrl = keycloakSettings.GetSection("BaseUrl").Value,
+                ClientId = keycloakSettings.GetSection("ClientId").Value,
+                ClientSecret = keycloakSettings.GetSection("ClientSecret").Value,
+            };
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                  
+                    options.Authority = "https://www.keycloak.forlink-group.com/realms/MYB";
+                    options.Audience = settings.ClientId;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidIssuer = "https://www.keycloak.forlink-group.com/realms/MYB",
                         ValidateIssuer = true,
-                        ValidAudience = "MYB_BACK",
+                        ValidAudience = settings.ClientId,
                         ValidateAudience = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("eSruikrc7UE9S1KkKGA3I8NVesi1K4pf")),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.ClientSecret)),
                         ValidateIssuerSigningKey = true,
                         //ClockSkew = TimeSpan.Zero // enable this line to validate the expiration time below 5mins
                     };
+                    options.Events = new JwtBearerEvents()
+                    {
+                        OnAuthenticationFailed = c =>
+                        {
+                            c.NoResult();
 
+                            c.Response.StatusCode = 500;
+                            c.Response.ContentType = "text/plain";
+
+                            // Debug only for security reasons
+                             return c.Response.WriteAsync(c.Exception.ToString());
+
+                            //return c.Response.ToString();
+                        }
+                    };
                 });
              builder.Services.AddAuthorization();
 

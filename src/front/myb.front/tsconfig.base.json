@@ -15,11 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@myb-front/UserModel": [
-        "libs/auth/src/lib/Models/UserModel/src/index.ts"
-      ],
       "@myb-front/auth": ["libs/auth/src/index.ts"],
-      "@myb-front/custom-styles": ["libs/custom-styles/src/index.ts"]
+      "@myb-front/custom-styles": ["libs/shared/custom-styles/src/index.ts"],
+      "@myb-front/shared-ui": ["libs/shared/shared-ui/src/index.ts"],
+      "@myb-front/time-sheet-module": ["libs/time-sheet-module/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

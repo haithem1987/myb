@@ -1,9 +1,0 @@
-{
-  "name": "custom-styles",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/custom-styles/src",
-  "prefix": "myb-front",
-  "tags": [],
-  "projectType": "library",
-  "targets": {}
-}

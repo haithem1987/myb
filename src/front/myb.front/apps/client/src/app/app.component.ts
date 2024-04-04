@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NxWelcomeComponent } from './nx-welcome.component';
-import { KeycloakService } from 'libs/auth/src/lib/keycloack/keycloack.service';
+import { Component, OnInit } from '@angular/core';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   standalone: true,

@@ -28,13 +28,13 @@ namespace Myb.UserManager.Infra.GraphQl.Querys
         {
             return user?.FindFirstValue(ClaimTypes.NameIdentifier);
         }
-        [Authorize]
-        public string Welcome()
+        [Authorize (Roles = new [] { "Guest" })]
+        public string GetWelcome()
         {
             return "Welcome To Custom Authentication Servies In GraphQL In Pure Code First";
         }
         [Authorize]
-        public List<string> Authorized([Service] IHttpContextAccessor contextAccessor)
+        public List<string> GetAuthorized([Service] IHttpContextAccessor contextAccessor)
         {
             return contextAccessor.HttpContext.User.Claims.Select(x => $"{x.Type} : {x.Value}").ToList();
         }

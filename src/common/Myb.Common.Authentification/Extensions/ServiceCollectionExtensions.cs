@@ -38,15 +38,16 @@ namespace Myb.Common.Authentification.Extensions
                 BaseUrl = keycloakSettings.GetSection("BaseUrl").Value,
                 ClientId = keycloakSettings.GetSection("ClientId").Value,
                 ClientSecret = keycloakSettings.GetSection("ClientSecret").Value,
+                Authority = keycloakSettings.GetSection("Authority").Value,
             };
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    options.Authority = "https://www.keycloak.forlink-group.com/realms/MYB";
+                    options.Authority = settings.Authority;
                     options.Audience = settings.ClientId;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = "https://www.keycloak.forlink-group.com/realms/MYB",
+                        ValidIssuer = settings.Authority,
                         ValidateIssuer = true,
                         ValidAudience = settings.ClientId,
                         ValidateAudience = true,

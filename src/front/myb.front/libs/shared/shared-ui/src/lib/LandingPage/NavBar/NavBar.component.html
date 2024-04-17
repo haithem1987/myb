@@ -1,0 +1,40 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-altlight">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">M.Y.B</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
+      <div class="d-flex">
+        <button
+          *ngIf="keycloakService.isAuthenticated(); else logoutButton"
+          class="btn btn-outline-secondary btn-sm"
+          (click)="onLogin()"
+        >
+          Login
+        </button>
+        <ng-template #logoutButton>
+          <button class="btn btn-outline-secondary btn-sm" (click)="onLogout()">
+            Logout
+          </button>
+        </ng-template>
+        <!-- Only show the Register button if not authenticated -->
+        <button
+          *ngIf="!keycloakService.isAuthenticated()"
+          class="btn btn-outline-secondary btn-sm ms-1"
+        >
+          Register
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

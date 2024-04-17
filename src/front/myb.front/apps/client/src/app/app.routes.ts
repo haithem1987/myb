@@ -1,8 +1,16 @@
 import { Route } from '@angular/router';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
 export const appRoutes: Route[] = [
-  //   {path :'', loadComponent: ()=>import('@myb-front/auth').then((c)=>c.aut)},
-
+  // {
+  //   path: 'home',
+  //   canActivate: [authGuard],
+  //   component: LandingPageComponent,
+  // },
+  {
+    path: '',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.LandingPageComponent),
+  },
   {
     path: 'timesheet',
     canActivate: [authGuard],

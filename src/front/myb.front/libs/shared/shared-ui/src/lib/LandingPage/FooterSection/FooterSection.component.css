@@ -1,0 +1,16 @@
+footer {
+  .overlay {
+    position: relative;
+    &:before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: url('../../../../../../../apps/client/src/assets/wave-shape.svg')
+        no-repeat bottom;
+      background-size: cover;
+      height: 150px;
+    }
+  }
+}

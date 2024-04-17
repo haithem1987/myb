@@ -1,0 +1,25 @@
+<!-- footer.component.html -->
+<footer class="bg-light text-center text-lg-start">
+  <!-- ... -->
+  <div class="col-lg-4 col-md-12 mb-4 mb-md-0">
+    <!-- ... -->
+    <h5 class="text-uppercase">{{ contactInfo.location }}</h5>
+    <p><i class="bi bi-geo-alt-fill"></i> {{ contactInfo.location }}</p>
+    <p><i class="bi bi-envelope-fill"></i> {{ contactInfo.email }}</p>
+    <p><i class="bi bi-telephone-fill"></i> {{ contactInfo.phone }}</p>
+  </div>
+
+  <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+    <h5 class="text-uppercase">{{ aboutSection.title }}</h5>
+    <p>{{ aboutSection.content }}</p>
+  </div>
+
+  <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+    <h5 class="text-uppercase">{{ servicesSection.title }}</h5>
+    <p>{{ servicesSection.content }}</p>
+  </div>
+  <!-- ... -->
+  <div class="text-center p-3">
+    {{ copyRightText }}
+  </div>
+</footer>

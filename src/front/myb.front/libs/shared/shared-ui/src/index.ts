@@ -11,3 +11,5 @@ export * from './lib/LandingPage/HeroSection/HeroSection.component';
 export * from './lib/LandingPage/FooterSection/FooterSection.component';
 
 export * from './lib/LandingPage/FeaturesSection/FeaturesSection.component';
+
+export * from './lib/components/userCRUD.component';

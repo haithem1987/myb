@@ -1,0 +1,55 @@
+<!-- User List Table -->
+<div class="container mt-3">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          <button class="btn btn-primary btn-sm" (click)="selectUser(user)">Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteUser(user.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- User Edit Form -->
+<div *ngIf="selectedUser" class="container mt-3">
+  <h3>Edit User</h3>
+  <form>
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" class="form-control" id="name" [(ngModel)]="selectedUser.name" name="name">
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" [(ngModel)]="selectedUser.email" name="email">
+    </div>
+    <button type="button" class="btn btn-success" (click)="saveUser()">Save</button>
+    <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  </form>
+</div>
+
+<!-- Create New User Form -->
+<div class="container mt-3">
+  <h3>Create New User</h3>
+  <form>
+    <div class="mb-3">
+      <label for="newName" class="form-label">Name</label>
+      <input type="text" class="form-control" id="newName" [(ngModel)]="newUser.name" name="newName">
+    </div>
+    <div class="mb-3">
+      <label for="newEmail" class="form-label">Email</label>
+      <input type="email" class="form-control" id="newEmail" [(ngModel)]="newUser.email" name="newEmail">
+    </div>
+    <button type="button" class="btn btn-primary" (click)="createUser()">Create</button>
+  </form>
+</div>

@@ -12,6 +12,11 @@ export const appRoutes: Route[] = [
       import('@myb-front/shared-ui').then((c) => c.LandingPageComponent),
   },
   {
+    path: 'users',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.UserCRUDComponent),
+  },
+  {
     path: 'timesheet',
     canActivate: [authGuard],
     loadComponent: () =>

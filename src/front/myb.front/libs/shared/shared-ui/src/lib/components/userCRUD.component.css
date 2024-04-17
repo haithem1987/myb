@@ -1,0 +1,13 @@
+.edit-form,
+.create-form {
+  margin-top: 20px;
+}
+
+.user-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.user-list li {
+  margin-bottom: 10px;
+}

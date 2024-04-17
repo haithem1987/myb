@@ -15,6 +15,9 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
       <div class="d-flex">
+        <div *ngIf="limitedCount$ | async as counter">
+          <h1>Counter: {{ counter.count }}</h1>
+        </div>
         <button
           *ngIf="keycloakService.isAuthenticated(); else logoutButton"
           class="btn btn-outline-secondary btn-sm"

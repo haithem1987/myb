@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { KeycloakService } from '../../../../../../auth/src/lib/keycloak.service';
+import { CounterService } from '../FeaturesSection/CounterService';
+import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'myb-front-nav-bar',
@@ -10,8 +12,18 @@ import { KeycloakService } from '../../../../../../auth/src/lib/keycloak.service
   styleUrl: './NavBar.component.css',
 })
 export class NavBarComponent {
-  constructor(public keycloakService: KeycloakService) {}
+  limitedCount$ = this.counterService.counter$.pipe(
+    filter((value) => value.count < 3)
+  );
 
+  constructor(
+    public keycloakService: KeycloakService,
+    public counterService: CounterService
+  ) {}
+
+  incrementCount() {
+    this.counterService.increment();
+  }
   onLogin(): void {
     this.keycloakService.login();
   }

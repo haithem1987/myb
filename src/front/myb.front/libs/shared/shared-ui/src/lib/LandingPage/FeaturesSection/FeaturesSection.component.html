@@ -29,6 +29,12 @@
           </div>
         </div>
       </div>
+      <div>
+        <div *ngIf="counterService.counter$ | async as counter">
+          <h1>Counter: {{ counter.count }}</h1>
+        </div>
+        <button (click)="incrementCount()">Increment</button>
+      </div>
     </div>
   </div>
 </section>

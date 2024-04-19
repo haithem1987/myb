@@ -1,16 +1,16 @@
-import { Observable, of, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { IRepository } from '../repositories/repository.interface';
-import { HttpClient } from '@angular/common/http';
+import { Apollo, gql } from 'apollo-angular';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { typeConfig } from '../graphql/type-config';
-export interface IIdentity {
-  id: number;
-}
+import { IRepository } from '../repositories/repository.interface';
+import { IIdentity } from '../models/user.model';
+import { Inject, Injectable } from '@angular/core';
+import { TYPE_KEY_TOKEN } from '../tokens/apolloToken';
 
 export class RepositoryService<T extends IIdentity> implements IRepository<T> {
-  private typeOperations: ;
+  private typeOperations: any;
 
-  constructor(private http: HttpClient, typeKey: string) {
+  constructor(private apollo: Apollo, @Inject(TYPE_KEY_TOKEN) typeKey: string) {
     if (!typeConfig[typeKey]) {
       throw new Error(
         `GraphQL operations for type ${typeKey} are not defined.`
@@ -20,36 +20,59 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
   }
 
   getAll(): Observable<T[]> {
-    return this.http.post<T[]>('/graphql', {
-      query: this.typeOperations.getAll,
-    });
+    return this.apollo
+      .watchQuery<T[]>({
+        query: gql`
+          ${this.typeOperations.getAll}
+        `,
+      })
+      .valueChanges.pipe(map((result) => result.data));
   }
 
   get(id: number): Observable<T> {
-    return this.http.post<T>('/graphql', {
-      query: this.typeOperations.getById,
-      variables: { id },
-    });
+    return this.apollo
+      .query<{ item: T }>({
+        // Explicitly typing the expected return structure
+        query: gql`
+          ${this.typeOperations.getById}
+        `,
+        variables: { id },
+      })
+      .pipe(
+        map((result) => result.data.item as T) // Type assertion here
+      );
   }
 
   create(item: T): Observable<T> {
-    return this.http.post<T>('/graphql', {
-      query: this.typeOperations.create,
-      variables: { item },
-    });
+    return this.apollo
+      .mutate<T>({
+        mutation: gql`
+          ${this.typeOperations.create}
+        `,
+        variables: { item },
+      })
+      .pipe(map((result) => result.data as T));
   }
 
   update(id: number, item: T): Observable<T> {
-    return this.http.post<T>('/graphql', {
-      query: this.typeOperations.update,
-      variables: { id, item },
-    });
+    return this.apollo
+      .mutate<T>({
+        mutation: gql`
+          ${this.typeOperations.update}
+        `,
+        variables: { id, item },
+      })
+      .pipe(map((result) => result.data as T));
   }
 
   delete(id: number): Observable<any> {
-    return this.http.post<any>('/graphql', {
-      query: this.typeOperations.delete,
-      variables: { id },
-    });
+    return this.apollo
+      .mutate<any>({
+        mutation: gql`
+          ${this.typeOperations.delete}
+        `,
+        variables: { id },
+      })
+      .pipe(map((result) => result.data as T));
   }
 }

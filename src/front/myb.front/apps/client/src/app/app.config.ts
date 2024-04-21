@@ -1,4 +1,4 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { appRoutes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -13,16 +13,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(appRoutes),
     provideAnimationsAsync(),
+    importProvidersFrom(GraphQLModule),
     KeycloakService,
-    {
-      provide: APOLLO_OPTIONS,
-      useFactory: (httpLink: HttpLink) => ({
-        cache: new InMemoryCache(),
-        link: httpLink.create({ uri: 'http://localhost:5145/graphql' }),
-      }),
-      deps: [HttpLink],
-    },
-    // GraphQLModule,
     { provide: TYPE_KEY_TOKEN, useValue: 'User' },
   ], // Add your Keycloak service to providers],
 };

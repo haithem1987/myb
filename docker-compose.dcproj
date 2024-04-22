@@ -16,4 +16,7 @@
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\services\time-sheet\" />
+  </ItemGroup>
 </Project>

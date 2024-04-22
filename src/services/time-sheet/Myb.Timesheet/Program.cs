@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Myb.Common.Authentification.Extensions;
 using Myb.Common.GraphQL.Infra;
+using Myb.Timesheet.EntityFrameWork.Infra;
 using Myb.UserManager.EntityFrameWork.Infra;
 using Myb.UserManager.Infra.Extensions;
 using Myb.UserManager.Infra.GraphQl.Mutations;
@@ -17,7 +18,7 @@ builder.Services.AddServices();
 
 // Configure the HTTP request pipeline.
 
-builder.Services.AddPooledDbContextFactory<UserContext>(options=>options.UseNpgsql(""));
+builder.Services.AddPooledDbContextFactory<TimesheetContext>(options=>options.UseNpgsql(builder.Configuration.GetSection("ConnectionStrings").GetConnectionString("TimesheetDBConnection")));
 
 builder.Services.RegisterGraphQl<UserContext, UserQuery, UserMutation>();
 builder.Services.RegisterServices();

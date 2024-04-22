@@ -23,6 +23,7 @@
       <ProjectReference Include="..\..\..\common\Myb.Common.GraphQL.Infra\Myb.Common.GraphQL.Infra.csproj" />
       <ProjectReference Include="..\..\user-manager\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj" />
       <ProjectReference Include="..\..\user-manager\Myb.UserManager.Infra\Myb.UserManager.Infra.csproj" />
+      <ProjectReference Include="..\Myb.Timesheet.EntityFrameWork.Infra\Myb.Timesheet.EntityFrameWork.Infra.csproj" />
     </ItemGroup>
 
 </Project>

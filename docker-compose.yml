@@ -6,3 +6,30 @@ services:
     build:
       context: .
       dockerfile: src/services/user-manager/Myb.UserManager/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Port=5432;Database=usermanagerdb;UserId=postgres;Password=YourPassword
+
+  myb.timesheet:
+    image: ${DOCKER_REGISTRY-}m.y.b.timesheet-kh
+    build:
+      context: .
+      dockerfile: src/services/time-sheet/Myb.Timesheet/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Port=5432;Database=timesheetdb;UserId=postgres;Password=YourPassword
+    depends_on:
+      - timesheetDB
+
+  timesheetDB:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: timesheet-pwd
+      POSTGRES_DB: timesheetDB
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

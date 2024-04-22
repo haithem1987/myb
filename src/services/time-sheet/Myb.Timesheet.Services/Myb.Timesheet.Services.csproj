@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Myb.Timesheet.Models\Myb.Timesheet.Models.csproj" />
+    </ItemGroup>
+
 </Project>

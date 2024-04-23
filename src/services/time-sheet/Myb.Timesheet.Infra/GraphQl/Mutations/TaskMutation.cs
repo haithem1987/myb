@@ -1,16 +1,12 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HotChocolate;
 using Myb.Timesheet.Models;
+using Myb.Timesheet.Services;
 
-namespace Myb.UserManager.Infra.GraphQl.Mutations
+namespace Myb.Timesheet.Infra.GraphQl.Mutations
 {
     public class TaskMutation
     {
-  
-
+        public Task<TimesheetTask?> AddTask([Service] ITaskService taskService,TimesheetTask task) => taskService.AddTaskAsync(task);
     }
 }

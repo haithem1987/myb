@@ -30,6 +30,7 @@
       <ProjectReference Include="..\..\user-manager\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj" />
       <ProjectReference Include="..\..\user-manager\Myb.UserManager.Infra\Myb.UserManager.Infra.csproj" />
       <ProjectReference Include="..\Myb.Timesheet.EntityFrameWork.Infra\Myb.Timesheet.EntityFrameWork.Infra.csproj" />
+      <ProjectReference Include="..\Myb.Timesheet.Infra\Myb.Timesheet.Infra.csproj" />
     </ItemGroup>
 
 </Project>

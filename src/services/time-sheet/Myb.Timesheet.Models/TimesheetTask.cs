@@ -1,6 +1,8 @@
+using Myb.Common.Models;
+
 namespace Myb.Timesheet.Models;
 
-public class TimesheetTask
+public class TimesheetTask:BaseEntity
 {
     public int Id { get; set; }
     public int EmployeeId { get; set; }

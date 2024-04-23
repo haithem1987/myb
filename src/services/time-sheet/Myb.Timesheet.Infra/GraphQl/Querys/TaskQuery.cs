@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
 
-namespace Myb.UserManager.Infra.GraphQl.Querys
+namespace Myb.Timesheet.Infra.GraphQl.Querys
 {
     public class TaskQuery
     {

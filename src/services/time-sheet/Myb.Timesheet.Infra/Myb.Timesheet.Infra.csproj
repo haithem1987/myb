@@ -12,11 +12,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="HotChocolate.Abstractions" Version="13.8.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Extensions\" />
     </ItemGroup>
 
 </Project>

@@ -7,6 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\common\Myb.Common.Repositories\Myb.Common.Repositories.csproj" />
+      <ProjectReference Include="..\Myb.Timesheet.EntityFrameWork.Infra\Myb.Timesheet.EntityFrameWork.Infra.csproj" />
       <ProjectReference Include="..\Myb.Timesheet.Models\Myb.Timesheet.Models.csproj" />
     </ItemGroup>
 

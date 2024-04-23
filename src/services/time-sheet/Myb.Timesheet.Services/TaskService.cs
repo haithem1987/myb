@@ -1,31 +1,43 @@
+using Myb.Common.Repositories;
+using Myb.Timesheet.EntityFrameWork.Infra;
 using Myb.Timesheet.Models;
-
-namespace Myb.Timesheet.Services;
-
-public class TaskService:ITaskService
+namespace Myb.Timesheet.Services
 {
-    public Task<TimesheetTask> AddTask(TimesheetTask task)
+    public class TaskService : ITaskService
     {
-        throw new NotImplementedException();
-    }
+        private readonly IGenericRepository<int,TimesheetTask, TimesheetContext> _taskRepository;
 
-    public Task<TimesheetTask> UpdateTask(TimesheetTask task)
-    {
-        throw new NotImplementedException();
-    }
+        public TaskService(IGenericRepository<int,TimesheetTask, TimesheetContext> taskRepository)
+        {
+            _taskRepository = taskRepository;
+        }
 
-    public Task<bool> DeleteTask(Guid taskId)
-    {
-        throw new NotImplementedException();
-    }
+        public Task<TimesheetTask> GetTaskByIdAsync(int id)
+        {
+            return  Task.FromResult(_taskRepository.GetById(id)!);
+        }
 
-    public Task<TimesheetTask> GetTaskById(Guid taskId)
-    {
-        throw new NotImplementedException();
-    }
+        public async Task<IEnumerable<TimesheetTask>> GetAllTasksAsync()
+        {
+            return  _taskRepository.GetAll();
+        }
 
-    public Task<IEnumerable<TimesheetTask>> GetAllTasks()
-    {
-        throw new NotImplementedException();
+        public async Task<TimesheetTask> AddTaskAsync(TimesheetTask task)
+        {
+            await _taskRepository.InsertAsync(task);
+            return task;
+        }
+
+        public async Task<TimesheetTask> UpdateTaskAsync(TimesheetTask task)
+        {
+            await _taskRepository.UpdateAsync(task);
+            return task;
+        }
+
+        public async Task<bool> DeleteTaskAsync(int id)
+        {
+            await _taskRepository.DeleteAsync(id);
+            return true;
+        }
     }
 }

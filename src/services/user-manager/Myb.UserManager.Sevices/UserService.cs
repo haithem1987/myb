@@ -1,7 +1,6 @@
 ﻿
 
 using HotChocolate.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Myb.Common.Authentification.Dtos;
 using Myb.Common.Authentification.Exceptions;
 using Myb.Common.Authentification.Interfaces;

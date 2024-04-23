@@ -4,9 +4,9 @@ namespace Myb.Timesheet.Services;
 
 public interface ITaskService
 {
-        Task<TimesheetTask> AddTask(TimesheetTask task);
-        Task<TimesheetTask> UpdateTask(TimesheetTask task);
-        Task<bool> DeleteTask(Guid taskId);
-        Task<TimesheetTask> GetTaskById(Guid taskId);
-        Task<IEnumerable<TimesheetTask>> GetAllTasks();
+        Task<TimesheetTask> GetTaskByIdAsync(int id);
+        Task<IEnumerable<TimesheetTask>> GetAllTasksAsync();
+        Task<TimesheetTask> AddTaskAsync(TimesheetTask task);
+        Task<TimesheetTask> UpdateTaskAsync(TimesheetTask task);
+        Task<bool> DeleteTaskAsync(int id);
 }

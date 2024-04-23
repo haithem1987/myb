@@ -25,11 +25,11 @@ public class TimesheetContext:DbContext
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (!optionsBuilder.IsConfigured)
-        {
-            var connectionString = _configuration.GetConnectionString("TimesheetDBConnection");
-            optionsBuilder.UseNpgsql(connectionString);
-        }
+        if (optionsBuilder.IsConfigured) return;
+        
+        var connectionString = _configuration.GetConnectionString("TimesheetDBConnection");
+        optionsBuilder.UseNpgsql(connectionString);
+        
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

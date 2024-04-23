@@ -17,6 +17,8 @@
     <None Include=".dockerignore" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="src\services\document-management\" />
+    <Folder Include="src\services\invoice-management\" />
     <Folder Include="src\services\time-sheet\" />
   </ItemGroup>
 </Project>

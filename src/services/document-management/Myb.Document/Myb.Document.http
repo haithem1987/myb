@@ -1,0 +1,6 @@
+@Myb.Document_HostAddress = http://localhost:5117
+
+GET {{Myb.Document_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

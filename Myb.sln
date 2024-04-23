@@ -67,6 +67,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Timesheet.Infra", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Timesheet.EntityFrameWork.Infra", "src\services\time-sheet\Myb.Timesheet.EntityFrameWork.Infra\Myb.Timesheet.EntityFrameWork.Infra.csproj", "{6DA7D137-CE7E-4CE0-A60C-E59AC57105D0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "document-management", "document-management", "{B2BA43CE-B2E9-4758-BF9F-99115F28257F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Document", "src\services\document-management\Myb.Document\Myb.Document.csproj", "{2EEBEEAF-79A9-4865-ADB7-7C48656F411E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "invoice-management", "invoice-management", "{BDDBC706-6D31-438A-9AD6-D74E3E4D6635}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Invoice", "src\services\invoice-management\Myb.Invoice\Myb.Invoice.csproj", "{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -169,6 +177,14 @@ Global
 		{6DA7D137-CE7E-4CE0-A60C-E59AC57105D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DA7D137-CE7E-4CE0-A60C-E59AC57105D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DA7D137-CE7E-4CE0-A60C-E59AC57105D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EEBEEAF-79A9-4865-ADB7-7C48656F411E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EEBEEAF-79A9-4865-ADB7-7C48656F411E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EEBEEAF-79A9-4865-ADB7-7C48656F411E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EEBEEAF-79A9-4865-ADB7-7C48656F411E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -202,6 +218,10 @@ Global
 		{AAB94E1B-1A56-482F-8CDA-ACDF5DAAE8D9} = {6143CEB1-A0AA-4832-850D-E3654B47FCF8}
 		{36597B46-3AB9-43F7-8E6F-F9DA4BCE2EB9} = {6143CEB1-A0AA-4832-850D-E3654B47FCF8}
 		{6DA7D137-CE7E-4CE0-A60C-E59AC57105D0} = {6143CEB1-A0AA-4832-850D-E3654B47FCF8}
+		{B2BA43CE-B2E9-4758-BF9F-99115F28257F} = {37E15B0B-E56E-4E11-94F2-21C4193E2CB0}
+		{2EEBEEAF-79A9-4865-ADB7-7C48656F411E} = {B2BA43CE-B2E9-4758-BF9F-99115F28257F}
+		{BDDBC706-6D31-438A-9AD6-D74E3E4D6635} = {37E15B0B-E56E-4E11-94F2-21C4193E2CB0}
+		{4ABFB93E-B0FA-4762-B7D0-D087D2366E08} = {BDDBC706-6D31-438A-9AD6-D74E3E4D6635}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {34C7383E-9796-48B2-8928-9E1E96C528F0}

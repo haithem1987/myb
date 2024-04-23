@@ -13,14 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.AddKeycloakSettings();
 builder.Services.AddHttpClient();
-builder.Services.AddControllers();
-builder.Services.AddServices();
+//builder.Services.AddControllers();
+//builder.Services.AddServices();
 
 // Configure the HTTP request pipeline.
 
-builder.Services.AddPooledDbContextFactory<TimesheetContext>(options=>options.UseNpgsql(builder.Configuration.GetSection("ConnectionStrings").GetConnectionString("TimesheetDBConnection")));
+builder.Services.AddDbContext<TimesheetContext>(options=>options.UseNpgsql(builder.Configuration.GetConnectionString("TimesheetDBConnection")));
 
-builder.Services.RegisterGraphQl<UserContext, UserQuery, UserMutation>();
+//builder.Services.RegisterGraphQl<UserContext, UserQuery, UserMutation>();
 builder.Services.RegisterServices();
 builder.AddKeycloakAuthorization();
 var app = builder.Build();

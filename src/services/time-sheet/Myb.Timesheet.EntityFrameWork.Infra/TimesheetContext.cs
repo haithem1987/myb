@@ -1,24 +1,37 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Myb.Timesheet.Models;
-
 namespace Myb.Timesheet.EntityFrameWork.Infra;
 
 public class TimesheetContext:DbContext
 {
+    private readonly IConfiguration _configuration;
     public TimesheetContext()
     {
         
     }
-    public TimesheetContext(DbContextOptions<TimesheetContext> options)
+
+    public TimesheetContext(DbContextOptions<TimesheetContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
+    
     public DbSet<Project> Projects { get; set; }
-    public DbSet<Task> Tasks { get; set; }
+    public DbSet<TimesheetTask> Tasks { get; set; }
     public DbSet<TimeEntry> TimeEntries { get; set; }
     public DbSet<TimeOff> TimeOffs { get; set; }
     public DbSet<TimeSheet> TimeSheets { get; set; }
     
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var connectionString = _configuration.GetConnectionString("TimesheetDBConnection");
+            optionsBuilder.UseNpgsql(connectionString);
+        }
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TimeSheet>()

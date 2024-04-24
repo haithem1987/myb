@@ -20,5 +20,6 @@
     <Folder Include="src\services\document-management\" />
     <Folder Include="src\services\invoice-management\" />
     <Folder Include="src\services\time-sheet\" />
+    <Folder Include="src\services\user-manager\" />
   </ItemGroup>
 </Project>

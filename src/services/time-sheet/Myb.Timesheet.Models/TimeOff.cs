@@ -1,8 +1,9 @@
+using Myb.Common.Models;
+
 namespace Myb.Timesheet.Models;
 
-public class TimeOff
+public class TimeOff:BaseEntity
 {
-    public int Id { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public TimeOffType Type { get; set; }

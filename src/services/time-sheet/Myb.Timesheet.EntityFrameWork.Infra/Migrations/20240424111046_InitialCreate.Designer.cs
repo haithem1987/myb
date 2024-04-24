@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(TimesheetContext))]
-    [Migration("20240423115140_InitialCreate")]
+    [Migration("20240424111046_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -33,6 +33,9 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Department")
                         .IsRequired()
                         .HasColumnType("text");
@@ -40,6 +43,9 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -52,11 +58,14 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
             modelBuilder.Entity("Myb.Timesheet.Models.Project", b =>
                 {
-                    b.Property<int>("ProjectId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProjectId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -65,6 +74,12 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -72,7 +87,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("ProjectId");
+                    b.HasKey("Id");
 
                     b.ToTable("Projects");
                 });
@@ -85,12 +100,18 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TimeSheetId")
                         .HasColumnType("integer");
@@ -113,7 +134,13 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("StartDate")
@@ -135,7 +162,13 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("DateEntry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
@@ -161,7 +194,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("EmployeeId")
+                    b.Property<int?>("EmployeeId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("EndTime")
@@ -170,7 +203,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("ProjectId")
+                    b.Property<int?>("ProjectId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StartTime")
@@ -201,14 +234,12 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.HasOne("Myb.Timesheet.Models.Employee", "Employee")
                         .WithMany("Tasks")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Myb.Timesheet.Models.Project", "Project")
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Employee");
 

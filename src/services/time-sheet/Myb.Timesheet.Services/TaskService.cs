@@ -17,9 +17,9 @@ namespace Myb.Timesheet.Services
             return  Task.FromResult(_taskRepository.GetById(id)!);
         }
 
-        public async Task<IEnumerable<TimesheetTask>> GetAllTasksAsync()
+        public Task<IEnumerable<TimesheetTask>> GetAllTasksAsync()
         {
-            return  _taskRepository.GetAll();
+            return Task.FromResult<IEnumerable<TimesheetTask>>(_taskRepository.GetAll());
         }
 
         public async Task<TimesheetTask> AddTaskAsync(TimesheetTask task)

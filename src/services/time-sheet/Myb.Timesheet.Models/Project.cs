@@ -1,14 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+using Myb.Common.Models;
+
 namespace Myb.Timesheet.Models;
 
-public class Project
+public class Project:BaseEntity
 {
-    public int ProjectId { get; set; }
+    [Required]
     public string ProjectName { get; set; }
     public string Description { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
 
     // Assuming a Project has multiple Tasks
+    public int ProjectId { get; set; }
     public virtual ICollection<TimesheetTask> Tasks { get; set; }
     
     public void AddProject(Project project)

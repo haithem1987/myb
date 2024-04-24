@@ -20,7 +20,7 @@ services:
       - timesheetDB
 
   timesheetDB:
-    image: postgres
+    image: postgres:16.2
     restart: always
     environment:
       POSTGRES_PASSWORD: timesheet-pwd
@@ -29,7 +29,20 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/timesheet/data
+        
+  documentDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: timesheet-pwd
+      POSTGRES_DB: documentDB
+      POSTGRES_USER: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_document_data:/var/lib/postgresql/document/data
 
 volumes:
   postgres_data:
+  postgres_document_data:

@@ -16,21 +16,21 @@ public class TimesheetContext:DbContext
     {
         _configuration = configuration;
     }
-    
+
     public DbSet<Project> Projects { get; set; }
     public DbSet<TimesheetTask> Tasks { get; set; }
     public DbSet<TimeEntry> TimeEntries { get; set; }
     public DbSet<TimeOff> TimeOffs { get; set; }
     public DbSet<TimeSheet> TimeSheets { get; set; }
     
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+   /* protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (optionsBuilder.IsConfigured) return;
         
         var connectionString = _configuration.GetConnectionString("TimesheetDBConnection");
         optionsBuilder.UseNpgsql(connectionString);
         
-    }
+    }*/
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,14 +39,17 @@ public class TimesheetContext:DbContext
             .WithOne(te => te.TimeSheet)
             .HasForeignKey(te => te.TimeSheetId);
 
-        modelBuilder.Entity<TimesheetTask>()
-            .HasOne(t => t.Employee)
-            .WithMany(e => e.Tasks)
-            .HasForeignKey(t => t.EmployeeId);
+        modelBuilder.Entity<TimesheetTask>(entity =>
+        {
+            entity.HasOne(d => d.Employee)
+                .WithMany(p => p.Tasks)
+                .HasForeignKey(d => d.EmployeeId)  
+                .OnDelete(DeleteBehavior.Restrict); 
 
-        modelBuilder.Entity<TimesheetTask>()
-            .HasOne(t => t.Project)
-            .WithMany(p => p.Tasks)
-            .HasForeignKey(t => t.ProjectId);
+            entity.HasOne(d => d.Project)
+                .WithMany(p => p.Tasks)
+                .HasForeignKey(d => d.ProjectId)   
+                .OnDelete(DeleteBehavior.Restrict); 
+        });
     }
 }

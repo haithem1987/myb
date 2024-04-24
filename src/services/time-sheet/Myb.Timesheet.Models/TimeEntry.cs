@@ -1,8 +1,9 @@
+using Myb.Common.Models;
+
 namespace Myb.Timesheet.Models;
 
-public class TimeEntry
+public class TimeEntry:BaseEntity
 {
-    public int Id { get; set; }
     public DateTime Date { get; set; }
     public double WorkedHours { get; set; }
     public string Description { get; set; }

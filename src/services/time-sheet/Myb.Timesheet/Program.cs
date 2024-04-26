@@ -7,7 +7,16 @@ using Myb.Timesheet.Infra.GraphQl.Mutations;
 using Myb.Timesheet.Infra.GraphQl.Querys;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowTimesheetOrigins", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 // Add services to the container.
 builder.AddKeycloakSettings();
@@ -23,6 +32,7 @@ builder.Services.RegisterGraphQl<TimesheetContext, TaskQuery, TaskMutation>();
 builder.Services.RegisterServices();
 builder.AddKeycloakAuthorization();
 var app = builder.Build();
+app.UseCors("AllowTimesheetOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();

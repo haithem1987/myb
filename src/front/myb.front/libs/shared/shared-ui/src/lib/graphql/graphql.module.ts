@@ -14,7 +14,7 @@ import { BrowserModule } from '@angular/platform-browser';
         return {
           cache: new InMemoryCache(),
           link: httpLink.create({
-            uri: 'http://localhost:5145/graphql',
+            uri: 'http://localhost:5059/graphql',
           }),
         };
       },

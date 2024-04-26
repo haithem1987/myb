@@ -18,7 +18,6 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'timesheet',
-    canActivate: [authGuard],
     loadComponent: () =>
       import('@myb-front/time-sheet-module').then(
         (c) => c.TimeSheetModuleComponent

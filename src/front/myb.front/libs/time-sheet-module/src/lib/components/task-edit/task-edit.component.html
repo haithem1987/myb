@@ -1,0 +1,28 @@
+<!-- task-edit.component.html -->
+<div class="modal-header">
+  <h5 class="modal-title">Edit Task</h5>
+</div>
+<div class="modal-body">
+  <form>
+    <div class="form-group">
+      <label for="taskDescription">Description</label>
+      <input
+        type="text"
+        class="form-control"
+        id="taskDescription"
+        [(ngModel)]="description"
+      />
+    </div>
+    <!-- Add other fields as needed -->
+  </form>
+</div>
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="activeModal.dismiss('cancel')"
+  >
+    Cancel
+  </button>
+  <button type="button" class="btn btn-primary" (click)="save()">Save</button>
+</div>

@@ -1,1 +1,31 @@
-<p>time-sheet-module works!</p>
+<!-- time-sheet-module.component.html -->
+
+<div class="time-sheet-module">
+  <!-- Task Actions Component (could be for creating new tasks or other actions) -->
+  <!-- <myb-front-task-actions
+    (create)="onCreateTask()"
+    (refresh)="onRefreshTasks()"
+  ></myb-front-task-actions> -->
+
+  <!-- Task Create Component (displayed when a user wants to create a task) -->
+  <!-- <myb-front-task-create
+    *ngIf="isCreatingTask"
+    (save)="onSaveTask($event)"
+    (cancel)="onCancelCreate()"
+  ></myb-front-task-create> -->
+
+  <!-- Task List Component (displays the list of tasks) -->
+  <myb-front-task-list
+    [tasks]="tasks"
+    (edit)="onEditTask($event)"
+    (delete)="onDeleteTask($event)"
+  ></myb-front-task-list>
+
+  <!-- Task Edit Component (displayed when a user is editing a task) -->
+  <!-- <myb-front-task-edit
+    *ngIf="editingTask"
+    [task]="selectedTask"
+    (save)="onSaveTask($event)"
+    (cancel)="onCancelEdit()"
+  ></myb-front-task-edit> -->
+</div>

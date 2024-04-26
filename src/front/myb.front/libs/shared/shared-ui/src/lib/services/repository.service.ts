@@ -8,9 +8,12 @@ import { Inject, Injectable } from '@angular/core';
 import { TYPE_KEY_TOKEN } from '../tokens/apolloToken';
 
 export class RepositoryService<T extends IIdentity> implements IRepository<T> {
-  private typeOperations: any;
+  protected typeOperations: any;
 
-  constructor(private apollo: Apollo, @Inject(TYPE_KEY_TOKEN) typeKey: string) {
+  constructor(
+    protected apollo: Apollo,
+    @Inject(TYPE_KEY_TOKEN) typeKey: string
+  ) {
     if (!typeConfig[typeKey]) {
       throw new Error(
         `GraphQL operations for type ${typeKey} are not defined.`

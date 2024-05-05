@@ -2,10 +2,10 @@ import { BaseModel } from './base.model';
 import { Employee } from './employee';
 import { Project } from './project.model';
 
-export interface Task extends BaseModel {
-  startTime: Date;
-  endTime: Date;
-  description: string;
+export class Task extends BaseModel {
+  startTime: string = new Date().toUTCString();
+  endTime: string = new Date().toISOString();
+  description: string = '';
   employeeId?: number;
   projectId?: number;
   employee?: Employee;

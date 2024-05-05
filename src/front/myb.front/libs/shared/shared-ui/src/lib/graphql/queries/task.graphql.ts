@@ -5,6 +5,12 @@ export const GET_ALL_TASKS = gql`
     allTasks {
       id
       description
+      projectId
+      employeeId
+      startTime
+      endTime
+      createdDate
+      lastModifiedDate
     }
   }
 `;

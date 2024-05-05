@@ -10,8 +10,57 @@
         type="text"
         class="form-control"
         id="taskDescription"
-        [(ngModel)]="description"
+        name="description"
+        [(ngModel)]="editableTask.description"
       />
+    </div>
+    <div class="form-group">
+      <label for="taskStartTime">Start Time</label>
+      <input
+        type="datetime-local"
+        class="form-control"
+        id="taskStartTime"
+        name="startTime"
+        [(ngModel)]="editableTask.startTime"
+      />
+    </div>
+    <div class="form-group">
+      <label for="taskEndTime">End Time</label>
+      <input
+        type="datetime"
+        class="form-control"
+        id="taskEndTime"
+        name="endTime"
+        [(ngModel)]="editableTask.endTime"
+      />
+    </div>
+    <div class="form-group">
+      <label for="employee">Employee</label>
+      <select
+        class="form-control"
+        id="employee"
+        name="employee"
+        [(ngModel)]="editableTask.employeeId"
+        (change)="onEmployeeChange()"
+      >
+        <option *ngFor="let employee of employees" [ngValue]="employee.id">
+          {{ employee.name }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="project">Project</label>
+      <select
+        class="form-control"
+        id="project"
+        name="project"
+        [(ngModel)]="editableTask.projectId"
+        (change)="onProjectChange()"
+      >
+        <option *ngFor="let project of projects" [ngValue]="project.id">
+          {{ project.projectName }}
+        </option>
+      </select>
     </div>
     <!-- Add other fields as needed -->
   </form>
@@ -24,5 +73,7 @@
   >
     Cancel
   </button>
-  <button type="button" class="btn btn-primary" (click)="save()">Save</button>
+  <button type="button" class="btn btn-primary" (click)="save()">
+    {{ isNewTask ? 'Create' : 'Save' }}
+  </button>
 </div>

@@ -12,7 +12,9 @@ import { BrowserModule } from '@angular/platform-browser';
       provide: APOLLO_OPTIONS,
       useFactory: (httpLink: HttpLink) => {
         return {
-          cache: new InMemoryCache(),
+          cache: new InMemoryCache({
+            addTypename: false, // This is default, adds __typename automatically on read
+          }),
           link: httpLink.create({
             uri: 'http://localhost:5059/graphql',
           }),

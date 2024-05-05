@@ -23,14 +23,14 @@ public class TimesheetContext:DbContext
     public DbSet<TimeOff> TimeOffs { get; set; }
     public DbSet<TimeSheet> TimeSheets { get; set; }
     
-   /* protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (optionsBuilder.IsConfigured) return;
         
         var connectionString = _configuration.GetConnectionString("TimesheetDBConnection");
         optionsBuilder.UseNpgsql(connectionString);
         
-    }*/
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

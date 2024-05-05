@@ -36,10 +36,9 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ProjectName = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ProjectId = table.Column<int>(type: "integer", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -120,7 +119,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     WorkedHours = table.Column<double>(type: "double precision", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
                     TimeSheetId = table.Column<int>(type: "integer", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)

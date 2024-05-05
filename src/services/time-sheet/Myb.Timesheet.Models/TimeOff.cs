@@ -7,10 +7,5 @@ public class TimeOff:BaseEntity
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public TimeOffType Type { get; set; }
-
-    // Constructor
-    public TimeOff()
-    {
-        // Initialization logic here
-    }
+    
 }

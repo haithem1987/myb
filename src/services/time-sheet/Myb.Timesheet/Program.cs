@@ -28,7 +28,7 @@ builder.Services.AddServices();
 
 builder.Services.AddPooledDbContextFactory<TimesheetContext>(options=>options.UseNpgsql(builder.Configuration.GetConnectionString("TimesheetDBConnection")));
 
-builder.Services.RegisterGraphQl<TimesheetContext, TaskQuery, TaskMutation>();
+builder.Services.RegisterGraphQl<TimesheetContext, TimesheetQuery, TimesheetMutation>();
 builder.Services.RegisterServices();
 builder.AddKeycloakAuthorization();
 var app = builder.Build();

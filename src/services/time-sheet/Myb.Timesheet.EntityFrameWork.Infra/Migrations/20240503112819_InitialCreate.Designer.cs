@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Myb.Timesheet.EntityFrameWork.Infra;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(TimesheetContext))]
-    partial class TimesheetContextModelSnapshot : ModelSnapshot
+    [Migration("20240503112819_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,7 +33,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Department")
@@ -41,7 +44,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("LastModifiedDate")
+                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
@@ -61,7 +64,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -70,7 +73,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("LastModifiedDate")
+                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ProjectName")
@@ -93,7 +96,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("Date")
@@ -102,7 +105,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("LastModifiedDate")
+                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TimeSheetId")
@@ -126,13 +129,13 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("LastModifiedDate")
+                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("StartDate")
@@ -154,13 +157,13 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DateEntry")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("LastModifiedDate")
+                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
@@ -179,7 +182,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -192,7 +195,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("LastModifiedDate")
+                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("ProjectId")

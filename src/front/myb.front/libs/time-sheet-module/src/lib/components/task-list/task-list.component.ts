@@ -3,38 +3,40 @@ import { CommonModule } from '@angular/common';
 import { Task } from '../../models/task.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TaskEditComponent } from '../task-edit/task-edit.component';
+import { FormsModule } from '@angular/forms';
+import { Project } from '../../models/project.model';
+import { Employee } from '../../models/employee';
 
 @Component({
   selector: 'myb-front-task-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.css',
 })
 export class TaskListComponent {
   @Input() tasks: Task[] = [];
-  @Output() edit = new EventEmitter<Task>();
-  @Output() delete = new EventEmitter<number>();
-
+  @Input() projects: Project[] = [];
+  @Input() employees: Employee[] = [];
+  @Output() taskUpdated = new EventEmitter<Task>();
+  @Output() taskCreated = new EventEmitter<Task>();
+  @Output() taskDeleted = new EventEmitter<number>();
   constructor(private modalService: NgbModal) {}
 
-  openEditModal(task: Task) {
+  openModal(task?: Task) {
     const modalRef = this.modalService.open(TaskEditComponent);
-    console.log('task', task);
-    modalRef.componentInstance.task = task;
-    modalRef.result.then(
-      (result) => {
-        if (result === 'save') {
-          this.edit.emit(task);
-        }
-      },
-      (reason) => {
-        // Handle modal dismissal
-      }
-    );
+    modalRef.componentInstance.task = task || new Task();
+    modalRef.componentInstance.projects = this.projects || [];
+    modalRef.componentInstance.employees = this.employees || [];
+    modalRef.componentInstance.saveEvent.subscribe((updatedTask: Task) => {
+      task
+        ? this.taskUpdated.emit(updatedTask)
+        : this.taskCreated.emit(updatedTask);
+      modalRef.close();
+    });
   }
 
   onDelete(taskId: number) {
-    this.delete.emit(taskId);
+    this.taskDeleted.emit(taskId);
   }
 }

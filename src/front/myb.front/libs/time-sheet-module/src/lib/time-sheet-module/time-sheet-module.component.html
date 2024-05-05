@@ -17,8 +17,11 @@
   <!-- Task List Component (displays the list of tasks) -->
   <myb-front-task-list
     [tasks]="tasks"
-    (edit)="onEditTask($event)"
-    (delete)="onDeleteTask($event)"
+    [projects]="projects"
+    [employees]="employees"
+    (taskCreated)="onCreateTask($event)"
+    (taskUpdated)="onEditTask($event)"
+    (taskDeleted)="onDeleteTask($event)"
   ></myb-front-task-list>
 
   <!-- Task Edit Component (displayed when a user is editing a task) -->

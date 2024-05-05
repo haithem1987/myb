@@ -5,8 +5,9 @@ using Myb.Timesheet.Services;
 
 namespace Myb.Timesheet.Infra.GraphQl.Mutations
 {
-    public class TaskMutation
+    public class TimesheetMutation
     {
+        // Task mutations
         public async Task<TimesheetTask> AddTask([Service] ITaskService taskService, TimesheetTask task)
         {
             return await taskService.AddTaskAsync(task);
@@ -20,6 +21,21 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
         public async Task<bool> DeleteTask([Service] ITaskService taskService, int id)
         {
             return await taskService.DeleteTaskAsync(id);
+        }
+        // Project Mutations
+        public async Task<Project> AddProject([Service] IProjectService projectService, Project project)
+        {
+            return await projectService.AddProjectAsync(project);
+        }
+
+        public async Task<Project> UpdateProject([Service] IProjectService projectService, Project project)
+        {
+            return await projectService.UpdateProjectAsync(project);
+        }
+
+        public async Task<bool> DeleteProject([Service] IProjectService projectService, int id)
+        {
+            return await projectService.DeleteProjectAsync(id);
         }
     }
 }

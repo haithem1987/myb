@@ -7,9 +7,9 @@ namespace Myb.Common.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-        public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
+        public int Id { get; set; } = 0;
+        public DateTime? CreatedDate { get; set; } 
+        public DateTime? LastModifiedDate { get; set; }
 
     }
 }

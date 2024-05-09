@@ -9,8 +9,8 @@ export const GET_ALL_TASKS = gql`
       employeeId
       startTime
       endTime
-      createdDate
-      lastModifiedDate
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -20,10 +20,10 @@ export const GET_TASK_BY_ID = gql`
     taskById(id: $id) {
       id
       description
-      createdDate
       endTime
       startTime
-      lastModifiedDate
+      createdAt
+      updatedAt
     }
   }
 `;

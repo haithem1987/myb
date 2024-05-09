@@ -19,8 +19,8 @@ namespace Myb.UserManager.Infra.GraphQl.Querys
         [Authorize]
         public User GetUser() => new User() { Name="Koutaiba",Username="Kout1999"};
 
-        public User? GetUserById([Service] IUserService userService,int id) => userService.GetById(id);
-        public IEnumerable<User?> GetUserByIds([Service] IUserService userService, int[] ids) =>
+        public User? GetUserById([Service] IUserService userService,int? id) => userService.GetById(id);
+        public IEnumerable<User?> GetUserByIds([Service] IUserService userService, int?[] ids) =>
             userService.GetUsersByIds(ids);
         public String GetMessage([Service] IUserService userService) =>
             userService.GetMessage();

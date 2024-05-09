@@ -7,10 +7,10 @@ namespace Myb.Timesheet.Services;
 
 public class ProjectService:IProjectService
 {
-    private readonly IGenericRepository<int, Project, TimesheetContext> _projectRepository;
+    private readonly IGenericRepository<int?, Project, TimesheetContext> _projectRepository;
     private readonly ILogger _logger;
 
-    public ProjectService(IGenericRepository<int, Project, TimesheetContext> projectRepository, ILogger<ProjectService> logger)
+    public ProjectService(IGenericRepository<int?, Project, TimesheetContext> projectRepository, ILogger<ProjectService> logger)
     {
         _projectRepository = projectRepository;
         _logger = logger;

@@ -88,8 +88,8 @@ namespace Myb.Common.Repositories
             {
                 if (entity == null) throw new ArgumentNullException(nameof(entity));
                 
-                entity.CreatedDate = DateTime.UtcNow; // Set CreatedDate
-                entity.LastModifiedDate = DateTime.UtcNow; // Set LastModifiedDate
+                entity.CreatedAt ??= DateTime.UtcNow;
+                entity.UpdatedAt ??= DateTime.UtcNow;
                 _entities.Add(entity);
                 await _dbContext.SaveChangesAsync();
                 result.Entity = entity;
@@ -113,7 +113,7 @@ namespace Myb.Common.Repositories
                     return result;
                 }
                 
-                entity.LastModifiedDate = DateTime.UtcNow;
+                entity.UpdatedAt ??= DateTime.UtcNow;
                 
                 entity.ApplyChanges(selectedEntity);
                 await _dbContext.SaveChangesAsync();

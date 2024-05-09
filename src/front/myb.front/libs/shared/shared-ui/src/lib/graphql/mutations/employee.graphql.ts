@@ -4,7 +4,11 @@ export const CREATE_PROJECT = gql`
   mutation addProject($item: Project!) {
     updateProject(project: $item) {
       id
-      description
+      name
+      department
+      email
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -13,7 +17,11 @@ export const UPDATE_PROJECT = gql`
   mutation updateProject($item: Project!) {
     updateProject(project: $item) {
       id
-      description
+      name
+      department
+      email
+      createdAt
+      updatedAt
     }
   }
 `;

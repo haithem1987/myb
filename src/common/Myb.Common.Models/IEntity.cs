@@ -3,7 +3,7 @@
     public interface IEntity<TKey> 
     {
         TKey Id { get; set; }
-        DateTime? CreatedDate { get; set; }
-        DateTime? LastModifiedDate { get; set; }
+        DateTime? CreatedAt { get; set; }
+        DateTime? UpdatedAt { get; set; }
     }
 }

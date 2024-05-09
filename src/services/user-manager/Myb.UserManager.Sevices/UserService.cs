@@ -12,16 +12,16 @@ namespace Myb.UserManager.Sevices
 {
     public class UserService : IUserService 
     {
-        private readonly IGenericRepository<int,User, UserContext> _genericRepo;
+        private readonly IGenericRepository<int?,User, UserContext> _genericRepo;
         private readonly IKeycloakTokenService _keycloakTokenService; 
 
-        public UserService(IGenericRepository<int, User, UserContext> genericRepository ,IKeycloakTokenService keycloakTokenService)
+        public UserService(IGenericRepository<int?, User, UserContext> genericRepository ,IKeycloakTokenService keycloakTokenService)
         {
             _genericRepo = genericRepository;
             _keycloakTokenService = keycloakTokenService;
         }
 
-        public User? GetById(int id)
+        public User? GetById(int? id)
         {
             return _genericRepo.GetById(id);
         }
@@ -29,7 +29,7 @@ namespace Myb.UserManager.Sevices
         {
             return _genericRepo.GetAll();
         }
-        public IEnumerable<User?> GetUsersByIds(IEnumerable<int> ids)
+        public IEnumerable<User?> GetUsersByIds(IEnumerable<int?> ids)
         {
             return _genericRepo.GetByIds(ids);
         }
@@ -44,7 +44,7 @@ namespace Myb.UserManager.Sevices
             var result = await _genericRepo.UpdateAsync(user);
             return result.Entity;
         }
-        public async Task<User?> Delete(int id) 
+        public async Task<User?> Delete(int? id) 
         {
             var result = await _genericRepo.DeleteAsync(id);
             return result.Entity;

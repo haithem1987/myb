@@ -64,26 +64,36 @@ export class TimeSheetModuleComponent implements OnInit {
   onCreateTask(task: Task) {
     console.log('onEditTask', task);
     this.taskService.create(task).subscribe(
-      (updatedTask) => {
-        console.log('success create', updatedTask);
-        this.loadTasks();
+      (response: any) => {
+        console.log('success create', response);
+        this.tasks = [...this.tasks, response.addTask];
       },
       (error) => {
         console.log('error', error);
-        // Handle error
+        // Ideally, add error handling logic here
       }
     );
   }
   onEditTask(task: Task) {
     console.log('onEditTask', task);
     this.taskService.update(task.id, task).subscribe(
-      (updatedTask) => {
-        console.log('success update', updatedTask);
-        this.loadTasks();
+      (response: any) => {
+        console.log('success update', response);
+        const index = this.tasks.findIndex(
+          (t) => t.id === response.updateTask.id
+        ); // Find index of the task to update
+        console.log('index', index);
+        if (index !== -1) {
+          this.tasks = [
+            ...this.tasks.slice(0, index),
+            response.updateTask,
+            ...this.tasks.slice(index + 1),
+          ]; // Update the task in the local array
+        }
       },
       (error) => {
         console.log('error', error);
-        // Handle error
+        // Add error handling here, possibly showing an error message to the user
       }
     );
   }
@@ -93,14 +103,16 @@ export class TimeSheetModuleComponent implements OnInit {
   }
 
   onDeleteTask(taskId: number) {
+    console.log('Deleting task with ID:', taskId);
     this.taskService.delete(taskId).subscribe(
-      (response) => {
-        console.log('deleted succesfully', response);
-        this.loadTasks();
+      (response: any) => {
+        console.log('Deleted successfully', response);
+        // Remove the task from the local array
+        this.tasks = [...this.tasks.filter((task) => task.id !== taskId)];
       },
       (error) => {
-        console.log('error', error);
-        // Handle error
+        console.log('Error deleting task', error);
+        // Add error handling here, possibly showing an error message to the user
       }
     );
   }

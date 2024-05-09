@@ -8,8 +8,8 @@ export const GET_ALL_PROJECTS = gql`
       description
       startDate
       endDate
-      createdDate
-      lastModifiedDate
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -20,11 +20,10 @@ export const GET_PROJECT_BY_ID = gql`
       id
       projectName
       description
-      createdDate
       endDate
       startDate
-      createdDate
-      lastModifiedDate
+      createdAt
+      updatedAt
     }
   }
 `;

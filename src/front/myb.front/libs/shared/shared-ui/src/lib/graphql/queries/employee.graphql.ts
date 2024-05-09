@@ -7,8 +7,8 @@ export const GET_ALL_EMPLOYEES = gql`
       name
       department
       email
-      createdDate
-      lastModifiedDate
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -19,11 +19,10 @@ export const GET_EMPLOYEE_BY_ID = gql`
       id
       projectName
       description
-      createdDate
+      createdAt
       endDate
       startDate
-      createdDate
-      lastModifiedDate
+      updatedAt
     }
   }
 `;

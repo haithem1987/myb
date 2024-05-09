@@ -7,10 +7,10 @@ namespace Myb.Timesheet.Services;
 
 public class EmployeeService:IEmployeeService
 {
-    private readonly IGenericRepository<int, Employee, TimesheetContext> _employeeRepository;
+    private readonly IGenericRepository<int?, Employee, TimesheetContext> _employeeRepository;
     private readonly ILogger _logger;
 
-    public EmployeeService(IGenericRepository<int, Employee, TimesheetContext> employeeRepository, ILogger<EmployeeService> logger)
+    public EmployeeService(IGenericRepository<int?, Employee, TimesheetContext> employeeRepository, ILogger<EmployeeService> logger)
     {
         _employeeRepository = employeeRepository;
         _logger = logger;

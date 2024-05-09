@@ -12,10 +12,10 @@ namespace Myb.UserManager.Sevices
     public interface IUserService
     {
         Task<User?> Add(User user);
-        Task<User?> Delete(int id);
+        Task<User?> Delete(int? id);
         IEnumerable<User?> GetAll();
-        User? GetById(int id);
-        IEnumerable<User?> GetUsersByIds(IEnumerable<int> ids);
+        User? GetById(int? id);
+        IEnumerable<User?> GetUsersByIds(IEnumerable<int?> ids);
         Task<User?> Update(User user);
         Task<KeycloakTokenResponseDto> AuthorizeAsync(KeycloakUserDto keycloakUserDto);
         String GetMessage();

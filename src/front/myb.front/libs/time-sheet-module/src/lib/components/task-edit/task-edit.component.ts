@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Task } from '../../models/task.model';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { Employee } from '../../models/employee';
 import { Project } from '../../models/project.model';
@@ -17,10 +17,11 @@ import {
   NgbDatepickerModule,
   NgbDateStruct,
 } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, debounceTime, distinctUntilChanged, map } from 'rxjs';
 @Component({
   selector: 'myb-front-task-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgbDatepickerModule],
+  imports: [CommonModule, FormsModule, NgbDatepickerModule, NgbTypeaheadModule],
   templateUrl: './task-edit.component.html',
   styleUrls: ['./task-edit.component.css'], // Note: it should be `styleUrls` not `styleUrl`
 })
@@ -29,7 +30,12 @@ export class TaskEditComponent implements OnInit {
   editableTask: Task = new Task();
   @Input() set task(value: Task) {
     this.editableTask = value ? { ...value } : new Task(); // Initialize with a new Task if null
-    this.editableTask.startTime = new Date(value.startTime).toISOString();
+    this.editableTask.startTime = new Date(value.startTime)
+      .toISOString()
+      .slice(0, 19);
+    this.editableTask.endTime = new Date(value.endTime)
+      .toISOString()
+      .slice(0, 19);
     console.log('this.editableTask', this.editableTask.startTime);
     this.isNewTask = !value?.id ? true : false; // Determine if it's a new task based on the presence of an `id`
   }
@@ -39,7 +45,39 @@ export class TaskEditComponent implements OnInit {
   // @Output() update = new EventEmitter<Task>();
   // @Output() create = new EventEmitter<Task>();
   @Output() saveEvent = new EventEmitter<Task>();
+  searchEmployees = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map((term) =>
+        term.length < 2
+          ? []
+          : this.employees
+              .filter(
+                (v) => v.name.toLowerCase().indexOf(term.toLowerCase()) > -1
+              )
+              .slice(0, 10)
+      )
+    );
 
+  searchProjects = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map((term) =>
+        term.length < 2
+          ? []
+          : this.projects
+              .filter(
+                (v) =>
+                  v.projectName.toLowerCase().indexOf(term.toLowerCase()) > -1
+              )
+              .slice(0, 10)
+      )
+    );
+
+  formatEmployeeResult = (result: any) => result.name;
+  formatProjectResult = (result: any) => result.projectName;
   constructor(public activeModal: NgbActiveModal) {}
 
   ngOnInit(): void {

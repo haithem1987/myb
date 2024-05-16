@@ -5,6 +5,5 @@ export interface Project extends BaseModel {
   description: string;
   startDate: Date;
   endDate: Date;
-  employeeId?: number;
-  projectId?: number;
+  userId: string;
 }

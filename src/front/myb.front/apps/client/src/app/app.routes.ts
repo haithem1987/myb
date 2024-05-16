@@ -18,9 +18,9 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'timesheet',
-    loadComponent: () =>
+    loadChildren: () =>
       import('@myb-front/time-sheet-module').then(
-        (c) => c.TimeSheetModuleComponent
+        (c) => c.TimesheetRoutingModule
       ),
   },
 ];

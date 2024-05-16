@@ -19,6 +19,9 @@
       "@myb-front/custom-styles": ["libs/shared/custom-styles/src/index.ts"],
       "@myb-front/shared-ui": ["libs/shared/shared-ui/src/index.ts"],
       "@myb-front/sharedModels": ["libs/shared/shared-ui/src/lib/models"],
+      "@myb-front/theme-styles": [
+        "libs/shared/custom-styles/src/lib/themes/styles.scss"
+      ],
       "@myb-front/time-sheet-module": ["libs/time-sheet-module/src/index.ts"]
     }
   },

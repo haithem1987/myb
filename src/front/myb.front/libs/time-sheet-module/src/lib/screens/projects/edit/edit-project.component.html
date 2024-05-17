@@ -1,0 +1,109 @@
+<div class="container mt-4">
+  <h2>{{ isEditMode ? 'Edit Project' : 'Create Project' }}</h2>
+  <form [formGroup]="projectForm" (ngSubmit)="saveProject()">
+    <div class="mb-3">
+      <label for="projectName" class="form-label">Project Name</label>
+      <input
+        id="projectName"
+        formControlName="projectName"
+        class="form-control"
+        [ngClass]="{
+          'is-invalid':
+            projectForm.get('projectName')?.invalid &&
+            projectForm.get('projectName')?.touched
+        }"
+      />
+      <div
+        *ngIf="
+          projectForm.get('projectName')?.invalid &&
+          projectForm.get('projectName')?.touched
+        "
+        class="invalid-feedback"
+      >
+        Project name is required.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        class="form-control"
+        [ngClass]="{
+          'is-invalid':
+            projectForm.get('description')?.invalid &&
+            projectForm.get('description')?.touched
+        }"
+      ></textarea>
+      <div
+        *ngIf="
+          projectForm.get('description')?.invalid &&
+          projectForm.get('description')?.touched
+        "
+        class="invalid-feedback"
+      >
+        Description is required.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="startDate" class="form-label">Start Date</label>
+      <input
+        type="date"
+        id="startDate"
+        formControlName="startDate"
+        class="form-control"
+        [ngClass]="{
+          'is-invalid':
+            projectForm.get('startDate')?.invalid &&
+            projectForm.get('startDate')?.touched
+        }"
+      />
+      <div
+        *ngIf="
+          projectForm.get('startDate')?.invalid &&
+          projectForm.get('startDate')?.touched
+        "
+        class="invalid-feedback"
+      >
+        Start date is required.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="endDate" class="form-label">End Date</label>
+      <input
+        type="date"
+        id="endDate"
+        formControlName="endDate"
+        class="form-control"
+        [ngClass]="{
+          'is-invalid':
+            projectForm.get('endDate')?.invalid &&
+            projectForm.get('endDate')?.touched
+        }"
+      />
+      <div
+        *ngIf="
+          projectForm.get('endDate')?.invalid &&
+          projectForm.get('endDate')?.touched
+        "
+        class="invalid-feedback"
+      >
+        End date is required.
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="projectForm.invalid"
+    >
+      {{ isEditMode ? 'Update Project' : 'Create Project' }}
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="cancel()">
+      Cancel
+    </button>
+  </form>
+</div>

@@ -42,7 +42,19 @@ services:
       - "5433:5432"
     volumes:
       - postgres_document_data:/var/lib/postgresql/document/data
+  invoiceDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: invoice-pwd
+      POSTGRES_DB: invoiceDB
+      POSTGRES_USER: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_invoice_data:/var/lib/postgresql/invoice/data
 
 volumes:
   postgres_data:
   postgres_document_data:
+  postgres_invoice_data:

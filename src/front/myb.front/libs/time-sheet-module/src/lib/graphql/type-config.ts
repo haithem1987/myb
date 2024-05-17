@@ -15,6 +15,7 @@ import {
 import { GET_ALL_PROJECTS, GET_PROJECT_BY_ID } from './queries/project.graphql';
 import { GET_ALL_TASKS, GET_TASK_BY_ID } from './queries/task.graphql';
 
+
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
   User: {
@@ -45,6 +46,7 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_PROJECT,
     delete: DELETE_PROJECT,
   },
+  
 
   // You can add more configurations for different types here
 };

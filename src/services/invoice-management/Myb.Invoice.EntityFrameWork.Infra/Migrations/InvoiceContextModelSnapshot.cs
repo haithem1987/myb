@@ -24,58 +24,52 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 
             modelBuilder.Entity("Myb.Invoice.Models.InvoiceModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
-                    b.Property<string>("ClientAdress")
-                        .IsRequired()
+                    b.Property<string>("ClientAddress")
                         .HasColumnType("text");
 
                     b.Property<string>("ClientName")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("CompanyId")
+                    b.Property<int?>("CompanyId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("DueDate")
+                    b.Property<DateTime?>("DueDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("InvoiceDate")
+                    b.Property<DateTime?>("InvoiceDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("InvoiceNum")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("SubTotal")
+                    b.Property<double?>("SubTotal")
                         .HasColumnType("double precision");
 
-                    b.Property<string>("SupplierAdress")
-                        .IsRequired()
+                    b.Property<string>("SupplierAddress")
                         .HasColumnType("text");
 
                     b.Property<string>("SupplierName")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("TotalAmmount")
+                    b.Property<double?>("TotalAmount")
                         .HasColumnType("double precision");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

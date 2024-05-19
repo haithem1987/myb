@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="GraphQL.Upload.AspNetCore" Version="3.0.3" />
       <PackageReference Include="HotChocolate.Abstractions" Version="13.8.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
     </ItemGroup>

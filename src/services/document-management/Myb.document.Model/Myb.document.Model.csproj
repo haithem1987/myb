@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL.Upload.AspNetCore" Version="3.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\user-manager\Myb.UserManager.Models\Myb.UserManager.Models.csproj" />
+	  <ProjectReference Include="..\..\..\common\Myb.Common.Models\Myb.Common.Models.csproj" />
+
+  </ItemGroup>
+
+</Project>

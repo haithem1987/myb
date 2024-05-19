@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="GraphQL.Upload.AspNetCore" Version="3.0.3" />
       <PackageReference Include="HotChocolate.AspNetCore" Version="13.8.1" />
       <PackageReference Include="HotChocolate.Authorization" Version="13.8.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.2" />

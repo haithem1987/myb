@@ -1,0 +1,54 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Myb.document.Model;
+
+namespace Myb.Document.EntityFramework.Infra
+{
+    public class DocumentContext : DbContext
+    {
+        private readonly IConfiguration _configuration;
+
+        public DocumentContext()
+        {
+        }
+
+        public DocumentContext(DbContextOptions<DocumentContext> options, IConfiguration configuration)
+            : base(options)
+        {
+            _configuration = configuration;
+        }
+
+        public DbSet<DocumentModel> Documents { get; set; }
+        public DbSet<Folder> Folders { get; set; }
+        public DbSet<DocumentVersion> DocumentVersions { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+
+     
+
+            // DocumentModel - Folder Relationship (One-to-Many)
+            modelBuilder.Entity<DocumentModel>()
+                .HasOne(d => d.Folder)
+                .WithMany(df => df.Documents)
+                .HasForeignKey(d => d.FolderId)
+                .IsRequired(false);
+            /*
+            // DocumentModel - DocumentVersion Relationship (One-to-Many)*/
+            modelBuilder.Entity<DocumentVersion>()
+                .HasOne(dv => dv.Document)
+                .WithMany(d => d.Versions)
+                .HasForeignKey(dv => dv.DocumentId)
+                .IsRequired();
+          
+
+
+            /* // Folder - Folder Relationship (Self-Referencing)
+             modelBuilder.Entity<Folder>()
+                 .HasOne(f => f.Parent)
+                 .WithMany(f => f.Children)
+                 .HasForeignKey(f => f.ParentId)
+                 .IsRequired(false);*/
+        }
+    }
+}

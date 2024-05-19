@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(TimesheetContext))]
-    [Migration("20240424111046_InitialCreate")]
+    [Migration("20240429152907_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

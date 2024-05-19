@@ -1,0 +1,47 @@
+<div class="modal-content">
+
+	<div class="modal-header">
+		<h4 class="modal-title">Edit  Document </h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+	</div>
+	
+	<form>
+		  <div class="mb-3">
+			<label for="taskDescription" class="form-label">Document  Name</label>
+			<input
+			  type="text"
+			  class="form-control"
+			  id="taskDescription"
+			  name="description"
+			  placeholder="Enter Document Name "
+			/>
+		  </div>
+		  <div class="mb-3">
+			<label for="taskStartTime" class="form-label">Created at</label>
+			<input
+			  type="datetime-local"
+			  class="form-control"
+			  id="taskStartTime"
+			  name="startTime"
+			/>
+		  </div>
+	 
+		  <div class="mb-3">
+			<label for="employee" class="form-label"> Type </label>
+			<select
+			  class="form-control"
+			  id="employee"
+			  name="employee"
+			>
+			  <option *ngFor="let document of documents" >
+				{{ document.documentType }}
+			  </option>
+			</select>
+		  </div>
+	 
+	</form>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
+		<button type="button" class="btn btn-outline-primary"(click)="activeModal.close('Close click')">Save</button>
+	</div>
+</div>

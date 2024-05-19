@@ -3,4 +3,6 @@ export class User {
 }
 export interface IIdentity {
   id: number;
+  __typename?: string;
+
 }

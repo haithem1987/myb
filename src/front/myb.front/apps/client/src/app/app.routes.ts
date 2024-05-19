@@ -23,4 +23,11 @@ export const appRoutes: Route[] = [
         (c) => c.TimeSheetModuleComponent
       ),
   },
+  {
+    path: 'documents',
+    loadComponent: () =>
+      import('@myb-front/doc-management-module').then(
+        (c) => c.DocManagementModuleComponent
+      ),
+  },
 ];

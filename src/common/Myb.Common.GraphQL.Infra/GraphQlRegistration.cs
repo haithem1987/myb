@@ -30,7 +30,8 @@ namespace Myb.Common.GraphQL.Infra
                 //.AddAuthorizationCore()
                 .RegisterDbContext<TDbContext>()
                 .AddQueryType<TQuery>()
-                .AddMutationType<TMutation>();
+                .AddMutationType<TMutation>()
+                .AddType<UploadType>();
 
         }
     }

@@ -57,17 +57,18 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
       .pipe(map((result) => result.data as T));
   }
 
+
+  
   update(id: number, item: T): Observable<T> {
+    const { __typename, ...itemInputWithoutTypename } = item;
     return this.apollo
       .mutate<T>({
-        mutation: gql`
-          ${this.typeOperations.update}
-        `,
-        variables: { id, item },
+        mutation: this.typeOperations.update,
+        variables: { id, item: itemInputWithoutTypename },
       })
       .pipe(map((result) => result.data as T));
   }
-
+  
   delete(id: number): Observable<any> {
     return this.apollo
       .mutate<any>({

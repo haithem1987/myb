@@ -57,23 +57,31 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.UserManager.Client", "s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "time-sheet", "time-sheet", "{6143CEB1-A0AA-4832-850D-E3654B47FCF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Timesheet", "src\services\time-sheet\Myb.Timesheet\Myb.Timesheet.csproj", "{0F4D0B66-7063-4E70-A388-58FC56E0855F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Timesheet", "src\services\time-sheet\Myb.Timesheet\Myb.Timesheet.csproj", "{0F4D0B66-7063-4E70-A388-58FC56E0855F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Timesheet.Services", "src\services\time-sheet\Myb.Timesheet.Services\Myb.Timesheet.Services.csproj", "{451BBEA8-F752-4D83-A639-61E416C931E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Timesheet.Services", "src\services\time-sheet\Myb.Timesheet.Services\Myb.Timesheet.Services.csproj", "{451BBEA8-F752-4D83-A639-61E416C931E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Timesheet.Models", "src\services\time-sheet\Myb.Timesheet.Models\Myb.Timesheet.Models.csproj", "{AAB94E1B-1A56-482F-8CDA-ACDF5DAAE8D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Timesheet.Models", "src\services\time-sheet\Myb.Timesheet.Models\Myb.Timesheet.Models.csproj", "{AAB94E1B-1A56-482F-8CDA-ACDF5DAAE8D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Timesheet.Infra", "src\services\time-sheet\Myb.Timesheet.Infra\Myb.Timesheet.Infra.csproj", "{36597B46-3AB9-43F7-8E6F-F9DA4BCE2EB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Timesheet.Infra", "src\services\time-sheet\Myb.Timesheet.Infra\Myb.Timesheet.Infra.csproj", "{36597B46-3AB9-43F7-8E6F-F9DA4BCE2EB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Timesheet.EntityFrameWork.Infra", "src\services\time-sheet\Myb.Timesheet.EntityFrameWork.Infra\Myb.Timesheet.EntityFrameWork.Infra.csproj", "{6DA7D137-CE7E-4CE0-A60C-E59AC57105D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Timesheet.EntityFrameWork.Infra", "src\services\time-sheet\Myb.Timesheet.EntityFrameWork.Infra\Myb.Timesheet.EntityFrameWork.Infra.csproj", "{6DA7D137-CE7E-4CE0-A60C-E59AC57105D0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "document-management", "document-management", "{B2BA43CE-B2E9-4758-BF9F-99115F28257F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Document", "src\services\document-management\Myb.Document\Myb.Document.csproj", "{2EEBEEAF-79A9-4865-ADB7-7C48656F411E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Document", "src\services\document-management\Myb.Document\Myb.Document.csproj", "{2EEBEEAF-79A9-4865-ADB7-7C48656F411E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "invoice-management", "invoice-management", "{BDDBC706-6D31-438A-9AD6-D74E3E4D6635}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Invoice", "src\services\invoice-management\Myb.Invoice\Myb.Invoice.csproj", "{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Invoice", "src\services\invoice-management\Myb.Invoice\Myb.Invoice.csproj", "{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Document.Infra", "src\services\document-management\Myb.Document.Infra\Myb.Document.Infra.csproj", "{19C3C18A-C7A0-4E33-9463-6A2625D40DB4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Document.Services", "src\services\document-management\Myb.Document.Services\Myb.Document.Services.csproj", "{ED32068B-C1F5-4660-B400-D50EC91BE287}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Document.EntityFrameWork.Infra", "src\services\document-management\Myb.Document.EntityFrameWork.Infra\Myb.Document.EntityFrameWork.Infra.csproj", "{B7066E29-E388-42D1-9911-3A6A7520640F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.document.Model", "src\services\document-management\Myb.document.Model\Myb.document.Model.csproj", "{944D8A11-F45F-4CC0-8330-8B7875F0AD3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -185,6 +193,22 @@ Global
 		{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ABFB93E-B0FA-4762-B7D0-D087D2366E08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19C3C18A-C7A0-4E33-9463-6A2625D40DB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19C3C18A-C7A0-4E33-9463-6A2625D40DB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19C3C18A-C7A0-4E33-9463-6A2625D40DB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19C3C18A-C7A0-4E33-9463-6A2625D40DB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED32068B-C1F5-4660-B400-D50EC91BE287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED32068B-C1F5-4660-B400-D50EC91BE287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED32068B-C1F5-4660-B400-D50EC91BE287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED32068B-C1F5-4660-B400-D50EC91BE287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7066E29-E388-42D1-9911-3A6A7520640F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7066E29-E388-42D1-9911-3A6A7520640F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7066E29-E388-42D1-9911-3A6A7520640F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7066E29-E388-42D1-9911-3A6A7520640F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{944D8A11-F45F-4CC0-8330-8B7875F0AD3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{944D8A11-F45F-4CC0-8330-8B7875F0AD3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{944D8A11-F45F-4CC0-8330-8B7875F0AD3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{944D8A11-F45F-4CC0-8330-8B7875F0AD3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -222,6 +246,10 @@ Global
 		{2EEBEEAF-79A9-4865-ADB7-7C48656F411E} = {B2BA43CE-B2E9-4758-BF9F-99115F28257F}
 		{BDDBC706-6D31-438A-9AD6-D74E3E4D6635} = {37E15B0B-E56E-4E11-94F2-21C4193E2CB0}
 		{4ABFB93E-B0FA-4762-B7D0-D087D2366E08} = {BDDBC706-6D31-438A-9AD6-D74E3E4D6635}
+		{19C3C18A-C7A0-4E33-9463-6A2625D40DB4} = {B2BA43CE-B2E9-4758-BF9F-99115F28257F}
+		{ED32068B-C1F5-4660-B400-D50EC91BE287} = {B2BA43CE-B2E9-4758-BF9F-99115F28257F}
+		{B7066E29-E388-42D1-9911-3A6A7520640F} = {B2BA43CE-B2E9-4758-BF9F-99115F28257F}
+		{944D8A11-F45F-4CC0-8330-8B7875F0AD3A} = {B2BA43CE-B2E9-4758-BF9F-99115F28257F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {34C7383E-9796-48B2-8928-9E1E96C528F0}

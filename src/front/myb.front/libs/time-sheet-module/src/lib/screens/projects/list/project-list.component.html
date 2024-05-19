@@ -1,0 +1,14 @@
+<div class="container mt-4">
+  <h2>Project List</h2>
+  <button class="btn btn-primary mb-4" (click)="addProject()">
+    Create New Project
+  </button>
+  <div class="row">
+    <div class="col-md-4" *ngFor="let project of projects">
+      <myb-front-project-card
+        [project]="project"
+        (delete)="deleteProject($event)"
+      ></myb-front-project-card>
+    </div>
+  </div>
+</div>

@@ -5,7 +5,11 @@
   <p class="mx-4 text-center">All the tools that you need are here</p>
   <div class="row mx-auto" style="width: 60%">
     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let app of list">
-      <div class="card h-100 align-items-center">
+      <div
+        class="card h-100 align-items-center"
+        (click)="navigateToApp(app.route)"
+        style="cursor: pointer"
+      >
         <div class="card-body text-center">
           <img
             [src]="'assets/images/' + app.icon"

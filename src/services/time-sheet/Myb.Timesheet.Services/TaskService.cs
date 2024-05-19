@@ -5,9 +5,9 @@ namespace Myb.Timesheet.Services
 {
     public class TaskService : ITaskService
     {
-        private readonly IGenericRepository<int,TimesheetTask, TimesheetContext> _taskRepository;
+        private readonly IGenericRepository<int?,TimesheetTask, TimesheetContext> _taskRepository;
 
-        public TaskService(IGenericRepository<int,TimesheetTask, TimesheetContext> taskRepository)
+        public TaskService(IGenericRepository<int?,TimesheetTask, TimesheetContext> taskRepository)
         {
             _taskRepository = taskRepository;
         }

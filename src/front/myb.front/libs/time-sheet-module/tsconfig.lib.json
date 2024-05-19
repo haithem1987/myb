@@ -5,7 +5,10 @@
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": []
+    "types": [],
+    "paths": {
+      "@myb-front/theme-styles": ["libs/shared/custom-styles/src/lib/themes/styles.scss"],
+    }
   },
   "exclude": [
     "src/**/*.spec.ts",
@@ -13,5 +16,5 @@
     "jest.config.ts",
     "src/**/*.test.ts"
   ],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "timesheet-routing.module.ts"]
 }

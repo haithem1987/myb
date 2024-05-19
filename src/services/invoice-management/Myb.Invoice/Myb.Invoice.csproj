@@ -8,8 +8,18 @@
     </PropertyGroup>
 
     <ItemGroup>
+<<<<<<< HEAD
         <PackageReference Include="GraphQL.Upload.AspNetCore" Version="3.0.3" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.2" />
+=======
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.4" />
+>>>>>>> d85cee36a15240a0985d8a65aea3b7dba0c15514
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 
@@ -17,6 +27,15 @@
       <Content Include="..\..\..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\common\Myb.Common.Authentification\Myb.Common.Authentification.csproj" />
+      <ProjectReference Include="..\..\..\common\Myb.Common.GraphQL.Infra\Myb.Common.GraphQL.Infra.csproj" />
+      <ProjectReference Include="..\Myb.Invoice.EntityFrameWork.Infra\Myb.Invoice.EntityFrameWork.Infra.csproj" />
+      <ProjectReference Include="..\Myb.Invoice.Infra\Myb.Invoice.Infra.csproj" />
+      <ProjectReference Include="..\Myb.Invoice.Models\Myb.Invoice.Models.csproj" />
+      <ProjectReference Include="..\Myb.Invoice.Services\Myb.Invoice.Services.csproj" />
     </ItemGroup>
 
 </Project>

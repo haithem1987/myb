@@ -2,26 +2,32 @@ import gql from 'graphql-tag';
 
 export const CREATE_TASK = gql`
   mutation addTask($item: TimesheetTaskInput!) {
-    addTask(input: $item) {
+    addTask(task: $item) {
       id
       description
+      endTime
+      startTime
+      createdAt
+      updatedAt
     }
   }
 `;
 
 export const UPDATE_TASK = gql`
-  mutation updateTask($id: Int!, $item: TimesheetTaskInput!) {
-    updateTask(id: $id, input: $item) {
+  mutation updateTask($item: TimesheetTaskInput!) {
+    updateTask(task: $item) {
       id
       description
+      endTime
+      startTime
+      createdAt
+      updatedAt
     }
   }
 `;
 
 export const DELETE_TASK = gql`
   mutation deleteTask($id: Int!) {
-    deleteTask(id: $id) {
-      id
-    }
+    deleteTask(id: $id)
   }
 `;

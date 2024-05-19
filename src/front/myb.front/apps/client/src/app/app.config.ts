@@ -1,13 +1,10 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { appRoutes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideRouter } from '@angular/router';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
-import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
-import { ApolloClientOptions, InMemoryCache } from '@apollo/client/core';
-import { HttpLink } from 'apollo-angular/http';
 import { TYPE_KEY_TOKEN } from 'libs/shared/shared-ui/src/lib/tokens/apolloToken';
-import { GraphQLModule } from 'libs/shared/shared-ui/src/lib/graphql/graphql.module';
+import { GraphQLModule } from 'libs/time-sheet-module/src/lib/graphql/graphql.module';
+import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [

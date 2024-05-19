@@ -87,6 +87,9 @@ namespace Myb.Common.Repositories
             try
             {
                 if (entity == null) throw new ArgumentNullException(nameof(entity));
+                
+                entity.CreatedAt ??= DateTime.UtcNow;
+                entity.UpdatedAt ??= DateTime.UtcNow;
                 _entities.Add(entity);
                 await _dbContext.SaveChangesAsync();
                 result.Entity = entity;
@@ -109,6 +112,9 @@ namespace Myb.Common.Repositories
                     result.Errors = new[] { "entity not found" };
                     return result;
                 }
+                
+                entity.UpdatedAt ??= DateTime.UtcNow;
+                
                 entity.ApplyChanges(selectedEntity);
                 await _dbContext.SaveChangesAsync();
                 result.Entity = entity;

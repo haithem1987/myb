@@ -23,25 +23,32 @@ public class TimesheetContext:DbContext
     public DbSet<TimeOff> TimeOffs { get; set; }
     public DbSet<TimeSheet> TimeSheets { get; set; }
     
-   /* protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (optionsBuilder.IsConfigured) return;
         
         var connectionString = _configuration.GetConnectionString("TimesheetDBConnection");
         optionsBuilder.UseNpgsql(connectionString);
         
-    }*/
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TimeSheet>()
-            .HasMany(ts => ts.TimeEntries)
-            .WithOne(te => te.TimeSheet)
-            .HasForeignKey(te => te.TimeSheetId);
+        modelBuilder.Entity<TimeSheet>(entity =>
+        {
+            entity.HasKey(ts => ts.Id);
+            entity.HasMany(ts => ts.TimeEntries)
+                .WithOne(te => te.TimeSheet)
+                .HasForeignKey(te => te.TimeSheetId);
+        });
+            
+          
 
         modelBuilder.Entity<TimesheetTask>(entity =>
         {
-            entity.HasOne(d => d.Employee)
+            entity.HasKey(d => d.Id);
+            entity
+                .HasOne(d => d.Employee)
                 .WithMany(p => p.Tasks)
                 .HasForeignKey(d => d.EmployeeId)  
                 .OnDelete(DeleteBehavior.Restrict); 

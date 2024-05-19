@@ -1,28 +1,116 @@
-<!-- task-edit.component.html -->
-<div class="modal-header">
-  <h5 class="modal-title">Edit Task</h5>
-</div>
-<div class="modal-body">
-  <form>
-    <div class="form-group">
-      <label for="taskDescription">Description</label>
-      <input
-        type="text"
-        class="form-control"
-        id="taskDescription"
-        [(ngModel)]="description"
-      />
-    </div>
-    <!-- Add other fields as needed -->
-  </form>
-</div>
-<div class="modal-footer">
-  <button
-    type="button"
-    class="btn btn-secondary"
-    (click)="activeModal.dismiss('cancel')"
-  >
-    Cancel
-  </button>
-  <button type="button" class="btn btn-primary" (click)="save()">Save</button>
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ isNewTask ? 'Create New Task' : 'Edit Task' }}
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="modal"
+      aria-label="Close"
+      (click)="activeModal.dismiss('cancel')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="taskDescription" class="form-label">Description</label>
+        <input
+          type="text"
+          class="form-control"
+          id="taskDescription"
+          name="description"
+          [(ngModel)]="editableTask.description"
+          placeholder="Enter task description"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="taskStartTime" class="form-label">Start Time</label>
+        <input
+          type="datetime-local"
+          class="form-control"
+          id="taskStartTime"
+          name="startTime"
+          [(ngModel)]="editableTask.startTime"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="taskEndTime" class="form-label">End Time</label>
+        <input
+          type="datetime-local"
+          class="form-control"
+          id="taskEndTime"
+          name="endTime"
+          [(ngModel)]="editableTask.endTime"
+        />
+      </div>
+      <!-- <div class="mb-3">
+        <label for="employee" class="form-label">Assigned to</label>
+        <input
+          type="text"
+          class="form-control"
+          id="employee"
+          [(ngModel)]="editableTask.employeeId"
+          [ngbTypeahead]="searchEmployees"
+          placeholder="Select employee"
+          [inputFormatter]="formatEmployeeResult"
+          [resultFormatter]="formatEmployeeResult"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="project" class="form-label">Project</label>
+        <input
+          type="text"
+          class="form-control"
+          id="project"
+          [(ngModel)]="editableTask.projectId"
+          name="projectName"
+          [ngbTypeahead]="searchProjects"
+          placeholder="Select project"
+          [inputFormatter]="formatProjectResult"
+          [resultFormatter]="formatProjectResult"
+        />
+      </div> -->
+      <div class="mb-3">
+        <label for="employee" class="form-label">Assigné à</label>
+        <select
+          class="form-control"
+          id="employee"
+          name="employee"
+          [(ngModel)]="editableTask.employeeId"
+        >
+          <option *ngFor="let employee of employees" [ngValue]="employee.id">
+            {{ employee.name }}
+          </option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="project" class="form-label">Project</label>
+        <select
+          class="form-control"
+          id="project"
+          name="project"
+          [(ngModel)]="editableTask.projectId"
+        >
+          <option *ngFor="let project of projects" [ngValue]="project.id">
+            {{ project.projectName }}
+          </option>
+        </select>
+      </div>
+      <!-- Add other fields as needed -->
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="activeModal.dismiss('cancel')"
+    >
+      Cancel
+    </button>
+    <button type="button" class="btn btn-primary" (click)="save()">
+      {{ isNewTask ? 'Create' : 'Save' }}
+    </button>
+  </div>
 </div>

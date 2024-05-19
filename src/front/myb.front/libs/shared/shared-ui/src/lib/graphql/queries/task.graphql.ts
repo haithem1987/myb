@@ -5,6 +5,12 @@ export const GET_ALL_TASKS = gql`
     allTasks {
       id
       description
+      projectId
+      employeeId
+      startTime
+      endTime
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -14,10 +20,10 @@ export const GET_TASK_BY_ID = gql`
     taskById(id: $id) {
       id
       description
-      createdDate
       endTime
       startTime
-      lastModifiedDate
+      createdAt
+      updatedAt
     }
   }
 `;

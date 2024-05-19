@@ -1,40 +1,98 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Task } from '../../models/task.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TaskEditComponent } from '../task-edit/task-edit.component';
+import { FormsModule } from '@angular/forms';
+import { Project } from '../../models/project.model';
+import { Employee } from '../../models/employee';
 
 @Component({
   selector: 'myb-front-task-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './task-list.component.html',
-  styleUrl: './task-list.component.css',
+  styleUrls: ['./task-list.component.scss'],
 })
-export class TaskListComponent {
+export class TaskListComponent implements OnChanges {
+  updatedTasks: Task[] = [];
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' | '' = '';
+  searchTerm: string = '';
   @Input() tasks: Task[] = [];
-  @Output() edit = new EventEmitter<Task>();
-  @Output() delete = new EventEmitter<number>();
+  @Input() projects: Project[] = [];
+  @Input() employees: Employee[] = [];
+  @Output() taskUpdated = new EventEmitter<Task>();
+  @Output() taskCreated = new EventEmitter<Task>();
+  @Output() taskDeleted = new EventEmitter<number>();
 
   constructor(private modalService: NgbModal) {}
 
-  openEditModal(task: Task) {
-    const modalRef = this.modalService.open(TaskEditComponent);
-    console.log('task', task);
-    modalRef.componentInstance.task = task;
-    modalRef.result.then(
-      (result) => {
-        if (result === 'save') {
-          this.edit.emit(task);
-        }
-      },
-      (reason) => {
-        // Handle modal dismissal
-      }
-    );
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['tasks']) {
+      this.updatedTasks = [...this.tasks]; // Copy the input to the display array
+      this.sortTasks();
+    }
+  }
+
+  onSort(column: string): void {
+    if (this.sortColumn === column) {
+      // Toggle sort direction
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+    this.sortTasks();
+  }
+
+  private sortTasks(): void {
+    if (!this.sortColumn || this.sortDirection === '') {
+      this.updatedTasks = [...this.tasks];
+    } else {
+      this.updatedTasks = [...this.tasks].sort((a: any, b: any) => {
+        const valueA = a[this.sortColumn] as string; // Assuming all sortable fields are strings
+        const valueB = b[this.sortColumn] as string;
+        return this.sortDirection === 'asc'
+          ? valueA.localeCompare(valueB)
+          : valueB.localeCompare(valueA);
+      });
+    }
+  }
+
+  filterTasks(): void {
+    if (!this.searchTerm) {
+      this.updatedTasks = [...this.tasks];
+    } else {
+      this.updatedTasks = this.tasks.filter((task) =>
+        task.description.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
   }
 
   onDelete(taskId: number) {
-    this.delete.emit(taskId);
+    this.taskDeleted.emit(taskId);
+  }
+
+  openModal(task?: Task) {
+    const modalRef = this.modalService.open(TaskEditComponent);
+    modalRef.componentInstance.task = task || new Task();
+    modalRef.componentInstance.projects = this.projects;
+    modalRef.componentInstance.employees = this.employees;
+    modalRef.componentInstance.saveEvent.subscribe((updatedTask: Task) => {
+      if (task) {
+        this.taskUpdated.emit(updatedTask);
+      } else {
+        this.taskCreated.emit(updatedTask);
+      }
+      modalRef.close();
+    });
   }
 }

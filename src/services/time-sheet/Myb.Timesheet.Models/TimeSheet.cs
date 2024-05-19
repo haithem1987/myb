@@ -6,6 +6,6 @@ public class TimeSheet:BaseEntity
 {
     public DateTime DateEntry { get; set; }
     public Status Status { get; set; }
-    public virtual ICollection<TimeEntry> TimeEntries { get; set; }
+    public virtual ICollection<TimeEntry>? TimeEntries { get; set; }
    
 }

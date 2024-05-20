@@ -11,5 +11,6 @@ public class Project:BaseEntity
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public virtual ICollection<TimesheetTask>? Tasks { get; set; }
-    
+    public virtual ICollection<TimeSheet>? Timesheets { get; set; }
+    public string? UserId { get; set; }
 }

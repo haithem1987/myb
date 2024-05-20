@@ -8,6 +8,12 @@ public class Employee:BaseEntity
     public string? Department { get; set; }
     public string? Email { get; set; }
     
+    public int? ManagerId { get; set; }
+    public Manager? Manager { get; set; }
     // Navigation properties
-    public virtual ICollection<TimesheetTask>? Tasks { get; set; }
+    public virtual ICollection<TimeSheet> Timesheets { get; set; } = new List<TimeSheet>();
+    public virtual ICollection<TimeOff> TimeOffs { get; set; } = new List<TimeOff>();
+    
+    public virtual ICollection<TimesheetTask> Tasks { get; set; } = new List<TimesheetTask>();
+    public string? UserId { get; set; }
 }

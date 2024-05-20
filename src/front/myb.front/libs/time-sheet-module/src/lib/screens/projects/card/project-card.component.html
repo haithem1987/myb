@@ -1,7 +1,7 @@
-<div class="card project-card h-100 mb-3 shadow-sm">
+<myb-front-card>
   <div class="card-body d-flex flex-column">
     <h5 class="card-title">{{ project.projectName }}</h5>
-    <p class="card-text">{{ project.description }}</p>
+    <p class="card-text text-muted">{{ project.description }}</p>
     <p class="card-text">
       <small class="text-muted d-flex justify-content-between">
         <div>
@@ -11,7 +11,7 @@
         <i class="bi bi-arrow-right mx-5"></i>
         <div>
           <div>Fin</div>
-          {{ project.startDate | date }}
+          {{ project.endDate | date }}
         </div></small
       >
     </p>
@@ -20,13 +20,11 @@
       <a
         [routerLink]="['/project-detail', project.id]"
         class="btn btn-primary btn-sm"
-        ><i class="bi bi-eye"></i>Afficher</a
+        ><i class="bi bi-ui-checks"></i>Tâches</a
       >
-      <a
-        [routerLink]="['/edit-project', project.id]"
-        class="btn btn-primary btn-sm"
-        ><i class="bi bi-pencil"></i>Editer</a
-      >
+      <button class="btn btn-primary btn-sm" (click)="editProject(project)">
+        <i class="bi bi-pencil"></i>Editer
+      </button>
       <button
         class="btn btn-outline-danger btn-sm"
         (click)="deleteProject(project.id)"
@@ -35,4 +33,4 @@
       </button>
     </div>
   </div>
-</div>
+</myb-front-card>

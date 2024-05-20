@@ -1,0 +1,82 @@
+@import '../../../../../custom-styles/src/lib/themes/styles.scss';
+
+
+
+.myb-card {
+    border: 1px solid $primary;
+    border-radius: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: white;
+    // overflow: hidden;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    ::ng-deep .card-body {
+        // display: flex;
+        // flex-direction: column;
+        // align-items: flex-start;
+        // padding: 20px;
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: $primary;
+            margin-bottom: 10px;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: dark;
+            margin-bottom: 10px;
+
+            small {
+                color: dark;
+            }
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.2s, transform 0.2s;
+
+            &:hover {
+                transform: translateY(-2px);
+            }
+        }
+
+        .btn-primary {
+            background-color: $primary;
+            border: none;
+            margin-right: 0.5rem;
+
+            &:hover {
+                background-color: darken($primary, 10%);
+            }
+        }
+
+        .btn-info {
+            background-color: $secondary;
+            border: none;
+            margin-right: 0.5rem;
+
+            &:hover {
+                background-color: darken($secondary, 10%);
+            }
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+
+            &:hover {
+                background-color: darken(#dc3545, 10%);
+            }
+        }
+    }
+}

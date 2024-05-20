@@ -1,0 +1,10 @@
+.toast-container {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1050;
+}
+
+.toast-success {
+  border-bottom: 4px solid #28a745; /* Use the success color */
+}

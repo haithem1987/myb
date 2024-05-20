@@ -1,0 +1,28 @@
+import { Injectable } from '@angular/core';
+import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class DateUtilsService {
+  toDateStruct(date: Date): NgbDateStruct {
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+    };
+  }
+
+  fromDateStruct(dateStruct: NgbDateStruct): Date {
+    return new Date(dateStruct.year, dateStruct.month - 1, dateStruct.day);
+  }
+
+  formatDate(date: Date): string {
+    const d = new Date(date);
+    const month = '' + (d.getMonth() + 1);
+    const day = '' + d.getDate();
+    const year = d.getFullYear();
+
+    return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-');
+  }
+}

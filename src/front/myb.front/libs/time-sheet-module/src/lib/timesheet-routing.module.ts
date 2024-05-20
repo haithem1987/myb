@@ -6,6 +6,7 @@ import { TaskScreenComponent } from './screens/task-screen/task-screen.component
 import { TimesheetScreenComponent } from './screens/timesheet-screen/timesheet-screen.component';
 import { ProjectIndexComponent } from './screens/projects/index/project-index.component';
 import { EditProjectComponent } from './screens/projects/edit/edit-project.component';
+import { ProjectListComponent } from './screens/projects/list/project-list.component';
 
 export const timesheetRoutes: Routes = [
   {
@@ -23,6 +24,11 @@ export const timesheetRoutes: Routes = [
         component: ProjectIndexComponent,
         data: { breadcrumb: 'Projets' },
         children: [
+          {
+            path: '',
+            component: ProjectListComponent,
+            data: { breadcrumb: 'Liste' },
+          },
           {
             path: 'new',
             component: EditProjectComponent,

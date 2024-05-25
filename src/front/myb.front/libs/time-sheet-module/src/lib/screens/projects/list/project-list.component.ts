@@ -1,20 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Project } from '../../../models/project.model';
 import { ProjectService } from '../../../services/project.service';
 import { ProjectCardComponent } from '../card/project-card.component';
+import { ToastService } from 'libs/shared/shared-ui/src/lib/services/toast.service';
 
 @Component({
   selector: 'myb-front-project-list',
   standalone: true,
   imports: [CommonModule, ProjectCardComponent],
   templateUrl: './project-list.component.html',
-  styleUrl: './project-list.component.css',
+  styleUrls: ['./project-list.component.css'],
 })
 export class ProjectListComponent implements OnInit {
   projects: Project[] = [];
 
-  constructor(private projectService: ProjectService) {}
+  constructor(
+    private projectService: ProjectService,
+    private router: Router,
+    private toastService: ToastService
+  ) {}
 
   ngOnInit(): void {
     this.loadProjects();
@@ -27,31 +33,20 @@ export class ProjectListComponent implements OnInit {
   }
 
   addProject(): void {
-    const newProject: Project = {
-      id: 0,
-      projectName: 'New Project',
-      description: 'Description',
-      startDate: new Date(),
-      endDate: new Date(),
-      userId: 'currentUserId',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.projectService.create(newProject).subscribe(() => {
-      this.loadProjects();
-    });
+    this.router.navigate(['/timesheet/projects/new']);
   }
 
-  updateProject(updatedProject: Project): void {
-    this.projectService
-      .update(updatedProject.id, updatedProject)
-      .subscribe(() => {
-        this.loadProjects();
-      });
+  editProject(project: Project): void {
+    this.router.navigate(['/timesheet/projects/edit', project.id], {
+      state: { project },
+    });
   }
 
   deleteProject(projectId: number): void {
     this.projectService.delete(projectId).subscribe(() => {
+      this.toastService.show('Project deleted successfully!', {
+        classname: 'border border-success bg-success text-light',
+      });
       this.loadProjects();
     });
   }

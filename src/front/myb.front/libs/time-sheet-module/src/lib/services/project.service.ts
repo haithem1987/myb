@@ -22,4 +22,16 @@ export class ProjectService extends RepositoryService<Project> {
         map((result: any) => result.data.allProjects) // Map to the allTasks property
       );
   }
+  override get(id: number): Observable<Project> {
+    return this.apollo
+      .watchQuery<{ projectById: Project }>({
+        query: gql`
+          ${this.typeOperations.getById}
+        `,
+        variables: { id },
+      })
+      .valueChanges.pipe(
+        map((result: any) => result.data.projectById) // Map to the allTasks property
+      );
+  }
 }

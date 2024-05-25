@@ -13,3 +13,9 @@ export * from './lib/LandingPage/FooterSection/FooterSection.component';
 export * from './lib/LandingPage/FeaturesSection/FeaturesSection.component';
 
 export * from './lib/components/userCRUD.component';
+
+export * from './lib/components/card/card.component';
+
+export * from './lib/services/date-utils.service';
+
+export * from './lib/components/toasts-container/toasts-container.component';

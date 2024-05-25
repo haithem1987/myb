@@ -4,7 +4,6 @@ import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache } from '@apollo/client/core';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { InvoiceModuleComponent } from '../invoice-module/invoice-module.component';
 
 @NgModule({
   imports: [BrowserModule, ApolloModule, HttpClientModule],

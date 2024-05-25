@@ -14,6 +14,10 @@ import {
 } from './queries/employee.graphql';
 import { GET_ALL_PROJECTS, GET_PROJECT_BY_ID } from './queries/project.graphql';
 import { GET_ALL_TASKS, GET_TASK_BY_ID } from './queries/task.graphql';
+import {
+  GET_ALL_INVOICES,
+  GET_INVOICE_BY_ID,
+} from '../../../../../invoice-module/src/lib/graphql/queries/invoice.query';
 
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
@@ -44,6 +48,10 @@ export const typeConfig: { [key: string]: any } = {
     create: CREATE_PROJECT,
     update: UPDATE_PROJECT,
     delete: DELETE_PROJECT,
+  },
+  Invoice: {
+    getAll: GET_ALL_INVOICES,
+    getById: GET_INVOICE_BY_ID,
   },
 
   // You can add more configurations for different types here

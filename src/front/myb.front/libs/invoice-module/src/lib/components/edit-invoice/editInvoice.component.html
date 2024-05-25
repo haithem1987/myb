@@ -1,0 +1,90 @@
+<div class="container modal-lg" >
+  <div class="row">
+    <div class="col-md">
+      <br />
+      <br />
+      <div class="card text-center">
+        <div class="card-body">
+          <img
+            src="http://100dayscss.com/codepen/upload.svg"
+            class="upload-icon"
+          />
+          <br /><br />
+          <p class="card-title">Choose Invoice to Upload !</p>
+          <p class="card-text"></p>
+          <div class="custom-file">
+            <!-- <input #file type="file" class="custom-file-input" id="customFile"
+              (change)="onSelectFile(file.files , $event)"  [multiple]="'multiple'"
+              [accept]="'.jpg, .png, .jpeg, .pdf'"> -->
+               <!-- Hidden File Input -->
+               <input #fileInput type="file" class="custom-file-input" id="customFile"
+               (change)="onSelectFile(fileInput.files, $event)" multiple accept=".jpg, .png, .jpeg, .pdf" style="display: none;">
+           
+           <!-- Button to Trigger File Input -->
+           <button class="btn btn-primary text-white" (click)="fileInput.click()">Upload Document</button>
+           <br>  <br>
+      <!--remove-->
+            <!-- <label class="custom-file-label"
+              for="customFile">{{ 'reportClaim.chooseFile'}}</label> -->
+            </div>
+          <!-- <button  (click)="addDocument()">upload </button> -->
+        </div>
+      </div>
+    </div>
+    <div class="col-md">
+      <div class="modal-header">
+        <h4 class="modal-title">Hi there!</h4>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="activeModal.dismiss('Cross click')"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="documentName" class="form-label">Invoice Num</label>
+            <input
+              type="text"
+              class="form-control"
+              id="invoice num"
+              name="invoice num"
+              placeholder="Enter invoice num "
+            />
+          </div>
+          <div class="mb-3">
+            <label for="docCreationTime" class="form-label">Created at</label>
+            <input
+              type="datetime-local"
+              class="form-control"
+              id="docCreationTime"
+              name="docCreationTime"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="Type" class="form-label"> Type </label>
+            <select class="form-control" id="Type" name="Type"></select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-dark"
+          (click)="activeModal.close('Close click')"
+        >
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          (click)="activeModal.close('Close click')"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

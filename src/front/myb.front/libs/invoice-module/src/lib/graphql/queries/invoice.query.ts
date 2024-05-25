@@ -4,6 +4,7 @@ export const GET_ALL_INVOICES = gql`
   query GetAllInvoices {
     allInvoices {
       id
+      invoiceNum
       invoiceDate
       subTotal
       totalAmount

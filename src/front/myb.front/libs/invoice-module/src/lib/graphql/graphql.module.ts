@@ -17,7 +17,7 @@ import { InvoiceModuleComponent } from '../invoice-module/invoice-module.compone
             addTypename: false, // This is default, adds __typename automatically on read
           }),
           link: httpLink.create({
-            uri: 'http://localhost:5145/graphql',
+            uri: 'http://localhost:5145/graphql/',
           }),
         };
       },

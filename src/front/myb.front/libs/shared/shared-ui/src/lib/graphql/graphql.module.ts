@@ -16,7 +16,7 @@ import { BrowserModule } from '@angular/platform-browser';
             addTypename: false, // This is default, adds __typename automatically on read
           }),
           link: httpLink.create({
-            uri: 'http://localhost:5059/graphql',
+            uri: 'http://localhost:5145/graphql/',
           }),
         };
       },

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { RepositoryService } from 'libs/shared/shared-ui/src/lib/services/repository.service';
+import { RepositoryService } from '../../../../shared/infra/services/repository.service';
 import { Project } from '../models/project.model';
 import { Observable, map } from 'rxjs';
 

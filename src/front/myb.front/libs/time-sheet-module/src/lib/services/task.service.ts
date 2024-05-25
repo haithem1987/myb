@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RepositoryService } from 'libs/shared/shared-ui/src/lib/services/repository.service';
+import { RepositoryService} from '../../../../shared/infra/services/repository.service';
 import { Task } from '../models/task.model';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, map } from 'rxjs';

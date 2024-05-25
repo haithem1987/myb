@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { User } from '../models/user.model';
-import { UserService } from '../services/user.service';
+import { User } from '../../../../infra/models/user.model';
+import { UserService } from '../../../../infra/services/user.service';
 import { FormsModule } from '@angular/forms';
 import { ApolloModule } from 'apollo-angular';
 import { HttpClientModule } from '@angular/common/http';

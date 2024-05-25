@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { User } from '../models/user.model';
+
 import { RepositoryService } from './repository.service';
 import { Apollo } from 'apollo-angular';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',

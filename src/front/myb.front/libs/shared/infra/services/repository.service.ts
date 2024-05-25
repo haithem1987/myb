@@ -2,10 +2,11 @@ import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { typeConfig } from '../graphql/type-config';
-import { IRepository } from '../repositories/repository.interface';
-import { IIdentity } from '../models/user.model';
+
 import { Inject, Injectable } from '@angular/core';
-import { TYPE_KEY_TOKEN } from '../tokens/apolloToken';
+import { IIdentity } from '../models/user.model';
+import { IRepository } from '../repositories/repository.interface';
+import { TYPE_KEY_TOKEN} from '../tokens/apolloToken'
 
 export class RepositoryService<T extends IIdentity> implements IRepository<T> {
   protected typeOperations: any;

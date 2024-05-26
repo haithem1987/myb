@@ -10,9 +10,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectService } from '../../../services/project.service';
 import { Project } from '../../../models/project.model';
 import { HttpClientModule } from '@angular/common/http';
-import { CardComponent, DateUtilsService } from 'libs/shared/shared-ui/src';
+import { CardComponent } from 'libs/shared/shared-ui/src';
+import { DateUtilsService } from 'libs/shared/infra/services/date-utils.service';
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
-import { ToastService } from 'libs/shared/shared-ui/src/lib/services/toast.service';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
   selector: 'myb-front-edit-project',

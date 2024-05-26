@@ -16,6 +16,6 @@ export * from './lib/components/userCRUD.component';
 
 export * from './lib/components/card/card.component';
 
-export * from './lib/services/date-utils.service';
+export * from '../../infra/services/date-utils.service';
 
 export * from './lib/components/toasts-container/toasts-container.component';

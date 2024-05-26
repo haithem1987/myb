@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Project } from '../../../models/project.model';
 import { ProjectService } from '../../../services/project.service';
 import { ProjectCardComponent } from '../card/project-card.component';
-import { ToastService } from 'libs/shared/shared-ui/src/lib/services/toast.service';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
   selector: 'myb-front-project-list',

@@ -13,6 +13,9 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { TimesheetService } from '../../../services/timesheet.service';
 import { Timesheet } from '../../../models/timesheet.model';
+import { ProjectService } from '../../../services/project.service';
+import { Project } from '../../../models/project.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'myb-front-timesheet-create',
@@ -28,6 +31,7 @@ import { Timesheet } from '../../../models/timesheet.model';
   styleUrls: ['./timesheet-create.component.css'],
 })
 export class TimesheetCreateComponent implements OnInit {
+  projects$: Observable<Project[]> = this.projectService.projects$;
   timesheetForm!: FormGroup;
   isTimerRunning = false;
   timer: any;
@@ -44,7 +48,8 @@ export class TimesheetCreateComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private timesheetService: TimesheetService
+    private timesheetService: TimesheetService,
+    private projectService: ProjectService
   ) {}
 
   ngOnInit(): void {
@@ -57,6 +62,7 @@ export class TimesheetCreateComponent implements OnInit {
       projectId: [null],
       userId: ['1'],
     });
+    console.log('$projects | async', this.projects$);
   }
 
   onDateSelect(date: NgbDateStruct, datePicker: NgbInputDatepicker): void {

@@ -5,6 +5,7 @@ import { Project } from '../../../models/project.model';
 import { ProjectService } from '../../../services/project.service';
 import { ProjectCardComponent } from '../card/project-card.component';
 import { ToastService } from 'libs/shared/shared-ui/src/lib/services/toast.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'myb-front-project-list',
@@ -14,7 +15,7 @@ import { ToastService } from 'libs/shared/shared-ui/src/lib/services/toast.servi
   styleUrls: ['./project-list.component.css'],
 })
 export class ProjectListComponent implements OnInit {
-  projects: Project[] = [];
+  projects$: Observable<Project[]> = this.projectService.projects$;
 
   constructor(
     private projectService: ProjectService,
@@ -22,15 +23,7 @@ export class ProjectListComponent implements OnInit {
     private toastService: ToastService
   ) {}
 
-  ngOnInit(): void {
-    this.loadProjects();
-  }
-
-  loadProjects(): void {
-    this.projectService.getAll().subscribe((projects) => {
-      this.projects = projects;
-    });
-  }
+  ngOnInit(): void {}
 
   addProject(): void {
     this.router.navigate(['/timesheet/projects/new']);
@@ -43,11 +36,12 @@ export class ProjectListComponent implements OnInit {
   }
 
   deleteProject(projectId: number): void {
-    this.projectService.delete(projectId).subscribe(() => {
-      this.toastService.show('Project deleted successfully!', {
-        classname: 'border border-success bg-success text-light',
-      });
-      this.loadProjects();
+    this.projectService.delete(projectId).subscribe((success) => {
+      if (success) {
+        this.toastService.show('Project deleted successfully!', {
+          classname: '',
+        });
+      }
     });
   }
 }

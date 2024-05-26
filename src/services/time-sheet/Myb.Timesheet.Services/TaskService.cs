@@ -39,5 +39,11 @@ namespace Myb.Timesheet.Services
             await _taskRepository.DeleteAsync(id);
             return true;
         }
+        
+        public Task<IEnumerable<TimesheetTask>> GetTasksByProjectIdAsync(int projectId)
+        {
+            var tasks = _taskRepository.GetAll().Where(t => t.ProjectId == projectId);
+            return Task.FromResult<IEnumerable<TimesheetTask>>(tasks);
+        }
     }
 }

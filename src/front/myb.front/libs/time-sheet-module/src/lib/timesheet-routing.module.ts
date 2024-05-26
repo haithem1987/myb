@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Routes } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterModule, Routes } from '@angular/router';
 import { TimeSheetModuleComponent } from '..';
 import { TaskScreenComponent } from './screens/task-screen/task-screen.component';
 import { TimesheetScreenComponent } from './screens/timesheet-screen/timesheet-screen.component';
@@ -38,6 +38,16 @@ export const timesheetRoutes: Routes = [
             path: 'edit/:id',
             component: EditProjectComponent,
             data: { breadcrumb: 'Editer' },
+          },
+          {
+            path: ':projectId/tasks',
+            component: TaskScreenComponent,
+            data: {
+              breadcrumb: (route: ActivatedRouteSnapshot) => {
+                console.log('route.paramMap', route.paramMap);
+                return `${route.paramMap.get('projectId')}`;
+              },
+            },
           },
         ],
       },

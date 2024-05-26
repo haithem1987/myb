@@ -13,4 +13,5 @@ public interface ITimesheetService
     // Additional methods related to timesheet operations
     Task ApproveTimeSheetAsync(int timesheetId);
     Task RejectTimeSheetAsync(int timesheetId, string reason);
+    Task<IEnumerable<TimeSheet>> GetTimeSheetsByUserIdAsync(string userId);
 }

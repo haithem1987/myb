@@ -1,0 +1,115 @@
+<div class="card d-flex mb-3">
+  <form
+    [formGroup]="timesheetForm"
+    class="entry-body d-flex align-content-center justify-content-between"
+  >
+    <div class="border-end w-25 d-flex align-items-center">
+      <input
+        type="text"
+        id="description"
+        formControlName="description"
+        class="form-control border-0"
+        placeholder="Sur quoi avez-vous travaillé ?"
+      />
+    </div>
+    <div>
+      <button
+        type="button"
+        class="btn btn-outline-primary mr-2"
+        ngbPopover="projectsPopover"
+        #projectsPopover="ngbPopover"
+        [popoverTitle]="'Projects'"
+        triggers="manual"
+        (click)="projectsPopover.toggle()"
+      >
+        <i class="bi bi-plus-circle"></i>
+        <!-- Projet icon -->
+      </button>
+
+      <ng-template #projectsPopover>
+        <ul class="list-group">
+          <li
+            class="list-group-item"
+            *ngFor="let project of projects"
+            (click)="onProjectSelect(project)"
+          >
+            {{ project.name }}
+          </li>
+        </ul>
+      </ng-template>
+
+      <button
+        type="button"
+        class="btn btn-outline-primary mr-2"
+        ngbPopover="employeesPopover"
+        #employeesPopover="ngbPopover"
+        [popoverTitle]="'Employees'"
+        triggers="manual"
+        (click)="employeesPopover.toggle()"
+      >
+        <i class="bi bi-plus-circle"></i>
+        <!-- Employee icon -->
+      </button>
+
+      <ng-template #employeesPopover>
+        <ul class="list-group">
+          <li
+            class="list-group-item"
+            *ngFor="let employee of employees"
+            (click)="onEmployeeSelect(employee)"
+          >
+            {{ employee.name }}
+          </li>
+        </ul>
+      </ng-template>
+    </div>
+
+    <div class="d-flex align-items-center ml-3 w-25 border-start">
+      <input
+        type="text"
+        id="date"
+        formControlName="date"
+        placeholder="YYYY-MM-DD"
+        class="form-control border-0"
+        ngbDatepicker
+        #datePicker="ngbDatepicker"
+        (focus)="datePicker.open()"
+        (dateSelect)="onDateSelect($event, datePicker)"
+      />
+    </div>
+
+    <div class="d-flex align-items-center border-start">
+      <input
+        type="text"
+        id="workedHours"
+        formControlName="workedHours"
+        class="form-control border-0"
+        placeholder="00:00:00"
+        [readonly]="isTimerRunning"
+        mask="00:00:00"
+      />
+    </div>
+    <div class="border-start">
+      <button
+        type="button"
+        class="btn ml-3 p-3 rounded-0"
+        (click)="toggleTimer()"
+        [ngClass]="isTimerRunning ? 'btn-danger' : 'btn-light'"
+      >
+        <i
+          class="bi"
+          [ngClass]="isTimerRunning ? 'bi-stop-circle' : 'bi-play-circle'"
+        ></i>
+        <!-- Timer icon -->
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary rounded-0 rounded-end ml-3 py-3 text-bold"
+        (click)="addEntry()"
+      >
+        <i class="bi bi-check-circle"></i> AJOUTER
+        <!-- Add icon -->
+      </button>
+    </div>
+  </form>
+</div>

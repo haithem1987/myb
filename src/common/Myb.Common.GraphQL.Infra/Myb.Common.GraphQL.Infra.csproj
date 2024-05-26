@@ -14,10 +14,11 @@
     <PackageReference Include="HotChocolate.Types.Json" Version="13.9.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\services\time-sheet\Myb.Timesheet.Infra\Myb.Timesheet.Infra.csproj" />
     <ProjectReference Include="..\Myb.Common.Repositories\Myb.Common.Repositories.csproj" />
   </ItemGroup>
 

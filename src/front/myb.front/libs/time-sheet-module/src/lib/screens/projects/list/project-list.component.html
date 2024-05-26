@@ -3,7 +3,7 @@
     <div class="d-flex align-items-center">
       <h2 class="">Projets</h2>
       <span class="badge rounded-pill bg-secondary badge-sm">{{
-        projects.length
+        (projects$ | async)?.length
       }}</span>
     </div>
     <button class="btn btn-primary text-bold mb-4" (click)="addProject()">
@@ -11,7 +11,7 @@
     </button>
   </div>
   <div class="row">
-    <div class="col-md-4 mb-4" *ngFor="let project of projects">
+    <div class="col-md-4 mb-4" *ngFor="let project of projects$ | async">
       <myb-front-project-card
         [project]="project"
         (edit)="editProject($event)"

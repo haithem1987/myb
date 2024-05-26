@@ -1,0 +1,92 @@
+<div class="container my-4">
+  <div class="d-flex justify-content-between mb-3">
+    <h2 class="mb-0 w-50" style="color: var(--bs-darklight)">
+      Timesheet Manager
+    </h2>
+    <!-- <button
+      type="button"
+      class="btn btn-outline-primary"
+      (click)="addTimesheet()"
+    >
+      <i class="bi bi-plus-lg"></i> Add Timesheet
+    </button> -->
+    <input
+      type="text"
+      class="form-control mb-3"
+      placeholder="Search timesheets..."
+      [(ngModel)]="searchTerm"
+      (keyup)="filterTimesheets()"
+    />
+  </div>
+  <myb-front-timesheet-create></myb-front-timesheet-create>
+
+  <div class="card pt-2">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" (click)="onSort('date')" style="cursor: pointer">
+            Date
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-sort-numeric-down':
+                  sortColumn === 'date' && sortDirection === 'asc',
+                'bi-sort-numeric-up':
+                  sortColumn === 'date' && sortDirection === 'desc',
+                'bi-sort': sortColumn !== 'date'
+              }"
+            ></i>
+          </th>
+          <th
+            scope="col"
+            (click)="onSort('workedHours')"
+            style="cursor: pointer"
+          >
+            Worked Hours
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-sort-numeric-down':
+                  sortColumn === 'workedHours' && sortDirection === 'asc',
+                'bi-sort-numeric-up':
+                  sortColumn === 'workedHours' && sortDirection === 'desc',
+                'bi-sort': sortColumn !== 'workedHours'
+              }"
+            ></i>
+          </th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let timesheet of timeSheets">
+          <td>{{ timesheet.date | date }}</td>
+          <td>{{ timesheet.workedHours }}</td>
+          <td>{{ timesheet.description }}</td>
+          <td>
+            <span
+              [ngClass]="'badge ' + getApprovalStatus(timesheet).badgeClass"
+            >
+              {{ getApprovalStatus(timesheet).text }}
+            </span>
+          </td>
+          <td>
+            <button
+              class="btn btn-outline-primary me-2"
+              (click)="editTimeSheet(timesheet.id)"
+            >
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              (click)="deleteTimeSheet(timesheet.id)"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

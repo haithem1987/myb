@@ -22,6 +22,18 @@ export class TaskService extends RepositoryService<Task> {
         map((result: any) => result.data.allTasks) // Map to the allTasks property
       );
   }
+  getTasksByProjectId(id: number): Observable<Task[]> {
+    return this.apollo
+      .watchQuery<{ tasksByProjectId: Task[] }>({
+        query: gql`
+          ${this.typeOperations.getTasksByProjectId}
+        `,
+        variables: { id },
+      })
+      .valueChanges.pipe(
+        map((result: any) => result.data.tasksByProjectId) // Map to the allTasks property
+      );
+  }
 
   // Task-specific methods
   // startTask(taskId: number): Observable<Task> {

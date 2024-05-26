@@ -1,0 +1,26 @@
+{
+  "name": "invoice-module",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/invoice-module/src",
+  "prefix": "myb-front",
+  "tags": [],
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/invoice-module/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/invoice-module/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/invoice-module/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    }
+  }
+}

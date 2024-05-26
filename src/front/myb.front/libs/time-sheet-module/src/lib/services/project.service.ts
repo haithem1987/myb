@@ -3,7 +3,7 @@ import { Apollo } from 'apollo-angular';
 import { Project } from '../models/project.model';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { RepositoryService } from 'libs/shared/shared-ui/src/lib/services/repository.service';
+import { RepositoryService } from 'libs/shared/infra/services/repository.service';
 
 @Injectable({
   providedIn: 'root',
@@ -30,8 +30,7 @@ export class ProjectService extends RepositoryService<Project> {
   }
 
   protected override mapCreateItem(result: any): Project {
-    console.log('mapCreateItem', result);
-    return result.data?.addProject as Project;
+    return result.data?.createProject as Project;
   }
 
   protected override mapUpdateItem(result: any): Project {
@@ -54,10 +53,10 @@ export class ProjectService extends RepositoryService<Project> {
   override get(id: number): Observable<Project> {
     return super.get(id).pipe(
       map((project) => {
-        const updatedProjects = this.projectsSubject.value.map((p) =>
+        const projects = this.projectsSubject.value.map((p) =>
           p.id === id ? project : p
         );
-        this.projectsSubject.next(updatedProjects);
+        this.projectsSubject.next(projects);
         return project;
       })
     );
@@ -66,7 +65,6 @@ export class ProjectService extends RepositoryService<Project> {
   override create(item: Project): Observable<Project> {
     return super.create(item).pipe(
       map((newProject) => {
-        console.log('newProject', newProject);
         const projects = [...this.projectsSubject.value, newProject];
         this.projectsSubject.next(projects);
         return newProject;

@@ -1,6 +1,4 @@
-import gql from 'graphql-tag';
-
-export const GET_ALL_PROJECTS = gql`
+export const GET_ALL_PROJECTS = `
   query GetAllProjects {
     allProjects {
       id
@@ -14,7 +12,7 @@ export const GET_ALL_PROJECTS = gql`
   }
 `;
 
-export const GET_PROJECT_BY_ID = gql`
+export const GET_PROJECT_BY_ID = `
   query projectById($id: Int!) {
     projectById(id: $id) {
       id

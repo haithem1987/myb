@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { RepositoryService } from 'libs/shared/shared-ui/src/lib/services/repository.service';
 import { Timesheet } from '../models/timesheet.model';
 import { Observable, map } from 'rxjs';
+import { RepositoryService } from 'libs/shared/infra/services/repository.service';
 
 @Injectable({
   providedIn: 'root',

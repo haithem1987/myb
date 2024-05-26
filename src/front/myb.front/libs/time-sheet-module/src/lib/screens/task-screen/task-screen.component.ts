@@ -8,7 +8,7 @@ import { EmployeeService } from '../../services/employee.service';
 import { ProjectService } from '../../services/project.service';
 import { TaskService } from '../../services/task.service';
 import { TaskListComponent } from './list/task-list.component';
-import { ToastService } from 'libs/shared/shared-ui/src/lib/services/toast.service';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
   selector: 'myb-front-task-screen',

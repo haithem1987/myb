@@ -5,7 +5,7 @@ namespace Myb.Timesheet.Models;
 public class TimeSheet:BaseEntity
 {
     public DateTime Date { get; set; }
-    public int WorkedHours { get; set; }
+    public float WorkedHours { get; set; }
     public string? Description { get; set; }
     public bool IsApproved { get; set; }
     //public Status Status { get; set; }

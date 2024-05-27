@@ -13,8 +13,6 @@ import { TimesheetListComponent } from './list/timesheet-list.component';
   styleUrls: ['./timesheet-screen.component.css'],
 })
 export class TimesheetScreenComponent implements OnInit {
-  timeSheets: Timesheet[] = [];
-
   constructor(
     private timesheetService: TimesheetService,
     private router: Router
@@ -25,10 +23,8 @@ export class TimesheetScreenComponent implements OnInit {
   }
 
   loadTimesheets(): void {
-    this.timesheetService.getTimesheetsByUserId('1').subscribe(
-      (data) => (this.timeSheets = data),
-      (error) => console.error('Error fetching timesheets', error)
-    );
+    // this.timesheetService.getTimesheetsByUserId('1').subscribe(
+    // );
   }
 
   editTimeSheet(id: number): void {

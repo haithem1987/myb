@@ -30,7 +30,7 @@ export class ProjectService extends RepositoryService<Project> {
   }
 
   protected override mapCreateItem(result: any): Project {
-    return result.data?.createProject as Project;
+    return result.data?.addProject as Project;
   }
 
   protected override mapUpdateItem(result: any): Project {

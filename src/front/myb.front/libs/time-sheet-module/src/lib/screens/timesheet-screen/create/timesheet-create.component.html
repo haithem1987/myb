@@ -1,9 +1,9 @@
 <div class="card d-flex mb-3">
   <form
     [formGroup]="timesheetForm"
-    class="entry-body d-flex align-content-center justify-content-between"
+    class="entry-body d-flex flex-wrap align-content-center"
   >
-    <div class="border-end w-25 d-flex align-items-center">
+    <div class="border-end flex-fill align-items-center form-floating">
       <input
         type="text"
         id="description"
@@ -11,74 +11,60 @@
         class="form-control border-0"
         placeholder="Sur quoi avez-vous travaillé ?"
       />
-    </div>
-    <div>
-      <button
-        type="button"
-        class="btn btn-outline-primary mr-2"
-        ngbPopover="projectsPopover"
-        #projectsPopover="ngbPopover"
-        [popoverTitle]="'Projects'"
-        triggers="manual"
-        (click)="projectsPopover.toggle()"
-      >
-        <i class="bi bi-plus-circle"></i>
-        <!-- Projet icon -->
-      </button>
-
-      <ng-template #projectsPopover>
-        <ul class="list-group">
-          <li
-            class="list-group-item"
-            *ngFor="let project of projects"
-            (click)="onProjectSelect(project)"
-          >
-            {{ project.name }}
-          </li>
-        </ul>
-      </ng-template>
-
-      <button
-        type="button"
-        class="btn btn-outline-primary mr-2"
-        ngbPopover="employeesPopover"
-        #employeesPopover="ngbPopover"
-        [popoverTitle]="'Employees'"
-        triggers="manual"
-        (click)="employeesPopover.toggle()"
-      >
-        <i class="bi bi-plus-circle"></i>
-        <!-- Employee icon -->
-      </button>
-
-      <ng-template #employeesPopover>
-        <ul class="list-group">
-          <li
-            class="list-group-item"
-            *ngFor="let employee of employees"
-            (click)="onEmployeeSelect(employee)"
-          >
-            {{ employee.name }}
-          </li>
-        </ul>
-      </ng-template>
+      <label for="description">Description</label>
     </div>
 
-    <div class="d-flex align-items-center ml-3 w-25 border-start">
+    <div class="flex-fill align-items-center form-floating">
+      <select
+        id="projectId"
+        placeholder="project"
+        formControlName="projectId"
+        class="form-control border-0"
+      >
+        <option selected [value]="null">Séléctionner un projet</option>
+        <option *ngFor="let project of projects$ | async" [value]="project.id">
+          {{ project.projectName }}
+        </option>
+      </select>
+      <label for="projectId">Projet</label>
+    </div>
+
+    <div
+      class="flex-fill justify-content-center ml-3 border-start form-floating"
+    >
+      <select
+        id="employeeId"
+        formControlName="employeeId"
+        class="form-control border-0"
+      >
+        <option selected [value]="null">Séléctionner un employee</option>
+        <option
+          *ngFor="let employee of employees$ | async"
+          [value]="employee.id"
+        >
+          {{ employee.name }}
+        </option>
+      </select>
+      <label for="employeeId">Employee</label>
+    </div>
+
+    <div class="flex-fill ml-3 border-start form-floating" style="width: 90px">
       <input
-        type="text"
         id="date"
         formControlName="date"
         placeholder="YYYY-MM-DD"
-        class="form-control border-0"
+        class="form-control flex-fill border-0"
         ngbDatepicker
         #datePicker="ngbDatepicker"
-        (focus)="datePicker.open()"
-        (dateSelect)="onDateSelect($event, datePicker)"
+        (click)="datePicker.toggle()"
       />
+      <label for="date">Date</label>
     </div>
 
-    <div class="d-flex align-items-center border-start">
+    <div
+      class="flex-fill align-items-center border-start form-floating"
+      style="width: 65px"
+    >
       <input
         type="text"
         id="workedHours"
@@ -88,11 +74,12 @@
         [readonly]="isTimerRunning"
         mask="00:00:00"
       />
+      <label for="workedHours">Heures</label>
     </div>
-    <div class="border-start">
+    <div class="d-flex border-start">
       <button
         type="button"
-        class="btn ml-3 p-3 rounded-0"
+        class="btn p-3 rounded-0"
         (click)="toggleTimer()"
         [ngClass]="isTimerRunning ? 'btn-danger' : 'btn-light'"
       >
@@ -104,10 +91,11 @@
       </button>
       <button
         type="button"
-        class="btn btn-primary rounded-0 rounded-end ml-3 py-3 text-bold"
+        class="btn btn-primary rounded-0 rounded-end ml-3 py-3 fw-bold text-uppercase"
         (click)="addEntry()"
       >
-        <i class="bi bi-check-circle"></i> AJOUTER
+        <i class="bi bi-check-circle"></i>
+        AJOUter
         <!-- Add icon -->
       </button>
     </div>

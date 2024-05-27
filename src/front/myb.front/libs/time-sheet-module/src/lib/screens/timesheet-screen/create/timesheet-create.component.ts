@@ -6,6 +6,7 @@ import {
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import {
   NgbDatepickerModule,
@@ -15,7 +16,11 @@ import { TimesheetService } from '../../../services/timesheet.service';
 import { Timesheet } from '../../../models/timesheet.model';
 import { ProjectService } from '../../../services/project.service';
 import { Project } from '../../../models/project.model';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { Employee } from '../../../models/employee';
+import { EmployeeService } from '../../../services/employee.service';
+import { DateUtilsService } from 'libs/shared/shared-ui/src';
 
 @Component({
   selector: 'myb-front-timesheet-create',
@@ -32,37 +37,47 @@ import { Observable } from 'rxjs';
 })
 export class TimesheetCreateComponent implements OnInit {
   projects$: Observable<Project[]> = this.projectService.projects$;
+  employees$: Observable<Employee[]> = this.employeeService.employees$;
   timesheetForm!: FormGroup;
   isTimerRunning = false;
   timer: any;
-  projects = [
-    { id: 1, name: 'Project 1' },
-    { id: 2, name: 'Project 2' },
-  ];
-  employees = [
-    { id: 1, name: 'Employee 1' },
-    { id: 2, name: 'Employee 2' },
-  ];
 
   @ViewChild('datePicker', { static: false }) datePicker!: NgbInputDatepicker;
 
   constructor(
     private fb: FormBuilder,
     private timesheetService: TimesheetService,
-    private projectService: ProjectService
-  ) {}
+    private projectService: ProjectService,
+    private employeeService: EmployeeService,
+    private toastService: ToastService,
+    private dateUtils: DateUtilsService
+  ) {
+    this.projectService.getAll().subscribe();
+    this.employeeService.getAll().subscribe();
+  }
 
   ngOnInit(): void {
+    const currentDate = this.getCurrentDate();
+
     this.timesheetForm = this.fb.group({
-      description: [''],
-      date: [''],
-      workedHours: ['00:00:00'],
-      isApproved: [false],
-      employeeId: [null],
-      projectId: [null],
-      userId: ['1'],
+      description: ['', Validators.required],
+      date: [currentDate, Validators.required], // Set current date as default
+      workedHours: ['00:00:00', Validators.required], // Use string for display
+      isApproved: [false, Validators.required],
+      employeeId: [null, Validators.required],
+      projectId: [null, Validators.required],
+      userId: ['1', Validators.required],
     });
     console.log('$projects | async', this.projects$);
+  }
+
+  getCurrentDate(): NgbDateStruct {
+    const now = new Date();
+    return {
+      year: now.getFullYear(),
+      month: now.getMonth() + 1,
+      day: now.getDate(),
+    };
   }
 
   onDateSelect(date: NgbDateStruct, datePicker: NgbInputDatepicker): void {
@@ -122,15 +137,46 @@ export class TimesheetCreateComponent implements OnInit {
   }
 
   addEntry(): void {
-    const timesheet: Timesheet = this.timesheetForm.value;
-    this.timesheetService.create(timesheet).subscribe(
-      (response) => {
-        console.log('Timesheet entry added successfully', response);
-        this.timesheetForm.reset();
-      },
-      (error) => {
-        console.error('Error adding timesheet entry', error);
-      }
-    );
+    if (this.timesheetForm.valid) {
+      const formValue = this.timesheetForm.value;
+      const [hours, minutes, seconds] = formValue.workedHours
+        .split(':')
+        .map((part: string) => parseInt(part, 10));
+      const workedHours = hours + minutes / 60 + seconds / 3600;
+
+      const timesheet: Timesheet = {
+        ...formValue,
+        workedHours,
+        employeeId: Number(formValue.employeeId),
+        projectId: Number(formValue.projectId),
+        date: this.dateUtils.fromDateStruct(formValue.date),
+      };
+      console.log('timesheet', timesheet);
+      this.timesheetService
+        .create(timesheet)
+        .pipe(
+          tap({
+            next: (response) => {
+              console.log('Timesheet entry added successfully', response);
+              this.timesheetForm.reset();
+              this.toastService.show('Timesheet entry added successfully', {
+                classname: 'bg-success text-light',
+              });
+            },
+            error: (error) => {
+              console.error('Error adding timesheet entry', error);
+              this.toastService.show('Error adding timesheet entry', {
+                classname: 'bg-danger text-light',
+              });
+            },
+          })
+        )
+        .subscribe();
+    } else {
+      console.log('Form is invalid');
+      this.toastService.show('Erreur, Vérifier les champs obligatoires', {
+        classname: 'border border-success bg-success text-light',
+      });
+    }
   }
 }

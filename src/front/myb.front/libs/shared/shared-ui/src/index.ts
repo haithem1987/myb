@@ -19,3 +19,5 @@ export * from './lib/components/card/card.component';
 export * from '../../infra/services/date-utils.service';
 
 export * from './lib/components/toasts-container/toasts-container.component';
+
+export * from './lib/components/progress-bar/progress-bar.component';

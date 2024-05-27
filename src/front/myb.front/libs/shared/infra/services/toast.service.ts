@@ -10,7 +10,6 @@ export class ToastService {
     this.toasts.push({
       textOrTpl,
       ...options,
-      classname: 'border border-success bg-success text-light',
     });
   }
 

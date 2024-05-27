@@ -29,6 +29,11 @@ import {
   DELETE_PROJECT,
   UPDATE_PROJECT,
 } from 'libs/time-sheet-module/src/lib/graphql/mutations/project.graphql';
+import {
+  CREATE_TIMESHEET,
+  DELETE_TIMESHEET,
+  UPDATE_TIMESHEET,
+} from 'libs/time-sheet-module/src/lib/graphql/mutations/timesheet.graphql';
 
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
@@ -42,9 +47,9 @@ export const typeConfig: { [key: string]: any } = {
   Timesheet: {
     getAll: GET_ALL_TIMESHEETS,
     getById: GET_TASK_BY_ID,
-    create: CREATE_TASK,
-    update: UPDATE_TASK,
-    delete: DELETE_TASK,
+    create: CREATE_TIMESHEET,
+    update: UPDATE_TIMESHEET,
+    delete: DELETE_TIMESHEET,
     getTimesheetsByUserId: GET_TIMESHEETS_BY_USER_ID,
   },
   Task: {

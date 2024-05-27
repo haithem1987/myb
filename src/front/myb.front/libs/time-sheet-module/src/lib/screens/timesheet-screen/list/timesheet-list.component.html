@@ -60,9 +60,26 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let timesheet of timeSheets">
+        <tr *ngFor="let timesheet of timesheets$ | async">
           <td>{{ timesheet.date | date }}</td>
-          <td>{{ timesheet.workedHours }}</td>
+          <td>
+            <div class="d-flex align-items-center">
+              <div class="w-75">
+                <myb-front-progress-bar
+                  [value]="getWorkedHours(timesheet.workedHours)"
+                  type="success"
+                  [striped]="false"
+                  [animated]="false"
+                  [showValue]="false"
+                  [max]="24"
+                  height="8px"
+                ></myb-front-progress-bar>
+              </div>
+              <span class="w-25 ms-1"
+                >{{ timesheet.workedHours.toFixed() }} hr</span
+              >
+            </div>
+          </td>
           <td>{{ timesheet.description }}</td>
           <td>
             <span

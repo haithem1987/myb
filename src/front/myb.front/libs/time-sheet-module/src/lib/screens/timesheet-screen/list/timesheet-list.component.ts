@@ -4,23 +4,37 @@ import { Router, RouterModule } from '@angular/router';
 import { Timesheet } from '../../../models/timesheet.model';
 import { FormsModule } from '@angular/forms';
 import { TimesheetCreateComponent } from '../create/timesheet-create.component';
+import { TimesheetService } from '../../../services/timesheet.service';
+import { Observable } from 'rxjs';
+import { ProgressBarComponent } from 'libs/shared/shared-ui/src';
 
 @Component({
   selector: 'myb-timesheet-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, TimesheetCreateComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    TimesheetCreateComponent,
+    ProgressBarComponent,
+  ],
   templateUrl: './timesheet-list.component.html',
   styleUrls: ['./timesheet-list.component.css'],
 })
 export class TimesheetListComponent implements OnInit {
-  @Input() timeSheets: Timesheet[] = [];
+  timesheets$: Observable<Timesheet[]> = this.timesheetService.timesheets$;
   searchTerm: string = '';
   sortColumn: string = '';
   sortDirection: string = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private timesheetService: TimesheetService
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.timesheetService.getTimesheetsByUserId('1').subscribe();
+  }
 
   addTimesheet(): void {
     this.router.navigate(['/timesheet/add']);
@@ -63,5 +77,8 @@ export class TimesheetListComponent implements OnInit {
     } else {
       return { text: 'En attente', badgeClass: 'bg-warning' };
     }
+  }
+  getWorkedHours(workedHours: number): number {
+    return Number(workedHours.toFixed(1));
   }
 }

@@ -87,7 +87,7 @@ export class EditProjectComponent implements OnInit {
       if (this.isEditMode && this.projectId) {
         this.projectService.update(this.projectId, project).subscribe(() => {
           this.toastService.show('Project updated successfully!', {
-            classname: 'bg-success text-light',
+            classname: 'border border-success bg-success text-light',
           });
           this.router.navigate(['/timesheet/projects']);
         });

@@ -3,6 +3,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
 } from '@angular/core';
@@ -14,6 +15,10 @@ import { Project } from '../../../models/project.model';
 import { Employee } from '../../../models/employee';
 import { TaskEditComponent } from '../edit/task-edit.component';
 import { DateUtilsService } from 'libs/shared/shared-ui/src';
+import { Observable, defaultIfEmpty } from 'rxjs';
+import { TaskService } from '../../../services/task.service';
+import { ProjectService } from '../../../services/project.service';
+import { EmployeeService } from '../../../services/employee.service';
 
 @Component({
   selector: 'myb-front-task-list',
@@ -22,28 +27,35 @@ import { DateUtilsService } from 'libs/shared/shared-ui/src';
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.scss'],
 })
-export class TaskListComponent implements OnChanges {
+export class TaskListComponent implements OnInit {
   updatedTasks: Task[] = [];
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' | '' = '';
   searchTerm: string = '';
-  @Input() tasks: Task[] = [];
-  @Input() projects: Project[] = [];
-  @Input() employees: Employee[] = [];
+  tasks$: Observable<Task[]> = this.taskService.tasks$.pipe(defaultIfEmpty([]));
+  projects$: Observable<Project[]> = this.projectService.projects$.pipe(
+    defaultIfEmpty([])
+  );
+  employees$: Observable<Employee[]> = this.employeeService.employees$.pipe(
+    defaultIfEmpty([])
+  );
   @Output() taskUpdated = new EventEmitter<Task>();
   @Output() taskCreated = new EventEmitter<Task>();
   @Output() taskDeleted = new EventEmitter<number>();
 
   constructor(
     private modalService: NgbModal,
-    private dateUtils: DateUtilsService
+    private dateUtils: DateUtilsService,
+    private taskService: TaskService,
+    private projectService: ProjectService,
+    private employeeService: EmployeeService
   ) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['tasks']) {
-      this.updatedTasks = [...this.tasks]; // Copy the input to the display array
+  ngOnInit(): void {
+    this.tasks$.subscribe((tasks) => {
+      this.updatedTasks = [...tasks];
       this.sortTasks();
-    }
+    });
   }
 
   onSort(column: string): void {
@@ -59,25 +71,33 @@ export class TaskListComponent implements OnChanges {
 
   private sortTasks(): void {
     if (!this.sortColumn || this.sortDirection === '') {
-      this.updatedTasks = [...this.tasks];
+      this.tasks$.subscribe((tasks) => {
+        this.updatedTasks = [...tasks];
+      });
     } else {
-      this.updatedTasks = [...this.tasks].sort((a: any, b: any) => {
-        const valueA = a[this.sortColumn] as string; // Assuming all sortable fields are strings
-        const valueB = b[this.sortColumn] as string;
-        return this.sortDirection === 'asc'
-          ? valueA.localeCompare(valueB)
-          : valueB.localeCompare(valueA);
+      this.tasks$.subscribe((tasks) => {
+        this.updatedTasks = [...tasks].sort((a: any, b: any) => {
+          const valueA = a[this.sortColumn] as string; // Assuming all sortable fields are strings
+          const valueB = b[this.sortColumn] as string;
+          return this.sortDirection === 'asc'
+            ? valueA.localeCompare(valueB)
+            : valueB.localeCompare(valueA);
+        });
       });
     }
   }
 
   filterTasks(): void {
     if (!this.searchTerm) {
-      this.updatedTasks = [...this.tasks];
+      this.tasks$.subscribe((tasks) => {
+        this.updatedTasks = [...tasks];
+      });
     } else {
-      this.updatedTasks = this.tasks.filter((task) =>
-        task.description.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
+      this.tasks$.subscribe((tasks) => {
+        this.updatedTasks = tasks.filter((task) =>
+          task.description.toLowerCase().includes(this.searchTerm.toLowerCase())
+        );
+      });
     }
   }
 
@@ -88,8 +108,12 @@ export class TaskListComponent implements OnChanges {
   openModal(task?: Task) {
     const modalRef = this.modalService.open(TaskEditComponent);
     modalRef.componentInstance.task = task || new Task();
-    modalRef.componentInstance.projects = this.projects;
-    modalRef.componentInstance.employees = this.employees;
+    this.projects$.subscribe((projects) => {
+      modalRef.componentInstance.projects = projects;
+    });
+    this.employees$.subscribe((employees) => {
+      modalRef.componentInstance.employees = employees;
+    });
     modalRef.componentInstance.saveEvent.subscribe((updatedTask: Task) => {
       if (task) {
         this.taskUpdated.emit(updatedTask);
@@ -99,6 +123,7 @@ export class TaskListComponent implements OnChanges {
       modalRef.close();
     });
   }
+
   isCompletedLabel(task: Task): string {
     return task.isCompleted ? 'Terminé' : 'En cours';
   }
@@ -106,6 +131,7 @@ export class TaskListComponent implements OnChanges {
   getCompletionBadgeClass(task: Task): string {
     return task.isCompleted ? 'bg-success' : 'bg-warning';
   }
+
   getTimeRemaining(dueDate: string | undefined): string {
     if (!dueDate || dueDate == undefined) return '--';
     return this.dateUtils.calculateTimeRemaining(dueDate);

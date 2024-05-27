@@ -9,6 +9,7 @@ import { ProjectService } from '../../services/project.service';
 import { TaskService } from '../../services/task.service';
 import { TaskListComponent } from './list/task-list.component';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { Observable, defaultIfEmpty } from 'rxjs';
 
 @Component({
   selector: 'myb-front-task-screen',
@@ -18,9 +19,6 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
   styleUrls: ['./task-screen.component.css'],
 })
 export class TaskScreenComponent implements OnInit {
-  tasks: Task[] = [];
-  projects: Project[] = [];
-  employees: Employee[] = [];
   isCreatingTask: boolean = false;
   editingTask: Task | null = null;
   projectId?: number;
@@ -42,37 +40,19 @@ export class TaskScreenComponent implements OnInit {
       this.projectName = projectName;
       this.loadTasks();
     });
-    this.loadProjects();
     this.loadEmployees();
   }
 
   loadTasks() {
     if (this.projectId) {
-      this.taskService
-        .getTasksByProjectId(this.projectId)
-        .subscribe((tasks) => {
-          console.log('tasks by project', tasks);
-          this.tasks = tasks;
-        });
+      this.taskService.getTasksByProjectId(this.projectId).subscribe();
     } else {
-      this.taskService.getAll().subscribe((tasks) => {
-        console.log('tasks', tasks);
-        this.tasks = tasks;
-      });
+      this.taskService.getAll().subscribe();
     }
   }
 
-  loadProjects() {
-    this.projectService.getAll().subscribe((response) => {
-      this.projects = response;
-    });
-  }
-
   loadEmployees() {
-    this.employeeService.getAll().subscribe((response) => {
-      console.log('employees', response);
-      this.employees = response;
-    });
+    this.employeeService.getAll().subscribe((response) => {});
   }
 
   onCreateTask(task: Task) {
@@ -83,7 +63,6 @@ export class TaskScreenComponent implements OnInit {
           classname: 'bg-success text-light',
         });
         console.log('success create', response);
-        this.tasks = [...this.tasks, response.addTask];
       },
       (error) => {
         console.log('error', error);
@@ -100,17 +79,6 @@ export class TaskScreenComponent implements OnInit {
           classname: 'bg-success text-light',
         });
         console.log('success update', response);
-        const index = this.tasks.findIndex(
-          (t) => t.id === response.updateTask.id
-        ); // Find index of the task to update
-        console.log('index', index);
-        if (index !== -1) {
-          this.tasks = [
-            ...this.tasks.slice(0, index),
-            response.updateTask,
-            ...this.tasks.slice(index + 1),
-          ]; // Update the task in the local array
-        }
       },
       (error) => {
         console.log('error', error);
@@ -131,8 +99,6 @@ export class TaskScreenComponent implements OnInit {
           classname: 'bg-success text-light',
         });
         console.log('Deleted successfully', response);
-        // Remove the task from the local array
-        this.tasks = [...this.tasks.filter((task) => task.id !== taskId)];
       },
       (error) => {
         console.log('Error deleting task', error);

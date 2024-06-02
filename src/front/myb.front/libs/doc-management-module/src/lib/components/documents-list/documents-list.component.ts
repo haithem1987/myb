@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Folder } from '../../models/Folder';
 
 @Component({
   selector: 'myb-front-documents-list',
@@ -8,4 +9,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './documents-list.component.html',
   styleUrl: './documents-list.component.css',
 })
-export class DocumentsListComponent {}
+export class DocumentsListComponent {
+ folders: Folder[] = [];
+
+}

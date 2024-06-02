@@ -12,11 +12,11 @@ export interface DocumentModel extends BaseModel {
     documentName: string;
     createdBy: number;
     editedBy: number;
-     createdDate: Date;
     documentType?: DocumentType;
     status?: DocumentStatus;
-    documentSize: number;
+    documentSize?: number;
     folderId: number | null;
     folder: Folder | null;
     versions: DocumentVersion[] | null; 
+    // content:string;
 }

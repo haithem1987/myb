@@ -1,0 +1,70 @@
+<div class="modal-content">
+    <div>
+      <div class="modal-header">
+        <h4 class="modal-title">Generate Document</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+      </div>
+      <div class="container">
+        <form>
+          <div class="mb-3">
+            <label for="documentName" class="form-label">Document Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="documentName"
+              [(ngModel)]="documentName"
+              name="documentName"
+              placeholder="Enter Document Name"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="documentType" class="form-label">Document Type</label>
+            <select
+              class="form-control"
+              id="documentType"
+              [(ngModel)]="documentType"
+              name="documentType"
+            >
+              <option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="folderId" class="form-label">Folder</label>
+            <select
+              class="form-control"
+              id="folderId"
+              [(ngModel)]="folderId"
+              name="folderId"
+            >
+              <option *ngFor="let folder of folders" [value]="folder.id">{{ folder.folderName }}</option>
+            </select>
+          </div>
+          <!-- <div class="mb-3">
+            <label for="content" class="form-label">Content</label>
+            <textarea
+              class="form-control"
+              id="content"
+              [(ngModel)]="content"
+              name="content"
+              placeholder="Enter Content"
+            ></textarea>
+          </div> -->
+          <!-- <div class="mb-3">
+            <label for="file" class="form-label">Upload File</label>
+            <input
+              type="file"
+              class="form-control"
+              id="file"
+              (change)="onFileChange($event)"
+            />
+          </div> -->
+        </form>
+      </div>
+  
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
+        <button type="button" class="btn btn-outline-primary" (click)="createDocument()">Save</button>
+      </div>
+    </div>
+  </div>
+  

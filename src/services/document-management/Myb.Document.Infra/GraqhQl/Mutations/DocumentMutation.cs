@@ -12,7 +12,7 @@ namespace Myb.Document.Infra.GraphQl.Mutations
 
         public async Task<DocumentModel> AddDocument([Service] IDocumentService documentService, DocumentModel document )
         {
-            return await documentService.AddDocumentAsync(document );
+            return await documentService.AddDocumentAsync(document);
         }
 
         public async Task<DocumentModel> UpdateDocument([Service] IDocumentService documentService, DocumentModel document)
@@ -37,6 +37,7 @@ namespace Myb.Document.Infra.GraphQl.Mutations
         {
             return await folderService.UpdateFolderAsync(folder);
         }
+
 
         public async Task<bool> DeleteFolder([Service] IFolderService folderService, int id)
         {

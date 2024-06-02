@@ -1,56 +1,15 @@
 
-
+<myb-front-navbar ></myb-front-navbar>
 <div class="container mt-3">
-  <h1> Documents </h1>
-<hr>
-<!-- <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Documents</li>
-        </ol>
-      </nav> -->
-<myb-front-folder-cards></myb-front-folder-cards>
-<br/>
-<myb-front-document-upload></myb-front-document-upload>
-<br/>
-<myb-front-nav-links></myb-front-nav-links>
-<!-- <myb-front-documents-list></myb-front-documents-list> -->
+  <div>
+    <myb-front-breadcumb></myb-front-breadcumb>
+    <myb-front-folder-cards ></myb-front-folder-cards>
+     <!-- <myb-front-document-upload></myb-front-document-upload> -->
+     <br/>
+     <!-- <myb-front-documents-list ></myb-front-documents-list> -->
 
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Document Name</th>
-          <th>Created at</th>
-          <th>Document Type</th>
-          <th>Status</th>
-          <th>Size</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        
-        <tr *ngFor="let doc of documents">
-          <td>{{ doc.documentName }}</td>
-          <td>{{ doc.createdDate | date : 'MM/dd/yyyy, h:mm a' }}</td>
-          <td>{{ doc.documentType }}</td>
-          <td [ngClass]="doc.status ? getStatusClass(doc.status) : 'defaultClass'">{{ doc.status }}</td>
-          <!-- @if( doc.status?.toString() === 'Submitted'){ 
-            <td  style="color:green" >{{ doc.status }}</td>
-                    
-          } -->
-          <td>{{ doc.documentSize }} kb</td>
-        <td> 
-          <button  type="button" class="btn btn-outline-secondary">
-           <i class="bi bi-trash" (click)="deleteDocument(doc.id)"> </i>
-          </button>
-          <button  type="button"class="btn btn-outline-primary me-2">
-            <i class="bi bi-pencil-square"(click)="openModal() "></i>
-
-          </button>
-        </td>
-        </tr>
-      </tbody>
-    </table>
-    
- 
+    <!-- <myb-front-nav-links></myb-front-nav-links> -->
   </div>
+
+</div>
+<router-outlet></router-outlet>

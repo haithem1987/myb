@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">MYB</a>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+
+     
+
+      <ul class="navbar-nav ms-auto">
+        <form class="d-flex mx-auto" style="width: 1250px;">
+          <input class="form-control me-2" type="search"   placeholder=" Search Files .." aria-label="Search">
+          
+        </form>
+        <!-- <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <button class="btn btn-outline-secondary me-2" (click)="openModal() ">
+              <i class="bi bi-folder-plus" style="font-size: 20px;"></i> + Folder
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <button class="btn btn-outline-secondary">
+              <i class="bi bi-file-earmark-font" style="font-size: 20px;"></i> + Documents
+            </button>
+          </li>
+        </ul> -->
+
+        <li ngbDropdown class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            id="navbarDropdown"
+            ngbDropdownToggle
+            role="button"
+            aria-expanded="false"
+            >User</a
+          >
+          <ul ngbDropdownMenu aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="#">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

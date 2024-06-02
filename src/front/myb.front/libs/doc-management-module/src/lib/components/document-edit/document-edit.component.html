@@ -4,34 +4,35 @@
 		<h4 class="modal-title">Edit  Document </h4>
 		<button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
 	</div>
+	<div>
+	<form class="container">
 	
-	<form>
 		  <div class="mb-3">
-			<label for="taskDescription" class="form-label">Document  Name</label>
+			<label for="documentName" class="form-label">Document  Name</label>
 			<input
 			  type="text"
 			  class="form-control"
-			  id="taskDescription"
-			  name="description"
+			  id="documentName"
+			  name="documentName"
 			  placeholder="Enter Document Name "
 			/>
 		  </div>
 		  <div class="mb-3">
-			<label for="taskStartTime" class="form-label">Created at</label>
+			<label for="docCreationTime" class="form-label">Created at</label>
 			<input
 			  type="datetime-local"
 			  class="form-control"
-			  id="taskStartTime"
-			  name="startTime"
+			  id="docCreationTime"
+			  name="docCreationTime"
 			/>
 		  </div>
 	 
 		  <div class="mb-3">
-			<label for="employee" class="form-label"> Type </label>
+			<label for="Type" class="form-label"> Type </label>
 			<select
 			  class="form-control"
-			  id="employee"
-			  name="employee"
+			  id="Type"
+			  name="Type"
 			>
 			  <option *ngFor="let document of documents" >
 				{{ document.documentType }}
@@ -40,6 +41,7 @@
 		  </div>
 	 
 	</form>
+</div>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
 		<button type="button" class="btn btn-outline-primary"(click)="activeModal.close('Close click')">Save</button>

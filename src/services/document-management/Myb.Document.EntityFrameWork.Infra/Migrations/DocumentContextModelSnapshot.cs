@@ -24,39 +24,38 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
 
             modelBuilder.Entity("Myb.document.Model.DocumentModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
                     b.Property<string>("DocumentName")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long>("DocumentSize")
+                    b.Property<long?>("DocumentSize")
                         .HasColumnType("bigint");
 
                     b.Property<int?>("DocumentType")
                         .HasColumnType("integer");
 
-                    b.Property<int>("EditedBy")
+                    b.Property<int?>("EditedBy")
                         .HasColumnType("integer");
 
                     b.Property<int?>("FolderId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("LastModifiedDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int?>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -67,26 +66,23 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
 
             modelBuilder.Entity("Myb.document.Model.DocumentVersion", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("DocumentId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("LastModifiedDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("Number")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UpdatedBy")
-                        .HasColumnType("integer");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -103,11 +99,11 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("CreatedBy")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EditedBy")
                         .HasColumnType("integer");
@@ -116,11 +112,11 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("LastModifiedDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int?>("ParentId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

@@ -1,6 +1,6 @@
-export class BaseModel {
-    id!: number;
-    createdDate: Date = new Date();
-    LastModifiedDate: Date = new Date();
-  }
-  
+export interface BaseModel {
+  id: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  // any other fields that are common across entities
+}

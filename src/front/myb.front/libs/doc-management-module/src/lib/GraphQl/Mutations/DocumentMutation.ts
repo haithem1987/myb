@@ -1,18 +1,14 @@
 import gql from 'graphql-tag';
 
 export const CREATE_DOCUMENT = gql`
-  mutation AddDocument($document: DocumentModel!) {
-    addDocument(document: $document) {
-      id
-      documentName
-      createdBy
-      editedBy
-      documentType
-      status
-      documentSize
-      createdDate
-      lastModifiedDate
-      folderId
+mutation CreateDocument($item: DocumentModelInput!) {
+  createDocument(input: $item) {
+    id
+    documentName
+    documentType
+    folderId
+    createdBy
+    editedBy
     }
   }
 `;
@@ -27,8 +23,8 @@ export const UPDATE_DOCUMENT = gql`
       documentType
       status
       documentSize
-      createdDate
-      lastModifiedDate
+      createdAt
+      updatedAt
       folderId
     }
   }

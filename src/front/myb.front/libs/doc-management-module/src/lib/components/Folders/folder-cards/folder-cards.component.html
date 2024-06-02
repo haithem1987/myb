@@ -1,20 +1,66 @@
+<div class="add-card">
+  <div>
+    <h5> <i class="bi bi-pin-angle-fill"></i> Quick Access </h5>
+  </div>
+  <div>
+    <button class="btn btn-outline-secondary me-2 btn-sm" (click)="openModal()">
+      <i class="bi bi-folder-plus" style="font-size: 20px;"></i>  Folder
+    </button>
+    <button class="btn btn-outline-secondary me-2 btn-sm" (click)="openModalDoc()">
+      <i class="bi bi-file-earmark-pdf" style="font-size: 20px;"></i>  +Documents
+    </button>
+  </div>
+</div>
 
-        <section class="pt-5">
-            <div class="container">
-              <div class="row">
-                <div class="col-lg " *ngFor="let folder of folders">
-                  <div class="card ">
-                   
-                    <!-- <div class="card-body " style="background-color: rgb(245, 247, 245);"> -->
-                        <div class="card-body " >
+<section class="pt-2">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-3" *ngFor="let folder of folders">
+        <div class="card" >
+          <div class="card-body">
+            <i class="bi bi-folder-fill" style="font-size: 40px;"></i>
+            <h6 class="card-title" [routerLink]="['/folder',folder.id]">{{ folder.folderName }}</h6>
+            <!-- <p class="card-text d-inline me-2">{{ getDocumentCount(folder) }} Doc </p><p class="card-text d-inline">10 KB</p> -->
 
-                        <i class="bi bi-folder-fill" style="font-size: 40px;"></i>
-                      <h6 class="card-title">{{folder.folderName}}</h6>
-                      <p class="card-text d-inline me-2">{{ getDocumentCount(folder) }} Doc </p><p class="card-text d-inline">10 KB</p>
-                    </div>
-                  </div>
-                </div>
-               </div>
-            </div>
-          
-            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <router-outlet></router-outlet>
+</section>
+
+<myb-front-document-upload></myb-front-document-upload>
+<!-- <div class="card border-primary p-3"> -->
+
+
+  <table class="table " >
+    <thead>
+      <tr>
+        <!-- <th>Folder Name</th>
+         <th> Createtd at</th> -->
+        <!-- <th class="text-end">Actions</th> --> 
+       
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let folder of folders">
+        <td>
+          <i class="bi bi-folder2-open  me-2" style="font-size: 25px;"></i>
+          <a class="card-title folder-link" [routerLink]="['/folder', folder.id]">{{ folder.folderName }} </a>
+        </td>
+        <!-- <td>{{ folder.createdAt }}</td> -->
+        <td class="text-end">
+          <button class="btn btn-outline-primary me-2" (click)="updateFolder(folder)">
+            <i class="bi bi-pencil-square "></i>
+          </button>
+          <button class="btn btn-outline-secondary" (click)="deleteFolder(folder.id)">
+            <i class="bi bi-trash" ></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+<!-- </div> -->
+

@@ -1,3 +1,27 @@
 .custom-bg-color{
     color: gray
 }
+.add-card{
+    display: flex;
+    justify-content:space-between;
+}
+.card{
+    padding: 15px;
+    margin-bottom: 20px;
+}
+.pagination{
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+/* Custom class for folder link */
+.folder-link {
+    text-decoration: none;
+    color: inherit; /* Default color */
+  }
+  
+  .folder-link:hover {
+    text-decoration: none;
+    color: green; /* Default color */
+  }
+  

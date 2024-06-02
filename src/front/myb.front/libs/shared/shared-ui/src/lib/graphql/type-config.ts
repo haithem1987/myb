@@ -8,7 +8,6 @@ import {
   DELETE_TASK,
   UPDATE_TASK,
 } from './mutations/task.graphql';
-<<<<<<< HEAD
 import { 
   GET_ALL_TASKS, 
   GET_TASK_BY_ID  } 
@@ -33,14 +32,12 @@ import {
 
 
 
-=======
 import {
   GET_ALL_EMPLOYEES,
   GET_EMPLOYEE_BY_ID,
 } from './queries/employee.graphql';
 import { GET_ALL_PROJECTS, GET_PROJECT_BY_ID } from './queries/project.graphql';
-import { GET_ALL_TASKS, GET_TASK_BY_ID } from './queries/task.graphql';
->>>>>>> d85cee36a15240a0985d8a65aea3b7dba0c15514
+// import { GET_ALL_TASKS, GET_TASK_BY_ID } from './queries/task.graphql';
 
 export const typeConfig: { [key: string]: any } = {
   User: {
@@ -57,7 +54,6 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_TASK,
     delete: DELETE_TASK,
   },
-<<<<<<< HEAD
   DocumentModel:{
     getById: GET_DOCUMENT_BY_ID,
     getAll: GET_ALL_DOCUMENTS,
@@ -80,7 +76,6 @@ export const typeConfig: { [key: string]: any } = {
 
 
 
-=======
   Project: {
     getAll: GET_ALL_PROJECTS,
     getById: GET_PROJECT_BY_ID,
@@ -95,7 +90,6 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_PROJECT,
     delete: DELETE_PROJECT,
   },
->>>>>>> d85cee36a15240a0985d8a65aea3b7dba0c15514
 
   // You can add more configurations for different types here
 };

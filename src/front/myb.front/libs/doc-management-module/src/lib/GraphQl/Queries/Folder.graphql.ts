@@ -15,27 +15,24 @@ export const GET_ALL_FOLDERS = gql`
     }
   }
 `;
-
 export const GET_FOLDER_BY_ID = gql`
-  query GetFolderById($id: ID!) {
-    folderById(id: $id) {
-      id
-      folderName
-      createdBy
-      editedBy
-      createdDate
-      lastModifiedDate
-      documents {
-        id
-        documentName
-        createdBy
-        editedBy
-        documentType
-        status
-        documentSize
-        createdDate
-        lastModifiedDate
+query getFolderById($id: Int!) {
+        folderById(id: $id) {
+          id
+          folderName
+          createdBy
+          editedBy
+          documents {
+            id
+            documentName
+            createdBy
+            editedBy
+            documentType
+            status
+            folderId
+            documentSize
+          }
+        }
       }
-    }
-  }
+
 `;

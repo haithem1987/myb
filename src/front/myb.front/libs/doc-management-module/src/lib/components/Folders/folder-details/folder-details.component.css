@@ -1,0 +1,14 @@
+.container {
+    /* padding-top: 20px; */
+
+}
+
+  
+  /* Hide the default dropdown arrow */
+  ::ng-deep .dropdown-toggle::after {
+    display: none !important;
+  }
+  .folder-name {
+    color: #845bba; /* Change 'blue' to any color you prefer */
+  }
+  

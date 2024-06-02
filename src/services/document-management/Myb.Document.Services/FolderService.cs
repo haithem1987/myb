@@ -2,17 +2,20 @@
 using Myb.Document.EntityFramework.Infra;
 using Myb.document.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 
 namespace Myb.Document.Services
 {
     public class FolderService : IFolderService
     {
-        private readonly IGenericRepository<int, Folder, DocumentContext> _folderRepository;
+        private readonly IGenericRepository<int?, Folder, DocumentContext> _folderRepository;
+        private readonly ILogger _logger;
 
-        public FolderService(IGenericRepository<int, Folder, DocumentContext> folderRepository)
+        public FolderService(IGenericRepository<int?, Folder, DocumentContext> folderRepository, ILogger<FolderService> logger)
         {
             _folderRepository = folderRepository;
+            _logger = logger;
         }
         /*
         public async Task<Folder> GetFolderByIdAsync(int id)
@@ -46,8 +49,16 @@ namespace Myb.Document.Services
 
         public async Task<Folder> UpdateFolderAsync(Folder folder)
         {
-            await _folderRepository.UpdateAsync(folder);
-            return folder;
+            try
+            {
+                await _folderRepository.UpdateAsync(folder);
+                return folder;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating folder");
+                throw;
+            }
         }
 
         public async Task<bool> DeleteFolderAsync(int id)

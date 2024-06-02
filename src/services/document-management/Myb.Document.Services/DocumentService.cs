@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Myb.Common.Repositories;
 using Myb.document.Model;
 using Myb.Document.EntityFramework.Infra;
@@ -10,11 +11,15 @@ namespace Myb.Document.Services
 {
     public class DocumentService : IDocumentService
     {
-        private readonly IGenericRepository<int, DocumentModel, DocumentContext> _documentRepository;
+        private readonly IGenericRepository<int?, DocumentModel, DocumentContext> _documentRepository;
+        private readonly ILogger _logger;
 
-        public DocumentService(IGenericRepository<int, DocumentModel, DocumentContext> documentRepository )
+
+        public DocumentService(IGenericRepository<int?, DocumentModel, DocumentContext> documentRepository , ILogger<DocumentModel> logger)
         {
             _documentRepository = documentRepository;
+            _logger = logger;
+
         }
 
         public Task<DocumentModel> GetDocumentByIdAsync(int id)
@@ -30,8 +35,16 @@ namespace Myb.Document.Services
 
         public async Task<DocumentModel> AddDocumentAsync(DocumentModel document)
         {
-            await _documentRepository.InsertAsync(document);
-            return document;
+            try
+            {
+                await _documentRepository.InsertAsync(document);
+                return document;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creatin  doc");
+                throw;
+            }
         }
 
         public async Task<DocumentModel> UpdateDocumentAsync(DocumentModel document)

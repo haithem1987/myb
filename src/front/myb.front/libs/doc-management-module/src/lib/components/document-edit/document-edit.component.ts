@@ -14,7 +14,7 @@ import { DocumentModel } from '../../models/DocumentModel';
 })
 export class DocumentEditComponent {
 
-  documents: DocumentModel[]=[];
+documents: DocumentModel[]=[];
 activeModal = inject(NgbActiveModal);
 documentType: any;
 

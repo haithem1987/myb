@@ -10,8 +10,8 @@ export const GET_ALL_DOCUMENTS = gql`
       documentType
       status
       documentSize
-      createdDate
-      lastModifiedDate
+      createdAt
+      updatedAt
       folderId
     }
   }
@@ -27,8 +27,8 @@ export const GET_DOCUMENT_BY_ID = gql`
       documentType
       status
       documentSize
-      createdDate
-      lastModifiedDate
+      createdAt
+      updatedAt
       folderId
     }
   }

@@ -6,8 +6,8 @@ export interface Folder extends BaseModel {
     folderName: string;
     createdBy: number;
     editedBy: number;
-    createdDate: Date;
-    lastModifiedDate: Date;
+    lastModifiedDate?: Date;
     documents: DocumentModel[] | null;
     children: Folder[] | null; 
+    CreatedAt: Date;
   }

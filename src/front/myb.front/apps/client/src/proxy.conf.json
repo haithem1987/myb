@@ -1,0 +1,16 @@
+{
+  "/auth": {
+    "target": "https://www.keycloak.forlink-group.com",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/auth": ""
+    },
+    "logLevel": "debug"
+  },
+  "/realms/*": {
+    "target": "https://www.keycloak.forlink-group.com",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

@@ -24,6 +24,7 @@
     <table class="table">
       <thead>
         <tr>
+          <th>Description</th>
           <th scope="col" (click)="onSort('date')" style="cursor: pointer">
             Date
             <i
@@ -54,13 +55,25 @@
               }"
             ></i>
           </th>
-          <th>Description</th>
+
           <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let timesheet of timesheets$ | async">
+        <tr *ngFor="let timesheet of updatedTimesheets">
+          <td>
+            <div>{{ timesheet.description }}</div>
+            <div class="d-flex text-muted">
+              <myb-front-avatar
+                [text]="timesheet.employeeName"
+                [size]="20"
+              ></myb-front-avatar
+              ><span class="ms-1 text-capitalize">{{
+                timesheet?.employeeName ?? ''
+              }}</span>
+            </div>
+          </td>
           <td>{{ timesheet.date | date }}</td>
           <td>
             <div class="d-flex align-items-center">
@@ -71,7 +84,7 @@
                   [striped]="false"
                   [animated]="false"
                   [showValue]="false"
-                  [max]="24"
+                  [max]="8"
                   height="8px"
                 ></myb-front-progress-bar>
               </div>
@@ -80,7 +93,7 @@
               >
             </div>
           </td>
-          <td>{{ timesheet.description }}</td>
+
           <td>
             <span
               [ngClass]="'badge ' + getApprovalStatus(timesheet).badgeClass"

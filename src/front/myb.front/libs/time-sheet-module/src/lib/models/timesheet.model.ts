@@ -8,8 +8,8 @@ export interface Timesheet extends BaseModel {
   description?: string;
   isApproved: boolean;
   employeeId: number;
-  employee?: Employee;
+  employeeName?: string;
   projectId: number;
-  project?: Project;
+  projectName?: string;
   userId?: string;
 }

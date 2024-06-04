@@ -21,6 +21,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { Employee } from '../../../models/employee';
 import { EmployeeService } from '../../../services/employee.service';
 import { DateUtilsService } from 'libs/shared/shared-ui/src';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   selector: 'myb-front-timesheet-create',
@@ -50,7 +51,8 @@ export class TimesheetCreateComponent implements OnInit {
     private projectService: ProjectService,
     private employeeService: EmployeeService,
     private toastService: ToastService,
-    private dateUtils: DateUtilsService
+    private dateUtils: DateUtilsService,
+    private keycloakService: KeycloakService
   ) {
     this.projectService.getAll().subscribe();
     this.employeeService.getAll().subscribe();
@@ -65,8 +67,15 @@ export class TimesheetCreateComponent implements OnInit {
       workedHours: ['00:00:00', Validators.required], // Use string for display
       isApproved: [false, Validators.required],
       employeeId: [null, Validators.required],
+      employeeName: [''],
       projectId: [null, Validators.required],
-      userId: ['1', Validators.required],
+      projectName: [''],
+      userId: ['', Validators.required],
+    });
+    this.keycloakService.userId$.subscribe((userId) => {
+      if (userId) {
+        this.timesheetForm.get('userId')?.setValue(userId);
+      }
     });
     console.log('$projects | async', this.projects$);
   }
@@ -130,10 +139,12 @@ export class TimesheetCreateComponent implements OnInit {
 
   onProjectSelect(project: any): void {
     this.timesheetForm.get('projectId')?.setValue(project.id);
+    this.timesheetForm.get('projectName')?.setValue(project.projectName);
   }
 
   onEmployeeSelect(employee: any): void {
     this.timesheetForm.get('employeeId')?.setValue(employee.id);
+    this.timesheetForm.get('employeeName')?.setValue(employee.name);
   }
 
   addEntry(): void {

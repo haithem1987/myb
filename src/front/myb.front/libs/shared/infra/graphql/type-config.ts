@@ -22,6 +22,7 @@ import {
 } from '../../../time-sheet-module/src/lib/graphql/queries/task.graphql';
 import {
   GET_ALL_EMPLOYEES,
+  GET_EMPLOYEES_BY_MANAGER_ID,
   GET_EMPLOYEE_BY_ID,
 } from 'libs/time-sheet-module/src/lib/graphql/queries/employee.graphql';
 import {
@@ -34,6 +35,11 @@ import {
   DELETE_TIMESHEET,
   UPDATE_TIMESHEET,
 } from 'libs/time-sheet-module/src/lib/graphql/mutations/timesheet.graphql';
+import {
+  CREATE_EMPLOYEE,
+  DELETE_EMPLOYEE,
+  UPDATE_EMPLOYEE,
+} from 'libs/time-sheet-module/src/lib/graphql/mutations/employee.graphql';
 
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
@@ -70,9 +76,10 @@ export const typeConfig: { [key: string]: any } = {
   Employee: {
     getAll: GET_ALL_EMPLOYEES,
     getById: GET_EMPLOYEE_BY_ID,
-    create: CREATE_PROJECT,
-    update: UPDATE_PROJECT,
-    delete: DELETE_PROJECT,
+    create: CREATE_EMPLOYEE,
+    update: UPDATE_EMPLOYEE,
+    delete: DELETE_EMPLOYEE,
+    getEmployeesByManagerId: GET_EMPLOYEES_BY_MANAGER_ID,
   },
   Invoice: {
     getAll: GET_ALL_INVOICES,

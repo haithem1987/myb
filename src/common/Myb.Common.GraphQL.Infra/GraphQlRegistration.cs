@@ -32,8 +32,7 @@ namespace Myb.Common.GraphQL.Infra
                 //.AddAuthorizationCore()
                 .RegisterDbContext<TDbContext>()
                 .AddQueryType<TQuery>()
-                .AddMutationType<TMutation>()
-                .AddTypeExtension<TimesheetResolver>();
+                .AddMutationType<TMutation>();
         }
     }
 }

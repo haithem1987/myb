@@ -1,12 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Timesheet } from '../../../models/timesheet.model';
 import { FormsModule } from '@angular/forms';
 import { TimesheetCreateComponent } from '../create/timesheet-create.component';
 import { TimesheetService } from '../../../services/timesheet.service';
-import { Observable } from 'rxjs';
-import { ProgressBarComponent } from 'libs/shared/shared-ui/src';
+import { Observable, tap } from 'rxjs';
+import {
+  AvatarComponent,
+  ProgressBarComponent,
+} from 'libs/shared/shared-ui/src';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   selector: 'myb-timesheet-list',
@@ -17,23 +21,33 @@ import { ProgressBarComponent } from 'libs/shared/shared-ui/src';
     FormsModule,
     TimesheetCreateComponent,
     ProgressBarComponent,
+    AvatarComponent,
   ],
   templateUrl: './timesheet-list.component.html',
   styleUrls: ['./timesheet-list.component.css'],
 })
 export class TimesheetListComponent implements OnInit {
   timesheets$: Observable<Timesheet[]> = this.timesheetService.timesheets$;
+  userId$: Observable<string | null> = this.keycloakService.userId$;
+  updatedTimesheets: Timesheet[] = [];
   searchTerm: string = '';
   sortColumn: string = '';
-  sortDirection: string = '';
+  sortDirection: 'asc' | 'desc' | '' = '';
 
   constructor(
     private router: Router,
-    private timesheetService: TimesheetService
+    private timesheetService: TimesheetService,
+    private keycloakService: KeycloakService
   ) {}
 
   ngOnInit(): void {
-    this.timesheetService.getTimesheetsByUserId('1').subscribe();
+    this.userId$.subscribe((userId) => {
+      if (!userId) return;
+      this.timesheetService
+        .getTimesheetsByUserId(userId)
+        .pipe(tap((timesheets) => (this.updatedTimesheets = timesheets)))
+        .subscribe();
+    });
   }
 
   addTimesheet(): void {
@@ -46,8 +60,11 @@ export class TimesheetListComponent implements OnInit {
 
   deleteTimeSheet(id: number): void {
     if (confirm('Are you sure you want to delete this timesheet?')) {
-      // Assuming a deleteTimesheet method is passed or implemented
-      this.deleteTimesheet(id);
+      this.timesheetService.delete(id).subscribe(() => {
+        this.updatedTimesheets = this.updatedTimesheets.filter(
+          (t) => t.id !== id
+        );
+      });
     }
   }
 
@@ -62,12 +79,31 @@ export class TimesheetListComponent implements OnInit {
       this.sortColumn = column;
       this.sortDirection = 'asc';
     }
-    // Implement sorting logic
+    this.sortTimesheets();
   }
 
-  deleteTimesheet(id: number): void {
-    // Placeholder method for deletion logic
+  private sortTimesheets(): void {
+    if (!this.sortColumn || this.sortDirection === '') {
+      this.updatedTimesheets = [...this.updatedTimesheets];
+    } else {
+      this.updatedTimesheets.sort((a: any, b: any) => {
+        let valueA = a[this.sortColumn];
+        let valueB = b[this.sortColumn];
+
+        if (typeof valueA === 'string') {
+          valueA = valueA.toLowerCase();
+          valueB = valueB.toLowerCase();
+        }
+
+        if (this.sortDirection === 'asc') {
+          return valueA > valueB ? 1 : -1;
+        } else {
+          return valueA < valueB ? 1 : -1;
+        }
+      });
+    }
   }
+
   getApprovalStatus(timesheet: Timesheet): {
     text: string;
     badgeClass: string;
@@ -78,6 +114,7 @@ export class TimesheetListComponent implements OnInit {
       return { text: 'En attente', badgeClass: 'bg-warning' };
     }
   }
+
   getWorkedHours(workedHours: number): number {
     return Number(workedHours.toFixed(1));
   }

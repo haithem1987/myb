@@ -11,6 +11,8 @@ export const GET_ALL_TIMESHEETS = `
       updatedAt
       userId
       workedHours
+      employeeName
+    projectName
     }
   }
 `;
@@ -28,6 +30,8 @@ export const GET_TIMESHEETS_BY_USER_ID = `
     updatedAt
     userId
     workedHours
+    employeeName
+    projectName
     }
   }
 `;

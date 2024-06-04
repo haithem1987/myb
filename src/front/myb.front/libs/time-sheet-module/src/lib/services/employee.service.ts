@@ -46,12 +46,12 @@ export class EmployeeService extends RepositoryService<Employee> {
 
   override get(id: number): Observable<Employee> {
     return super.get(id).pipe(
-      map((project) => {
+      map((employee) => {
         const employees = this.employeeSubject.value.map((p) =>
-          p.id === id ? project : p
+          p.id === id ? employee : p
         );
         this.employeeSubject.next(employees);
-        return project;
+        return employee;
       })
     );
   }
@@ -69,9 +69,11 @@ export class EmployeeService extends RepositoryService<Employee> {
   override update(id: number, item: Employee): Observable<Employee> {
     return super.update(id, item).pipe(
       map((updatedEmployee) => {
+        console.log('updatedEmployee', updatedEmployee);
         const employees = this.employeeSubject.value.map((t) =>
           t.id === id ? updatedEmployee : t
         );
+        console.log(' updated employees ', employees);
         this.employeeSubject.next(employees);
         return updatedEmployee;
       })
@@ -90,5 +92,22 @@ export class EmployeeService extends RepositoryService<Employee> {
         return success;
       })
     );
+  }
+
+  getEmployeesByManagerId(managerId: string): Observable<Employee[]> {
+    return this.apollo
+      .watchQuery<{ employeesByManagerId: Employee[] }>({
+        query: gql`
+          ${this.typeOperations.getEmployeesByManagerId}
+        `,
+        variables: { managerId },
+      })
+      .valueChanges.pipe(
+        map((result: any) => {
+          const employees = result.data.employeesByManagerId;
+          this.employeeSubject.next(employees);
+          return employees;
+        })
+      );
   }
 }

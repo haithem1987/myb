@@ -11,6 +11,8 @@ export const CREATE_TIMESHEET = `
     updatedAt
     userId
     workedHours
+    employeeName
+    projectName
     }
   }
 `;
@@ -28,6 +30,8 @@ export const UPDATE_TIMESHEET = `
     updatedAt
     userId
     workedHours
+    employeeName
+    projectName
     }
   }
 `;

@@ -3,6 +3,7 @@ import '@angular/localize/init';
 import { Router, RouterModule } from '@angular/router';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { NxWelcomeComponent } from './nx-welcome.component';
+
 @Component({
   standalone: true,
   imports: [NxWelcomeComponent, RouterModule],

@@ -7,6 +7,9 @@ import { TimesheetScreenComponent } from './screens/timesheet-screen/timesheet-s
 import { ProjectIndexComponent } from './screens/projects/index/project-index.component';
 import { EditProjectComponent } from './screens/projects/edit/edit-project.component';
 import { ProjectListComponent } from './screens/projects/list/project-list.component';
+import { EmployeeIndexComponent } from './screens/employees/index/employee-index.component';
+import { EmployeeListComponent } from './screens/employees/list/employee-list.component';
+import { EmployeeEditComponent } from './screens/employees/edit/employee-edit.component';
 
 export const timesheetRoutes: Routes = [
   {
@@ -48,6 +51,28 @@ export const timesheetRoutes: Routes = [
                 return `${route.paramMap.get('projectId')}`;
               },
             },
+          },
+        ],
+      },
+      {
+        path: 'employees',
+        component: EmployeeIndexComponent,
+        data: { breadcrumb: 'Employeurs' },
+        children: [
+          {
+            path: '',
+            component: EmployeeListComponent,
+            data: { breadcrumb: 'Liste' },
+          },
+          {
+            path: 'new',
+            component: EmployeeEditComponent,
+            data: { breadcrumb: 'Créer' },
+          },
+          {
+            path: 'edit/:id',
+            component: EmployeeEditComponent,
+            data: { breadcrumb: 'Editer' },
           },
         ],
       },

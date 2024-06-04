@@ -30,37 +30,67 @@
   <router-outlet></router-outlet>
 </section>
 
-<myb-front-document-upload></myb-front-document-upload>
+<!-- <myb-front-document-upload></myb-front-document-upload> -->
 <!-- <div class="card border-primary p-3"> -->
 
 
-  <table class="table " >
-    <thead>
-      <tr>
-        <!-- <th>Folder Name</th>
-         <th> Createtd at</th> -->
-        <!-- <th class="text-end">Actions</th> --> 
-       
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let folder of folders">
-        <td>
-          <i class="bi bi-folder2-open  me-2" style="font-size: 25px;"></i>
-          <a class="card-title folder-link" [routerLink]="['/folder', folder.id]">{{ folder.folderName }} </a>
-        </td>
-        <!-- <td>{{ folder.createdAt }}</td> -->
-        <td class="text-end">
-          <button class="btn btn-outline-primary me-2" (click)="updateFolder(folder)">
-            <i class="bi bi-pencil-square "></i>
-          </button>
-          <button class="btn btn-outline-secondary" (click)="deleteFolder(folder.id)">
-            <i class="bi bi-trash" ></i>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  
-<!-- </div> -->
+  <!-- Table to display folders and documents -->
+  <div class="table doc folders">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Size</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let folder of folders">
+          <td>
+            <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
+            <a class="card-title folder-link" [routerLink]="['/folder', folder.id]">{{ folder.folderName }}</a>
+          </td>
+          <td>Folder</td>
+          <td></td>
+          <td class="text-end">
+            <button class="btn btn-outline-primary me-2" (click)="updateFolder(folder)">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button class="btn btn-outline-secondary" (click)="deleteFolder(folder.id != null ? folder.id : -1)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngFor="let doc of documents">
+          <td>
+            <ng-container [ngSwitch]="doc.documentType">
+              <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf me-2" style="font-size: 25px;"></i>
+              <i *ngSwitchCase="'WORD'" class="bi bi-file-word me-2" style="font-size: 25px;"></i>
+              <i *ngSwitchCase="'EXCEL'" class="bi bi-file-earmark-excel me-2" style="font-size: 25px;"></i>
+            </ng-container>
+            <a class="card-title folder-link" [href]="doc.file" target="_blank">{{ doc.documentName }}</a>
+          </td>
+          <td>{{ doc.documentType }}</td>
+          <td>{{ doc.documentSize }} bytes</td>
+          <td class="text-end">
+            <div class="d-flex justify-content-end">
+              <a [href]="doc.url" target="_blank">
+                <button type="button" class="btn btn-outline-primary">
+                  <i class="bi bi-eye-fill"></i>
+                </button>
+              </a> 
+              <button class="btn btn-outline-primary me-2">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button class="btn btn-outline-secondary">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
+  

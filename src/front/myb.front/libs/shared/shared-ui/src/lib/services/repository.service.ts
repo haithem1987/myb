@@ -47,6 +47,7 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
   }
 
   create(item: T): Observable<T> {
+    console.log(item);
     return this.apollo
       .mutate<T>({
         mutation: gql`

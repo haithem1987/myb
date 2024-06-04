@@ -2,7 +2,7 @@ import { FolderService } from './../../../services/folder.service';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DocumentModel } from '../../../models/DocumentModel';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DocumentService } from '../../../services/Document.service';
 import { NavbarComponent } from '../../navigation-components/navbar/navbar.component';
 import { DocumentStatus } from '../../../models/DocumentStatus';
@@ -26,7 +26,8 @@ export class FolderDetailsComponent  implements OnInit {
     private route: ActivatedRoute,
     private folderService: FolderService,
     private DocumentService: DocumentService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
@@ -106,4 +107,5 @@ console.log('doc deleted');
       return { text: 'Approved', badgeClass: 'bg-warning' };
     }
   }
+ 
 }

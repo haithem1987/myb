@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DocumentModel } from '../../models/DocumentModel';
 import { DocumentStatus } from '../../models/DocumentStatus';
@@ -21,28 +21,12 @@ export class DocumentUploadComponent {
   documents: DocumentModel[] = [];
   folders:Folder[] = []
 
-  public selectedFiles: SelectedFiles[] = [];
-  public isLoading = new BehaviorSubject(false);
+  selectedFiles: SelectedFiles[] = [];
+  @Output() selectedFilesChange = new EventEmitter<SelectedFiles[]>();
 
+  constructor(private files :UploadFilesService) {}
   
 
-  constructor(private documentService: DocumentService , private files :UploadFilesService) {}
-
-
-
-  //alldoc
-  loadDocuments() {
-    this.documentService.getAll().subscribe((data: any) => {
-      console.log("Received data from server:", data);
-     // console.log('status ',this.documents);
-      if (data && data.allDocuments && Array.isArray(data.allDocuments)) {
-        this.documents = data.allDocuments;
-      } else {
-        console.error("Invalid data format received from the server");
-      }
-    });
-  }
-  
   onSelectFile(filesData: any, fileInput: any) {
     const { files } = fileInput.target;
       const file = files[0];
@@ -65,6 +49,7 @@ export class DocumentUploadComponent {
           this.selectedFiles = res;
         }
       }
+      console.log('upload component',files)
     });
   }
 

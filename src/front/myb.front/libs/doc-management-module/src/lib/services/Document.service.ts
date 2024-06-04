@@ -1,8 +1,11 @@
+import { DocumentVersion } from './../models/DocumentVersion';
 import { Injectable } from '@angular/core';
 import { RepositoryService } from 'libs/shared/shared-ui/src/lib/services/repository.service';
 import { DocumentModel } from '../models/DocumentModel'; 
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, catchError, map, throwError } from 'rxjs';
+import { DocumentStatus } from '../models/DocumentStatus';
+import { ApolloError } from '@apollo/client';
 
 
 @Injectable({
@@ -91,6 +94,24 @@ getDocumentsByFolderId(folderId: number): Observable<DocumentModel[]> {
     map((result: any) => result.data.documentsByFolderId)
   );
 }
+
+createDocument(document: DocumentModel): Observable<DocumentModel> {
+  let documenttest =document;
+  console.log("this document test",documenttest);
+  // console.log("type operation",this.typeOperations.create);
+  return this.apollo
+    .mutate<{ addDocument: DocumentModel }>({
+      mutation: gql`
+      ${this.typeOperations.create}
+    `,
+      variables: { document }
+    })
+    .pipe(
+      map((result: any) => { console.log(result.data); return result.data.addDocument})
+    );
+}
+
+
 
 //create document
 

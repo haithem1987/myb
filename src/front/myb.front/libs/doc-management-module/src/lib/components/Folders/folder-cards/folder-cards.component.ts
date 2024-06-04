@@ -63,6 +63,9 @@ documents: DocumentModel[]=[];
 
   //delete doc
 deleteFolder(id: number){
+  if (id==-1) {
+    return;
+  }
   this.folderService.delete(id).subscribe(() => {
     this.loadFolders();
     // this.documents = this.documents.filter(doc => doc.id !== docId);

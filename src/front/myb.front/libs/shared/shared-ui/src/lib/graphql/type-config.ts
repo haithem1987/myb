@@ -16,9 +16,10 @@ import { GET_ALL_DOCUMENTS ,
   GET_DOCUMENT_BY_ID } 
   from "../../../../../doc-management-module/src/lib/GraphQl/Queries/Document.graphql"
 import { 
-  CREATE_DOCUMENT , 
+
   UPDATE_DOCUMENT ,
-  DELETE_DOCUMENT} 
+  DELETE_DOCUMENT,
+  ADD_DOCUMENT} 
   from "../../../../../doc-management-module/src/lib/GraphQl/Mutations/DocumentMutation"
 import { 
   ADD_FOLDER, 
@@ -59,7 +60,7 @@ export const typeConfig: { [key: string]: any } = {
     getAll: GET_ALL_DOCUMENTS,
     update: UPDATE_DOCUMENT,
     delete: DELETE_DOCUMENT,
-    create: CREATE_DOCUMENT,
+    create: ADD_DOCUMENT,
 
   },
   //folder type

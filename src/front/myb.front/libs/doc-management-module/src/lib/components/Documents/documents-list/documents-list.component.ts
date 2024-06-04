@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Folder } from '../../models/Folder';
+import { Folder } from '../../../models/Folder';
 
 @Component({
   selector: 'myb-front-documents-list',

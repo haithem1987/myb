@@ -1,7 +1,5 @@
 export enum DocumentType {
-  PDF,
- Word,
- Excel
-   
-  }
-  
+  PDF = 'PDF',
+  Word = 'WORD',
+  Excel = 'EXCEL',
+}

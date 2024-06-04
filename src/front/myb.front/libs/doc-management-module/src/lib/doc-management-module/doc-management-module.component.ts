@@ -1,5 +1,5 @@
 import { DocumentStatus } from './../models/DocumentStatus';
-import { DocumentsListComponent } from './../components/documents-list/documents-list.component';
+import { DocumentsListComponent } from '../components/Documents/documents-list/documents-list.component';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

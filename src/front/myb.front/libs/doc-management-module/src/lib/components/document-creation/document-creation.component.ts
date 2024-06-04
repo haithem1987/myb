@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
@@ -7,13 +7,13 @@ import { FolderService } from '../../services/folder.service';
 import { DocumentModel } from '../../models/DocumentModel';
 import { Folder } from '../../models/Folder';
 import { DocumentType } from '../../models/DocumentType';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { DocumentUploadComponent } from '../document-upload/document-upload.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'myb-front-document-creation',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DocumentUploadComponent],
   templateUrl: './document-creation.component.html',
   styleUrls: ['./document-creation.component.css'],
 })
@@ -21,16 +21,17 @@ export class DocumentCreationComponent implements OnInit {
   documentName: string = '';
   folderId: number | null = null;
   documentType: DocumentType | undefined = undefined;
-  // content: string = '';
   @Output() documentCreated = new EventEmitter<DocumentModel>();
   folders: Folder[] = [];
+  documents: DocumentModel[] = [];
   documentTypes = Object.values(DocumentType).filter(value => typeof value === 'string') as string[];
-
+  @ViewChild(DocumentUploadComponent) documentUploadComponent: DocumentUploadComponent | undefined;
 
   constructor(
     public activeModal: NgbActiveModal,
     private documentService: DocumentService,
-    private folderService: FolderService 
+    private folderService: FolderService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -48,62 +49,45 @@ export class DocumentCreationComponent implements OnInit {
     );
   }
 
-
   createDocument(): void {
     if (this.documentName && this.documentType !== undefined && this.folderId !== null) {
-        console.log('Debug - Input Values:', {
-            documentName: this.documentName,
-            documentType: this.documentType,
-            folderId: this.folderId,
-        });
-
-        const document: DocumentModel = {
-            id: 0,
-            documentName: this.documentName,
-            folderId: this.folderId,
-            createdBy: 0,
-            editedBy: 0,
-            folder: null,
-            versions: null,
-            status: undefined,
-            documentType: DocumentType[this.documentType as unknown as keyof typeof DocumentType] as unknown as DocumentType,
-            // content: this.content, // Assuming 'content' is added to DocumentModel
+      const selectedFiles = this.documentUploadComponent?.selectedFiles || [];
+      if (selectedFiles.length > 0) {
+        const document = {
+          id: 0,
+          documentName: this.documentName,
+          documentType: this.documentType.toString(),
+          createdBy: 1,
+          editedBy: 1,
+          folderId: parseInt(this.folderId.toString()),
+          documentSize: selectedFiles[0].file.size,
+          file: selectedFiles[0].Image, // Save the base64 string
+          url: selectedFiles[0].url, // Save the URL
+          createdAt: new Date(),
+          updatedAt: new Date(),
         };
-
-        console.log('Debug - Document Object to be Sent:', document);
-
-        this.documentService.create(document).subscribe(
-            (newDocument) => {
-                console.log('Debug - Document Created:', newDocument);
-                this.documentCreated.emit(newDocument);
-                this.activeModal.close();
-                if (this.documentType === DocumentType.PDF) {
-                    this.generatePDF();
-                }
-            },
-            (error) => {
-                console.error('Error creating document:', error);
-                alert('An error occurred while creating the document. Please try again.');
-            }
+        console.log('url:', selectedFiles[0].url);
+        console.log('file:', selectedFiles[0].Image);
+        this.documentService.createDocument(document).subscribe(
+          (newDocument) => {
+            this.documents.push(newDocument);
+            this.documentCreated.emit(newDocument);
+            this.activeModal.close();
+            console.log('new doc', newDocument);
+          },
+          (error) => {
+            console.error('Error creating document:', error);
+            alert('An error occurred while creating the document. Please try again.');
+          }
         );
+      } else {
+        alert('Please upload a file');
+      }
     } else {
-        alert('Please enter all required fields');
-    }
-}
-
-
-  generatePDF() {
-    const data = document.getElementById('contentToConvert');
-    if (data) {
-      html2canvas(data).then(canvas => {
-        const imgWidth = 208;
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-        const contentDataURL = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const position = 0;
-        pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight);
-        pdf.save(`${this.documentName}.pdf`);
-      });
+      alert('Please enter all required fields');
     }
   }
+
+  
+
 }

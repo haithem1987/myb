@@ -19,6 +19,7 @@ export class UploadFilesService {
 
   public toBase64(files: File[], selectedFiles: SelectedFiles[]): Observable<SelectedFiles[]> {
     const result = new AsyncSubject<SelectedFiles[]>();
+
     if (files?.length) {
       Object.keys(files)?.forEach((file, i) => {
         const url = URL.createObjectURL(files[i]);
@@ -28,10 +29,18 @@ export class UploadFilesService {
           selectedFiles = selectedFiles?.filter(f => f?.ImageName != files[i]?.name);
           selectedFiles.push({ ImageName: files[i]?.name, file: files[i], Image: reader?.result as string, url: url});
           result.next(selectedFiles);
+
           if (files?.length === (i + 1)) {
             result.complete();
           }
-          console.log('result' ,result)
+          
+          console.log('result',selectedFiles);
+          // selectedFiles.forEach((selectedFile) => {
+          //   const fileSize = selectedFile.file.size; // Accessing the size property of the file
+          //   console.log("File Size:", fileSize);
+            
+          // });
+
 
         };
       });

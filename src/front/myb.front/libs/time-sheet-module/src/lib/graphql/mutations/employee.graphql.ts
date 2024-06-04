@@ -1,33 +1,37 @@
-import gql from 'graphql-tag';
-
-export const CREATE_PROJECT = gql`
-  mutation addProject($item: Project!) {
-    updateProject(project: $item) {
-      id
-      name
+export const CREATE_EMPLOYEE = `
+  mutation addEmployee($item: EmployeeInput!) {
+    addEmployee(employee: $item) {
+      createdAt
       department
       email
-      createdAt
+      id
+      isManager
+      managerId
+      name
       updatedAt
+      userId
     }
   }
 `;
 
-export const UPDATE_PROJECT = gql`
-  mutation updateProject($item: Project!) {
-    updateProject(project: $item) {
-      id
-      name
+export const UPDATE_EMPLOYEE = `
+  mutation updateEmployee($item: EmployeeInput!) {
+    updateEmployee(employee: $item) {
+      createdAt
       department
       email
-      createdAt
+      id
+      isManager
+      managerId
+      name
       updatedAt
+      userId
     }
   }
 `;
 
-export const DELETE_PROJECT = gql`
-  mutation deleteProject($id: Int!) {
-    deleteProject(id: $id)
+export const DELETE_EMPLOYEE = `
+  mutation deleteEmployee($id: Int!) {
+    deleteEmployee(id: $id)
   }
 `;

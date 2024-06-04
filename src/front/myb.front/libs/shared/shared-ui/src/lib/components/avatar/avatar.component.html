@@ -1,0 +1,12 @@
+<div
+  class="avatar"
+  [ngStyle]="{
+    'background-color': getAvatarColor(text ?? ''),
+    'width.px': size,
+    'height.px': size,
+    'font-size.px': size * 0.5
+  }"
+>
+  <img *ngIf="imageUrl; else noImage" [src]="imageUrl" class="avatar-image" />
+  <ng-template #noImage>{{ text?.charAt(0)?.toUpperCase() }}</ng-template>
+</div>

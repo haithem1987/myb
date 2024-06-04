@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Myb.Common.Repositories;
+using Myb.Timesheet.Infra;
 
 namespace Myb.Common.GraphQL.Infra
 {
@@ -27,12 +28,11 @@ namespace Myb.Common.GraphQL.Infra
                 .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true)
                 .AddSorting()
                 .AddFiltering()
+                .AddType<TimesheetResolver>()
                 //.AddAuthorizationCore()
                 .RegisterDbContext<TDbContext>()
                 .AddQueryType<TQuery>()
-                .AddMutationType<TMutation>()
-                .AddType<UploadType>();
-
+                .AddMutationType<TMutation>();
         }
     }
 }

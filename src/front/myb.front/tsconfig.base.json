@@ -20,6 +20,7 @@
       "@myb-front/doc-management-module": [
         "libs/doc-management-module/src/index.ts"
       ],
+      "@myb-front/invoice-module": ["libs/invoice-module/src/index.ts"],
       "@myb-front/shared-ui": ["libs/shared/shared-ui/src/index.ts"],
       "@myb-front/sharedModels": ["libs/shared/shared-ui/src/lib/models"],
       "@myb-front/theme-styles": [

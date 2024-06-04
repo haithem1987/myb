@@ -7,7 +7,13 @@ public class Employee:BaseEntity
     public string? Name { get; set; }
     public string? Department { get; set; }
     public string? Email { get; set; }
-    
+    public bool isManager { get; set; } = false;
+    public string? ManagerId { get; set; }
+
     // Navigation properties
-    public virtual ICollection<TimesheetTask>? Tasks { get; set; }
+    public virtual ICollection<TimeSheet>? Timesheets { get; set; } = new List<TimeSheet>();
+    public virtual ICollection<TimeOff>? TimeOffs { get; set; } = new List<TimeOff>();
+    
+    public virtual ICollection<TimesheetTask>? Tasks { get; set; } = new List<TimesheetTask>();
+    public string? UserId { get; set; }
 }

@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export const CREATE_PROJECT = gql`
-  mutation addProject($item: Project!) {
-    updateProject(project: $item) {
+  mutation addProject($item: ProjectInput!) {
+    addProject(project: $item) {
       id
       projectName
       description
@@ -15,7 +15,7 @@ export const CREATE_PROJECT = gql`
 `;
 
 export const UPDATE_PROJECT = gql`
-  mutation updateProject($item: Project!) {
+  mutation updateProject($item: ProjectInput!) {
     updateProject(project: $item) {
       id
       projectName

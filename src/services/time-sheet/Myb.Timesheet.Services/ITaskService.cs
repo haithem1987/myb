@@ -9,4 +9,5 @@ public interface ITaskService
         Task<TimesheetTask> AddTaskAsync(TimesheetTask task);
         Task<TimesheetTask> UpdateTaskAsync(TimesheetTask task);
         Task<bool> DeleteTaskAsync(int id);
+        Task<IEnumerable<TimesheetTask>> GetTasksByProjectIdAsync(int projectId);
 }

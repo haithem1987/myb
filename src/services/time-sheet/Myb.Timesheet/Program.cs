@@ -23,13 +23,13 @@ builder.AddKeycloakSettings();
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddServices();
+builder.Services.RegisterServices();
 
 // Configure the HTTP request pipeline.
 
 builder.Services.AddPooledDbContextFactory<TimesheetContext>(options=>options.UseNpgsql(builder.Configuration.GetConnectionString("TimesheetDBConnection")));
 
 builder.Services.RegisterGraphQl<TimesheetContext, TimesheetQuery, TimesheetMutation>();
-builder.Services.RegisterServices();
 builder.AddKeycloakAuthorization();
 var app = builder.Build();
 app.UseCors("AllowTimesheetOrigins");

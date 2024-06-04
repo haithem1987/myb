@@ -7,6 +7,8 @@ import {
   RouterModule,
 } from '@angular/router';
 import { filter } from 'rxjs';
+import { ActivatedRouteSnapshot } from '@angular/router';
+
 interface Breadcrumb {
   label: string;
   url: string;
@@ -17,7 +19,7 @@ interface Breadcrumb {
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './breadcrumb.component.html',
-  styleUrl: './breadcrumb.component.css',
+  styleUrls: ['./breadcrumb.component.css'],
 })
 export class BreadcrumbComponent implements OnInit {
   breadcrumbs: Breadcrumb[] = [];
@@ -26,7 +28,6 @@ export class BreadcrumbComponent implements OnInit {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
-        console.log('breadcrumbs', this.buildBreadcrumbs(this.route.root));
         this.breadcrumbs = this.buildBreadcrumbs(this.route.root);
       });
   }
@@ -52,8 +53,13 @@ export class BreadcrumbComponent implements OnInit {
         url += `/${routeURL}`;
       }
 
+      let label = child.snapshot.data['breadcrumb'];
+      if (typeof label === 'function') {
+        label = label(child.snapshot);
+      }
+
       const breadcrumb: Breadcrumb = {
-        label: child.snapshot.data['breadcrumb'],
+        label,
         url: url,
       };
       breadcrumbs.push(breadcrumb);

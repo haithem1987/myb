@@ -11,6 +11,7 @@ namespace Myb.Timesheet.Infra.Extensions
             services.AddScoped<ITaskService,TaskService>();
             services.AddScoped<IProjectService,ProjectService>();
             services.AddScoped<IEmployeeService,EmployeeService>();
+            services.AddScoped<ITimesheetService,TimesheetService>();
         }
     }
 }

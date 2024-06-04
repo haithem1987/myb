@@ -1,0 +1,18 @@
+<!-- toasts-container.component.html -->
+<div class="position-absolute top-0 end-0 m-3">
+  <ngb-toast
+    *ngFor="let toast of toastService.toasts"
+    [autohide]="true"
+    [delay]="toast.delay || 5000"
+    (hide)="toastService.remove(toast)"
+    [ngClass]="{
+      'toast-success': toast.classname === 'bg-success text-light'
+    }"
+  >
+    <ng-template [ngIf]="isTemplate(toast)" [ngIfElse]="text">
+      <ng-template [ngTemplateOutlet]="toast.textOrTpl"></ng-template>
+    </ng-template>
+
+    <ng-template #text>{{ toast.textOrTpl }}</ng-template>
+  </ngb-toast>
+</div>

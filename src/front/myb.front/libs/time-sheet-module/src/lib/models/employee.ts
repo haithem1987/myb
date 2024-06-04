@@ -6,4 +6,7 @@ export interface Employee extends BaseModel {
   department: string;
   email: string;
   tasks?: Task[];
+  isManager: boolean;
+  managerId: string;
+  userId: string;
 }

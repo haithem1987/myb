@@ -4,8 +4,19 @@ namespace Myb.Timesheet.Models;
 
 public class TimeSheet:BaseEntity
 {
-    public DateTime DateEntry { get; set; }
-    public Status Status { get; set; }
-    public virtual ICollection<TimeEntry>? TimeEntries { get; set; }
-   
+    public DateTime Date { get; set; }
+    public float WorkedHours { get; set; }
+    public string? Description { get; set; }
+    public bool IsApproved { get; set; }
+    //public Status Status { get; set; }
+
+    
+    // Navigation properties
+    public int EmployeeId { get; set; }
+    public string? EmployeeName { get; set; }
+    public virtual Employee? Employee { get; set; }
+    public int ProjectId { get; set; }
+    public string? ProjectName { get; set; }
+    public virtual Project? Project { get; set; }
+    public string? UserId { get; set; }
 }

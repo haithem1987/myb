@@ -1,109 +1,117 @@
 <div class="container mt-4">
-  <h2>{{ isEditMode ? 'Edit Project' : 'Create Project' }}</h2>
-  <form [formGroup]="projectForm" (ngSubmit)="saveProject()">
-    <div class="mb-3">
-      <label for="projectName" class="form-label">Project Name</label>
-      <input
-        id="projectName"
-        formControlName="projectName"
-        class="form-control"
-        [ngClass]="{
-          'is-invalid':
-            projectForm.get('projectName')?.invalid &&
-            projectForm.get('projectName')?.touched
-        }"
-      />
-      <div
-        *ngIf="
-          projectForm.get('projectName')?.invalid &&
-          projectForm.get('projectName')?.touched
-        "
-        class="invalid-feedback"
-      >
-        Project name is required.
+  <myb-front-card>
+    <div class="card-body w-100">
+      <h5 class="card-title">
+        {{ isEditMode ? 'Edit Project' : 'Create Project' }}
+      </h5>
+      <div class="card-text">
+        <form [formGroup]="projectForm" (ngSubmit)="saveProject()">
+          <div class="mb-3">
+            <label for="projectName" class="form-label">Project Name</label>
+            <input
+              id="projectName"
+              formControlName="projectName"
+              class="form-control"
+              [ngClass]="{
+                'is-invalid':
+                  projectForm.get('projectName')?.invalid &&
+                  projectForm.get('projectName')?.touched
+              }"
+            />
+            <div
+              *ngIf="
+                projectForm.get('projectName')?.invalid &&
+                projectForm.get('projectName')?.touched
+              "
+              class="invalid-feedback"
+            >
+              Project name is required.
+            </div>
+          </div>
+          <div class="mb-3 d-flex justify-content-between align-items-center">
+            <div class="w-100 me-1">
+              <label for="startDate" class="form-label">Start Date</label>
+              <div class="input-group">
+                <input
+                  id="startDate"
+                  formControlName="startDate"
+                  class="form-control"
+                  ngbDatepicker
+                  #startDatePicker="ngbDatepicker"
+                  (click)="startDatePicker.toggle()"
+                />
+                <div
+                  *ngIf="
+                    projectForm.get('startDate')?.invalid &&
+                    projectForm.get('startDate')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  Start date is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="w-100 ms-1">
+              <label for="endDate" class="form-label">End Date</label>
+              <div class="input-group">
+                <input
+                  id="endDate"
+                  formControlName="endDate"
+                  class="form-control"
+                  ngbDatepicker
+                  #endDatePicker="ngbDatepicker"
+                  (click)="endDatePicker.toggle()"
+                />
+                <div
+                  *ngIf="
+                    projectForm.get('endDate')?.invalid &&
+                    projectForm.get('endDate')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  End date is required.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea
+              id="description"
+              formControlName="description"
+              class="form-control"
+              rows="8"
+              [ngClass]="{
+                'is-invalid':
+                  projectForm.get('description')?.invalid &&
+                  projectForm.get('description')?.touched
+              }"
+            ></textarea>
+            <div
+              *ngIf="
+                projectForm.get('description')?.invalid &&
+                projectForm.get('description')?.touched
+              "
+              class="invalid-feedback"
+            >
+              Description is required.
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="projectForm.invalid"
+          >
+            {{ isEditMode ? 'Update Project' : 'Create Project' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancel()">
+            Cancel
+          </button>
+        </form>
       </div>
     </div>
-
-    <div class="mb-3">
-      <label for="description" class="form-label">Description</label>
-      <textarea
-        id="description"
-        formControlName="description"
-        class="form-control"
-        [ngClass]="{
-          'is-invalid':
-            projectForm.get('description')?.invalid &&
-            projectForm.get('description')?.touched
-        }"
-      ></textarea>
-      <div
-        *ngIf="
-          projectForm.get('description')?.invalid &&
-          projectForm.get('description')?.touched
-        "
-        class="invalid-feedback"
-      >
-        Description is required.
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="startDate" class="form-label">Start Date</label>
-      <input
-        type="date"
-        id="startDate"
-        formControlName="startDate"
-        class="form-control"
-        [ngClass]="{
-          'is-invalid':
-            projectForm.get('startDate')?.invalid &&
-            projectForm.get('startDate')?.touched
-        }"
-      />
-      <div
-        *ngIf="
-          projectForm.get('startDate')?.invalid &&
-          projectForm.get('startDate')?.touched
-        "
-        class="invalid-feedback"
-      >
-        Start date is required.
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="endDate" class="form-label">End Date</label>
-      <input
-        type="date"
-        id="endDate"
-        formControlName="endDate"
-        class="form-control"
-        [ngClass]="{
-          'is-invalid':
-            projectForm.get('endDate')?.invalid &&
-            projectForm.get('endDate')?.touched
-        }"
-      />
-      <div
-        *ngIf="
-          projectForm.get('endDate')?.invalid &&
-          projectForm.get('endDate')?.touched
-        "
-        class="invalid-feedback"
-      >
-        End date is required.
-      </div>
-    </div>
-
-    <button
-      type="submit"
-      class="btn btn-primary"
-      [disabled]="projectForm.invalid"
-    >
-      {{ isEditMode ? 'Update Project' : 'Create Project' }}
-    </button>
-    <button type="button" class="btn btn-secondary" (click)="cancel()">
-      Cancel
-    </button>
-  </form>
+  </myb-front-card>
 </div>

@@ -19,6 +19,12 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('@myb-front/shared-ui').then((c) => c.UserCRUDComponent),
   },
+
+  {
+    path: 'invoices',
+    loadComponent: () =>
+      import('@myb-front/invoice-module').then((c) => c.InvoiceModuleComponent),
+  },
   {
     path: 'timesheet',
     loadChildren: () =>

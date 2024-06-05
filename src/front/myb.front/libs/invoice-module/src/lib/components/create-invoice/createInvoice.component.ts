@@ -15,11 +15,13 @@ import {
 } from '@angular/forms';
 import { DateUtilsService } from '../../../../../shared/infra/services/date-utils.service';
 import { ToastService } from '../../../../../shared/infra/services/toast.service';
+import { HttpClientModule } from '@angular/common/http';
+import { OcrService } from '../../../../../shared/infra/services/ocr.service';
 
 @Component({
   selector: 'myb-front-create-invoice',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './createInvoice.component.html',
   styleUrl: './createInvoice.component.css',
 })
@@ -36,6 +38,7 @@ export class CreateInvoiceComponent {
   private files = inject(UploadFilesService);
   private formBuilder = inject(FormBuilder);
   private toastService = inject(ToastService);
+  private ocrService = inject(OcrService);
 
   constructor() {
     this.invoiceForm = this.formBuilder.group({
@@ -81,6 +84,7 @@ export class CreateInvoiceComponent {
       //   return false;
       // }
     }
+    //this.preformOcr(fileInput.target);
     this.files.toBase64(filesData, this.selectedFiles).subscribe((res) => {
       if (res) {
         if (res.length > 10) {
@@ -92,6 +96,8 @@ export class CreateInvoiceComponent {
           // this.genService.openSnackBar('Maximum no. of 10 Media items can be uploaded.');
         } else {
           this.selectedFiles = res;
+          this.preformOcr([res[0].file]);
+          console.log('file name', res[0].ImageName);
         }
       }
     });
@@ -122,5 +128,17 @@ export class CreateInvoiceComponent {
           classname: 'bg-success text-light',
         }); */
     });
+  }
+
+  preformOcr(files: File[]) {
+    this.ocrService.performOCR(files).subscribe(
+      (response) => {
+        // handle OCR response
+        console.log('ocr responce', response);
+      },
+      (error) => {
+        console.error('Error performing OCR:', error);
+      }
+    );
   }
 }

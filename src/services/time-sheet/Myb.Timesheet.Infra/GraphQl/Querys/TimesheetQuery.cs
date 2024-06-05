@@ -1,6 +1,9 @@
 ﻿using HotChocolate;
+using HotChocolate.Types;
 using Myb.Timesheet.Models;
 using Myb.Timesheet.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Myb.Timesheet.Infra.GraphQl.Querys
 {
@@ -16,6 +19,12 @@ namespace Myb.Timesheet.Infra.GraphQl.Querys
         {
             return await taskService.GetAllTasksAsync();
         }
+
+        public async Task<IEnumerable<TimesheetTask>> GetTasksByProjectId([Service] ITaskService taskService, int projectId)
+        {
+            return await taskService.GetTasksByProjectIdAsync(projectId);
+        }
+
         // Project queries
         public async Task<Project> GetProjectById([Service] IProjectService projectService, int id)
         {
@@ -26,15 +35,27 @@ namespace Myb.Timesheet.Infra.GraphQl.Querys
         {
             return await projectService.GetAllProjectsAsync();
         }
-        
+
+        // Employee queries
         public async Task<IEnumerable<Employee>> GetAllEmployees([Service] IEmployeeService employeeService)
         {
             return await employeeService.GetAllEmployeesAsync();
         }
-        
+
+        public async Task<IEnumerable<Employee>> GetEmployeesByManagerId([Service] IEmployeeService employeeService, string managerId)
+        {
+            return await employeeService.GetEmployeesByManagerIdAsync(managerId);
+        }
+
+        // Timesheet queries
         public async Task<IEnumerable<TimeSheet>> GetAllTimesheets([Service] ITimesheetService timesheetService)
         {
             return await timesheetService.GetAllTimeSheetsAsync();
+        }
+
+        public async Task<IEnumerable<TimeSheet>> GetTimesheetsByUserId([Service] ITimesheetService timesheetService, string userId)
+        {
+            return await timesheetService.GetTimeSheetsByUserIdAsync(userId);
         }
     }
 }

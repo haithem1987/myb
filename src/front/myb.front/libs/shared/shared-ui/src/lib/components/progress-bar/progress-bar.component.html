@@ -1,0 +1,13 @@
+<div class="progress-container">
+  <ngb-progressbar
+    [value]="value"
+    [type]="type"
+    [striped]="striped"
+    [animated]="animated"
+    [showValue]="showValue"
+    [max]="max"
+    [height]="height"
+  >
+    {{ showValue ? value + '%' : '' }}
+  </ngb-progressbar>
+</div>

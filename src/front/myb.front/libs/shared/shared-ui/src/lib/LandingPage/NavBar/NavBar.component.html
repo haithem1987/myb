@@ -19,7 +19,7 @@
           <h1>Counter: {{ counter.count }}</h1>
         </div> -->
         <button
-          *ngIf="keycloakService.isAuthenticated(); else logoutButton"
+          *ngIf="!keycloakService.isAuthenticated(); else logoutButton"
           class="btn btn-outline-secondary btn-sm"
           (click)="onLogin()"
         >

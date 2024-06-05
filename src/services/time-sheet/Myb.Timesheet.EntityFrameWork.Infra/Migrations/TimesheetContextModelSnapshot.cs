@@ -39,8 +39,8 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
-                    b.Property<int?>("ManagerId")
-                        .HasColumnType("integer");
+                    b.Property<string>("ManagerId")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -51,13 +51,12 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
+                    b.Property<bool>("isManager")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ManagerId");
-
                     b.ToTable("Employees", (string)null);
-
-                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Myb.Timesheet.Models.Project", b =>
@@ -155,11 +154,17 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("EmployeeName")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsApproved")
                         .HasColumnType("boolean");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("ProjectName")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -167,8 +172,8 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
-                    b.Property<int>("WorkedHours")
-                        .HasColumnType("integer");
+                    b.Property<float>("WorkedHours")
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -230,22 +235,6 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("Myb.Timesheet.Models.Manager", b =>
-                {
-                    b.HasBaseType("Myb.Timesheet.Models.Employee");
-
-                    b.ToTable("Managers", (string)null);
-                });
-
-            modelBuilder.Entity("Myb.Timesheet.Models.Employee", b =>
-                {
-                    b.HasOne("Myb.Timesheet.Models.Manager", "Manager")
-                        .WithMany("Employees")
-                        .HasForeignKey("ManagerId");
-
-                    b.Navigation("Manager");
-                });
-
             modelBuilder.Entity("Myb.Timesheet.Models.TimeOff", b =>
                 {
                     b.HasOne("Myb.Timesheet.Models.Employee", "Employee")
@@ -292,15 +281,6 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Myb.Timesheet.Models.Manager", b =>
-                {
-                    b.HasOne("Myb.Timesheet.Models.Employee", null)
-                        .WithOne()
-                        .HasForeignKey("Myb.Timesheet.Models.Manager", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Myb.Timesheet.Models.Employee", b =>
                 {
                     b.Navigation("Tasks");
@@ -315,11 +295,6 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Navigation("Tasks");
 
                     b.Navigation("Timesheets");
-                });
-
-            modelBuilder.Entity("Myb.Timesheet.Models.Manager", b =>
-                {
-                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

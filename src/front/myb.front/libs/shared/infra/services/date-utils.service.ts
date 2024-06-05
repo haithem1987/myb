@@ -25,4 +25,15 @@ export class DateUtilsService {
 
     return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-');
   }
+  calculateTimeRemaining(dueDate: string): string {
+    const now = new Date();
+    const due = new Date(dueDate);
+    const diff = due.getTime() - now.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${days} Jr restant`;
+    return `${days} Jr, ${hours} hr, ${minutes} min restant`;
+  }
 }

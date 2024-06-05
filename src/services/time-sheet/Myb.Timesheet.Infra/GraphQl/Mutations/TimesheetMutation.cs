@@ -48,6 +48,9 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
         public async Task<Employee> AddEmployee([Service] IEmployeeService employeeService, Employee employee)
         {
             return await employeeService.AddEmployeeAsync(employee);
+        }  public async Task<Employee> UpdateEmployee([Service] IEmployeeService employeeService, Employee employee)
+        {
+            return await employeeService.UpdateEmployeeAsync(employee);
         }
         
        

@@ -2,11 +2,10 @@ import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { typeConfig } from '../graphql/type-config';
-
-import { Inject, Injectable } from '@angular/core';
-import { IIdentity } from '../models/user.model';
 import { IRepository } from '../repositories/repository.interface';
-import { TYPE_KEY_TOKEN} from '../tokens/apolloToken'
+import { IIdentity } from '../models/user.model';
+import { Inject, Injectable } from '@angular/core';
+import { TYPE_KEY_TOKEN } from '../tokens/apolloToken';
 
 export class RepositoryService<T extends IIdentity> implements IRepository<T> {
   protected typeOperations: any;
@@ -23,59 +22,78 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
     this.typeOperations = typeConfig[typeKey];
   }
 
+  protected mapAllItems(result: any): T[] {
+    return result.data?.allItems || [];
+  }
+
+  protected mapSingleItem(result: any): T {
+    return result.data?.item as T;
+  }
+
+  protected mapCreateItem(result: any): T {
+    return result.data?.createItem as T;
+  }
+
+  protected mapUpdateItem(result: any): T {
+    return result.data?.updateItem as T;
+  }
+
+  protected mapDeleteResult(result: any): boolean {
+    return result.data?.deleteItem === true;
+  }
+
   getAll(): Observable<T[]> {
     return this.apollo
-      .watchQuery<T[]>({
+      .watchQuery<{ allItems: T[] }>({
         query: gql`
           ${this.typeOperations.getAll}
         `,
       })
-      .valueChanges.pipe(map((result) => result.data));
+      .valueChanges.pipe(map((result) => this.mapAllItems(result)));
   }
 
   get(id: number): Observable<T> {
     return this.apollo
       .query<{ item: T }>({
-        // Explicitly typing the expected return structure
         query: gql`
           ${this.typeOperations.getById}
         `,
         variables: { id },
       })
-      .pipe(
-        map((result) => result.data.item as T) // Type assertion here
-      );
+      .pipe(map((result) => this.mapSingleItem(result)));
   }
 
   create(item: T): Observable<T> {
     return this.apollo
-      .mutate<T>({
+      .mutate<{ createItem: T }>({
         mutation: gql`
           ${this.typeOperations.create}
         `,
         variables: { item },
       })
-      .pipe(map((result) => result.data as T));
+      .pipe(map((result) => this.mapCreateItem(result)));
   }
 
   update(id: number, item: T): Observable<T> {
     const { __typename, ...itemInputWithoutTypename } = item;
     return this.apollo
-      .mutate<T>({
-        mutation: this.typeOperations.update,
+      .mutate<{ updateItem: T }>({
+        mutation: gql`
+          ${this.typeOperations.update}
+        `,
         variables: { id, item: itemInputWithoutTypename },
       })
-      .pipe(map((result) => result.data as T));
+      .pipe(map((result) => this.mapUpdateItem(result)));
   }
 
-  delete(id: number): Observable<any> {
+  delete(id: number): Observable<boolean> {
     return this.apollo
-      .mutate<any>({
+      .mutate<{ deleteItem: { success: boolean } }>({
         mutation: gql`
           ${this.typeOperations.delete}
         `,
         variables: { id },
       })
-      .pipe(map((result) => result.data as T));
+      .pipe(map((result) => this.mapDeleteResult(result)));
   }
 }

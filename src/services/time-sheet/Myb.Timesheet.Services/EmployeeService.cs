@@ -80,4 +80,18 @@ public class EmployeeService:IEmployeeService
             throw;
         }
     }
+    
+    public Task<IQueryable<Employee>> GetEmployeesByManagerIdAsync(string managerId)
+    {
+        try
+        {
+            var employees = _employeeRepository.GetAll().Where(e => e.ManagerId == managerId);
+            return Task.FromResult(employees);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting employees by managerId: {ManagerId}", managerId);
+            throw;
+        }
+    }
 }

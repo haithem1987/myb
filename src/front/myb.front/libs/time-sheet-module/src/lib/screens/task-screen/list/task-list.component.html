@@ -1,0 +1,158 @@
+<div class="container my-4">
+  <div class="d-flex justify-content-between mb-3">
+    <h2 class="mb-0" style="color: var(--bs-darklight)">Task Manager</h2>
+    <button type="button" class="btn btn-outline-primary" (click)="openModal()">
+      <i class="bi bi-plus-lg"></i> Create Task
+    </button>
+  </div>
+  <input
+    type="text"
+    class="form-control mb-3"
+    placeholder="Search tasks..."
+    [(ngModel)]="searchTerm"
+    (keyup)="filterTasks()"
+  />
+  <div class="card border-primary p-3">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col" (click)="onSort('name')" style="cursor: pointer">
+            Nom
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-sort-alpha-down':
+                  sortColumn === 'name' && sortDirection === 'asc',
+                'bi-sort-alpha-up':
+                  sortColumn === 'name' && sortDirection === 'desc',
+                'bi-sort': sortColumn !== 'name'
+              }"
+            ></i>
+          </th>
+          <th scope="col" (click)="onSort('startTime')" style="cursor: pointer">
+            Début
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-sort-numeric-down':
+                  sortColumn === 'startTime' && sortDirection === 'asc',
+                'bi-sort-numeric-up':
+                  sortColumn === 'startTime' && sortDirection === 'desc',
+                'bi-sort': sortColumn !== 'startTime'
+              }"
+            ></i>
+          </th>
+          <th scope="col" (click)="onSort('endTime')" style="cursor: pointer">
+            Fin
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-sort-numeric-down':
+                  sortColumn === 'endTime' && sortDirection === 'asc',
+                'bi-sort-numeric-up':
+                  sortColumn === 'endTime' && sortDirection === 'desc',
+                'bi-sort': sortColumn !== 'endTime'
+              }"
+            ></i>
+          </th>
+          <th
+            scope="col"
+            (click)="onSort('isCompleted')"
+            style="cursor: pointer"
+          >
+            Status
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-sort-alpha-down':
+                  sortColumn === 'isCompleted' && sortDirection === 'asc',
+                'bi-sort-alpha-up':
+                  sortColumn === 'isCompleted' && sortDirection === 'desc',
+                'bi-sort': sortColumn !== 'isCompleted'
+              }"
+            ></i>
+          </th>
+          <!-- <th scope="col" (click)="onSort('employee')" style="cursor: pointer">
+            Assigned To
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-sort-alpha-down':
+                  sortColumn === 'employee' && sortDirection === 'asc',
+                'bi-sort-alpha-up':
+                  sortColumn === 'employee' && sortDirection === 'desc',
+                'bi-sort': sortColumn !== 'employee'
+              }"
+            ></i>
+          </th>
+          <th scope="col" (click)="onSort('project')" style="cursor: pointer">
+            Project
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-sort-alpha-down':
+                  sortColumn === 'project' && sortDirection === 'asc',
+                'bi-sort-alpha-up':
+                  sortColumn === 'project' && sortDirection === 'desc',
+                'bi-sort': sortColumn !== 'project'
+              }"
+            ></i>
+          </th> -->
+          <th scope="col" (click)="onSort('dueDate')" style="cursor: pointer">
+            Date d'échéance
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-sort-numeric-down':
+                  sortColumn === 'dueDate' && sortDirection === 'asc',
+                'bi-sort-numeric-up':
+                  sortColumn === 'dueDate' && sortDirection === 'desc',
+                'bi-sort': sortColumn !== 'dueDate'
+              }"
+            ></i>
+          </th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let task of updatedTasks">
+          <td>
+            <div>{{ task.name }}</div>
+            <div>{{ task.description }}</div>
+          </td>
+
+          <td>{{ task.startTime | date : 'MM/dd/yyyy, h:mm a' }}</td>
+          <td>{{ task.endTime | date : 'MM/dd/yyyy, h:mm a' }}</td>
+          <td>
+            <span class="badge" [ngClass]="getCompletionBadgeClass(task)">
+              {{ isCompletedLabel(task) }}
+            </span>
+          </td>
+          <td>
+            ({{ getTimeRemaining(task.dueDate) }})
+            {{ task.dueDate | date : 'MM/dd/yyyy, h:mm a' }}
+          </td>
+
+          <!-- <td>{{ task.employee?.name }}</td>
+          <td>{{ task.project?.projectName }}</td> -->
+          <td>
+            <button
+              type="button"
+              class="btn btn-outline-primary me-2"
+              (click)="openModal(task)"
+            >
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="onDelete(task.id)"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

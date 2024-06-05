@@ -1,3 +1,4 @@
+import { CREATE_INVOICE } from "libs/invoice-module/src/lib/graphql/mutations/invoice.mutation";
 import { GET_ALL_INVOICES, GET_INVOICE_BY_ID } from "../../../invoice-module/src/lib/graphql/queries/invoice.query";
 import { CREATE_PROJECT, UPDATE_PROJECT, DELETE_PROJECT } from "../../../time-sheet-module/src/lib/graphql/mutations/project.graphql";
 import { CREATE_TASK, UPDATE_TASK, DELETE_TASK } from "../../../time-sheet-module/src/lib/graphql/mutations/task.graphql";
@@ -38,6 +39,7 @@ import { GET_ALL_TASKS, GET_TASK_BY_ID } from "../../../time-sheet-module/src/li
     Invoice: {
       getAll: GET_ALL_INVOICES,
       getById: GET_INVOICE_BY_ID,
+      create: CREATE_INVOICE
     },
   
     // You can add more configurations for different types here

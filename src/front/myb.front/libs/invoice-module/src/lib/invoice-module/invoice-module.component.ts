@@ -4,6 +4,7 @@ import { Invoice } from '../models/invoice.model';
 import { InvoiceService } from '../services/invoice.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditInvoiceComponent } from '../components/edit-invoice/editInvoice.component';
+import { CreateInvoiceComponent } from '../components/create-invoice/createInvoice.component';
 
 @Component({
   selector: 'myb-front-invoice-module',
@@ -33,7 +34,9 @@ export class InvoiceModuleComponent implements OnInit {
 	} */
 
   open() {
+    const modalRef = this.modalService.open(CreateInvoiceComponent);
+  }
+  openEditModal(){
     const modalRef = this.modalService.open(EditInvoiceComponent);
-    modalRef.componentInstance.name = 'World';
   }
 }

@@ -27,7 +27,7 @@ export class UploadFilesService {
         reader.readAsDataURL(files[i]);
         reader.onload = (e) => {
           selectedFiles = selectedFiles?.filter(f => f?.ImageName != files[i]?.name);
-          selectedFiles.push({ ImageName: files[i]?.name, file: files[i], Image: reader?.result as string, url: url});
+          selectedFiles.push({ ImageName: files[i]?.name, file: files[i], Image: reader?.result as string, url: url });
           result.next(selectedFiles);
 
           if (files?.length === (i + 1)) {

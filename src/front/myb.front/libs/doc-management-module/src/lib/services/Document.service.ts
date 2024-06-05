@@ -1,50 +1,94 @@
 import { DocumentVersion } from './../models/DocumentVersion';
 import { Injectable } from '@angular/core';
-import { RepositoryService } from 'libs/shared/shared-ui/src/lib/services/repository.service';
+
 import { DocumentModel } from '../models/DocumentModel'; 
 import { Apollo, gql } from 'apollo-angular';
-import { Observable, catchError, map, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, throwError } from 'rxjs';
 import { DocumentStatus } from '../models/DocumentStatus';
 import { ApolloError } from '@apollo/client';
+import { RepositoryService } from 'libs/shared/infra/services/repository.service';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class DocumentService extends RepositoryService<DocumentModel> {
+  private documentSubject = new BehaviorSubject<DocumentModel[]>([]);
+  public tasks$ = this.documentSubject.asObservable();
 constructor(apollo: Apollo) {
     super(apollo, 'DocumentModel');
 }
+private loadInitialTasks(): void {
+  this.getAll().subscribe((tasks) => this.documentSubject.next(tasks));
+}
 
+protected override mapAllItems(result: any): DocumentModel[] {
+  return result.data?.allDocuments || [];
+}
+
+protected override mapSingleItem(result: any): DocumentModel {
+  return result.data?.TaskById as DocumentModel;
+}
+
+protected override mapCreateItem(result: any): DocumentModel {
+  return result.data?.addDocument as DocumentModel;
+}
+
+protected override mapUpdateItem(result: any): DocumentModel {
+  return result.data?.updateTask as DocumentModel;
+}
+
+protected override mapDeleteResult(result: any): boolean {
+  return result.data?.deleteDocument === true;
+}
 //get all doc 
+// override getAll(): Observable<DocumentModel[]> {
+//     return this.apollo
+//         .watchQuery<{ allDocuments: DocumentModel[] }>({
+//             query: gql`
+//                 ${this.typeOperations.getAll}
+//             `,
+//         })
+//         .valueChanges.pipe(
+//             map((result: any) => result.data) 
+//         );
+// }
 override getAll(): Observable<DocumentModel[]> {
-    return this.apollo
-        .watchQuery<{ allDocuments: DocumentModel[] }>({
-            query: gql`
-                ${this.typeOperations.getAll}
-            `,
-        })
-        .valueChanges.pipe(
-            map((result: any) => result.data) 
-        );
+  return super.getAll().pipe(
+    map((documents) => {
+      console.log('documents', documents);
+      this.documentSubject.next(documents);
+      return documents;
+    })
+  );
 }
 
 //delete document
-override delete(id: number): Observable<DocumentModel> {
-    return  this.apollo
-        .mutate({
-            mutation: gql`
-            ${this.typeOperations.delete}
-            `,
-            variables: {
-                id: id,
-            },
-        })
-        .pipe(
-            map((result: any) => result.data.deleteDocument )
-        );
+// override delete(id: number): Observable<DocumentModel> {
+//     return  this.apollo
+//         .mutate({
+//             mutation: gql`
+//             ${this.typeOperations.delete}
+//             `,
+//             variables: {
+//                 id: id,
+//             },
+//         })
+//         .pipe(
+//             map((result: any) => result.data.deleteDocument )
+//         );
+// }
+override delete(id: number): Observable<boolean> {
+  return super.delete(id).pipe(
+    map((success) => {
+      if (success) {
+        const  document = this.documentSubject.value.filter((t) => t.id !== id);
+        this.documentSubject.next( document);
+      }
+      return success;
+    })
+  );
 }
-
 //update document
 // override update(id: number, document: DocumentModel): Observable<DocumentModel> {
 //   return this.apollo
@@ -111,31 +155,6 @@ createDocument(document: DocumentModel): Observable<DocumentModel> {
     );
 }
 
-
-
-//create document
-
-// createDocument(document: any) {
-//   const createDocumentMutation = gql`
-//     mutation CreateDocument($input: DocumentInput!) {
-//       createDocument(input: $input) {
-//         id
-//         documentName
-//         documentType
-//         folderId
-//         createdBy
-//         editedBy
-//       }
-//     }
-//   `;
-
-//   return this.apollo.mutate({
-//     mutation: createDocumentMutation,
-//     variables: {
-//       input: document
-//     }
-//   });
-// }
 
 
 }

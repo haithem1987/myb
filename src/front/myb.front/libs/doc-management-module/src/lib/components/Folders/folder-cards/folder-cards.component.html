@@ -1,7 +1,8 @@
-<div class="add-card">
-  <div>
-    <h5> <i class="bi bi-pin-angle-fill"></i> Quick Access </h5>
-  </div>
+<div class="d-flex justify-content-between mb-3">
+  <h2 class="mb-0 w-50" style="color: var(--bs-darklight)">
+    Documents Manager
+  </h2>
+
   <div>
     <button class="btn btn-outline-secondary me-2 btn-sm" (click)="openModal()">
       <i class="bi bi-folder-plus" style="font-size: 20px;"></i>  Folder
@@ -9,25 +10,68 @@
     <button class="btn btn-outline-secondary me-2 btn-sm" (click)="openModalDoc()">
       <i class="bi bi-file-earmark-pdf" style="font-size: 20px;"></i>  +Documents
     </button>
+    <button class="btn btn-outline-secondary me-2 btn-sm" >
+      <i class="bi bi-cloud-arrow-up-fill" style="font-size: 20px;"></i>  Upload Document
+    </button>
+    <!-- <div class="custom-file">
+      <input
+        #fileInput
+        type="file"
+        class="custom-file-input"
+        id="customFile"
+        (change)="onSelectFile(fileInput.files, $event)"
+        multiple
+        accept=".jpg, .png, .jpeg, .pdf"
+        style="display: none;"
+      />
+      <button class="btn btn-primary text-white" (click)="fileInput.click()">Upload Document</button>
+      <br /><br />
+      <div class="card-footer text-muted"></div>
+    </div> -->
+    <!-- <myb-front-document-upload></myb-front-document-upload> -->
+  </div>
+</div>
+
+<div class="add-card">
+  <div>
+    <h5> <i class="bi bi-pin-angle-fill"></i> Quick Access </h5>
   </div>
 </div>
 
 <section class="pt-2">
   <div class="container">
     <div class="row">
-      <div class="col-sm-3" *ngFor="let folder of folders">
-        <div class="card" >
+      <div class="col-sm-3" >
+        <!-- <div class="col-sm-3" *ngFor="let folder of folders"> -->
+
+        <div class="card border-primary p-2" >
           <div class="card-body">
             <i class="bi bi-folder-fill" style="font-size: 40px;"></i>
-            <h6 class="card-title" [routerLink]="['/folder',folder.id]">{{ folder.folderName }}</h6>
-            <!-- <p class="card-text d-inline me-2">{{ getDocumentCount(folder) }} Doc </p><p class="card-text d-inline">10 KB</p> -->
+            <h5 >Important Documents</h5>
+            <!-- <h5 [routerLink]="['/documents/folder', folder.id]">{{ folder.folderName }}</h5> -->
+
+            <p class="card-text d-inline me-2">6 Doc </p><p class="card-text d-inline">10 KB</p>
+
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3" >
+        <!-- <div class="col-sm-3" *ngFor="let folder of folders"> -->
+
+        <div class="card border-primary p-2" >
+          <div class="card-body">
+            <i class="bi bi-folder-fill" style="font-size: 40px;"></i>
+            <h5 >My folder</h5>
+            <!-- <h5 [routerLink]="['/documents/folder', folder.id]">{{ folder.folderName }}</h5> -->
+
+            <p class="card-text d-inline me-2">6 Doc </p><p class="card-text d-inline">100 KB</p>
 
           </div>
         </div>
       </div>
     </div>
   </div>
-  <router-outlet></router-outlet>
+  
 </section>
 
 <!-- <myb-front-document-upload></myb-front-document-upload> -->
@@ -35,7 +79,7 @@
 
 
   <!-- Table to display folders and documents -->
-  <div class="table doc folders">
+  <!-- <div class="table doc folders">
     <table class="table">
       <thead>
         <tr>
@@ -91,6 +135,14 @@
         </tr>
       </tbody>
     </table>
-  </div>
+  </div> -->
 
   
+  <!-- <app-folder-list ></app-folder-list> -->
+
+<myb-front-folder-list 
+  [folders]="folders" 
+  [documents]="documents" 
+  
+  >
+</myb-front-folder-list>

@@ -9,7 +9,7 @@ import { DocumentType } from './DocumentType';
 
 export interface DocumentModel extends BaseModel {
 
-    documentName: string;
+    documentName?: string;
     createdBy: number;
     editedBy: number;
     documentType?: string;
@@ -22,5 +22,6 @@ export interface DocumentModel extends BaseModel {
     // uploadedFiles?: SelectedFiles[];
     file?: string; // Add file property to store the uploaded file
     url?: string;
+   
 
 }

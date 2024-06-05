@@ -20,7 +20,8 @@ namespace Myb.document.Model
 
         public virtual ICollection<DocumentVersion>? Versions { get; set; }
 
-        /*public string? Content { get; set; } */
+       /* public string? file { get; set; }*/
+       /*public string? url { get; set; }*/
 
 
 

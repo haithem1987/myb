@@ -39,8 +39,8 @@ export const appRoutes: Route[] = [
         (m) => m.DocumentroutingModule
       ),
   },
-  {
-    path:'folder/:id' , component:FolderDetailsComponent
-  }
+  // {
+  //   path:'folder/:id' , component:FolderDetailsComponent
+  // }
 
 ];

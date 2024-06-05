@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { RepositoryService } from 'libs/shared/shared-ui/src/lib/services/repository.service';
+
 import { Folder } from '../models/Folder';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { ADD_FOLDER, DELETE_FOLDER } from '../GraphQl/Mutations/FolderMutation';
 import { GET_FOLDER_BY_ID } from '../GraphQl/Queries/Folder.graphql';
+import { RepositoryService } from 'libs/shared/infra/services/repository.service';
 
 @Injectable({
   providedIn: 'root'

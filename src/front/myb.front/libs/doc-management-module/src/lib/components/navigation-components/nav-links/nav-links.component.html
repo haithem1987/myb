@@ -1,23 +1,17 @@
-<ul ngbNav #nav="ngbNav" class="nav-tabs">
-	<li [ngbNavItem]="1">
-		<button ngbNavLink>All Docuements</button>
-		<ng-template ngbNavContent>
-			
-		</ng-template>
-	</li>
-	<li [ngbNavItem]="2">
-		<button ngbNavLink>History</button>
-		<ng-template ngbNavContent>
-		
-		</ng-template>
-	</li>
-	<li [ngbNavItem]="3">
-		<button ngbNavLink>Others</button>
-		<ng-template ngbNavContent>
-		
-		</ng-template>
-	</li>
-</ul>
-
-<div [ngbNavOutlet]="nav" class="mt-2"></div>
-
+<div class="d-flex justify-content-between mb-3">
+	<h2 class="mb-0 w-50" style="color: var(--bs-darklight)">
+	  Documents Manager
+	</h2>
+  
+	<div>
+	  <button class="btn btn-outline-secondary me-2 btn-sm" (click)="openModal()">
+		<i class="bi bi-folder-plus" style="font-size: 20px;"></i>  Folder
+	  </button>
+	  <button class="btn btn-outline-secondary me-2 btn-sm" (click)="openModalDoc()">
+		<i class="bi bi-file-earmark-pdf" style="font-size: 20px;"></i>  +Documents
+	  </button>
+	  <button class="btn btn-outline-secondary me-2 btn-sm" >
+		<i class="bi bi-cloud-arrow-up-fill" style="font-size: 20px;"></i>  Upload Document
+	  </button>
+	</div>
+  </div>

@@ -9,11 +9,12 @@ import { DocumentStatus } from '../../../models/DocumentStatus';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentUploadComponent } from '../../document-upload/document-upload.component';
 import { DocumentEditComponent } from '../../document-edit/document-edit.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'myb-front-folder-details',
   standalone: true,
-  imports: [CommonModule ,NavbarComponent ,NgbDropdownModule,DocumentUploadComponent],
+  imports: [CommonModule ,NavbarComponent ,NgbDropdownModule,DocumentUploadComponent,FormsModule],
   templateUrl: './folder-details.component.html',
   styleUrl: './folder-details.component.css',
 })
@@ -21,13 +22,14 @@ export class FolderDetailsComponent  implements OnInit {
   folderId!: number;
   documents: any[] = [];
   folder: any;
+  folderName!: string;
 
   constructor(
     private route: ActivatedRoute,
     private folderService: FolderService,
-    private DocumentService: DocumentService,
+    private documentService: DocumentService,
     private modalService: NgbModal,
-    private router:Router
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -43,7 +45,7 @@ export class FolderDetailsComponent  implements OnInit {
       (data: any) => {
         console.log('Raw response data:', data);
         if (data && data.id) {
-          this.folder = data; 
+          this.folder = data;
           this.documents = this.folder.documents;
           console.log('Documents in folder:', this.documents);
         } else {
@@ -64,48 +66,37 @@ export class FolderDetailsComponent  implements OnInit {
     );
   }
 
-  
-    //alldoc
-    // loadDocuments() {
-    //   this.DocumentService.getAll().subscribe((data: any) => {
-    //     console.log("Received data from server:", data);
-    //   //  console.log('status ',data.status);
-        
-    //     if (data && data.allDocuments && Array.isArray(data.allDocuments)) {
-    //       this.documents = data.allDocuments;
-    //     } else {
-    //       console.error("Invalid data format received from the server");
-    //     }
-    //   });
-    // }
-    
-//delete doc
-deleteDocument(docId: number){
-  this.DocumentService.delete(docId).subscribe(() => {
-    // this.loadDocuments();
-    // this.documents = this.documents.filter(doc => doc.id !== docId);
-console.log('doc deleted');
-  });
+  deleteDocument(docId: number) {
+    this.documentService.delete(docId).subscribe(() => {
+      console.log('doc deleted');
+    });
+  }
 
-}
-//modal 
-	openModal(document?: DocumentModel) {
-		const modalRef = this.modalService.open(DocumentEditComponent);
+  openModal(document?: DocumentModel) {
+    const modalRef = this.modalService.open(DocumentEditComponent);
     modalRef.componentInstance.documents = this.documents;
-    console.log('modal',modalRef.componentInstance.documents)
-	}
+    console.log('modal', modalRef.componentInstance.documents);
+  }
 
-
-
-  getApprovalStatus(document: DocumentStatus): {
-    text: string;
-    badgeClass: string;
-  } {
+  getApprovalStatus(document: DocumentStatus): { text: string; badgeClass: string } {
     if (document) {
       return { text: 'Submitted', badgeClass: 'bg-success' };
     } else {
       return { text: 'Approved', badgeClass: 'bg-warning' };
     }
   }
- 
+  updateBreadcrumb() {
+    const routeData = this.route.snapshot.data;
+    if (this.folderName) {
+      routeData['breadcrumb'] = this.folderName;
+      this.router.config.forEach((route) => {
+        if (route.path === 'documents/folder/:id') {
+          route.data = routeData;
+        }
+      });
+    }
+  }
+  filterTimesheets(): void {
+    // Implement filtering logic
+  }
 }

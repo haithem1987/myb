@@ -50,24 +50,27 @@ export class DocumentCreationComponent implements OnInit {
   }
 
   createDocument(): void {
-    if (this.documentName && this.documentType !== undefined && this.folderId !== null) {
+    if (this.documentType !== undefined && this.folderId !== null) {
       const selectedFiles = this.documentUploadComponent?.selectedFiles || [];
       if (selectedFiles.length > 0) {
         const document = {
           id: 0,
-          documentName: this.documentName,
+          documentName: selectedFiles[0].ImageName,
           documentType: this.documentType.toString(),
+          // documentType :selectedFiles[0].file.type,
           createdBy: 1,
           editedBy: 1,
           folderId: parseInt(this.folderId.toString()),
           documentSize: selectedFiles[0].file.size,
           file: selectedFiles[0].Image, // Save the base64 string
-          url: selectedFiles[0].url, // Save the URL
+          url: selectedFiles[0].url, // 
           createdAt: new Date(),
           updatedAt: new Date(),
+         
         };
         console.log('url:', selectedFiles[0].url);
-        console.log('file:', selectedFiles[0].Image);
+        
+        // console.log('file:', selectedFiles[0].Image);
         this.documentService.createDocument(document).subscribe(
           (newDocument) => {
             this.documents.push(newDocument);

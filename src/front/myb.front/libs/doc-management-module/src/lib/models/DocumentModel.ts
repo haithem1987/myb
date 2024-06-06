@@ -21,7 +21,7 @@ export interface DocumentModel extends BaseModel {
     // content:string;
     // uploadedFiles?: SelectedFiles[];
     file?: string; // Add file property to store the uploaded file
-    url?: string;
+    // url?: string;
    
 
 }

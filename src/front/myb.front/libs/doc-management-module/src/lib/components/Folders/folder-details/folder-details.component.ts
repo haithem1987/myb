@@ -99,4 +99,16 @@ export class FolderDetailsComponent  implements OnInit {
   filterTimesheets(): void {
     // Implement filtering logic
   }
+  // downloadFile(document: DocumentModel): void {
+  //   const link = window.document.createElement('a'); // Changed here
+  //   link.href = document.file!;
+  //   link.download = document.documentName!;
+  //   link.click();
+  // }
+  // downloadDocument(document: any) {
+  //   this.documentService.download(document.id).subscribe((response: any) => {
+  //     const blob = new Blob([response], { type: 'application/pdf' });
+  //     saveAs(blob, document.documentName);
+  //   });
+  // }
 }

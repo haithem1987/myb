@@ -5,7 +5,7 @@ namespace Myb.document.Model
 {
     public class DocumentModel : BaseEntity
     {
-      
+        
         public string? DocumentName { get; set; }
        
         public int? CreatedBy { get; set; } 
@@ -20,7 +20,7 @@ namespace Myb.document.Model
 
         public virtual ICollection<DocumentVersion>? Versions { get; set; }
 
-       /* public string? file { get; set; }*/
+        public string? file { get; set; }
        /*public string? url { get; set; }*/
 
 

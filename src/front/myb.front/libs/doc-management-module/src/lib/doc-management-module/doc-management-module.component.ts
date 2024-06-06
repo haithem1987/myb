@@ -18,6 +18,7 @@ import { RouterLink, RouterModule , RouterOutlet } from '@angular/router';
 import { SelectedFiles, UploadFilesService } from '../services/upload-files.service';
 import { NavbarComponent } from '../components/navigation-components/navbar/navbar.component';
 import { BreadcrumbComponent } from 'libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component';
+import { ToastsContainerComponent } from 'libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component';
 @Component({
   selector: 'myb-front-doc-management-module',
   standalone: true,
@@ -34,7 +35,7 @@ import { BreadcrumbComponent } from 'libs/time-sheet-module/src/lib/components/b
     NavbarComponent,
     RouterOutlet,
     BreadcrumbComponent,
-    
+    ToastsContainerComponent
     
 
   ],

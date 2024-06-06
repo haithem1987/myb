@@ -26,7 +26,7 @@
             <i class="bi"></i>
           </th>
           <th scope="col">Status</th>
-          <th scope="col" class="text-end">Actions</th>
+          <th scope="col" >Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -41,21 +41,35 @@
           </td>
           <td class="text-end">
             <div class="d-flex justify-content-end align-items-center">
-              <button class="btn btn-outline-primary me-2" (click)="openModal(document)">
+              <!-- <button class="btn btn-outline-primary me-2" (click)="openModal(document)">
                 <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-outline-secondary me-2">
+              </button> -->
+              <!-- <button class="btn btn-outline-secondary me-2">
                 <i class="bi bi-box-arrow-down"></i>
               </button>
               <button class="btn btn-outline-secondary me-2" (click)="deleteDocument(document.id)">
                 <i class="bi bi-trash"></i>
-              </button>
+              </button> -->
               <div ngbDropdown>
                 <i class="bi bi-three-dots-vertical" style="font-size: 30px; color: green;" ngbDropdownToggle></i>
                 <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                  <button ngbDropdownItem> <i class="bi bi-share-fill m-2"></i>Share</button>
                   <button ngbDropdownItem> 
-                    <i class="bi bi-copy m-2"></i> Duplicate
+                    <i class="bi bi-share-fill">
+                    </i>  Share</button>
+                    <button ngbDropdownItem>
+                      <i class="bi bi-files"></i> Duplicate
+                    </button>
+                  <button ngbDropdownItem (click)="openModal(document)">
+                    <i class="bi bi-pencil-square"></i>
+                    Edit
+                  </button>
+                  <button ngbDropdownItem >
+                    <i class="bi bi-box-arrow-down"></i>
+                    Downoad
+                  </button>
+                  <button ngbDropdownItem (click)="deleteDocument(document.id)">
+                    <i class="bi bi-trash"></i>
+                    Delete
                   </button>
                 </div>
               </div>

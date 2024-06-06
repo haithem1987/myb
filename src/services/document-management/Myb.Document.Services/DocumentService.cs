@@ -37,15 +37,18 @@ namespace Myb.Document.Services
         {
             try
             {
+                Console.WriteLine($"Document file: {document.file}");
+                document.Id = null;
                 await _documentRepository.InsertAsync(document);
                 return document;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creatin  doc");
+                _logger.LogError(ex, "Error creating document");
                 throw;
             }
         }
+
 
         public async Task<DocumentModel> UpdateDocumentAsync(DocumentModel document)
         {

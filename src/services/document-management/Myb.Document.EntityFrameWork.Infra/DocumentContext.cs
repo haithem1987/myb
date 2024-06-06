@@ -24,8 +24,9 @@ namespace Myb.Document.EntityFramework.Infra
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<DocumentModel>()
+      .HasKey(d => d.Id);
 
-     
 
             // DocumentModel - Folder Relationship (One-to-Many)
             modelBuilder.Entity<DocumentModel>()

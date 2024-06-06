@@ -12,6 +12,8 @@ namespace Myb.Document.Infra.GraphQl.Mutations
 
         public async Task<DocumentModel> AddDocument([Service] IDocumentService documentService, DocumentModel document )
         {
+            document.Id = null;
+            Console.WriteLine($"Document file: {document.file}");
             return await documentService.AddDocumentAsync(document);
         }
 

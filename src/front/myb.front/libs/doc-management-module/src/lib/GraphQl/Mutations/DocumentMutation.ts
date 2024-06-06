@@ -28,7 +28,7 @@ export const ADD_DOCUMENT = gql`
       status
       createdAt
       updatedAt
-      # file
+      file
       # url
     
     }

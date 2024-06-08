@@ -85,14 +85,19 @@ export class DocumentCreationComponent implements OnInit {
             this.documents.push(newDocument);
             this.documentCreated.emit(newDocument);
             this.toastService.show('Document Added successfully!', {
-              classname: 'bg-success ',
+              classname: 'bg-success text-light ',
             });
 
             this.activeModal.close();
-            // this.downloadFile(newDocument.file, newDocument.documentName); // Trigger the download
 
-            console.log('new doc', newDocument);
-          },
+    //         if (newDocument.file && newDocument.documentName) {
+    //   this.downloadFile(newDocument.file, newDocument.documentName); // Trigger the download
+    // } else {
+    //   console.error('File data or document name is undefined');
+    // }
+
+    console.log('new doc', newDocument);
+  },
           (error) => {
             console.error('Error creating document:', error);
             
@@ -113,11 +118,6 @@ export class DocumentCreationComponent implements OnInit {
     }
   }
 
-    downloadFile(fileUrl: string, fileName: string): void {
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.download = fileName;
-    link.click();
-  }
+ 
 
 }

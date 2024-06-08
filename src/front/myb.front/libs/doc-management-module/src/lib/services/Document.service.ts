@@ -156,5 +156,31 @@ createDocument(document: DocumentModel): Observable<DocumentModel> {
 }
 
 
-
+updateDocument(document: DocumentModel): Observable<DocumentModel> {
+  return this.apollo
+    .mutate<{ updateDocument: DocumentModel }>({
+      mutation: gql`
+        mutation UpdateDocument($id: Int!, $document: DocumentModelInput!) {
+          updateDocument(id: $id, document: $document) {
+            id
+            documentName
+            documentType
+            createdBy
+            editedBy
+            folderId
+            documentSize
+            status
+            createdAt
+            updatedAt
+            file
+          }
+        }
+      `,
+      variables: { id: document.id, document: { ...document, id: undefined } }, // Ensure id is included separately
+    })
+ 
+    .pipe(
+      map((result: any) => { console.log(result.data); return result.data.updateDocument})
+    );
+}
 }

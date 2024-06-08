@@ -8,6 +8,7 @@ import { DocumentType } from './DocumentType';
 
 
 export interface DocumentModel extends BaseModel {
+    [x: string]: any;
 
     documentName?: string;
     createdBy: number;

@@ -67,7 +67,7 @@ export class FolderService extends RepositoryService<Folder> {
   //     );
   // }
    // Create folder
-  createFolder(folder: { id: number; folderName: string; parentId?: number; createdBy: number; editedBy: number }): Observable<Folder> {
+  createFolder(folder: { id: number; folderName: string; parentId?: number; createdBy: number; editedBy: number;createdAt:Date }): Observable<Folder> {
     console.log("type operation for folder",this.typeOperations.create);
     return this.apollo
       .mutate<{ addFolder: Folder }>({

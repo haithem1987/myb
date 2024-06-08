@@ -10,5 +10,5 @@ export interface Folder extends BaseModel {
     lastModifiedDate?: Date;
     documents: DocumentModel[] | null;
     children: Folder[] | null; 
-    CreatedAt: Date;
+  
   }

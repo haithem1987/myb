@@ -52,6 +52,7 @@ namespace Myb.Document.Services
 
         public async Task<DocumentModel> UpdateDocumentAsync(DocumentModel document)
         {
+
             await _documentRepository.UpdateAsync(document);
             return document;
         }

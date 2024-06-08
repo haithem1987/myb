@@ -14,13 +14,13 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'myb-front-folder-details',
   standalone: true,
-  imports: [CommonModule ,NavbarComponent ,NgbDropdownModule,DocumentUploadComponent,FormsModule],
+  imports: [CommonModule, NavbarComponent, NgbDropdownModule, DocumentUploadComponent, FormsModule],
   templateUrl: './folder-details.component.html',
-  styleUrl: './folder-details.component.css',
+  styleUrls: ['./folder-details.component.css'],
 })
-export class FolderDetailsComponent  implements OnInit {
+export class FolderDetailsComponent implements OnInit {
   folderId!: number;
-  documents: any[] = [];
+  documents: DocumentModel[] = [];
   folder: any;
   folderName!: string;
 
@@ -69,13 +69,19 @@ export class FolderDetailsComponent  implements OnInit {
   deleteDocument(docId: number) {
     this.documentService.delete(docId).subscribe(() => {
       console.log('doc deleted');
+      this.loadDocumentsWithinFolder(); // Reload documents after deletion
     });
   }
 
   openModal(document?: DocumentModel) {
     const modalRef = this.modalService.open(DocumentEditComponent);
-    modalRef.componentInstance.documents = this.documents;
-    console.log('modal', modalRef.componentInstance.documents);
+    modalRef.componentInstance.document = { ...document }; // Pass a shallow copy to avoid mutation issues
+    modalRef.componentInstance.documentUpdated.subscribe((updatedDocument: DocumentModel) => {
+      const index = this.documents.findIndex(doc => doc.id === updatedDocument.id);
+      if (index !== -1) {
+        this.documents[index] = updatedDocument;
+      }
+    });
   }
 
   getApprovalStatus(document: DocumentStatus): { text: string; badgeClass: string } {
@@ -85,6 +91,7 @@ export class FolderDetailsComponent  implements OnInit {
       return { text: 'Approved', badgeClass: 'bg-warning' };
     }
   }
+
   updateBreadcrumb() {
     const routeData = this.route.snapshot.data;
     if (this.folderName) {
@@ -96,19 +103,43 @@ export class FolderDetailsComponent  implements OnInit {
       });
     }
   }
+
   filterTimesheets(): void {
     // Implement filtering logic
   }
-  // downloadFile(document: DocumentModel): void {
-  //   const link = window.document.createElement('a'); // Changed here
-  //   link.href = document.file!;
-  //   link.download = document.documentName!;
-  //   link.click();
-  // }
-  // downloadDocument(document: any) {
-  //   this.documentService.download(document.id).subscribe((response: any) => {
-  //     const blob = new Blob([response], { type: 'application/pdf' });
-  //     saveAs(blob, document.documentName);
-  //   });
-  // }
+  viewDocument(base64String: string): void {
+    const blob = this.b64toBlob(base64String, 'application/octet-stream');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    URL.revokeObjectURL(url);
+  }
+
+  downloadDocument(base64String: string, fileName: string): void {
+    const blob = this.b64toBlob(base64String, 'application/octet-stream');
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  b64toBlob(b64Data: string, contentType: string = ''): Blob {
+    const sliceSize = 512;
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+
+    return new Blob(byteArrays, { type: contentType });
+  }
 }

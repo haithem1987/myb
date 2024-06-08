@@ -8,9 +8,13 @@ export const GET_ALL_FOLDERS = gql`
       folderName
       parentId
       createdBy
+      createdAt
+          updatedAt
       documents {
         documentName
         createdBy
+        createdAt
+          updatedAt
       }
     }
   }
@@ -22,6 +26,8 @@ query getFolderById($id: Int!) {
           folderName
           createdBy
           editedBy
+          createdAt
+          updatedAt
           documents {
             id
             documentName
@@ -31,6 +37,8 @@ query getFolderById($id: Int!) {
             status
             folderId
             documentSize
+            createdAt
+            updatedAt
           }
         }
       }

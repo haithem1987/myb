@@ -17,6 +17,7 @@ export const UPDATE_FOLDER = gql`
       editedBy
       createdDate
       lastModifiedDate
+      updatedAt
     }
   }
 `;

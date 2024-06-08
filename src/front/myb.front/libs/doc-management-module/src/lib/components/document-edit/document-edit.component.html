@@ -1,49 +1,37 @@
 <div class="modal-content">
-
 	<div class="modal-header">
-		<h4 class="modal-title">Edit  Document </h4>
-		<button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+	  <h4 class="modal-title">Edit Document</h4>
+	  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
 	</div>
-	<div>
-	<form class="container">
-	
-		  <div class="mb-3">
-			<label for="documentName" class="form-label">Document  Name</label>
-			<input
-			  type="text"
-			  class="form-control"
-			  id="documentName"
-			  name="documentName"
-			  placeholder="Enter Document Name "
-			/>
-		  </div>
-		  <div class="mb-3">
-			<label for="docCreationTime" class="form-label">Created at</label>
-			<input
-			  type="datetime-local"
-			  class="form-control"
-			  id="docCreationTime"
-			  name="docCreationTime"
-			/>
-		  </div>
-	 
-		  <div class="mb-3">
-			<label for="Type" class="form-label"> Type </label>
-			<select
-			  class="form-control"
-			  id="Type"
-			  name="Type"
-			>
-			  <option *ngFor="let document of documents" >
-				{{ document.documentType }}
-			  </option>
-			</select>
-		  </div>
-	 
-	</form>
-</div>
+	<div class="container">
+	  <form>
+		<div class="mb-3">
+		  <label for="documentName" class="form-label">Document Name</label>
+		  <input
+			type="text"
+			class="form-control"
+			id="documentName"
+			[(ngModel)]="document.documentName"
+			name="documentName"
+			placeholder="Enter Document Name"
+		  />
+		</div>
+		<!-- <div class="mb-3">
+		  <label for="documentType" class="form-label">Type</label>
+		  <select
+			class="form-control"
+			id="documentType"
+			[(ngModel)]="document.documentType"
+			name="documentType"
+		  >
+			<option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
+		  </select>
+		</div> -->
+	  </form>
+	</div>
 	<div class="modal-footer">
-		<button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
-		<button type="button" class="btn btn-outline-primary"(click)="activeModal.close('Close click')">Save</button>
+	  <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
+	  <button type="button" class="btn btn-outline-primary" (click)="saveDocument()">Save</button>
 	</div>
-</div>
+  </div>
+  

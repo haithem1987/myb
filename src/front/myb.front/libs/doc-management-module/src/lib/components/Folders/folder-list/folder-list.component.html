@@ -20,9 +20,9 @@
             <a [routerLink]="['/documents/folder', folder.id]" class="no-underline">{{ folder.folderName }}</a>
           </td>
           <td></td>
-          <td>{{folder.CreatedAt}}</td>
+          <td>{{folder.createdAt | date }}</td>
           <td class="text-end">
-            <button class="btn btn-outline-primary me-2" (click)="updateFolder(folder)">
+            <button class="btn btn-outline-primary me-2" (click)="openModal()">
               <i class="bi bi-pencil-square"></i>
             </button>
             <button class="btn btn-outline-secondary" (click)="deleteFolder(folder.id != null ? folder.id : -1)">

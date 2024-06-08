@@ -26,7 +26,7 @@ export class FolderCreationComponent {
         parentId: 0,
         createdBy: 0,
         editedBy: 0 ,
-       
+        createdAt: new Date(),
       };
       
       this.folderService.createFolder(folder).subscribe(

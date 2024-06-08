@@ -17,11 +17,13 @@ namespace Myb.Document.Infra.GraphQl.Mutations
             return await documentService.AddDocumentAsync(document);
         }
 
-        public async Task<DocumentModel> UpdateDocument([Service] IDocumentService documentService, DocumentModel document)
+        public async Task<DocumentModel> UpdateDocument([Service] IDocumentService documentService, int id, DocumentModel document)
         {
+            document.Id = id; // Ensure the id is set correctly
             return await documentService.UpdateDocumentAsync(document);
         }
-      
+
+
         public async Task<bool> DeleteDocument([Service] IDocumentService documentService, int id)
         {
             return await documentService.DeleteDocumentAsync(id);

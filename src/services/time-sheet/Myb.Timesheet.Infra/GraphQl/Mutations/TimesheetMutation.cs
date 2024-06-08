@@ -1,7 +1,7 @@
-﻿
-using HotChocolate;
+﻿using HotChocolate;
 using Myb.Timesheet.Models;
 using Myb.Timesheet.Services;
+using System.Threading.Tasks;
 
 namespace Myb.Timesheet.Infra.GraphQl.Mutations
 {
@@ -11,6 +11,16 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
         public async Task<TimeSheet> addTimesheet([Service] ITimesheetService timesheetService, TimeSheet timeSheet)
         {
             return await timesheetService.CreateTimeSheetAsync(timeSheet);
+        }
+        
+        public async Task<TimeSheet> updateTimesheet([Service] ITimesheetService timesheetService, TimeSheet timeSheet)
+        {
+            return await timesheetService.UpdateTimeSheetAsync(timeSheet);
+        }
+
+        public async Task<bool> DeleteTimesheet([Service] ITimesheetService timesheetService, int id)
+        {
+            return await timesheetService.DeleteTimeSheetAsync(id);
         }
 
         // Task mutations
@@ -28,6 +38,7 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
         {
             return await taskService.DeleteTaskAsync(id);
         }
+
         // Project Mutations
         public async Task<Project> AddProject([Service] IProjectService projectService, Project project)
         {
@@ -43,16 +54,16 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
         {
             return await projectService.DeleteProjectAsync(id);
         }
-        
-        //Employee Mutation
+
+        // Employee Mutation
         public async Task<Employee> AddEmployee([Service] IEmployeeService employeeService, Employee employee)
         {
             return await employeeService.AddEmployeeAsync(employee);
-        }  public async Task<Employee> UpdateEmployee([Service] IEmployeeService employeeService, Employee employee)
+        }
+
+        public async Task<Employee> UpdateEmployee([Service] IEmployeeService employeeService, Employee employee)
         {
             return await employeeService.UpdateEmployeeAsync(employee);
         }
-        
-       
     }
 }

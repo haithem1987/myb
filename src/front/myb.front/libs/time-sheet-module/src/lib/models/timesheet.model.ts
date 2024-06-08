@@ -3,7 +3,7 @@ import { Employee } from './employee';
 import { Project } from './project.model';
 
 export interface Timesheet extends BaseModel {
-  date: Date;
+  date: Date | null;
   workedHours: number;
   description?: string;
   isApproved: boolean;

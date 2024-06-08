@@ -1,1 +1,78 @@
-<p>timesheet-edit works!</p>
+<div class="modal-header">
+  <h5 class="modal-title">Edit Timesheet</h5>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="cancel()"
+  ></button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="editForm">
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <input
+        id="description"
+        type="text"
+        class="form-control"
+        formControlName="description"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="date" class="form-label">Date</label>
+      <input
+        id="date"
+        formControlName="date"
+        placeholder="YYYY-MM-DD"
+        class="form-control flex-fill"
+        ngbDatepicker
+        #datePicker="ngbDatepicker"
+        (click)="datePicker.toggle()"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="workedHours" class="form-label">Worked Hours</label>
+      <input
+        id="workedHours"
+        type="text"
+        class="form-control"
+        formControlName="workedHours"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="projectId" class="form-label">Project</label>
+      <select
+        id="projectId"
+        class="form-control"
+        formControlName="projectId"
+        (change)="onProjectSelect($event)"
+      >
+        <option *ngFor="let project of projects$ | async" [value]="project.id">
+          {{ project.projectName }}
+        </option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="employeeId" class="form-label">Employee</label>
+      <select
+        id="employeeId"
+        class="form-control"
+        formControlName="employeeId"
+        (change)="onEmployeeSelect($event)"
+      >
+        <option
+          *ngFor="let employee of employees$ | async"
+          [value]="employee.id"
+        >
+          {{ employee.name }}
+        </option>
+      </select>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="cancel()">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-primary" (click)="save()">Save</button>
+</div>

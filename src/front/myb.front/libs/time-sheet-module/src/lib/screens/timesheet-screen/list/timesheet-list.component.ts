@@ -11,6 +11,13 @@ import {
   ProgressBarComponent,
 } from 'libs/shared/shared-ui/src';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
+import {
+  NgbDropdownConfig,
+  NgbDropdownModule,
+  NgbModal,
+} from '@ng-bootstrap/ng-bootstrap';
+import { TimesheetEditComponent } from '../edit/timesheet-edit.component';
 
 @Component({
   selector: 'myb-timesheet-list',
@@ -22,7 +29,9 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
     TimesheetCreateComponent,
     ProgressBarComponent,
     AvatarComponent,
+    NgbDropdownModule,
   ],
+  providers: [NgbDropdownConfig],
   templateUrl: './timesheet-list.component.html',
   styleUrls: ['./timesheet-list.component.css'],
 })
@@ -33,14 +42,23 @@ export class TimesheetListComponent implements OnInit {
   searchTerm: string = '';
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' | '' = '';
-
+  workingHoursPerDay: number = 8;
   constructor(
     private router: Router,
     private timesheetService: TimesheetService,
-    private keycloakService: KeycloakService
-  ) {}
+    private keycloakService: KeycloakService,
+    private toastService: ToastService,
+    private modalService: NgbModal,
+    config: NgbDropdownConfig
+  ) {
+    config.placement = 'left-start';
+    config.autoClose = true;
+  }
 
   ngOnInit(): void {
+    this.timesheets$.subscribe((timesheets) => {
+      this.updatedTimesheets = timesheets;
+    });
     this.userId$.subscribe((userId) => {
       if (!userId) return;
       this.timesheetService
@@ -54,16 +72,42 @@ export class TimesheetListComponent implements OnInit {
     this.router.navigate(['/timesheet/add']);
   }
 
+  approveTimeSheet(timesheet: Timesheet): void {
+    const updatedTimesheet = {
+      ...timesheet,
+      isApproved: !timesheet.isApproved,
+    };
+    this.timesheetService
+      .update(timesheet.id, updatedTimesheet)
+      .subscribe(() => {
+        this.toastService.show(
+          `Timesheet ${
+            updatedTimesheet.isApproved ? 'approved' : 'disapproved'
+          } successfully`,
+          {
+            classname: 'toast-success',
+          }
+        );
+      });
+  }
+
   editTimeSheet(id: number): void {
-    this.router.navigate(['/timesheet/edit', id]);
+    const timesheet = this.updatedTimesheets.find((t) => t.id === id);
+    if (!timesheet) return;
+
+    const modalRef = this.modalService.open(TimesheetEditComponent);
+    modalRef.componentInstance.timesheet = timesheet;
   }
 
   deleteTimeSheet(id: number): void {
     if (confirm('Are you sure you want to delete this timesheet?')) {
       this.timesheetService.delete(id).subscribe(() => {
-        this.updatedTimesheets = this.updatedTimesheets.filter(
-          (t) => t.id !== id
-        );
+        this.toastService.show('timesheet deleted succesfuly', {
+          classname: 'toast-success',
+        });
+        // this.updatedTimesheets = this.updatedTimesheets.filter(
+        //   (t) => t.id !== id
+        // );
       });
     }
   }
@@ -83,6 +127,7 @@ export class TimesheetListComponent implements OnInit {
   }
 
   private sortTimesheets(): void {
+    console.log('this.updatedTimesheets', this.updatedTimesheets);
     if (!this.sortColumn || this.sortDirection === '') {
       this.updatedTimesheets = [...this.updatedTimesheets];
     } else {

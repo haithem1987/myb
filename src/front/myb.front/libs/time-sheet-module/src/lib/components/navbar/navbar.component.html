@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" routerLink="/">MYB</a>
     <button
@@ -53,14 +53,11 @@
             role="button"
             aria-expanded="false"
           >
-            <div
-              class="avatar"
-              [ngStyle]="{
-                'background-color': getAvatarColor(user?.username ?? '')
-              }"
-            >
-              {{ user.username?.charAt(0)?.toUpperCase() }}
-            </div>
+            <myb-front-avatar
+              [text]="user?.username?.toLocaleUpperCase()"
+              [size]="25"
+            ></myb-front-avatar>
+
             <span class="ms-2">{{ user.username }}</span>
           </a>
           <ul

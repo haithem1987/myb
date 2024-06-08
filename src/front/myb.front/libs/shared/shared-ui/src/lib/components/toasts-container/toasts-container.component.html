@@ -1,5 +1,4 @@
-<!-- toasts-container.component.html -->
-<div class="position-absolute top-0 end-0 m-3">
+<div class="toast-container position-fixed top-0 end-0 p-3">
   <ngb-toast
     *ngFor="let toast of toastService.toasts"
     [autohide]="true"
@@ -12,7 +11,6 @@
     <ng-template [ngIf]="isTemplate(toast)" [ngIfElse]="text">
       <ng-template [ngTemplateOutlet]="toast.textOrTpl"></ng-template>
     </ng-template>
-
     <ng-template #text>{{ toast.textOrTpl }}</ng-template>
   </ngb-toast>
 </div>

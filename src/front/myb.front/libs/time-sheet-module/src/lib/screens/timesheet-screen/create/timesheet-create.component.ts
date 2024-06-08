@@ -22,6 +22,7 @@ import { Employee } from '../../../models/employee';
 import { EmployeeService } from '../../../services/employee.service';
 import { DateUtilsService } from 'libs/shared/shared-ui/src';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 
 @Component({
   selector: 'myb-front-timesheet-create',
@@ -32,7 +33,9 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
     ReactiveFormsModule,
     NgbDatepickerModule,
     NgbPopoverModule,
+    NgxMaskDirective,
   ],
+  providers: [provideNgxMask()],
   templateUrl: './timesheet-create.component.html',
   styleUrls: ['./timesheet-create.component.css'],
 })
@@ -42,6 +45,8 @@ export class TimesheetCreateComponent implements OnInit {
   timesheetForm!: FormGroup;
   isTimerRunning = false;
   timer: any;
+  selectedProject: Project | null = null;
+  selectedEmployee: Employee | null = null;
 
   @ViewChild('datePicker', { static: false }) datePicker!: NgbInputDatepicker;
 
@@ -63,8 +68,8 @@ export class TimesheetCreateComponent implements OnInit {
 
     this.timesheetForm = this.fb.group({
       description: ['', Validators.required],
-      date: [currentDate, Validators.required], // Set current date as default
-      workedHours: ['00:00:00', Validators.required], // Use string for display
+      date: [currentDate, Validators.required],
+      workedHours: ['000000', [Validators.required, this.timeValidator]],
       isApproved: [false, Validators.required],
       employeeId: [null, Validators.required],
       employeeName: [''],
@@ -72,12 +77,12 @@ export class TimesheetCreateComponent implements OnInit {
       projectName: [''],
       userId: ['', Validators.required],
     });
+
     this.keycloakService.userId$.subscribe((userId) => {
       if (userId) {
         this.timesheetForm.get('userId')?.setValue(userId);
       }
     });
-    console.log('$projects | async', this.projects$);
   }
 
   getCurrentDate(): NgbDateStruct {
@@ -114,43 +119,59 @@ export class TimesheetCreateComponent implements OnInit {
   startTimer(): void {
     this.timer = setInterval(() => {
       const currentValue = this.timesheetForm.get('workedHours')?.value;
-      const timeParts = currentValue.split(':');
-      let hours = parseInt(timeParts[0], 10);
-      let minutes = parseInt(timeParts[1], 10);
-      let seconds = parseInt(timeParts[2], 10);
+      const hours = parseInt(currentValue.substring(0, 2), 10);
+      const minutes = parseInt(currentValue.substring(2, 4), 10);
+      const seconds = parseInt(currentValue.substring(4, 6), 10);
 
-      seconds += 1;
-      if (seconds === 60) {
-        seconds = 0;
-        minutes += 1;
-      }
-      if (minutes === 60) {
-        minutes = 0;
-        hours += 1;
-      }
+      const newSeconds = (seconds + 1) % 60;
+      const newMinutes = (minutes + Math.floor((seconds + 1) / 60)) % 60;
+      const newHours =
+        hours + Math.floor((minutes + Math.floor((seconds + 1) / 60)) / 60);
 
       this.timesheetForm
         .get('workedHours')
         ?.setValue(
-          `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`
+          `${this.pad(newHours)}${this.pad(newMinutes)}${this.pad(newSeconds)}`
         );
     }, 1000);
   }
 
-  onProjectSelect(project: any): void {
-    this.timesheetForm.get('projectId')?.setValue(project.id);
-    this.timesheetForm.get('projectName')?.setValue(project.projectName);
+  onProjectSelect(selectedProject: Project): void {
+    this.selectedProject = selectedProject;
+    if (selectedProject) {
+      this.timesheetForm.patchValue({
+        projectId: selectedProject.id,
+        projectName: selectedProject.projectName,
+      });
+    } else {
+      this.timesheetForm.patchValue({
+        projectId: null,
+        projectName: '',
+      });
+    }
   }
 
-  onEmployeeSelect(employee: any): void {
-    this.timesheetForm.get('employeeId')?.setValue(employee.id);
-    this.timesheetForm.get('employeeName')?.setValue(employee.name);
+  onEmployeeSelect(selectedEmployee: Employee): void {
+    this.selectedEmployee = selectedEmployee;
+    if (selectedEmployee) {
+      this.timesheetForm.patchValue({
+        employeeId: selectedEmployee.id,
+        employeeName: selectedEmployee.name,
+      });
+    } else {
+      this.timesheetForm.patchValue({
+        employeeId: null,
+        employeeName: '',
+      });
+    }
   }
 
   addEntry(): void {
     if (this.timesheetForm.valid) {
       const formValue = this.timesheetForm.value;
-      const [hours, minutes, seconds] = formValue.workedHours
+      const [hours, minutes, seconds] = this.addSeparators(
+        formValue.workedHours
+      )
         .split(':')
         .map((part: string) => parseInt(part, 10));
       const workedHours = hours + minutes / 60 + seconds / 3600;
@@ -162,32 +183,74 @@ export class TimesheetCreateComponent implements OnInit {
         projectId: Number(formValue.projectId),
         date: this.dateUtils.fromDateStruct(formValue.date),
       };
-      console.log('timesheet', timesheet);
-      this.timesheetService
-        .create(timesheet)
-        .pipe(
-          tap({
-            next: (response) => {
-              console.log('Timesheet entry added successfully', response);
-              this.timesheetForm.reset();
-              this.toastService.show('Timesheet entry added successfully', {
-                classname: 'bg-success text-light',
-              });
-            },
-            error: (error) => {
-              console.error('Error adding timesheet entry', error);
-              this.toastService.show('Error adding timesheet entry', {
-                classname: 'bg-danger text-light',
-              });
-            },
-          })
-        )
-        .subscribe();
+
+      this.timesheetService.create(timesheet).subscribe({
+        next: (response) => {
+          this.selectedEmployee = null;
+          this.selectedProject = null;
+          this.timesheetForm.reset({
+            description: '',
+            date: this.getCurrentDate(),
+            workedHours: '000000',
+            isApproved: false,
+            employeeId: null,
+            employeeName: '',
+            projectId: null,
+            projectName: '',
+            userId: this.timesheetForm.get('userId')?.value,
+          });
+          this.toastService.show('Timesheet entry added successfully', {
+            classname: 'bg-success text-light',
+          });
+        },
+        error: (error) => {
+          this.toastService.show('Error adding timesheet entry', {
+            classname: 'bg-danger text-light',
+          });
+        },
+      });
     } else {
-      console.log('Form is invalid');
       this.toastService.show('Erreur, Vérifier les champs obligatoires', {
         classname: 'border border-success bg-success text-light',
       });
     }
+  }
+
+  private timeValidator(control: any): { [key: string]: boolean } | null {
+    if (!control.value) {
+      return { invalidTime: true };
+    }
+    const timeStr = control.value;
+    if (timeStr.length !== 6) {
+      return { invalidTime: true };
+    }
+    const hours = parseInt(timeStr.substring(0, 2), 10);
+    const minutes = parseInt(timeStr.substring(2, 4), 10);
+    const seconds = parseInt(timeStr.substring(4, 6), 10);
+
+    if (
+      isNaN(hours) ||
+      isNaN(minutes) ||
+      isNaN(seconds) ||
+      hours < 0 ||
+      hours > 23 ||
+      minutes < 0 ||
+      minutes > 59 ||
+      seconds < 0 ||
+      seconds > 59
+    ) {
+      return { invalidTime: true };
+    }
+    return null;
+  }
+
+  private addSeparators(timeStr: string): string {
+    if (timeStr.length !== 6) {
+      return timeStr;
+    }
+    return `${timeStr.substring(0, 2)}:${timeStr.substring(
+      2,
+      4
+    )}:${timeStr.substring(4, 6)}`;
   }
 }

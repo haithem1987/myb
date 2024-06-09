@@ -1,6 +1,6 @@
 <div class="container mt-3">
-  <h5>Your Files in <span class="folder-name">{{ folder.folderName }}</span>'s Folder</h5>
-  <br>
+  <h5>Your Files in <span class="folder-name">{{ folder.folderName }}</span> :</h5>
+
   <input
     type="text"
     class="form-control mb-3"
@@ -25,8 +25,8 @@
           </th>
           <th scope="col">Status</th>
           <th scope="col">Created At </th>
-          <th scope="col">Created At </th>
-          <th scope="col">Actions</th>
+          <th scope="col">Updated At </th>
+          <th scope="col" class="text-end">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -46,21 +46,25 @@
               <div ngbDropdown>
                 <i class="bi bi-three-dots-vertical" style="font-size: 30px; color: green;" ngbDropdownToggle></i>
                 <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                  <button ngbDropdownItem>
+                  <button ngbDropdownItem >
                     <i class="bi bi-share-fill"></i> Share
                   </button>
-                  <button ngbDropdownItem>
+                  <!-- <button ngbDropdownItem>
                     <i class="bi bi-files"></i> Duplicate
-                  </button>
+                  </button> -->
                   <button ngbDropdownItem (click)="openModal(document)">
                     <i class="bi bi-pencil-square"></i> Edit
                   </button>
-                  <button ngbDropdownItem >
+                  <button ngbDropdownItem (click)="downloadDocument(document)">
                     <i class="bi bi-box-arrow-down"></i> Download
                   </button>
-                  <button ngbDropdownItem (click)="deleteDocument(document.id)">
+                  <button ngbDropdownItem (click)="viewDocument(document)">
+                    <i class="bi bi-eye"></i> View
+                  </button> 
+                  <button ngbDropdownItem class="delete-button" (click)="deleteDocument(document.id)">
                     <i class="bi bi-trash"></i> Delete
                   </button>
+                  
                 </div>
               </div>
             </div>

@@ -8,8 +8,8 @@
       <thead>
         <tr>
           <th> Folder Name</th>
-          <th>Created by</th>
-          <th>Created at</th>
+          <!-- <th>Created by</th> -->
+          <th  class="text-end">Date</th>
           <th class="text-end">Actions</th>
         </tr>
       </thead>
@@ -19,44 +19,20 @@
             <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
             <a [routerLink]="['/documents/folder', folder.id]" class="no-underline">{{ folder.folderName }}</a>
           </td>
-          <td></td>
-          <td>{{folder.createdAt | date }}</td>
+          <!-- <td></td> -->
+          <td  class="text-end">{{folder.createdAt | date }}</td>
           <td class="text-end">
             <button class="btn btn-outline-primary me-2" (click)="openModal()">
               <i class="bi bi-pencil-square"></i>
             </button>
-            <button class="btn btn-outline-secondary" (click)="deleteFolder(folder.id != null ? folder.id : -1)">
+            <button class="btn btn-outline-danger   me-2" (click)="deleteFolder(folder.id != null ? folder.id : -1)">
               <i class="bi bi-trash"></i>
+            </button>
+            <button class="btn btn-outline-secondary me-2" (click)="pinFolder(folder)">
+              <i class="bi bi-pin-angle"></i> 
             </button>
           </td>
         </tr>
-        <!-- <tr *ngFor="let doc of documents">
-          <td>
-            <ng-container [ngSwitch]="doc.documentType">
-              <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf me-2" style="font-size: 25px;"></i>
-              <i *ngSwitchCase="'WORD'" class="bi bi-file-word me-2" style="font-size: 25px;"></i>
-              <i *ngSwitchCase="'EXCEL'" class="bi bi-file-earmark-excel me-2" style="font-size: 25px;"></i>
-            </ng-container>
-            <a class="card-title folder-link" [href]="doc.file" target="_blank">{{ doc.documentName }}</a>
-          </td>
-          <td>{{ doc.documentType }}</td>
-          <td>{{ doc.documentSize }} bytes</td>
-          <td class="text-end">
-            <div class="d-flex justify-content-end">
-               <a [href]="doc.url" target="_blank">
-                <button type="button" class="btn btn-outline-primary">
-                  <i class="bi bi-eye-fill"></i>
-                </button>
-              </a>
-              <button class="btn btn-outline-primary me-2">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-outline-secondary">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr> -->
       </tbody>
     </table>
   </div>

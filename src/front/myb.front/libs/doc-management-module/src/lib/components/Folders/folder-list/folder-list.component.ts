@@ -20,9 +20,16 @@ export class FolderListComponent {
   @Input() documents: DocumentModel[] = [];
   @Output() folderUpdated = new EventEmitter<Folder>();
   @Output() folderDeleted = new EventEmitter<number>();
+  @Output() folderPinned = new EventEmitter<Folder>();
 
-  constructor(private folderService: FolderService,    private modalService: NgbModal, ) {}
 
+  // List to store pinned folders
+  pinnedFolders: Folder[] = [];
+
+  constructor(private folderService: FolderService, private modalService: NgbModal) {}
+pinFolder(folder: Folder): void {
+    this.folderPinned.emit(folder);
+  }
   deleteFolder(id: number) {
     if (id == -1) {
       return;
@@ -42,18 +49,24 @@ export class FolderListComponent {
       }
     );
   }
+
   openModal() {
     const modalRef = this.modalService.open(FolderEditComponent);
     modalRef.componentInstance.folderEdit.subscribe((newFolder: Folder) => {
       this.folders = [...this.folders, newFolder]; 
     });
   }
-  
-  // getUrl(file: any){
-  //   const reader = new FileReader();
-  //   reader.readAsDataURL(file);
-  //   return URL.createObjectURL(file);
 
-  // }
- 
+  togglePinFolder(folder: Folder) {
+    const index = this.pinnedFolders.findIndex(f => f.id === folder.id);
+    if (index === -1) {
+      this.pinnedFolders.push(folder);
+    } else {
+      this.pinnedFolders.splice(index, 1);
+    }
+  }
+
+  isPinned(folder: Folder): boolean {
+    return this.pinnedFolders.some(f => f.id === folder.id);
+  }
 }

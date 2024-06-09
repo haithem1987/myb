@@ -10,6 +10,7 @@ import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentUploadComponent } from '../../document-upload/document-upload.component';
 import { DocumentEditComponent } from '../../document-edit/document-edit.component';
 import { FormsModule } from '@angular/forms';
+import { base64ToBlob } from '../../../base64-to-blob';
 
 @Component({
   selector: 'myb-front-folder-details',
@@ -23,6 +24,7 @@ export class FolderDetailsComponent implements OnInit {
   documents: DocumentModel[] = [];
   folder: any;
   folderName!: string;
+DocumentStatus: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -46,7 +48,13 @@ export class FolderDetailsComponent implements OnInit {
         console.log('Raw response data:', data);
         if (data && data.id) {
           this.folder = data;
-          this.documents = this.folder.documents;
+          this.documents = this.folder.documents.map((doc: any) => {
+            console.log('Document:', doc); // Log each document to see its properties
+            return {
+              ...doc,
+              file: doc.file // Ensure the file property is included
+            };
+          });
           console.log('Documents in folder:', this.documents);
         } else {
           console.error('Invalid response structure:', data);
@@ -65,6 +73,7 @@ export class FolderDetailsComponent implements OnInit {
       }
     );
   }
+  
 
   deleteDocument(docId: number) {
     this.documentService.delete(docId).subscribe(() => {
@@ -84,13 +93,19 @@ export class FolderDetailsComponent implements OnInit {
     });
   }
 
-  getApprovalStatus(document: DocumentStatus): { text: string; badgeClass: string } {
-    if (document) {
-      return { text: 'Submitted', badgeClass: 'bg-success' };
-    } else {
-      return { text: 'Approved', badgeClass: 'bg-warning' };
+  getApprovalStatus(status: DocumentStatus): { text: string; badgeClass: string } {
+    switch (status) {
+      case DocumentStatus.Submitted:
+        return { text: 'Submitted', badgeClass: 'bg-success' };
+      case DocumentStatus.Approved:
+        return { text: 'Approved', badgeClass: 'bg-warning' };
+      case DocumentStatus.Rejected:
+        return { text: 'Rejected', badgeClass: 'bg-danger' };
+      default:
+        return { text: 'Unknown', badgeClass: 'bg-secondary' };
     }
   }
+
 
   updateBreadcrumb() {
     const routeData = this.route.snapshot.data;
@@ -107,39 +122,79 @@ export class FolderDetailsComponent implements OnInit {
   filterTimesheets(): void {
     // Implement filtering logic
   }
-  viewDocument(base64String: string): void {
-    const blob = this.b64toBlob(base64String, 'application/octet-stream');
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    URL.revokeObjectURL(url);
-  }
 
-  downloadDocument(base64String: string, fileName: string): void {
-    const blob = this.b64toBlob(base64String, 'application/octet-stream');
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    link.click();
-    URL.revokeObjectURL(link.href);
-  }
 
-  b64toBlob(b64Data: string, contentType: string = ''): Blob {
-    const sliceSize = 512;
+  downloadDocument(document: DocumentModel): void {
+    console.log('Attempting to download document:', document);
+  
+    const { file, documentName } = document;
+    console.log('Document file:', file);
+    console.log('Document name:', documentName);
+  
+    if (file && documentName) {
+      try {
+        // Ensure the base64 string is correctly formatted
+        const base64String = file.split(',')[1]; // Remove the data type prefix if present
+        if (base64String) {
+          const blob = this.b64toBlob(base64String, 'application/pdf');
+          const link = window.document.createElement('a'); // Using window.document.createElement
+          link.href = URL.createObjectURL(blob);
+          link.download = documentName;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        } else {
+          console.error('Base64 string is missing or malformed.');
+        }
+      } catch (error) {
+        console.error('Error while processing base64 string:', error);
+      }
+    } else {
+      console.error('File data or document name is undefined', document);
+    }
+  }
+  
+  b64toBlob(b64Data: string, contentType: string = '', sliceSize: number = 512): Blob {
     const byteCharacters = atob(b64Data);
     const byteArrays = [];
-
+  
     for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
       const slice = byteCharacters.slice(offset, offset + sliceSize);
-
+  
       const byteNumbers = new Array(slice.length);
       for (let i = 0; i < slice.length; i++) {
         byteNumbers[i] = slice.charCodeAt(i);
       }
-
+  
       const byteArray = new Uint8Array(byteNumbers);
       byteArrays.push(byteArray);
     }
-
+  
     return new Blob(byteArrays, { type: contentType });
   }
+  viewDocument(document: DocumentModel): void {
+    console.log('Attempting to view document:', document);
+    const { file, documentName } = document;
+    console.log('Document file:', file);
+    console.log('Document name:', documentName);
+
+    if (file && documentName) {
+      try {
+        const base64String = file.split(',')[1];
+        if (base64String) {
+          const blob = this.b64toBlob(base64String, 'application/pdf');
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        } else {
+          console.error('Base64 string is missing or malformed.');
+        }
+      } catch (error) {
+        console.error('Error while processing base64 string:', error);
+      }
+    } else {
+      console.error('File data or document name is undefined', document);
+    }
+  }  
+
+
+  
 }

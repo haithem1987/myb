@@ -9,6 +9,16 @@
     display: none !important;
   }
   .folder-name {
-    color: #845bba; /* Change 'blue' to any color you prefer */
+    color: #845bba; 
+    font-size: larger
+  }
+  .delete-button {
+    color: red;
+    border: none;
+    background: none;
+  }
+  
+  .delete-button i {
+    color: red;
   }
   

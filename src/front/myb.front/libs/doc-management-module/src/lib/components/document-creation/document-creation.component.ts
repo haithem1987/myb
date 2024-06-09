@@ -72,7 +72,7 @@ export class DocumentCreationComponent implements OnInit {
           folderId: parseInt(this.folderId.toString()),
           documentSize: selectedFiles[0].file.size,
           file: selectedFiles[0].Image, // Save the base64 string
-          // url: selectedFiles[0].url, // 
+          url: selectedFiles[0].url, // 
           createdAt: new Date(),
           updatedAt: new Date(),
          
@@ -90,11 +90,6 @@ export class DocumentCreationComponent implements OnInit {
 
             this.activeModal.close();
 
-    //         if (newDocument.file && newDocument.documentName) {
-    //   this.downloadFile(newDocument.file, newDocument.documentName); // Trigger the download
-    // } else {
-    //   console.error('File data or document name is undefined');
-    // }
 
     console.log('new doc', newDocument);
   },

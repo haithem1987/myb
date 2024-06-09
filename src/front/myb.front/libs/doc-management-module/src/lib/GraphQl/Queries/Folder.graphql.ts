@@ -39,6 +39,7 @@ query getFolderById($id: Int!) {
             documentSize
             createdAt
             updatedAt
+            file
           }
         }
       }

@@ -13,22 +13,6 @@
     <button class="btn btn-outline-secondary me-2 btn-sm" >
       <i class="bi bi-file-earmark-pdf"style="font-size: 20px;"></i> + Documents
     </button>
-    <!-- <div class="custom-file">
-      <input
-        #fileInput
-        type="file"
-        class="custom-file-input"
-        id="customFile"
-        (change)="onSelectFile(fileInput.files, $event)"
-        multiple
-        accept=".jpg, .png, .jpeg, .pdf"
-        style="display: none;"
-      />
-      <button class="btn btn-primary text-white" (click)="fileInput.click()">Upload Document</button>
-      <br /><br />
-      <div class="card-footer text-muted"></div>
-    </div> -->
-    <!-- <myb-front-document-upload></myb-front-document-upload> -->
   </div>
 </div>
 
@@ -37,112 +21,35 @@
     <h5> <i class="bi bi-pin-angle-fill"></i> Quick Access </h5>
   </div>
 </div>
-
 <section class="pt-2">
   <div class="container">
     <div class="row">
-      <div class="col-sm-3" >
-        <!-- <div class="col-sm-3" *ngFor="let folder of folders"> -->
-
-        <div class="card border-primary p-2" >
+      <div class="col-sm-3" *ngFor="let folder of pinnedFolders">
+        <div class="card border-primary p-2">
           <div class="card-body">
-            <i class="bi bi-folder-fill" style="font-size: 40px;"></i>
-            <h5 >Important Documents</h5>
-            <!-- <h5 [routerLink]="['/documents/folder', folder.id]">{{ folder.folderName }}</h5> -->
-
-            <p class="card-text d-inline me-2">6 Doc </p><p class="card-text d-inline">10 KB</p>
-
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-3" >
-        <!-- <div class="col-sm-3" *ngFor="let folder of folders"> -->
-
-        <div class="card border-primary p-2" >
-          <div class="card-body">
-            <i class="bi bi-folder-fill" style="font-size: 40px;"></i>
-            <h5 >My folder</h5>
-            <!-- <h5 [routerLink]="['/documents/folder', folder.id]">{{ folder.folderName }}</h5> -->
-
-            <p class="card-text d-inline me-2">6 Doc </p><p class="card-text d-inline">100 KB</p>
-
+            <div class="icons">
+              <i class="bi bi-folder-fill" style="font-size: 40px;"></i>
+              <!-- <button class="btn btn-outline-danger btn-sm" (click)="unpinFolder(folder)"> -->
+                <i class="bi bi-pin-fill" style="font-size: 20px; color:#845bba" (click)="unpinFolder(folder)"></i> 
+              <!-- </button> -->
+            </div>
+            <br/>
+           
+            <h5 [routerLink]="['/documents/folder', folder.id]">{{ folder.folderName }}</h5>
+            <!-- <p class="card-text d-inline me-2">{{ folder.documents.length }} Doc </p> -->
+            <p class="card-text d-inline">{{ calculateFolderSize(folder) }} KB</p>
+            <!-- <button class="btn btn-outline-danger btn-sm" (click)="unpinFolder(folder)">
+              <i class="bi bi-pin-fill" (click)="unpinFolder(folder)"></i> 
+            </button> -->
           </div>
         </div>
       </div>
     </div>
   </div>
-  
 </section>
-
-<!-- <myb-front-document-upload></myb-front-document-upload> -->
-<!-- <div class="card border-primary p-3"> -->
-
-
-  <!-- Table to display folders and documents -->
-  <!-- <div class="table doc folders">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Size</th>
-          <th class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let folder of folders">
-          <td>
-            <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
-            <a class="card-title folder-link" [routerLink]="['/folder', folder.id]">{{ folder.folderName }}</a>
-          </td>
-          <td>Folder</td>
-          <td></td>
-          <td class="text-end">
-            <button class="btn btn-outline-primary me-2" (click)="updateFolder(folder)">
-              <i class="bi bi-pencil-square"></i>
-            </button>
-            <button class="btn btn-outline-secondary" (click)="deleteFolder(folder.id != null ? folder.id : -1)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <tr *ngFor="let doc of documents">
-          <td>
-            <ng-container [ngSwitch]="doc.documentType">
-              <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf me-2" style="font-size: 25px;"></i>
-              <i *ngSwitchCase="'WORD'" class="bi bi-file-word me-2" style="font-size: 25px;"></i>
-              <i *ngSwitchCase="'EXCEL'" class="bi bi-file-earmark-excel me-2" style="font-size: 25px;"></i>
-            </ng-container>
-            <a class="card-title folder-link" [href]="doc.file" target="_blank">{{ doc.documentName }}</a>
-          </td>
-          <td>{{ doc.documentType }}</td>
-          <td>{{ doc.documentSize }} bytes</td>
-          <td class="text-end">
-            <div class="d-flex justify-content-end">
-              <a [href]="doc.url" target="_blank">
-                <button type="button" class="btn btn-outline-primary">
-                  <i class="bi bi-eye-fill"></i>
-                </button>
-              </a> 
-              <button class="btn btn-outline-primary me-2">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-outline-secondary">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div> -->
-
-  
-  <!-- <app-folder-list ></app-folder-list> -->
 
 <myb-front-folder-list 
   [folders]="folders" 
   [documents]="documents" 
-  
-  >
-</myb-front-folder-list>
+  (folderPinned)="onFolderPinned($event)"
+></myb-front-folder-list>

@@ -24,4 +24,7 @@
     text-decoration: none;
     color: green; /* Default color */
   }
-  
+  .icons{
+    display: flex;
+    justify-content: space-between;
+  }

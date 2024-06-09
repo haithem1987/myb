@@ -36,6 +36,7 @@ export class FolderCardsComponent  implements OnInit {
   searchTerm: string = '';
   @Output() folderCreated = new EventEmitter<Folder>();
   @Output() documentCreated = new EventEmitter<DocumentModel>();
+  pinnedFolders: Folder[] = [];
 
   constructor(
     private modalService: NgbModal, 
@@ -45,6 +46,8 @@ export class FolderCardsComponent  implements OnInit {
 
   ngOnInit() {
     this.loadFolders();
+    this.pinnedFolders = [];
+    this.loadPinnedFolders();
   }
 
   loadFolders() {
@@ -105,5 +108,48 @@ export class FolderCardsComponent  implements OnInit {
 //     }
 //   );
 // }
+calculateFolderSize(folder: Folder): number {
+  let size = 0;
+  if (folder.documents) {
+    folder.documents.forEach(doc => {
+      size += doc.documentSize || 0;
+    });
+  }
+  return size / 1024; // convert bytes to KB
+}  
+
+
+
+pinFolder(folder: Folder): void {
+  if (!this.isPinned(folder)) {
+    this.pinnedFolders.push(folder);
+    this.savePinnedFolders();
+  }
+}
+
+unpinFolder(folder: Folder): void {
+  this.pinnedFolders = this.pinnedFolders.filter(f => f.id !== folder.id);
+  this.savePinnedFolders();
+}
+
+isPinned(folder: Folder): boolean {
+  return this.pinnedFolders.some(f => f.id === folder.id);
+}
+
+onFolderPinned(folder: Folder): void {
+  this.pinFolder(folder);
+}
+
+savePinnedFolders(): void {
+  localStorage.setItem('pinnedFolders', JSON.stringify(this.pinnedFolders));
+}
+
+loadPinnedFolders(): void {
+  const pinnedFolders = localStorage.getItem('pinnedFolders');
+  if (pinnedFolders) {
+    this.pinnedFolders = JSON.parse(pinnedFolders);
+  }
+}
+
 
 }

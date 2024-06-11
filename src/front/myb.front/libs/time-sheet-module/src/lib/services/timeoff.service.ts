@@ -3,81 +3,78 @@ import { Apollo, gql } from 'apollo-angular';
 
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { RepositoryService } from 'libs/shared/infra/services/repository.service';
-import { Employee } from '../models/employee';
 import { TimeOff } from '../models/timeoff.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class EmployeeService extends RepositoryService<Employee> {
-  private employeeSubject = new BehaviorSubject<Employee[]>([]);
-  public employees$ = this.employeeSubject.asObservable();
+export class TimeoffService extends RepositoryService<TimeOff> {
   private timeOffSubject = new BehaviorSubject<TimeOff[]>([]);
   public timeoffs$ = this.timeOffSubject.asObservable();
   constructor(apollo: Apollo) {
-    super(apollo, 'Employee');
+    super(apollo, 'TimeOff');
   }
-  protected override mapAllItems(result: any): Employee[] {
+  protected override mapAllItems(result: any): TimeOff[] {
     return result.data?.allEmployees || [];
   }
 
-  protected override mapSingleItem(result: any): Employee {
-    return result.data?.EmployeeById as Employee;
+  protected override mapSingleItem(result: any): TimeOff {
+    return result.data?.EmployeeById as TimeOff;
   }
 
-  protected override mapCreateItem(result: any): Employee {
-    return result.data?.addEmployee as Employee;
+  protected override mapCreateItem(result: any): TimeOff {
+    return result.data?.addEmployee as TimeOff;
   }
 
-  protected override mapUpdateItem(result: any): Employee {
-    return result.data?.updateEmployee as Employee;
+  protected override mapUpdateItem(result: any): TimeOff {
+    return result.data?.updateEmployee as TimeOff;
   }
 
   protected override mapDeleteResult(result: any): boolean {
     return result.data?.deleteEmployee === true;
   }
 
-  override getAll(): Observable<Employee[]> {
+  override getAll(): Observable<TimeOff[]> {
     return super.getAll().pipe(
-      map((employees) => {
-        console.log('employees', employees);
-        this.employeeSubject.next(employees);
-        return employees;
+      map((timeoffs) => {
+        console.log('timeoffs', timeoffs);
+        this.timeOffSubject.next(timeoffs);
+        return timeoffs;
       })
     );
   }
 
-  override get(id: number): Observable<Employee> {
+  override get(id: number): Observable<TimeOff> {
     return super.get(id).pipe(
       map((employee) => {
-        const employees = this.employeeSubject.value.map((p) =>
+        const timeoffs = this.timeOffSubject.value.map((p) =>
           p.id === id ? employee : p
         );
-        this.employeeSubject.next(employees);
+        this.timeOffSubject.next(timeoffs);
         return employee;
       })
     );
   }
 
-  override create(item: Employee): Observable<Employee> {
+  override create(item: TimeOff): Observable<TimeOff> {
     return super.create(item).pipe(
       map((newEmployee) => {
-        const employees = [...this.employeeSubject.value, newEmployee];
-        this.employeeSubject.next(employees);
+        const timeoffs = [...this.timeOffSubject.value, newEmployee];
+        this.timeOffSubject.next(timeoffs);
         return newEmployee;
       })
     );
   }
 
-  override update(id: number, item: Employee): Observable<Employee> {
+  override update(id: number, item: TimeOff): Observable<TimeOff> {
     return super.update(id, item).pipe(
       map((updatedEmployee) => {
         console.log('updatedEmployee', updatedEmployee);
-        const employees = this.employeeSubject.value.map((t) =>
+        const timeoffs = this.timeOffSubject.value.map((t) =>
           t.id === id ? updatedEmployee : t
         );
-        console.log(' updated employees ', employees);
-        this.employeeSubject.next(employees);
+        console.log(' updated timeoffs ', timeoffs);
+        this.timeOffSubject.next(timeoffs);
         return updatedEmployee;
       })
     );
@@ -87,19 +84,17 @@ export class EmployeeService extends RepositoryService<Employee> {
     return super.delete(id).pipe(
       map((success) => {
         if (success) {
-          const employees = this.employeeSubject.value.filter(
-            (t) => t.id !== id
-          );
-          this.employeeSubject.next(employees);
+          const timeoffs = this.timeOffSubject.value.filter((t) => t.id !== id);
+          this.timeOffSubject.next(timeoffs);
         }
         return success;
       })
     );
   }
 
-  getEmployeesByManagerId(managerId: string): Observable<Employee[]> {
+  getEmployeesByManagerId(managerId: string): Observable<TimeOff[]> {
     return this.apollo
-      .watchQuery<{ employeesByManagerId: Employee[] }>({
+      .watchQuery<{ employeesByManagerId: TimeOff[] }>({
         query: gql`
           ${this.typeOperations.getEmployeesByManagerId}
         `,
@@ -107,9 +102,9 @@ export class EmployeeService extends RepositoryService<Employee> {
       })
       .valueChanges.pipe(
         map((result: any) => {
-          const employees = result.data.employeesByManagerId;
-          this.employeeSubject.next(employees);
-          return employees;
+          const timeoffs = result.data.employeesByManagerId;
+          this.timeOffSubject.next(timeoffs);
+          return timeoffs;
         })
       );
   }
@@ -127,12 +122,12 @@ export class EmployeeService extends RepositoryService<Employee> {
           const timeoffs = result.data.timeOffsByEmployeeId;
           console.log('timeoffs', timeoffs);
           // // Update the employee's timeOffs
-          // const employees = this.employeeSubject.value.map((employee) =>
+          // const timeoffs = this.timeOffSubject.value.map((employee) =>
           //   employee.id === employeeId
           //     ? { ...employee, timeOffs: timeoffs }
           //     : employee
           // );
-          // this.employeeSubject.next(employees);
+          // this.timeOffSubject.next(timeoffs);
 
           // Update the timeOffSubject with the latest time-offs
           this.timeOffSubject.next(timeoffs);
@@ -154,8 +149,8 @@ export class EmployeeService extends RepositoryService<Employee> {
         map((result: any) => {
           const updatedTimeOff = result.data.updateTimeOff;
 
-          // // Update the employee's timeOffs in the employeeSubject
-          // const employees = this.employeeSubject.value.map((employee) => {
+          // // Update the employee's timeOffs in the timeOffSubject
+          // const timeoffs = this.timeOffSubject.value.map((employee) => {
           //   if (employee.id === item.employeeId) {
           //     const updatedTimeOffs = employee.timeOffs?.map((timeOff) =>
           //       timeOff.id === item.id ? updatedTimeOff : timeOff
@@ -164,7 +159,7 @@ export class EmployeeService extends RepositoryService<Employee> {
           //   }
           //   return employee;
           // });
-          // this.employeeSubject.next(employees);
+          // this.timeOffSubject.next(timeoffs);
 
           // Update the timeOffSubject with the latest time-offs
           const timeoffs = this.timeOffSubject.value.map((timeOff) =>

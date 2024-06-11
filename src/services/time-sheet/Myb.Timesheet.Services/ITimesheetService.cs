@@ -14,4 +14,5 @@ public interface ITimesheetService
     Task ApproveTimeSheetAsync(int timesheetId);
     Task RejectTimeSheetAsync(int timesheetId, string reason);
     Task<IEnumerable<TimeSheet>> GetTimeSheetsByUserIdAsync(string userId);
+    Task<IEnumerable<TimeSheet>> GetTimeSheetsByEmployeeIdAsync(int employeeId);
 }

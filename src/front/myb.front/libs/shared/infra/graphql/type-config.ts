@@ -1,5 +1,6 @@
 import {
   GET_ALL_TIMESHEETS,
+  GET_TIMESHEETS_BY_EMPLOYEE_ID,
   GET_TIMESHEETS_BY_USER_ID,
 } from 'libs/time-sheet-module/src/lib/graphql/queries/timesheet.graphql';
 import {
@@ -40,6 +41,11 @@ import {
   DELETE_EMPLOYEE,
   UPDATE_EMPLOYEE,
 } from 'libs/time-sheet-module/src/lib/graphql/mutations/employee.graphql';
+import {
+  CREATE_TIMEOFF,
+  UPDATE_TIMEOFF,
+} from 'libs/time-sheet-module/src/lib/graphql/mutations/timeoff.graphql';
+import { GET_TIMEOFFS_BY_EMPLOYEE_ID } from 'libs/time-sheet-module/src/lib/graphql/queries/timeoff.graphql';
 
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
@@ -57,6 +63,7 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_TIMESHEET,
     delete: DELETE_TIMESHEET,
     getTimesheetsByUserId: GET_TIMESHEETS_BY_USER_ID,
+    getTimesheetsByEmployeeId: GET_TIMESHEETS_BY_EMPLOYEE_ID,
   },
   Task: {
     getAll: GET_ALL_TASKS,
@@ -80,6 +87,9 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_EMPLOYEE,
     delete: DELETE_EMPLOYEE,
     getEmployeesByManagerId: GET_EMPLOYEES_BY_MANAGER_ID,
+    getTimeoffsByEmployeeId: GET_TIMEOFFS_BY_EMPLOYEE_ID,
+    addTimeOff: CREATE_TIMEOFF,
+    updateTimeOff: UPDATE_TIMEOFF,
   },
   Invoice: {
     getAll: GET_ALL_INVOICES,

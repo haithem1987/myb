@@ -65,5 +65,16 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
         {
             return await employeeService.UpdateEmployeeAsync(employee);
         }
+        
+        // TimeOff mutations
+        public async Task<TimeOff> UpdateTimeOff([Service] ITimeoffService timeoffService, TimeOff timeOff)
+        {
+            return await timeoffService.UpdateTimeOffAsync(timeOff);
+        }
+        
+        public async Task<TimeOff> AddTimeOff([Service] ITimeoffService timeoffService, TimeOff timeOff)
+        {
+            return await timeoffService.AddTimeOffAsync(timeOff);
+        }
     }
 }

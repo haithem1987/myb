@@ -106,4 +106,17 @@ public class TimesheetService:ITimesheetService
             throw;
         }
     }
+    public Task<IEnumerable<TimeSheet>> GetTimeSheetsByEmployeeIdAsync(int employeeId)
+    {
+        try
+        {
+            var timesheets = _timesheetRepository.GetAll().Where(t => t.EmployeeId == employeeId);
+            return Task.FromResult<IEnumerable<TimeSheet>>(timesheets);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting timesheets by employee id: {employeeId}", employeeId);
+            throw;
+        }
+    }
 }

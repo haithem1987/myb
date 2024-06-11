@@ -35,3 +35,11 @@ export const GET_TIMESHEETS_BY_USER_ID = `
     }
   }
 `;
+export const GET_TIMESHEETS_BY_EMPLOYEE_ID = `
+  query ($employeeId: Int!) {
+    timesheetsByEmployeeId(employeeId: $employeeId) {
+      date
+      workedHours
+    }
+  }
+`;

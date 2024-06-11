@@ -50,6 +50,22 @@ export class TimesheetService extends RepositoryService<Timesheet> {
         }) // Map to the allTimesheets property
       );
   }
+  getTimesheetsByEmployeeId(employeeId: number): Observable<Timesheet[]> {
+    return this.apollo
+      .watchQuery<{ timesheetsByEmployeeId: Timesheet[] }>({
+        query: gql`
+          ${this.typeOperations.getTimesheetsByEmployeeId}
+        `,
+        variables: { employeeId },
+      })
+      .valueChanges.pipe(
+        map((result: any) => {
+          console.log('result', result);
+          const timesheets = result.data.timesheetsByEmployeeId;
+          return timesheets;
+        }) // Map to the allTimesheets property
+      );
+  }
 
   override getAll(): Observable<Timesheet[]> {
     return super.getAll().pipe(

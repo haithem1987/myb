@@ -12,17 +12,24 @@ import { Employee } from '../../../models/employee';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { EmployeeStatsComponent } from '../stats/employee-stats.component';
+import { TimeoffListComponent } from '../timeoff-list/timeoff-list.component';
 
 @Component({
   selector: 'myb-front-employee-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    EmployeeStatsComponent,
+    TimeoffListComponent,
+  ],
   templateUrl: './employee-edit.component.html',
   styleUrl: './employee-edit.component.css',
 })
 export class EmployeeEditComponent implements OnInit {
   employeeForm: FormGroup;
-  employeeId?: number;
+  employeeId!: number | null;
   isEditMode = false;
   suggestions: Employee[] = [];
   constructor(
@@ -57,12 +64,14 @@ export class EmployeeEditComponent implements OnInit {
       this.isEditMode = true;
       this.employeeId = employeeState.id;
       this.employeeForm.patchValue(employeeState);
+      this.loadTimeOffs(this.employeeId);
     } else {
       this.route.paramMap.subscribe((params) => {
         const id = params.get('id');
         if (id) {
           this.employeeId = +id;
           this.isEditMode = true;
+          this.loadTimeOffs(this.employeeId);
           this.loadEmployee(this.employeeId);
         }
       });
@@ -92,6 +101,24 @@ export class EmployeeEditComponent implements OnInit {
         console.error('Error fetching user by email:', err);
       });
   }
+  loadTimeOffs(employeeId: number): void {
+    if (employeeId) {
+      this.employeeService.getTimeOffsByEmployeeId(employeeId).subscribe({
+        next: (resp) => {
+          console.log('resp', resp);
+          this.toastService.show('Timeoff list successfully', {
+            classname: 'bg-success text-light',
+          });
+        },
+        error: (err) => {
+          console.log('error', err);
+          this.toastService.show('Error time off', {
+            classname: 'bg-danger text-light',
+          });
+        },
+      });
+    }
+  }
 
   loadEmployee(id: number): void {
     // this.employeeService.getById(id).subscribe((employee:any) => {
@@ -117,6 +144,9 @@ export class EmployeeEditComponent implements OnInit {
           this.router.navigate(['/timesheet/employees']);
         });
       }
+    } else {
+      console.error('Form is invalid:', this.employeeForm.errors);
+      this.employeeForm.markAllAsTouched();
     }
   }
 

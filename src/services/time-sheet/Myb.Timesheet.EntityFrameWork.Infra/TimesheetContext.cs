@@ -19,7 +19,7 @@ public class TimesheetContext:DbContext
 
     public DbSet<Project> Projects { get; set; }
     public DbSet<Employee> Employees { get; set; }
-    //public DbSet<Manager> Managers { get; set; }
+   public DbSet<TimeOff> TimeOff { get; set; }
     public DbSet<TimesheetTask> Tasks { get; set; }
     public DbSet<TimeSheet> Timesheets { get; set; }
     

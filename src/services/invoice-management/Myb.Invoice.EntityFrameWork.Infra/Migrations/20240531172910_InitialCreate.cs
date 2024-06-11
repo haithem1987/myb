@@ -19,7 +19,7 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     InvoiceNum = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
+                    UserId = table.Column<string>(type: "text", nullable: true),
                     CompanyId = table.Column<int>(type: "integer", nullable: true),
                     InvoiceDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -30,6 +30,7 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     ClientAddress = table.Column<string>(type: "text", nullable: true),
                     SupplierName = table.Column<string>(type: "text", nullable: true),
                     SupplierAddress = table.Column<string>(type: "text", nullable: true),
+                    image = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },

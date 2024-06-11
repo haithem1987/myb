@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(InvoiceContext))]
-    [Migration("20240516153933_InitialCreate")]
+    [Migration("20240531172910_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -72,8 +72,11 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("image")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

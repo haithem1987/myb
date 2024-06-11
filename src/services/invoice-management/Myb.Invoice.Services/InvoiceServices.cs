@@ -42,8 +42,10 @@ namespace Myb.Invoice.Services
 
         public async Task<InvoiceModel?> Update(InvoiceModel invoice)
         {
+            Console.WriteLine("update");
             var responce = await _invoiceRepository.UpdateAsync(invoice);
             return responce.Entity;
+            
         }
     }
 }

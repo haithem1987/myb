@@ -27,6 +27,7 @@ export class FolderListComponent {
   pinnedFolders: Folder[] = [];
 
   constructor(private folderService: FolderService, private modalService: NgbModal) {}
+  
 pinFolder(folder: Folder): void {
     this.folderPinned.emit(folder);
   }
@@ -37,6 +38,7 @@ pinFolder(folder: Folder): void {
     this.folderService.delete(id).subscribe(() => {
       this.folderDeleted.emit(id);
     });
+    
   }
 
   updateFolder(folder: Folder) {

@@ -22,6 +22,7 @@ export class DocumentCreationComponent implements OnInit {
   documentName: string = '';
   folderId: number | null = null;
   documentType: DocumentType | undefined = undefined;
+
   @Output() documentCreated = new EventEmitter<DocumentModel>();
   folders: Folder[] = [];
   documents: DocumentModel[] = [];
@@ -85,7 +86,7 @@ export class DocumentCreationComponent implements OnInit {
             this.documents.push(newDocument);
             this.documentCreated.emit(newDocument);
             this.toastService.show('Document Added successfully!', {
-              classname: 'bg-success text-light ',
+              classname: 'bg-success text-light text-center ',
             });
 
             this.activeModal.close();

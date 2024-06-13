@@ -32,7 +32,16 @@ export class DocumentUploadComponent {
       const file = files[0];
       if (files && file) {
         // Size Filter Bytes
-        // const allowed_types = ['application/pdf', 'application/x-pdf', 'application/x-bzpdf', 'application/x-gzpdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/JPG', 'image/JPEG'];
+        const allowed_types = [
+          'application/pdf', 
+          'application/x-pdf', 
+          'application/x-bzpdf', 
+          'application/x-gzpdf', 
+          'image/png', 
+          'image/jpeg', 
+          'image/jpg', 
+          'image/JPG', 
+          'image/JPEG'];
       }
       
     this.files.toBase64(filesData, this.selectedFiles).subscribe((res) => {

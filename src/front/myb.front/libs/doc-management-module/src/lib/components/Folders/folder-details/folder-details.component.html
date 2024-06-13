@@ -7,6 +7,7 @@
     placeholder="Search Documents..."
     (keyup)="filterTimesheets()"
   />
+  
   <div class="card border-primary p-2">
     <table class="table table-hover">
       <thead>
@@ -23,22 +24,32 @@
             Size
             <i class="bi"></i>
           </th>
-          <th scope="col">Status</th>
-          <th scope="col">Created At </th>
-          <th scope="col">Updated At </th>
+          <!-- <th scope="col">Status</th> -->
+          <th scope="col">Creation Date </th>
+          <th scope="col">Update Date </th>
           <th scope="col" class="text-end">Actions</th>
         </tr>
       </thead>
       <tbody>
+        
         <tr *ngFor="let document of documents">
-          <td>{{ document.documentName }}</td>
+          <td>
+            <ng-container [ngSwitch]="document.documentType">
+              <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf-fill me-2" style="font-size: 25px;"></i>
+              <i *ngSwitchCase="'WORD'" class="bi bi-file-earmark-word me-2" style="font-size: 25px;"></i>
+              <i *ngSwitchCase="'EXCEL'" class="bi bi-filetype-xls me-2" style="font-size: 25px;"></i>
+              <i *ngSwitchCase="'IMAGE'" class="bi bi-file-image me-2" style="font-size: 25px;"></i>
+            </ng-container>
+       {{ document.documentName }}
+          </td>
+
           <td>{{ document.documentType }}</td>
           <td>{{ document.documentSize }} bytes</td>
-          <td>
-            <!-- <span [ngClass]="'badge ' + getApprovalStatus(document).badgeClass">
+          <!-- <td>
+            <span [ngClass]="'badge ' + getApprovalStatus(document).badgeClass">
               {{ getApprovalStatus(document).text }}
-            </span> -->
-          </td>
+            </span>
+          </td> -->
           <td>{{ document.createdAt | date }}</td>
           <td>{{ document.updatedAt | date }}</td>
           <td class="text-end">

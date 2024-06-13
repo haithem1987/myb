@@ -5,12 +5,13 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { KeycloakProfile } from 'keycloak-js';
 import { Observable } from 'rxjs';
+import { NavLinksComponent } from '../nav-links/nav-links.component';
 
 
 @Component({
   selector: 'myb-front-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgbDropdownModule],
+  imports: [CommonModule, RouterModule, NgbDropdownModule , NavLinksComponent],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })

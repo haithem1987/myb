@@ -11,11 +11,19 @@ import { DocumentUploadComponent } from '../../document-upload/document-upload.c
 import { DocumentEditComponent } from '../../document-edit/document-edit.component';
 import { FormsModule } from '@angular/forms';
 import { base64ToBlob } from '../../../base64-to-blob';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { NoResultComponent } from 'libs/shared/shared-ui/src/lib/components/no-result/no-result.component';
 
 @Component({
   selector: 'myb-front-folder-details',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, NgbDropdownModule, DocumentUploadComponent, FormsModule],
+  imports: [CommonModule, 
+    NavbarComponent, 
+    NgbDropdownModule, 
+    DocumentUploadComponent, 
+    FormsModule,
+    NoResultComponent
+  ],
   templateUrl: './folder-details.component.html',
   styleUrls: ['./folder-details.component.css'],
 })
@@ -24,14 +32,15 @@ export class FolderDetailsComponent implements OnInit {
   documents: DocumentModel[] = [];
   folder: any;
   folderName!: string;
-DocumentStatus: any;
+  DocumentStatus: any;
 
   constructor(
     private route: ActivatedRoute,
     private folderService: FolderService,
     private documentService: DocumentService,
     private modalService: NgbModal,
-    private router: Router
+    private router: Router,
+    private  toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -78,6 +87,9 @@ DocumentStatus: any;
   deleteDocument(docId: number) {
     this.documentService.delete(docId).subscribe(() => {
       console.log('doc deleted');
+      this.toastService.show('Document Deleted successfully!', {
+        classname: 'bg-success text-light ',
+      });
       this.loadDocumentsWithinFolder(); // Reload documents after deletion
     });
   }
@@ -137,7 +149,7 @@ DocumentStatus: any;
         const base64String = file.split(',')[1]; // Remove the data type prefix if present
         if (base64String) {
           const blob = this.b64toBlob(base64String, 'application/pdf');
-          const link = window.document.createElement('a'); // Using window.document.createElement
+          const link = window.document.createElement('a'); 
           link.href = URL.createObjectURL(blob);
           link.download = documentName;
           link.click();
@@ -181,7 +193,8 @@ DocumentStatus: any;
       try {
         const base64String = file.split(',')[1];
         if (base64String) {
-          const blob = this.b64toBlob(base64String, 'application/pdf');
+          const contentType = this.getContentType(documentName);
+          const blob = this.b64toBlob(base64String, contentType);
           const url = URL.createObjectURL(blob);
           window.open(url, '_blank');
         } else {
@@ -193,7 +206,21 @@ DocumentStatus: any;
     } else {
       console.error('File data or document name is undefined', document);
     }
-  }  
+  }
+
+  getContentType(fileName: string): string {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'pdf': return 'application/pdf';
+      case 'png': return 'image/png';
+      case 'jpeg':
+      case 'jpg': return 'image/jpeg';
+      case 'xls': return 'application/vnd.ms-excel';
+      case 'xlsx': return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      // Add more cases for other file types if needed
+      default: return 'application/octet-stream';
+    }
+  }
 
 
   

@@ -10,7 +10,8 @@ namespace Myb.document.Model
     {
         PDF,
         Word,
-        Excel
+        Excel,
+        Image
     }
 }
 

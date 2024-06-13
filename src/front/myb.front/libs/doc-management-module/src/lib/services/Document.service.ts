@@ -142,7 +142,6 @@ getDocumentsByFolderId(folderId: number): Observable<DocumentModel[]> {
 createDocument(document: DocumentModel): Observable<DocumentModel> {
   let documenttest =document;
   console.log("this document test",documenttest);
-  // console.log("type operation",this.typeOperations.create);
   return this.apollo
     .mutate<{ addDocument: DocumentModel }>({
       mutation: gql`

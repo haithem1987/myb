@@ -1,4 +1,4 @@
-<div class="d-flex justify-content-between mb-3">
+<!-- <div class="d-flex justify-content-between mb-3">
   <h2 class="mb-0 w-50" style="color: var(--bs-darklight)">
     Documents Manager
   </h2>
@@ -14,11 +14,15 @@
       <i class="bi bi-file-earmark-pdf"style="font-size: 20px;"></i> + Documents
     </button>
   </div>
-</div>
+</div> -->
 
 <div class="add-card">
   <div>
     <h5> <i class="bi bi-pin-angle-fill"></i> Quick Access </h5>
+    <!-- <p> You Can 
+      pin your favourite folder here
+    </p> -->
+
   </div>
 </div>
 <section class="pt-2">
@@ -35,9 +39,9 @@
             </div>
             <br/>
            
-            <h5 [routerLink]="['/documents/folder', folder.id]">{{ folder.folderName }}</h5>
+            <h5 [routerLink]="['/documents/folder', folder.id]" > {{ folder.folderName }}</h5>
             <!-- <p class="card-text d-inline me-2">{{ folder.documents.length }} Doc </p> -->
-            <p class="card-text d-inline">{{ calculateFolderSize(folder) }} KB</p>
+            <!-- <p class="card-text d-inline">{{ calculateFolderSize(folder) }} KB</p> -->
             <!-- <button class="btn btn-outline-danger btn-sm" (click)="unpinFolder(folder)">
               <i class="bi bi-pin-fill" (click)="unpinFolder(folder)"></i> 
             </button> -->

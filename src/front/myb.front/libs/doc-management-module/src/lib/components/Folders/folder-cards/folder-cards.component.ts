@@ -47,7 +47,7 @@ export class FolderCardsComponent  implements OnInit {
   ngOnInit() {
     this.loadFolders();
     this.pinnedFolders = [];
-    this.loadPinnedFolders();
+ this.loadPinnedFolders();
   }
 
   loadFolders() {
@@ -78,9 +78,12 @@ export class FolderCardsComponent  implements OnInit {
     // Implement filtering logic
   }
 
-  // getDocumentCount(folder: Folder): number {
-  //   return folder.documents ? folder.documents.length : 0;
-  // }
+  getDocumentCount(folder: Folder): number {
+    
+    return folder.documents ? folder.documents.length : 0;
+
+  }
+
 
 
   //delete doc

@@ -22,7 +22,7 @@
         <li class="nav-item">
           <a
             class="nav-link"
-            routerLink="/documents"
+            routerLink="/folders"
             routerLinkActive="active"
             >Folders</a
           >
@@ -30,13 +30,15 @@
         <li class="nav-item">
           <a
             class="nav-link"
-            routerLink="/"
+            routerLink="/documents/logs"
             routerLinkActive="active"
             >Logs</a
           >
         </li>
     
       </ul>
+      <!-- <myb-front-nav-links></myb-front-nav-links> -->
+
       <ul class="navbar-nav ms-auto">
         <li *ngIf="user$ | async as user" ngbDropdown class="nav-item dropdown">
           <a

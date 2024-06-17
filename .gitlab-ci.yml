@@ -1,20 +1,30 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
 
 stages:
-  - pull_request
   - build
+  - test
   - deploy
 
-include:
-  - local: .gitlab-ci-pr.yml
-    rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+variables:
+  SOLUTION_FILE: 'Myb.sln'
 
-  - local: .gitlab-ci-build.yml
-    rules:
-      - if: '$CI_BUILD == "build"'
+build:
+  stage: build
+  script:
+    - dotnet restore $SOLUTION_FILE
+    - dotnet build $SOLUTION_FILE --configuration Release
+  artifacts:
+    paths:
+      - 'bin/'
 
-  - local: .gitlab-ci-deploy.yml
-    rules:
-      - if: '$CI_COMMIT_BRANCH == "main"'
- 
+test:
+  stage: test
+  script:
+    - dotnet test $SOLUTION_FILE  --verbosity normal
 
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying to production server..."
+  only:
+    - main

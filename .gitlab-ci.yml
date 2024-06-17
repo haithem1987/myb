@@ -20,7 +20,7 @@ build:
 test:
   stage: test
   script:
-    - dotnet test $SOLUTION_FILE --no-restore --verbosity normal
+    - dotnet test $SOLUTION_FILE 
 
 deploy:
   stage: deploy

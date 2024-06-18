@@ -1,7 +1,7 @@
-image: docker:latest
+image: docker:stable
 
 services:
-  - docker:dind
+  - docker:stable-dind
 
  
 
@@ -16,10 +16,8 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 before_script:
-  - apk update
-  - apk add docker
   - docker info
-  
+
 test:
   stage: test
   image: mcr.microsoft.com/dotnet/sdk:8.0

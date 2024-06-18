@@ -1,7 +1,7 @@
-image: docker:stable
+image: docker:26.1.4
 
 services:
-  - docker:stable-dind
+  - docker:26.1.4-dind
 
  
 

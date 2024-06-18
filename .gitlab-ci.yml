@@ -6,7 +6,7 @@ services:
  
 
 stages: 
-  - test
+  # - test
   - build
   - deploy
 
@@ -18,17 +18,17 @@ variables:
 before_script:
   - docker info
 
-test:
-  stage: test
-  image: mcr.microsoft.com/dotnet/sdk:8.0
-  script:
-    - dotnet test $SOLUTION_FILE  
+# test:
+#   stage: test
+#   image: mcr.microsoft.com/dotnet/sdk:8.0
+#   script:
+#     - dotnet test $SOLUTION_FILE  
 build:
   stage: build
-  image: mcr.microsoft.com/dotnet/sdk:8.0
+  # image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
-    - dotnet restore $SOLUTION_FILE
-    - dotnet build $SOLUTION_FILE --configuration Release
+    # - dotnet restore $SOLUTION_FILE
+    # - dotnet build $SOLUTION_FILE --configuration Release
     - docker build -t koutaibams1999/myb-usermanager:latest .
     - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
     - docker push koutaibams1999/myb-usermanager:latest

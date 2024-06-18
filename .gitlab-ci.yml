@@ -1,26 +1,39 @@
 image: mcr.microsoft.com/dotnet/sdk:8.0
+image: docker:latest
 
-stages:
-  - build
+services:
+  - docker:dind
+
+ 
+
+stages: 
   - test
+  - build
   - deploy
 
 variables:
   SOLUTION_FILE: 'Myb.sln'
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
 
-build:
-  stage: build
-  script:
-    - dotnet restore $SOLUTION_FILE
-    - dotnet build $SOLUTION_FILE --configuration Release
-  artifacts:
-    paths:
-      - 'bin/'
 
 test:
   stage: test
   script:
     - dotnet test $SOLUTION_FILE  --verbosity normal
+build:
+  stage: build
+  script:
+    - dotnet restore $SOLUTION_FILE
+    - dotnet build $SOLUTION_FILE --configuration Release
+    - docker build -t koutaibams1999/myb-usermanager:latest .
+    - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    - docker push koutaibams1999/myb-usermanager:latest
+  artifacts:
+    paths:
+      - 'bin/'
+
+
 
 deploy:
   stage: deploy

@@ -20,7 +20,7 @@ variables:
 test:
   stage: test
   script:
-    - dotnet test $SOLUTION_FILE  --verbosity normal
+    - dotnet test $SOLUTION_FILE  
 build:
   stage: build
   script:

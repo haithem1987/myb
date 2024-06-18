@@ -15,7 +15,11 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
 
-
+before_script:
+  - apk update
+  - apk add docker
+  - docker info
+  
 test:
   stage: test
   image: mcr.microsoft.com/dotnet/sdk:8.0

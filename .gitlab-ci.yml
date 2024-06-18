@@ -29,7 +29,7 @@ build:
   script:
     # - dotnet restore $SOLUTION_FILE
     # - dotnet build $SOLUTION_FILE --configuration Release
-    - docker build -t koutaibams1999/myb-usermanager:latest ./src/services/user-manager/Myb.UserManager/Dockerfile
+    - docker build -t koutaibams1999/myb-usermanager:latest src/services/user-manager/Myb.UserManager/Dockerfile
     - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
     - docker push koutaibams1999/myb-usermanager:latest
   artifacts:

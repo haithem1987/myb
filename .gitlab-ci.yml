@@ -46,6 +46,6 @@ deploy:
     - chmod 700 ~/.ssh
     - ssh-keyscan 146.59.233.31 >> ~/.ssh/known_hosts
   script:
-    - ssh ubuntu@146.59.233.31 "sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && sudo docker pull koutaibams1999/myb-usermanager:latest &&  sudo docker run -d --name myb-usermanager -p 5000:5000 koutaibams1999/myb-usermanager:latest"
+    - ssh ubuntu@146.59.233.31 "sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && sudo docker pull koutaibams1999/myb-usermanager:latest &&  sudo docker run -d --name myb-usermanager -p 8080:8080 koutaibams1999/myb-usermanager:latest"
   only:
     - main

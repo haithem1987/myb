@@ -10,6 +10,7 @@ import { ProjectListComponent } from './screens/projects/list/project-list.compo
 import { EmployeeIndexComponent } from './screens/employees/index/employee-index.component';
 import { EmployeeListComponent } from './screens/employees/list/employee-list.component';
 import { EmployeeEditComponent } from './screens/employees/edit/employee-edit.component';
+import { ProjectTabsComponent } from './screens/projects/tabs/project-tabs.component';
 
 export const timesheetRoutes: Routes = [
   {
@@ -29,7 +30,7 @@ export const timesheetRoutes: Routes = [
         children: [
           {
             path: '',
-            component: ProjectListComponent,
+            component: ProjectTabsComponent,
             data: { breadcrumb: 'Liste' },
           },
           {
@@ -57,7 +58,7 @@ export const timesheetRoutes: Routes = [
       {
         path: 'employees',
         component: EmployeeIndexComponent,
-        data: { breadcrumb: 'Employeurs' },
+        data: { breadcrumb: 'Intervenants' },
         children: [
           {
             path: '',

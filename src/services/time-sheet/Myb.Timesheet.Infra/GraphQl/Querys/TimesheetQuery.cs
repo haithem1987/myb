@@ -36,6 +36,16 @@ namespace Myb.Timesheet.Infra.GraphQl.Querys
             return await projectService.GetAllProjectsAsync();
         }
 
+        public async Task<IEnumerable<Project>> GetActiveProjects([Service] IProjectService projectService)
+        {
+            return await projectService.GetActiveProjectsAsync();
+        }
+
+        public async Task<IEnumerable<Project>> GetArchivedProjects([Service] IProjectService projectService)
+        {
+            return await projectService.GetArchivedProjectsAsync();
+        }
+
         // Employee queries
         public async Task<IEnumerable<Employee>> GetAllEmployees([Service] IEmployeeService employeeService)
         {
@@ -57,12 +67,12 @@ namespace Myb.Timesheet.Infra.GraphQl.Querys
         {
             return await timesheetService.GetTimeSheetsByUserIdAsync(userId);
         }
-        
+
         public async Task<IEnumerable<TimeSheet>> GetTimesheetsByEmployeeId([Service] ITimesheetService timesheetService, int employeeId)
         {
             return await timesheetService.GetTimeSheetsByEmployeeIdAsync(employeeId);
         }
-        
+
         // TimeOff queries
         public async Task<IEnumerable<TimeOff>> GetTimeOffsByEmployeeId([Service] ITimeoffService timeoffService, int employeeId)
         {

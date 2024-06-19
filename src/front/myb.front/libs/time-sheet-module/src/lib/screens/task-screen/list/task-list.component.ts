@@ -33,9 +33,8 @@ export class TaskListComponent implements OnInit {
   sortDirection: 'asc' | 'desc' | '' = '';
   searchTerm: string = '';
   tasks$: Observable<Task[]> = this.taskService.tasks$.pipe(defaultIfEmpty([]));
-  projects$: Observable<Project[]> = this.projectService.projects$.pipe(
-    defaultIfEmpty([])
-  );
+  activeProjects$: Observable<Project[]> =
+    this.projectService.activeProjects$.pipe(defaultIfEmpty([]));
   employees$: Observable<Employee[]> = this.employeeService.employees$.pipe(
     defaultIfEmpty([])
   );
@@ -108,7 +107,7 @@ export class TaskListComponent implements OnInit {
   openModal(task?: Task) {
     const modalRef = this.modalService.open(TaskEditComponent);
     modalRef.componentInstance.task = task || new Task();
-    this.projects$.subscribe((projects) => {
+    this.activeProjects$.subscribe((projects) => {
       modalRef.componentInstance.projects = projects;
     });
     this.employees$.subscribe((employees) => {

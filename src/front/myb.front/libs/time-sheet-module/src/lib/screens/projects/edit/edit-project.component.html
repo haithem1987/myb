@@ -100,11 +100,7 @@
             </div>
           </div>
 
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="projectForm.invalid"
-          >
+          <button type="submit" class="btn btn-primary">
             {{ isEditMode ? 'Update Project' : 'Create Project' }}
           </button>
           <button type="button" class="btn btn-secondary" (click)="cancel()">

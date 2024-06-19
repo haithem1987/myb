@@ -47,7 +47,10 @@
         formControlName="projectId"
         (change)="onProjectSelect($event)"
       >
-        <option *ngFor="let project of projects$ | async" [value]="project.id">
+        <option
+          *ngFor="let project of activeProjects$ | async"
+          [value]="project.id"
+        >
           {{ project.projectName }}
         </option>
       </select>

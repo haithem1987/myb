@@ -40,7 +40,7 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
   styleUrls: ['./timesheet-create.component.css'],
 })
 export class TimesheetCreateComponent implements OnInit {
-  projects$: Observable<Project[]> = this.projectService.projects$;
+  activeProjects$: Observable<Project[]> = this.projectService.activeProjects$;
   employees$: Observable<Employee[]> = this.employeeService.employees$;
   timesheetForm!: FormGroup;
   isTimerRunning = false;

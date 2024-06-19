@@ -29,3 +29,5 @@ export * from './lib/components/loader/loader.component';
 export * from './lib/components/no-result/no-result.component';
 
 export * from './lib/components/avatar/avatar.component';
+
+export * from './lib/components/user-dropdown/user-dropdown.component';

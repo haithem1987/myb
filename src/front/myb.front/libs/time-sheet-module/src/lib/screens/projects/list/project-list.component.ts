@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Project } from '../../../models/project.model';
+import { Project, ProjectStatus } from '../../../models/project.model';
 import { ProjectService } from '../../../services/project.service';
 import { ProjectCardComponent } from '../card/project-card.component';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
@@ -15,7 +15,8 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
   styleUrls: ['./project-list.component.css'],
 })
 export class ProjectListComponent implements OnInit {
-  projects$: Observable<Project[]> = this.projectService.projects$;
+  @Input() isArchived: boolean = false;
+  @Input() projects?: Observable<Project[]>;
 
   constructor(
     private projectService: ProjectService,

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { TimeOff } from '../../../models/timeoff.model';
 import { EmployeeService } from '../../../services/employee.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   selector: 'myb-front-timeoff-list',
@@ -18,7 +19,8 @@ export class TimeoffListComponent implements OnInit {
 
   constructor(
     private employeeService: EmployeeService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private keycloakService: KeycloakService
   ) {}
 
   ngOnInit(): void {

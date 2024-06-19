@@ -24,7 +24,10 @@
         [ngModelOptions]="{ standalone: true }"
       >
         <option [ngValue]="null" selected>Sélectionner un projet</option>
-        <option *ngFor="let project of projects$ | async" [ngValue]="project">
+        <option
+          *ngFor="let project of activeProjects$ | async"
+          [ngValue]="project"
+        >
           {{ project.projectName }}
         </option>
       </select>
@@ -49,7 +52,7 @@
           {{ employee.name }}
         </option>
       </select>
-      <label for="employeeId">Employé</label>
+      <label for="employeeId">Intervenant</label>
     </div>
 
     <div class="flex-fill ml-3 border-start form-floating" style="width: 90px">

@@ -36,7 +36,7 @@ import { DateUtilsService } from 'libs/shared/shared-ui/src';
 export class TimesheetEditComponent implements OnInit {
   @Input() timesheet!: Timesheet;
   editForm!: FormGroup;
-  projects$: Observable<Project[]> = this.projectService.projects$;
+  activeProjects$: Observable<Project[]> = this.projectService.activeProjects$;
   employees$: Observable<Employee[]> = this.employeeService.employees$;
   selectedProject: Project | null = null;
   selectedEmployee: Employee | null = null;
@@ -140,7 +140,7 @@ export class TimesheetEditComponent implements OnInit {
 
   private findProjectById(id: number): Project | null {
     let foundProject: Project | null = null;
-    this.projects$.subscribe((projects) => {
+    this.activeProjects$.subscribe((projects) => {
       foundProject = projects.find((project) => project.id === id) || null;
     });
     return foundProject;

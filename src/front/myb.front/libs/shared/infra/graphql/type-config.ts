@@ -2,7 +2,7 @@ import {
   GET_ALL_TIMESHEETS,
   GET_TIMESHEETS_BY_EMPLOYEE_ID,
   GET_TIMESHEETS_BY_USER_ID,
-} from 'libs/time-sheet-module/src/lib/graphql/queries/timesheet.graphql';
+} from '../../../time-sheet-module/src/lib/graphql/queries/timesheet.graphql';
 import {
   GET_ALL_INVOICES,
   GET_INVOICE_BY_ID,
@@ -13,7 +13,9 @@ import {
   DELETE_TASK,
 } from '../../../time-sheet-module/src/lib/graphql/mutations/task.graphql';
 import {
+  GET_ACTIVE_PROJECTS,
   GET_ALL_PROJECTS,
+  GET_ARCHIVED_PROJECTS,
   GET_PROJECT_BY_ID,
 } from '../../../time-sheet-module/src/lib/graphql/queries/project.graphql';
 import {
@@ -25,27 +27,27 @@ import {
   GET_ALL_EMPLOYEES,
   GET_EMPLOYEES_BY_MANAGER_ID,
   GET_EMPLOYEE_BY_ID,
-} from 'libs/time-sheet-module/src/lib/graphql/queries/employee.graphql';
+} from '../../../time-sheet-module/src/lib/graphql/queries/employee.graphql';
 import {
   CREATE_PROJECT,
   DELETE_PROJECT,
   UPDATE_PROJECT,
-} from 'libs/time-sheet-module/src/lib/graphql/mutations/project.graphql';
+} from '../../../time-sheet-module/src/lib/graphql/mutations/project.graphql';
 import {
   CREATE_TIMESHEET,
   DELETE_TIMESHEET,
   UPDATE_TIMESHEET,
-} from 'libs/time-sheet-module/src/lib/graphql/mutations/timesheet.graphql';
+} from '../../../time-sheet-module/src/lib/graphql/mutations/timesheet.graphql';
 import {
   CREATE_EMPLOYEE,
   DELETE_EMPLOYEE,
   UPDATE_EMPLOYEE,
-} from 'libs/time-sheet-module/src/lib/graphql/mutations/employee.graphql';
+} from '../../../time-sheet-module/src/lib/graphql/mutations/employee.graphql';
 import {
   CREATE_TIMEOFF,
   UPDATE_TIMEOFF,
-} from 'libs/time-sheet-module/src/lib/graphql/mutations/timeoff.graphql';
-import { GET_TIMEOFFS_BY_EMPLOYEE_ID } from 'libs/time-sheet-module/src/lib/graphql/queries/timeoff.graphql';
+} from '../../../time-sheet-module/src/lib/graphql/mutations/timeoff.graphql';
+import { GET_TIMEOFFS_BY_EMPLOYEE_ID } from '../../../time-sheet-module/src/lib/graphql/queries/timeoff.graphql';
 
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
@@ -79,6 +81,8 @@ export const typeConfig: { [key: string]: any } = {
     create: CREATE_PROJECT,
     update: UPDATE_PROJECT,
     delete: DELETE_PROJECT,
+    getActiveProjects: GET_ACTIVE_PROJECTS,
+    getArchivedProjects: GET_ARCHIVED_PROJECTS,
   },
   Employee: {
     getAll: GET_ALL_EMPLOYEES,

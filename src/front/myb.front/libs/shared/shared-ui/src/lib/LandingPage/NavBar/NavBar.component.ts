@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { KeycloakService } from '../../../../../../auth/src/lib/keycloak.service';
 import { CounterService } from '../FeaturesSection/CounterService';
 import { Subscription, filter } from 'rxjs';
+import { UserDropdownComponent } from '../../components/user-dropdown/user-dropdown.component';
 
 @Component({
   selector: 'myb-front-nav-bar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, UserDropdownComponent],
   templateUrl: './NavBar.component.html',
   styleUrl: './NavBar.component.css',
 })

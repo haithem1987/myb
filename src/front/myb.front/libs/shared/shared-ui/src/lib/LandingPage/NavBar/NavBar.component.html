@@ -19,16 +19,17 @@
           <h1>Counter: {{ counter.count }}</h1>
         </div> -->
         <button
-          *ngIf="!keycloakService.isAuthenticated(); else logoutButton"
+          *ngIf="!keycloakService.isAuthenticated(); else userDropDown"
           class="btn btn-outline-secondary btn-sm"
           (click)="onLogin()"
         >
           Login
         </button>
-        <ng-template #logoutButton>
-          <button class="btn btn-outline-secondary btn-sm" (click)="onLogout()">
+        <ng-template #userDropDown>
+          <myb-front-user-dropdown></myb-front-user-dropdown>
+          <!-- <button class="btn btn-outline-secondary btn-sm" (click)="onLogout()">
             Logout
-          </button>
+          </button> -->
         </ng-template>
         <!-- Only show the Register button if not authenticated -->
         <button

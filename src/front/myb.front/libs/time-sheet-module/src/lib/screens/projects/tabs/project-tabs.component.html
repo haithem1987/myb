@@ -1,0 +1,43 @@
+<h2 class="">Projets</h2>
+
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a
+      class="nav-link cursor-pointer"
+      [ngClass]="{ active: activeTab === 'ACTIVE' }"
+      (click)="setActiveTab('ACTIVE')"
+      >Active
+      <span class="badge rounded-pill bg-danger">
+        {{ (activeProjects$ | async)?.length }}
+        <span class="visually-hidden">unread messages</span>
+      </span></a
+    >
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      [ngClass]="{ active: activeTab === 'ARCHIVED' }"
+      (click)="setActiveTab('ARCHIVED')"
+      >Archived
+      <span class="badge rounded-pill bg-danger">
+        {{ (archivedProjects$ | async)?.length }}
+        <span class="visually-hidden">unread messages</span>
+      </span></a
+    >
+  </li>
+</ul>
+
+<div class="container border border-top-0 rounded-bottom">
+  <div *ngIf="activeTab === 'ACTIVE'">
+    <myb-front-project-list
+      [projects]="activeProjects$"
+      [isArchived]="false"
+    ></myb-front-project-list>
+  </div>
+  <div *ngIf="activeTab === 'ARCHIVED'">
+    <myb-front-project-list
+      [projects]="archivedProjects$"
+      [isArchived]="true"
+    ></myb-front-project-list>
+  </div>
+</div>

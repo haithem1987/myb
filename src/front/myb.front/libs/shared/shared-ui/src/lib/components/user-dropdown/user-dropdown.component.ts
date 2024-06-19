@@ -1,29 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { KeycloakProfile } from 'keycloak-js';
 import { Observable } from 'rxjs';
-import {
-  AvatarComponent,
-  UserDropdownComponent,
-} from 'libs/shared/shared-ui/src';
+import { AvatarComponent } from '../avatar/avatar.component';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'myb-front-navbar',
+  selector: 'myb-front-user-dropdown',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    NgbDropdownModule,
-    AvatarComponent,
-    UserDropdownComponent,
-  ],
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
+  imports: [CommonModule, RouterModule, NgbDropdownModule, AvatarComponent],
+  templateUrl: './user-dropdown.component.html',
+  styleUrl: './user-dropdown.component.css',
 })
-export class NavbarComponent implements OnInit {
+export class UserDropdownComponent implements OnInit {
   user$: Observable<KeycloakProfile | null>;
 
   constructor(private keycloakService: KeycloakService) {

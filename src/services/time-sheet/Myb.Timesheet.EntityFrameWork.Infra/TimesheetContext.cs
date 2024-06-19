@@ -34,6 +34,8 @@ public class TimesheetContext:DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Project>()
+            .HasQueryFilter(p => p.Status != ProjectStatus.Deleted); // Filter out deleted projects
         modelBuilder.Entity<Employee>()
             .ToTable("Employees");
 

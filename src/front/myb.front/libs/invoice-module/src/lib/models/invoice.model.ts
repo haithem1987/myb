@@ -1,14 +1,17 @@
-import { BaseModel } from 'libs/time-sheet-module/src/lib/models/base.model';
+import { BaseModel } from 'libs/shared/infra/models/base.model';
+
 export class Invoice extends BaseModel {
-  public invoiceNum?: string;
-  public userId?: string;
-  public companyId?: string;
-  public invoiceDate?: Date;
-  public dueDate?: Date;
-  public totalAmount?: number;
-  public subTotal?: number;
-  public clientName?: string;
-  public clientAddress?: string;
-  public supplierName?: string;
-  public supplierAddress?: string;
+  invoiceNum?: string;
+  userId?: string;
+  companyId?: number;
+  invoiceDate?: Date | null;
+  dueDate?: Date | null;
+  totalAmount?: number;
+  subTotal?: number;
+  status?: string;
+  clientName?: string;
+  clientAddress?: string;
+  supplierName?: string;
+  supplierAddress?: string;
+  image?: string;
 }

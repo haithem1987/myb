@@ -1,48 +1,8 @@
-<div class="container my-4">
-  <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Invoices</li>
-    </ol>
-  </nav>
-  <div class="d-flex justify-content-between mb-3">
-    <h2 class="mb-0" style="color: var(--bs-darklight)">Invoice Manager</h2>
-    <button type="button" class="btn btn-primary" (click)="open()">
-      <i class="bi bi-plus-lg"></i> Add Invoice
-    </button>
-  </div>
-  <input type="text" class="form-control mb-3" placeholder="Search invoices..." />
-  <table class="table table-hover shadow">
-    <thead class="table-secondary">
-      <tr>
-        <th scope="col" style="cursor: pointer">Invoice-Num</th>
-        <th scope="col" style="cursor: pointer">Invoice date</th>
-        <th scope="col">Due date</th>
-        <th scope="col" style="cursor: pointer">Client</th>
-        <th scope="col">Supplier</th>
-        <th scope="col">Total</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for(invoice of invoices; track invoice){
-      <tr>
-        <td>{{ invoice.invoiceNum }}</td>
-        <td>{{ invoice.invoiceDate | date : 'MM/dd/yyyy' }}</td>
-        <td>{{ invoice.dueDate | date : 'MM/dd/yyyy' }}</td>
-        <td>{{ invoice.clientName }}</td>
-        <td>{{ invoice.supplierName }}</td>
-        <td>{{ invoice.totalAmount }}</td>
-        <td>
-          <button type="button" class="btn btn-outline-primary me-2">
-            <i class="bi bi-pencil-square"></i>
-          </button>
-          <button type="button" class="btn btn-outline-secondary">
-            <i class="bi bi-trash"></i>
-          </button>
-        </td>
-      </tr>
-      }
-    </tbody>
-  </table>
+<myb-front-navbar></myb-front-navbar>
+<app-toasts-container></app-toasts-container>
+<!-- <myb-front-list-invoice></myb-front-list-invoice>
+<myb-front-create-invoice></myb-front-create-invoice> -->
+<div class="invoice-module container">
+  <myb-front-breadcrumb></myb-front-breadcrumb>
+  <router-outlet></router-outlet>
 </div>

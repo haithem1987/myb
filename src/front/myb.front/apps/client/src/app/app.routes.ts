@@ -21,9 +21,9 @@ export const appRoutes: Route[] = [
   },
 
   {
-    path: 'invoices',
-    loadComponent: () =>
-      import('@myb-front/invoice-module').then((c) => c.InvoiceModuleComponent),
+    path: 'invoice',
+    loadChildren: () =>
+      import('@myb-front/invoice-module').then((c) => c.InvoiceRoutingModule),
   },
   {
     path: 'timesheet',

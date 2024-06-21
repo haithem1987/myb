@@ -1,4 +1,5 @@
-import { ADD_DOCUMENT, DELETE_DOCUMENT, UPDATE_DOCUMENT } from './../../../doc-management-module/src/lib/GraphQl/Mutations/DocumentMutation';
+import { 
+  ADD_DOCUMENT, DELETE_DOCUMENT, UPDATE_DOCUMENT } from './../../../doc-management-module/src/lib/GraphQl/Mutations/DocumentMutation';
 import { GET_ALL_DOCUMENTS, GET_DOCUMENT_BY_ID } from './../../../doc-management-module/src/lib/GraphQl/Queries/Document.graphql';
 import {
   GET_ALL_TIMESHEETS,
@@ -44,6 +45,8 @@ import {
 } from 'libs/time-sheet-module/src/lib/graphql/mutations/employee.graphql';
 import { GET_ALL_FOLDERS, GET_FOLDER_BY_ID } from 'libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql';
 import { ADD_FOLDER, DELETE_FOLDER, UPDATE_FOLDER } from 'libs/doc-management-module/src/lib/GraphQl/Mutations/FolderMutation';
+import { CREATE_INVOICE } from "libs/invoice-module/src/lib/graphql/mutations/invoice.mutation";
+
 
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
@@ -88,6 +91,7 @@ export const typeConfig: { [key: string]: any } = {
   Invoice: {
     getAll: GET_ALL_INVOICES,
     getById: GET_INVOICE_BY_ID,
+    create: CREATE_INVOICE
   },
   DocumentModel:{
     getById: GET_DOCUMENT_BY_ID,
@@ -108,3 +112,7 @@ export const typeConfig: { [key: string]: any } = {
 
   // You can add more configurations for different types here
 };
+
+
+ 
+  

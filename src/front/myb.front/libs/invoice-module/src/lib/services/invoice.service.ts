@@ -10,7 +10,7 @@ import { Observable, map } from 'rxjs';
 export class InvoiceService extends RepositoryService<Invoice> {
   constructor(apollo: Apollo) {
     super(apollo, 'Invoice');
-  } 
+  }
   override getAll(): Observable<Invoice[]> {
     return this.apollo
       .watchQuery<{ allInvoices: Invoice[] }>({
@@ -18,7 +18,12 @@ export class InvoiceService extends RepositoryService<Invoice> {
           ${this.typeOperations.getAll}
         `,
       })
-      .valueChanges.pipe(
-        map((result: any) => result.data.allInvoices));
-  } 
+      .valueChanges.pipe(map((result: any) => result.data.allInvoices));
+  }
+
+  
+
+  
+
+
 }

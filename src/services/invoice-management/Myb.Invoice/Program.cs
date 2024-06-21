@@ -29,7 +29,6 @@ builder.Services.AddServices();
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddServices();
-//builder.Services.AddPooledDbContextFactory<InvoiceContext>(options => options.UseNpgsql(""));
 builder.Services.AddPooledDbContextFactory<InvoiceContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("InvoiceDBConnection")));
 
 builder.Services.RegisterGraphQl<InvoiceContext, InvoiceQuery, InvoiceMutations>();

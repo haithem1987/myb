@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Document.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(DocumentContext))]
-    [Migration("20240601194557_addcontentdMigration")]
-    partial class addcontentdMigration
+    [Migration("20240621171514_NEWWMigration")]
+    partial class NEWWMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,6 +60,9 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("file")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("FolderId");
@@ -96,11 +99,11 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
 
             modelBuilder.Entity("Myb.document.Model.Folder", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");

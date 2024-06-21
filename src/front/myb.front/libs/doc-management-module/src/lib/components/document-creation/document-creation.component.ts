@@ -8,7 +8,7 @@ import { DocumentModel } from '../../models/DocumentModel';
 import { Folder } from '../../models/Folder';
 import { DocumentType } from '../../models/DocumentType';
 import { DocumentUploadComponent } from '../document-upload/document-upload.component';
-import { Router } from '@angular/router';
+
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
@@ -33,7 +33,6 @@ export class DocumentCreationComponent implements OnInit {
     public activeModal: NgbActiveModal,
     private documentService: DocumentService,
     private folderService: FolderService,
-    private router: Router,
     private  toastService: ToastService
   ) {}
 

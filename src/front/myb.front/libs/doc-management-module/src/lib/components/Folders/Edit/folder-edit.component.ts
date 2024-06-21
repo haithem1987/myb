@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Folder } from '../../../models/Folder';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
+import { FolderService } from '../../../services/folder.service';
 
 @Component({
   selector: 'myb-front-folder-edit',
@@ -16,25 +17,21 @@ export class FolderEditComponent {
   @Output() folderEdit = new EventEmitter<Folder>();
   folderName: string = '';
 
-  constructor(public activeModal: NgbActiveModal){
-    
+  constructor(
+    public activeModal: NgbActiveModal,
+    private folderService: FolderService
+  
+  ){}
+
+  //edit folder
+  editFolder() {
+    // if (this.folderName) {
+    //   const updatedFolder = { ...this.folder, folderName: this.folderName };
+    //   this.folderService.updateFolder(updatedFolder).subscribe((folder) => {
+    //     this.folderEdit.emit(folder);
+    //     this.activeModal.close();
+    //   });
+    // }
   }
-  //folder edit
-  // editFolder(): void {
-  //   if (this.folderName) {
-  //     const folder = {
-  //       id: 0, 
-  //       folderName: this.folderName,
-  //       parentId: 0,
-  //       createdBy: 0,
-  //       editedBy: 0 ,
-       
-  //     };
-      
-  //     this.folderEdit.emit(folder);
-  //     this.activeModal.close();
-  //   } else {
-  //     alert('Please enter a folder name');
-  //   }
-  // }
+  
 }

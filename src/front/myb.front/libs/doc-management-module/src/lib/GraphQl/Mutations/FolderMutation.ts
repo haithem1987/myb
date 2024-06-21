@@ -18,6 +18,7 @@ export const UPDATE_FOLDER = gql`
       createdDate
       lastModifiedDate
       updatedAt
+      parentId
     }
   }
 `;
@@ -31,6 +32,7 @@ export const ADD_FOLDER = gql`
       editedBy
       createdAt
       updatedAt
+      parentId
     }
   }
 `;
@@ -44,6 +46,7 @@ export const ADD_FOLDER_WITH_DOCUMENTS = gql`
       editedBy
       createdDate
       lastModifiedDate
+      parentId
       documents {
         documentName
         documentType

@@ -6,7 +6,6 @@ import { DocumentCreationComponent } from '../../document-creation/document-crea
 import { Folder } from '../../../models/Folder';
 import { DocumentModel } from '../../../models/DocumentModel';
 import { FolderService } from '../../../services/folder.service';
-import { Router } from '@angular/router';
 import { FolderDetailsComponent } from '../../Folders/folder-details/folder-details.component';
 import { FolderListComponent } from "../../Folders/folder-list/folder-list.component";
 
@@ -15,19 +14,25 @@ import { FolderListComponent } from "../../Folders/folder-list/folder-list.compo
     standalone: true,
     templateUrl: './nav-links.component.html',
     styleUrl: './nav-links.component.css',
-    imports: [CommonModule, NgbNavModule, NavLinksComponent, FolderDetailsComponent, FolderListComponent]
+    imports: [
+      CommonModule, 
+      NgbNavModule, 
+      NavLinksComponent,
+       FolderDetailsComponent, 
+       FolderListComponent
+      ]
 })
+
 export class NavLinksComponent {
   folders: Folder[] = [];
   documents: DocumentModel[] = [];
-  searchTerm: string = '';
+
   @Output() folderCreated = new EventEmitter<Folder>();
   @Output() documentCreated = new EventEmitter<DocumentModel>();
 
   constructor(
     private modalService: NgbModal, 
     private folderService: FolderService,    
-    private router: Router
   ) {}
 
   ngOnInit() {
@@ -50,6 +55,8 @@ export class NavLinksComponent {
     modalRef.componentInstance.folderCreated.subscribe((newFolder: Folder) => {
       this.folders = [...this.folders, newFolder]; 
     });
+
+    
   }
 
   openModalDoc() {
@@ -58,7 +65,6 @@ export class NavLinksComponent {
       this.documents = [...this.documents, newDoc]; 
     });
   }
-  filterTimesheets(): void {
-    // Implement filtering logic
-  }
+ 
+  
 }

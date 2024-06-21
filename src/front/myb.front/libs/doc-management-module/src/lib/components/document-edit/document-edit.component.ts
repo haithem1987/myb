@@ -24,14 +24,13 @@ export class DocumentEditComponent {
 
   ngOnInit(): void {
     if (!this.document) {
-      this.document = {};  // Ensure document is initialized
+      this.document = {};  
     }
     console.log('DocumentEditComponent initialized', this.document);
   }
 
   saveDocument(): void {
     if (this.document) {
-      // Create a shallow copy of the document
       const updatedDocument = { ...this.document, updatedAt: new Date() };
 
       this.documentService.updateDocument(updatedDocument).subscribe(

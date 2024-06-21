@@ -37,10 +37,11 @@ namespace Myb.Document.Infra.GraphQl.Mutations
             return await folderService.AddFolderAsync(folder);
         }
 
-        public async Task<Folder> UpdateFolder([Service] IFolderService folderService, Folder folder)
+           public async Task<Folder> UpdateFolder([Service] IFolderService folderService, Folder folder)
         {
             return await folderService.UpdateFolderAsync(folder);
         }
+
 
 
         public async Task<bool> DeleteFolder([Service] IFolderService folderService, int id)

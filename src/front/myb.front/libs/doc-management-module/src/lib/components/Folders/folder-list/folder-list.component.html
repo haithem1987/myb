@@ -10,6 +10,8 @@
           <th> Folder Name</th>
           <!-- <th>Created by</th> -->
           <th  class="text-end">Date</th>
+          <th  class="text-end">Update Date</th>
+
           <th class="text-end">Actions</th>
         </tr>
       </thead>
@@ -21,6 +23,8 @@
           </td>
           <!-- <td></td> -->
           <td  class="text-end">{{folder.createdAt | date }}</td>
+          <td  class="text-end">{{folder.updatedAt | date }}</td>
+
           <td class="text-end">
             <button class="btn btn-outline-primary me-2" (click)="openModal()">
               <i class="bi bi-pencil-square"></i>

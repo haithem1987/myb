@@ -36,19 +36,19 @@ export const ADD_DOCUMENT = gql`
 `;
 
 export const UPDATE_DOCUMENT = gql`
-  mutation UpdateDocument($id: Int!, $item: DocumentModelInput!) {
-    updateDocument(id: $id, document: $item) {
+  mutation UpdateDocument($id: Int!, $document: DocumentModelInput!) {
+          updateDocument(id: $id, document: $document) {
       id
-      documentName
-      documentType
-      createdBy
-      editedBy
-      folderId
-      documentSize
-      status
-      createdAt
-      updatedAt
-      file
+            documentName
+            documentType
+            createdBy
+            editedBy
+            folderId
+            documentSize
+            status
+            createdAt
+            updatedAt
+            file
     }
   }
 `;

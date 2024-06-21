@@ -1,4 +1,4 @@
-import { BaseModel } from './BaseModel';
+import { BaseModel } from '../../../../shared/infra/models/base.model';
 import { DocumentStatus } from './DocumentStatus';
 import { DocumentVersion } from './DocumentVersion';
 import { Folder } from './Folder';

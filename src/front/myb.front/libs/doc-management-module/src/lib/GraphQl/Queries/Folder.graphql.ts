@@ -28,6 +28,7 @@ query getFolderById($id: Int!) {
           editedBy
           createdAt
           updatedAt
+          parentId
           documents {
             id
             documentName

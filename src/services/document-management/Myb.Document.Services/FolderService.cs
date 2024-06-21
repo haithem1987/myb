@@ -53,20 +53,13 @@ namespace Myb.Document.Services
         {
             try
             {
-                _logger.LogInformation("Updating folder with ID {FolderId}", folder.Id);
-              
-                _logger.LogInformation("Folder state before update: {@Folder}", folder);
-
+                folder.UpdatedAt = DateTime.UtcNow;
                 await _folderRepository.UpdateAsync(folder);
-
-                _logger.LogInformation("Folder updated successfully with ID {FolderId}", folder.Id);
-                _logger.LogInformation("Folder state after update: {@Folder}", folder);
-
                 return folder;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating folder with ID {FolderId}", folder.Id);
+                _logger.LogError(ex, "Error updating folder");
                 throw;
             }
         }
@@ -77,5 +70,6 @@ namespace Myb.Document.Services
             return true;
         }
     }
+
 }
 

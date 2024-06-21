@@ -13,11 +13,14 @@ import { FormsModule } from '@angular/forms';
 import { base64ToBlob } from '../../../base64-to-blob';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { NoResultComponent } from 'libs/shared/shared-ui/src/lib/components/no-result/no-result.component';
+import { Folder } from '../../../models/Folder';
+import { FolderCreationComponent } from '../folder-creation/folder-creation.component';
 
 @Component({
   selector: 'myb-front-folder-details',
   standalone: true,
-  imports: [CommonModule, 
+  imports: [
+    CommonModule, 
     NavbarComponent, 
     NgbDropdownModule, 
     DocumentUploadComponent, 
@@ -39,7 +42,6 @@ export class FolderDetailsComponent implements OnInit {
     private folderService: FolderService,
     private documentService: DocumentService,
     private modalService: NgbModal,
-    private router: Router,
     private  toastService: ToastService
   ) {}
 
@@ -48,23 +50,28 @@ export class FolderDetailsComponent implements OnInit {
 
     this.folderId = +this.route.snapshot.paramMap.get('id')!;
     this.loadDocumentsWithinFolder();
+   
   }
 
   loadDocumentsWithinFolder() {
     console.log('Fetching details for folder ID:', this.folderId);
+    //console.log('parentid', this.folder.parentId);
     this.folderService.getById(this.folderId).subscribe(
       (data: any) => {
+        
         console.log('Raw response data:', data);
+        
         if (data && data.id) {
           this.folder = data;
           this.documents = this.folder.documents.map((doc: any) => {
-            console.log('Document:', doc); // Log each document to see its properties
+            console.log('Document:', doc); 
             return {
               ...doc,
-              file: doc.file // Ensure the file property is included
+              file: doc.file 
             };
           });
           console.log('Documents in folder:', this.documents);
+      
         } else {
           console.error('Invalid response structure:', data);
         }
@@ -90,13 +97,13 @@ export class FolderDetailsComponent implements OnInit {
       this.toastService.show('Document Deleted successfully!', {
         classname: 'bg-success text-light ',
       });
-      this.loadDocumentsWithinFolder(); // Reload documents after deletion
+      this.loadDocumentsWithinFolder(); 
     });
   }
 
   openModal(document?: DocumentModel) {
     const modalRef = this.modalService.open(DocumentEditComponent);
-    modalRef.componentInstance.document = { ...document }; // Pass a shallow copy to avoid mutation issues
+    modalRef.componentInstance.document = { ...document };
     modalRef.componentInstance.documentUpdated.subscribe((updatedDocument: DocumentModel) => {
       const index = this.documents.findIndex(doc => doc.id === updatedDocument.id);
       if (index !== -1) {
@@ -119,19 +126,19 @@ export class FolderDetailsComponent implements OnInit {
   }
 
 
-  updateBreadcrumb() {
-    const routeData = this.route.snapshot.data;
-    if (this.folderName) {
-      routeData['breadcrumb'] = this.folderName;
-      this.router.config.forEach((route) => {
-        if (route.path === 'documents/folder/:id') {
-          route.data = routeData;
-        }
-      });
-    }
-  }
+  // updateBreadcrumb() {
+  //   const routeData = this.route.snapshot.data;
+  //   if (this.folderName) {
+  //     routeData['breadcrumb'] = this.folderName;
+  //     this.router.config.forEach((route) => {
+  //       if (route.path === 'documents/folder/:id') {
+  //         route.data = routeData;
+  //       }
+  //     });
+  //   }
+  // }
 
-  filterTimesheets(): void {
+  filterDocument(): void {
     // Implement filtering logic
   }
 
@@ -183,6 +190,7 @@ export class FolderDetailsComponent implements OnInit {
   
     return new Blob(byteArrays, { type: contentType });
   }
+  
   viewDocument(document: DocumentModel): void {
     console.log('Attempting to view document:', document);
     const { file, documentName } = document;
@@ -223,5 +231,16 @@ export class FolderDetailsComponent implements OnInit {
   }
 
 
+  openFolderCreationModal() {
+    const modalRef = this.modalService.open(FolderCreationComponent);
+    modalRef.componentInstance.parentId = this.folderId; // Pass current folder ID as parent ID
+    modalRef.componentInstance.folderCreated.subscribe((newFolder: Folder) => {
+      if (this.folder?.subFolders) {
+        this.folder.subFolders.push(newFolder); // Add new subfolder to the current folder's subfolders
+      } else {
+        this.folder!.subFolders = [newFolder];
+      }
+    });
+  }
   
 }

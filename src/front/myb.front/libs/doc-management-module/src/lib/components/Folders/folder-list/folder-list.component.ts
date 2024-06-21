@@ -26,11 +26,15 @@ export class FolderListComponent {
   // List to store pinned folders
   pinnedFolders: Folder[] = [];
 
-  constructor(private folderService: FolderService, private modalService: NgbModal) {}
+  constructor(
+    private folderService: FolderService, 
+    private modalService: NgbModal
+  ) {}
   
-pinFolder(folder: Folder): void {
+  pinFolder(folder: Folder): void {
     this.folderPinned.emit(folder);
   }
+
   deleteFolder(id: number) {
     if (id == -1) {
       return;
@@ -41,21 +45,21 @@ pinFolder(folder: Folder): void {
     
   }
 
-  updateFolder(folder: Folder) {
-    this.folderService.update(folder.id, folder).subscribe(
-      (updatedFolder) => {
-        this.folderUpdated.emit(updatedFolder);
-      },
-      (error) => {
-        console.error('Error updating folder:', error);
-      }
-    );
-  }
+  // updateFolder(folder: Folder) {
+  //   this.folderService.update(folder.id, folder).subscribe(
+  //     (updatedFolder) => {
+  //       this.folderUpdated.emit(updatedFolder);
+  //     },
+  //     (error) => {
+  //       console.error('Error updating folder:', error);
+  //     }
+  //   );
+  // }
 
   openModal() {
     const modalRef = this.modalService.open(FolderEditComponent);
-    modalRef.componentInstance.folderEdit.subscribe((newFolder: Folder) => {
-      this.folders = [...this.folders, newFolder]; 
+    modalRef.componentInstance.folderEdit.subscribe((updateFolder: Folder) => {
+      this.folders = [...this.folders, updateFolder]; 
     });
   }
 

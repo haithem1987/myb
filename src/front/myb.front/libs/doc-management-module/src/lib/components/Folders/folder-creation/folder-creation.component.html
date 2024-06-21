@@ -3,30 +3,27 @@
 	<div>
 		<div class="modal-header">
 			<h4 class="modal-title">Add Folder </h4>
-			<button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+				<button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+					</div>
+						<div class="container">
+							<form >
+			 					 <div class="mb-3">
+									<label for="documentName" class="form-label">Folder  Name</label>
+										<input
+										type="text"
+										class="form-control"
+										id="foldername"
+										[(ngModel)]="folderName"
+							
+										name="foldername"
+										placeholder="Enter Folder Name "
+										/>
+								</div>
+							</form>
+						</div>
+					<div class="modal-footer">
+					<button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
+					<button type="button" class="btn btn-outline-primary"(click)="createFolder()">Save</button>
+				</div>
 		</div>
-		<div class="container">
-		<form >
-			  <div class="mb-3">
-				<label for="documentName" class="form-label">Folder  Name</label>
-				<input
-				  type="text"
-				  class="form-control"
-				  id="foldername"
-				  [(ngModel)]="folderName"
-	
-				  name="foldername"
-				  placeholder="Enter Folder Name "
-				  
-				/>
-			  </div>
-		
-		</form>
-	</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
-			<button type="button" class="btn btn-outline-primary"(click)="createFolder()">Save</button>
-		</div>
-	</div>
-		
-	</div>
+</div>

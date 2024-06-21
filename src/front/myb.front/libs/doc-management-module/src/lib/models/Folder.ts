@@ -1,4 +1,4 @@
-import { BaseModel } from "./BaseModel";
+import { BaseModel } from '../../../../shared/infra/models/base.model';
 import { DocumentModel } from "./DocumentModel";
 
 export interface Folder extends BaseModel {
@@ -10,5 +10,6 @@ export interface Folder extends BaseModel {
     lastModifiedDate?: Date;
     documents: DocumentModel[] | null;
     children: Folder[] | null; 
+    
   
   }

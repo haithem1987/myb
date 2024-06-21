@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Document.EntityFrameWork.Infra.Migrations
 {
     /// <inheritdoc />
-    public partial class gMigration : Migration
+    public partial class NEWWMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,13 +36,14 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DocumentName = table.Column<string>(type: "text", nullable: false),
-                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
-                    EditedBy = table.Column<int>(type: "integer", nullable: false),
+                    DocumentName = table.Column<string>(type: "text", nullable: true),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: true),
+                    EditedBy = table.Column<int>(type: "integer", nullable: true),
                     DocumentType = table.Column<int>(type: "integer", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: true),
-                    DocumentSize = table.Column<long>(type: "bigint", nullable: false),
+                    DocumentSize = table.Column<long>(type: "bigint", nullable: true),
                     FolderId = table.Column<int>(type: "integer", nullable: true),
+                    file = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },

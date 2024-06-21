@@ -11,135 +11,76 @@
       (keyup)="filterTimesheets()"
     />
   </div>
-  <myb-front-timesheet-create></myb-front-timesheet-create>
 
-  <div class="card pt-2">
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th>Projet</th>
-          <th scope="col" (click)="onSort('date')" style="cursor: pointer">
-            Date
-            <i
-              class="bi"
-              [ngClass]="{
-                'bi-sort-numeric-down':
-                  sortColumn === 'date' && sortDirection === 'asc',
-                'bi-sort-numeric-up':
-                  sortColumn === 'date' && sortDirection === 'desc',
-                'bi-sort': sortColumn !== 'date'
-              }"
-            ></i>
-          </th>
-          <th
-            scope="col"
-            (click)="onSort('workedHours')"
-            style="cursor: pointer"
-          >
-            Heures de travail
-            <i
-              class="bi"
-              [ngClass]="{
-                'bi-sort-numeric-down':
-                  sortColumn === 'workedHours' && sortDirection === 'asc',
-                'bi-sort-numeric-up':
-                  sortColumn === 'workedHours' && sortDirection === 'desc',
-                'bi-sort': sortColumn !== 'workedHours'
-              }"
-            ></i>
-          </th>
-          <th>Status</th>
-          <th class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let timesheet of updatedTimesheets">
-          <td class="align-middle">
-            <div>{{ timesheet.description }}</div>
-            <div class="d-flex text-muted">
-              <myb-front-avatar
-                [text]="timesheet.employeeName?.toLocaleUpperCase()"
-                [size]="20"
-              ></myb-front-avatar>
-              <span class="ms-1 text-capitalize">{{
-                timesheet?.employeeName ?? ''
-              }}</span>
-            </div>
-          </td>
-          <td class="align-middle">{{ timesheet?.projectName ?? '--' }}</td>
-          <td class="align-middle">{{ timesheet.date | date }}</td>
-          <td class="align-middle">
-            <div class="d-flex align-items-center">
-              <div class="w-75">
-                <myb-front-progress-bar
-                  [value]="getWorkedHours(timesheet.workedHours)"
-                  type="success"
-                  [striped]="false"
-                  [animated]="false"
-                  [showValue]="false"
-                  [max]="workingHoursPerDay"
-                  height="8px"
-                ></myb-front-progress-bar>
-                <div class="ms-1 d-flex fs-6 text-muted">
-                  {{ timesheet.workedHours.toFixed() }}/{{ workingHoursPerDay }}
-                  hr
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="align-middle">
-            <span
-              [ngClass]="'badge ' + getApprovalStatus(timesheet).badgeClass"
+  <div class="mb-3">
+    <div class="btn-group" ngbButtonGroup>
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        [class.active]="selectedPeriod === 'day'"
+        (click)="setPeriod('day')"
+      >
+        Day
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        [class.active]="selectedPeriod === 'week'"
+        (click)="setPeriod('week')"
+      >
+        Week
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        [class.active]="selectedPeriod === 'month'"
+        (click)="setPeriod('month')"
+      >
+        Month
+      </button>
+    </div>
+  </div>
+
+  <div *ngFor="let group of groupedTimesheets$ | async | keyvalue">
+    <h3>{{ group.key }}</h3>
+    <div class="card pt-2 table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th class="text-center" *ngFor="let date of dateRange">
+              <div class="text-muted fw-light">{{ date.weekday }}</div>
+              <div>{{ date.day }}</div>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let timesheet of group.value; trackBy: trackByTimesheet">
+            <td>{{ timesheet.projectName }}</td>
+            <td
+              class="text-center"
+              style="width: 100px"
+              *ngFor="let date of dateRange; trackBy: trackByDate"
+              [ngClass]="{ 'bg-light text-muted': isWeekend(date) }"
             >
-              {{ getApprovalStatus(timesheet).text }}
-            </span>
-          </td>
-          <td class="align-middle text-end">
-            <button
-              type="button"
-              class="btn btn-link text-dark fw-bold me-2"
-              (click)="$event.stopPropagation(); myDrop.toggle()"
-            >
-              <i class="bi bi-three-dots-vertical"></i>
-            </button>
-            <div ngbDropdown #myDrop="ngbDropdown">
-              <div ngbDropdownMenu>
-                <button
-                  ngbDropdownItem
-                  class="dropdown-item"
-                  *ngIf="!timesheet.isApproved"
-                  (click)="approveTimeSheet(timesheet)"
-                >
-                  <i class="bi bi-check-circle"></i> Approve
-                </button>
-                <button
-                  ngbDropdownItem
-                  class="dropdown-item"
-                  *ngIf="timesheet.isApproved"
-                  (click)="approveTimeSheet(timesheet)"
-                >
-                  <i class="bi bi-x-circle"></i> Disapprove
-                </button>
-                <button
-                  ngbDropdownItem
-                  class="dropdown-item"
-                  (click)="editTimeSheet(timesheet.id)"
-                >
-                  <i class="bi bi-pencil-square"></i> Edit
-                </button>
-                <button
-                  ngbDropdownItem
-                  class="dropdown-item"
-                  (click)="deleteTimeSheet(timesheet.id)"
-                >
-                  <i class="bi bi-trash"></i> Delete
-                </button>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              <ng-container *ngIf="!isWeekend(date)">
+                <input
+                  type="number"
+                  class="form-control text-center"
+                  [value]="
+                    getHoursForDate(timesheet.id, date.weekday + ' ' + date.day)
+                  "
+                  (input)="onHoursChange(timesheet.id, date, $event)"
+                />
+              </ng-container>
+            </td>
+            <td>
+              <!-- Action buttons can be added here -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

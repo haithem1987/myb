@@ -14,5 +14,6 @@ namespace Myb.Common.Repositories
         Task<QueryResult<TKey, TEntity>> UpdateAsync(TEntity entity);
         Task<QueryResult<TKey, TEntity>> DeleteAsync(TKey entityId);
         TEntity? GetById(TKey keys);
+       // Task<Folder> GetByIdAsync(int id);
     }
 }

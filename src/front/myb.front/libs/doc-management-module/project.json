@@ -1,0 +1,9 @@
+{
+  "name": "doc-management-module",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/doc-management-module/src",
+  "prefix": "myb-front",
+  "tags": [],
+  "projectType": "library",
+  "targets": {}
+}

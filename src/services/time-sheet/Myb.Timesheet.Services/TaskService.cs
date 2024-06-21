@@ -24,7 +24,7 @@ namespace Myb.Timesheet.Services
 
         public async Task<TimesheetTask> AddTaskAsync(TimesheetTask task)
         {
-            await _taskRepository.InsertAsync(task);
+            await _taskRepository.UpdateAsync(task);
             return task;
         }
 

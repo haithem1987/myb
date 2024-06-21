@@ -47,7 +47,7 @@ public class EmployeeService:IEmployeeService
     {
         try
         {
-            await _employeeRepository.InsertAsync(employee);
+            await _employeeRepository.UpdateAsync(employee);
             return employee;
         }
         catch (Exception ex)

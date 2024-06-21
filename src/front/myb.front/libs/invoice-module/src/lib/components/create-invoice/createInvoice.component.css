@@ -1,0 +1,8 @@
+.dotted-card {
+  border: 1px dotted #aeabab;
+  height: 180px; /* Adjust height as needed */
+  width: 100%; /* Adjust width as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

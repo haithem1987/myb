@@ -1,0 +1,24 @@
+.container {
+    /* padding-top: 20px; */
+
+}
+
+  
+  /* Hide the default dropdown arrow */
+  ::ng-deep .dropdown-toggle::after {
+    display: none !important;
+  }
+  .folder-name {
+    color: #845bba; 
+    font-size: larger
+  }
+  .delete-button {
+    color: red;
+    border: none;
+    background: none;
+  }
+  
+  .delete-button i {
+    color: red;
+  }
+  

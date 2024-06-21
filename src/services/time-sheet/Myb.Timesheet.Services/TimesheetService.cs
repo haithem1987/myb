@@ -20,7 +20,7 @@ public class TimesheetService:ITimesheetService
     {
         try
         {
-            await _timesheetRepository.InsertAsync(timesheet);
+            await _timesheetRepository.UpdateAsync(timesheet);
             return timesheet;
         }
         catch (Exception ex)

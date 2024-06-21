@@ -35,7 +35,7 @@ services:
     image: postgres:16.2
     restart: always
     environment:
-      POSTGRES_PASSWORD: timesheet-pwd
+      POSTGRES_PASSWORD: document-pwd
       POSTGRES_DB: documentDB
       POSTGRES_USER: postgres
     ports:

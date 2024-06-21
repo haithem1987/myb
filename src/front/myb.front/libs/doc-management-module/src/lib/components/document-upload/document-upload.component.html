@@ -1,0 +1,72 @@
+<!-- <div class="card text-center">
+  <div class="card-header"></div>
+  <div class="card-body">
+    <img src="http://100dayscss.com/codepen/upload.svg" class="upload-icon" />
+    <br /><br />
+    <h5 class="card-title">Choose File to Upload!</h5>
+    <p class="card-text"></p>
+  </div>
+  <div class="custom-file">
+    <input
+      #fileInput
+      type="file"
+      class="custom-file-input"
+      id="customFile"
+      (change)="onSelectFile(fileInput.files, $event)"
+      multiple
+      accept=".jpg, .png, .jpeg, .pdf"
+      style="display: none;"
+    />
+    <button class="btn btn-primary text-white" (click)="fileInput.click()">Upload Document</button>
+    <br /><br />
+    <div class="card-footer text-muted"></div>
+  </div>
+</div>
+
+<br /> -->
+
+<!-- <table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Document Name</th>
+      <th class="text-end">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of selectedFiles , let i = index">
+      <td class="col-md-6">
+        <i class="bi bi-file-earmark-pdf" style="font-size: 25px;"></i>
+        <a [href]="row?.url" target="_blank">{{row?.ImageName}}</a>
+      </td>
+      <td>
+        <div class="d-flex justify-content-end">
+          <a class="btn btn-blue simple" [href]="row?.url" target="_blank">
+            <button type="button" class="btn btn-outline-primary">
+              <i class="bi bi-eye-fill"></i>
+            </button>
+          </a> -->
+          <!-- <div class="btn btn-red simple"> -->
+            <!-- <button type="button" class="btn btn-outline-secondary">
+              <i class="bi bi-x-lg"></i>
+            </button> -->
+            <!-- <button class="btn btn-outline-secondary">
+              <i class="bi bi-trash" (click)="removeSelectedFilesImage(i)"></i>
+            </button> -->
+          <!-- </div> -->
+        <!-- </div>
+      </td>
+    </tr>
+  </tbody>
+</table> -->
+<div class="custom-file">
+  <label for="file" class="form-label">Upload File</label><br>
+  <input 
+ #file type="file" 
+ class="custom-file-input form-control"
+  id="customFile"
+  (change)="onSelectFile(file.files , $event)" 
+   [multiple]="'multiple'"
+  [accept]="'.jpg, .png, .jpeg, .pdf, .xlsx, .xls'">
+<!-- <label class="custom-file-label" 
+  for="customFile">{{ 'reportClaim.chooseFile'}}</label> -->
+</div>

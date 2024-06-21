@@ -15,5 +15,14 @@ namespace Myb.Invoice.Infra.GraphQl.Querys
         public Task<IEnumerable<InvoiceModel?>> GetAllInvoices([Service] IInvoiceService invoiceService) => invoiceService.GetAll();
         public Task<IEnumerable<InvoiceModel?>> GetInvoicesByIds([Service] IInvoiceService invoiceService , IEnumerable<int?> ids) => invoiceService.GetByIds(ids);
         public Task<InvoiceModel?> GetInvoiceByID([Service] IInvoiceService invoiceService, int id) => invoiceService.GetById(id);
+
+
+        public Task<IEnumerable<Client?>> GetAllClients([Service] IClientService clientService) => clientService.GetAll();
+        public Task<IEnumerable<Client?>> GetClientsByIds([Service] IClientService clientService, IEnumerable<int?> ids) => clientService.GetByIds(ids);
+        public Task<Client?> GetClientByID([Service] IClientService clientService, int id) => clientService.GetById(id);
+
+        public Task<IEnumerable<Product?>> GetAllProducts([Service] IProductService productService) => productService.GetAll();
+        public Task<IEnumerable<Product?>> GetProductsByIds([Service] IProductService productService, IEnumerable<int?> ids) => productService.GetByIds(ids);
+        public Task<Product?> GetProductByID([Service] IProductService productService, int id) => productService.GetById(id);
     }
 }

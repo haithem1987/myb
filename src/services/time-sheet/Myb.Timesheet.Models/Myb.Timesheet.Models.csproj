@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="GraphQL.Upload.AspNetCore" Version="3.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\..\..\common\Myb.Common.Models\Myb.Common.Models.csproj" />
     </ItemGroup>
 

@@ -1,0 +1,87 @@
+<div class="container mt-3">
+  <h5>Your Files in <span class="folder-name">{{ folder.folderName }}</span> :</h5>
+ 
+  <input
+    type="text"
+    class="form-control mb-3"
+    placeholder="Search Documents..."
+    (keyup)="filterDocument()"
+  />
+  
+  <div class="card border-primary p-2">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col" style="cursor: pointer">
+            Document Name
+            <i class="bi"></i>
+          </th>
+          <th scope="col" style="cursor: pointer">
+            Type
+            <i class="bi"></i>
+          </th>
+          <th scope="col" style="cursor: pointer">
+            Size
+            <i class="bi"></i>
+          </th>
+          <!-- <th scope="col">Status</th> -->
+          <th scope="col">Creation Date </th>
+          <th scope="col">Update Date </th>
+          <th scope="col" class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr *ngFor="let document of documents">
+          <td>
+            <ng-container [ngSwitch]="document.documentType">
+              <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf-fill me-2" style="font-size: 25px;"></i>
+              <i *ngSwitchCase="'WORD'" class="bi bi-file-earmark-word me-2" style="font-size: 25px;"></i>
+              <i *ngSwitchCase="'EXCEL'" class="bi bi-filetype-xls me-2" style="font-size: 25px;"></i>
+              <i *ngSwitchCase="'IMAGE'" class="bi bi-file-image me-2" style="font-size: 25px;"></i>
+            </ng-container>
+       {{ document.documentName }}
+          </td>
+
+          <td>{{ document.documentType }}</td>
+          <td>{{ document.documentSize }} bytes</td>
+          <!-- <td>
+            <span [ngClass]="'badge ' + getApprovalStatus(document).badgeClass">
+              {{ getApprovalStatus(document).text }}
+            </span>
+          </td> -->
+          <td>{{ document.createdAt | date }}</td>
+          <td>{{ document.updatedAt | date }}</td>
+          <td class="text-end">
+            <div class="d-flex justify-content-end align-items-center">
+              <div ngbDropdown>
+                <i class="bi bi-three-dots-vertical" style="font-size: 30px; color: green;" ngbDropdownToggle></i>
+                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                  <button ngbDropdownItem >
+                    <i class="bi bi-share-fill"></i> Share
+                  </button>
+                  <!-- <button ngbDropdownItem>
+                    <i class="bi bi-files"></i> Duplicate
+                  </button> -->
+                  <button ngbDropdownItem (click)="openModal(document)">
+                    <i class="bi bi-pencil-square"></i> Edit
+                  </button>
+                  <button ngbDropdownItem (click)="downloadDocument(document)">
+                    <i class="bi bi-box-arrow-down"></i> Download
+                  </button>
+                  <button ngbDropdownItem (click)="viewDocument(document)">
+                    <i class="bi bi-eye"></i> View
+                  </button> 
+                  <button ngbDropdownItem class="delete-button" (click)="deleteDocument(document.id)">
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                  
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

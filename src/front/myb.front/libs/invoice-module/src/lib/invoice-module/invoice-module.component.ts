@@ -5,11 +5,26 @@ import { InvoiceService } from '../services/invoice.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditInvoiceComponent } from '../components/edit-invoice/editInvoice.component';
 import { CreateInvoiceComponent } from '../components/create-invoice/createInvoice.component';
+import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { NavbarComponent } from '../components/navbar/navbar.component';
+import { ListInvoiceComponent } from '../components/list-invoice/listInvoice.component';
+import {BreadcrumbComponent} from '../../../../time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component'
+import {ToastsContainerComponent} from '../../../../shared/shared-ui/src/lib/components/toasts-container/toasts-container.component'
+
 
 @Component({
   selector: 'myb-front-invoice-module',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    NavbarComponent,
+    RouterOutlet, 
+    ListInvoiceComponent, 
+    CreateInvoiceComponent,
+    BreadcrumbComponent,
+    ToastsContainerComponent
+  ],
   templateUrl: './invoice-module.component.html',
   styleUrl: './invoice-module.component.css',
 })
@@ -17,26 +32,7 @@ export class InvoiceModuleComponent implements OnInit {
   invoices: Invoice[] = [];
   private modalService = inject(NgbModal);
   private invoiceService = inject(InvoiceService);
+  private router = inject(Router);
 
-  ngOnInit(): void {
-    this.loadInvoices();
-  }
-
-  loadInvoices() {
-    this.invoiceService.getAll().subscribe((invoices) => {
-      console.log(invoices);
-      this.invoices = invoices;
-    });
-  }
-  /* open() {
-		const modalRef = this.modalService.open(EditInvoiceComponent);
-		modalRef.componentInstance.name = 'World';
-	} */
-
-  open() {
-    const modalRef = this.modalService.open(CreateInvoiceComponent);
-  }
-  openEditModal(){
-    const modalRef = this.modalService.open(EditInvoiceComponent);
-  }
+  ngOnInit(): void {}
 }

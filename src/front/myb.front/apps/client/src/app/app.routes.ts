@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+import { CreateInvoiceComponent } from '@myb-front/invoice-module';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
 export const appRoutes: Route[] = [
   // {
@@ -18,9 +19,9 @@ export const appRoutes: Route[] = [
   },
 
   {
-    path: 'invoices',
-    loadComponent: () =>
-      import('@myb-front/invoice-module').then((c) => c.InvoiceModuleComponent),
+    path: 'invoice',
+    loadChildren: () =>
+      import('@myb-front/invoice-module').then((c) => c.InvoiceRoutingModule),
   },
   {
     path: 'timesheet',
@@ -29,4 +30,5 @@ export const appRoutes: Route[] = [
         (c) => c.TimesheetRoutingModule
       ),
   },
+  
 ];

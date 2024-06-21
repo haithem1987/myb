@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { InvoiceService } from '../../services/invoice.service';
 import {
   SelectedFiles,
@@ -8,58 +7,60 @@ import {
 } from '../../services/upload-files.service';
 import { Invoice } from '../../models/invoice.model';
 import {
-  FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  FormControl,
   Validators,
 } from '@angular/forms';
 import { DateUtilsService } from '../../../../../shared/infra/services/date-utils.service';
 import { ToastService } from '../../../../../shared/infra/services/toast.service';
 import { HttpClientModule } from '@angular/common/http';
 import { OcrService } from '../../../../../shared/infra/services/ocr.service';
+import { NgbScrollSpyModule } from '@ng-bootstrap/ng-bootstrap';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'myb-front-create-invoice',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    NgbScrollSpyModule,
+    RouterLink
+  ],
   templateUrl: './createInvoice.component.html',
   styleUrl: './createInvoice.component.css',
 })
 export class CreateInvoiceComponent {
-  invoiceForm: FormGroup;
+  invoiceForm: FormGroup = new FormGroup({
+    invoiceNum: new FormControl(''),
+    createdAt: new FormControl(new Date('2024-06-01T08:00:00Z')),
+    updatedAt: new FormControl(new Date('2024-06-01T08:00:00Z')),
+    invoiceDate: new FormControl(new Date('2024-06-01T08:00:00Z')),
+    dueDate: new FormControl(new Date('2024-06-01T08:00:00Z')),
+    clientName: new FormControl(''),
+    clientAddress: new FormControl(''),
+    supplierName: new FormControl(''),
+    supplierAddress: new FormControl(''),
+    status: new FormControl(''),
+    totalAmount: new FormControl(0),
+    subTotal: new FormControl(0),
+  });
   selectedFile: File | null = null;
-  public selectedFiles: SelectedFiles[] = [];
-  activeModal = inject(NgbActiveModal);
+  selectedFiles: SelectedFiles[] = [];
+  extractedText: string = '';
+  extractedTexts: string[] = [];
 
   @Input() name?: string;
 
   private invoiceService = inject(InvoiceService);
   private dateUtils = inject(DateUtilsService);
   private files = inject(UploadFilesService);
-  private formBuilder = inject(FormBuilder);
   private toastService = inject(ToastService);
   private ocrService = inject(OcrService);
 
-  constructor() {
-    this.invoiceForm = this.formBuilder.group({
-      id: [0],
-      invoiceNum: [''],
-      invoiceDate: [null],
-      subTotal: [0],
-      totalAmount: [0],
-      dueDate: [null],
-      status: [''],
-      createdAt: [null],
-      updatedAt: [null],
-      clientName: [''],
-      clientAddress: [''],
-      supplierName: [''],
-      supplierAddress: [''],
-      userId: [1],
-      companyId: [1],
-      image: [''],
-    });
-  }
+  constructor() {}
 
   onSelectFile(filesData: any, fileInput: any) {
     const { files } = fileInput.target;
@@ -93,11 +94,13 @@ export class CreateInvoiceComponent {
             fileList.push(res[index]);
           }
           this.selectedFiles = fileList;
+          
           // this.genService.openSnackBar('Maximum no. of 10 Media items can be uploaded.');
         } else {
           this.selectedFiles = res;
+          //////////////////////////////////////////////// fic selected files multi files
           this.preformOcr([res[0].file]);
-          console.log('file name', res[0].ImageName);
+          this.removeSelectedFilesImage(0);
         }
       }
     });
@@ -109,36 +112,41 @@ export class CreateInvoiceComponent {
 
   saveInvoice(): void {
     const newInvoice = new Invoice();
-    newInvoice.invoiceNum = '9';
-    newInvoice.createdAt = new Date('2024-06-01T08:00:00Z');
-    newInvoice.updatedAt = new Date('2024-06-01T08:00:00Z');
-    newInvoice.invoiceDate = new Date('2024-06-01T08:00:00Z');
-    newInvoice.dueDate = new Date('2024-06-01T08:00:00Z');
-    newInvoice.status = 'unpayed';
-    newInvoice.totalAmount = 900.0;
-    newInvoice.subTotal = 700.0;
-    newInvoice.clientName = 'x';
-    newInvoice.clientAddress = 'x';
-    newInvoice.supplierName = 'y';
-    newInvoice.supplierAddress = 'y';
+    newInvoice.invoiceNum = this.invoiceForm.value.invoiceNum;
+    newInvoice.createdAt = this.invoiceForm.value.createdAt;
+    newInvoice.updatedAt = this.invoiceForm.value.updatedAt;
+    newInvoice.invoiceDate = this.invoiceForm.value.invoiceDate;
+    newInvoice.dueDate = this.invoiceForm.value.dueDate;
+    newInvoice.status = this.invoiceForm.value.status;
+    newInvoice.totalAmount = this.invoiceForm.value.totalAmount;
+    newInvoice.subTotal = this.invoiceForm.value.subTotal;
+    newInvoice.clientName = this.invoiceForm.value.clientName;
+    newInvoice.clientAddress = this.invoiceForm.value.clientAddress;
+    newInvoice.supplierName = this.invoiceForm.value.supplierName;
+    newInvoice.supplierAddress = this.invoiceForm.value.supplierAddress;
     console.log('invoice', newInvoice);
 
     this.invoiceService.create(newInvoice).subscribe(() => {
-      /* this.toastService.show('Invoice created successfully!', {
-          classname: 'bg-success text-light',
-        }); */
+      this.toastService.show('Invoice created successfully!', {
+        classname: 'bg-success text-light',
+      });
     });
   }
 
   preformOcr(files: File[]) {
     this.ocrService.performOCR(files).subscribe(
       (response) => {
-        // handle OCR response
         console.log('ocr responce', response);
+        this.extractedText = response[0].text;
+        this.extractedTexts = this.extractedText.split('\n');
+        console.log('extracted text', this.extractedTexts);
       },
       (error) => {
         console.error('Error performing OCR:', error);
       }
     );
+  }
+  closeOcr(){
+    this.extractedText = '';
   }
 }

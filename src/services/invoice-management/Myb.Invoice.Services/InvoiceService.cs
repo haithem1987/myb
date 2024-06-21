@@ -4,11 +4,11 @@ using Myb.Invoice.Models;
 
 namespace Myb.Invoice.Services
 {
-    public class InvoiceServices : IInvoiceService
+    public class InvoiceService : IInvoiceService
     {
         private readonly IGenericRepository<int?, InvoiceModel, InvoiceContext> _invoiceRepository;
 
-        public InvoiceServices(IGenericRepository<int?, InvoiceModel, InvoiceContext> invoiceRepository)
+        public InvoiceService(IGenericRepository<int?, InvoiceModel, InvoiceContext> invoiceRepository)
         {
             _invoiceRepository = invoiceRepository;
         }
@@ -42,7 +42,6 @@ namespace Myb.Invoice.Services
 
         public async Task<InvoiceModel?> Update(InvoiceModel invoice)
         {
-            Console.WriteLine("update");
             var responce = await _invoiceRepository.UpdateAsync(invoice);
             return responce.Entity;
             

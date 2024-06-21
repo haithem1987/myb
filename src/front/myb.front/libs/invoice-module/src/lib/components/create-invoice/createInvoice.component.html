@@ -1,137 +1,137 @@
+<div class="card border-primary p-3">
+  <div class="container">
+    <br />
+    <div class="row">
+      <div class="col-md me-4">
+        <br />
+        @if(extractedText == ''){
+        <div class="bg-light card text-center dotted-card">
+          <div class="card-body">
+            <img
+              src="http://100dayscss.com/codepen/upload.svg"
+              class="upload-icon"
+            />
 
-  <div class="modal-content">
-    <div class="modal-header">
-      <h4 class="modal-title">Hi there!</h4>
-      <button
-        type="button"
-        class="btn-close"
-        aria-label="Close"
-        (click)="activeModal.dismiss('Cross click')"
-      ></button>
-    </div>
-    <div class="modal-body">
-      <!-- <form [formGroup]="invoiceForm" (ngSubmit)="saveProject()"> -->
-      <div class="row">
-        <div class="col-md">
-          <br />
-          <br />
-          <div class="card text-center">
-            <div class="card-body">
-              <img
-                src="http://100dayscss.com/codepen/upload.svg"
-                class="upload-icon"
+            <p class="card-title">Choose Invoice to Upload !</p>
+            <p class="card-text"></p>
+            <div class="custom-file">
+              <input
+                #fileInput
+                type="file"
+                class="custom-file-input"
+                id="customFile"
+                (change)="onSelectFile(fileInput.files, $event)"
+                multiple
+                accept=".jpg, .png, .jpeg, .pdf"
+                style="display: none"
               />
-              <br /><br />
-              <p class="card-title">Choose Invoice to Upload !</p>
-              <p class="card-text"></p>
-              <div class="custom-file">
-                <!-- <input #file type="file" class="custom-file-input" id="customFile"
-                        (change)="onSelectFile(file.files , $event)"  [multiple]="'multiple'"
-                        [accept]="'.jpg, .png, .jpeg, .pdf'"> -->
-                <!-- Hidden File Input -->
-                <input
-                  #fileInput
-                  type="file"
-                  class="custom-file-input"
-                  id="customFile"
-                  (change)="onSelectFile(fileInput.files, $event)"
-                  multiple
-                  accept=".jpg, .png, .jpeg, .pdf"
-                  style="display: none"
-                />
 
-                <!-- Button to Trigger File Input -->
-                <button
-                  class="btn btn-primary text-white"
-                  (click)="fileInput.click()"
-                >
-                  Upload Document
-                </button>
-                <br />
-                <br />
-                <!--remove-->
-                <!-- <label class="custom-file-label"
-                        for="customFile">{{ 'reportClaim.chooseFile'}}</label> -->
-              </div>
-              <!-- <button  (click)="addDocument()">upload </button> -->
+              <button
+                class="btn btn-primary text-white"
+                (click)="fileInput.click()"
+              >
+                Upload Document
+              </button>
             </div>
           </div>
         </div>
-        
-        <div class="col-md">
-          <form [formGroup]="invoiceForm">
-            <div class="mb-3">
-              <label for="invoiceNum" class="form-label">Invoice Num</label>
-              <input
-                type="text"
-                class="form-control"
-                id="invoice num"
-                name="invoice num"
-                placeholder="Enter invoice num "
-              />
-            </div>
-            <div class="mb-3">
-              <label for="invoicedate" class="form-label">Invoice date</label>
-              <input
-                type="datetime-local"
-                class="form-control"
-                id="invoicedate"
-                name="invoice date"
-              />
-            </div>
-
-            <div class="mb-3">
-              <label for="duedate" class="form-label">Due date</label>
-              <input
-                type="datetime-local"
-                class="form-control"
-                id="duedate"
-                name="duedate"
-              />
-            </div>
-            <label for="client" class="form-label">Client</label>
-            <input
-              type="text"
-              class="form-control"
-              id="client"
-              name="client"
-              placeholder="Enter Client"
-            />
-            <label for="supplier" class="form-label">Supplier</label>
-            <input
-              type="text"
-              class="form-control"
-              id="supplier"
-              name="supplier"
-              placeholder="Enter Supplier "
-            />
-            <label for="total" class="form-label">Total</label>
-            <input
-              type="text"
-              class="form-control"
-              id="total"
-              name="total"
-              placeholder="Enter Total "
-            />
-          </form>
+        } @if(extractedText != ''){
+        <div class="card border-secondary p-3">
+          <div class="modal-header" style="display: flex; justify-content: space-between; ">
+            <h3 style="color: #845bba">Extracted info:</h3>
+            <button type="button" class="btn-close" aria-label="Close" (click)="closeOcr()"></button>
+          </div>
+          <div
+            ngbScrollSpy
+            #spy="ngbScrollSpy"
+            class="p-3 rounded-2 mb-3"
+            style="height: 350px"
+          >
+            @for(text of extractedTexts; track text){
+            <p>{{ text }}</p>
+            }
+          </div>
         </div>
+        }
+      </div>
+      <div class="col-md">
+        <form [formGroup]="invoiceForm" (submit)="saveInvoice()">
+          <div class="mb-3">
+            <label for="invoiceNum" class="form-label">Invoice Num</label>
+            <input
+              type="text"
+              class="form-control"
+              id="invoice num"
+              name="invoice num"
+              formControlName="invoiceNum"
+              placeholder="Enter invoice num "
+            />
+          </div>
+          <div class="mb-3">
+            <label for="invoicedate" class="form-label">Invoice date</label>
+            <input
+              type="datetime-local"
+              class="form-control"
+              id="invoicedate"
+              formControlName="invoiceDate"
+              name="invoice date"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="duedate" class="form-label">Due date</label>
+            <input
+              type="datetime-local"
+              class="form-control"
+              id="duedate"
+              formControlName="dueDate"
+              name="duedate"
+            />
+          </div>
+          <label for="client" class="form-label">Client</label>
+          <input
+            type="text"
+            class="form-control"
+            id="client"
+            name="client"
+            formControlName="clientName"
+            placeholder="Enter Client"
+          />
+          <label for="supplier" class="form-label">Supplier</label>
+          <input
+            type="text"
+            class="form-control"
+            id="supplier"
+            name="supplier"
+            formControlName="supplierName"
+            placeholder="Enter Supplier "
+          />
+          <label for="total" class="form-label">Total</label>
+          <input
+            type="number"
+            class="form-control"
+            id="total"
+            name="total"
+            formControlName="totalAmount"
+            placeholder="Enter Total "
+          />
+          <div>
+            <br />
+            <div class="d-flex justify-content-end">
+              <button
+                type="button"
+                class="btn btn-outline-secondary me-2"
+                [routerLink]="['/invoice']"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-outline-primary">
+                Save
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
-    <div class="modal-footer">
-      <button
-        type="button"
-        class="btn btn-outline-dark"
-        (click)="activeModal.close('Close click')"
-      >
-        Close
-      </button>
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        (click)="saveInvoice()"
-      >
-        Save
-      </button>
-    </div>
   </div>
-
+</div>

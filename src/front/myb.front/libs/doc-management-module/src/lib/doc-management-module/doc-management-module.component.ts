@@ -42,49 +42,14 @@ import { ToastsContainerComponent } from 'libs/shared/shared-ui/src/lib/componen
   templateUrl: './doc-management-module.component.html',
   styleUrl: './doc-management-module.component.css',
 })
-export class DocManagementModuleComponent implements OnInit {
+export class DocManagementModuleComponent  {
 documents :DocumentModel[] = [];
 folders:Folder[] = []
 
 constructor( private files: UploadFilesService ,private DocumentService: DocumentService , private modalService: NgbModal  , private folderService :FolderService){}
 
 
-  
-  ngOnInit(){
-    this.loadDocuments();
-    this.loadFolders();
-  }
 
- 
-  //alldoc
-  loadDocuments() {
-    this.DocumentService.getAll().subscribe((data: any) => {
-      console.log("Received data from server:", data);
-     console.log('status ',data.status);
-      
-      if (data && data.allDocuments && Array.isArray(data.allDocuments)) {
-        this.documents = data.allDocuments;
-      } else {
-        console.error("Invalid data format received from the server");
-      }
-    });
-  }
-  
-
-
-loadFolders() {
-  this.folderService.getAll().subscribe((data: any) => {
-    console.log("Received folders from server:", data);
-    
-    if (Array.isArray(data)) {
-      this.folders = data;
-    } else {
-      console.error("Invalid data format received from the server");
-    }
-  }, (error: any) => {
-    console.error("Error loading folders", error);
-});
-}
 
 
 }

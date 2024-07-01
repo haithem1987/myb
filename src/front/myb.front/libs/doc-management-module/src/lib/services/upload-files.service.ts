@@ -8,6 +8,8 @@ export interface SelectedFiles {
   Image?: string;
   file: any;
   url?: string;
+  fileType?: string; 
+
 }
 @Injectable({
   providedIn: 'root'
@@ -25,9 +27,16 @@ export class UploadFilesService {
         const url = URL.createObjectURL(files[i]);
         const reader = new FileReader();
         reader.readAsDataURL(files[i]);
+
         reader.onload = (e) => {
           selectedFiles = selectedFiles?.filter(f => f?.ImageName != files[i]?.name);
-          selectedFiles.push({ ImageName: files[i]?.name, file: files[i], Image: reader?.result as string, url: url });
+          selectedFiles.push({ 
+            ImageName: files[i]?.name, 
+            file: files[i], 
+            Image: reader?.result as string, 
+            url: url ,
+            fileType: files[i].type 
+          });
           result.next(selectedFiles);
 
           if (files?.length === (i + 1)) {
@@ -35,6 +44,8 @@ export class UploadFilesService {
           }
           
           console.log('result',selectedFiles);
+          console.log('type ',selectedFiles[0].file.type);
+
           // selectedFiles.forEach((selectedFile) => {
           //   const fileSize = selectedFile.file.size; // Accessing the size property of the file
           //   console.log("File Size:", fileSize);

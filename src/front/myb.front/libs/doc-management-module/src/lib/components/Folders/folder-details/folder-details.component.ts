@@ -1,8 +1,8 @@
 import { FolderService } from './../../../services/folder.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DocumentModel } from '../../../models/DocumentModel';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DocumentService } from '../../../services/Document.service';
 import { NavbarComponent } from '../../navigation-components/navbar/navbar.component';
 import { DocumentStatus } from '../../../models/DocumentStatus';
@@ -10,11 +10,11 @@ import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentUploadComponent } from '../../document-upload/document-upload.component';
 import { DocumentEditComponent } from '../../document-edit/document-edit.component';
 import { FormsModule } from '@angular/forms';
-import { base64ToBlob } from '../../../base64-to-blob';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { NoResultComponent } from 'libs/shared/shared-ui/src/lib/components/no-result/no-result.component';
 import { Folder } from '../../../models/Folder';
 import { FolderCreationComponent } from '../folder-creation/folder-creation.component';
+import { DocumentCreationComponent } from '../../document-creation/document-creation.component';
 
 @Component({
   selector: 'myb-front-folder-details',
@@ -25,79 +25,156 @@ import { FolderCreationComponent } from '../folder-creation/folder-creation.comp
     NgbDropdownModule, 
     DocumentUploadComponent, 
     FormsModule,
-    NoResultComponent
+    NoResultComponent,
+    RouterLink
   ],
   templateUrl: './folder-details.component.html',
   styleUrls: ['./folder-details.component.css'],
 })
 export class FolderDetailsComponent implements OnInit {
-  folderId!: number;
+  fId!: number;
+
   documents: DocumentModel[] = [];
   folder: any;
   folderName!: string;
   DocumentStatus: any;
+  @Input() folders: Folder[] = [];
+  @Input()parentId!: number;
+  pinnedFolders: Folder[] = [];
+
+
+  @Output() folderDeleted = new EventEmitter<number>();
+  @Output() folderPinned = new EventEmitter<Folder>();
+
+
+
+
 
   constructor(
     private route: ActivatedRoute,
     private folderService: FolderService,
     private documentService: DocumentService,
     private modalService: NgbModal,
-    private  toastService: ToastService
+    private  toastService: ToastService,
+    private router: Router,
+
+
   ) {}
 
   ngOnInit(): void {
-    console.log('FolderDetailsComponent initialized');
 
-    this.folderId = +this.route.snapshot.paramMap.get('id')!;
-    this.loadDocumentsWithinFolder();
-   
+    this.fId = +this.route.snapshot.paramMap.get('id')!;
+    console.log('this is  folderid from details ', this.fId)
+
+    this.loadFolderDetails();
+    this.loadFoldersByParentId(this.fId);
   }
 
-  loadDocumentsWithinFolder() {
-    console.log('Fetching details for folder ID:', this.folderId);
-    //console.log('parentid', this.folder.parentId);
-    this.folderService.getById(this.folderId).subscribe(
-      (data: any) => {
+  openFolder(folderId: number): void {
+    this.fId = folderId;
+    this.loadFolderDetails();
+    this.loadFoldersByParentId(this.fId);
+     this.router.navigate(['documents/folder', folderId]);
+
+  }
+
+//  ngOnInit(): void {
+//     this.route.paramMap.subscribe(params => {
+//       this.fId = +params.get('id')!;
+//       console.log('this is folderid from details ', this.fId);
+//       this.loadFolderDetails();
+//       this.loadFoldersByParentId(this.fId);
+//     });
+//   }
+
+//   openFolder(folderId: number): void {
+//     this.router.navigate(['/folders', folderId]);
+//   }
+
+
+  openFolderCreationModal(): void {
+    const modalRef = this.modalService.open(FolderCreationComponent);
+    modalRef.componentInstance.folderId = this.fId; 
+    modalRef.componentInstance.parentId=this.folder?.parentId;
+    console.log('Passing folderId to modal:', this.fId);
+    console.log('Loading parentid',this.folder.parentId);
+    modalRef.componentInstance.folderCreated.subscribe((newFolder: Folder) => {
+      this.folders.push(newFolder); 
+    });
+  }
+  
+  // loadDocumentsWithinFolder() {
+  //   this.folderService.getById(this.folderId).subscribe(
+  //     (data: any) => {
         
-        console.log('Raw response data:', data);
+  //       console.log('Raw response data:', data);
         
-        if (data && data.id) {
-          this.folder = data;
-          this.documents = this.folder.documents.map((doc: any) => {
-            console.log('Document:', doc); 
-            return {
-              ...doc,
-              file: doc.file 
-            };
-          });
-          console.log('Documents in folder:', this.documents);
+  //       if (data && data.id) {
+  //         this.folder = data;
+  //         this.folders = data.children;
+
+  //         console.log('Loading parentid',this.folder.parentId);
+
+  //         this.documents = this.folder.documents.map((doc: any) => {
+  //           // console.log('Document:', doc); 
+  //           return {
+  //             ...doc,
+  //             file: doc.file 
+  //           };
+  //         });
+  //         // console.log('Documents in folder:', this.documents);
       
-        } else {
-          console.error('Invalid response structure:', data);
-        }
+  //       } else {
+  //         console.error('Invalid response structure:', data);
+  //       }
+  //     },
+  //     (error: any) => {
+  //       console.error('Error fetching folder details:', error);
+  //       if (error.networkError) {
+  //         console.error('Network error:', error.networkError);
+  //       }
+  //       if (error.graphQLErrors) {
+  //         error.graphQLErrors.forEach((err: any) => {
+  //           console.error('GraphQL error:', err);
+  //         });
+  //       }
+  //     }
+  //   );
+  // }
+  loadFolderDetails(): void {
+    this.folderService.getById(this.fId).subscribe(
+      (data: Folder) => {
+        this.folder = data;
+        // this.folders = data. || [];
+        this.documents = data.documents || [];
+        console.log('Loading fId',this.fId)
+        console.log('Loading parentid',this.folder.parentId);
+
       },
-      (error: any) => {
+      (error) => {
         console.error('Error fetching folder details:', error);
-        if (error.networkError) {
-          console.error('Network error:', error.networkError);
-        }
-        if (error.graphQLErrors) {
-          error.graphQLErrors.forEach((err: any) => {
-            console.error('GraphQL error:', err);
-          });
-        }
+
       }
     );
   }
-  
-
+  loadFoldersByParentId(parentId: number): void {
+    this.folderService.getFoldersByParentId(parentId).subscribe(
+      (data: Folder[]) => {
+        this.folders = data;
+        console.log('alllFolders by parentId:', data);
+      },
+      (error) => {
+        console.error('Error fetching folders by parentId:', error);
+      }
+    );
+  }
   deleteDocument(docId: number) {
     this.documentService.delete(docId).subscribe(() => {
       console.log('doc deleted');
       this.toastService.show('Document Deleted successfully!', {
         classname: 'bg-success text-light ',
       });
-      this.loadDocumentsWithinFolder(); 
+      this.loadFolderDetails(); 
     });
   }
 
@@ -230,17 +307,85 @@ export class FolderDetailsComponent implements OnInit {
     }
   }
 
+  // loadFoldersByParentId() {
+  //   if (this.parentId !== null) {
+  //     this.folderService.getFoldersByParentId(this.parentId).subscribe(
+  //       (data: any) => {
+          
+  //         console.log('Raw response data:', data);
+          
+  //         if (data && data.id) {
+  //           this.folder = data;
+  //           this.folders = data.children;
+  
+  //           console.log('Loading parentid',this.folder.parentId);
+  
+  //           this.documents = this.folder.documents.map((doc: any) => {
+  //             // console.log('Document:', doc); 
+  //             return {
+  //               ...doc,
+  //               file: doc.file 
+  //             };
+  //           });
+  //           // console.log('Documents in folder:', this.documents);
+        
+  //         } else {
+  //           console.error('Invalid response structure:', data);
+  //         }
+  //       },
+  //       (error: any) => {
+  //         console.error('Error fetching folder details:', error);
+  //         if (error.networkError) {
+  //           console.error('Network error:', error.networkError);
+  //         }
+  //         if (error.graphQLErrors) {
+  //           error.graphQLErrors.forEach((err: any) => {
+  //             console.error('GraphQL error:', err);
+  //           });
+  //         }
+  //       }
+  //     );
+  //   }}
+  
+  
+  deleteFolder(id: number) {
+    if (id == -1) {
+      return;
+    }
+    this.folderService.delete(id).subscribe(() => {
+      this.folderDeleted.emit(id);
+      console.log('Folder deleted')
+    });
+    
+  }
+  pinFolder(folder: Folder): void {
+    this.folderPinned.emit(folder);
+  }
 
-  openFolderCreationModal() {
-    const modalRef = this.modalService.open(FolderCreationComponent);
-    modalRef.componentInstance.parentId = this.folderId; // Pass current folder ID as parent ID
-    modalRef.componentInstance.folderCreated.subscribe((newFolder: Folder) => {
-      if (this.folder?.subFolders) {
-        this.folder.subFolders.push(newFolder); // Add new subfolder to the current folder's subfolders
-      } else {
-        this.folder!.subFolders = [newFolder];
-      }
+
+  togglePinFolder(folder: Folder) {
+    const index = this.pinnedFolders.findIndex(f => f.id === folder.id);
+    if (index === -1) {
+      this.pinnedFolders.push(folder);
+    } else {
+      this.pinnedFolders.splice(index, 1);
+    }
+  }
+
+  isPinned(folder: Folder): boolean {
+    return this.pinnedFolders.some(f => f.id === folder.id);
+  }
+
+
+  openModalDoc(): void {
+    const modalRef = this.modalService.open(DocumentCreationComponent);
+    modalRef.componentInstance.folderId = this.fId; 
+    modalRef.componentInstance.parentId=this.folder.parentId;
+    console.log(' folderId from ddoc creation :', this.fId);
+    console.log(' parentid from ddoc creation',this.folder.parentId);
+    modalRef.componentInstance.documentCreated.subscribe((newDoc: DocumentModel) => {
+      this.documents = [...this.documents, newDoc];
+      console.log('New document created:', newDoc);
     });
   }
-  
-}
+  }

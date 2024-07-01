@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FolderService } from '../../../services/folder.service';
 import { Folder } from '../../../models/Folder';
 import { DocumentModel } from '../../../models/DocumentModel';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FolderEditComponent } from '../Edit/folder-edit.component';
 import { FormsModule } from '@angular/forms';
@@ -25,11 +25,16 @@ export class FolderListComponent {
 
   // List to store pinned folders
   pinnedFolders: Folder[] = [];
+  fId!: number;
 
   constructor(
+    private route: ActivatedRoute,
+
     private folderService: FolderService, 
     private modalService: NgbModal
   ) {}
+
+ 
   
   pinFolder(folder: Folder): void {
     this.folderPinned.emit(folder);

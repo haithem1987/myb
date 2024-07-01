@@ -19,7 +19,7 @@ namespace Myb.Document.Infra.GraphQl.Mutations
 
         public async Task<DocumentModel> UpdateDocument([Service] IDocumentService documentService, int id, DocumentModel document)
         {
-            document.Id = id; // Ensure the id is set correctly
+            document.Id = id; 
             return await documentService.UpdateDocumentAsync(document);
         }
 
@@ -47,6 +47,10 @@ namespace Myb.Document.Infra.GraphQl.Mutations
         public async Task<bool> DeleteFolder([Service] IFolderService folderService, int id)
         {
             return await folderService.DeleteFolderAsync(id);
+        }
+        public async Task<bool> DeleteFolderByParentId([Service] IFolderService folderService, int parentId)
+        {
+            return await folderService.DeleteFolderAsync(parentId);
         }
 
         //add document version

@@ -27,6 +27,11 @@ namespace Myb.Document.Infra.GraphQl.Queries
             return await folderService.GetFolderByIdAsync(id);
         }
 
+        public async Task<IEnumerable<Folder>> GetFoldersByParentId([Service] IFolderService folderService, int parentId)
+        {
+            return await folderService.GetFoldersByParentIdAsync(parentId);
+        }
+
         public async Task<IEnumerable<Folder>> GetAllFolders([Service] IFolderService folderService)
         {
             return await folderService.GetAllFoldersAsync();

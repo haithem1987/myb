@@ -35,7 +35,7 @@ export class KeycloakService {
           checkLoginIframe: false,
         })
         .then((authenticated) => {
-          console.log('Keycloak authentication success:', authenticated);
+          // console.log('Keycloak authentication success:', authenticated);
           if (authenticated) {
             this.loadUserProfile()
               .then(() => {
@@ -103,7 +103,7 @@ export class KeycloakService {
       this.keycloak
         .loadUserProfile()
         .then((profile) => {
-          console.log('User profile loaded successfully:', profile);
+          // console.log('User profile loaded successfully:', profile);
           this.profileSubject.next(profile);
           this.userIdSubject.next(profile?.id ?? null); // Set userId here
           resolve();

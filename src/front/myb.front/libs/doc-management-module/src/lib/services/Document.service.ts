@@ -4,8 +4,7 @@ import { Injectable } from '@angular/core';
 import { DocumentModel } from '../models/DocumentModel'; 
 import { Apollo, gql } from 'apollo-angular';
 import { BehaviorSubject, Observable, catchError, map, throwError } from 'rxjs';
-import { DocumentStatus } from '../models/DocumentStatus';
-import { ApolloError } from '@apollo/client';
+
 import { RepositoryService } from 'libs/shared/infra/services/repository.service';
 
 

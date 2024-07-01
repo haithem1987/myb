@@ -59,53 +59,50 @@ export class DocumentCreationComponent implements OnInit {
   // }
 
   createDocument(): void {
-    if (this.documentType !== undefined && this.folderId !== null) {
-      const selectedFiles = this.documentUploadComponent?.selectedFiles || [];
-      if (selectedFiles.length > 0) {
-        const document = {
-          id:0,
-          documentName: selectedFiles[0].ImageName,
-          documentType: this.documentType.toString(),
-          // documentType :selectedFiles[0].file.type,
-          createdBy: 1,
-          editedBy: 1,
-          folderId: parseInt(this.folderId.toString()),
-          documentSize: selectedFiles[0].file.size,
-          file: selectedFiles[0].Image, // Save the base64 string
-          url: selectedFiles[0].url, // 
-          createdAt: new Date(),
-          updatedAt: new Date(),
-         
-        };
-        console.log('url:', selectedFiles[0].url);
-        
-        // console.log('file:', selectedFiles[0].Image);
-        this.documentService.createDocument(document).subscribe(
-          (newDocument) => {
-            this.documents.push(newDocument);
-            this.documentCreated.emit(newDocument);
-            this.toastService.show('Document Added successfully!', {
-              classname: 'bg-success text-light text-center ',
-            });
-
-            this.activeModal.close();
-
-
-    console.log('new doc', newDocument);
-  },
-          (error) => {
-            console.error('Error creating document:', error);
+    if (this.documentType !== undefined && this.folderId !== null) 
+      {
+        const selectedFiles = this.documentUploadComponent?.selectedFiles || [];
+        if (selectedFiles.length > 0) {
+            const document = {
+              id:0,
+              documentName: selectedFiles[0].ImageName,
+              documentType: this.documentType.toString(),
+              // documentType :selectedFiles[0].file.type,
+              createdBy: 1,
+              editedBy: 1,
+              folderId: parseInt(this.folderId.toString()),
+              documentSize: selectedFiles[0].file.size,
+              file: selectedFiles[0].Image, // Save the base64 string
+              url: selectedFiles[0].url, // 
+              createdAt: new Date(),
+              updatedAt: new Date(),
             
-            this.toastService.show('An error occurred while creating the document. Please try again.', {
-              classname: 'bg-danger text-light',
-            });
-          }
-        );
-      } else{
-        this.toastService.show('Please upload a file', {
-          classname: 'bg-warning text-dark',
-        });
-      }
+            };
+            console.log('url:', selectedFiles[0].url);
+            
+            // console.log('file:', selectedFiles[0].Image);
+            this.documentService.createDocument(document).subscribe(
+              (newDocument) => {
+                this.documents.push(newDocument);
+                this.documentCreated.emit(newDocument);
+                this.toastService.show('Document Added successfully!', {
+                  classname: 'bg-success text-light text-center ',
+                });
+                this.activeModal.close();
+                console.log('new doc', newDocument);
+                },
+              (error) => {
+                console.error('Error creating document:', error);           
+                this.toastService.show('An error occurred while creating the document. Please try again.', {
+                classname: 'bg-danger text-light',
+                });
+              }
+            );
+        } else{
+          this.toastService.show('Please upload a file', {
+            classname: 'bg-warning text-dark',
+          });
+        }
     } else {
       this.toastService.show('Please enter all required fields', {
         classname: 'bg-warning text-dark',

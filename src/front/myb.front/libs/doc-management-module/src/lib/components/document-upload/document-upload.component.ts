@@ -18,8 +18,8 @@ import { SelectedFiles, UploadFilesService } from '../../services/upload-files.s
 export class DocumentUploadComponent {
 
   selectedFile: File | null = null;
-  documents: DocumentModel[] = [];
-  folders:Folder[] = []
+  // documents: DocumentModel[] = [];
+  // folders:Folder[] = []
 
   selectedFiles: SelectedFiles[] = [];
   @Output() selectedFilesChange = new EventEmitter<SelectedFiles[]>();

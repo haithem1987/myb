@@ -17,7 +17,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let folder of folders">
-          <td>
+          <ng-container  *ngIf="folder.parentId ===null">
+          <td >
             <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
             <a [routerLink]="['/documents/folder', folder.id]" class="no-underline">{{ folder.folderName }}</a>
           </td>
@@ -36,6 +37,7 @@
               <i class="bi bi-pin-angle"></i> 
             </button>
           </td>
+        </ng-container >
         </tr>
       </tbody>
     </table>

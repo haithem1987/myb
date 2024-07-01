@@ -1,13 +1,14 @@
 <div class="container mt-3">
-  <h5>Your Files in <span class="folder-name">{{ folder.folderName }}</span> :</h5>
- 
+  <h5>Your Files in <span class="folder-name">{{ folder?.folderName }}</span> :</h5>
+  <button class="btn btn-outline-secondary me-2 btn-sm" (click)="openFolderCreationModal()"> New Folder</button>
+  <button  class="btn btn-outline-secondary me-2 btn-sm" (click)="openModalDoc()"> New document</button>
   <input
     type="text"
     class="form-control mb-3"
     placeholder="Search Documents..."
     (keyup)="filterDocument()"
   />
-  
+
   <div class="card border-primary p-2">
     <table class="table table-hover">
       <thead>
@@ -24,14 +25,56 @@
             Size
             <i class="bi"></i>
           </th>
-          <!-- <th scope="col">Status</th> -->
-          <th scope="col">Creation Date </th>
-          <th scope="col">Update Date </th>
+          <th scope="col">Creation Date</th>
+          <th scope="col">Update Date</th>
           <th scope="col" class="text-end">Actions</th>
         </tr>
       </thead>
       <tbody>
-        
+        <ng-container *ngFor="let folder of folders">
+          <tr >
+            <td (click)="openFolder(folder.id)">
+              <!-- <td> -->
+              <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
+              <a class="no-underline">{{ folder.folderName }}</a>
+            </td>
+            <td>Folder</td>
+            <td></td>
+            <td>{{ folder.createdAt | date }}</td>
+            <td>{{ folder.updatedAt | date }}</td>
+            <td class="text-end">
+              <div class="d-flex justify-content-end align-items-center">
+                <div ngbDropdown>
+                  <i
+                    class="bi bi-three-dots-vertical"
+                    style="font-size: 30px; color: green;"
+                    ngbDropdownToggle
+                  ></i>
+                  <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                    <button ngbDropdownItem>
+                      <i class="bi bi-pencil-square"></i> Edit
+                    </button>
+                    <button
+                      ngbDropdownItem
+                      class="btn btn-outline-secondary me-2"
+                      (click)="pinFolder(folder)"
+                    >
+                      <i class="bi bi-pin-angle"></i> Pin
+                    </button>
+                    <button
+                      ngbDropdownItem
+                      class="delete-button"
+                      (click)="deleteFolder(folder.id != null ? folder.id : -1)"
+                    >
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+
         <tr *ngFor="let document of documents">
           <td>
             <ng-container [ngSwitch]="document.documentType">
@@ -40,16 +83,10 @@
               <i *ngSwitchCase="'EXCEL'" class="bi bi-filetype-xls me-2" style="font-size: 25px;"></i>
               <i *ngSwitchCase="'IMAGE'" class="bi bi-file-image me-2" style="font-size: 25px;"></i>
             </ng-container>
-       {{ document.documentName }}
+            {{ document.documentName }}
           </td>
-
           <td>{{ document.documentType }}</td>
           <td>{{ document.documentSize }} bytes</td>
-          <!-- <td>
-            <span [ngClass]="'badge ' + getApprovalStatus(document).badgeClass">
-              {{ getApprovalStatus(document).text }}
-            </span>
-          </td> -->
           <td>{{ document.createdAt | date }}</td>
           <td>{{ document.updatedAt | date }}</td>
           <td class="text-end">
@@ -57,12 +94,9 @@
               <div ngbDropdown>
                 <i class="bi bi-three-dots-vertical" style="font-size: 30px; color: green;" ngbDropdownToggle></i>
                 <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                  <button ngbDropdownItem >
+                  <button ngbDropdownItem>
                     <i class="bi bi-share-fill"></i> Share
                   </button>
-                  <!-- <button ngbDropdownItem>
-                    <i class="bi bi-files"></i> Duplicate
-                  </button> -->
                   <button ngbDropdownItem (click)="openModal(document)">
                     <i class="bi bi-pencil-square"></i> Edit
                   </button>
@@ -71,11 +105,10 @@
                   </button>
                   <button ngbDropdownItem (click)="viewDocument(document)">
                     <i class="bi bi-eye"></i> View
-                  </button> 
+                  </button>
                   <button ngbDropdownItem class="delete-button" (click)="deleteDocument(document.id)">
                     <i class="bi bi-trash"></i> Delete
                   </button>
-                  
                 </div>
               </div>
             </div>

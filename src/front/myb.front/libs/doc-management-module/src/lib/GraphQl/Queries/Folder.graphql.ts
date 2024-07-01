@@ -9,12 +9,12 @@ export const GET_ALL_FOLDERS = gql`
       parentId
       createdBy
       createdAt
-          updatedAt
+      updatedAt
       documents {
         documentName
         createdBy
         createdAt
-          updatedAt
+        updatedAt
       }
     }
   }
@@ -42,7 +42,36 @@ query getFolderById($id: Int!) {
             updatedAt
             file
           }
+          
         }
       }
 
+      
+
+`;
+
+export const GET_FOLDERS_BY_PARENT_ID = gql`
+  query getFoldersByParentId($parentId: Int!) {
+    foldersByParentId(parentId: $parentId) {
+      id
+      folderName
+      parentId
+      createdBy
+      createdAt
+      updatedAt
+      documents {
+        id
+        documentName
+        createdBy
+        editedBy
+        documentType
+        status
+        folderId
+        documentSize
+        createdAt
+        updatedAt
+        file
+      }
+    }
+  }
 `;

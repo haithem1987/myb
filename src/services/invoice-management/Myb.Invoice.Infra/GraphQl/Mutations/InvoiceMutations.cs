@@ -27,5 +27,16 @@ namespace Myb.Invoice.Infra.GraphQl.Mutations
 
         public Task<Product?> UpdateProduct([Service] IProductService productService, Product product) => productService.Update(product);
         public Task<Product?> DeleteProduct([Service] IProductService productService, int id) => productService.Delete(id);
+
+
+        public Task<ProductLine?> AddProductLine([Service] IProductLineService productLineService, ProductLine productLine) => productLineService.Add(productLine);
+
+        public Task<ProductLine?> UpdateProductLine([Service] IProductLineService productLineService, ProductLine productLine) => productLineService.Update(productLine);
+        public Task<ProductLine?> DeleteProductLine([Service] IProductLineService productLineService, int id) => productLineService.Delete(id);
+
+        public Task<Contact?> AddContact([Service] IContactService contactService, Contact contact) => contactService.Add(contact);
+
+        public Task<Contact?> UpdateContact([Service] IContactService contactService, Contact contact) => contactService.Update(contact);
+        public Task<Contact?> DeleteContatc([Service] IContactService contactService, int id) => contactService.Delete(id);
     }
 }

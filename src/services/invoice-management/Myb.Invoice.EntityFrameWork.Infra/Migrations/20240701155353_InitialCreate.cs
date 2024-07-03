@@ -39,6 +39,7 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     Name = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
                     Price = table.Column<double>(type: "double precision", nullable: true),
+                    Unit = table.Column<string>(type: "text", nullable: true),
                     ProductType = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -49,25 +50,26 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Contact",
+                name: "Contacts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Credentials = table.Column<string>(type: "text", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    ClientId = table.Column<int>(type: "integer", nullable: true),
+                    Credentials = table.Column<string>(type: "text", nullable: true),
+                    Type = table.Column<int>(type: "integer", nullable: true),
+                    ClientID = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Contact", x => x.Id);
+                    table.PrimaryKey("PK_Contacts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Contact_Clients_ClientId",
-                        column: x => x.ClientId,
+                        name: "FK_Contacts_Clients_ClientID",
+                        column: x => x.ClientID,
                         principalTable: "Clients",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -102,33 +104,38 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "T_Invoices_Products",
+                name: "ProductLines",
                 columns: table => new
                 {
-                    InvoicesId = table.Column<int>(type: "integer", nullable: false),
-                    ProductsId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ProductId = table.Column<int>(type: "integer", nullable: true),
+                    Quantity = table.Column<double>(type: "double precision", nullable: true),
+                    UnitPrice = table.Column<double>(type: "double precision", nullable: true),
+                    TotalPrice = table.Column<double>(type: "double precision", nullable: true),
+                    InvoiceID = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_T_Invoices_Products", x => new { x.InvoicesId, x.ProductsId });
+                    table.PrimaryKey("PK_ProductLines", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_T_Invoices_Products_Invoices_InvoicesId",
-                        column: x => x.InvoicesId,
+                        name: "FK_ProductLines_Invoices_InvoiceID",
+                        column: x => x.InvoiceID,
                         principalTable: "Invoices",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_T_Invoices_Products_Products_ProductsId",
-                        column: x => x.ProductsId,
+                        name: "FK_ProductLines_Products_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Contact_ClientId",
-                table: "Contact",
-                column: "ClientId");
+                name: "IX_Contacts_ClientID",
+                table: "Contacts",
+                column: "ClientID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Invoices_ClientID",
@@ -136,19 +143,24 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 column: "ClientID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_T_Invoices_Products_ProductsId",
-                table: "T_Invoices_Products",
-                column: "ProductsId");
+                name: "IX_ProductLines_InvoiceID",
+                table: "ProductLines",
+                column: "InvoiceID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductLines_ProductId",
+                table: "ProductLines",
+                column: "ProductId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Contact");
+                name: "Contacts");
 
             migrationBuilder.DropTable(
-                name: "T_Invoices_Products");
+                name: "ProductLines");
 
             migrationBuilder.DropTable(
                 name: "Invoices");

@@ -21,30 +21,29 @@ namespace Myb.Invoice.Services
 
         public async Task<InvoiceModel?> Delete(int id)
         {
-           var responce = await _invoiceRepository.DeleteAsync(id);
+            var responce = await _invoiceRepository.DeleteAsync(id);
             return responce.Entity;
         }
 
         public Task<IEnumerable<InvoiceModel?>> GetAll()
         {
-            return Task.FromResult<IEnumerable<InvoiceModel?>>( _invoiceRepository.GetAll());
+            return Task.FromResult<IEnumerable<InvoiceModel?>>(_invoiceRepository.GetAll());
         }
 
         public Task<InvoiceModel?> GetById(int id)
         {
-            return Task.FromResult<InvoiceModel?>( _invoiceRepository?.GetById(id));
+            return Task.FromResult<InvoiceModel?>(_invoiceRepository.GetById(id));
         }
 
         public Task<IEnumerable<InvoiceModel?>> GetByIds(IEnumerable<int?> ids)
         {
-            return Task.FromResult<IEnumerable<InvoiceModel?>>( _invoiceRepository.GetByIds(ids));
+            return Task.FromResult<IEnumerable<InvoiceModel?>>(_invoiceRepository.GetByIds(ids));
         }
 
         public async Task<InvoiceModel?> Update(InvoiceModel invoice)
         {
             var responce = await _invoiceRepository.UpdateAsync(invoice);
             return responce.Entity;
-            
         }
     }
 }

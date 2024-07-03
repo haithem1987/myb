@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace Myb.Invoice.Models
 {
-    public class Contact 
+    public class Contact : BaseEntity
     {
-        public string Credentials { get; set; }
-        public ContactType Type { get; set; }
+        public string? Credentials { get; set; }
+        public ContactType? Type { get; set; }
+        public int? ClientID { get; set; }
+        public virtual Client? Client { get; set; }
     }
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(InvoiceContext))]
-    [Migration("20240618173144_InitialCreate")]
+    [Migration("20240701155353_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -24,21 +24,6 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("InvoiceModelProduct", b =>
-                {
-                    b.Property<int>("InvoicesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("InvoicesId", "ProductsId");
-
-                    b.HasIndex("ProductsId");
-
-                    b.ToTable("T_Invoices_Products", (string)null);
-                });
 
             modelBuilder.Entity("Myb.Invoice.Models.Client", b =>
                 {
@@ -82,17 +67,16 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
-                    b.Property<int?>("ClientId")
+                    b.Property<int?>("ClientID")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Credentials")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Type")
+                    b.Property<int?>("Type")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -100,9 +84,9 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("ClientID");
 
-                    b.ToTable("Contact");
+                    b.ToTable("Contacts");
                 });
 
             modelBuilder.Entity("Myb.Invoice.Models.InvoiceModel", b =>
@@ -182,6 +166,9 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Property<int?>("ProductType")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Unit")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -190,26 +177,52 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("InvoiceModelProduct", b =>
+            modelBuilder.Entity("Myb.Invoice.Models.ProductLine", b =>
                 {
-                    b.HasOne("Myb.Invoice.Models.InvoiceModel", null)
-                        .WithMany()
-                        .HasForeignKey("InvoicesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.HasOne("Myb.Invoice.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("InvoiceID")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<double?>("Quantity")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("TotalPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("UnitPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvoiceID");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductLines");
                 });
 
             modelBuilder.Entity("Myb.Invoice.Models.Contact", b =>
                 {
-                    b.HasOne("Myb.Invoice.Models.Client", null)
+                    b.HasOne("Myb.Invoice.Models.Client", "Client")
                         .WithMany("Contacts")
-                        .HasForeignKey("ClientId");
+                        .HasForeignKey("ClientID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("Myb.Invoice.Models.InvoiceModel", b =>
@@ -222,11 +235,36 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Navigation("Client");
                 });
 
+            modelBuilder.Entity("Myb.Invoice.Models.ProductLine", b =>
+                {
+                    b.HasOne("Myb.Invoice.Models.InvoiceModel", "Invoice")
+                        .WithMany("Products")
+                        .HasForeignKey("InvoiceID");
+
+                    b.HasOne("Myb.Invoice.Models.Product", "Product")
+                        .WithMany("ProductLines")
+                        .HasForeignKey("ProductId");
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Myb.Invoice.Models.Client", b =>
                 {
                     b.Navigation("Contacts");
 
                     b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("Myb.Invoice.Models.InvoiceModel", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Myb.Invoice.Models.Product", b =>
+                {
+                    b.Navigation("ProductLines");
                 });
 #pragma warning restore 612, 618
         }

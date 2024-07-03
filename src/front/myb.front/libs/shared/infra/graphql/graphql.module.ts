@@ -38,7 +38,7 @@ import { onError } from '@apollo/client/link/error';
             addTypename: false, // This is default, adds __typename automatically on read
           }),
           link: httpLink.create({
-            uri: 'http://localhost:5059/graphql/',
+            uri: 'http://localhost:5059/graphql',
             //uri: 'http://localhost:5117/graphql',
             //  uri: 'http://localhost:5145/graphql/',
           }),

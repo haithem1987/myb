@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(TimesheetContext))]
-    [Migration("20240612170809_updateProject")]
-    partial class updateProject
+    [Migration("20240702230631_addApprovaStatus")]
+    partial class addApprovaStatus
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -163,14 +163,20 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("EmployeeName")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("boolean");
-
                     b.Property<int>("ProjectId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ProjectName")
                         .HasColumnType("text");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TimeUnit")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

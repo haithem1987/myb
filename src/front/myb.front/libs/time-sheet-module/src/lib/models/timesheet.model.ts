@@ -1,15 +1,25 @@
-import { BaseModel } from './base.model';
-import { Employee } from './employee';
-import { Project } from './project.model';
+import { BaseModel } from 'libs/shared/infra/models/base.model';
 
+export enum TimeUnit {
+  HOUR = 'HOUR',
+  DAY = 'DAY',
+  MONTH = 'MONTH',
+}
+export enum ApprovalStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
 export interface Timesheet extends BaseModel {
   date: Date | null;
   workedHours: number;
   description?: string;
-  isApproved: boolean;
-  employeeId: number;
+  status: ApprovalStatus;
+  employeeId?: number | null;
+  quantity?: number;
   employeeName?: string;
   projectId: number;
   projectName?: string;
-  userId?: string;
+  userId?: string | null;
+  timeUnit: TimeUnit;
 }

@@ -45,7 +45,7 @@ public class ProjectService:IProjectService
     {
         try
         {
-            await _projectRepository.UpdateAsync(project);
+            await _projectRepository.InsertAsync(project);
             return project;
         }
         catch (Exception ex)

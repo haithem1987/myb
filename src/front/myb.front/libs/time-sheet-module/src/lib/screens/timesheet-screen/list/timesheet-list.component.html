@@ -1,27 +1,15 @@
-<div class="container my-4">
+<div *ngIf="isLoading" class="text-center">
+  <p>Loading...</p>
+</div>
+<div *ngIf="!isLoading" class="container my-4">
   <div class="d-flex justify-content-between mb-3">
     <h2 class="mb-0 w-50" style="color: var(--bs-darklight)">
       Timesheet Manager
     </h2>
-    <input
-      type="text"
-      class="form-control mb-3"
-      placeholder="Search timesheets..."
-      [(ngModel)]="searchTerm"
-      (keyup)="filterTimesheets()"
-    />
   </div>
 
-  <div class="mb-3">
+  <div class="mb-3 d-flex justify-content-between align-items-center">
     <div class="btn-group" ngbButtonGroup>
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        [class.active]="selectedPeriod === 'day'"
-        (click)="setPeriod('day')"
-      >
-        Day
-      </button>
       <button
         type="button"
         class="btn btn-outline-primary"
@@ -29,6 +17,9 @@
         (click)="setPeriod('week')"
       >
         Week
+        <span class="badge bg-danger ms-1">{{
+          getTotalQuantitiesForPeriod('week')
+        }}</span>
       </button>
       <button
         type="button"
@@ -37,50 +28,74 @@
         (click)="setPeriod('month')"
       >
         Month
+        <span class="badge bg-danger ms-1">{{
+          getTotalQuantitiesForPeriod('month')
+        }}</span>
+      </button>
+    </div>
+
+    <div class="text-end mt-3">
+      <button
+        class="btn btn-primary fw-bold text-uppercase"
+        (click)="saveAllChanges()"
+      >
+        Valider
       </button>
     </div>
   </div>
 
-  <div *ngFor="let group of groupedTimesheets$ | async | keyvalue">
-    <h3>{{ group.key }}</h3>
-    <div class="card pt-2 table-responsive">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Project</th>
-            <th class="text-center" *ngFor="let date of dateRange">
-              <div class="text-muted fw-light">{{ date.weekday }}</div>
-              <div>{{ date.day }}</div>
-            </th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let timesheet of group.value; trackBy: trackByTimesheet">
-            <td>{{ timesheet.projectName }}</td>
-            <td
-              class="text-center"
-              style="width: 100px"
-              *ngFor="let date of dateRange; trackBy: trackByDate"
-              [ngClass]="{ 'bg-light text-muted': isWeekend(date) }"
-            >
-              <ng-container *ngIf="!isWeekend(date)">
-                <input
-                  type="number"
-                  class="form-control text-center"
-                  [value]="
-                    getHoursForDate(timesheet.id, date.weekday + ' ' + date.day)
-                  "
-                  (input)="onHoursChange(timesheet.id, date, $event)"
-                />
-              </ng-container>
-            </td>
-            <td>
-              <!-- Action buttons can be added here -->
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="card table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th
+            class="text-center"
+            [ngClass]="{ 'bg-light': isWeekend(date) }"
+            *ngFor="let date of dateRange; trackBy: trackByDate"
+          >
+            <div class="text-muted fw-light">{{ date.weekday }}</div>
+            <div>{{ date.day }}</div>
+          </th>
+          <th class="total-column">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let project of projects$ | async; trackBy: trackByProject">
+          <td style="min-width: 300px">{{ project.projectName }}</td>
+          <td
+            class="text-center"
+            style="width: 80px"
+            *ngFor="let date of dateRange; trackBy: trackByDate"
+            [ngClass]="{ 'bg-light text-muted': isWeekend(date) }"
+          >
+            <ng-container *ngIf="!isWeekend(date); else weekend">
+              <input
+                type="number"
+                class="form-control text-center"
+                style="width: 60px"
+                [value]="
+                  getQuantityForDate(project.id, date.weekday + ' ' + date.day)
+                "
+                (input)="onQuantityChange(project.id, date, $event)"
+                [disabled]="isPending(project, date)"
+              />
+            </ng-container>
+            <ng-template #weekend>
+              <div style="width: 60px"></div>
+            </ng-template>
+          </td>
+          <td class="total-column text-end">
+            <myb-front-progress-bar
+              [value]="getTotalQuantityForProject(project.id)"
+              type="success"
+              height="8px"
+              [max]="5"
+            ></myb-front-progress-bar>
+            {{ getTotalQuantityForProject(project.id) }} / 5
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

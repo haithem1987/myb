@@ -1,53 +1,53 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { Router } from '@angular/router';
-import { Timesheet } from '../../../models/timesheet.model';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TimesheetService } from '../../../services/timesheet.service';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
-import { debounceTime, tap } from 'rxjs/operators';
 import {
   NgbDropdownConfig,
   NgbDropdownModule,
   NgbModal,
 } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { Project } from '../../../models/project.model';
+import {
+  ApprovalStatus,
+  TimeUnit,
+  Timesheet,
+} from '../../../models/timesheet.model';
+import { ProjectService } from '../../../services/project.service';
+import { TimesheetService } from '../../../services/timesheet.service';
+import { TimesheetEditComponent } from '../edit/timesheet-edit.component';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
-import { CommonModule } from '@angular/common';
-import { TimesheetEditComponent } from '../edit/timesheet-edit.component';
+import { ProgressBarComponent } from 'libs/shared/shared-ui/src';
 
 @Component({
   selector: 'myb-timesheet-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgbDropdownModule],
+  imports: [CommonModule, FormsModule, NgbDropdownModule, ProgressBarComponent],
   providers: [NgbDropdownConfig],
   templateUrl: './timesheet-list.component.html',
   styleUrls: ['./timesheet-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimesheetListComponent implements OnInit {
-  timesheets$: Observable<Timesheet[]> = this.timesheetService.timesheets$;
+  projects$: Observable<Project[]> = this.projectService.projects$;
   userId$: Observable<string | null> = this.keycloakService.userId$;
   updatedTimesheets: Timesheet[] = [];
-  private groupedTimesheetsSubject = new BehaviorSubject<{
-    [key: string]: Timesheet[];
-  }>({});
-  groupedTimesheets$ = this.groupedTimesheetsSubject.asObservable();
   searchTerm: string = '';
-  sortColumn: string = '';
-  sortDirection: 'asc' | 'desc' | '' = '';
-  workingHoursPerDay: number = 8;
-  selectedPeriod: 'day' | 'week' | 'month' = 'week';
+  userId: string | null = '';
+  isLoading = true;
+  selectedPeriod: 'week' | 'month' = 'week';
   dateRange: { weekday: string; day: string }[] = [];
-  timesheetHours: { [key: string]: number } = {};
-  hoursChange: Subject<{
-    timesheetId: number;
+  timesheetQuantities: { [key: string]: number } = {};
+  quantityChange: Subject<{
+    projectId: number;
     date: { weekday: string; day: string };
-    hours: number;
+    quantity: number;
   }> = new Subject();
 
   constructor(
-    private router: Router,
     private timesheetService: TimesheetService,
+    private projectService: ProjectService,
     private keycloakService: KeycloakService,
     private toastService: ToastService,
     private modalService: NgbModal,
@@ -56,30 +56,30 @@ export class TimesheetListComponent implements OnInit {
     config.placement = 'left-start';
     config.autoClose = true;
 
-    this.hoursChange
+    this.quantityChange
       .pipe(debounceTime(300))
-      .subscribe(({ timesheetId, date, hours }) => {
-        const key = `${timesheetId}-${date.weekday} ${date.day}`;
-        this.timesheetHours[key] = hours;
+      .subscribe(({ projectId, date, quantity }) => {
+        const key = `${projectId}-${date.weekday} ${date.day}`;
+        this.timesheetQuantities[key] = quantity;
       });
   }
 
   ngOnInit(): void {
-    this.timesheets$.subscribe((timesheets) => {
-      this.updatedTimesheets = timesheets;
+    this.projects$.subscribe(() => {
       this.refreshView();
     });
     this.userId$.subscribe((userId) => {
-      if (!userId) return;
-      this.timesheetService
-        .getTimesheetsByUserId(userId)
-        .pipe(
-          tap((timesheets) => {
+      this.userId = userId;
+      if (userId) {
+        this.timesheetService
+          .getTimesheetsByUserId(userId)
+          .subscribe((timesheets) => {
             this.updatedTimesheets = timesheets;
+            this.populateTimesheetQuantities(timesheets);
+            this.isLoading = false;
             this.refreshView();
-          })
-        )
-        .subscribe();
+          });
+      }
     });
   }
 
@@ -87,48 +87,15 @@ export class TimesheetListComponent implements OnInit {
     return date.weekday + ' ' + date.day;
   }
 
-  trackByTimesheet(index: number, timesheet: Timesheet) {
-    return timesheet.id;
-  }
-
-  groupByPeriod(
-    timesheets: Timesheet[],
-    period: string
-  ): { [key: string]: Timesheet[] } {
-    const grouped: { [key: string]: Timesheet[] } = {};
-    timesheets.forEach((timesheet) => {
-      const date = timesheet.date ? new Date(timesheet.date) : new Date();
-      let key!: string;
-
-      if (period === 'day') {
-        key = date.toDateString();
-      } else if (period === 'week') {
-        const startOfWeek = new Date(
-          date.setDate(date.getDate() - date.getDay())
-        );
-        key = startOfWeek.toDateString();
-      } else if (period === 'month') {
-        key = `${date.getFullYear()}-${date.getMonth() + 1}`;
-      }
-
-      if (!grouped[key]) {
-        grouped[key] = [];
-      }
-      grouped[key].push(timesheet);
-    });
-    return grouped;
+  trackByProject(index: number, project: Project) {
+    return project.id;
   }
 
   calculateDateRange(): void {
     const today = new Date();
     this.dateRange = [];
 
-    if (this.selectedPeriod === 'day') {
-      this.dateRange.push({
-        weekday: today.toLocaleDateString(undefined, { weekday: 'short' }),
-        day: today.getDate().toString(),
-      });
-    } else if (this.selectedPeriod === 'week') {
+    if (this.selectedPeriod === 'week') {
       const startOfWeek = new Date(
         today.setDate(today.getDate() - today.getDay())
       );
@@ -164,52 +131,172 @@ export class TimesheetListComponent implements OnInit {
 
   refreshView(): void {
     this.calculateDateRange();
-    const groupedTimesheets = this.groupByPeriod(
-      this.updatedTimesheets,
-      this.selectedPeriod
-    );
-    this.groupedTimesheetsSubject.next(groupedTimesheets);
   }
 
-  onPeriodChange(): void {
+  getQuantityForDate(projectId: number, date: string): number {
+    const key = `${projectId}-${date}`;
+    return this.timesheetQuantities[key] || 0;
+  }
+
+  onQuantityChange(
+    projectId: number,
+    date: { weekday: string; day: string },
+    event: Event
+  ): void {
+    const inputElement = event.target as HTMLInputElement;
+    const quantity = Number(inputElement.value);
+    this.quantityChange.next({ projectId, date, quantity });
+  }
+
+  setPeriod(period: 'week' | 'month'): void {
+    this.selectedPeriod = period;
     this.refreshView();
   }
 
-  getHoursForDate(timesheetId: number, date: string): number {
-    const key = `${timesheetId}-${date}`;
-    return this.timesheetHours[key] || 0;
+  populateTimesheetQuantities(timesheets: Timesheet[]): void {
+    this.timesheetQuantities = {};
+    timesheets.forEach((timesheet) => {
+      const date = new Date(timesheet.date || new Date());
+      const dateKey = `${timesheet.projectId}-${date.toLocaleDateString(
+        undefined,
+        {
+          weekday: 'short',
+        }
+      )} ${date.getDate()}`;
+      this.timesheetQuantities[dateKey] = timesheet.quantity || 0;
+    });
   }
 
-  addTimesheet(): void {
-    this.router.navigate(['/timesheet/add']);
-  }
+  getTotalQuantitiesForPeriod(period: 'week' | 'month'): number {
+    const totalQuantities = this.updatedTimesheets.reduce(
+      (total, timesheet) => {
+        const timesheetDate = new Date(timesheet.date || new Date());
+        const today = new Date();
 
-  approveTimeSheet(timesheet: Timesheet): void {
-    const updatedTimesheet = {
-      ...timesheet,
-      isApproved: !timesheet.isApproved,
-    };
-    this.timesheetService
-      .update(timesheet.id, updatedTimesheet)
-      .subscribe(() => {
-        this.toastService.show(
-          `Timesheet ${
-            updatedTimesheet.isApproved ? 'approved' : 'disapproved'
-          } successfully`,
-          {
-            classname: 'toast-success',
+        if (period === 'week') {
+          const startOfWeek = new Date(
+            today.setDate(today.getDate() - today.getDay())
+          );
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+          if (timesheetDate >= startOfWeek && timesheetDate <= endOfWeek) {
+            return total + (timesheet.quantity || 0);
           }
-        );
-        this.refreshView();
-      });
+        } else if (period === 'month') {
+          const startOfMonth = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            1
+          );
+          const endOfMonth = new Date(
+            today.getFullYear(),
+            today.getMonth() + 1,
+            0
+          );
+
+          if (timesheetDate >= startOfMonth && timesheetDate <= endOfMonth) {
+            return total + (timesheet.quantity || 0);
+          }
+        }
+        return total;
+      },
+      0
+    );
+
+    return totalQuantities;
   }
+
+  saveAllChanges(): void {
+    const timesheetUpdates: Timesheet[] = [];
+
+    for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
+      const [projectIdStr, dateStr] = key.split('-');
+      const projectId = Number(projectIdStr);
+      const dateParts = dateStr.split(' ');
+      const date = new Date();
+      date.setDate(Number(dateParts[1]));
+
+      let timesheet = this.updatedTimesheets.find(
+        (t: any) =>
+          t.projectId === projectId &&
+          new Date(t.date).getDate() === date.getDate()
+      );
+
+      if (!timesheet) {
+        const newTimesheet: Timesheet = {
+          id: 0,
+          date,
+          workedHours: 0,
+          description: '',
+          status: ApprovalStatus.PENDING,
+          employeeId: 0,
+          projectId,
+          quantity,
+          employeeName: '',
+          projectName: '',
+          userId: this.userId,
+          timeUnit: TimeUnit.DAY,
+        };
+        this.updatedTimesheets = [...this.updatedTimesheets, newTimesheet];
+        timesheet = newTimesheet;
+      } else {
+        timesheet = { ...timesheet, quantity };
+        this.updatedTimesheets = this.updatedTimesheets.map((t) =>
+          t.id === timesheet?.id ? timesheet : t
+        );
+      }
+
+      timesheetUpdates.push(timesheet);
+    }
+
+    if (timesheetUpdates.length > 0) {
+      this.timesheetService
+        .updateMultipleTimesheets(timesheetUpdates)
+        .subscribe(() => {
+          console.log('updateMultipleTimesheets response');
+          this.toastService.show('All changes saved successfully', {
+            classname: 'toast-success',
+          });
+          this.refreshView();
+        });
+    }
+  }
+
+  getTotalQuantityForProject(projectId: number): number {
+    let total = 0;
+    for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
+      if (key.startsWith(`${projectId}-`)) {
+        total += quantity;
+      }
+    }
+    return total;
+  }
+
+  // approveTimeSheet(timesheet: Timesheet): void {
+  //   const updatedTimesheet = {
+  //     ...timesheet,
+  //     isApproved: !timesheet.isApproved,
+  //   };
+  //   this.timesheetService
+  //     .update(timesheet.id, updatedTimesheet)
+  //     .subscribe(() => {
+  //       this.toastService.show(
+  //         `Timesheet ${
+  //           updatedTimesheet.isApproved ? 'approved' : 'disapproved'
+  //         } successfully`,
+  //         { classname: 'toast-success' }
+  //       );
+  //       this.refreshView();
+  //     });
+  // }
 
   editTimeSheet(id: number): void {
     const timesheet = this.updatedTimesheets.find((t) => t.id === id);
-    if (!timesheet) return;
-
-    const modalRef = this.modalService.open(TimesheetEditComponent);
-    modalRef.componentInstance.timesheet = timesheet;
+    if (timesheet) {
+      const modalRef = this.modalService.open(TimesheetEditComponent);
+      modalRef.componentInstance.timesheet = timesheet;
+    }
   }
 
   deleteTimeSheet(id: number): void {
@@ -225,69 +312,30 @@ export class TimesheetListComponent implements OnInit {
       });
     }
   }
+  isPending(project: Project, date: { weekday: string; day: string }): boolean {
+    const targetDate = new Date();
+    targetDate.setDate(Number(date.day));
+    targetDate.setMonth(new Date().getMonth());
 
-  private sortTimesheets(): void {
-    if (!this.sortColumn || this.sortDirection === '') {
-      this.updatedTimesheets = [...this.updatedTimesheets];
-    } else {
-      this.updatedTimesheets.sort((a: any, b: any) => {
-        let valueA = a[this.sortColumn];
-        let valueB = b[this.sortColumn];
+    const timesheet = this.updatedTimesheets.find(
+      (ts: Timesheet) =>
+        ts.projectId === project.id &&
+        new Date(ts.date || new Date()).toDateString() ===
+          targetDate.toDateString()
+    );
 
-        if (typeof valueA === 'string') {
-          valueA = valueA.toLowerCase();
-          valueB = valueB.toLowerCase();
-        }
-
-        if (this.sortDirection === 'asc') {
-          return valueA > valueB ? 1 : -1;
-        } else {
-          return valueA < valueB ? 1 : -1;
-        }
-      });
-    }
-    this.refreshView();
+    return timesheet ? timesheet.status === ApprovalStatus.PENDING : false;
   }
+  // getApprovalStatus(timesheet: Timesheet): {
+  //   text: string;
+  //   badgeClass: string;
+  // } {
+  //   return timesheet.isApproved
+  //     ? { text: 'Approuvé', badgeClass: 'bg-success' }
+  //     : { text: 'En attente', badgeClass: 'bg-warning' };
+  // }
 
-  getApprovalStatus(timesheet: Timesheet): {
-    text: string;
-    badgeClass: string;
-  } {
-    return timesheet.isApproved
-      ? { text: 'Approuvé', badgeClass: 'bg-success' }
-      : { text: 'En attente', badgeClass: 'bg-warning' };
-  }
   isWeekend(date: { weekday: string; day: string }): boolean {
-    // console.log('day', date.weekday);
-    // const fullDateStr = `${date.weekday} ${date.day}, 2024`; // Adjust the year as necessary
-    // const dateObj = new Date(fullDateStr);
-    // const dayIndex = dateObj.getDay();
-    return date.weekday === 'Sun' || date.weekday === 'Sat'; // 0 = Sunday, 6 = Saturday
-  }
-  onHoursChange(
-    timesheetId: number,
-    date: { weekday: string; day: string },
-    event: Event
-  ): void {
-    const inputElement = event.target as HTMLInputElement;
-    const hours = Number(inputElement.value);
-    this.hoursChange.next({ timesheetId, date, hours });
-  }
-  setPeriod(period: 'day' | 'week' | 'month'): void {
-    this.selectedPeriod = period;
-    this.refreshView();
-  }
-  filterTimesheets(): void {
-    // Implement filtering logic
-  }
-
-  onSort(column: string): void {
-    if (this.sortColumn === column) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.sortColumn = column;
-      this.sortDirection = 'asc';
-    }
-    this.sortTimesheets();
+    return date.weekday === 'Sun' || date.weekday === 'Sat';
   }
 }

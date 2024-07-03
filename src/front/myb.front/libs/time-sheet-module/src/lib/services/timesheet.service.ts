@@ -67,6 +67,32 @@ export class TimesheetService extends RepositoryService<Timesheet> {
       );
   }
 
+  updateMultipleTimesheets(timesheets: Timesheet[]): Observable<Timesheet[]> {
+    return this.apollo
+      .mutate<{ updateMultipleTimesheets: Timesheet[] }>({
+        mutation: gql`
+          ${this.typeOperations.updateMultipleTimesheets}
+        `,
+        variables: { timesheets },
+      })
+      .pipe(
+        map((result: any) => {
+          const updatedTimesheets = result.data.updateMultipleTimesheets;
+          // Make a mutable copy of the existing timesheets
+          const existingTimesheets = [...this.timesheetSubject.value];
+          updatedTimesheets.forEach((updated: Timesheet) => {
+            const index = existingTimesheets.findIndex(
+              (ts) => ts.id === updated.id
+            );
+            if (index !== -1) {
+              existingTimesheets[index] = updated;
+            }
+          });
+          this.timesheetSubject.next(existingTimesheets);
+          return updatedTimesheets;
+        })
+      );
+  }
   override getAll(): Observable<Timesheet[]> {
     return super.getAll().pipe(
       map((timesheets) => {

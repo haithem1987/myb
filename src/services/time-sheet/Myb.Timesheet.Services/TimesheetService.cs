@@ -20,15 +20,32 @@ public class TimesheetService:ITimesheetService
     {
         try
         {
-            await _timesheetRepository.UpdateAsync(timesheet);
-            return timesheet;
+            // Attempt to insert the new timesheet
+            var result = await _timesheetRepository.InsertAsync(timesheet);
+
+            // Check if the insertion was successful
+            if (result.Entity == null)
+            {
+                _logger.LogError("Failed to create timesheet: {Errors}", string.Join(", ", result.Errors));
+                throw new Exception("Failed to create timesheet: " + string.Join(", ", result.Errors));
+            }
+
+            return result.Entity;
+        }
+        catch (ArgumentNullException argEx)
+        {
+            // Handle argument null exceptions specifically
+            _logger.LogError(argEx, "Argument null error while adding new timesheet: {Message}", argEx.Message);
+            throw new Exception("Required information is missing for adding a new timesheet. Please ensure all fields are filled correctly.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error adding new timesheet");
-            throw;
+            // General exception handling
+            _logger.LogError(ex, "Unexpected error while adding new timesheet: {Message}", ex.Message);
+            throw new Exception("An unexpected error occurred while adding the new timesheet. Please try again or contact support if the problem persists.");
         }
     }
+
 
     public Task<TimeSheet> GetTimeSheetAsync(int timesheetId)
     {
@@ -119,4 +136,55 @@ public class TimesheetService:ITimesheetService
             throw;
         }
     }
+ public async Task<List<TimeSheet>> UpdateMultipleTimesheetsAsync(List<TimeSheet> timesheets)
+{
+    var updatedTimesheets = new List<TimeSheet>();
+
+    try
+    {
+        foreach (var timesheet in timesheets)
+        {
+            if (timesheet.Id == 0)
+            {
+                var newTimesheet = timesheet;
+                newTimesheet.Id = null;
+                
+                // New timesheet, create it
+                var createdTimesheetResult = await _timesheetRepository.InsertAsync(newTimesheet);
+                if (createdTimesheetResult.Entity != null)
+                {
+                    updatedTimesheets.Add(createdTimesheetResult.Entity);
+                }
+                else
+                {
+                    _logger.LogError("Error creating timesheet: {Errors}", string.Join(", ", createdTimesheetResult.Errors));
+                    throw new Exception("Error creating timesheet: " + string.Join(", ", createdTimesheetResult.Errors));
+                }
+            }
+            else
+            {
+                // Existing timesheet, update it
+                var updateResult = await _timesheetRepository.UpdateAsync(timesheet);
+                if (updateResult.Entity != null)
+                {
+                    updatedTimesheets.Add(updateResult.Entity);
+                }
+                else
+                {
+                    _logger.LogError("Error updating timesheet: {Errors}", string.Join(", ", updateResult.Errors));
+                    throw new Exception("Error updating timesheet: " + string.Join(", ", updateResult.Errors));
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error updating multiple timesheets");
+        throw;
+    }
+
+    return updatedTimesheets;
+}
+
+
 }

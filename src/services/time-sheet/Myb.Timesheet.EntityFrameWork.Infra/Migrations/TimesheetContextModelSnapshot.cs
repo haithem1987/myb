@@ -160,14 +160,20 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("EmployeeName")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("boolean");
-
                     b.Property<int>("ProjectId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ProjectName")
                         .HasColumnType("text");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TimeUnit")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

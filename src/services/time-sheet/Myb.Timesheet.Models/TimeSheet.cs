@@ -6,8 +6,10 @@ public class TimeSheet:BaseEntity
 {
     public DateTime Date { get; set; }
     public float WorkedHours { get; set; }
+    public int? Quantity { get; set; } = 0;
+    public TimeUnit? TimeUnit { get; set; } 
     public string? Description { get; set; }
-    public bool IsApproved { get; set; }
+    public ApprovalStatus Status { get; set; }
     //public Status Status { get; set; }
 
     

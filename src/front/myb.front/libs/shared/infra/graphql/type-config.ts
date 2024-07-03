@@ -46,6 +46,7 @@ import {
 import {
   CREATE_TIMESHEET,
   DELETE_TIMESHEET,
+  UPDATE_MULTIPLE_TIMESHEETS,
   UPDATE_TIMESHEET,
 } from '../../../time-sheet-module/src/lib/graphql/mutations/timesheet.graphql';
 import {
@@ -87,6 +88,7 @@ export const typeConfig: { [key: string]: any } = {
     delete: DELETE_TIMESHEET,
     getTimesheetsByUserId: GET_TIMESHEETS_BY_USER_ID,
     getTimesheetsByEmployeeId: GET_TIMESHEETS_BY_EMPLOYEE_ID,
+    updateMultipleTimesheets: UPDATE_MULTIPLE_TIMESHEETS,
   },
   Task: {
     getAll: GET_ALL_TASKS,

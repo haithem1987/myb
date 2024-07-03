@@ -17,6 +17,11 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
         {
             return await timesheetService.UpdateTimeSheetAsync(timeSheet);
         }
+        
+        public async Task<List<TimeSheet>> UpdateMultipleTimesheets([Service] ITimesheetService timesheetService, List<TimeSheet> timesheets)
+        {
+            return await timesheetService.UpdateMultipleTimesheetsAsync(timesheets);
+        }
 
         public async Task<bool> DeleteTimesheet([Service] ITimesheetService timesheetService, int id)
         {

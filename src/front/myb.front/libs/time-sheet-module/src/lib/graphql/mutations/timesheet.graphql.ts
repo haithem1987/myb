@@ -6,9 +6,10 @@ export const CREATE_TIMESHEET = `
       description
       employeeId
       id
-      isApproved
+      status
       projectId
       updatedAt
+      quantity
       userId
       workedHours
       employeeName
@@ -25,13 +26,32 @@ export const UPDATE_TIMESHEET = `
       description
       employeeId
       id
-      isApproved
+      status
       projectId
       updatedAt
+      quantity
       userId
       workedHours
       employeeName
       projectName
+    }
+  }
+`;
+
+export const UPDATE_MULTIPLE_TIMESHEETS = `
+  mutation UpdateMultipleTimesheets($timesheets: [TimeSheetInput!]!) {
+    updateMultipleTimesheets(timesheets: $timesheets) {
+      id
+      date
+      workedHours
+      description
+      status
+      employeeId
+      quantity
+      employeeName
+      projectId
+      projectName
+      userId
     }
   }
 `;

@@ -44,7 +44,7 @@ public class TimesheetContext:DbContext
         
         modelBuilder.Entity<TimeSheet>(entity =>
         {
-            entity.HasKey(ts => ts.Id);
+           
             entity.HasOne(ts => ts.Employee)
                 .WithMany(te => te.Timesheets)
                 .HasForeignKey(te => te.EmployeeId)

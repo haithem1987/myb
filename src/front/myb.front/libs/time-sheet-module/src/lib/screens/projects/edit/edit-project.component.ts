@@ -48,7 +48,7 @@ export class EditProjectComponent implements OnInit {
       startDate: [null, Validators.required],
       endDate: [null],
       userId: ['1', Validators.required],
-      status: ['COMPLETED'],
+      status: ['ACTIVE'],
       createdAt: [null],
       updatedAt: [null],
     });

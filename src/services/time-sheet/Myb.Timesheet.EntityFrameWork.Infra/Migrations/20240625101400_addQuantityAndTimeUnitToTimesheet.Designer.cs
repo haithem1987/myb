@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(TimesheetContext))]
-    [Migration("20240610082947_timeoff")]
-    partial class timeoff
+    [Migration("20240625101400_addQuantityAndTimeUnitToTimesheet")]
+    partial class addQuantityAndTimeUnitToTimesheet
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,19 +39,11 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("Department")
                         .HasColumnType("text");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)");
-
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
                     b.Property<string>("ManagerId")
                         .HasColumnType("text");
-
-                    b.Property<int?>("ManagerId1")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -67,13 +59,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ManagerId1");
-
                     b.ToTable("Employees", (string)null);
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Employee");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Myb.Timesheet.Models.Project", b =>
@@ -97,8 +83,11 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("StartDate")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -183,6 +172,12 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("ProjectName")
                         .HasColumnType("text");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TimeUnit")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -252,20 +247,6 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("Myb.Timesheet.Models.Manager", b =>
-                {
-                    b.HasBaseType("Myb.Timesheet.Models.Employee");
-
-                    b.HasDiscriminator().HasValue("Manager");
-                });
-
-            modelBuilder.Entity("Myb.Timesheet.Models.Employee", b =>
-                {
-                    b.HasOne("Myb.Timesheet.Models.Manager", null)
-                        .WithMany("Employees")
-                        .HasForeignKey("ManagerId1");
-                });
-
             modelBuilder.Entity("Myb.Timesheet.Models.TimeOff", b =>
                 {
                     b.HasOne("Myb.Timesheet.Models.Employee", "Employee")
@@ -326,11 +307,6 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Navigation("Tasks");
 
                     b.Navigation("Timesheets");
-                });
-
-            modelBuilder.Entity("Myb.Timesheet.Models.Manager", b =>
-                {
-                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

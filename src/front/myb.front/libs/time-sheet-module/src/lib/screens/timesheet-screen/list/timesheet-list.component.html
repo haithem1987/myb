@@ -54,6 +54,15 @@
             [ngClass]="{ 'bg-light': isWeekend(date) }"
             *ngFor="let date of dateRange; trackBy: trackByDate"
           >
+            <div class="position-relative">
+              <span
+                *ngIf="handleHoliday(date).isHoliday"
+                class="holiday-badge bg-danger border border-light rounded-circle"
+                [ngbTooltip]="handleHoliday(date).name"
+              >
+                <span class="visually-hidden">New alerts</span>
+              </span>
+            </div>
             <div class="text-muted fw-light">{{ date.weekday }}</div>
             <div>{{ date.day }}</div>
           </th>
@@ -67,9 +76,9 @@
             class="text-center"
             style="width: 80px"
             *ngFor="let date of dateRange; trackBy: trackByDate"
-            [ngClass]="{ 'bg-light text-muted': isWeekend(date) }"
+            [ngClass]="{ 'bg-light text-muted': isWeekend(date), }"
           >
-            <ng-container *ngIf="!isWeekend(date); else weekend">
+            <ng-container>
               <input
                 type="number"
                 class="form-control text-center"
@@ -77,13 +86,13 @@
                 [value]="
                   getQuantityForDate(project.id, date.weekday + ' ' + date.day)
                 "
+                [ngClass]="{
+                  'holiday-disabled': handleHoliday(date).isHoliday
+                }"
                 (input)="onQuantityChange(project.id, date, $event)"
-                [disabled]="isPending(project, date)"
+                [disabled]="handleHoliday(date).isHoliday"
               />
             </ng-container>
-            <ng-template #weekend>
-              <div style="width: 60px"></div>
-            </ng-template>
           </td>
           <td class="total-column text-end">
             <myb-front-progress-bar

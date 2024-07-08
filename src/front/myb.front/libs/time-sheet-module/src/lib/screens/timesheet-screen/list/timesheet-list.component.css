@@ -5,3 +5,16 @@
   z-index: 1;
   width: 100px;
 }
+
+.holiday-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  z-index: 1000;
+}
+.holiday-disabled {
+  background-color: #845bba40 !important;
+  color: #000; /* Change the text color if needed */
+}

@@ -5,6 +5,7 @@ import {
   NgbDropdownConfig,
   NgbDropdownModule,
   NgbModal,
+  NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -19,12 +20,21 @@ import { TimesheetService } from '../../../services/timesheet.service';
 import { TimesheetEditComponent } from '../edit/timesheet-edit.component';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
-import { ProgressBarComponent } from 'libs/shared/shared-ui/src';
+import {
+  HolidayService,
+  ProgressBarComponent,
+} from 'libs/shared/shared-ui/src';
 
 @Component({
   selector: 'myb-timesheet-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgbDropdownModule, ProgressBarComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NgbDropdownModule,
+    ProgressBarComponent,
+    NgbTooltip,
+  ],
   providers: [NgbDropdownConfig],
   templateUrl: './timesheet-list.component.html',
   styleUrls: ['./timesheet-list.component.css'],
@@ -37,11 +47,13 @@ export class TimesheetListComponent implements OnInit {
   userId: string | null = '';
   isLoading = true;
   selectedPeriod: 'week' | 'month' = 'week';
-  dateRange: { weekday: string; day: string }[] = [];
+  dateRange: { weekday: string; day: string; month: string; year: string }[] =
+    [];
   timesheetQuantities: { [key: string]: number } = {};
+  holidays: { [date: string]: string } = {};
   quantityChange: Subject<{
     projectId: number;
-    date: { weekday: string; day: string };
+    date: { weekday: string; day: string; month: string; year: string };
     quantity: number;
   }> = new Subject();
 
@@ -49,8 +61,10 @@ export class TimesheetListComponent implements OnInit {
     private timesheetService: TimesheetService,
     private projectService: ProjectService,
     private keycloakService: KeycloakService,
+    private holidayService: HolidayService,
     private toastService: ToastService,
     private modalService: NgbModal,
+
     config: NgbDropdownConfig
   ) {
     config.placement = 'left-start';
@@ -65,6 +79,10 @@ export class TimesheetListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.holidayService.getHolidays().subscribe((data) => {
+      console.log('holidays', data);
+      this.holidays = data;
+    });
     this.projects$.subscribe(() => {
       this.refreshView();
     });
@@ -90,7 +108,6 @@ export class TimesheetListComponent implements OnInit {
   trackByProject(index: number, project: Project) {
     return project.id;
   }
-
   calculateDateRange(): void {
     const today = new Date();
     this.dateRange = [];
@@ -106,6 +123,8 @@ export class TimesheetListComponent implements OnInit {
             weekday: 'short',
           }),
           day: currentDate.getDate().toString(),
+          month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
+          year: currentDate.getFullYear().toString(),
         });
         startOfWeek.setDate(startOfWeek.getDate() + 1);
       }
@@ -123,10 +142,15 @@ export class TimesheetListComponent implements OnInit {
             weekday: 'short',
           }),
           day: currentDate.getDate().toString(),
+          month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
+          year: currentDate.getFullYear().toString(),
         });
         startOfMonth.setDate(startOfMonth.getDate() + 1);
       }
     }
+
+    // Log the dateRange array to verify
+    console.log('Calculated Date Range:', this.dateRange);
   }
 
   refreshView(): void {
@@ -140,7 +164,7 @@ export class TimesheetListComponent implements OnInit {
 
   onQuantityChange(
     projectId: number,
-    date: { weekday: string; day: string },
+    date: { weekday: string; day: string; month: string; year: string },
     event: Event
   ): void {
     const inputElement = event.target as HTMLInputElement;
@@ -326,6 +350,36 @@ export class TimesheetListComponent implements OnInit {
 
     return timesheet ? timesheet.status === ApprovalStatus.PENDING : false;
   }
+  handleHoliday(date: {
+    weekday: string;
+    day: string;
+    month: string;
+    year: string;
+  }): { isHoliday: boolean; name: string } {
+    // Ensure month and day are two digits for consistent formatting
+    const month = date.month.padStart(2, '0');
+    const day = date.day.padStart(2, '0');
+
+    // Construct the date in YYYY-MM-DD format, assuming the time as midday to avoid timezone issues
+    const targetDate = new Date(`${date.year}-${month}-${day}T12:00:00Z`);
+
+    // Format the date to match the holiday format (YYYY-MM-DD)
+    const formattedDate = targetDate.toISOString().split('T')[0];
+
+    console.log(
+      'formattedDate',
+      formattedDate,
+      !!this.holidays[formattedDate],
+      `${date.year}-${month}-${day}`
+    );
+
+    // Check if the formatted date is a holiday
+    return {
+      isHoliday: !!this.holidays[formattedDate],
+      name: this.holidays[formattedDate] ?? '',
+    };
+  }
+
   // getApprovalStatus(timesheet: Timesheet): {
   //   text: string;
   //   badgeClass: string;

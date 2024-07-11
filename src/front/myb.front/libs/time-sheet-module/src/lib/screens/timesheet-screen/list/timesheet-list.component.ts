@@ -47,8 +47,13 @@ export class TimesheetListComponent implements OnInit {
   userId: string | null = '';
   isLoading = true;
   selectedPeriod: 'week' | 'month' = 'week';
-  dateRange: { weekday: string; day: string; month: string; year: string }[] =
-    [];
+  dateRange: {
+    weekday: string;
+    day: string;
+    month: string;
+    year: string;
+    isToday: boolean;
+  }[] = [];
   timesheetQuantities: { [key: string]: number } = {};
   holidays: { [date: string]: string } = {};
   quantityChange: Subject<{
@@ -110,6 +115,8 @@ export class TimesheetListComponent implements OnInit {
   }
   calculateDateRange(): void {
     const today = new Date();
+    const todayString = today.toLocaleDateString();
+
     this.dateRange = [];
 
     if (this.selectedPeriod === 'week') {
@@ -118,6 +125,7 @@ export class TimesheetListComponent implements OnInit {
       );
       for (let i = 0; i < 7; i++) {
         const currentDate = new Date(startOfWeek);
+        const currentDateString = currentDate.toLocaleDateString();
         this.dateRange.push({
           weekday: currentDate.toLocaleDateString(undefined, {
             weekday: 'short',
@@ -125,6 +133,7 @@ export class TimesheetListComponent implements OnInit {
           day: currentDate.getDate().toString(),
           month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
           year: currentDate.getFullYear().toString(),
+          isToday: currentDateString === todayString,
         });
         startOfWeek.setDate(startOfWeek.getDate() + 1);
       }
@@ -137,6 +146,7 @@ export class TimesheetListComponent implements OnInit {
       ).getDate();
       for (let i = 0; i < daysInMonth; i++) {
         const currentDate = new Date(startOfMonth);
+        const currentDateString = currentDate.toLocaleDateString();
         this.dateRange.push({
           weekday: currentDate.toLocaleDateString(undefined, {
             weekday: 'short',
@@ -144,6 +154,7 @@ export class TimesheetListComponent implements OnInit {
           day: currentDate.getDate().toString(),
           month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
           year: currentDate.getFullYear().toString(),
+          isToday: currentDateString === todayString,
         });
         startOfMonth.setDate(startOfMonth.getDate() + 1);
       }

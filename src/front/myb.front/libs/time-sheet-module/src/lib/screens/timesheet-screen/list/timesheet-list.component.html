@@ -51,7 +51,9 @@
           <th>Project</th>
           <th
             class="text-center"
-            [ngClass]="{ 'bg-light': isWeekend(date) }"
+            [ngClass]="{
+              'weekend-dark': isWeekend(date)
+            }"
             *ngFor="let date of dateRange; trackBy: trackByDate"
           >
             <div class="position-relative">
@@ -64,7 +66,13 @@
               </span>
             </div>
             <div class="text-muted fw-light">{{ date.weekday }}</div>
-            <div>{{ date.day }}</div>
+            <div
+              [ngClass]="{
+                'badge bg-secondary rounded-pill': date.isToday
+              }"
+            >
+              {{ date.day }}
+            </div>
           </th>
           <th class="total-column">Total</th>
         </tr>
@@ -76,7 +84,9 @@
             class="text-center"
             style="width: 80px"
             *ngFor="let date of dateRange; trackBy: trackByDate"
-            [ngClass]="{ 'bg-light text-muted': isWeekend(date), }"
+            [ngClass]="{
+              'weekend-dark text-muted': isWeekend(date)
+            }"
           >
             <ng-container>
               <input

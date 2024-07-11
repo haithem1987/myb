@@ -1,3 +1,4 @@
+<!-- navigation.component.html (or wherever your navbar is defined) -->
 <ul class="navbar-nav ms-auto">
   <li *ngIf="user$ | async as user" ngbDropdown class="nav-item dropdown">
     <a
@@ -11,7 +12,6 @@
         [text]="user?.username?.toLocaleUpperCase()"
         [size]="25"
       ></myb-front-avatar>
-
       <span class="ms-2">{{ user.username }}</span>
     </a>
     <ul
@@ -20,7 +20,7 @@
       class="dropdown-menu-end"
     >
       <li><a class="dropdown-item" href="#">Profile</a></li>
-      <li><a class="dropdown-item" href="#">Settings</a></li>
+      <li><a class="dropdown-item" [routerLink]="'/settings'">Settings</a></li>
       <li><hr class="dropdown-divider" /></li>
       <li>
         <a

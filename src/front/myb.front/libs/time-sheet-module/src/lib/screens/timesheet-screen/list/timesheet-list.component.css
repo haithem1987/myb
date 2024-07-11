@@ -18,3 +18,16 @@
   background-color: #845bba40 !important;
   color: #000; /* Change the text color if needed */
 }
+.weekend-dark {
+  background-color: #efefef !important; /* Darker gray */
+}
+.today-background {
+  /* width: 20px;
+  height: 20px; */
+  border-radius: 50px;
+  /* background-color: #845bba !important;
+  color: #fff; */
+}
+.today-column {
+  background-color: #ffe395;
+}

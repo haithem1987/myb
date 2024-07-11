@@ -11,6 +11,7 @@ import { EmployeeIndexComponent } from './screens/employees/index/employee-index
 import { EmployeeListComponent } from './screens/employees/list/employee-list.component';
 import { EmployeeEditComponent } from './screens/employees/edit/employee-edit.component';
 import { ProjectTabsComponent } from './screens/projects/tabs/project-tabs.component';
+import { SettingsPageComponent } from './screens/settings/settings-page.component';
 
 export const timesheetRoutes: Routes = [
   {
@@ -22,6 +23,11 @@ export const timesheetRoutes: Routes = [
         path: '',
         component: TimesheetScreenComponent,
         data: { breadcrumb: 'Temps de travail' },
+      },
+      {
+        path: 'settings',
+        component: SettingsPageComponent,
+        data: { breadcrumb: 'Paramétres' },
       },
       {
         path: 'projects',

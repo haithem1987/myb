@@ -10,7 +10,8 @@ namespace Myb.Invoice.Infra.Extensions
             services.AddScoped<IContactService, ContactService>();
             services.AddScoped<IClientService, ClientService>();
             services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IProductLineService, ProductLineService>();
+            services.AddScoped<IInvoiceDetailsService, InvoiceDetailsService>();
+            services.AddScoped<ITaxService, TaxService>();
 
         }
     }

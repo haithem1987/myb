@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Myb.Invoice.Models
 {
-    public class ProductLine : BaseEntity
+    public class InvoiceDetails : BaseEntity
     {
         public int? ProductId { get; set; } 
         public virtual Product? Product { get; set; }

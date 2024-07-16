@@ -10,19 +10,19 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "ProductsIds",
-                table: "Invoices");
+            migrationBuilder.AddColumn<bool>(
+                name: "IsPercentage",
+                table: "Taxes",
+                type: "boolean",
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int[]>(
-                name: "ProductsIds",
-                table: "Invoices",
-                type: "integer[]",
-                nullable: true);
+            migrationBuilder.DropColumn(
+                name: "IsPercentage",
+                table: "Taxes");
         }
     }
 }

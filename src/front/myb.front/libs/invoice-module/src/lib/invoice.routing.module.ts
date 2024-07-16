@@ -9,6 +9,7 @@ import { ListProductComponent } from './components/product-components/list-produ
 import { CreateProductComponent } from './components/product-components/create-product/createProduct.component';
 import { ProductComponent } from './components/product-components/index/product.component';
 import { CreateClientComponent } from './components/client-components/create-client/createClient.component';
+import { ClientComponent } from './components/client-components/index/client.component';
 
 export const invoiceRoutes: Routes = [
   {
@@ -41,7 +42,7 @@ export const invoiceRoutes: Routes = [
       },
       {
         path: 'clients',
-        component: ProductComponent,
+        component: ClientComponent,
         data: {
           breadcrumb: 'client',
         },

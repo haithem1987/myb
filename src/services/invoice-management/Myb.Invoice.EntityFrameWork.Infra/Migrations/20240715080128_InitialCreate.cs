@@ -18,10 +18,10 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FirstName = table.Column<string>(type: "text", nullable: false),
-                    LastName = table.Column<string>(type: "text", nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: false),
-                    ClientType = table.Column<int>(type: "integer", nullable: false),
+                    FirstName = table.Column<string>(type: "text", nullable: true),
+                    LastName = table.Column<string>(type: "text", nullable: true),
+                    Address = table.Column<string>(type: "text", nullable: true),
+                    ClientType = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -31,22 +31,19 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
+                name: "Taxes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Price = table.Column<double>(type: "double precision", nullable: true),
-                    Unit = table.Column<string>(type: "text", nullable: true),
-                    ProductType = table.Column<int>(type: "integer", nullable: true),
+                    Value = table.Column<double>(type: "double precision", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_Taxes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,8 +84,7 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     SubTotal = table.Column<double>(type: "double precision", nullable: true),
                     Status = table.Column<string>(type: "text", nullable: true),
                     ClientID = table.Column<int>(type: "integer", nullable: true),
-                    ProductsIds = table.Column<int[]>(type: "integer[]", nullable: true),
-                    image = table.Column<string>(type: "text", nullable: true),
+                    Image = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -104,7 +100,32 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductLines",
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Price = table.Column<double>(type: "double precision", nullable: true),
+                    Unit = table.Column<string>(type: "text", nullable: true),
+                    ProductType = table.Column<int>(type: "integer", nullable: true),
+                    TaxId = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_Taxes_TaxId",
+                        column: x => x.TaxId,
+                        principalTable: "Taxes",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InvoiceDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -119,14 +140,14 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductLines", x => x.Id);
+                    table.PrimaryKey("PK_InvoiceDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductLines_Invoices_InvoiceID",
+                        name: "FK_InvoiceDetails_Invoices_InvoiceID",
                         column: x => x.InvoiceID,
                         principalTable: "Invoices",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ProductLines_Products_ProductId",
+                        name: "FK_InvoiceDetails_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id");
@@ -138,19 +159,24 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 column: "ClientID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InvoiceDetails_InvoiceID",
+                table: "InvoiceDetails",
+                column: "InvoiceID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InvoiceDetails_ProductId",
+                table: "InvoiceDetails",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Invoices_ClientID",
                 table: "Invoices",
                 column: "ClientID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductLines_InvoiceID",
-                table: "ProductLines",
-                column: "InvoiceID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductLines_ProductId",
-                table: "ProductLines",
-                column: "ProductId");
+                name: "IX_Products_TaxId",
+                table: "Products",
+                column: "TaxId");
         }
 
         /// <inheritdoc />
@@ -160,7 +186,7 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                 name: "Contacts");
 
             migrationBuilder.DropTable(
-                name: "ProductLines");
+                name: "InvoiceDetails");
 
             migrationBuilder.DropTable(
                 name: "Invoices");
@@ -170,6 +196,9 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 
             migrationBuilder.DropTable(
                 name: "Clients");
+
+            migrationBuilder.DropTable(
+                name: "Taxes");
         }
     }
 }

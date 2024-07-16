@@ -25,8 +25,9 @@ namespace Myb.Invoice.EntityFrameWork.Infra
         public DbSet<InvoiceModel> Invoices { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<ProductLine> ProductLines { get; set; }
+        public DbSet<InvoiceDetails> InvoiceDetails { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Tax> Taxes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,20 +50,31 @@ namespace Myb.Invoice.EntityFrameWork.Infra
                     .HasForeignKey(x => x.ClientID)
                     .OnDelete(DeleteBehavior.Restrict);
                 });
-            modelBuilder.Entity<ProductLine>(
+            modelBuilder.Entity<InvoiceDetails>(
                 entity =>
                 {
                     entity.HasKey(x => x.Id);
                     entity.HasOne(x => x.Product)
-                    .WithMany(x => x.ProductLines)
+                    .WithMany( x => x.InvoiceDetails )
                     .HasForeignKey(x => x.ProductId);
 
                     entity.HasOne(x => x.Invoice)
-                    .WithMany(x => x.Products)
+                    .WithMany(x => x.InvoiceDetails)
                     .HasForeignKey(x => x.InvoiceID);
                 }
                 );
-                   
+
+            modelBuilder.Entity<Product>(
+               entity =>
+               {
+                   entity.HasKey(x => x.Id);
+                   entity.HasOne(x => x.Tax)
+                   .WithMany(x => x.Products)
+                   .HasForeignKey(x => x.TaxId);
+               }
+               );
+
+
         }
     }
 }

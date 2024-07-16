@@ -14,7 +14,9 @@ namespace Myb.Invoice.Models
         public double? Price {  get; set; }
         public string? Unit {  get; set; }
         public ProductType? ProductType { get; set; }
-        public virtual ICollection<ProductLine>? ProductLines { get; set; }
+        public virtual ICollection<InvoiceDetails>? InvoiceDetails { get; set; }
+        public int? TaxId { get; set; }
+        public virtual Tax? Tax { get; set; }
 
     }
 }

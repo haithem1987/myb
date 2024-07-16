@@ -22,3 +22,11 @@ export * from './lib/components/product-components/index/product.component';
 export * from './lib/components/client-components/index/client.component';
 
 export * from './lib/components/client-components/create-client/createClient.component';
+
+export * from './lib/components/client-components/client-card/clientCard.component';
+
+export * from './lib/components/tax-component/index/tax.component';
+
+export * from './lib/components/tax-component/create-tax/createTax.component';
+
+export * from './lib/components/tax-component/list-tax/listTax.component';

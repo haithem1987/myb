@@ -7,7 +7,7 @@ import {
   NgbModal,
   NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { Project } from '../../../models/project.model';
 import {
@@ -24,6 +24,11 @@ import {
   HolidayService,
   ProgressBarComponent,
 } from 'libs/shared/shared-ui/src';
+import {
+  LangChangeEvent,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-timesheet-list',
@@ -34,6 +39,7 @@ import {
     NgbDropdownModule,
     ProgressBarComponent,
     NgbTooltip,
+    TranslateModule,
   ],
   providers: [NgbDropdownConfig],
   templateUrl: './timesheet-list.component.html',
@@ -46,8 +52,10 @@ export class TimesheetListComponent implements OnInit {
   searchTerm: string = '';
   userId: string | null = '';
   isLoading = true;
+  isSaving = false;
   selectedPeriod: 'week' | 'month' = 'week';
   dateRange: {
+    dateString: string;
     weekday: string;
     day: string;
     month: string;
@@ -58,10 +66,17 @@ export class TimesheetListComponent implements OnInit {
   holidays: { [date: string]: string } = {};
   quantityChange: Subject<{
     projectId: number;
-    date: { weekday: string; day: string; month: string; year: string };
+    date: {
+      dateString: string;
+      weekday: string;
+      day: string;
+      month: string;
+      year: string;
+    };
     quantity: number;
   }> = new Subject();
-
+  private langChangeSubscription!: Subscription;
+  weekendDays: string[] = [];
   constructor(
     private timesheetService: TimesheetService,
     private projectService: ProjectService,
@@ -69,7 +84,7 @@ export class TimesheetListComponent implements OnInit {
     private holidayService: HolidayService,
     private toastService: ToastService,
     private modalService: NgbModal,
-
+    private translate: TranslateService,
     config: NgbDropdownConfig
   ) {
     config.placement = 'left-start';
@@ -78,7 +93,7 @@ export class TimesheetListComponent implements OnInit {
     this.quantityChange
       .pipe(debounceTime(300))
       .subscribe(({ projectId, date, quantity }) => {
-        const key = `${projectId}-${date.weekday} ${date.day}`;
+        const key = `${projectId}.${date.dateString}`;
         this.timesheetQuantities[key] = quantity;
       });
   }
@@ -97,6 +112,7 @@ export class TimesheetListComponent implements OnInit {
         this.timesheetService
           .getTimesheetsByUserId(userId)
           .subscribe((timesheets) => {
+            this.setWeekendDays();
             this.updatedTimesheets = timesheets;
             this.populateTimesheetQuantities(timesheets);
             this.isLoading = false;
@@ -104,6 +120,14 @@ export class TimesheetListComponent implements OnInit {
           });
       }
     });
+    this.langChangeSubscription = this.translate.onLangChange.subscribe(
+      (event: LangChangeEvent) => {
+        console.log('langChangeSubscription', this.updatedTimesheets);
+        this.setWeekendDays();
+        this.populateTimesheetQuantities(this.updatedTimesheets);
+        this.calculateDateRange();
+      }
+    );
   }
 
   trackByDate(index: number, date: { weekday: string; day: string }) {
@@ -115,7 +139,7 @@ export class TimesheetListComponent implements OnInit {
   }
   calculateDateRange(): void {
     const today = new Date();
-    const todayString = today.toLocaleDateString();
+    const todayString = today.toISOString().split('T')[0];
 
     this.dateRange = [];
 
@@ -125,16 +149,24 @@ export class TimesheetListComponent implements OnInit {
       );
       for (let i = 0; i < 7; i++) {
         const currentDate = new Date(startOfWeek);
-        const currentDateString = currentDate.toLocaleDateString();
-        this.dateRange.push({
-          weekday: currentDate.toLocaleDateString(undefined, {
+        const currentDateString = currentDate.toISOString().split('T')[0];
+        const weekdayKey = currentDate
+          .toLocaleDateString(undefined, {
             weekday: 'short',
-          }),
-          day: currentDate.getDate().toString(),
-          month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
-          year: currentDate.getFullYear().toString(),
-          isToday: currentDateString === todayString,
-        });
+          })
+          .toLowerCase();
+        this.translate
+          .get(`WEEKDAY.${weekdayKey}`)
+          .subscribe((translatedWeekday) => {
+            this.dateRange.push({
+              dateString: currentDateString,
+              weekday: translatedWeekday,
+              day: currentDate.getDate().toString(),
+              month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
+              year: currentDate.getFullYear().toString(),
+              isToday: currentDateString === todayString,
+            });
+          });
         startOfWeek.setDate(startOfWeek.getDate() + 1);
       }
     } else if (this.selectedPeriod === 'month') {
@@ -146,16 +178,24 @@ export class TimesheetListComponent implements OnInit {
       ).getDate();
       for (let i = 0; i < daysInMonth; i++) {
         const currentDate = new Date(startOfMonth);
-        const currentDateString = currentDate.toLocaleDateString();
-        this.dateRange.push({
-          weekday: currentDate.toLocaleDateString(undefined, {
+        const currentDateString = currentDate.toISOString().split('T')[0];
+        const weekdayKey = currentDate
+          .toLocaleDateString(undefined, {
             weekday: 'short',
-          }),
-          day: currentDate.getDate().toString(),
-          month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
-          year: currentDate.getFullYear().toString(),
-          isToday: currentDateString === todayString,
-        });
+          })
+          .toLowerCase();
+        this.translate
+          .get(`WEEKDAY.${weekdayKey}`)
+          .subscribe((translatedWeekday) => {
+            this.dateRange.push({
+              dateString: currentDateString,
+              weekday: translatedWeekday,
+              day: currentDate.getDate().toString(),
+              month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
+              year: currentDate.getFullYear().toString(),
+              isToday: currentDateString === todayString,
+            });
+          });
         startOfMonth.setDate(startOfMonth.getDate() + 1);
       }
     }
@@ -169,13 +209,19 @@ export class TimesheetListComponent implements OnInit {
   }
 
   getQuantityForDate(projectId: number, date: string): number {
-    const key = `${projectId}-${date}`;
+    const key = `${projectId}.${date}`;
     return this.timesheetQuantities[key] || 0;
   }
 
   onQuantityChange(
     projectId: number,
-    date: { weekday: string; day: string; month: string; year: string },
+    date: {
+      dateString: string;
+      weekday: string;
+      day: string;
+      month: string;
+      year: string;
+    },
     event: Event
   ): void {
     const inputElement = event.target as HTMLInputElement;
@@ -192,12 +238,9 @@ export class TimesheetListComponent implements OnInit {
     this.timesheetQuantities = {};
     timesheets.forEach((timesheet) => {
       const date = new Date(timesheet.date || new Date());
-      const dateKey = `${timesheet.projectId}-${date.toLocaleDateString(
-        undefined,
-        {
-          weekday: 'short',
-        }
-      )} ${date.getDate()}`;
+      const dateKey = `${timesheet.projectId}.${
+        date.toISOString().split('T')[0]
+      }`;
       this.timesheetQuantities[dateKey] = timesheet.quantity || 0;
     });
   }
@@ -243,19 +286,20 @@ export class TimesheetListComponent implements OnInit {
   }
 
   saveAllChanges(): void {
+    this.isSaving = true; // Start loading spinner
+
     const timesheetUpdates: Timesheet[] = [];
 
     for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
-      const [projectIdStr, dateStr] = key.split('-');
+      const [projectIdStr, dateString] = key.split('.');
+      console.log('dateString', dateString);
       const projectId = Number(projectIdStr);
-      const dateParts = dateStr.split(' ');
-      const date = new Date();
-      date.setDate(Number(dateParts[1]));
-
+      const date = new Date(`${dateString}`);
+      console.log('date', date);
       let timesheet = this.updatedTimesheets.find(
         (t: any) =>
           t.projectId === projectId &&
-          new Date(t.date).getDate() === date.getDate()
+          new Date(t.date).toDateString() === date.toDateString()
       );
 
       if (!timesheet) {
@@ -288,20 +332,29 @@ export class TimesheetListComponent implements OnInit {
     if (timesheetUpdates.length > 0) {
       this.timesheetService
         .updateMultipleTimesheets(timesheetUpdates)
-        .subscribe(() => {
-          console.log('updateMultipleTimesheets response');
-          this.toastService.show('All changes saved successfully', {
-            classname: 'toast-success',
-          });
-          this.refreshView();
-        });
+        .subscribe(
+          () => {
+            console.log('updateMultipleTimesheets response');
+            this.toastService.show('All changes saved successfully', {
+              classname: 'toast-success',
+            });
+            this.refreshView();
+            this.isSaving = false; // Stop loading spinner
+          },
+          (error) => {
+            console.error('Error saving changes', error);
+            this.isSaving = false; // Stop loading spinner in case of error
+          }
+        );
+    } else {
+      this.isSaving = false; // Stop loading spinner if there are no changes
     }
   }
 
   getTotalQuantityForProject(projectId: number): number {
     let total = 0;
     for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
-      if (key.startsWith(`${projectId}-`)) {
+      if (key.startsWith(`${projectId}.`)) {
         total += quantity;
       }
     }
@@ -362,27 +415,21 @@ export class TimesheetListComponent implements OnInit {
     return timesheet ? timesheet.status === ApprovalStatus.PENDING : false;
   }
   handleHoliday(date: {
+    dateString: string;
     weekday: string;
     day: string;
     month: string;
     year: string;
   }): { isHoliday: boolean; name: string } {
     // Ensure month and day are two digits for consistent formatting
-    const month = date.month.padStart(2, '0');
-    const day = date.day.padStart(2, '0');
+    // const month = date.month.padStart(2, '0');
+    // const day = date.day.padStart(2, '0');
 
     // Construct the date in YYYY-MM-DD format, assuming the time as midday to avoid timezone issues
-    const targetDate = new Date(`${date.year}-${month}-${day}T12:00:00Z`);
+    const targetDate = new Date(`${date.dateString}T12:00:00Z`);
 
     // Format the date to match the holiday format (YYYY-MM-DD)
     const formattedDate = targetDate.toISOString().split('T')[0];
-
-    console.log(
-      'formattedDate',
-      formattedDate,
-      !!this.holidays[formattedDate],
-      `${date.year}-${month}-${day}`
-    );
 
     // Check if the formatted date is a holiday
     return {
@@ -399,8 +446,12 @@ export class TimesheetListComponent implements OnInit {
   //     ? { text: 'Approuvé', badgeClass: 'bg-success' }
   //     : { text: 'En attente', badgeClass: 'bg-warning' };
   // }
-
+  setWeekendDays(): void {
+    this.translate.get('WEEKDAY.weekend').subscribe((weekendDays: string[]) => {
+      this.weekendDays = weekendDays;
+    });
+  }
   isWeekend(date: { weekday: string; day: string }): boolean {
-    return date.weekday === 'Sun' || date.weekday === 'Sat';
+    return this.weekendDays.includes(date.weekday);
   }
 }

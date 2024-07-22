@@ -1,8 +1,11 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="">Intervenants</h2>
-    <button class="btn btn-primary fw-bold p-3" (click)="addEmployee()">
-      <i class="bi bi-person-plus-fill"></i> Ajouter
+    <button
+      class="btn btn-primary fw-bold text-uppercase p-3"
+      (click)="addEmployee()"
+    >
+      <i class="bi bi-person-plus-fill"></i> {{ 'CREATE' | translate }}
     </button>
   </div>
   <div class="row">

@@ -9,6 +9,8 @@ import {
   AvatarComponent,
   UserDropdownComponent,
 } from 'libs/shared/shared-ui/src';
+import { TranslateModule } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from 'libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'myb-front-navbar',
@@ -19,6 +21,8 @@ import {
     NgbDropdownModule,
     AvatarComponent,
     UserDropdownComponent,
+    TranslateModule,
+    LanguageSwitcherComponent,
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],

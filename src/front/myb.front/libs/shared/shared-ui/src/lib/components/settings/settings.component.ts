@@ -4,11 +4,17 @@ import { GeneralSettingsService } from 'libs/shared/infra/services/general-setti
 import { Subscription } from 'rxjs';
 import { BreadcrumbComponent } from 'libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component';
 import { NavBarComponent } from '../../LandingPage/NavBar/NavBar.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-settings',
   standalone: true,
-  imports: [CommonModule, BreadcrumbComponent, NavBarComponent],
+  imports: [
+    CommonModule,
+    BreadcrumbComponent,
+    NavBarComponent,
+    TranslateModule,
+  ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css'],
 })
@@ -18,7 +24,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
   keys: { [category: string]: string[] } = {};
   private subscription!: Subscription;
 
-  constructor(private settingsService: GeneralSettingsService) {}
+  constructor(
+    private settingsService: GeneralSettingsService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.subscription = this.settingsService.settings$.subscribe((settings) => {

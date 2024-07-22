@@ -14,6 +14,7 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { EmployeeStatsComponent } from '../stats/employee-stats.component';
 import { TimeoffListComponent } from '../timeoff-list/timeoff-list.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-employee-edit',
@@ -23,6 +24,7 @@ import { TimeoffListComponent } from '../timeoff-list/timeoff-list.component';
     ReactiveFormsModule,
     EmployeeStatsComponent,
     TimeoffListComponent,
+    TranslateModule,
   ],
   templateUrl: './employee-edit.component.html',
   styleUrl: './employee-edit.component.css',
@@ -58,7 +60,7 @@ export class EmployeeEditComponent implements OnInit {
   }
   ngOnInit(): void {
     console.log('this.employeeForm', this.employeeForm.value);
-    const employeeState = history.state.employee as Employee;
+    const employeeState = history.state?.employee as Employee | null;
     console.log('employeeState', employeeState);
     if (employeeState) {
       this.isEditMode = true;
@@ -71,7 +73,7 @@ export class EmployeeEditComponent implements OnInit {
         if (id) {
           this.employeeId = +id;
           this.isEditMode = true;
-          this.loadTimeOffs(this.employeeId);
+          // this.loadTimeOffs(this.employeeId);
           this.loadEmployee(this.employeeId);
         }
       });
@@ -121,9 +123,12 @@ export class EmployeeEditComponent implements OnInit {
   }
 
   loadEmployee(id: number): void {
-    // this.employeeService.getById(id).subscribe((employee:any) => {
-    //   this.employeeForm.patchValue(employee);
-    // });
+    this.employeeService.get(id).subscribe((employee: any) => {
+      console.log('employee', employee);
+      this.employeeId = +employee.id;
+      this.employeeForm.patchValue(employee);
+      // this.employeeForm.patchValue(employee);
+    });
   }
 
   saveEmployee(): void {

@@ -29,5 +29,6 @@
   color: #fff; */
 }
 .today-column {
-  background-color: #ffe395;
+  background-color: #ffbc0024;
+  z-index: 1500;
 }

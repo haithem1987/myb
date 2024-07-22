@@ -22,7 +22,7 @@ export class EmployeeService extends RepositoryService<Employee> {
   }
 
   protected override mapSingleItem(result: any): Employee {
-    return result.data?.EmployeeById as Employee;
+    return result.data?.employeeById as Employee;
   }
 
   protected override mapCreateItem(result: any): Employee {
@@ -50,10 +50,10 @@ export class EmployeeService extends RepositoryService<Employee> {
   override get(id: number): Observable<Employee> {
     return super.get(id).pipe(
       map((employee) => {
-        const employees = this.employeeSubject.value.map((p) =>
-          p.id === id ? employee : p
-        );
-        this.employeeSubject.next(employees);
+        // const employees = this.employeeSubject.value.map((p) =>
+        //   p.id === id ? employee : p
+        // );
+        // this.employeeSubject.next(employees);
         return employee;
       })
     );

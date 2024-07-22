@@ -1,10 +1,10 @@
 <div *ngIf="isLoading" class="text-center">
-  <p>Loading...</p>
+  <p>{{ 'LOADING' | translate }}</p>
 </div>
 <div *ngIf="!isLoading" class="container my-4">
   <div class="d-flex justify-content-between mb-3">
     <h2 class="mb-0 w-50" style="color: var(--bs-darklight)">
-      Timesheet Manager
+      {{ 'TIMESHEET_MANAGER' | translate }}
     </h2>
   </div>
 
@@ -16,7 +16,7 @@
         [class.active]="selectedPeriod === 'week'"
         (click)="setPeriod('week')"
       >
-        Week
+        {{ 'WEEK' | translate }}
         <span class="badge bg-danger ms-1">{{
           getTotalQuantitiesForPeriod('week')
         }}</span>
@@ -27,7 +27,7 @@
         [class.active]="selectedPeriod === 'month'"
         (click)="setPeriod('month')"
       >
-        Month
+        {{ 'MONTH' | translate }}
         <span class="badge bg-danger ms-1">{{
           getTotalQuantitiesForPeriod('month')
         }}</span>
@@ -38,8 +38,19 @@
       <button
         class="btn btn-primary fw-bold text-uppercase"
         (click)="saveAllChanges()"
+        [disabled]="isSaving"
       >
-        Valider
+        <ng-container *ngIf="!isSaving">
+          {{ 'VALIDATE' | translate }}
+        </ng-container>
+        <ng-container *ngIf="isSaving">
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          {{ 'SAVING' | translate }}
+        </ng-container>
       </button>
     </div>
   </div>
@@ -48,11 +59,12 @@
     <table class="table">
       <thead>
         <tr>
-          <th>Project</th>
+          <th>{{ 'PROJECT' | translate }}</th>
           <th
             class="text-center"
             [ngClass]="{
-              'weekend-dark': isWeekend(date)
+              'weekend-dark': isWeekend(date) && !date.isToday,
+              'today-column': date.isToday
             }"
             *ngFor="let date of dateRange; trackBy: trackByDate"
           >
@@ -74,7 +86,7 @@
               {{ date.day }}
             </div>
           </th>
-          <th class="total-column">Total</th>
+          <th class="total-column">{{ 'TOTAL' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -85,7 +97,8 @@
             style="width: 80px"
             *ngFor="let date of dateRange; trackBy: trackByDate"
             [ngClass]="{
-              'weekend-dark text-muted': isWeekend(date)
+              'weekend-dark': isWeekend(date) && !date.isToday,
+              'today-column': date.isToday
             }"
           >
             <ng-container>
@@ -93,9 +106,7 @@
                 type="number"
                 class="form-control text-center"
                 style="width: 60px"
-                [value]="
-                  getQuantityForDate(project.id, date.weekday + ' ' + date.day)
-                "
+                [value]="getQuantityForDate(project.id, date.dateString)"
                 [ngClass]="{
                   'holiday-disabled': handleHoliday(date).isHoliday
                 }"

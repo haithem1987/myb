@@ -5,13 +5,13 @@
     <p class="card-text">
       <small class="text-muted d-flex justify-content-between">
         <div>
-          <div>Début</div>
+          <div>{{ 'START' | translate }}</div>
           {{ project.startDate | date }}
         </div>
         <i class="bi bi-arrow-right mx-5"></i>
         <div>
-          <div>Fin</div>
-          {{ (project.endDate | date) || 'Non expiré' }}
+          <div>{{ 'END' | translate }}</div>
+          {{ (project.endDate | date) || ('NON_EXPIRED' | translate) }}
         </div>
       </small>
     </p>
@@ -20,23 +20,29 @@
       class="mt-auto d-flex justify-content-between align-items-center"
       *ngIf="!isArchived; else restoreTemplate"
     >
-      <button class="btn btn-primary btn-sm" (click)="showTasks(project)">
-        <i class="bi bi-ui-checks"></i> Tâches
+      <button class="btn btn-primary btn-sm w-100" (click)="showTasks(project)">
+        <div><i class="bi bi-ui-checks"></i></div>
+        <div>{{ 'TASKS' | translate }}</div>
       </button>
-      <button class="btn btn-primary btn-sm" (click)="editProject(project)">
-        <i class="bi bi-pencil-fill"></i> Editer
+      <button
+        class="btn btn-primary btn-sm w-100"
+        (click)="editProject(project)"
+      >
+        <div><i class="bi bi-pencil-fill"></i></div>
+        <div>{{ 'EDIT' | translate }}</div>
       </button>
       <!-- <button
-        class="btn btn-outline-danger btn-sm"
+        class="btn btn-outline-danger btn-sm w-100"
         (click)="deleteProject(project.id)"
       >
-        <i class="bi bi-trash"></i> Supprimer
+        <i class="bi bi-trash"></i> {{ 'DELETE' | translate }}
       </button> -->
       <button
-        class="btn btn-outline-secondary btn-sm"
+        class="btn btn-outline-secondary btn-sm w-100"
         (click)="archiveProject(project)"
       >
-        <i class="bi bi-archive-fill"></i> Archiver
+        <div><i class="bi bi-archive-fill"></i></div>
+        <div>{{ 'ARCHIVE' | translate }}</div>
       </button>
     </div>
     <ng-template #restoreTemplate>
@@ -45,7 +51,7 @@
           class="btn btn-info btn-sm text-white"
           (click)="restoreProject(project)"
         >
-          <i class="bi bi-arrow-repeat"></i> Restaurer
+          <i class="bi bi-arrow-repeat"></i> {{ 'RESTORE' | translate }}
         </button>
       </div>
     </ng-template>

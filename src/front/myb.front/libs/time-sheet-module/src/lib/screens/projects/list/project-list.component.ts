@@ -6,11 +6,12 @@ import { ProjectService } from '../../../services/project.service';
 import { ProjectCardComponent } from '../card/project-card.component';
 import { Observable, map } from 'rxjs';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-project-list',
   standalone: true,
-  imports: [CommonModule, ProjectCardComponent],
+  imports: [CommonModule, ProjectCardComponent, TranslateModule],
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css'],
 })
@@ -31,6 +32,7 @@ export class ProjectListComponent implements OnInit {
   }
 
   editProject(project: Project): void {
+    console.log('emit editProject', project);
     this.router.navigate(['/timesheet/projects/edit', project.id], {
       state: { project },
     });

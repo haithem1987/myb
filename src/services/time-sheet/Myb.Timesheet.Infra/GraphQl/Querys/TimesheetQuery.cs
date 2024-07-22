@@ -56,6 +56,11 @@ namespace Myb.Timesheet.Infra.GraphQl.Querys
         {
             return await employeeService.GetEmployeesByManagerIdAsync(managerId);
         }
+        
+        public async Task<Employee> GetEmployeeById([Service] IEmployeeService employeeService, int id)
+        {
+            return await employeeService.GetEmployeeByIdAsync(id);
+        }
 
         // Timesheet queries
         public async Task<IEnumerable<TimeSheet>> GetAllTimesheets([Service] ITimesheetService timesheetService)

@@ -6,11 +6,12 @@ import { CardComponent } from 'libs/shared/shared-ui/src';
 import { ProjectService } from '../../../services/project.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-project-card',
   standalone: true,
-  imports: [CommonModule, RouterModule, CardComponent],
+  imports: [CommonModule, RouterModule, CardComponent, TranslateModule],
   templateUrl: './project-card.component.html',
   styleUrl: './project-card.component.scss',
 })
@@ -26,7 +27,8 @@ export class ProjectCardComponent implements OnInit {
     private router: Router,
     private projectService: ProjectService,
     private toastService: ToastService,
-    private keycloakService: KeycloakService
+    private keycloakService: KeycloakService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -45,14 +47,16 @@ export class ProjectCardComponent implements OnInit {
 
   editProject(project: Project): void {
     if (this.canEdit) {
-      this.edit.emit(project);
+      this.router.navigate(['/timesheet/projects/edit', project.id], {
+        state: { project },
+      });
+      // this.edit.emit(project);
     } else {
-      this.toastService.show(
-        'You do not have permission to edit this project',
-        {
-          classname: 'toast-success bg-danger text-light',
-        }
-      );
+      this.translate.get('NO_PERMISSION_EDIT').subscribe((res: string) => {
+        this.toastService.show(res, {
+          classname: 'toast-success',
+        });
+      });
     }
   }
 
@@ -60,37 +64,49 @@ export class ProjectCardComponent implements OnInit {
     if (this.canDelete) {
       this.delete.emit(id);
     } else {
-      this.toastService.show(
-        'You do not have permission to delete this project',
-        {
-          classname: 'bg-danger text-light',
-        }
-      );
-    }
-  }
-  archiveProject(project: Project): void {
-    if (confirm('Are you sure you want to archive this project?')) {
-      const updatedProject = { ...project, status: 'ARCHIVED' };
-
-      this.projectService
-        .update(project.id, updatedProject)
-        .subscribe((response) => {
-          this.toastService.show('Project archived successfully!', {
-            classname: '',
-          });
-        });
-    }
-  }
-
-  restoreProject(project: Project): void {
-    if (confirm('Are you sure you want to restore this project?')) {
-      const updatedProject = { ...project, status: 'ACTIVE' };
-
-      this.projectService.update(project.id, updatedProject).subscribe(() => {
-        this.toastService.show('Project restored successfully!', {
-          classname: '',
+      this.translate.get('NO_PERMISSION_DELETE').subscribe((res: string) => {
+        this.toastService.show(res, {
+          classname: 'toast-success',
         });
       });
     }
+  }
+
+  archiveProject(project: Project): void {
+    this.translate.get('CONFIRM_ARCHIVE_PROJECT').subscribe((res: string) => {
+      if (confirm(res)) {
+        const updatedProject = { ...project, status: 'ARCHIVED' };
+
+        this.projectService
+          .update(project.id, updatedProject)
+          .subscribe((response) => {
+            this.translate
+              .get('PROJECT_ARCHIVED_SUCCESS')
+              .subscribe((msg: string) => {
+                this.toastService.show(msg, {
+                  classname: 'toast-success',
+                });
+              });
+          });
+      }
+    });
+  }
+
+  restoreProject(project: Project): void {
+    this.translate.get('CONFIRM_RESTORE_PROJECT').subscribe((res: string) => {
+      if (confirm(res)) {
+        const updatedProject = { ...project, status: 'ACTIVE' };
+
+        this.projectService.update(project.id, updatedProject).subscribe(() => {
+          this.translate
+            .get('PROJECT_RESTORED_SUCCESS')
+            .subscribe((msg: string) => {
+              this.toastService.show(msg, {
+                classname: '',
+              });
+            });
+        });
+      }
+    });
   }
 }

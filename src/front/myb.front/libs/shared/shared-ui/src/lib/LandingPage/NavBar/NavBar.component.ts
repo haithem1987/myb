@@ -4,11 +4,18 @@ import { KeycloakService } from '../../../../../../auth/src/lib/keycloak.service
 import { CounterService } from '../FeaturesSection/CounterService';
 import { Subscription, filter } from 'rxjs';
 import { UserDropdownComponent } from '../../components/user-dropdown/user-dropdown.component';
+import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-nav-bar',
   standalone: true,
-  imports: [CommonModule, UserDropdownComponent],
+  imports: [
+    CommonModule,
+    UserDropdownComponent,
+    LanguageSwitcherComponent,
+    TranslateModule,
+  ],
   templateUrl: './NavBar.component.html',
   styleUrl: './NavBar.component.css',
 })

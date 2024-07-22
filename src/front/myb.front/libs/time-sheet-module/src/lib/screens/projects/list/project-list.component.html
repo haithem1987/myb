@@ -1,7 +1,7 @@
 <div class="container pt-3">
   <div class="d-flex justify-content-end align-items-center">
     <!-- <div class="d-flex align-items-center">
-      <h2 class="">Projets</h2>
+      <h2 class="">{{ 'PROJECTS' | translate }}</h2>
       <span class="badge rounded-pill bg-secondary badge-sm">{{
         (projects | async)?.length
       }}</span>
@@ -11,7 +11,7 @@
       class="btn btn-primary text-bold mb-4 p-3"
       (click)="addProject()"
     >
-      <i class="bi bi-plus-lg"></i> CRÉER
+      <i class="bi bi-plus-lg"></i> {{ 'CREATE' | translate }}
     </button>
   </div>
   <div class="row">

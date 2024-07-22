@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { EmployeeCardComponent } from '../card/employee-card.component';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { LoaderComponent, NoResultComponent } from 'libs/shared/shared-ui/src';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-employee-list',
@@ -16,6 +17,7 @@ import { LoaderComponent, NoResultComponent } from 'libs/shared/shared-ui/src';
     EmployeeCardComponent,
     LoaderComponent,
     NoResultComponent,
+    TranslateModule,
   ],
   templateUrl: './employee-list.component.html',
   styleUrl: './employee-list.component.css',

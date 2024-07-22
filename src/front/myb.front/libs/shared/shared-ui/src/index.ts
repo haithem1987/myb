@@ -24,6 +24,8 @@ export * from '../../infra/services/functions-utils.service';
 
 export * from '../../infra/services/holiday.service';
 
+export * from '../../infra/services/language.service';
+
 export * from './lib/components/toasts-container/toasts-container.component';
 
 export * from './lib/components/progress-bar/progress-bar.component';

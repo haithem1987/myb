@@ -14,6 +14,7 @@ import { CardComponent } from 'libs/shared/shared-ui/src';
 import { DateUtilsService } from 'libs/shared/infra/services/date-utils.service';
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-edit-project',
@@ -24,6 +25,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     HttpClientModule,
     CardComponent,
     NgbDatepickerModule,
+    TranslateModule,
   ],
   templateUrl: './edit-project.component.html',
   styleUrls: ['./edit-project.component.css'],
@@ -55,7 +57,7 @@ export class EditProjectComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const projectState = history.state.project as Project;
+    const projectState = history.state?.project as Project | null;
     console.log('projectState', projectState);
     if (projectState) {
       this.isEditMode = true;

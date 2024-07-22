@@ -44,7 +44,7 @@ export class UploadFilesService {
           }
           
           console.log('result',selectedFiles);
-          console.log('type ',selectedFiles[0].file.type);
+          console.log('type  of file ',selectedFiles[0].file.type);
 
           // selectedFiles.forEach((selectedFile) => {
           //   const fileSize = selectedFile.file.size; // Accessing the size property of the file

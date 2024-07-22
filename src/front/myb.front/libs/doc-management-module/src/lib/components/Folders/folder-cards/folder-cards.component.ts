@@ -71,11 +71,7 @@ export class FolderCardsComponent  implements OnInit {
   //   // Implement filtering logic
   // }
 
-  getDocumentCount(folder: Folder): number {
-    
-    return folder.documents ? folder.documents.length : 0;
-
-  }
+ 
 
 pinFolder(folder: Folder): void {
   if (!this.isPinned(folder)) {

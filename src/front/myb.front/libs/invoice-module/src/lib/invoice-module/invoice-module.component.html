@@ -1,8 +1,19 @@
 <myb-front-navbar></myb-front-navbar>
 <app-toasts-container></app-toasts-container>
+
 <!-- <myb-front-list-invoice></myb-front-list-invoice>
 <myb-front-create-invoice></myb-front-create-invoice> -->
 <div class="invoice-module container">
   <myb-front-breadcrumb></myb-front-breadcrumb>
+
   <router-outlet></router-outlet>
+
+  <myb-front-folder-details 
+      [fId]="1" 
+      [title]="'Doc   in invoice  Manager'" 
+      [canCreateFolder]="true"
+      
+  >
+  </myb-front-folder-details>
+
 </div>

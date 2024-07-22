@@ -12,101 +12,144 @@ import { RepositoryService } from 'libs/shared/infra/services/repository.service
 export class FolderService extends RepositoryService<Folder> {
   private folderSubject = new BehaviorSubject<Folder[]>([]);
   public folders$ = this.folderSubject.asObservable();
-constructor(apollo: Apollo) {
+  private navigationHistory: number[] = [];
+
+  constructor(apollo: Apollo) {
     super(apollo, 'Folder');
-}
-private loadInitialfolders(): void {
-  this.getAll().subscribe((folders) => this.folderSubject.next(folders));
-}
+    this.loadInitialFolders();
+  }
 
-protected override mapAllItems(result: any): Folder[] {
-  return result.data?.allFolders || [];
-}
+  private loadInitialFolders(): void {
+    this.getAll().subscribe((folders) => this.folderSubject.next(folders));
+  }
 
-protected override mapSingleItem(result: any): Folder {
-  return result.data?.FolderById as Folder;
-}
+  protected override mapAllItems(result: any): Folder[] {
+    return result.data?.allFolders || [];
+  }
 
-protected override mapCreateItem(result: any): Folder {
-  return result.data?.addFolder as Folder;
-}
+  protected override mapSingleItem(result: any): Folder {
+    return result.data?.FolderById as Folder;
+  }
 
-protected override mapUpdateItem(result: any): Folder {
-  return result.data?.updateFolder as Folder;
-}
+  protected override mapCreateItem(result: any): Folder {
+    return result.data?.addFolder as Folder;
+  }
 
-protected override mapDeleteResult(result: any): boolean {
-  return result.data?.deleteFolder === true;
-}
+  protected override mapUpdateItem(result: any): Folder {
+    return result.data?.updateFolder as Folder;
+  }
+
+  protected override mapDeleteResult(result: any): boolean {
+    return result.data?.deleteFolder === true;
+  }
+
   // Get all folders
   override getAll(): Observable<Folder[]> {
-    return this.apollo
-      .watchQuery<{ allFolders: Folder[] }>({
-        query: gql`
-          ${this.typeOperations.getAll}
-        `,
+    return super.getAll().pipe(
+      map((folders) => {
+        this.folderSubject.next(folders);
+        return folders;
       })
-      .valueChanges.pipe(
-        map((result: any) => result.data.allFolders,console.log(' get allllll' ))
-      );
+    );
   }
+
   // Get folder by ID
-  getById(id: number): Observable<Folder> {
+  override get(id: number): Observable<Folder> {
     return this.apollo
       .watchQuery<{ folderById: Folder }>({
         query: GET_FOLDER_BY_ID,
         variables: { id },
-        
       })
       .valueChanges.pipe(
-        map((result: any) => result.data.folderById ,console.log(' getbyid' , id))
-      
+        map((result: any) => {
+          const folder = result.data.folderById;
+          const currentFolders = this.folderSubject.value;
+          const updatedFolders = currentFolders.map(f => f.id === folder.id ? folder : f);
+          this.folderSubject.next(updatedFolders);
+          return folder;
+        })
       );
+     
   }
-  getFoldersByParentId(parentId: number): Observable<Folder[]> {
-    return this.apollo.query({
-      query: GET_FOLDERS_BY_PARENT_ID,
-      variables: { parentId }
-    }).pipe(
-      map((result: any) => result.data.foldersByParentId,console.log(' getfolderbyparentid' , parentId))
+  // override get(id: number): Observable<Folder> {
+  //   return super.get(id).pipe(
+  //     map((folder) => {
+  //       const folders = this.folderSubject.value.map((p) =>
+  //         p.id === id ? folder : p
+  //       );
+  //       this.folderSubject.next(folders);
+  //       return folder;
+  //     })
+  //   );
+  // }
 
+  getFoldersByParentId(parentId: number): Observable<Folder[]> {
+    return this.apollo.watchQuery({
+      query:  gql`
+        ${this.typeOperations.getFoldersByParentId}
+      `,
+      variables: { parentId }
+    }).valueChanges.pipe(
+      map((result: any) => {
+        const folders = result.data.foldersByParentId;
+        this.folderSubject.next(folders);
+        return folders;
+      })
     );
   }
-  
 
-   // Create folder
-  createFolder(folder: {  
-    folderName: string;
-    parentId?: number;
-    createdBy: number;
-    editedBy: number;
-    createdAt: Date;
-    updatedAt: Date;
-  }): Observable<Folder> {
-    // console.log("type operation for folder",this.typeOperations.create);
+  // Create folder
+  override create(folder: Folder
+  ): Observable<Folder> {
     return this.apollo
       .mutate<{ addFolder: Folder }>({
         mutation: gql`
         ${this.typeOperations.create}
       `,
-        variables: { folder  }
+        variables: { folder }
       })
       .pipe(
-        map((result: any) => result.data.addFolder,console.log(' folder service parent id' , folder.parentId ))
+        map((result: any) => {
+          const newFolder = result.data.addFolder;
+          const currentFolders = this.folderSubject.value;
+          this.folderSubject.next([...currentFolders, newFolder]);
+          return newFolder;
+        })
       );
+      
   }
 
   // Update folder
   updateFolder(folder: Folder): Observable<Folder> {
     return super.update(folder.id, folder).pipe(
       map((updatedFolder) => {
+        const updatedFolders = this.folderSubject.value.map(f =>
+          f.id === updatedFolder.id ? updatedFolder : f
+        );
+        this.folderSubject.next(updatedFolders);
         return updatedFolder;
       })
     );
   }
 
-
-
-  // Other methods...
-
+  override delete(id: number): Observable<boolean> {
+    return super.delete(id).pipe(
+      map((success) => {
+        if (success) {
+          const folders = this.folderSubject.value.filter((t) => t.id !== id);
+          this.folderSubject.next(folders);
+          console.log('folders deleted',folders); 
+        }
+        return success;
+      })
+    );
+  }
+    // Navigation history methods
+    addToNavigationHistory(folderId: number): void {
+      this.navigationHistory.push(folderId);
+    }
+  
+    getPreviousFolderId(): number | undefined {
+      return this.navigationHistory.pop();
+    }
 }

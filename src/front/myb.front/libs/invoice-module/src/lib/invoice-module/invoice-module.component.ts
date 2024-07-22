@@ -10,6 +10,9 @@ import { NavbarComponent } from '../components/navbar/navbar.component';
 import { ListInvoiceComponent } from '../components/list-invoice/listInvoice.component';
 import {BreadcrumbComponent} from '../../../../time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component'
 import {ToastsContainerComponent} from '../../../../shared/shared-ui/src/lib/components/toasts-container/toasts-container.component'
+import { DocModuleWidgetComponent } from 'libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component';
+import { FolderDetailsComponent } from '@myb-front/doc-management-module';
+import { FolderListComponent } from 'libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component';
 
 
 @Component({
@@ -23,7 +26,9 @@ import {ToastsContainerComponent} from '../../../../shared/shared-ui/src/lib/com
     ListInvoiceComponent, 
     CreateInvoiceComponent,
     BreadcrumbComponent,
-    ToastsContainerComponent
+    ToastsContainerComponent,
+    DocModuleWidgetComponent,
+    FolderDetailsComponent,
   ],
   templateUrl: './invoice-module.component.html',
   styleUrl: './invoice-module.component.css',
@@ -33,6 +38,12 @@ export class InvoiceModuleComponent implements OnInit {
   private modalService = inject(NgbModal);
   private invoiceService = inject(InvoiceService);
   private router = inject(Router);
-
+  
+  fId!:number ; 
+  folderTitle! :string;
   ngOnInit(): void {}
+
+  onFolderSelected(folderId: number): void {
+    this.fId = folderId;
+  }
 }

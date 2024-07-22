@@ -43,7 +43,7 @@ import {
   DELETE_EMPLOYEE,
   UPDATE_EMPLOYEE,
 } from 'libs/time-sheet-module/src/lib/graphql/mutations/employee.graphql';
-import { GET_ALL_FOLDERS, GET_FOLDER_BY_ID } from 'libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql';
+import { GET_ALL_FOLDERS, GET_FOLDERS_BY_PARENT_ID, GET_FOLDER_BY_ID } from 'libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql';
 import { ADD_FOLDER, DELETE_FOLDER, UPDATE_FOLDER } from 'libs/doc-management-module/src/lib/GraphQl/Mutations/FolderMutation';
 import { CREATE_INVOICE } from "libs/invoice-module/src/lib/graphql/mutations/invoice.mutation";
 
@@ -99,6 +99,7 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_DOCUMENT,
     delete: DELETE_DOCUMENT,
     create: ADD_DOCUMENT,
+   
 
   },
   //folder type
@@ -108,6 +109,8 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_FOLDER,
     delete: DELETE_FOLDER,
     create: ADD_FOLDER,
+    getFoldersByParentId:GET_FOLDERS_BY_PARENT_ID
+
     },
 
   // You can add more configurations for different types here

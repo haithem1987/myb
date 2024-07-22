@@ -8,10 +8,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class KeycloakService {
   private keycloak!: Keycloak;
-  private profileSubject: BehaviorSubject<KeycloakProfile | null> =
-    new BehaviorSubject<KeycloakProfile | null>(null);
-  public profile$: Observable<KeycloakProfile | null> =
-    this.profileSubject.asObservable();
+  private profileSubject: BehaviorSubject<KeycloakProfile | null> = new BehaviorSubject<KeycloakProfile | null>(null);
+  public profile$: Observable<KeycloakProfile | null> = this.profileSubject.asObservable();
 
   private adminToken: string | null = null;
   private userIdSubject: BehaviorSubject<string | null> = new BehaviorSubject<

@@ -30,36 +30,32 @@ export class FolderCreationComponent  {
     console.log('Received parentid from details:', this.parentId);
   }
 
-  createFolder(): void {
+   createFolder(): void {
     if (this.folderName) {
-      // const parentId = this.folderId === this.folderId ? this.folderId : null;
-
       const folder = {
         folderName: this.folderName,
-        parentId: this.folderId, 
+        parentId: this.folderId,
         createdBy: 0,
         editedBy: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
-      };
+      } as Folder; 
 
-      this.folderService.createFolder(folder).subscribe(
-        
-        (newFolder) => {
+      this.folderService.create(folder).subscribe({
+        next: (newFolder) => {
           this.folderCreated.emit(newFolder);
           this.activeModal.close();
-          console.log('creation  id', newFolder.id);
+          console.log('creation id', newFolder.id);
           console.log('creation parentId:', newFolder.parentId);
         },
-        (error) => {
+        error: (error) => {
           console.error('Error creating folder:', error);
         }
-      );
+      });
     } else {
       alert('Please enter a folder name');
     }
   }
-
   
 }
 

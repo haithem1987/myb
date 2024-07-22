@@ -7,8 +7,8 @@ export interface Folder extends BaseModel {
     folderName: string;
     createdBy: number;
     editedBy: number;
-    documents: DocumentModel[] | null;
-    children: Folder[] | null; 
+    documents?: DocumentModel[] | null;
+    children?: Folder[] | null; 
     
   
   }

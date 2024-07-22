@@ -25,7 +25,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
       ]
 })
 
-export class NavLinksComponent {
+export class NavLinksComponent  {
   folders: Folder[] = [];
   documents: DocumentModel[] = [];
   fId!: number;
@@ -41,18 +41,11 @@ export class NavLinksComponent {
 
   ) {}
 
-  // ngOnInit() {
-  //   this.vId = +this.route.snapshot.paramMap.get('id')!;
-  //   console.log('this is  folderid from navlink ', this.vId)   
-  //   this.fId = +this.route.snapshot.paramMap.get('id')!;
-  //   console.log('this is  folderid from details ', this.fId)
 
- 
-  // }
   openModal(): void {
     const modalRef = this.modalService.open(FolderCreationComponent);
-    modalRef.componentInstance.fId = this.vId;
-    console.log('Folder ID modal:', this.vId);
+    modalRef.componentInstance.fId = this.fId;
+    console.log('Folder ID modal:', this.fId);
     modalRef.componentInstance.folderCreated.subscribe((newFolder: Folder) => {
       this.folderCreated.emit(newFolder);
     });

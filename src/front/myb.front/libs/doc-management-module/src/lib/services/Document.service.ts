@@ -14,8 +14,10 @@ import { RepositoryService } from 'libs/shared/infra/services/repository.service
 export class DocumentService extends RepositoryService<DocumentModel> {
   private documentSubject = new BehaviorSubject<DocumentModel[]>([]);
   public documents$ = this.documentSubject.asObservable();
+
 constructor(apollo: Apollo) {
     super(apollo, 'DocumentModel');
+    this.loadInitialdocuments
 }
 private loadInitialdocuments(): void {
   this.getAll().subscribe((documents) => this.documentSubject.next(documents));
@@ -62,21 +64,8 @@ override getAll(): Observable<DocumentModel[]> {
   );
 }
 
-//delete document
-// override delete(id: number): Observable<DocumentModel> {
-//     return  this.apollo
-//         .mutate({
-//             mutation: gql`
-//             ${this.typeOperations.delete}
-//             `,
-//             variables: {
-//                 id: id,
-//             },
-//         })
-//         .pipe(
-//             map((result: any) => result.data.deleteDocument )
-//         );
-// }
+
+
 override delete(id: number): Observable<boolean> {
   return super.delete(id).pipe(
     map((success) => {
@@ -88,6 +77,8 @@ override delete(id: number): Observable<boolean> {
     })
   );
 }
+
+
 //update document
 // override update(id: number, document: DocumentModel): Observable<DocumentModel> {
 //   return this.apollo
@@ -120,19 +111,20 @@ getDocumentsByFolderId(folderId: number): Observable<DocumentModel[]> {
     variables: {
       folderId,
     },
-  }).valueChanges.pipe(
+  })
+  .valueChanges.pipe(
     // map((result: any) => result.data.documentsByFolderId)
     map((result: any) => {
       const documents = result.data.documentsByFolderId;
       this.documentSubject.next(documents);
+      console.log('doc service',documents)
+
       return documents;
     })
   );
 }
 
 createDocument(document: DocumentModel): Observable<DocumentModel> {
-  let documenttest =document;
-  console.log("this document test",documenttest);
   return this.apollo
     .mutate<{ addDocument: DocumentModel }>({
       mutation: gql`
@@ -141,8 +133,12 @@ createDocument(document: DocumentModel): Observable<DocumentModel> {
       variables: { document }
     })
     .pipe(
-      map((result: any) => { console.log(result.data); return result.data.addDocument})
-      
+      map((result: any) => {
+        const newDocument = result.data.addDocument;
+        const documents = [...this.documentSubject.value, newDocument];
+        this.documentSubject.next(documents);
+        return newDocument;
+      })
     );
 }
 

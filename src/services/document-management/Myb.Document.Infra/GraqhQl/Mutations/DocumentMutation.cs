@@ -63,6 +63,23 @@ namespace Myb.Document.Infra.GraphQl.Mutations
         {
             return await documentVersionService.UpdateDocumentVersionAsync(documentVersion);
         }
+
+
+        // RootFolder Mutations
+        public async Task<RootFolder> AddRootFolder([Service] IRootFolderService rootFolderService, RootFolder rootFolder)
+        {
+            return await rootFolderService.AddRootFolderAsync(rootFolder);
+        }
+
+        public async Task<RootFolder> UpdateRootFolder([Service] IRootFolderService rootFolderService, RootFolder rootFolder)
+        {
+            return await rootFolderService.UpdateRootFolderAsync(rootFolder);
+        }
+
+        public async Task<bool> DeleteRootFolder([Service] IRootFolderService rootFolderService, int id)
+        {
+            return await rootFolderService.DeleteRootFolderAsync(id);
+        }
     }
 
    

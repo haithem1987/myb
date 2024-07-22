@@ -36,10 +36,27 @@ namespace Myb.Document.Infra.GraphQl.Queries
         {
             return await folderService.GetAllFoldersAsync();
         }
-      /*  //version query
-        public async Task<Version> GetVersionById([Service] IDocumentVersionService versionService, int id)
+        /*  //version query
+          public async Task<Version> GetVersionById([Service] IDocumentVersionService versionService, int id)
+          {
+              return await versionService.GetVersionByIdAsync(id);
+          }*/
+
+
+        // RootFolder Queries
+        public async Task<RootFolder> GetRootFolderById([Service] IRootFolderService rootFolderService, int id)
         {
-            return await versionService.GetVersionByIdAsync(id);
-        }*/
+            return await rootFolderService.GetRootFolderByIdAsync(id);
+        }
+
+        public async Task<RootFolder> GetRootFolderByUserIdAndModuleName([Service] IRootFolderService rootFolderService, string userId, string moduleName)
+        {
+            return await rootFolderService.GetRootFolderByUserIdAndModuleNameAsync(userId, moduleName);
+        }
+
+        public async Task<IEnumerable<RootFolder>> GetAllRootFolders([Service] IRootFolderService rootFolderService)
+        {
+            return await rootFolderService.GetAllRootFoldersAsync();
+        }
     }
 }

@@ -14,6 +14,7 @@ namespace Myb.Document.Infra.GraqhQl.Extensions
         {
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IFolderService, FolderService>();
+            services.AddScoped<IRootFolderService, RootFolderService>();
         }
 
 

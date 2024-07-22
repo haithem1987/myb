@@ -1,71 +1,125 @@
 <div class="container mt-3">
-  <h5>Your Files in <span class="folder-name">{{ folder?.folderName }}</span> :</h5>
-  <button class="btn btn-outline-secondary me-2 btn-sm" (click)="openFolderCreationModal()"> New Folder</button>
-  <button  class="btn btn-outline-secondary me-2 btn-sm" (click)="openModalDoc()"> New document</button>
-  <input
-    type="text"
-    class="form-control mb-3"
-    placeholder="Search Documents..."
-    (keyup)="filterDocument()"
-  />
+  <div class="ms-auto" *ngIf="canCreateFolder">
+    <h4>{{ title }}</h4>
+    <h5 class="mb-0">Your Files in <span class="folder-name">{{ folder?.folderName }}</span> :</h5>
+    <div class="d-flex mb-3">
+      <span (click)="goBackToPreviousFolder()"><i class="bi bi-arrow-return-left"></i></span>
+  
+      
+      <div class="ms-auto">
+        
+        <button class="btn btn-outline-secondary me-2 btn-sm" (click)="openFolderCreationModal()">
+          <i class="bi bi-folder-plus" style="font-size: 20px;"></i>
+          Folder
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="openModalDoc()">
+          <i class="bi bi-cloud-arrow-up-fill" style="font-size: 20px;"></i>
+          Upload
+        </button>
+      </div>
+  </div>
 
-  <div class="card border-primary p-2">
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th scope="col" style="cursor: pointer">
-            Document Name
-            <i class="bi"></i>
-          </th>
-          <th scope="col" style="cursor: pointer">
-            Type
-            <i class="bi"></i>
-          </th>
-          <th scope="col" style="cursor: pointer">
-            Size
-            <i class="bi"></i>
-          </th>
-          <th scope="col">Creation Date</th>
-          <th scope="col">Update Date</th>
-          <th scope="col" class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let folder of folders">
-          <tr >
-            <td (click)="openFolder(folder.id)">
-              <!-- <td> -->
-              <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
-              <a class="no-underline">{{ folder.folderName }}</a>
+  <div *ngIf="folders.length === 0 && documents.length === 0">
+
+    <p>No folders yet, Add folder</p>
+  </div>
+
+  </div>
+
+  <!-- Show message when there are no folders or documents -->
+  <div *ngIf="folders$ | async as folders; else noFolders">
+    
+
+    <!-- Show table when there are folders or documents -->
+    <div *ngIf="folders.length > 0 || documents.length > 0" class="card border-primary p-2">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col" style="cursor: pointer">
+              Document Name
+              <i class="bi"></i>
+            </th>
+            <th scope="col" style="cursor: pointer">
+              Type
+              <i class="bi"></i>
+            </th>
+            <th scope="col" style="cursor: pointer">
+              Size
+              <i class="bi"></i>
+            </th>
+            <th scope="col">Creation Date</th>
+            <th scope="col">Update Date</th>
+            <!-- <th scope="col">createdBy</th> -->
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <ng-container *ngFor="let folder of folders$ | async">
+            <tr>
+              <td (click)="openFolder(folder.id)">
+                <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
+                <a class="no-underline">{{ folder.folderName }}</a>
+              </td>
+              <td>Folder</td>
+              <td></td>
+              <td>{{ folder.createdAt | date }}</td>
+              <td>{{ folder.updatedAt | date }}</td>
+              <!-- <td>{{ folder.createdBy }}</td> -->
+              <td class="text-end">
+                <div class="d-flex justify-content-end align-items-center">
+                  <div ngbDropdown>
+                    <i class="bi bi-three-dots-vertical" style="font-size: 30px; color: green;" ngbDropdownToggle></i>
+                    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                      <button ngbDropdownItem>
+                        <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+                      <button ngbDropdownItem class="btn btn-outline-secondary me-2" (click)="pinFolder(folder)">
+                        <i class="bi bi-pin-angle"></i> Pin
+                      </button>
+                      <button ngbDropdownItem class="delete-button" (click)="deleteFolder(folder.id != null ? folder.id : -1)">
+                        <i class="bi bi-trash"></i> Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+
+          <tr *ngFor="let document of documents">
+            <td>
+              <ng-container [ngSwitch]="document.documentType">
+                <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf-fill me-2" style="font-size: 25px;"></i>
+                <i *ngSwitchCase="'WORD'" class="bi bi-file-earmark-word me-2" style="font-size: 25px;"></i>
+                <i *ngSwitchCase="'EXCEL'" class="bi bi-filetype-xls me-2" style="font-size: 25px;"></i>
+                <i *ngSwitchCase="'IMAGE'" class="bi bi-file-image me-2" style="font-size: 25px;"></i>
+              </ng-container>
+              {{ document.documentName }}
             </td>
-            <td>Folder</td>
-            <td></td>
-            <td>{{ folder.createdAt | date }}</td>
-            <td>{{ folder.updatedAt | date }}</td>
+            <td>{{ document.documentType }}</td>
+            <td>{{ document.documentSize }} bytes</td>
+            <td>{{ document.createdAt | date }}</td>
+            <td>{{ document.updatedAt | date }}</td>
+            <!-- <td>{{ document.createdBy }}</td> -->
             <td class="text-end">
               <div class="d-flex justify-content-end align-items-center">
                 <div ngbDropdown>
-                  <i
-                    class="bi bi-three-dots-vertical"
-                    style="font-size: 30px; color: green;"
-                    ngbDropdownToggle
-                  ></i>
+                  <i class="bi bi-three-dots-vertical" style="font-size: 30px; color: green;" ngbDropdownToggle></i>
                   <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
                     <button ngbDropdownItem>
+                      <i class="bi bi-share-fill"></i> Share
+                    </button>
+                    <button ngbDropdownItem (click)="openModal(document)">
                       <i class="bi bi-pencil-square"></i> Edit
                     </button>
-                    <button
-                      ngbDropdownItem
-                      class="btn btn-outline-secondary me-2"
-                      (click)="pinFolder(folder)"
-                    >
-                      <i class="bi bi-pin-angle"></i> Pin
+                    <button ngbDropdownItem (click)="downloadDocument(document)">
+                      <i class="bi bi-box-arrow-down"></i> Download
                     </button>
-                    <button
-                      ngbDropdownItem
-                      class="delete-button"
-                      (click)="deleteFolder(folder.id != null ? folder.id : -1)"
-                    >
+                    <button ngbDropdownItem (click)="viewDocument(document)">
+                      <i class="bi bi-eye"></i> View
+                    </button>
+                    <button ngbDropdownItem class="delete-button" (click)="deleteDocument(document.id)">
                       <i class="bi bi-trash"></i> Delete
                     </button>
                   </div>
@@ -73,48 +127,11 @@
               </div>
             </td>
           </tr>
-        </ng-container>
-
-        <tr *ngFor="let document of documents">
-          <td>
-            <ng-container [ngSwitch]="document.documentType">
-              <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf-fill me-2" style="font-size: 25px;"></i>
-              <i *ngSwitchCase="'WORD'" class="bi bi-file-earmark-word me-2" style="font-size: 25px;"></i>
-              <i *ngSwitchCase="'EXCEL'" class="bi bi-filetype-xls me-2" style="font-size: 25px;"></i>
-              <i *ngSwitchCase="'IMAGE'" class="bi bi-file-image me-2" style="font-size: 25px;"></i>
-            </ng-container>
-            {{ document.documentName }}
-          </td>
-          <td>{{ document.documentType }}</td>
-          <td>{{ document.documentSize }} bytes</td>
-          <td>{{ document.createdAt | date }}</td>
-          <td>{{ document.updatedAt | date }}</td>
-          <td class="text-end">
-            <div class="d-flex justify-content-end align-items-center">
-              <div ngbDropdown>
-                <i class="bi bi-three-dots-vertical" style="font-size: 30px; color: green;" ngbDropdownToggle></i>
-                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                  <button ngbDropdownItem>
-                    <i class="bi bi-share-fill"></i> Share
-                  </button>
-                  <button ngbDropdownItem (click)="openModal(document)">
-                    <i class="bi bi-pencil-square"></i> Edit
-                  </button>
-                  <button ngbDropdownItem (click)="downloadDocument(document)">
-                    <i class="bi bi-box-arrow-down"></i> Download
-                  </button>
-                  <button ngbDropdownItem (click)="viewDocument(document)">
-                    <i class="bi bi-eye"></i> View
-                  </button>
-                  <button ngbDropdownItem class="delete-button" (click)="deleteDocument(document.id)">
-                    <i class="bi bi-trash"></i> Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </div>
+  <ng-template #noFolders>
+    <p>No folders yet, Add folder</p>
+  </ng-template>
 </div>

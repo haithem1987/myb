@@ -15,15 +15,8 @@ variables:
   SOLUTION_FILE: 'Myb.sln'
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  SERVICES:
-    - name: myb-usermanager
-      directory: ./src/services/user-manager/Myb.UserManager/Dockerfile
-    - name: TimeSheet
-      directory: ./src/services/time-sheet/Myb.Timesheet/Dockerfile
-    - name: DocManager
-      directory: ./src/services/invoice-management/Myb.Invoice/Dockerfile
-    - name: InvoiceService
-      directory: ./src/services/document-management/Myb.Document/Dockerfile
+
+
 
 
 before_script:
@@ -42,14 +35,26 @@ build:
     # - dotnet restore $SOLUTION_FILE
     # - dotnet build $SOLUTION_FILE --configuration Release
     - |
-      for service in $SERVICES; do
+      for service in $SERVICE; do
         docker build -t "$CI_REGISTRY_IMAGE/$service[name]:latest" -f "$service[directory]" .
         echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
         docker push "$CI_REGISTRY_IMAGE/$service[name]:latest"
       done
   parallel:
     matrix:
-      - SERVICE: $SERVICES
+      - SERVICE: 
+          - UserManager:
+                - name: myb-usermanager
+                  directory: ./src/services/user-manager/Myb.UserManager/Dockerfile
+          - TimeSheet:
+                - name: TimeSheet
+                  directory: ./src/services/time-sheet/Myb.Timesheet/Dockerfile
+          - InvoiceService:
+                - name: InvoiceService
+                  directory: ./src/services/invoice-management/Myb.Invoice/Dockerfile
+          - DocManager:
+                - name: DocManager
+                  directory: ./src/services/document-management/Myb.Document/Dockerfile
 
 
 

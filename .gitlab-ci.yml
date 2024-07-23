@@ -1,20 +1,69 @@
+image: docker:26.1.4
 
-stages:
-  - pull_request
+services:
+  - docker:26.1.4-dind
+
+
+ 
+
+stages: 
+  # - test
   - build
   - deploy
 
-include:
-  - local: .gitlab-ci-pr.yml
-    rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+variables:
+  SOLUTION_FILE: 'Myb.sln'
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  SERVICES:
+    - name: myb-usermanager
+      directory: ./src/services/user-manager/Myb.UserManager/Dockerfile
+    - name: TimeSheet
+      directory: ./src/services/time-sheet/Myb.Timesheet/Dockerfile
+    - name: DocManager
+      directory: ./src/services/invoice-management/Myb.Invoice/Dockerfile
+    - name: InvoiceService
+      directory: ./src/services/document-management/Myb.Document/Dockerfile
 
-  - local: .gitlab-ci-build.yml
-    rules:
-      - if: '$CI_BUILD == "build"'
 
-  - local: .gitlab-ci-deploy.yml
-    rules:
-      - if: '$CI_COMMIT_BRANCH == "main"'
- 
+before_script:
+  - docker info
 
+# test:
+#   stage: test
+#   image: mcr.microsoft.com/dotnet/sdk:8.0
+#   script:
+#     - dotnet test $SOLUTION_FILE  
+
+build:
+  stage: build
+  # image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    # - dotnet restore $SOLUTION_FILE
+    # - dotnet build $SOLUTION_FILE --configuration Release
+    - |
+      for service in $SERVICES; do
+        docker build -t "$CI_REGISTRY_IMAGE/$service[name]:latest" -f "$service[directory]" .
+        echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+        docker push "$CI_REGISTRY_IMAGE/$service[name]:latest"
+      done
+  parallel:
+    matrix:
+      - SERVICE: $SERVICES
+
+
+
+
+deploy:
+  stage: deploy
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan 146.59.233.31 >> ~/.ssh/known_hosts
+  script:
+    - ssh ubuntu@146.59.233.31 "sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && sudo docker pull koutaibams1999/myb-usermanager:latest &&  sudo docker run -d --name myb-usermanager -p 8080:8080 koutaibams1999/myb-usermanager:latest"
+  only:
+    - main

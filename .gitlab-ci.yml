@@ -34,7 +34,7 @@ build:
   stage: build
   script:
     - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-    - docker-compose -f docker-compose.yml build
+    - docker-compose  build
     # Tag and push images to Docker Hub
     - |
       for service in  $SERVICE_NAME; do

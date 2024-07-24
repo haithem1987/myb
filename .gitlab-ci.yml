@@ -23,9 +23,9 @@ build:
   script:
     # - dotnet restore $SOLUTION_FILE
     # - dotnet build $SOLUTION_FILE --configuration Release
-    - docker build -t koutaibams1999/myb-usermanager:latest -f ./src/services/user-manager/Myb.UserManager/Dockerfile .
+    - docker build -t koutaibams1999/myb-timesheet:latest -f ./src/services/document-management/Myb.Document/Dockerfile .
     - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-    - docker push koutaibams1999/myb-usermanager:latest
+    - docker push koutaibams1999/myb-timesheet:latest
 deploy:
   stage: deploy
   before_script:

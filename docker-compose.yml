@@ -1,19 +1,19 @@
-version: '3.8'
+
 
 services:
   myb-usermanager:
     build:
       context: ./src/services/user-manager/Myb.UserManager
       dockerfile: Dockerfile
-  TimeSheet:
+  myb-timesheet:
     build:
       context: ./src/services/time-sheet/Myb.Timesheet
       dockerfile: Dockerfile
-  DocManager:
+  myb-docmanager:
     build:
       context: ./src/services/document-management/Myb.Document
       dockerfile: Dockerfile
-  InvoiceService:
+  myb-invoiceservice:
     build:
       context: ./src/services/invoice-management/Myb.Invoice
       dockerfile: Dockerfile

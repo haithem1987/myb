@@ -51,9 +51,9 @@ build:
     matrix:
       - SERVICE_NAME: 
         - myb-usermanager
-        - TimeSheet
-        - DocManager
-        - InvoiceService
+        - myb-timesheet
+        - myb-docmanager
+        - myb-invoiceservice
 
 
 

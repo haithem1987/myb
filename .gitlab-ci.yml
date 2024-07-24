@@ -2,12 +2,13 @@ image: docker:26.1.4
 
 services:
   - docker:26.1.4-dind
+  - mcr.microsoft.com/dotnet/sdk:8.0 
 
 
  
 
 stages: 
-  # - test
+  - test
   - build
   - deploy
 
@@ -24,7 +25,6 @@ before_script:
 
 test:
   stage: test
-  image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
     - dotnet test $SOLUTION_FILE  
 

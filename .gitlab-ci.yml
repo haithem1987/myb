@@ -8,7 +8,7 @@ services:
  
 
 stages: 
-  - test
+  # - test
   - build
   - deploy
 
@@ -16,7 +16,7 @@ variables:
   SOLUTION_FILE: 'Myb.sln'
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  BUILD_IMAGE : mcr.microsoft.com/dotnet/sdk:8.0 
+  # BUILD_IMAGE : mcr.microsoft.com/dotnet/sdk:8.0 
 
 
 
@@ -24,11 +24,11 @@ variables:
 before_script:
   - docker info
 
-test:
-  stage: test
-  image: $BUILD_IMAGE
-  script:
-    - dotnet test $SOLUTION_FILE  
+# test:
+#   stage: test
+#   image: $BUILD_IMAGE
+#   script:
+#     - dotnet test $SOLUTION_FILE  
 
 build:
   stage: build

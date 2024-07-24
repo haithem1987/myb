@@ -1,64 +1,72 @@
-image: docker:26.1.4
+Primary navigation
+Homepage
+ 1
+ Search or go to…
+Project
+M
+MYB
 
+Pinned
+Issues
+37
+
+Manage
+
+Plan
+
+Code
+
+Build
+
+Secure
+
+Deploy
+
+Operate
+
+Monitor
+
+Analyze
+
+Settings
+MOHAMED KOUTAIBA MSADAA
+MYB
+myb
+.gitlab-ci.yml
+Bassem's avatar
+gbwdh
+Bassem TRABELSI authored 1 month ago
+95f596f5
+.gitlab-ci.yml
+1.33 KiB
+image: docker:26.1.4
 services:
   - docker:26.1.4-dind
-  
-
-
  
-
 stages: 
   # - test
   - build
   - deploy
-
 variables:
   SOLUTION_FILE: 'Myb.sln'
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  # BUILD_IMAGE : mcr.microsoft.com/dotnet/sdk:8.0 
-
-
-
-
 before_script:
   - docker info
-
 # test:
 #   stage: test
-#   image: $BUILD_IMAGE
+#   image: mcr.microsoft.com/dotnet/sdk:8.0
 #   script:
 #     - dotnet test $SOLUTION_FILE  
-
 build:
   stage: build
+  # image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
+    # - dotnet restore $SOLUTION_FILE
+    # - dotnet build $SOLUTION_FILE --configuration Release
+    - docker build -t koutaibams1999/myb-usermanager:latest -f ./src/services/user-manager/Myb.UserManager/Dockerfile .
     - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-    - docker-compose  build
-    # Tag and push images to Docker Hub
-    - |
-      for service in  $SERVICE_NAME; do
-        docker tag ${service}:latest $CI_REGISTRY_IMAGE/${service}:latest
-        docker push $CI_REGISTRY_IMAGE/${service}:latest
-      done
-    # - |
-    #   for service in $SERVICE; do
-    #     docker build -t "$CI_REGISTRY_IMAGE/$service[name]:latest" -f "$service[directory]" .
-    #     echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-    #     docker push "$CI_REGISTRY_IMAGE/$service[name]:latest"
-    #   done
-  parallel:
-    matrix:
-      - SERVICE_NAME: 
-         - myb-usermanager
-        #- myb-timesheet
-        # - myb-docmanager
-        # - myb-invoiceservice
-
-
-
-
-
+    - docker push koutaibams1999/myb-usermanager:latest
 deploy:
   stage: deploy
   before_script:

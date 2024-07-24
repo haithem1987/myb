@@ -22,39 +22,37 @@ variables:
 before_script:
   - docker info
 
-# test:
-#   stage: test
-#   image: mcr.microsoft.com/dotnet/sdk:8.0
-#   script:
-#     - dotnet test $SOLUTION_FILE  
+test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - dotnet test $SOLUTION_FILE  
 
 build:
   stage: build
-  # image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
-    # - dotnet restore $SOLUTION_FILE
-    # - dotnet build $SOLUTION_FILE --configuration Release
+    - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+    - docker-compose -f docker-compose.yml build
+    # Tag and push images to Docker Hub
     - |
-      for service in $SERVICE; do
-        docker build -t "$CI_REGISTRY_IMAGE/$service[name]:latest" -f "$service[directory]" .
-        echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-        docker push "$CI_REGISTRY_IMAGE/$service[name]:latest"
+      for service in $SERVICE_NAME; do
+        docker tag ${service}:latest $CI_REGISTRY_IMAGE/${service}:latest
+        docker push $CI_REGISTRY_IMAGE/${service}:latest
       done
+    # - |
+    #   for service in $SERVICE; do
+    #     docker build -t "$CI_REGISTRY_IMAGE/$service[name]:latest" -f "$service[directory]" .
+    #     echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+    #     docker push "$CI_REGISTRY_IMAGE/$service[name]:latest"
+    #   done
   parallel:
     matrix:
-      - SERVICE: 
-          - UserManager:
-                - name: myb-usermanager
-                  directory: ./src/services/user-manager/Myb.UserManager/Dockerfile
-          - TimeSheet:
-                - name: TimeSheet
-                  directory: ./src/services/time-sheet/Myb.Timesheet/Dockerfile
-          - InvoiceService:
-                - name: InvoiceService
-                  directory: ./src/services/invoice-management/Myb.Invoice/Dockerfile
-          - DocManager:
-                - name: DocManager
-                  directory: ./src/services/document-management/Myb.Document/Dockerfile
+      - SERVICE_NAME: 
+        - myb-usermanager
+        - TimeSheet
+        - DocManager
+        - InvoiceService
+
 
 
 

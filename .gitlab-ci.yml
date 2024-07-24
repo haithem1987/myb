@@ -37,7 +37,7 @@ build:
     - docker-compose -f docker-compose.yml build
     # Tag and push images to Docker Hub
     - |
-      for service in $SERVICE_NAME; do
+      for service in myb-usermanager myb-timesheet myb-docmanager myb-invoiceservice; do
         docker tag ${service}:latest $CI_REGISTRY_IMAGE/${service}:latest
         docker push $CI_REGISTRY_IMAGE/${service}:latest
       done
@@ -47,13 +47,13 @@ build:
     #     echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
     #     docker push "$CI_REGISTRY_IMAGE/$service[name]:latest"
     #   done
-  parallel:
-    matrix:
-      - SERVICE_NAME: 
-        - myb-usermanager
-        - myb-timesheet
-        - myb-docmanager
-        - myb-invoiceservice
+  # parallel:
+  #   matrix:
+  #     - SERVICE_NAME: 
+  #       - myb-usermanager
+  #       - myb-timesheet
+  #       - myb-docmanager
+  #       - myb-invoiceservice
 
 
 

@@ -50,8 +50,8 @@ build:
   parallel:
     matrix:
       - SERVICE_NAME: 
-        # - myb-usermanager
-        - myb-timesheet
+         - myb-usermanager
+        #- myb-timesheet
         # - myb-docmanager
         # - myb-invoiceservice
 

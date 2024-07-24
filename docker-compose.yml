@@ -1,14 +1,14 @@
 
 
 services:
-  # myb-usermanager:
-  #   build:
-  #     context: ./src/services/user-manager/Myb.UserManager
-  #     dockerfile: Dockerfile
-  myb-timesheet:
+  myb-usermanager:
     build:
-      context: ./src/services/time-sheet/Myb.Timesheet
+      context: ./src/services/user-manager/Myb.UserManager
       dockerfile: Dockerfile
+  # myb-timesheet:
+  #   build:
+  #     context: ./src/services/time-sheet/Myb.Timesheet
+  #     dockerfile: Dockerfile
   # myb-docmanager:
   #   build:
   #     context: ./src/services/document-management/Myb.Document

@@ -1,22 +1,22 @@
 
 
 services:
-  myb-usermanager:
-    build:
-      context: ./src/services/user-manager/Myb.UserManager
-      dockerfile: Dockerfile
+  # myb-usermanager:
+  #   build:
+  #     context: ./src/services/user-manager/Myb.UserManager
+  #     dockerfile: Dockerfile
   myb-timesheet:
     build:
       context: ./src/services/time-sheet/Myb.Timesheet
       dockerfile: Dockerfile
-  myb-docmanager:
-    build:
-      context: ./src/services/document-management/Myb.Document
-      dockerfile: Dockerfile
-  myb-invoiceservice:
-    build:
-      context: ./src/services/invoice-management/Myb.Invoice
-      dockerfile: Dockerfile
+  # myb-docmanager:
+  #   build:
+  #     context: ./src/services/document-management/Myb.Document
+  #     dockerfile: Dockerfile
+  # myb-invoiceservice:
+  #   build:
+  #     context: ./src/services/invoice-management/Myb.Invoice
+  #     dockerfile: Dockerfile
 #   timesheetDB:
 #     image: postgres:16.2
 #     restart: always

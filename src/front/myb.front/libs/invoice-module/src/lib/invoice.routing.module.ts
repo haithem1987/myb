@@ -1,15 +1,18 @@
 import { RouterModule, Routes } from '@angular/router';
 import { InvoiceModuleComponent } from './invoice-module/invoice-module.component';
 import { NgModule } from '@angular/core';
-import { InvoiceDetailsComponent } from './components/details-invoice/invoiceDetails.component';
-import { CreateInvoiceComponent } from './components/create-invoice/createInvoice.component';
-import { InvoiceIndexComponent } from './components/index/invoiceIndex.component';
+import { InvoiceDetailsComponent } from './components/invoice-components/details-invoice/invoiceDetails.component';
+import { CreateInvoiceComponent } from './components/invoice-components/create-invoice/createInvoice.component';
+import { InvoiceIndexComponent } from './components/invoice-components/index/invoiceIndex.component';
 import { ListClientComponent } from './components/client-components/list-client/listClient.component';
 import { ListProductComponent } from './components/product-components/list-product/listProduct.component';
 import { CreateProductComponent } from './components/product-components/create-product/createProduct.component';
 import { ProductComponent } from './components/product-components/index/product.component';
 import { CreateClientComponent } from './components/client-components/create-client/createClient.component';
 import { ClientComponent } from './components/client-components/index/client.component';
+import { TaxComponent } from './components/tax-component/index/tax.component';
+import { ListTaxComponent } from './components/tax-component/list-tax/listTax.component';
+import { CreateTaxComponent } from './components/tax-component/create-tax/createTax.component';
 
 export const invoiceRoutes: Routes = [
   {
@@ -46,7 +49,7 @@ export const invoiceRoutes: Routes = [
         data: {
           breadcrumb: 'client',
         },
-        children:[
+        children: [
           {
             path: '',
             component: ListClientComponent,
@@ -61,7 +64,7 @@ export const invoiceRoutes: Routes = [
               breadcrumb: 'new Client',
             },
           },
-        ]
+        ],
       },
       {
         path: 'products',
@@ -69,7 +72,7 @@ export const invoiceRoutes: Routes = [
         data: {
           breadcrumb: 'Product',
         },
-        children:[
+        children: [
           {
             path: '',
             component: ListProductComponent,
@@ -84,7 +87,30 @@ export const invoiceRoutes: Routes = [
               breadcrumb: 'new Product',
             },
           },
-        ]
+        ],
+      },
+      {
+        path: 'taxes',
+        component: TaxComponent,
+        data: {
+          breadcrumb: 'Tax',
+        },
+        children: [
+          {
+            path: '',
+            component: ListTaxComponent,
+            data: {
+              breadcrumb: 'Taxes',
+            },
+          },
+          {
+            path: 'createTax',
+            component: CreateTaxComponent,
+            data: {
+              breadcrumb: 'new Tax',
+            },
+          },
+        ],
       },
     ],
   },

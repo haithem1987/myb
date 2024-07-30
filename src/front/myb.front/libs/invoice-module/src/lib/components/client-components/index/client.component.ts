@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterOutlet } from '@angular/router';
+import { ContactService } from '../../../services/contact.service';
 
 @Component({
   selector: 'myb-front-client',
@@ -9,4 +10,6 @@ import { RouterModule, RouterOutlet } from '@angular/router';
   templateUrl: './client.component.html',
   styleUrl: './client.component.css',
 })
-export class ClientComponent {}
+export class ClientComponent {
+ 
+}

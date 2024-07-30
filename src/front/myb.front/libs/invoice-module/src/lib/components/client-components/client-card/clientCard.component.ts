@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardComponent } from '@myb-front/shared-ui';
+import { Client } from '../../../models/client.model';
 
 @Component({
   selector: 'myb-front-client-card',
@@ -9,4 +10,6 @@ import { CardComponent } from '@myb-front/shared-ui';
   templateUrl: './clientCard.component.html',
   styleUrl: './clientCard.component.css',
 })
-export class ClientCardComponent {}
+export class ClientCardComponent {
+  @Input() client!: Client;
+}

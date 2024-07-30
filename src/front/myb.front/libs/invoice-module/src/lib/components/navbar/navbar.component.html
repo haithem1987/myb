@@ -35,6 +35,14 @@
             >Products</a
           >
         </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/invoice/taxes"
+            routerLinkActive="active"
+            >Taxes</a
+          >
+        </li>
       </ul>
       <ul class="navbar-nav ms-auto">
         <li *ngIf="user$ | async as user" ngbDropdown class="nav-item dropdown">

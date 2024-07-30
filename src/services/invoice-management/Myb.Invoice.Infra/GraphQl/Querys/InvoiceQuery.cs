@@ -31,7 +31,7 @@ namespace Myb.Invoice.Infra.GraphQl.Querys
         public Task<InvoiceDetails?> GetInvoiceDetailsByID([Service] IInvoiceDetailsService invoiceDateilsService, int id) => invoiceDateilsService.GetById(id);
 
 
-        public Task<IEnumerable<Contact?>> GetAllConatcts([Service] IContactService contactService) => contactService.GetAll();
+        public Task<IEnumerable<Contact?>> GetAllContacts([Service] IContactService contactService) => contactService.GetAll();
         public Task<IEnumerable<Contact?>> GetConatctsByIds([Service] IContactService contactService, IEnumerable<int?> ids) => contactService.GetByIds(ids);
         public Task<Contact?> GetContactByID([Service] IContactService contactService, int id) => contactService.GetById(id);
 

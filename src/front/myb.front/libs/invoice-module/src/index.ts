@@ -1,15 +1,15 @@
 export * from './lib/invoice-module/invoice-module.component';
 
-export * from './lib/components/create-invoice/createInvoice.component';
+export * from './lib/components/invoice-components/create-invoice/createInvoice.component';
 
 export * from './lib/components/navbar/navbar.component';
 
-export * from './lib/components/list-invoice/listInvoice.component';
+export * from './lib/components/invoice-components/list-invoice/listInvoice.component';
 
-export * from './lib/components/details-invoice/invoiceDetails.component';
+export * from './lib/components/invoice-components/details-invoice/invoiceDetails.component';
 export * from './lib/invoice.routing.module';
 
-export * from './lib/components/index/invoiceIndex.component';
+export * from './lib/components/invoice-components/index/invoiceIndex.component';
 
 export * from './lib/components/client-components/list-client/listClient.component';
 
@@ -30,3 +30,5 @@ export * from './lib/components/tax-component/index/tax.component';
 export * from './lib/components/tax-component/create-tax/createTax.component';
 
 export * from './lib/components/tax-component/list-tax/listTax.component';
+
+export * from './lib/components/client-components/create-client/add-contact/addContact.component';

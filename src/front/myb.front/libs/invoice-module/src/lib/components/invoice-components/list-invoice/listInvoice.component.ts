@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Invoice } from '../../models/invoice.model';
-import { InvoiceService } from '../../services/invoice.service';
+import { Invoice } from '../../../models/invoice.model';
+import { InvoiceService } from '../../../services/invoice.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EditInvoiceComponent } from '../../components/edit-invoice/editInvoice.component';
-import { CreateInvoiceComponent } from '../../components/create-invoice/createInvoice.component';
+import { EditInvoiceComponent } from '../../invoice-components/edit-invoice/editInvoice.component';
+import { CreateInvoiceComponent } from '../../invoice-components/create-invoice/createInvoice.component';
 import { Router, RouterLink, RouterModule } from '@angular/router';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
+import { NavbarComponent } from '../../../components/navbar/navbar.component';
 
 @Component({
   selector: 'myb-front-list-invoice',

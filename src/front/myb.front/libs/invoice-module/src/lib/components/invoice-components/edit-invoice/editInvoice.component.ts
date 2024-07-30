@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { InvoiceService } from '../../services/invoice.service';
-import { SelectedFiles, UploadFilesService } from '../../services/upload-files.service';
+import { InvoiceService } from '../../../services/invoice.service';
+import { SelectedFiles, UploadFilesService } from '../../../services/upload-files.service';
 
 @Component({
   selector: 'myb-front-edit-invoice',

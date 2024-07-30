@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ProductService } from '../../../services/product.service';
+import { Product } from '../../../models/product.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'myb-front-list-product',
@@ -9,4 +12,7 @@ import { RouterLink } from '@angular/router';
   templateUrl: './listProduct.component.html',
   styleUrl: './listProduct.component.css',
 })
-export class ListProductComponent {}
+export class ListProductComponent {
+  private productService = inject( ProductService);
+  products$ : Observable<Product[]> = this.productService.products$
+}

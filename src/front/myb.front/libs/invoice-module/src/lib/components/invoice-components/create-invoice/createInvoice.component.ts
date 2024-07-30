@@ -1,21 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
-import { InvoiceService } from '../../services/invoice.service';
+import { InvoiceService } from '../../../services/invoice.service';
 import {
   SelectedFiles,
   UploadFilesService,
-} from '../../services/upload-files.service';
-import { Invoice } from '../../models/invoice.model';
+} from '../../../services/upload-files.service';
+import { Invoice } from '../../../models/invoice.model';
 import {
   FormGroup,
   ReactiveFormsModule,
   FormControl,
   Validators,
 } from '@angular/forms';
-import { DateUtilsService } from '../../../../../shared/infra/services/date-utils.service';
-import { ToastService } from '../../../../../shared/infra/services/toast.service';
+import { DateUtilsService } from '../../../../../../shared/infra/services/date-utils.service';
+import { ToastService } from '../../../../../../shared/infra/services/toast.service';
 import { HttpClientModule } from '@angular/common/http';
-import { OcrService } from '../../../../../shared/infra/services/ocr.service';
+import { OcrService } from '../../../../../../shared/infra/services/ocr.service';
 import { NgbScrollSpyModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterLink } from '@angular/router';
 

@@ -10,6 +10,7 @@ export const CREATE_PROJECT = gql`
       endDate
       createdAt
       updatedAt
+      status
     }
   }
 `;
@@ -24,6 +25,7 @@ export const UPDATE_PROJECT = gql`
       endDate
       createdAt
       updatedAt
+      status
     }
   }
 `;

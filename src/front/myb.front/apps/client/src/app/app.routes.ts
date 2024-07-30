@@ -1,5 +1,9 @@
+import { DocumentroutingModule } from './../../../../libs/doc-management-module/src/lib/document-routing-module';
 import { Route } from '@angular/router';
-import { CreateInvoiceComponent } from '@myb-front/invoice-module';
+import {
+  DocManagementModuleComponent,
+  FolderDetailsComponent,
+} from '@myb-front/doc-management-module';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
 export const appRoutes: Route[] = [
   // {
@@ -12,6 +16,7 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('@myb-front/shared-ui').then((c) => c.LandingPageComponent),
   },
+
   {
     path: 'users',
     loadComponent: () =>
@@ -30,5 +35,19 @@ export const appRoutes: Route[] = [
         (c) => c.TimesheetRoutingModule
       ),
   },
-  
+  {
+    path: 'documents',
+    loadChildren: () =>
+      import('@myb-front/doc-management-module').then(
+        (m) => m.DocumentroutingModule
+      ),
+  },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.SettingsComponent),
+  },
+  // {
+  //   path:'folder/:id' , component:FolderDetailsComponent
+  // }
 ];

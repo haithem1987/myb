@@ -1,0 +1,43 @@
+<div class="table doc folders">
+  <h5>  All Documents </h5>
+  <p> This section allows you to manage your folders and  documents</p>
+
+  <div class="card border-primary p-2">
+
+    <table class="table table-hover ">
+      <thead>
+        <tr>
+          <th> Folder Name</th>
+          <!-- <th>Created by</th> -->
+          <th  class="text-end">Date</th>
+          <th  class="text-end">Update Date</th>
+
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let folder of folders">
+          <td>
+            <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
+            <a [routerLink]="['/documents/folder', folder.id]" class="no-underline">{{ folder.folderName }}</a>
+          </td>
+          <!-- <td></td> -->
+          <td  class="text-end">{{folder.createdAt | date }}</td>
+          <td  class="text-end">{{folder.updatedAt | date }}</td>
+
+          <td class="text-end">
+            <button class="btn btn-outline-primary me-2" (click)="openModal()">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button class="btn btn-outline-danger   me-2" (click)="deleteFolder(folder.id != null ? folder.id : -1)">
+              <i class="bi bi-trash"></i>
+            </button>
+            <button class="btn btn-outline-secondary me-2" (click)="pinFolder(folder)">
+              <i class="bi bi-pin-angle"></i> 
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

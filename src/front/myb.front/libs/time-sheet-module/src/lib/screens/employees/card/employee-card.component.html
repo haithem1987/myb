@@ -11,14 +11,14 @@
         (click)="editEmployee(employee)"
       >
         <i class="bi bi-pencil"></i>
-        <div>Éditer</div>
+        <div>{{ 'EDIT' | translate }}</div>
       </button>
       <button
         class="btn btn-outline-danger btn-sm"
         (click)="deleteEmployee(employee.id)"
       >
         <i class="bi bi-trash"></i>
-        <div>Supprimer</div>
+        <div>{{ 'DELETE' | translate }}</div>
       </button>
     </div>
   </div>

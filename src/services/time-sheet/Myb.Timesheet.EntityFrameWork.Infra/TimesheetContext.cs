@@ -19,7 +19,7 @@ public class TimesheetContext:DbContext
 
     public DbSet<Project> Projects { get; set; }
     public DbSet<Employee> Employees { get; set; }
-    //public DbSet<Manager> Managers { get; set; }
+   public DbSet<TimeOff> TimeOff { get; set; }
     public DbSet<TimesheetTask> Tasks { get; set; }
     public DbSet<TimeSheet> Timesheets { get; set; }
     
@@ -34,6 +34,8 @@ public class TimesheetContext:DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Project>()
+            .HasQueryFilter(p => p.Status != ProjectStatus.Deleted); // Filter out deleted projects
         modelBuilder.Entity<Employee>()
             .ToTable("Employees");
 
@@ -42,7 +44,7 @@ public class TimesheetContext:DbContext
         
         modelBuilder.Entity<TimeSheet>(entity =>
         {
-            entity.HasKey(ts => ts.Id);
+           
             entity.HasOne(ts => ts.Employee)
                 .WithMany(te => te.Timesheets)
                 .HasForeignKey(te => te.EmployeeId)

@@ -8,11 +8,13 @@ namespace Myb.Timesheet.Services;
 public class EmployeeService:IEmployeeService
 {
     private readonly IGenericRepository<int?, Employee, TimesheetContext> _employeeRepository;
+    private readonly IGenericRepository<int?, TimeOff, TimesheetContext> _timeoffRepository;
     private readonly ILogger _logger;
 
-    public EmployeeService(IGenericRepository<int?, Employee, TimesheetContext> employeeRepository, ILogger<EmployeeService> logger)
+    public EmployeeService(IGenericRepository<int?, Employee, TimesheetContext> employeeRepository, IGenericRepository<int?, TimeOff, TimesheetContext> timeoffRepository,ILogger<EmployeeService> logger)
     {
         _employeeRepository = employeeRepository;
+        _timeoffRepository = timeoffRepository;
         _logger = logger;
     }
     
@@ -94,4 +96,5 @@ public class EmployeeService:IEmployeeService
             throw;
         }
     }
+
 }

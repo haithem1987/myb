@@ -4,11 +4,12 @@ import { Employee } from '../../../models/employee';
 import { Router } from '@angular/router';
 import { EmployeeService } from '../../../services/employee.service';
 import { CardComponent } from 'libs/shared/shared-ui/src';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-employee-card',
   standalone: true,
-  imports: [CommonModule, CardComponent],
+  imports: [CommonModule, CardComponent, TranslateModule],
   templateUrl: './employee-card.component.html',
   styleUrl: './employee-card.component.css',
 })

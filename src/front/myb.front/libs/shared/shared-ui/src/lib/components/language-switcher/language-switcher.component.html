@@ -1,0 +1,14 @@
+<div class="language-switcher">
+  <div class="d-flex align-items-center justify-center me-2">
+    <i class="bi bi-translate me-1"></i>
+    <select
+      id="languageSelect"
+      class="form-select language-select"
+      [(ngModel)]="selectedLanguage"
+      (change)="switchLanguage(selectedLanguage)"
+    >
+      <option value="en">English</option>
+      <option value="fr">Français</option>
+    </select>
+  </div>
+</div>

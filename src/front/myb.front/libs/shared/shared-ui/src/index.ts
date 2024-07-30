@@ -18,6 +18,14 @@ export * from './lib/components/card/card.component';
 
 export * from '../../infra/services/date-utils.service';
 
+export * from '../../infra/services/general-settings.service';
+
+export * from '../../infra/services/functions-utils.service';
+
+export * from '../../infra/services/holiday.service';
+
+export * from '../../infra/services/language.service';
+
 export * from './lib/components/toasts-container/toasts-container.component';
 
 export * from './lib/components/progress-bar/progress-bar.component';
@@ -26,4 +34,8 @@ export * from './lib/components/loader/loader.component';
 
 export * from './lib/components/no-result/no-result.component';
 
+export * from './lib/components/settings/settings.component';
+
 export * from './lib/components/avatar/avatar.component';
+
+export * from './lib/components/user-dropdown/user-dropdown.component';

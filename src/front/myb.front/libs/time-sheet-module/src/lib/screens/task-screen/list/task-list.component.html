@@ -1,14 +1,16 @@
 <div class="container my-4">
   <div class="d-flex justify-content-between mb-3">
-    <h2 class="mb-0" style="color: var(--bs-darklight)">Task Manager</h2>
+    <h2 class="mb-0" style="color: var(--bs-darklight)">
+      {{ 'TASK_MANAGER' | translate }}
+    </h2>
     <button type="button" class="btn btn-outline-primary" (click)="openModal()">
-      <i class="bi bi-plus-lg"></i> Create Task
+      <i class="bi bi-plus-lg"></i> {{ 'CREATE_TASK' | translate }}
     </button>
   </div>
   <input
     type="text"
     class="form-control mb-3"
-    placeholder="Search tasks..."
+    [placeholder]="'SEARCH_TASKS' | translate"
     [(ngModel)]="searchTerm"
     (keyup)="filterTasks()"
   />
@@ -17,7 +19,7 @@
       <thead>
         <tr>
           <th scope="col" (click)="onSort('name')" style="cursor: pointer">
-            Nom
+            {{ 'NAME' | translate }}
             <i
               class="bi"
               [ngClass]="{
@@ -30,7 +32,7 @@
             ></i>
           </th>
           <th scope="col" (click)="onSort('startTime')" style="cursor: pointer">
-            Début
+            {{ 'START' | translate }}
             <i
               class="bi"
               [ngClass]="{
@@ -43,7 +45,7 @@
             ></i>
           </th>
           <th scope="col" (click)="onSort('endTime')" style="cursor: pointer">
-            Fin
+            {{ 'END' | translate }}
             <i
               class="bi"
               [ngClass]="{
@@ -60,7 +62,7 @@
             (click)="onSort('isCompleted')"
             style="cursor: pointer"
           >
-            Status
+            {{ 'STATUS' | translate }}
             <i
               class="bi"
               [ngClass]="{
@@ -72,34 +74,8 @@
               }"
             ></i>
           </th>
-          <!-- <th scope="col" (click)="onSort('employee')" style="cursor: pointer">
-            Assigned To
-            <i
-              class="bi"
-              [ngClass]="{
-                'bi-sort-alpha-down':
-                  sortColumn === 'employee' && sortDirection === 'asc',
-                'bi-sort-alpha-up':
-                  sortColumn === 'employee' && sortDirection === 'desc',
-                'bi-sort': sortColumn !== 'employee'
-              }"
-            ></i>
-          </th>
-          <th scope="col" (click)="onSort('project')" style="cursor: pointer">
-            Project
-            <i
-              class="bi"
-              [ngClass]="{
-                'bi-sort-alpha-down':
-                  sortColumn === 'project' && sortDirection === 'asc',
-                'bi-sort-alpha-up':
-                  sortColumn === 'project' && sortDirection === 'desc',
-                'bi-sort': sortColumn !== 'project'
-              }"
-            ></i>
-          </th> -->
           <th scope="col" (click)="onSort('dueDate')" style="cursor: pointer">
-            Date d'échéance
+            {{ 'DUE_DATE' | translate }}
             <i
               class="bi"
               [ngClass]="{
@@ -111,7 +87,7 @@
               }"
             ></i>
           </th>
-          <th scope="col">Actions</th>
+          <th scope="col">{{ 'ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -120,21 +96,17 @@
             <div>{{ task.name }}</div>
             <div>{{ task.description }}</div>
           </td>
-
           <td>{{ task.startTime | date : 'MM/dd/yyyy, h:mm a' }}</td>
           <td>{{ task.endTime | date : 'MM/dd/yyyy, h:mm a' }}</td>
           <td>
             <span class="badge" [ngClass]="getCompletionBadgeClass(task)">
-              {{ isCompletedLabel(task) }}
+              {{ isCompletedLabel(task) | translate }}
             </span>
           </td>
           <td>
-            ({{ getTimeRemaining(task.dueDate) }})
+            ({{ getTimeRemaining(task.dueDate) | translate }})
             {{ task.dueDate | date : 'MM/dd/yyyy, h:mm a' }}
           </td>
-
-          <!-- <td>{{ task.employee?.name }}</td>
-          <td>{{ task.project?.projectName }}</td> -->
           <td>
             <button
               type="button"

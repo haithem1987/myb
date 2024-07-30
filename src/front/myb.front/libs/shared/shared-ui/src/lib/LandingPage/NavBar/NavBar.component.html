@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-altlight">
+<nav class="navbar navbar-expand-lg navbar-light bg-altlight fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand fw-bold" href="#">M.Y.B</a>
     <button
@@ -14,21 +14,17 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
-      <div class="d-flex">
-        <!-- <div *ngIf="limitedCount$ | async as counter">
-          <h1>Counter: {{ counter.count }}</h1>
-        </div> -->
+      <div class="d-flex align-items-center">
+        <myb-front-language-switcher class="ms-3"></myb-front-language-switcher>
         <button
-          *ngIf="!keycloakService.isAuthenticated(); else logoutButton"
+          *ngIf="!keycloakService.isAuthenticated(); else userDropDown"
           class="btn btn-outline-secondary btn-sm"
           (click)="onLogin()"
         >
           Login
         </button>
-        <ng-template #logoutButton>
-          <button class="btn btn-outline-secondary btn-sm" (click)="onLogout()">
-            Logout
-          </button>
+        <ng-template #userDropDown>
+          <myb-front-user-dropdown></myb-front-user-dropdown>
         </ng-template>
         <!-- Only show the Register button if not authenticated -->
         <button

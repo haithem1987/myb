@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="GraphQL.Upload.AspNetCore" Version="3.0.3" />
       <PackageReference Include="HotChocolate" Version="13.8.1" />
       <PackageReference Include="HotChocolate.Abstractions" Version="13.8.1" />
       <PackageReference Include="HotChocolate.Data" Version="13.8.1" />

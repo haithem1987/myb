@@ -45,7 +45,7 @@ public class ProjectService:IProjectService
     {
         try
         {
-            await _projectRepository.UpdateAsync(project);
+            await _projectRepository.InsertAsync(project);
             return project;
         }
         catch (Exception ex)
@@ -77,6 +77,77 @@ public class ProjectService:IProjectService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting project with id: {ProjectId}", id);
+            throw;
+        }
+    }
+    
+    public async Task<bool> SoftDeleteProjectAsync(int id)
+    {
+        try
+        {
+            var project =  _projectRepository.GetById(id);
+            if (project == null)
+            {
+                _logger.LogWarning("Project with id {ProjectId} not found", id);
+                return false;
+            }
+
+            project.Status = ProjectStatus.Deleted;
+            await _projectRepository.UpdateAsync(project);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error soft deleting project with id: {ProjectId}", id);
+            throw;
+        }
+    }
+
+    public async Task<bool> UpdateProjectStatusAsync(int id, ProjectStatus status)
+    {
+        try
+        {
+            var project =  _projectRepository.GetById(id);
+            if (project == null)
+            {
+                _logger.LogWarning("Project with id {ProjectId} not found", id);
+                return false;
+            }
+
+            project.Status = status;
+            await _projectRepository.UpdateAsync(project);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating project status with id: {ProjectId}", id);
+            throw;
+        }
+    }
+    public async Task<IEnumerable<Project>> GetActiveProjectsAsync()
+    {
+        try
+        {
+            var projects = _projectRepository.GetAll().Where(p => p.Status == ProjectStatus.Active);
+            return await Task.FromResult(projects);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting active projects");
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<Project>> GetArchivedProjectsAsync()
+    {
+        try
+        {
+            var projects = _projectRepository.GetAll().Where(p => p.Status == ProjectStatus.Archived);
+            return await Task.FromResult(projects);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting archived projects");
             throw;
         }
     }

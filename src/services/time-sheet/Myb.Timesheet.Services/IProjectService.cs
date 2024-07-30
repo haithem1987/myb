@@ -9,4 +9,8 @@ public interface IProjectService
     Task<Project> AddProjectAsync(Project project);
     Task<Project> UpdateProjectAsync(Project project);
     Task<bool> DeleteProjectAsync(int id);
+    Task<bool> SoftDeleteProjectAsync(int id);
+    Task<bool> UpdateProjectStatusAsync(int id, ProjectStatus status);
+    Task<IEnumerable<Project>> GetActiveProjectsAsync();
+    Task<IEnumerable<Project>> GetArchivedProjectsAsync();
 }

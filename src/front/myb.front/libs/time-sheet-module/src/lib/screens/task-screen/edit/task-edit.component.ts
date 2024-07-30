@@ -18,11 +18,17 @@ import { Observable, debounceTime, distinctUntilChanged, map } from 'rxjs';
 import { Task } from '../../../models/task.model';
 import { Project } from '../../../models/project.model';
 import { Employee } from '../../../models/employee';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-task-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgbTypeaheadModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NgbTypeaheadModule,
+    TranslateModule,
+  ],
   templateUrl: './task-edit.component.html',
   styleUrls: ['./task-edit.component.css'], // Note: it should be `styleUrls` not `styleUrl`
 })

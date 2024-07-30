@@ -19,19 +19,21 @@
       </div>
   </div>
 
-  <div *ngIf="folders.length === 0 && documents.length === 0">
+  <!-- <div *ngIf="folders.length === 0 && documents.length === 0">
 
     <p>No folders yet, Add folder</p>
   </div>
 
-  </div>
+  </div> -->
 
   <!-- Show message when there are no folders or documents -->
   <div *ngIf="folders$ | async as folders; else noFolders">
     
 
     <!-- Show table when there are folders or documents -->
-    <div *ngIf="folders.length > 0 || documents.length > 0" class="card border-primary p-2">
+     @if(folders.length > 0 ||( documents$ | async)!.length > 0 ){
+    <div class="card border-primary p-2">
+      <div class="table-responsive"> 
       <table class="table table-hover">
         <thead>
           <tr>
@@ -87,7 +89,10 @@
             </tr>
           </ng-container>
 
-          <tr *ngFor="let document of documents">
+          <tr *ngFor="let document of documents$ | async ; track document">
+            @if( document.folderId==this.fId){
+            
+            
             <td>
               <ng-container [ngSwitch]="document.documentType">
                 <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf-fill me-2" style="font-size: 25px;"></i>
@@ -126,10 +131,13 @@
                 </div>
               </div>
             </td>
+          }
           </tr>
         </tbody>
       </table>
     </div>
+    </div>
+  }
   </div>
   <ng-template #noFolders>
     <p>No folders yet, Add folder</p>

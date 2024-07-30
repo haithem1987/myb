@@ -24,7 +24,7 @@ namespace Myb.Document.Infra.GraphQl.Mutations
         }
 
 
-        public async Task<bool> DeleteDocument([Service] IDocumentService documentService, int id)
+        public async Task<DocumentModel> DeleteDocument([Service] IDocumentService documentService, int id)
         {
             return await documentService.DeleteDocumentAsync(id);
         }

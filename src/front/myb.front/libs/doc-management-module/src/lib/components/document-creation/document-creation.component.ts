@@ -1,4 +1,10 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
@@ -26,14 +32,18 @@ export class DocumentCreationComponent implements OnInit {
   @Output() documentCreated = new EventEmitter<DocumentModel>();
   folders: Folder[] = [];
   documents: DocumentModel[] = [];
-  documentTypes = Object.values(DocumentType).filter(value => typeof value === 'string') as string[];
-  @ViewChild(DocumentUploadComponent) documentUploadComponent: DocumentUploadComponent | undefined;
+  documentTypes = Object.values(DocumentType).filter(
+    (value) => typeof value === 'string'
+  ) as string[];
+  @ViewChild(DocumentUploadComponent) documentUploadComponent:
+    | DocumentUploadComponent
+    | undefined;
 
   constructor(
     public activeModal: NgbActiveModal,
     private documentService: DocumentService,
     private folderService: FolderService,
-    private  toastService: ToastService
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -59,7 +69,7 @@ export class DocumentCreationComponent implements OnInit {
   // }
 
   // createDocument(): void {
-  //   if (this.documentType !== undefined && this.folderId !== null) 
+  //   if (this.documentType !== undefined && this.folderId !== null)
   //     {
   //       const selectedFiles = this.documentUploadComponent?.selectedFiles || [];
   //       if (selectedFiles.length > 0) {
@@ -74,13 +84,13 @@ export class DocumentCreationComponent implements OnInit {
   //             folderId: parseInt(this.folderId.toString()),
   //             documentSize: selectedFiles[0].file.size,
   //             file: selectedFiles[0].Image, // Save the base64 string
-  //             url: selectedFiles[0].url, // 
+  //             url: selectedFiles[0].url, //
   //             createdAt: new Date(),
   //             updatedAt: new Date(),
-            
+
   //           };
   //           console.log('url:', selectedFiles[0].url);
-            
+
   //           // console.log('file:', selectedFiles[0].Image);
   //           this.documentService.createDocument(document).subscribe(
   //             (newDocument) => {
@@ -93,7 +103,7 @@ export class DocumentCreationComponent implements OnInit {
   //               console.log('new doc', newDocument);
   //               },
   //             (error) => {
-  //               console.error('Error creating document:', error);           
+  //               console.error('Error creating document:', error);
   //               this.toastService.show('An error occurred while creating the document. Please try again.', {
   //               classname: 'bg-danger text-light',
   //               });
@@ -117,12 +127,12 @@ export class DocumentCreationComponent implements OnInit {
         const document = {
           id: 0,
           documentName: selectedFiles[0].ImageName,
-          documentType: this.getDocumentType(selectedFiles[0].fileType),  // Get the document type from file type
-          createdBy: 1,
-          editedBy: 1,
+          documentType: this.getDocumentType(selectedFiles[0].fileType),
+          createdBy: '',
+          editedBy: '',
           folderId: parseInt(this.folderId.toString()),
           documentSize: selectedFiles[0].file.size,
-          file: selectedFiles[0].Image, // Save the base64 string
+          file: selectedFiles[0].Image, // Save base64 string
           url: selectedFiles[0].url,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -139,9 +149,12 @@ export class DocumentCreationComponent implements OnInit {
           },
           (error) => {
             console.error('Error creating document:', error);
-            this.toastService.show('An error occurred while creating the document. Please try again.', {
-              classname: 'bg-danger text-light',
-            });
+            this.toastService.show(
+              'An error occurred while creating the document. Please try again.',
+              {
+                classname: 'bg-danger text-light',
+              }
+            );
           }
         );
       } else {
@@ -160,18 +173,21 @@ export class DocumentCreationComponent implements OnInit {
     if (fileType === undefined) {
       return 'UNKNOWN';
     }
-  
+
     switch (fileType) {
-      case 'application/pdf': return 'PDF';
+      case 'application/pdf':
+        return 'PDF';
       case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-      case 'application/msword': return 'WORD';
-      case 'application/vnd.ms-excel': 
-      case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': return 'EXCEL';
-      case 'image/jpeg': 
-      case 'image/png': return 'IMAGE';
-      default: return 'UNKNOWN';
+      case 'application/msword':
+        return 'WORD';
+      case 'application/vnd.ms-excel':
+      case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        return 'EXCEL';
+      case 'image/jpeg':
+      case 'image/png':
+        return 'IMAGE';
+      default:
+        return 'UNKNOWN';
     }
   }
- 
-
 }

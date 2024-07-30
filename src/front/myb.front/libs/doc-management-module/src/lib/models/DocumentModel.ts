@@ -8,11 +8,11 @@ import { DocumentType } from './DocumentType';
 
 
 export interface DocumentModel extends BaseModel {
-    [x: string]: any;
+   // [x: string]: any;
 
     documentName?: string;
-    createdBy: number;
-    editedBy: number;
+    createdBy: string;
+    editedBy: string;
     documentType?: string;
     status?: string;
     documentSize?: number;

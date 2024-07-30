@@ -12,9 +12,11 @@ namespace Myb.document.Model
 
         public  virtual ICollection<DocumentModel> ?Documents { get; set; } 
 
+        public string CreatedBy { get; set; }
+        public string EditedBy { get; set; }
 
-        public int CreatedBy { get; set; }
-        public int EditedBy { get; set; }
+        public string? UserId { get; set; }
+        public int? CompanyId { get; set; }
 
 
 

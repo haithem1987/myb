@@ -1,5 +1,7 @@
+import { LoaderComponent } from 'libs/shared/shared-ui/src';
+import { FolderService } from './folder.service';
 import { DocumentVersion } from './../models/DocumentVersion';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { DocumentModel } from '../models/DocumentModel'; 
 import { Apollo, gql } from 'apollo-angular';
@@ -15,12 +17,15 @@ export class DocumentService extends RepositoryService<DocumentModel> {
   private documentSubject = new BehaviorSubject<DocumentModel[]>([]);
   public documents$ = this.documentSubject.asObservable();
 
+   
+
 constructor(apollo: Apollo) {
     super(apollo, 'DocumentModel');
-    this.loadInitialdocuments
+    this.loadInitialdocuments();
 }
 private loadInitialdocuments(): void {
   this.getAll().subscribe((documents) => this.documentSubject.next(documents));
+  
 }
 
 protected override mapAllItems(result: any): DocumentModel[] {
@@ -57,7 +62,7 @@ protected override mapDeleteResult(result: any): boolean {
 override getAll(): Observable<DocumentModel[]> {
   return super.getAll().pipe(
     map((documents) => {
-      console.log('documents', documents);
+      console.log('documents for getall', documents);
       this.documentSubject.next(documents);
       return documents;
     })
@@ -71,7 +76,7 @@ override delete(id: number): Observable<boolean> {
     map((success) => {
       if (success) {
         const  documents = this.documentSubject.value.filter((t) => t.id !== id);
-        this.documentSubject.next( documents);
+        this.documentSubject.next(documents);
       }
       return success;
     })
@@ -103,26 +108,26 @@ override delete(id: number): Observable<boolean> {
 
 
 
-getDocumentsByFolderId(folderId: number): Observable<DocumentModel[]> {
-  return this.apollo.watchQuery<{ documentsByFolderId: DocumentModel[] }>({
-    query: gql`
-    ${this.typeOperations.documentsByFolderId}
-  `,
-    variables: {
-      folderId,
-    },
-  })
-  .valueChanges.pipe(
-    // map((result: any) => result.data.documentsByFolderId)
-    map((result: any) => {
-      const documents = result.data.documentsByFolderId;
-      this.documentSubject.next(documents);
-      console.log('doc service',documents)
+// getDocumentsByFolderId(folderId: number): Observable<DocumentModel[]> {
+//   return this.apollo.watchQuery<{ documentsByFolderId: DocumentModel[] }>({
+//     query: gql`
+//     ${this.typeOperations.documentsByFolderId}
+//   `,
+//     variables: {
+//       folderId,
+//     },
+//   })
+//   .valueChanges.pipe(
+//     // map((result: any) => result.data.documentsByFolderId)
+//     map((result: any) => {
+//       const documents = result.data.documentsByFolderId;
+//       this.documentSubject.next(documents);
+//       console.log('doc service',documents)
 
-      return documents;
-    })
-  );
-}
+//       return documents;
+//     })
+//   );
+// }
 
 createDocument(document: DocumentModel): Observable<DocumentModel> {
   return this.apollo
@@ -137,6 +142,7 @@ createDocument(document: DocumentModel): Observable<DocumentModel> {
         const newDocument = result.data.addDocument;
         const documents = [...this.documentSubject.value, newDocument];
         this.documentSubject.next(documents);
+     //   this.folderService.loadInitialFolders();
         return newDocument;
       })
     );

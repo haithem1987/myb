@@ -11,10 +11,17 @@ export const GET_ALL_FOLDERS = gql`
       createdAt
       updatedAt
       documents {
-        documentName
-        createdBy
-        createdAt
-        updatedAt
+        id
+            documentName
+            createdBy
+            editedBy
+            documentType
+            status
+            folderId
+            documentSize
+            createdAt
+            updatedAt
+            file
       }
     }
   }
@@ -74,4 +81,38 @@ export const GET_FOLDERS_BY_PARENT_ID = gql`
       }
     }
   }
+`;
+
+// RootFolder Queries
+export const GET_ROOT_FOLDER_BY_USER_AND_MODULE = gql`
+  query GetRootFolderByUserAndModule($userId: String!, $moduleName: String!) {
+    rootFolderByUserAndModule(userId: $userId, moduleName: $moduleName) {
+      id
+      userId
+      moduleName
+      folderId
+    }
+  }
+`;
+
+export const GET_ALL_ROOT_FOLDERS = gql`
+  query GetAllRootFolders {
+    allRootFolders {
+      id
+      userId
+      moduleName
+      folderId
+    }
+  }
+`;
+//getrootfolderbyid
+export const GET_ROOT_FOLDER_BY_ID = gql`
+query getRootFolderById($id: Int!) {
+        rootFolderById(id: $id) {
+          id
+          userId
+          moduleName
+          folderId
+        }
+      }
 `;

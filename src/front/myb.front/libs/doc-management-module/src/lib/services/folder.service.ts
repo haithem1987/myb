@@ -12,14 +12,12 @@ import { RepositoryService } from 'libs/shared/infra/services/repository.service
 export class FolderService extends RepositoryService<Folder> {
   private folderSubject = new BehaviorSubject<Folder[]>([]);
   public folders$ = this.folderSubject.asObservable();
-  private navigationHistory: number[] = [];
 
   constructor(apollo: Apollo) {
     super(apollo, 'Folder');
     this.loadInitialFolders();
   }
-
-  private loadInitialFolders(): void {
+  public loadInitialFolders(): void {
     this.getAll().subscribe((folders) => this.folderSubject.next(folders));
   }
 
@@ -39,7 +37,7 @@ export class FolderService extends RepositoryService<Folder> {
     return result.data?.updateFolder as Folder;
   }
 
-  protected override mapDeleteResult(result: any): boolean {
+   protected override mapDeleteResult(result: any): boolean {
     return result.data?.deleteFolder === true;
   }
 
@@ -113,6 +111,7 @@ export class FolderService extends RepositoryService<Folder> {
           const newFolder = result.data.addFolder;
           const currentFolders = this.folderSubject.value;
           this.folderSubject.next([...currentFolders, newFolder]);
+
           return newFolder;
         })
       );
@@ -144,12 +143,5 @@ export class FolderService extends RepositoryService<Folder> {
       })
     );
   }
-    // Navigation history methods
-    addToNavigationHistory(folderId: number): void {
-      this.navigationHistory.push(folderId);
-    }
-  
-    getPreviousFolderId(): number | undefined {
-      return this.navigationHistory.pop();
-    }
+
 }

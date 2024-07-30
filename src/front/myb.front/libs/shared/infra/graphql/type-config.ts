@@ -1,6 +1,12 @@
-import { 
-  ADD_DOCUMENT, DELETE_DOCUMENT, UPDATE_DOCUMENT } from './../../../doc-management-module/src/lib/GraphQl/Mutations/DocumentMutation';
-import { GET_ALL_DOCUMENTS, GET_DOCUMENT_BY_ID } from './../../../doc-management-module/src/lib/GraphQl/Queries/Document.graphql';
+import {
+  ADD_DOCUMENT,
+  DELETE_DOCUMENT,
+  UPDATE_DOCUMENT,
+} from './../../../doc-management-module/src/lib/GraphQl/Mutations/DocumentMutation';
+import {
+  GET_ALL_DOCUMENTS,
+  GET_DOCUMENT_BY_ID,
+} from './../../../doc-management-module/src/lib/GraphQl/Queries/Document.graphql';
 import {
   GET_ALL_TIMESHEETS,
   GET_TIMESHEETS_BY_USER_ID,
@@ -43,10 +49,25 @@ import {
   DELETE_EMPLOYEE,
   UPDATE_EMPLOYEE,
 } from 'libs/time-sheet-module/src/lib/graphql/mutations/employee.graphql';
-import { GET_ALL_FOLDERS, GET_FOLDERS_BY_PARENT_ID, GET_FOLDER_BY_ID } from 'libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql';
-import { ADD_FOLDER, DELETE_FOLDER, UPDATE_FOLDER } from 'libs/doc-management-module/src/lib/GraphQl/Mutations/FolderMutation';
-import { CREATE_INVOICE } from "libs/invoice-module/src/lib/graphql/mutations/invoice.mutation";
-
+import {
+  GET_ALL_FOLDERS,
+  GET_FOLDERS_BY_PARENT_ID,
+  GET_FOLDER_BY_ID,
+} from 'libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql';
+import {
+  GET_ALL_ROOT_FOLDERS,
+  GET_ROOT_FOLDER_BY_ID,
+  GET_ROOT_FOLDER_BY_USER_AND_MODULE,
+} from 'libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql';
+import {
+  ADD_FOLDER,
+  ADD_ROOT_FOLDER,
+  DELETE_FOLDER,
+  DELETE_ROOT_FOLDER,
+  UPDATE_FOLDER,
+  UPDATE_ROOT_FOLDER,
+} from 'libs/doc-management-module/src/lib/GraphQl/Mutations/FolderMutation';
+import { CREATE_INVOICE } from 'libs/invoice-module/src/lib/graphql/mutations/invoice.mutation';
 
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
@@ -91,31 +112,31 @@ export const typeConfig: { [key: string]: any } = {
   Invoice: {
     getAll: GET_ALL_INVOICES,
     getById: GET_INVOICE_BY_ID,
-    create: CREATE_INVOICE
+    create: CREATE_INVOICE,
   },
-  DocumentModel:{
+  DocumentModel: {
     getById: GET_DOCUMENT_BY_ID,
     getAll: GET_ALL_DOCUMENTS,
     update: UPDATE_DOCUMENT,
     delete: DELETE_DOCUMENT,
     create: ADD_DOCUMENT,
-   
-
   },
   //folder type
-  Folder:{
+  Folder: {
     getById: GET_FOLDER_BY_ID,
     getAll: GET_ALL_FOLDERS,
     update: UPDATE_FOLDER,
     delete: DELETE_FOLDER,
     create: ADD_FOLDER,
-    getFoldersByParentId:GET_FOLDERS_BY_PARENT_ID
-
-    },
-
-  // You can add more configurations for different types here
+    getFoldersByParentId: GET_FOLDERS_BY_PARENT_ID,
+  },
+  //rootfolder
+  RootFolder: {
+    getById: GET_ROOT_FOLDER_BY_ID,
+    getAll: GET_ALL_ROOT_FOLDERS,
+    update: UPDATE_ROOT_FOLDER,
+    delete: DELETE_ROOT_FOLDER,
+    create: ADD_ROOT_FOLDER,
+    getRootFolderByUserAndModule: GET_ROOT_FOLDER_BY_USER_AND_MODULE,
+  },
 };
-
-
- 
-  

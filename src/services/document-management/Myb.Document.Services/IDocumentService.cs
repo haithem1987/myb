@@ -12,7 +12,7 @@ namespace Myb.Document.Services
         Task<DocumentModel> AddDocumentAsync(DocumentModel document);
 
         Task<DocumentModel> UpdateDocumentAsync(DocumentModel document);
-         Task<bool> DeleteDocumentAsync(int id);
+         Task<DocumentModel> DeleteDocumentAsync(int id);
 
     }
 }

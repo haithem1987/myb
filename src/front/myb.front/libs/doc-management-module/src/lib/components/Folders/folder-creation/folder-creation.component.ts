@@ -1,11 +1,17 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Folder } from '../../../models/Folder';
 import { FormsModule } from '@angular/forms';
 import { FolderService } from '../../../services/folder.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-
 
 @Component({
   selector: 'myb-front-folder-creation',
@@ -14,32 +20,33 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
   templateUrl: './folder-creation.component.html',
   styleUrl: './folder-creation.component.css',
 })
-export class FolderCreationComponent  {
+export class FolderCreationComponent {
   folderName: string = '';
-  @Input()  parentId!: number;
   @Output() folderCreated = new EventEmitter<Folder>();
   @Input() folderId!: number;
 
   constructor(
     public activeModal: NgbActiveModal,
     private folderService: FolderService,
-    private route: ActivatedRoute,
+    private route: ActivatedRoute
   ) {}
+
+  
   ngOnInit() {
     console.log('Received folderId from details:', this.folderId);
-    console.log('Received parentid from details:', this.parentId);
+    //console.log('Received parentid from details:', this.parentId);
   }
 
-   createFolder(): void {
+  createFolder(): void {
     if (this.folderName) {
       const folder = {
         folderName: this.folderName,
         parentId: this.folderId,
-        createdBy: 0,
-        editedBy: 0,
+        createdBy: '',
+        editedBy: '',
         createdAt: new Date(),
         updatedAt: new Date(),
-      } as Folder; 
+      } as Folder;
 
       this.folderService.create(folder).subscribe({
         next: (newFolder) => {
@@ -47,15 +54,14 @@ export class FolderCreationComponent  {
           this.activeModal.close();
           console.log('creation id', newFolder.id);
           console.log('creation parentId:', newFolder.parentId);
+          console.log('first', this.folderService.folders$);
         },
         error: (error) => {
           console.error('Error creating folder:', error);
-        }
+        },
       });
     } else {
       alert('Please enter a folder name');
     }
   }
-  
 }
-

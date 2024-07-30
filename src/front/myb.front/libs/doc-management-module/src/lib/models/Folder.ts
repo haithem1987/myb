@@ -5,10 +5,10 @@ export interface Folder extends BaseModel {
   
     parentId: number | null; 
     folderName: string;
-    createdBy: number;
-    editedBy: number;
+    createdBy: string;
+    editedBy: string;
     documents?: DocumentModel[] | null;
-    children?: Folder[] | null; 
+   // children?: Folder[] | null; 
     
   
   }

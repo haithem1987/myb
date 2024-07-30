@@ -1,5 +1,13 @@
+import { RootFolderService } from './../../../services/root-folder.service';
 import { FolderService } from './../../../services/folder.service';
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DocumentModel } from '../../../models/DocumentModel';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -15,9 +23,8 @@ import { NoResultComponent } from 'libs/shared/shared-ui/src/lib/components/no-r
 import { Folder } from '../../../models/Folder';
 import { FolderCreationComponent } from '../folder-creation/folder-creation.component';
 import { DocumentCreationComponent } from '../../document-creation/document-creation.component';
-import { Observable } from 'rxjs';
-
-
+import { filter, map, Observable } from 'rxjs';
+import { RootFolder } from '../../../models/RootFolder';
 
 @Component({
   selector: 'myb-front-folder-details',
@@ -30,32 +37,40 @@ import { Observable } from 'rxjs';
     FormsModule,
     NoResultComponent,
     RouterLink,
-
   ],
   templateUrl: './folder-details.component.html',
   styleUrls: ['./folder-details.component.css'],
 })
 export class FolderDetailsComponent implements OnInit {
- @Input() fId!: number;
- @Input() title!: string; 
-//  @Input() parentId!: number;
-@Input() canCreateFolder = true; 
+  @Input() fId!: number;
+  //fid2=38;
+  @Input() title!: string;
+  //  @Input() parentId!: number;
+  @Input() canCreateFolder = true;
+  @Input() moduleName!: string;
 
-  documents: DocumentModel[] = [];
+  //documents: DocumentModel[] = [];
   folder: any;
   folderName!: string;
   folders: Folder[] = [];
   pinnedFolders: Folder[] = [];
 
-  folders$: Observable<Folder[]> = this.folderService.folders$;
+  //folders$: Observable<Folder[]> = this.folderService.folders$.pipe(filter((value) => {}));
+
+  // folders$: Observable<Folder[]> = this.folderService.folders$.pipe(
+  //   filter((folders) => folders.some(folder => folder.parentId === this.fid2))
+  // );
+  folders$: Observable<Folder[]> = this.folderService.folders$.pipe(
+    map((folders) => folders.filter((folder) => folder.parentId === this.fId))
+  );
+
+  // documents$: Observable<DocumentModel[]> = this.documentService.documents$.pipe(
+  //   map(documents => documents.filter(document => document.folderId === this.fId))
+  // );
+
   documents$: Observable<DocumentModel[]> = this.documentService.documents$;
-  
 
- 
-
-  // @Output() folderDeleted = new EventEmitter<number>();
   @Output() folderPinned = new EventEmitter<Folder>();
-  // @Output() folderSelected = new EventEmitter<number>();
 
   constructor(
     private route: ActivatedRoute,
@@ -64,100 +79,138 @@ export class FolderDetailsComponent implements OnInit {
     private modalService: NgbModal,
     private toastService: ToastService,
     private router: Router,
-    // private breadcrumbService: BreadcrumbService
-  ) {}
-  ngOnInit(): void {
+    private RootFolderService: RootFolderService
+  ) // private breadcrumbService: BreadcrumbService
+  {}
+  // ngOnInit(): void {
 
-  
-  
-    if (this.fId) {
+  //   if (this.fId) {
+  //     // this.loadFolderDetails();
+  //     this.loadFoldersByParentId(this.fId);
+  //   } else {
+  //     this.route.paramMap.subscribe(params => {
+  //       this.fId = +params.get('id')!;
+  //       // this.loadFolderDetails();
+  //        this.loadFoldersByParentId(this.fId);
+  //     });
+  //   }
+  // }
+
+  ngOnInit(): void {
+    this.route.paramMap.subscribe((params) => {
+      this.fId = +params.get('id')!;
       this.loadFolderDetails();
-      this.loadFoldersByParentId(this.fId);
-    } else {
-      this.route.paramMap.subscribe(params => {
-        this.fId = +params.get('id')!;
-        this.loadFolderDetails();
-        this.loadFoldersByParentId(this.fId);
-      });
-    }
+    });
+    console.log('ngOnInit FolderDetailsComponent', this.fId);
   }
- 
+
+  getRootFolder(userId: string, moduleName: string) {
+    this.RootFolderService.getRootFolderByUserAndModule(
+      userId,
+      moduleName
+    ).subscribe({
+      next: (data: RootFolder) => {
+        this.folder = data;
+        console.log('RootFolder:', data);
+      },
+      error: (error) => {
+        console.error('Error fetching root folder:', error);
+      },
+    });
+  }
+  addFolderRoot() {}
+  CheckFolderRoot() {}
+  
   loadFolders() {
     this.folderService.getAll().subscribe({
       next: (data: Folder[]) => {
         this.folders = data;
-        console.log('loaded folders func',data)
+        console.log('loaded folders func', data);
       },
-      
+
       error: (error) => {
         console.error('Error loading folders', error);
       },
       complete: () => {
         console.log('Folders loading completed');
-      }
+      },
     });
-  }
-    
+}
+
   openFolder(folderId: number): void {
-    this.folderService.addToNavigationHistory(this.fId); 
-        this.fId = folderId;
-        console.log('openflder', folderId,this.fId)
-        this.loadFolderDetails();
-        this.loadFoldersByParentId(this.fId);
+    this.fId = folderId;
+    this.loadFolderDetails();
+    // this.loadFoldersByParentId(this.fId);
+    console.log('openflder', folderId, this.fId);
+    console.log('this.documents$', this.documents$);
 
     console.log('fid', this.fId, 'folderId', folderId);
   }
+  
   goBackToPreviousFolder(): void {
-    const previousFolderId = this.folderService.getPreviousFolderId();
-    if (previousFolderId !== undefined) {
-      this.fId = previousFolderId;
-      this.loadFolderDetails();
-      this.loadFoldersByParentId(this.fId);
-    }
+    this.fId = this.folder.parentId;
+    this.loadFolderDetails();
+    //this.loadFoldersByParentId(this.fId);
+    console.log('first', this.folder);
   }
+  // goBackToPreviousFolder(): void {
+  //   // Check if the current folder's parentId is 0
+  //   if (this.folder.parentId === 0) {
+  //     // If parentId is 0, set fId to the root folder id (assuming root folder id is 0 or a specific value)
+  //     this.fId = 0; // Set to root folder id if different from 0
+  //   } else {
+  //     // Otherwise, set fId to the parentId of the current folder
+  //     this.fId = this.folder.parentId;
+  //   }
+  
+  //   // Load the details of the folder based on the updated fId
+  //   this.loadFolderDetails();
+  //   this.loadFoldersByParentId(this.fId);
+  //   console.log('Navigated back to folder with id:', this.fId);
+  // }
+  
 
   loadFolderDetails(): void {
     this.folderService.get(this.fId).subscribe({
       next: (data: Folder) => {
         this.folder = data;
-        this.documents = data.documents || [];
+        // this.documents = data.documents || [];
         this.folderName = data.folderName;
         console.log('Loading fId', this.fId);
         console.log('Loading parentid', this.folder.parentId);
         console.log('Folder details:', data);
-
       },
       error: (error) => {
         console.error('Error fetching folder details:', error);
-      }
+      },
     });
   }
-  
-  //load getDocumentsByFolderId 
-  
+
+  //load getDocumentsByFolderId
+
   loadFoldersByParentId(parentId: number): void {
     this.folderService.getFoldersByParentId(parentId).subscribe({
       next: (data: Folder[]) => {
         this.folders = data;
-        
+
         console.log('allFolders by parentId:', data);
       },
       error: (error) => {
         console.error('Error fetching folders by parentId:', error);
-      }
+      },
     });
   }
-  
-  deleteDocument(docId: number) {
+
+  deleteDocument(id: number) {
     if (confirm('Are you sure you want to delete this doc?')) {
-      this.documentService.delete(docId).subscribe({
+      this.documentService.delete(id).subscribe({
         next: () => {
           console.log('doc deleted');
           this.toastService.show('Document Deleted successfully!', {
             classname: 'bg-success text-light ',
           });
           // Remove the document from the local array
-          this.documents = this.documents.filter(doc => doc.id !== docId);
+        //  this.documents = this.documents.filter(doc => doc.id !== docId);
         },
         error: (error) => {
           console.error('Error deleting document:', error);
@@ -170,18 +223,18 @@ export class FolderDetailsComponent implements OnInit {
   }
 
   openModal(document?: DocumentModel) {
-    const modalRef = this.modalService.open(DocumentEditComponent);
-    modalRef.componentInstance.document = { ...document };
-    modalRef.componentInstance.documentUpdated.subscribe(
-      (updatedDocument: DocumentModel) => {
-        const index = this.documents.findIndex(
-          (doc) => doc.id === updatedDocument.id
-        );
-        if (index !== -1) {
-          this.documents[index] = updatedDocument;
-        }
-      }
-    );
+    // const modalRef = this.modalService.open(DocumentEditComponent);
+    // modalRef.componentInstance.document = { ...document };
+    // modalRef.componentInstance.documentUpdated.subscribe(
+    //   (updatedDocument: DocumentModel) => {
+    //     const index = this.documents.findIndex(
+    //       (doc) => doc.id === updatedDocument.id
+    //     );
+    //     if (index !== -1) {
+    //       this.documents[index] = updatedDocument;
+    //     }
+    //   }
+    // );
   }
 
   getApprovalStatus(status: DocumentStatus): {
@@ -199,7 +252,6 @@ export class FolderDetailsComponent implements OnInit {
         return { text: 'Unknown', badgeClass: 'bg-secondary' };
     }
   }
-
 
   filterDocument(): void {
     // Implement filtering logic
@@ -305,8 +357,6 @@ export class FolderDetailsComponent implements OnInit {
     }
   }
 
-  
-
   // deleteFolder(id: number) {
   //   this.folderService.delete(id).subscribe(() => {
   //     // this.folderDeleted.emit(id);
@@ -320,13 +370,12 @@ export class FolderDetailsComponent implements OnInit {
       this.folderService.delete(id).subscribe({
         next: () => {
           console.log('Folder deleted');
-          this.loadFoldersByParentId(this.fId); // Reload the folder list after deletion
+          //this.loadFoldersByParentId(this.fId); // Reload the folder list after deletion
         },
-        error: (error) => console.error('Error deleting folder', error)
+        error: (error) => console.error('Error deleting folder', error),
       });
     }
   }
-  
 
   pinFolder(folder: Folder): void {
     this.folderPinned.emit(folder);
@@ -354,7 +403,7 @@ export class FolderDetailsComponent implements OnInit {
     // console.log('type:' , this.folder.type);
     modalRef.componentInstance.documentCreated.subscribe(
       (newDoc: DocumentModel) => {
-        this.documents = [...this.documents, newDoc];
+        //  this.documents = [...this.documents, newDoc];
         console.log('New document created:', newDoc);
       }
     );
@@ -362,15 +411,11 @@ export class FolderDetailsComponent implements OnInit {
   openFolderCreationModal(): void {
     const modalRef = this.modalService.open(FolderCreationComponent);
     modalRef.componentInstance.folderId = this.fId;
-    modalRef.componentInstance.parentId = this.folder?.parentId;
+    //modalRef.componentInstance.parentId = this.folder?.id;
     console.log('Passing folderId  fId  to modal:', this.fId);
     console.log('passing parentid', this.folder.parentId);
-    modalRef.componentInstance.folderCreated.subscribe(
-      (newFolder: Folder) => {
-        this.folders = [...this.folders, newFolder];
+    modalRef.componentInstance.folderCreated.subscribe((newFolder: Folder) => {
+      this.folders = [...this.folders, newFolder];
     });
-
   }
-
- 
 }

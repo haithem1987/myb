@@ -39,8 +39,8 @@ namespace Myb.Document.Services
             {
                 Console.WriteLine($"Document file: {document.file}");
                 document.Id = null;
-                await _documentRepository.InsertAsync(document);
-                return document;
+              var response=   await _documentRepository.InsertAsync(document);
+                return response.Entity; ;
             }
             catch (Exception ex)
             {
@@ -89,11 +89,11 @@ namespace Myb.Document.Services
 
 
         //delete document
-        public async Task<bool> DeleteDocumentAsync(int id)
+        public async Task<DocumentModel> DeleteDocumentAsync(int id)
         {
-         
-           await  _documentRepository.DeleteAsync(id);
-            return true;
+
+            var responce = await  _documentRepository.DeleteAsync(id);
+            return responce.Entity;
         }
         /*
         

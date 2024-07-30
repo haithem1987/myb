@@ -14,10 +14,6 @@ import {
 } from './../../../doc-management-module/src/lib/GraphQl/Queries/Document.graphql';
 
 import {
-  GET_ALL_INVOICES,
-  GET_INVOICE_BY_ID,
-} from '../../../invoice-module/src/lib/graphql/queries/invoice.query';
-import {
   CREATE_TASK,
   UPDATE_TASK,
   DELETE_TASK,
@@ -69,40 +65,19 @@ import {
   DELETE_FOLDER,
   UPDATE_FOLDER,
 } from 'libs/doc-management-module/src/lib/GraphQl/Mutations/FolderMutation';
-import { CREATE_INVOICE } from 'libs/invoice-module/src/lib/graphql/mutations/invoice.mutation';
-import { CREATE_INVOICE } from 'libs/invoice-module/src/lib/graphql/mutations/invoice.mutation';
+
+
 import {
   GET_ALL_INVOICES,
   GET_INVOICE_BY_ID,
 } from '../../../invoice-module/src/lib/graphql/queries/invoice.query';
-import {
-  CREATE_PROJECT,
-  UPDATE_PROJECT,
-  DELETE_PROJECT,
-} from '../../../time-sheet-module/src/lib/graphql/mutations/project.graphql';
-import {
-  CREATE_TASK,
-  UPDATE_TASK,
-  DELETE_TASK,
-} from '../../../time-sheet-module/src/lib/graphql/mutations/task.graphql';
-import {
-  GET_ALL_EMPLOYEES,
-  GET_EMPLOYEE_BY_ID,
-} from '../../../time-sheet-module/src/lib/graphql/queries/employee.graphql';
-import {
-  GET_ALL_PROJECTS,
-  GET_PROJECT_BY_ID,
-} from '../../../time-sheet-module/src/lib/graphql/queries/project.graphql';
-import {
-  GET_ALL_TASKS,
-  GET_TASK_BY_ID,
-} from '../../../time-sheet-module/src/lib/graphql/queries/task.graphql';
-import { CREATE_TAX } from 'libs/invoice-module/src/lib/graphql/mutations/tax.mutation';
-import { GET_ALL_Taxes } from 'libs/invoice-module/src/lib/graphql/queries/tax.query';
-import { CREATE_PRODUCT } from 'libs/invoice-module/src/lib/graphql/mutations/product.mutation';
-import { GET_ALL_PRODUCTS } from 'libs/invoice-module/src/lib/graphql/queries/product.query';
-import { CREATE_CLIENT } from 'libs/invoice-module/src/lib/graphql/mutations/client.mutation';
-import { GET_ALL_CLIENTS } from 'libs/invoice-module/src/lib/graphql/queries/client.query';
+import { CREATE_TAX } from '../../../invoice-module/src/lib/graphql/mutations/tax.mutation';
+import { GET_ALL_Taxes } from '../../../invoice-module/src/lib/graphql/queries/tax.query';
+import { CREATE_PRODUCT } from '../../../invoice-module/src/lib/graphql/mutations/product.mutation';
+import { GET_ALL_PRODUCTS } from '../../../invoice-module/src/lib/graphql/queries/product.query';
+import { CREATE_CLIENT } from '../../..//invoice-module/src/lib/graphql/mutations/client.mutation';
+import { GET_ALL_CLIENTS } from '../../../invoice-module/src/lib/graphql/queries/client.query';
+import { CREATE_INVOICE } from '../../../invoice-module/src/lib/graphql/mutations/invoice.mutation';
 
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
@@ -156,6 +131,18 @@ export const typeConfig: { [key: string]: any } = {
     getById: GET_INVOICE_BY_ID,
     create: CREATE_INVOICE,
   },
+  Tax: {
+    create: CREATE_TAX,
+    getAll: GET_ALL_Taxes,
+  },
+  Product: {
+    create: CREATE_PRODUCT,
+    getAll: GET_ALL_PRODUCTS,
+  },
+  Client: {
+    create: CREATE_CLIENT,
+    getAll: GET_ALL_CLIENTS,
+  },
   DocumentModel: {
     getById: GET_DOCUMENT_BY_ID,
     getAll: GET_ALL_DOCUMENTS,
@@ -174,54 +161,4 @@ export const typeConfig: { [key: string]: any } = {
 
   // You can add more configurations for different types here
 };
-// src/app/graphql/type-config.ts
-export const typeConfig: { [key: string]: any } = {
-  User: {
-    getAll: 'GET_ALL_USERS',
-    getById: ' GET_USER_BY_ID',
-    create: 'CREATE_USER',
-    update: 'UPDATE_USER',
-    delete: 'DELETE_USER',
-  },
-  Task: {
-    getAll: GET_ALL_TASKS,
-    getById: GET_TASK_BY_ID,
-    create: CREATE_TASK,
-    update: UPDATE_TASK,
-    delete: DELETE_TASK,
-  },
-  Project: {
-    getAll: GET_ALL_PROJECTS,
-    getById: GET_PROJECT_BY_ID,
-    create: CREATE_PROJECT,
-    update: UPDATE_PROJECT,
-    delete: DELETE_PROJECT,
-  },
-  Employee: {
-    getAll: GET_ALL_EMPLOYEES,
-    getById: GET_EMPLOYEE_BY_ID,
-    create: CREATE_PROJECT,
-    update: UPDATE_PROJECT,
-    delete: DELETE_PROJECT,
-  },
-  Invoice: {
-    getAll: GET_ALL_INVOICES,
-    getById: GET_INVOICE_BY_ID,
-    create: CREATE_INVOICE,
-  },
 
-  Tax: {
-    create: CREATE_TAX,
-    getAll: GET_ALL_Taxes,
-  },
-  Product: {
-    create: CREATE_PRODUCT,
-    getAll: GET_ALL_PRODUCTS,
-  },
-  Client: {
-    create: CREATE_CLIENT,
-    getAll: GET_ALL_CLIENTS,
-  },
-
-  // You can add more configurations for different types here
-};

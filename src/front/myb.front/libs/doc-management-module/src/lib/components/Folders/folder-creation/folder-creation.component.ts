@@ -12,6 +12,9 @@ import { Folder } from '../../../models/Folder';
 import { FormsModule } from '@angular/forms';
 import { FolderService } from '../../../services/folder.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { KeycloakProfile } from 'keycloak-js';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'myb-front-folder-creation',
@@ -24,17 +27,25 @@ export class FolderCreationComponent {
   folderName: string = '';
   @Output() folderCreated = new EventEmitter<Folder>();
   @Input() folderId!: number;
+  @Input() userId!: string;
+  user$: Observable<KeycloakProfile | null>;
 
   constructor(
     public activeModal: NgbActiveModal,
     private folderService: FolderService,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private keycloakService: KeycloakService 
+  ) {
+    this.user$ = this.keycloakService.profile$;
+
+  }
 
   
   ngOnInit() {
     console.log('Received folderId from details:', this.folderId);
     //console.log('Received parentid from details:', this.parentId);
+      // Get the userId from KeycloakService
+    
   }
 
   createFolder(): void {

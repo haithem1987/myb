@@ -28,7 +28,7 @@ namespace Myb.Document.Services
                 .FirstOrDefaultAsync(rf => rf.Id == id);
         }
 
-        public async Task<RootFolder> GetRootFolderByUserIdAndModuleNameAsync(string userId, string moduleName)
+        public async Task<RootFolder?> GetRootFolderByUserIdAndModuleNameAsync(string userId, string moduleName)
         {
             return await _rootFolderRepository.GetAll()
                 .FirstOrDefaultAsync(rf => rf.UserId == userId && rf.ModuleName == moduleName);

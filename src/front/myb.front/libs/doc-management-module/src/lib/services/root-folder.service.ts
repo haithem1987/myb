@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Apollo } from 'apollo-angular';
+import { Apollo ,gql} from 'apollo-angular';
 import { RootFolder } from '../models/RootFolder';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -63,18 +63,33 @@ export class RootFolderService extends RepositoryService<RootFolder> {
     );
   }
 
-  getRootFolderByUserAndModule(userId: string, moduleName: string): Observable<RootFolder> {
-    return this.apollo.query<{ rootFolderByUserAndModule: RootFolder }>({
-      query: GET_ROOT_FOLDER_BY_USER_AND_MODULE,
+  getRootFolderByUserIdAndModuleName(userId: string, moduleName: string): Observable<RootFolder> {
+    return this.apollo.watchQuery({
+      query:  GET_ROOT_FOLDER_BY_USER_AND_MODULE,
       variables: { userId, moduleName }
-    }).pipe(map(result => result.data.rootFolderByUserAndModule));
+    }).valueChanges.pipe(
+      map((result: any) => {
+        const rfolders = result.data.rootFolderByUserIdAndModuleName;
+        this.rootFoldersSubject.next(rfolders);
+        return rfolders;
+      })
+    );
   }
 
-  override create(item: RootFolder): Observable<RootFolder> {
-    return super.create(item).pipe(
-      map((newRootFolder) => {
-        const rootFolders = [...this.rootFoldersSubject.value, newRootFolder];
-        this.rootFoldersSubject.next(rootFolders);
+  override create(rootFolder: RootFolder): Observable<RootFolder> {
+    return this.apollo
+    .mutate<{ addRootFolder: RootFolder }>({
+      mutation: gql`
+        ${this.typeOperations.create}
+      `,
+      variables: { rootFolder }
+    })
+    .pipe(
+      map((result: any) => {
+        const newRootFolder = result.data.addRootFolder;
+        const currentRootFolders = this.rootFoldersSubject.value;
+        this.rootFoldersSubject.next([...currentRootFolders, newRootFolder]);
+
         return newRootFolder;
       })
     );

@@ -85,8 +85,8 @@ export const GET_FOLDERS_BY_PARENT_ID = gql`
 
 // RootFolder Queries
 export const GET_ROOT_FOLDER_BY_USER_AND_MODULE = gql`
-  query GetRootFolderByUserAndModule($userId: String!, $moduleName: String!) {
-    rootFolderByUserAndModule(userId: $userId, moduleName: $moduleName) {
+  query getRootFolderByUserIdAndModuleName($userId: String!, $moduleName: String!) {
+    rootFolderByUserIdAndModuleName(userId: $userId, moduleName: $moduleName) {
       id
       userId
       moduleName

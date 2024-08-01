@@ -39,11 +39,11 @@ export class InvoiceModuleComponent implements OnInit {
   private invoiceService = inject(InvoiceService);
   private router = inject(Router);
   
-  fId!:number ; 
-  folderTitle! :string;
+ // fId!:number ; 
+  
+ // folderTitle! :string;
+userId!: string;
   ngOnInit(): void {}
 
-  onFolderSelected(folderId: number): void {
-    this.fId = folderId;
-  }
+
 }

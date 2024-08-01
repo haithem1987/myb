@@ -10,7 +10,7 @@ namespace Myb.Document.Services
     public interface IRootFolderService
     {
         Task<RootFolder> GetRootFolderByIdAsync(int id);
-        Task<RootFolder> GetRootFolderByUserIdAndModuleNameAsync(string userId, string moduleName);
+        Task<RootFolder?> GetRootFolderByUserIdAndModuleNameAsync(string userId, string moduleName);
 
         Task<IEnumerable<RootFolder>> GetAllRootFoldersAsync();
         Task<RootFolder> AddRootFolderAsync(RootFolder rootFolder);

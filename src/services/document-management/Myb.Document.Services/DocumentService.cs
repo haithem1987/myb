@@ -89,11 +89,13 @@ namespace Myb.Document.Services
 
 
         //delete document
-        public async Task<DocumentModel> DeleteDocumentAsync(int id)
+        public async Task<bool> DeleteDocumentAsync(int id)
         {
 
-            var responce = await  _documentRepository.DeleteAsync(id);
-            return responce.Entity;
+            /*  var responce = await  _documentRepository.DeleteAsync(id);
+              return responce.Entity;*/
+            await _documentRepository.DeleteAsync(id);
+            return true;
         }
         /*
         

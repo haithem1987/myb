@@ -49,7 +49,7 @@ namespace Myb.Document.Infra.GraphQl.Queries
             return await rootFolderService.GetRootFolderByIdAsync(id);
         }
 
-        public async Task<RootFolder> GetRootFolderByUserIdAndModuleName([Service] IRootFolderService rootFolderService, string userId, string moduleName)
+        public async Task<RootFolder?> GetRootFolderByUserIdAndModuleName([Service] IRootFolderService rootFolderService, string userId, string moduleName)
         {
             return await rootFolderService.GetRootFolderByUserIdAndModuleNameAsync(userId, moduleName);
         }

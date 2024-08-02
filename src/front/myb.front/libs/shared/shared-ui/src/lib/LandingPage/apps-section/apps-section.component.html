@@ -3,6 +3,16 @@
     <img src="assets/images/apps.png" width="50" height="50" alt="" /> Our Apps
   </h2>
   <p class="mx-4 text-center">All the tools that you need are here</p>
+  <!-- <div class="card-body text-center">
+    <img
+      src="assets/images/invoice.png"
+      width="50"
+      height="50"
+      alt="Invoice"
+    />
+    <h5 class="card-title my-3">Invoice</h5>
+    <p [routerLink]="['/invoice']"class="card-text">Invoice</p>
+  </div> -->
   <div class="row mx-auto" style="width: 60%">
     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let app of list">
       <div
@@ -20,6 +30,7 @@
           <h5 class="card-title my-3">{{ app.name }}</h5>
           <p class="card-text">{{ app.description }}</p>
         </div>
+        
       </div>
     </div>
   </div>

@@ -23,7 +23,7 @@ import { NoResultComponent } from 'libs/shared/shared-ui/src/lib/components/no-r
 import { Folder } from '../../../models/Folder';
 import { FolderCreationComponent } from '../folder-creation/folder-creation.component';
 import { DocumentCreationComponent } from '../../document-creation/document-creation.component';
-import { filter, map, Observable } from 'rxjs';
+import { filter, map, Observable, switchMap } from 'rxjs';
 import { RootFolder } from '../../../models/RootFolder';
 import { FolderEditComponent } from '../Edit/folder-edit.component';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
@@ -47,7 +47,7 @@ export class FolderDetailsComponent implements OnInit {
   @Input() fId!: number;
   //fid2=38;
   @Input() title!: string;
-  //  @Input() parentId!: number;
+  // @Input() parentId!: number;
   @Input() canCreateFolder = true;
   @Input() moduleName!: string;
   userId!: string;
@@ -77,99 +77,243 @@ export class FolderDetailsComponent implements OnInit {
     private RootFolderService: RootFolderService,
     private keycloakService: KeycloakService
   ) {}
-  // ngOnInit(): void {
 
-  //   if (this.fId) {
-  //     // this.loadFolderDetails();
-  //     this.loadFoldersByParentId(this.fId);
-  //   } else {
-  //     this.route.paramMap.subscribe(params => {
-  //       this.fId = +params.get('id')!;
-  //       // this.loadFolderDetails();
-  //        this.loadFoldersByParentId(this.fId);
-  //     });
-  //   }
+
+  // ngOnInit(): void {
+  //   this.keycloakService.userId$.subscribe((userId) => {
+  //     if (userId) {
+  //       this.userId = userId;
+  //       console.log('User ID:', this.userId);
+  //       console.log('module name ', this.moduleName);
+
+  //       this.getRootFolder(userId, this.moduleName);
+
+  //       // if (this.fId) {
+  //       //   this.loadFolderDetails();
+  //       //   this.loadFoldersByParentId(this.fId);
+  //       // } else {
+  //       //   this.route.paramMap.subscribe((params) => {
+  //       //     this.fId = +params.get('id')!;
+  //       //     this.loadFolderDetails();
+  //       //   });
+  //       // }
+  //     }
+  //   });
+  //   console.log('ngOnInit FolderDetailsComponent');
   // }
 
+  // getRootFolder(userId: string, moduleName: string) {
+  //   this.RootFolderService.getRootFolderByUserIdAndModuleName(
+  //     userId,
+  //     moduleName
+  //   ).subscribe({
+  //     next: (data: RootFolder) => {
+  //       console.log('RootFolder:', data);
+  //       if (data == null) {
+  //         const folder = {
+  //           folderName: 'root',
+  //           parentId: 0,
+  //           createdBy: '',
+  //           editedBy: '',
+  //           createdAt: new Date(),
+  //           updatedAt: new Date(),
+  //         } as Folder;
+  //         this.folderService.create(folder).subscribe({
+  //           next: (newFolder) => {
+  //             console.log('creation id', newFolder.id);
+  //             console.log('creation parentId:', newFolder.parentId);
+  //             console.log('first', this.folderService.folders$);
+
+  //             const rootFolder = {
+  //               moduleName: moduleName,
+  //               userId: userId,
+  //               folderId: newFolder.id,
+  //             } as RootFolder;
+  //             this.RootFolderService.create(rootFolder).subscribe({
+  //               next: (rootFolder) => {
+  //                 console.log('rootfolder', rootFolder.folderId);
+  //                 console.log('userid', rootFolder.userId);
+  //                 console.log('modulename', rootFolder.moduleName);
+  //                 this.rootId = rootFolder.folderId;
+  //                 this.fId = rootFolder.folderId;
+
+  //                 this.openFolder(rootFolder.folderId);
+  //               },
+  //             });
+  //           },
+  //           error: (error) => {
+  //             console.error('Error creating folder:', error);
+  //           },
+  //         });
+  //       } else {
+  //         this.rootId = data.folderId;
+  //         this.fId = data.folderId;
+
+  //         this.openFolder(data.folderId);
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error fetching root folder:', error);
+  //     },
+  //   });
+  // }
+  //2
+  // ngOnInit(): void {
+  //   this.keycloakService.userId$.subscribe((userId) => {
+  //     if (userId) {
+  //       this.userId = userId;
+  //       console.log('User ID:', this.userId);
+  //       console.log('Module name:', this.moduleName);
+  
+  //       this.getRootFolder(userId, this.moduleName);
+  //     }
+  //   });
+  //   console.log('ngOnInit FolderDetailsComponent');
+  // }
+  
+  // getRootFolder(userId: string, moduleName: string) {
+  //   this.RootFolderService.getRootFolderByUserIdAndModuleName(userId, moduleName).subscribe({
+  //     next: (data: RootFolder) => {
+  //       console.log('RootFolder:', data);
+  //       if (data == null) {
+  //         this.createRootFolder(userId, moduleName);
+  //       } else {
+  //         this.rootId = data.folderId;
+  //         this.fId = data.folderId;
+  //         this.openFolder(data.folderId);
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error fetching root folder:', error);
+  //     },
+  //   });
+  // }
+  
+  // createRootFolder(userId: string, moduleName: string) {
+  //   const folder = {
+  //     folderName: 'root',
+  //     parentId: 0,
+  //     createdBy: '',
+  //     editedBy: '',
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //   } as Folder;
+  
+  //   this.folderService.create(folder).subscribe({
+  //     next: (newFolder) => {
+  //       console.log('Creation ID:', newFolder.id);
+  //       console.log('Creation parentId:', newFolder.parentId);
+  
+  //       const rootFolder = {
+  //         moduleName: moduleName,
+  //         userId: userId,
+  //         folderId: newFolder.id,
+  //       } as RootFolder;
+  
+  //       this.RootFolderService.create(rootFolder).subscribe({
+  //         next: (rootFolder) => {
+  //           console.log('RootFolder:', rootFolder.folderId);
+  //           console.log('UserID:', rootFolder.userId);
+  //           console.log('ModuleName:', rootFolder.moduleName);
+  //           this.rootId = rootFolder.folderId;
+  //           this.fId = rootFolder.folderId;
+  
+  //           this.openFolder(rootFolder.folderId);
+  //         },
+  //         error: (error) => {
+  //           console.error('Error creating root folder:', error);
+  //         },
+  //       });
+  //     },
+  //     error: (error) => {
+  //       console.error('Error creating folder:', error);
+  //     },
+  //   });
+  // }
+  //3
   ngOnInit(): void {
-    this.keycloakService.userId$.subscribe((userId) => {
-      if (userId) {
-        this.userId = userId;
-        console.log('User ID:', this.userId);
-        console.log('module name ', this.moduleName);
-
-        this.getRootFolder(userId, this.moduleName);
-
-        if (this.fId) {
-          this.loadFolderDetails();
-          this.loadFoldersByParentId(this.fId);
-        } else {
-          this.route.paramMap.subscribe((params) => {
-            this.fId = +params.get('id')!;
-            this.loadFolderDetails();
-          });
-        }
-      }
-    });
-    console.log('ngOnInit FolderDetailsComponent');
+    this.keycloakService.userId$
+      .pipe(
+        filter((userId) => !!userId),
+        switchMap((userId) => {
+          this.userId = userId!;
+          console.log('User ID:', this.userId);
+          console.log('Module name:', this.moduleName);
+  
+          return this.getRootFolder(userId!, this.moduleName);
+        })
+      )
+      .subscribe({
+        next: (rootFolder) => {
+          if (!rootFolder) {
+            this.createRootFolderAndFolder(this.userId, this.moduleName);
+          } else {
+            this.rootId = rootFolder.folderId!;
+            this.fId = rootFolder.folderId!;
+           this.openFolder(rootFolder.folderId!);
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching root folder:', error);
+        },
+      });
   }
-
-  getRootFolder(userId: string, moduleName: string) {
-    this.RootFolderService.getRootFolderByUserIdAndModuleName(
-      userId,
-      moduleName
-    ).subscribe({
-      next: (data: RootFolder) => {
+  
+  getRootFolder(userId: string, moduleName: string): Observable<RootFolder | null> {
+    return this.RootFolderService.getRootFolderByUserIdAndModuleName(userId, moduleName).pipe(
+      map((data: RootFolder | null) => {
         console.log('RootFolder:', data);
-        if (data == null) {
-          const folder = {
-            folderName: 'root',
-            parentId: 0,
-            createdBy: '',
-            editedBy: '',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          } as Folder;
-          this.folderService.create(folder).subscribe({
-            next: (newFolder) => {
-              console.log('creation id', newFolder.id);
-              console.log('creation parentId:', newFolder.parentId);
-              console.log('first', this.folderService.folders$);
-
-              const rootFolder = {
-                moduleName: moduleName,
-                userId: userId,
-                folderId: newFolder.id,
-              } as RootFolder;
-              this.RootFolderService.create(rootFolder).subscribe({
-                next: (rootFolder) => {
-                  console.log('rootfolder', rootFolder.folderId);
-                  console.log('userid', rootFolder.userId);
-                  console.log('modulename', rootFolder.moduleName);
-                  this.rootId = rootFolder.folderId;
-                  this.fId = rootFolder.folderId;
-
-                  this.openFolder(rootFolder.folderId);
-                },
-              });
-            },
-            error: (error) => {
-              console.error('Error creating folder:', error);
-            },
-          });
-        } else {
-          this.rootId = data.folderId;
-          this.fId = data.folderId;
-
-          this.openFolder(data.folderId);
-        }
+        return data;
+      })
+    );
+  }
+  
+  createRootFolderAndFolder(userId: string, moduleName: string) {
+    const folder = {
+      folderName: 'root',
+      parentId: 0,
+      createdBy: '',
+      editedBy: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Folder;
+  
+    this.folderService.create(folder).subscribe({
+      next: (newFolder) => {
+        console.log('Created Folder:', newFolder);
+  
+        const rootFolder = {
+          moduleName: moduleName,
+          userId: userId,
+          folderId: newFolder.id,
+        } as RootFolder;
+  
+        this.RootFolderService.create(rootFolder).subscribe({
+          next: (createdRootFolder) => {
+            console.log('Created RootFolder:', createdRootFolder);
+            this.rootId = createdRootFolder.folderId!;
+            this.fId = createdRootFolder.folderId!;
+            this.openFolder(createdRootFolder.folderId!); // Open the newly created root folder
+          },
+          error: (error) => {
+            console.error('Error creating root folder:', error);
+          },
+        });
       },
       error: (error) => {
-        console.error('Error fetching root folder:', error);
+        console.error('Error creating folder:', error);
       },
     });
   }
-
+  
+  openFolder(folderId: number): void {
+    this.fId = folderId;
+    this.loadFolderDetails();
+    console.log('OpenFolder:', folderId, this.fId);
+    console.log('This.documents$', this.documents$);
+    console.log('FID:', this.fId, 'FolderID:', folderId);
+  }
+  
   loadFolders() {
     this.folderService.getAll().subscribe({
       next: (data: Folder[]) => {
@@ -186,15 +330,15 @@ export class FolderDetailsComponent implements OnInit {
     });
   }
 
-  openFolder(folderId: number): void {
-    this.fId = folderId;
-    this.loadFolderDetails();
-    // this.loadFoldersByParentId(this.fId);
-    console.log('openflder', folderId, this.fId);
-    console.log('this.documents$', this.documents$);
+  // openFolder(folderId: number): void {
+  //   this.fId = folderId;
+  //   this.loadFolderDetails();
+  //   // this.loadFoldersByParentId(this.fId);
+  //   console.log('openflder', folderId, this.fId);
+  //   console.log('this.documents$', this.documents$);
 
-    console.log('fid', this.fId, 'folderId', folderId);
-  }
+  //   console.log('fid', this.fId, 'folderId', folderId);
+  // }
 
   goBackToPreviousFolder(): void {
     if (this.fId !== this.rootId) {
@@ -438,11 +582,12 @@ export class FolderDetailsComponent implements OnInit {
   openFolderCreationModal(): void {
     const modalRef = this.modalService.open(FolderCreationComponent);
     modalRef.componentInstance.folderId = this.fId;
-    // modalRef.componentInstance.parentId = this.folder?.id;
+     modalRef.componentInstance.parentId = this.folder?.id;
     console.log('Passing folderId  fId  to modal:', this.fId);
     console.log('passing parentid', this.folder.parentId);
     modalRef.componentInstance.folderCreated.subscribe((newFolder: Folder) => {
       this.folders = [...this.folders, newFolder];
+
     });
   }
 }

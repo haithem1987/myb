@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 interface App {
   id: number;
@@ -13,7 +13,7 @@ interface App {
 @Component({
   selector: 'myb-front-apps-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,RouterLink],
   templateUrl: './apps-section.component.html',
   styleUrls: ['./apps-section.component.css'],
 })
@@ -35,10 +35,10 @@ export class AppsSectionComponent {
     },
     {
       id: 3,
-      name: 'Document Management',
+      name: 'Invoice Management',
       icon: 'timesheet.png',
       description: 'Organize and store your documents securely.',
-      route: '/documents',
+      route: '/invoice',
     },
     {
       id: 4,

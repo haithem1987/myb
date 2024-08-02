@@ -72,7 +72,7 @@ export class FolderCreationComponent {
         },
       });
     } else {
-      alert('Please enter a folder name');
+      //alert('Please enter a folder name');
     }
   }
 }

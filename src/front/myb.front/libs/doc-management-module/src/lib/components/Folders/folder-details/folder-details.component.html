@@ -1,12 +1,12 @@
 <div class="container mt-3">
   <div class="ms-auto" *ngIf="canCreateFolder">
     <h4>{{ title }}</h4>
-    @if(this.fId!==this.rootId){
+    @if(folder.parentId !=0){
 
       <h5 class="mb-0">Your Files in <span class="folder-name">{{ folder?.folderName }}</span> :</h5>
     }
       <div class="d-flex mb-3">
-        @if(this.fId!==this.rootId){
+        @if(folder.parentId !=0){
 
         <span (click)="goBackToPreviousFolder()"><i class="bi bi-arrow-return-left"></i></span>
         }

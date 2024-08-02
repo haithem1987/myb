@@ -21,4 +21,6 @@
   .delete-button i {
     color: red;
   }
-  
+  .no-underline {
+    text-decoration: none;
+  }

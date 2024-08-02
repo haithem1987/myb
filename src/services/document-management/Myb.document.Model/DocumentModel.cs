@@ -8,8 +8,8 @@ namespace Myb.document.Model
         
         public string? DocumentName { get; set; }
        
-        public int? CreatedBy { get; set; } 
-        public int? EditedBy { get; set; } 
+        public string? CreatedBy { get; set; } 
+        public string? EditedBy { get; set; } 
 
         public DocumentType? DocumentType { get; set; }
         public DocumentStatus? Status { get; set; }
@@ -21,8 +21,9 @@ namespace Myb.document.Model
         public virtual ICollection<DocumentVersion>? Versions { get; set; }
 
         public string? file { get; set; }
-       /*public string? url { get; set; }*/
-
+        /*public string? url { get; set; }*/
+        public string? UserId { get; set; }
+        public int? CompanyId { get; set; }
 
 
     }

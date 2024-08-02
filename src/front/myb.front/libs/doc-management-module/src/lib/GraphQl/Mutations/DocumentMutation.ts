@@ -53,8 +53,29 @@ export const UPDATE_DOCUMENT = gql`
   }
 `;
 
+// export const DELETE_DOCUMENT = gql`
+//   mutation DeleteDocument($id: Int!) {
+//     deleteDocument(id: $id){
+//       companyId
+//     createdAt
+//     createdBy
+//     documentName
+//     documentSize
+//     documentType
+//     editedBy
+//     file
+//     folderId
+//     id
+//     status
+//     updatedAt
+//     userId
+//     }
+//   }
+// `;
+
 export const DELETE_DOCUMENT = gql`
   mutation DeleteDocument($id: Int!) {
     deleteDocument(id: $id)
   }
 `;
+

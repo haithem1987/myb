@@ -69,4 +69,3 @@ const createCustomLink = (httpLink: HttpLink, router: Router) => {
   ],
 })
 export class GraphQLModule {}
- 

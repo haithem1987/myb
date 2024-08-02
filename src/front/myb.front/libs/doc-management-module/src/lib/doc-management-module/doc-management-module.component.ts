@@ -14,11 +14,15 @@ import { DocumentUploadComponent } from '../components/document-upload/document-
 import { FolderCardsComponent } from '../components/Folders/folder-cards/folder-cards.component';
 import { Folder } from '../models/Folder';
 import { FolderService } from '../services/folder.service';
-import { RouterLink, RouterModule , RouterOutlet } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterModule , RouterOutlet } from '@angular/router';
 import { SelectedFiles, UploadFilesService } from '../services/upload-files.service';
 import { NavbarComponent } from '../components/navigation-components/navbar/navbar.component';
 import { BreadcrumbComponent } from 'libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component';
+// import { BreadcrumbComponent } from 'libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component';
+
 import { ToastsContainerComponent } from 'libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component';
+import { DocModuleWidgetComponent } from '../doc-module-widget/doc-module-widget.component';
+import { FolderDetailsComponent } from '../components/Folders/folder-details/folder-details.component';
 @Component({
   selector: 'myb-front-doc-management-module',
   standalone: true,
@@ -35,56 +39,28 @@ import { ToastsContainerComponent } from 'libs/shared/shared-ui/src/lib/componen
     NavbarComponent,
     RouterOutlet,
     BreadcrumbComponent,
-    ToastsContainerComponent
+    ToastsContainerComponent,
+    DocModuleWidgetComponent,
+    FolderDetailsComponent,
+
     
 
   ],
   templateUrl: './doc-management-module.component.html',
   styleUrl: './doc-management-module.component.css',
 })
-export class DocManagementModuleComponent implements OnInit {
+export class DocManagementModuleComponent  {
 documents :DocumentModel[] = [];
 folders:Folder[] = []
+fId!: number;
 
-constructor( private files: UploadFilesService ,private DocumentService: DocumentService , private modalService: NgbModal  , private folderService :FolderService){}
-
-
+constructor(    private route: ActivatedRoute
+){}
+ngOnInit(): void {
   
-  ngOnInit(){
-    this.loadDocuments();
-    this.loadFolders();
-  }
-
- 
-  //alldoc
-  loadDocuments() {
-    this.DocumentService.getAll().subscribe((data: any) => {
-      console.log("Received data from server:", data);
-     console.log('status ',data.status);
-      
-      if (data && data.allDocuments && Array.isArray(data.allDocuments)) {
-        this.documents = data.allDocuments;
-      } else {
-        console.error("Invalid data format received from the server");
-      }
-    });
-  }
-  
-
-
-loadFolders() {
-  this.folderService.getAll().subscribe((data: any) => {
-    console.log("Received folders from server:", data);
-    
-    if (Array.isArray(data)) {
-      this.folders = data;
-    } else {
-      console.error("Invalid data format received from the server");
-    }
-  }, (error: any) => {
-    console.error("Error loading folders", error);
-});
 }
+
+
 
 
 }

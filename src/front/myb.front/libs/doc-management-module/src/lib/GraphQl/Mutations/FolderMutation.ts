@@ -54,3 +54,32 @@ export const ADD_FOLDER_WITH_DOCUMENTS = gql`
     }
   }
 `;
+
+// RootFolder Mutations
+export const ADD_ROOT_FOLDER = gql`
+  mutation AddRootFolder($rootFolder: RootFolderInput!) {
+    addRootFolder(rootFolder: $rootFolder) {
+      id
+      userId
+      moduleName
+      folderId
+    }
+  }
+`;
+
+export const UPDATE_ROOT_FOLDER = gql`
+  mutation UpdateRootFolder($rootFolder: RootFolderInput!) {
+    updateRootFolder(rootFolder: $rootFolder) {
+      id
+      userId
+      moduleName
+      folderId
+    }
+  }
+`;
+
+export const DELETE_ROOT_FOLDER = gql`
+  mutation DeleteRootFolder($id: Int!) {
+    deleteRootFolder(id: $id)
+  }
+`;

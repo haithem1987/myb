@@ -1,8 +1,23 @@
+
 import {
-  GET_ALL_TIMESHEETS,
-  GET_TIMESHEETS_BY_EMPLOYEE_ID,
-  GET_TIMESHEETS_BY_USER_ID,
-} from '../../../time-sheet-module/src/lib/graphql/queries/timesheet.graphql';
+  GET_ALL_FOLDERS,
+  GET_FOLDERS_BY_PARENT_ID,
+  GET_FOLDER_BY_ID,
+} from 'libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql';
+import {
+  GET_ALL_ROOT_FOLDERS,
+  GET_ROOT_FOLDER_BY_ID,
+  GET_ROOT_FOLDER_BY_USER_AND_MODULE,
+} from 'libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql';
+import {
+  ADD_FOLDER,
+  ADD_ROOT_FOLDER,
+  DELETE_FOLDER,
+  DELETE_ROOT_FOLDER,
+  UPDATE_FOLDER,
+  UPDATE_ROOT_FOLDER,
+} from 'libs/doc-management-module/src/lib/GraphQl/Mutations/FolderMutation';
+
 import {
   ADD_DOCUMENT,
   DELETE_DOCUMENT,
@@ -12,6 +27,15 @@ import {
   GET_ALL_DOCUMENTS,
   GET_DOCUMENT_BY_ID,
 } from './../../../doc-management-module/src/lib/GraphQl/Queries/Document.graphql';
+
+
+
+
+import {
+  GET_ALL_TIMESHEETS,
+  GET_TIMESHEETS_BY_EMPLOYEE_ID,
+  GET_TIMESHEETS_BY_USER_ID,
+} from '../../../time-sheet-module/src/lib/graphql/queries/timesheet.graphql';
 
 import {
   CREATE_TASK,
@@ -56,15 +80,6 @@ import {
 } from '../../../time-sheet-module/src/lib/graphql/mutations/timeoff.graphql';
 import { GET_TIMEOFFS_BY_EMPLOYEE_ID } from '../../../time-sheet-module/src/lib/graphql/queries/timeoff.graphql';
 
-import {
-  GET_ALL_FOLDERS,
-  GET_FOLDER_BY_ID,
-} from 'libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql';
-import {
-  ADD_FOLDER,
-  DELETE_FOLDER,
-  UPDATE_FOLDER,
-} from 'libs/doc-management-module/src/lib/GraphQl/Mutations/FolderMutation';
 
 
 import {
@@ -145,6 +160,7 @@ export const typeConfig: { [key: string]: any } = {
     create: CREATE_CLIENT,
     getAll: GET_ALL_CLIENTS,
   },
+ 
   DocumentModel: {
     getById: GET_DOCUMENT_BY_ID,
     getAll: GET_ALL_DOCUMENTS,
@@ -159,8 +175,16 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_FOLDER,
     delete: DELETE_FOLDER,
     create: ADD_FOLDER,
+    getFoldersByParentId: GET_FOLDERS_BY_PARENT_ID,
   },
-
+  //rootfolder
+  RootFolder: {
+    getById: GET_ROOT_FOLDER_BY_ID,
+    getAll: GET_ALL_ROOT_FOLDERS,
+    update: UPDATE_ROOT_FOLDER,
+    delete: DELETE_ROOT_FOLDER,
+    create: ADD_ROOT_FOLDER,
+    getRootFolderByUserAndModule: GET_ROOT_FOLDER_BY_USER_AND_MODULE,
+  },
   // You can add more configurations for different types here
 };
-

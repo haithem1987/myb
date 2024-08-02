@@ -25,14 +25,27 @@ namespace Myb.Document.Services
         }*/
         public async Task<Folder> GetFolderByIdAsync(int id)
         {
-            return await _folderRepository.GetAll().Include(f => f.Documents).FirstOrDefaultAsync(f => f.Id == id);
+            return await _folderRepository.GetAll()
+                .Include(f => f.Documents)
+                .FirstOrDefaultAsync(f => f.Id == id);
         }
 
         //get all folders including all documents
         public async Task<IEnumerable<Folder>> GetAllFoldersAsync()
         {
-            return await _folderRepository.GetAll().Include(f => f.Documents).ToListAsync();
+            return await _folderRepository.GetAll()
+                .Include(f => f.Documents)
+                .ToListAsync();
         }
+
+        public async Task<IEnumerable<Folder>> GetFoldersByParentIdAsync(int parentId)
+        {
+            return await _folderRepository.GetAll()
+                .Where(f => f.ParentId == parentId)
+                .Include(f => f.Documents)
+                .ToListAsync();
+        }
+
 
         /*
 
@@ -67,6 +80,12 @@ namespace Myb.Document.Services
         public async Task<bool> DeleteFolderAsync(int id)
         {
             await _folderRepository.DeleteAsync(id);
+            return true;
+        }
+
+        public async Task<bool> DeleteFolderByParentIdAsync(int parentId)
+        {
+            await _folderRepository.DeleteAsync(parentId);
             return true;
         }
     }

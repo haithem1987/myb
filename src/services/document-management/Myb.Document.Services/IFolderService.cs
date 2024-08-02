@@ -14,5 +14,8 @@ namespace Myb.Document.Services
         Task<Folder> AddFolderAsync(Folder folder);
         Task<Folder> UpdateFolderAsync(Folder folder);
         Task<bool> DeleteFolderAsync(int id);
+        Task<bool> DeleteFolderByParentIdAsync(int id);
+        Task<IEnumerable<Folder>> GetFoldersByParentIdAsync(int parentId);
+
     }
 }

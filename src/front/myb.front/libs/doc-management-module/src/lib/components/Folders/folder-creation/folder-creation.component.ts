@@ -1,9 +1,20 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Folder } from '../../../models/Folder';
 import { FormsModule } from '@angular/forms';
 import { FolderService } from '../../../services/folder.service';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { KeycloakProfile } from 'keycloak-js';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'myb-front-folder-creation',
@@ -14,64 +25,54 @@ import { FolderService } from '../../../services/folder.service';
 })
 export class FolderCreationComponent {
   folderName: string = '';
-  @Input() parentId: number | undefined;
   @Output() folderCreated = new EventEmitter<Folder>();
+  @Input() folderId!: number;
+  @Input() userId!: string;
+  user$: Observable<KeycloakProfile | null>;
 
-  constructor(public activeModal: NgbActiveModal, private folderService: FolderService) {}
+  constructor(
+    public activeModal: NgbActiveModal,
+    private folderService: FolderService,
+    private route: ActivatedRoute,
+    private keycloakService: KeycloakService 
+  ) {
+    this.user$ = this.keycloakService.profile$;
 
-  // createFolder(): void {
-  //   if (this.folderName) {
-  //     const folder = {
-  //       id: 0, 
-  //       folderName: this.folderName,
-  //       parentId: this.parentId,
-  //       createdBy: 0,
-  //       editedBy: 0 ,
-  //       createdAt: new Date(),
-  //     };
-      
-  //     this.folderService.createFolder(folder).subscribe(
-  //       (newFolder) => {
-  //         this.folderCreated.emit(newFolder);
-  //         this.activeModal.close();
-  //         console.log('folder created',newFolder)
-  //       },
-  //       (error) => {
-  //         console.error('Error creating folder:', error);
-  //       }
-  //     );
-  //   } else {
-  //     alert('Please enter a folder name');
-  //   }
-  // }
+  }
 
   
-  //updated 
+  ngOnInit() {
+    console.log('Received folderId from details:', this.folderId);
+    //console.log('Received parentid from details:', this.parentId);
+      // Get the userId from KeycloakService
+    
+  }
+
   createFolder(): void {
     if (this.folderName) {
       const folder = {
-        
         folderName: this.folderName,
-        parentId: this.parentId,
-        createdBy: 0,
-        editedBy: 0,
+        parentId: this.folderId,
+        createdBy: '',
+        editedBy: '',
         createdAt: new Date(),
         updatedAt: new Date(),
-      };
+      } as Folder;
 
-      this.folderService.createFolder(folder).subscribe(
-        (newFolder) => {
+      this.folderService.create(folder).subscribe({
+        next: (newFolder) => {
           this.folderCreated.emit(newFolder);
           this.activeModal.close();
-          console.log('Folder created', newFolder);
+          console.log('creation id', newFolder.id);
+          console.log('creation parentId:', newFolder.parentId);
+          console.log('first', this.folderService.folders$);
         },
-        (error) => {
+        error: (error) => {
           console.error('Error creating folder:', error);
-        }
-      );
+        },
+      });
     } else {
-      alert('Please enter a folder name');
+      //alert('Please enter a folder name');
     }
   }
 }
-

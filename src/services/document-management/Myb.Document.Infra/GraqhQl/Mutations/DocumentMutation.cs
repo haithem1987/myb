@@ -19,7 +19,7 @@ namespace Myb.Document.Infra.GraphQl.Mutations
 
         public async Task<DocumentModel> UpdateDocument([Service] IDocumentService documentService, int id, DocumentModel document)
         {
-            document.Id = id; // Ensure the id is set correctly
+            document.Id = id; 
             return await documentService.UpdateDocumentAsync(document);
         }
 
@@ -48,6 +48,10 @@ namespace Myb.Document.Infra.GraphQl.Mutations
         {
             return await folderService.DeleteFolderAsync(id);
         }
+        public async Task<bool> DeleteFolderByParentId([Service] IFolderService folderService, int parentId)
+        {
+            return await folderService.DeleteFolderAsync(parentId);
+        }
 
         //add document version
         public async Task<DocumentVersion> AddDocumentVersion([Service] IDocumentVersionService documentVersionService, DocumentVersion documentVersion)
@@ -58,6 +62,23 @@ namespace Myb.Document.Infra.GraphQl.Mutations
         public async Task<DocumentVersion> UpdateDocumentVersion([Service] IDocumentVersionService documentVersionService, DocumentVersion documentVersion)
         {
             return await documentVersionService.UpdateDocumentVersionAsync(documentVersion);
+        }
+
+
+        // RootFolder Mutations
+        public async Task<RootFolder> AddRootFolder([Service] IRootFolderService rootFolderService, RootFolder rootFolder)
+        {
+            return await rootFolderService.AddRootFolderAsync(rootFolder);
+        }
+
+        public async Task<RootFolder> UpdateRootFolder([Service] IRootFolderService rootFolderService, RootFolder rootFolder)
+        {
+            return await rootFolderService.UpdateRootFolderAsync(rootFolder);
+        }
+
+        public async Task<bool> DeleteRootFolder([Service] IRootFolderService rootFolderService, int id)
+        {
+            return await rootFolderService.DeleteRootFolderAsync(id);
         }
     }
 

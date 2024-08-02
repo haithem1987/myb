@@ -1,66 +1,26 @@
 <div class="container mt-3">
   
   
-  
+<!--   
   <div class="d-flex mb-3">
     <h5 class="mb-0">All Documents</h5>
     <div class="ms-auto">
-      <button class="btn btn-outline-secondary me-2 btn-sm"(click)="openModal()">
-        <i class="bi bi-folder-plus" style="font-size: 20px;"></i>  
-        Folder
-      </button>
+   
    
     </div>
   </div>
-  
+   -->
 
 
   <p> This section allows you to manage your folders and  documents</p>
 
-  <div class="card border-primary p-2">
-    <div class="table-responsive">
-    <table class="table table-hover ">
-      <thead>
-        <tr>
-          <th> Folder Name</th>
-          <!-- <th>Created by</th> -->
-          <th  class="text-end">Date</th>
-          <th  class="text-end">Update Date</th>
+  <myb-front-folder-details 
+    
+  [title]="''" 
+  [canCreateFolder]="true"
+  [moduleName]="'document'"
 
-          <th class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr  *ngFor="let folder of folders$ | async">
-          <ng-container  *ngIf="folder.parentId ===null">
-          <td >
-            <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
-            <a [routerLink]="['/documents/folder', folder.id]" class="no-underline">{{ folder.folderName }}</a>
-          </td>
-          <!-- <td (click)="openFolder(folder.id)">
-            <i class="bi bi-folder2-open me-2" style="font-size: 25px;"></i>
-            <a class="no-underline">{{ folder.folderName }}</a>
-          </td> -->
-          <!-- <td></td> -->
-          <td  class="text-end">{{folder.createdAt | date }}</td>
-          <td  class="text-end">{{folder.updatedAt | date }}</td>
-
-          <td class="text-end">
-            <button class="btn btn-outline-primary me-2" (click)="openModalEdit()">
-              <i class="bi bi-pencil-square"></i>
-            </button>
-            <button class="btn btn-outline-danger   me-2" (click)="deleteFolder(folder.id != null ? folder.id : -1)">
-              <i class="bi bi-trash"></i>
-            </button>
-            <button class="btn btn-outline-secondary me-2" (click)="pinFolder(folder)">
-              <i class="bi bi-pin-angle"></i> 
-            </button>
-            
-          </td>
-        </ng-container >
-        </tr>
-      </tbody>
-    </table>
-    </div>
-  </div>
   
+>
+</myb-front-folder-details>
+</div>

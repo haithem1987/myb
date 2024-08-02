@@ -9,11 +9,12 @@ import { FolderEditComponent } from '../Edit/folder-edit.component';
 import { FormsModule } from '@angular/forms';
 import { FolderCreationComponent } from '../folder-creation/folder-creation.component';
 import { map, Observable } from 'rxjs';
+import { FolderDetailsComponent } from '../folder-details/folder-details.component';
 
 @Component({
   selector: 'myb-front-folder-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink,FolderDetailsComponent],
   templateUrl: './folder-list.component.html',
   styleUrl: './folder-list.component.css',
 })

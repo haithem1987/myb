@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" routerLink="/">MYB</a>
     <button
@@ -15,68 +15,42 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/timesheet" routerLinkActive="active"
-            >Timesheet</a
-          >
+          <a class="nav-link" routerLink="/timesheet" routerLinkActive="active">
+            {{ 'TIMESHEET' | translate }}
+          </a>
         </li>
         <li class="nav-item">
           <a
             class="nav-link"
             routerLink="/timesheet/projects"
             routerLinkActive="active"
-            >Projects</a
           >
+            {{ 'PROJECTS' | translate }}
+          </a>
         </li>
         <li class="nav-item">
           <a
             class="nav-link"
             routerLink="/timesheet/employees"
             routerLinkActive="active"
-            >Employees</a
           >
+            {{ 'INTERVENANTS' | translate }}
+          </a>
         </li>
         <li class="nav-item">
           <a
             class="nav-link"
             routerLink="/timesheet/tasks"
             routerLinkActive="active"
-            >Tasks</a
           >
-        </li>
-      </ul>
-      <ul class="navbar-nav ms-auto">
-        <li *ngIf="user$ | async as user" ngbDropdown class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle d-flex align-items-center"
-            id="navbarDropdown"
-            ngbDropdownToggle
-            role="button"
-            aria-expanded="false"
-          >
-            <div
-              class="avatar"
-              [ngStyle]="{
-                'background-color': getAvatarColor(user?.username ?? '')
-              }"
-            >
-              {{ user.username?.charAt(0)?.toUpperCase() }}
-            </div>
-            <span class="ms-2">{{ user.username }}</span>
+            {{ 'TASKS' | translate }}
           </a>
-          <ul
-            ngbDropdownMenu
-            aria-labelledby="navbarDropdown"
-            class="dropdown-menu-end"
-          >
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><hr class="dropdown-divider" /></li>
-            <li>
-              <a class="dropdown-item" href="#" (click)="logout()">Logout</a>
-            </li>
-          </ul>
         </li>
       </ul>
+      <div class="d-flex align-items-center">
+        <myb-front-language-switcher class="ms-3"></myb-front-language-switcher>
+        <myb-front-user-dropdown></myb-front-user-dropdown>
+      </div>
     </div>
   </div>
 </nav>

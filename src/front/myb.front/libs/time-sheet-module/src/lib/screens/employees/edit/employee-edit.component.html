@@ -1,88 +1,121 @@
 <div class="container mt-4">
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">
-        {{ isEditMode ? 'Edit Employee' : 'Create Employee' }}
-      </h5>
-      <form [formGroup]="employeeForm" (ngSubmit)="saveEmployee()">
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input
-            id="email"
-            formControlName="email"
-            class="form-control"
-            [ngClass]="{
-              'is-invalid':
-                employeeForm.get('email')?.invalid &&
-                employeeForm.get('email')?.touched
-            }"
-          />
-          <div
-            *ngIf="
-              employeeForm.get('email')?.invalid &&
-              employeeForm.get('email')?.touched
-            "
-            class="invalid-feedback"
-          >
-            Valid email is required.
-          </div>
-        </div>
-        <div class="mb-3">
-          <label for="name" class="form-label">Name</label>
-          <input
-            id="name"
-            formControlName="name"
-            class="form-control"
-            [ngClass]="{
-              'is-invalid':
-                employeeForm.get('name')?.invalid &&
-                employeeForm.get('name')?.touched
-            }"
-          />
-          <div
-            *ngIf="
-              employeeForm.get('name')?.invalid &&
-              employeeForm.get('name')?.touched
-            "
-            class="invalid-feedback"
-          >
-            Name is required.
-          </div>
-        </div>
-        <div class="mb-3">
-          <label for="department" class="form-label">Department</label>
-          <input
-            id="department"
-            formControlName="department"
-            class="form-control"
-            [ngClass]="{
-              'is-invalid':
-                employeeForm.get('department')?.invalid &&
-                employeeForm.get('department')?.touched
-            }"
-          />
-          <div
-            *ngIf="
-              employeeForm.get('department')?.invalid &&
-              employeeForm.get('department')?.touched
-            "
-            class="invalid-feedback"
-          >
-            Department is required.
-          </div>
-        </div>
+  <div class="row">
+    <div class="col d-flex">
+      <div class="card flex-fill">
+        <div class="card-body">
+          <h5 class="card-title">
+            {{
+              isEditMode
+                ? ('EDIT_EMPLOYEE' | translate)
+                : ('CREATE_EMPLOYEE' | translate)
+            }}
+          </h5>
+          <form [formGroup]="employeeForm" (ngSubmit)="saveEmployee()">
+            <div class="mb-3">
+              <label for="email" class="form-label">{{
+                'EMAIL' | translate
+              }}</label>
+              <input
+                id="email"
+                formControlName="email"
+                class="form-control"
+                [ngClass]="{
+                  'is-invalid':
+                    employeeForm.get('email')?.invalid &&
+                    employeeForm.get('email')?.touched
+                }"
+              />
+              <div
+                *ngIf="
+                  employeeForm.get('email')?.invalid &&
+                  employeeForm.get('email')?.touched
+                "
+                class="invalid-feedback"
+              >
+                {{ 'VALID_EMAIL_REQUIRED' | translate }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="name" class="form-label">{{
+                'NAME' | translate
+              }}</label>
+              <input
+                id="name"
+                formControlName="name"
+                class="form-control"
+                [ngClass]="{
+                  'is-invalid':
+                    employeeForm.get('name')?.invalid &&
+                    employeeForm.get('name')?.touched
+                }"
+              />
+              <div
+                *ngIf="
+                  employeeForm.get('name')?.invalid &&
+                  employeeForm.get('name')?.touched
+                "
+                class="invalid-feedback"
+              >
+                {{ 'NAME_REQUIRED' | translate }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="department" class="form-label">{{
+                'DEPARTMENT' | translate
+              }}</label>
+              <input
+                id="department"
+                formControlName="department"
+                class="form-control"
+                [ngClass]="{
+                  'is-invalid':
+                    employeeForm.get('department')?.invalid &&
+                    employeeForm.get('department')?.touched
+                }"
+              />
+              <div
+                *ngIf="
+                  employeeForm.get('department')?.invalid &&
+                  employeeForm.get('department')?.touched
+                "
+                class="invalid-feedback"
+              >
+                {{ 'DEPARTMENT_REQUIRED' | translate }}
+              </div>
+            </div>
 
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="employeeForm.invalid"
-        >
-          {{ isEditMode ? 'Update Employee' : 'Create Employee' }}
-        </button>
-        <button type="button" class="btn btn-secondary" (click)="cancel()">
-          Cancel
-        </button>
-      </form>
+            <button
+              type="submit"
+              class="btn btn-primary fw-bold text-uppercase me-2"
+            >
+              {{
+                isEditMode
+                  ? ('UPDATE_EMPLOYEE' | translate)
+                  : ('CREATE_EMPLOYEE' | translate)
+              }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary fw-bold text-uppercase"
+              (click)="cancel()"
+            >
+              {{ 'CANCEL' | translate }}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
+    <!-- <div *ngIf="isEditMode" class="col-6 d-flex">
+      <div class="card p-3 flex-fill">
+        <myb-front-employee-stats
+          [employeeId]="employeeId"
+        ></myb-front-employee-stats>
+      </div>
+    </div>
+    <div *ngIf="isEditMode" class="col-12 mt-4">
+      <myb-front-timeoff-list
+        [employeeId]="employeeId"
+      ></myb-front-timeoff-list>
+    </div> -->
   </div>
 </div>

@@ -1,6 +1,9 @@
 import { DocumentroutingModule } from './../../../../libs/doc-management-module/src/lib/document-routing-module';
 import { Route } from '@angular/router';
-import { DocManagementModuleComponent, FolderDetailsComponent } from '@myb-front/doc-management-module';
+import {
+  DocManagementModuleComponent,
+  FolderDetailsComponent,
+} from '@myb-front/doc-management-module';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
 export const appRoutes: Route[] = [
   // {
@@ -39,8 +42,12 @@ export const appRoutes: Route[] = [
         (m) => m.DocumentroutingModule
       ),
   },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.SettingsComponent),
+  },
   // {
   //   path:'folder/:id' , component:FolderDetailsComponent
   // }
-
 ];

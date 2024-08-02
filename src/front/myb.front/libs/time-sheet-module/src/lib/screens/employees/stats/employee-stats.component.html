@@ -1,0 +1,27 @@
+<p>employee-stats works!</p>
+<div>
+  <div class="btn-group mb-3">
+    <button class="btn btn-primary" (click)="updateChart('daily')">
+      Daily
+    </button>
+    <button class="btn btn-primary" (click)="updateChart('weekly')">
+      Weekly
+    </button>
+    <button class="btn btn-primary" (click)="updateChart('monthly')">
+      Monthly
+    </button>
+  </div>
+  <ngx-charts-bar-horizontal
+    *ngIf="workedHoursPerDay"
+    [results]="workedHoursPerDay"
+    [xAxis]="true"
+    [yAxis]="true"
+    [legend]="false"
+    [showXAxisLabel]="true"
+    [showYAxisLabel]="true"
+    xAxisLabel="Worked Hours"
+    yAxisLabel="Date"
+    [roundEdges]="true"
+    [customColors]="customColors"
+  ></ngx-charts-bar-horizontal>
+</div>

@@ -6,7 +6,8 @@ export const GET_ALL_TIMESHEETS = `
       description
       employeeId
       id
-      isApproved
+      status
+      quantity
       projectId
       updatedAt
       userId
@@ -25,13 +26,22 @@ export const GET_TIMESHEETS_BY_USER_ID = `
     description
     employeeId
     id
-    isApproved
+    status
     projectId
     updatedAt
+    quantity
     userId
     workedHours
     employeeName
     projectName
+    }
+  }
+`;
+export const GET_TIMESHEETS_BY_EMPLOYEE_ID = `
+  query ($employeeId: Int!) {
+    timesheetsByEmployeeId(employeeId: $employeeId) {
+      date
+      workedHours
     }
   }
 `;

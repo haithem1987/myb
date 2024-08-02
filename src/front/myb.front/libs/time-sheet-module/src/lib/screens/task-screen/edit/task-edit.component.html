@@ -1,7 +1,9 @@
 <div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title">
-      {{ isNewTask ? 'Create New Task' : 'Edit Task' }}
+      {{
+        isNewTask ? ('CREATE_NEW_TASK' | translate) : ('EDIT_TASK' | translate)
+      }}
     </h5>
     <button
       type="button"
@@ -14,29 +16,33 @@
   <div class="modal-body">
     <form [formGroup]="taskForm">
       <div class="mb-3">
-        <label for="taskName" class="form-label">Task Name</label>
+        <label for="taskName" class="form-label">{{
+          'TASK_NAME' | translate
+        }}</label>
         <input
           type="text"
           class="form-control"
           id="taskName"
           formControlName="name"
-          placeholder="Enter task name"
+          [placeholder]="'ENTER_TASK_NAME' | translate"
         />
         <div
           *ngIf="taskForm.get('name')?.invalid && taskForm.get('name')?.touched"
           class="text-danger"
         >
-          Task name is required.
+          {{ 'TASK_NAME_REQUIRED' | translate }}
         </div>
       </div>
       <div class="mb-3">
-        <label for="taskDescription" class="form-label">Description</label>
+        <label for="taskDescription" class="form-label">{{
+          'DESCRIPTION' | translate
+        }}</label>
         <input
           type="text"
           class="form-control"
           id="taskDescription"
           formControlName="description"
-          placeholder="Enter task description"
+          [placeholder]="'ENTER_TASK_DESCRIPTION' | translate"
         />
         <div
           *ngIf="
@@ -45,11 +51,13 @@
           "
           class="text-danger"
         >
-          Description is required.
+          {{ 'DESCRIPTION_REQUIRED' | translate }}
         </div>
       </div>
       <div class="mb-3">
-        <label for="taskStartTime" class="form-label">Start Time</label>
+        <label for="taskStartTime" class="form-label">{{
+          'START_TIME' | translate
+        }}</label>
         <input
           type="datetime-local"
           class="form-control"
@@ -63,11 +71,13 @@
           "
           class="text-danger"
         >
-          Start time is required.
+          {{ 'START_TIME_REQUIRED' | translate }}
         </div>
       </div>
       <div class="mb-3">
-        <label for="taskEndTime" class="form-label">End Time</label>
+        <label for="taskEndTime" class="form-label">{{
+          'END_TIME' | translate
+        }}</label>
         <input
           type="datetime-local"
           class="form-control"
@@ -80,11 +90,13 @@
           "
           class="text-danger"
         >
-          End time is required.
+          {{ 'END_TIME_REQUIRED' | translate }}
         </div>
       </div>
       <div class="mb-3">
-        <label for="employee" class="form-label">Assigned to</label>
+        <label for="employee" class="form-label">{{
+          'ASSIGNED_TO' | translate
+        }}</label>
         <select class="form-control" id="employee" formControlName="employeeId">
           <option *ngFor="let employee of employees" [ngValue]="employee.id">
             {{ employee.name }}
@@ -97,11 +109,13 @@
           "
           class="text-danger"
         >
-          Employee is required.
+          {{ 'EMPLOYEE_REQUIRED' | translate }}
         </div>
       </div>
       <div class="mb-3">
-        <label for="project" class="form-label">Project</label>
+        <label for="project" class="form-label">{{
+          'PROJECT' | translate
+        }}</label>
         <select class="form-control" id="project" formControlName="projectId">
           <option *ngFor="let project of projects" [ngValue]="project.id">
             {{ project.projectName }}
@@ -114,11 +128,13 @@
           "
           class="text-danger"
         >
-          Project is required.
+          {{ 'PROJECT_REQUIRED' | translate }}
         </div>
       </div>
       <div class="mb-3">
-        <label for="isCompleted" class="form-label">Completed</label>
+        <label for="isCompleted" class="form-label">{{
+          'COMPLETED' | translate
+        }}</label>
         <input type="checkbox" id="isCompleted" formControlName="isCompleted" />
       </div>
     </form>
@@ -129,10 +145,10 @@
       class="btn btn-secondary"
       (click)="activeModal.dismiss('cancel')"
     >
-      Cancel
+      {{ 'CANCEL' | translate }}
     </button>
     <button type="button" class="btn btn-primary" (click)="save()">
-      {{ isNewTask ? 'Create' : 'Save' }}
+      {{ isNewTask ? ('CREATE' | translate) : ('SAVE' | translate) }}
     </button>
   </div>
 </div>

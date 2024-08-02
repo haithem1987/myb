@@ -18,8 +18,7 @@ namespace Myb.Invoice.Models
         public string? Status { get; set; }
         public int? ClientID { get; set; }
         public virtual Client? Client { get; set; }
-        public ICollection<int>? ProductsIds { get; set; }
-        public virtual ICollection<Product>? Products { get; set; }
-        public string? image {  get; set; }
+        public virtual ICollection<InvoiceDetails>? InvoiceDetails { get; set; }
+        public string? Image {  get; set; }
     }
 }

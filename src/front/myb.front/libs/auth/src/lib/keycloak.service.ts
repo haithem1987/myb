@@ -79,21 +79,33 @@ export class KeycloakService {
   }
 
   getUserRoles(): string[] {
-    if (
-      !this.keycloak.tokenParsed ||
-      !this.keycloak.tokenParsed.resource_access
-    ) {
+    if (!this.keycloak.tokenParsed || !this.keycloak.tokenParsed.realm_access) {
       return [];
     }
 
-    const resourceAccess = this.keycloak.tokenParsed.resource_access;
-    const clientRoles = resourceAccess['MYB-client']?.roles || [];
+    const resourceAccess = this.keycloak.tokenParsed.realm_access;
+    const clientRoles = resourceAccess?.roles || [];
     return clientRoles;
   }
 
-  isUserManager(): boolean {
+  hasRole(role: string): boolean {
     const roles = this.getUserRoles();
-    return roles.includes('manager_myb');
+    console.log('roles', roles);
+    return roles.includes(role);
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    const userRoles = this.getUserRoles();
+    return roles.some((role) => userRoles.includes(role));
+  }
+
+  hasAllRoles(roles: string[]): boolean {
+    const userRoles = this.getUserRoles();
+    return roles.every((role) => userRoles.includes(role));
+  }
+
+  isUserManager(): boolean {
+    return this.hasRole('manager_myb');
   }
 
   private loadUserProfile(): Promise<void> {

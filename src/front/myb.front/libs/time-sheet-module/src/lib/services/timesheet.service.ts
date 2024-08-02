@@ -50,7 +50,49 @@ export class TimesheetService extends RepositoryService<Timesheet> {
         }) // Map to the allTimesheets property
       );
   }
+  getTimesheetsByEmployeeId(employeeId: number): Observable<Timesheet[]> {
+    return this.apollo
+      .watchQuery<{ timesheetsByEmployeeId: Timesheet[] }>({
+        query: gql`
+          ${this.typeOperations.getTimesheetsByEmployeeId}
+        `,
+        variables: { employeeId },
+      })
+      .valueChanges.pipe(
+        map((result: any) => {
+          console.log('result', result);
+          const timesheets = result.data.timesheetsByEmployeeId;
+          return timesheets;
+        }) // Map to the allTimesheets property
+      );
+  }
 
+  updateMultipleTimesheets(timesheets: Timesheet[]): Observable<Timesheet[]> {
+    return this.apollo
+      .mutate<{ updateMultipleTimesheets: Timesheet[] }>({
+        mutation: gql`
+          ${this.typeOperations.updateMultipleTimesheets}
+        `,
+        variables: { timesheets },
+      })
+      .pipe(
+        map((result: any) => {
+          const updatedTimesheets = result.data.updateMultipleTimesheets;
+          // Make a mutable copy of the existing timesheets
+          const existingTimesheets = [...this.timesheetSubject.value];
+          updatedTimesheets.forEach((updated: Timesheet) => {
+            const index = existingTimesheets.findIndex(
+              (ts) => ts.id === updated.id
+            );
+            if (index !== -1) {
+              existingTimesheets[index] = updated;
+            }
+          });
+          this.timesheetSubject.next(existingTimesheets);
+          return updatedTimesheets;
+        })
+      );
+  }
   override getAll(): Observable<Timesheet[]> {
     return super.getAll().pipe(
       map((timesheets) => {

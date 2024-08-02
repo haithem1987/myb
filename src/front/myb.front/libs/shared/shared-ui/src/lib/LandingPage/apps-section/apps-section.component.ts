@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { CardComponent } from '../../components/card/card.component';
 
 interface App {
   id: number;
@@ -13,7 +15,7 @@ interface App {
 @Component({
   selector: 'myb-front-apps-section',
   standalone: true,
-  imports: [CommonModule,RouterLink],
+  imports: [CommonModule, CardComponent, TranslateModule],
   templateUrl: './apps-section.component.html',
   styleUrls: ['./apps-section.component.css'],
 })
@@ -21,45 +23,24 @@ export class AppsSectionComponent {
   list: App[] = [
     {
       id: 1,
-      name: 'Timesheet',
-      icon: 'bills.png',
-      description: 'Manage your working hours and projects.',
+      name: 'TIMESHEET',
+      icon: 'timesheet.png',
+      description: 'TIMESHEET_DESC',
       route: '/timesheet',
     },
     {
       id: 2,
-      name: 'Document Management',
+      name: 'DOCUMENT_MANAGEMENT',
       icon: 'timesheet.png',
-      description: 'Organize and store your documents securely.',
+      description: 'DOCUMENT_MANAGEMENT_DESC',
       route: '/documents',
     },
     {
       id: 3,
-      name: 'Invoice Management',
-      icon: 'timesheet.png',
-      description: 'Organize and store your documents securely.',
+      name: 'INVOICE_MANAGEMENT',
+      icon: 'bills.png',
+      description: 'INVOICE_MANAGEMENT_DESC',
       route: '/invoice',
-    },
-    {
-      id: 4,
-      name: 'Document Management',
-      icon: 'timesheet.png',
-      description: 'Organize and store your documents securely.',
-      route: '/documents',
-    },
-    {
-      id: 5,
-      name: 'Document Management',
-      icon: 'timesheet.png',
-      description: 'Organize and store your documents securely.',
-      route: '/documents',
-    },
-    {
-      id: 6,
-      name: 'Document Management',
-      icon: 'timesheet.png',
-      description: 'Organize and store your documents securely.',
-      route: '/documents',
     },
     // Add more modules as needed
   ];

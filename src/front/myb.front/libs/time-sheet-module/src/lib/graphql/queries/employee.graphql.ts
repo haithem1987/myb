@@ -1,26 +1,31 @@
 export const GET_ALL_EMPLOYEES = `
   query {
     allEmployees {
-      id
-      name
+      createdAt
       department
       email
-      createdAt
+      id
+      isManager
+      managerId
+      name
       updatedAt
+      userId
     }
   }
 `;
 
 export const GET_EMPLOYEE_BY_ID = `
-  query projectById($id: Int!) {
-    projectById(id: $id) {
-      id
-      projectName
-      description
+  query employeeById($id: Int!) {
+    employeeById(id: $id) {
       createdAt
-      endDate
-      startDate
+      department
+      email
+      id
+      isManager
+      managerId
+      name
       updatedAt
+      userId
     }
   }
 `;

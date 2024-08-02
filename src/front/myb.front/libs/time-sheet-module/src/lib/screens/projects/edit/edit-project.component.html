@@ -2,12 +2,18 @@
   <myb-front-card>
     <div class="card-body w-100">
       <h5 class="card-title">
-        {{ isEditMode ? 'Edit Project' : 'Create Project' }}
+        {{
+          isEditMode
+            ? ('EDIT_PROJECT' | translate)
+            : ('CREATE_PROJECT' | translate)
+        }}
       </h5>
       <div class="card-text">
         <form [formGroup]="projectForm" (ngSubmit)="saveProject()">
           <div class="mb-3">
-            <label for="projectName" class="form-label">Project Name</label>
+            <label for="projectName" class="form-label">{{
+              'PROJECT_NAME' | translate
+            }}</label>
             <input
               id="projectName"
               formControlName="projectName"
@@ -25,12 +31,14 @@
               "
               class="invalid-feedback"
             >
-              Project name is required.
+              {{ 'PROJECT_NAME_REQUIRED' | translate }}
             </div>
           </div>
           <div class="mb-3 d-flex justify-content-between align-items-center">
             <div class="w-100 me-1">
-              <label for="startDate" class="form-label">Start Date</label>
+              <label for="startDate" class="form-label">{{
+                'START_DATE' | translate
+              }}</label>
               <div class="input-group">
                 <input
                   id="startDate"
@@ -47,13 +55,15 @@
                   "
                   class="invalid-feedback"
                 >
-                  Start date is required.
+                  {{ 'START_DATE_REQUIRED' | translate }}
                 </div>
               </div>
             </div>
 
             <div class="w-100 ms-1">
-              <label for="endDate" class="form-label">End Date</label>
+              <label for="endDate" class="form-label">{{
+                'END_DATE' | translate
+              }}</label>
               <div class="input-group">
                 <input
                   id="endDate"
@@ -70,14 +80,16 @@
                   "
                   class="invalid-feedback"
                 >
-                  End date is required.
+                  {{ 'END_DATE_REQUIRED' | translate }}
                 </div>
               </div>
             </div>
           </div>
 
           <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
+            <label for="description" class="form-label">{{
+              'DESCRIPTION' | translate
+            }}</label>
             <textarea
               id="description"
               formControlName="description"
@@ -96,19 +108,23 @@
               "
               class="invalid-feedback"
             >
-              Description is required.
+              {{ 'DESCRIPTION_REQUIRED' | translate }}
             </div>
           </div>
 
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="projectForm.invalid"
-          >
-            {{ isEditMode ? 'Update Project' : 'Create Project' }}
+          <button type="submit" class="btn btn-primary fw-bold text-uppercase">
+            {{
+              isEditMode
+                ? ('UPDATE_PROJECT' | translate)
+                : ('CREATE_PROJECT' | translate)
+            }}
           </button>
-          <button type="button" class="btn btn-secondary" (click)="cancel()">
-            Cancel
+          <button
+            type="button"
+            class="btn btn-secondary fw-bold text-uppercase"
+            (click)="cancel()"
+          >
+            {{ 'CANCEL' | translate }}
           </button>
         </form>
       </div>

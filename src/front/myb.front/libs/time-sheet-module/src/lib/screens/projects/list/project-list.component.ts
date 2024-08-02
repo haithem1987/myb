@@ -1,21 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Project } from '../../../models/project.model';
+import { Project, ProjectStatus } from '../../../models/project.model';
 import { ProjectService } from '../../../services/project.service';
 import { ProjectCardComponent } from '../card/project-card.component';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-project-list',
   standalone: true,
-  imports: [CommonModule, ProjectCardComponent],
+  imports: [CommonModule, ProjectCardComponent, TranslateModule],
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css'],
 })
 export class ProjectListComponent implements OnInit {
-  projects$: Observable<Project[]> = this.projectService.projects$;
+  @Input() isArchived: boolean = false;
+  @Input() projects?: Observable<Project[]>;
 
   constructor(
     private projectService: ProjectService,
@@ -30,6 +32,7 @@ export class ProjectListComponent implements OnInit {
   }
 
   editProject(project: Project): void {
+    console.log('emit editProject', project);
     this.router.navigate(['/timesheet/projects/edit', project.id], {
       state: { project },
     });

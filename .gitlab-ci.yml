@@ -1,20 +1,41 @@
-
-stages:
-  - pull_request
+image: docker:26.1.4
+services:
+  - docker:26.1.4-dind
+ 
+stages: 
+  # - test
   - build
   - deploy
-
-include:
-  - local: .gitlab-ci-pr.yml
-    rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-
-  - local: .gitlab-ci-build.yml
-    rules:
-      - if: '$CI_BUILD == "build"'
-
-  - local: .gitlab-ci-deploy.yml
-    rules:
-      - if: '$CI_COMMIT_BRANCH == "main"'
- 
-
+variables:
+  SOLUTION_FILE: 'Myb.sln'
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+before_script:
+  - docker info
+# test:
+#   stage: test
+#   image: mcr.microsoft.com/dotnet/sdk:8.0
+#   script:
+#     - dotnet test $SOLUTION_FILE  
+build:
+  stage: build
+  # image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    # - dotnet restore $SOLUTION_FILE
+    # - dotnet build $SOLUTION_FILE --configuration Release
+    - docker build -t koutaibams1999/myb-timesheet:latest -f ./src/services/document-management/Myb.Document/Dockerfile .
+    - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+    - docker push koutaibams1999/myb-timesheet:latest
+deploy:
+  stage: deploy
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan 146.59.233.31 >> ~/.ssh/known_hosts
+  script:
+    - ssh ubuntu@146.59.233.31 "sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && sudo docker pull koutaibams1999/myb-usermanager:latest &&  sudo docker run -d --name myb-usermanager -p 8080:8080 koutaibams1999/myb-usermanager:latest"
+  only:
+    - main

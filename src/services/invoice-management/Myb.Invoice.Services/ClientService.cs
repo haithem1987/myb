@@ -1,4 +1,6 @@
-﻿using Myb.Common.Repositories;
+﻿using HotChocolate;
+using Microsoft.EntityFrameworkCore;
+using Myb.Common.Repositories;
 using Myb.Invoice.EntityFrameWork.Infra;
 using Myb.Invoice.Models;
 using System;
@@ -12,15 +14,27 @@ namespace Myb.Invoice.Services
     public class ClientService : IClientService
     {
         private readonly IGenericRepository<int?, Client, InvoiceContext> _clientRepository;
-        public ClientService(IGenericRepository<int?, Client, InvoiceContext> clientRepository)
+        private readonly IContactService _contactService;
+
+        public ClientService(IGenericRepository<int?, Client, InvoiceContext> clientRepository, IContactService contactService)
         {
             _clientRepository = clientRepository;
+            _contactService = contactService;
         }
 
         public async Task<Client?> Add(Client client)
         {
+            var contacts = client.Contacts;
+            client.Contacts = null;
             var responce = await _clientRepository.InsertAsync(client);
-            return responce.Entity;
+            var newClient = responce.Entity;
+            foreach (var contact in contacts!)
+            {
+                contact.ClientID = newClient!.Id;
+                await _contactService.Add(contact);
+
+            }
+            return await GetById(newClient!.Id);
         }
 
         public async Task<Client?> Delete(int id)
@@ -31,12 +45,12 @@ namespace Myb.Invoice.Services
 
         public Task<IEnumerable<Client?>> GetAll()
         {
-            return Task.FromResult<IEnumerable<Client?>>(_clientRepository.GetAll());
+            return Task.FromResult<IEnumerable<Client?>>(_clientRepository.GetAll().Include(C => C.Contacts));
         }
 
-        public Task<Client?> GetById(int id)
+        public Task<Client?> GetById(int? id)
         {
-            return Task.FromResult<Client?>(_clientRepository?.GetById(id));
+            return Task.FromResult<Client?>(_clientRepository.GetAll().Include(C => C.Contacts).FirstOrDefault(C => C.Id == id));
         }
 
         public Task<IEnumerable<Client?>> GetByIds(IEnumerable<int?> ids)

@@ -18,11 +18,16 @@
       <select
         id="projectId"
         placeholder="project"
-        formControlName="projectId"
         class="form-control border-0"
+        [(ngModel)]="selectedProject"
+        (ngModelChange)="onProjectSelect($event)"
+        [ngModelOptions]="{ standalone: true }"
       >
-        <option selected [value]="null">Séléctionner un projet</option>
-        <option *ngFor="let project of projects$ | async" [value]="project.id">
+        <option [ngValue]="null" selected>Sélectionner un projet</option>
+        <option
+          *ngFor="let project of activeProjects$ | async"
+          [ngValue]="project"
+        >
           {{ project.projectName }}
         </option>
       </select>
@@ -34,18 +39,20 @@
     >
       <select
         id="employeeId"
-        formControlName="employeeId"
         class="form-control border-0"
+        [(ngModel)]="selectedEmployee"
+        (ngModelChange)="onEmployeeSelect($event)"
+        [ngModelOptions]="{ standalone: true }"
       >
-        <option selected [value]="null">Séléctionner un employee</option>
+        <option [ngValue]="null" selected>Sélectionner un employé</option>
         <option
           *ngFor="let employee of employees$ | async"
-          [value]="employee.id"
+          [ngValue]="employee"
         >
           {{ employee.name }}
         </option>
       </select>
-      <label for="employeeId">Employee</label>
+      <label for="employeeId">Intervenant</label>
     </div>
 
     <div class="flex-fill ml-3 border-start form-floating" style="width: 90px">
@@ -70,9 +77,9 @@
         id="workedHours"
         formControlName="workedHours"
         class="form-control border-0"
-        placeholder="00:00:00"
         [readonly]="isTimerRunning"
         mask="00:00:00"
+        separator=":"
       />
       <label for="workedHours">Heures</label>
     </div>

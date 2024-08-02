@@ -1,0 +1,51 @@
+<div class="container my-4">
+  <div class="d-flex justify-content-between mb-3">
+    <h2 class="mb-0" style="color: var(--bs-darklight)">Product Manager</h2>
+    <button
+      type="button"
+      class="btn btn-primary"
+      [routerLink]="['/invoice/products/createProduct']"
+    >
+      <i class="bi bi-plus-lg"></i> Add Product
+    </button>
+  </div>
+  <input
+    type="text"
+    class="form-control mb-3"
+    placeholder="Search invoices..."
+  />
+  <br />
+  <div class="card border-primary p-2">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col" style="cursor: pointer">Product Name</th>
+          <th scope="col" style="cursor: pointer">Description</th>
+          <th scope="col" style="cursor: pointer">Price</th>
+          <th scope="col" style="cursor: pointer">Product Type</th>
+          <th scope="col">Unit</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(product of products$ | async ; track product){
+        <tr>
+          <td>{{ product.name }}</td>
+          <td>{{ product.description }}</td>
+          <td>{{ product.price }}</td>
+          <td>{{ product.productType }}</td>
+          <td>{{ product.unit }}</td>
+          <td>
+            <button type="button" class="btn btn-outline-primary me-2">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

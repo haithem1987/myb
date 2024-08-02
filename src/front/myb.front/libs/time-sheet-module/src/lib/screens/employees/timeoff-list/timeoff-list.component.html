@@ -1,0 +1,44 @@
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Time Off Records</h5>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Reason</th>
+          <th>Approved</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let timeOff of timeoffs$ | async">
+          <td>{{ timeOff.startDate | date : 'yyyy-MM-dd' }}</td>
+          <td>{{ timeOff.endDate | date : 'yyyy-MM-dd' }}</td>
+          <td>{{ timeOff.reason }}</td>
+          <td>
+            <span [ngClass]="'badge ' + getApprovalStatus(timeOff).badgeClass">
+              {{ getApprovalStatus(timeOff).text }}
+            </span>
+          </td>
+          <td>
+            <button
+              *ngIf="!timeOff.isApproved"
+              class="btn btn-success btn-sm"
+              (click)="approveTimeOff(timeOff)"
+            >
+              Approve
+            </button>
+            <button
+              *ngIf="timeOff.isApproved"
+              class="btn btn-danger btn-sm"
+              (click)="disapproveTimeOff(timeOff)"
+            >
+              Disapprove
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

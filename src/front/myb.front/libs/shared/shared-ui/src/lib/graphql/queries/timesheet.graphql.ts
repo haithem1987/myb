@@ -6,7 +6,7 @@ export const GET_ALL_TIMESHEETS = `
       description
       employeeId
       id
-      isApproved
+      status
       projectId
       updatedAt
       userId
@@ -23,7 +23,7 @@ export const GET_TIMESHEETS_BY_USER_ID = `
     description
     employeeId
     id
-    isApproved
+    status
     projectId
     updatedAt
     userId

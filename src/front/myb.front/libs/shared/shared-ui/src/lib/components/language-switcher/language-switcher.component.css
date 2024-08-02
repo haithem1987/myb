@@ -1,0 +1,13 @@
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-group {
+  width: 150px;
+}
+
+.language-select {
+  background-color: transparent;
+}

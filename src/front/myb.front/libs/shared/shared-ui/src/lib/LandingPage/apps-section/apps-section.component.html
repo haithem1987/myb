@@ -1,37 +1,29 @@
-<section class="container">
+<section class="container py-5">
   <h2 class="fw-bold text-center">
-    <img src="assets/images/apps.png" width="50" height="50" alt="" /> Our Apps
+    <img src="assets/images/apps.png" width="50" height="50" alt="" />
+    {{ 'OUR_APPS' | translate }}
   </h2>
-  <p class="mx-4 text-center">All the tools that you need are here</p>
-  <!-- <div class="card-body text-center">
-    <img
-      src="assets/images/invoice.png"
-      width="50"
-      height="50"
-      alt="Invoice"
-    />
-    <h5 class="card-title my-3">Invoice</h5>
-    <p [routerLink]="['/invoice']"class="card-text">Invoice</p>
-  </div> -->
+  <p class="mx-4 text-center">{{ 'ALL_TOOLS' | translate }}</p>
   <div class="row mx-auto" style="width: 60%">
     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let app of list">
-      <div
-        class="card h-100 align-items-center"
-        (click)="navigateToApp(app.route)"
-        style="cursor: pointer"
-      >
-        <div class="card-body text-center">
+      <myb-front-card>
+        <div
+          class="card-body text-center"
+          (click)="navigateToApp(app.route)"
+          style="cursor: pointer"
+        >
           <img
             [src]="'assets/images/' + app.icon"
             width="50"
             height="50"
-            alt="{{ app.name }}"
+            [alt]="app.name | translate"
           />
-          <h5 class="card-title my-3">{{ app.name }}</h5>
-          <p class="card-text">{{ app.description }}</p>
+          <h5 class="my-3 fw-bolder text-capitalize">
+            {{ app.name | translate }}
+          </h5>
+          <p class="card-text">{{ app.description | translate }}</p>
         </div>
-        
-      </div>
+      </myb-front-card>
     </div>
   </div>
 </section>

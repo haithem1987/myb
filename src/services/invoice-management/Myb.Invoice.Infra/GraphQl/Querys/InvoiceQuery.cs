@@ -24,5 +24,20 @@ namespace Myb.Invoice.Infra.GraphQl.Querys
         public Task<IEnumerable<Product?>> GetAllProducts([Service] IProductService productService) => productService.GetAll();
         public Task<IEnumerable<Product?>> GetProductsByIds([Service] IProductService productService, IEnumerable<int?> ids) => productService.GetByIds(ids);
         public Task<Product?> GetProductByID([Service] IProductService productService, int id) => productService.GetById(id);
+
+
+        public Task<IEnumerable<InvoiceDetails?>> GetAllInvoiceDetails([Service] IInvoiceDetailsService invoiceDateilsService) => invoiceDateilsService.GetAll();
+        public Task<IEnumerable<InvoiceDetails?>> GetInvoiceDetailsByIds([Service] IInvoiceDetailsService invoiceDateilsService, IEnumerable<int?> ids) => invoiceDateilsService.GetByIds(ids);
+        public Task<InvoiceDetails?> GetInvoiceDetailsByID([Service] IInvoiceDetailsService invoiceDateilsService, int id) => invoiceDateilsService.GetById(id);
+
+
+        public Task<IEnumerable<Contact?>> GetAllContacts([Service] IContactService contactService) => contactService.GetAll();
+        public Task<IEnumerable<Contact?>> GetConatctsByIds([Service] IContactService contactService, IEnumerable<int?> ids) => contactService.GetByIds(ids);
+        public Task<Contact?> GetContactByID([Service] IContactService contactService, int id) => contactService.GetById(id);
+
+
+        public Task<IEnumerable<Tax?>> GetAllTaxes([Service] ITaxService taxService) => taxService.GetAll();
+        public Task<IEnumerable<Tax?>> GetTaxesByIds([Service] ITaxService taxService, IEnumerable<int?> ids) => taxService.GetByIds(ids);
+        public Task<Tax?> GetTaxByID([Service] ITaxService taxService, int id) => taxService.GetById(id);
     }
 }

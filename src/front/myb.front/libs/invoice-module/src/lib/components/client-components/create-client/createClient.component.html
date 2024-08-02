@@ -1,0 +1,133 @@
+<div class="card border-primary p-3">
+  <div class="container">
+    <form [formGroup]="clientForm" (ngSubmit)="save()">
+      <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="firstName"
+          name="firstName"
+          formControlName="firstName"
+          placeholder="Enter First Name "
+          [ngClass]="{
+            'is-invalid':
+              clientForm.get('firstName')?.invalid &&
+              clientForm.get('firstName')?.touched
+          }"
+        />
+        @if(clientForm.get('firstName')?.invalid &&
+        clientForm.get('firstName')?.touched){
+        <div class="invalid-feedback">First name is required.</div>
+        }
+      </div>
+      <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="lastName"
+          name="lastName"
+          formControlName="lastName"
+          placeholder="Enter Last Name "
+          [ngClass]="{
+            'is-invalid':
+              clientForm.get('lastName')?.invalid &&
+              clientForm.get('lastName')?.touched
+          }"
+        />
+        @if(clientForm.get('lastName')?.invalid &&
+        clientForm.get('lastName')?.touched){
+        <div class="invalid-feedback">Last name is required.</div>
+        }
+      </div>
+      <div class="mb-3">
+        <label for="clientType" class="form-label">Client type</label>
+        <div
+          class="btn-group-horizontal"
+          role="group"
+          aria-label="horizontal radio toggle button group"
+        >
+          <input
+            type="radio"
+            class="btn-check"
+            name="vbtn-radio"
+            id="vbtn-radio1"
+            autocomplete="off"
+            checked=""
+            (click)="setTypeToPrivate()"
+          />
+          <label class="btn btn-outline-secondary me-2" for="vbtn-radio1"
+            >Private</label
+          >
+          <input
+            type="radio"
+            class="btn-check"
+            name="vbtn-radio"
+            id="vbtn-radio2"
+            autocomplete="off"
+            (click)="setTypeToCompany()"
+          />
+          <label class="btn btn-outline-primary" for="vbtn-radio2"
+            >Company</label
+          >
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="clientAddress" class="form-label">Client Address</label>
+        <input
+          type="text"
+          class="form-control"
+          id="clientAddress"
+          name="clientAddress"
+          formControlName="clientAddress"
+          placeholder="Enter Client Address "
+          [ngClass]="{
+            'is-invalid':
+              clientForm.get('clientAddress')?.invalid &&
+              clientForm.get('clientAddress')?.touched
+          }"
+        />
+        @if(clientForm.get('clientAddress')?.invalid &&
+        clientForm.get('clientAddress')?.touched){
+        <div class="invalid-feedback">Address is required.</div>
+        }
+      </div>
+      <div class="mb-3">
+        <label for="supplier" class="form-label">Contact</label>
+        <br />
+        <div style="display: flex; align-items: center">
+          <button
+            type="button"
+            class="btn btn-outline-secondary me-4"
+            (click)="openModal()"
+          >
+            <i class="bi bi-plus-lg"></i> Add Contact
+          </button>
+          @if(contacts.length == 0){
+          <p style="color: rgba(229, 4, 4, 0.896)">{{ errorMessage }}</p>
+          }
+        </div>
+      </div>
+      @for(contact of contacts; track trackByFn){
+      <li>
+        <span>{{ contact.credentials }}</span>
+      </li>
+      }
+
+      <div>
+        <br />
+        <div class="d-flex justify-content-end">
+          <button
+            type="button"
+            class="btn btn-outline-secondary me-2"
+            [routerLink]="['/invoice/clients']"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-outline-primary">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

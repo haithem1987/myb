@@ -8,27 +8,22 @@ import { CreateInvoiceComponent } from '../components/invoice-components/create-
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../components/navbar/navbar.component';
 import { ListInvoiceComponent } from '../components/invoice-components/list-invoice/listInvoice.component';
-import {BreadcrumbComponent} from '../../../../time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component'
-import {ToastsContainerComponent} from '../../../../shared/shared-ui/src/lib/components/toasts-container/toasts-container.component'
-import { DocModuleWidgetComponent } from 'libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component';
-import { FolderDetailsComponent } from '@myb-front/doc-management-module';
-import { FolderListComponent } from 'libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component';
+import { BreadcrumbComponent } from '../../../../time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component';
+import { ToastsContainerComponent } from '../../../../shared/shared-ui/src/lib/components/toasts-container/toasts-container.component';
 
 
 @Component({
   selector: 'myb-front-invoice-module',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
+    CommonModule,
+    RouterModule,
     NavbarComponent,
-    RouterOutlet, 
-    ListInvoiceComponent, 
+    RouterOutlet,
+    ListInvoiceComponent,
     CreateInvoiceComponent,
     BreadcrumbComponent,
     ToastsContainerComponent,
-    DocModuleWidgetComponent,
-    FolderDetailsComponent,
   ],
   templateUrl: './invoice-module.component.html',
   styleUrl: './invoice-module.component.css',
@@ -38,9 +33,6 @@ export class InvoiceModuleComponent implements OnInit {
   private modalService = inject(NgbModal);
   private invoiceService = inject(InvoiceService);
   private router = inject(Router);
-  
- 
+
   ngOnInit(): void {}
-
-
 }

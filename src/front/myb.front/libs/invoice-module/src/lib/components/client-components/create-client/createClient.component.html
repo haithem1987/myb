@@ -1,6 +1,11 @@
-<div class="card border-primary p-3">
+<div class="modal-header">
+  <h4 class="modal-title">Add Client</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+</div>
+<div class="modal-body">
+<div class="card border-primary p-3 m-2">
   <div class="container">
-    <form [formGroup]="clientForm" (ngSubmit)="save()">
+    <form [formGroup]="clientForm" >
       <div class="mb-3">
         <label for="firstName" class="form-label">First Name</label>
         <input
@@ -115,19 +120,22 @@
       </li>
       }
 
-      <div>
-        <br />
-        <div class="d-flex justify-content-end">
-          <button
-            type="button"
-            class="btn btn-outline-secondary me-2"
-            [routerLink]="['/invoice/clients']"
-          >
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-outline-primary">Save</button>
-        </div>
-      </div>
+      
     </form>
+  </div>
+</div>
+</div>
+<div class="modal-footer">
+  <div>
+    <div class="d-flex justify-content-end">
+      <button
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-outline-primary" (click)="save()">Save</button>
+    </div>
   </div>
 </div>

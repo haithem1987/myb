@@ -28,7 +28,8 @@ export class CreateClientComponent implements OnInit {
   private toastService = inject(ToastService);
   private router = inject(Router);
   clientService = inject(ClientService);
-  modalService = inject(NgbModal);
+  private modalService = inject(NgbModal);
+	activeModal = inject(NgbActiveModal);
 
   errorMessage: string = '';
 
@@ -58,7 +59,7 @@ export class CreateClientComponent implements OnInit {
         this.toastService.show('Client created successfully!', {
           classname: 'bg-success text-light',
         });
-        this.router.navigate(['/invoice/clients']);
+        this.closeModal()
       });
     }else {
       this.errorMessage = 'contact is required !';
@@ -80,6 +81,9 @@ export class CreateClientComponent implements OnInit {
         this.contacts.push(contact);
       }
     });
+  }
+  closeModal(): void {
+    this.activeModal.dismiss();
   }
 
   trackByFn(index: number, item: Contact): number {

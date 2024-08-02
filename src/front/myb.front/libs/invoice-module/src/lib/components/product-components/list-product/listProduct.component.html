@@ -4,7 +4,7 @@
     <button
       type="button"
       class="btn btn-primary"
-      [routerLink]="['/invoice/products/createProduct']"
+      (click)="openModal()"
     >
       <i class="bi bi-plus-lg"></i> Add Product
     </button>
@@ -12,7 +12,7 @@
   <input
     type="text"
     class="form-control mb-3"
-    placeholder="Search invoices..."
+    placeholder="Search products..."
   />
   <br />
   <div class="card border-primary p-2">

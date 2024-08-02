@@ -4,7 +4,7 @@
     <button
       type="button"
       class="btn btn-primary"
-      [routerLink]="['/invoice/clients/createClient']"
+      (click)="open()"
     >
       <i class="bi bi-plus-lg"></i> Add Client
     </button>
@@ -12,7 +12,7 @@
   <input
     type="text"
     class="form-control mb-3"
-    placeholder="Search invoices..."
+    placeholder="Search clients..."
   />
 </div>
 

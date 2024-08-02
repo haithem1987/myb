@@ -32,3 +32,9 @@ export * from './lib/components/tax-component/create-tax/createTax.component';
 export * from './lib/components/tax-component/list-tax/listTax.component';
 
 export * from './lib/components/client-components/create-client/add-contact/addContact.component';
+
+export * from './lib/components/invoice-components/create-invoice/select-client/selectClient.component';
+
+export * from './lib/components/invoice-components/create-invoice/add-item/addItemToInvoice.component';
+
+export * from './lib/components/invoice-components/create-invoice/select-product/selectProduct.component';

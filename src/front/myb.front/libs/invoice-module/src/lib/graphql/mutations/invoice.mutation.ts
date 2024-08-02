@@ -3,20 +3,29 @@ import gql from 'graphql-tag';
 export const CREATE_INVOICE = gql`
   mutation AddInvoice($item: InvoiceModelInput!) {
     addInvoice(invoice: $item) {
-      invoiceNum
+      clientID
+      companyId
+      createdAt
+      dueDate
+      id
+      image
       invoiceDate
+      invoiceNum
+      status
       subTotal
       totalAmount
-      dueDate
-      status
-      createdAt
       updatedAt
-      clientName
-      clientAddress
-      supplierName
-      supplierAddress
       userId
-      companyId
+      invoiceDetails {
+        createdAt
+        id
+        invoiceID
+        productId
+        quantity
+        totalPrice
+        unitPrice
+        updatedAt
+      }
     }
   }
 `;

@@ -1,6 +1,11 @@
+<div class="modal-header">
+  <h4 class="modal-title">Add Client</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+</div>
+<div class="modal-body">
 <div class="card border-primary p-3">
   <div class="container">
-    <form [formGroup]="productForm" (ngSubmit)="save()">
+    <form [formGroup]="productForm" >
       <div class="mb-3">
         <label for="clientType" class="form-label">Product type</label>
         <div
@@ -121,7 +126,7 @@
       </div>
 
       <div style="display: flex; align-items: center">
-        <div class="dropdown me-4">
+        <!-- <div class="dropdown me-4">
           <button
             class="btn btn-outline-secondary dropdown-toggle"
             type="button"
@@ -130,7 +135,7 @@
           >
             Tax
           </button>
-          <ul class="dropdown-menu" style="height: 300px; overflow: auto">
+          <ul class="dropdown-menu" style="height: 300px">
             <div
               data-bs-spy="scroll"
               data-bs-smooth-scroll="true"
@@ -151,6 +156,31 @@
               }
             </div>
           </ul>
+        </div> -->
+        
+        <div ngbDropdown>
+          <button
+            class="btn btn-outline-secondary me-4"
+            ngbDropdownToggle
+          >
+            Tax
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            @for(tax of taxes$ | async ; track tax){
+              <div ngbDropdownItem>
+              <li>
+                <label class="dropdown-item" (click)="setTax(tax)"
+                  >{{ tax.name }}
+                  <span
+                    >:&nbsp;&nbsp;{{ tax.value }}@if(tax.isPercentage == true){
+                    <span> %</span>
+                    }</span
+                  ></label
+                >
+              </li>
+            </div>
+              }
+          </div>
         </div>
         @if(tax != null){
         <label>
@@ -166,20 +196,22 @@
         <p style="color: rgba(229, 4, 4, 0.896)">{{ errorMessage }}</p>
         }
       </div>
-
-      <div>
-        <br />
-        <div class="d-flex justify-content-end">
-          <button
-            type="button"
-            class="btn btn-outline-secondary me-2"
-            [routerLink]="['/invoice/products']"
-          >
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-outline-primary">Save</button>
-        </div>
-      </div>
     </form>
+  </div>
+</div>
+</div>
+<div class="modal-footer">
+  <div>
+    <br />
+    <div class="d-flex justify-content-end">
+      <button
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-outline-primary" (click)="save()">Save</button>
+    </div>
   </div>
 </div>

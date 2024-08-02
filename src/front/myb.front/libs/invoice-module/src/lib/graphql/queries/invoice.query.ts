@@ -3,21 +3,29 @@ import gql from 'graphql-tag';
 export const GET_ALL_INVOICES = gql`
   query GetAllInvoices {
     allInvoices {
+      clientID
+      companyId
+      createdAt
+      dueDate
       id
-      invoiceNum
+      image
       invoiceDate
+      invoiceNum
+      status
       subTotal
       totalAmount
-      dueDate
-      status
-      createdAt
       updatedAt
-      clientName
-      clientAddress
-      supplierName
-      supplierAddress
       userId
-      companyId
+      invoiceDetails {
+        createdAt
+        id
+        invoiceID
+        productId
+        quantity
+        totalPrice
+        unitPrice
+        updatedAt
+      }
     }
   }
 `;

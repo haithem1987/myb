@@ -28,6 +28,9 @@ export class ProductService extends RepositoryService<Product>{
   protected override mapCreateItem(result: any): Product {
     return result.data?.addProduct as Product;
   }
+  protected override mapSingleItem(result: any): Product {
+    return result.data?.productByID as Product;
+  }
 
 
   override getAll(): Observable<Product[]> {
@@ -39,12 +42,19 @@ export class ProductService extends RepositoryService<Product>{
       })
     );
   }
+  override get(id: number): Observable<Product> {
+    return super.get(id).pipe(
+      map((product) => {
+        return product;
+      })
+    );
+  }
 
   override create(item: Product): Observable<Product> {
     return super.create(item).pipe(
       map((newProduct) => {
-        const taxes = [...this.productSubject.value, newProduct];
-        this.productSubject.next(taxes);
+        const products = [...this.productSubject.value, newProduct];
+        this.productSubject.next(products);
         console.log('new product', newProduct);
         return newProduct;
         

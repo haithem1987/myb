@@ -1,7 +1,158 @@
 <div class="card border-primary p-3">
   <div class="container">
-    <br />
-    <div class="row">
+    <div class="col-md">
+      <form [formGroup]="invoiceForm" >
+        <div class="mb-3">
+          <label for="invoiceNum" class="form-label">Invoice Num</label>
+          <input
+            type="text"
+            class="form-control"
+            id="invoiceNum"
+            name="invoiceNum"
+            formControlName="invoiceNum"
+            placeholder="Enter invoice num "
+          />
+          @if(invoiceForm.get('quantity')?.invalid &&
+          invoiceForm.get('quantity')?.touched){
+          <div class="invalid-feedback">Invoice Num is required.</div>
+          }
+        </div>
+        <div class="mb-3">
+          <label for="invoicedate" class="form-label">Invoice date</label>
+          <input
+            id="invoicedate"
+            formControlName="invoicedate"
+            class="form-control"
+            ngbDatepicker
+            #invoicedatePicker="ngbDatepicker"
+            (click)="invoicedatePicker.toggle()"
+          />
+          @if(invoiceForm.get('invoicedate')?.invalid &&
+          invoiceForm.get('invoicedate')?.touched){
+          <div class="invalid-feedback">Invoice Date is required.</div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="dueDate" class="form-label">Due date</label>
+          <input
+            id="dueDate"
+            formControlName="dueDate"
+            class="form-control"
+            ngbDatepicker
+            #duedatePicker="ngbDatepicker"
+            (click)="duedatePicker.toggle()"
+          />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Client</label>
+        </div>
+        <div class="d-flex align-items-center">
+          
+          <button
+            type="button"
+            class="btn btn-outline-secondary me-4"
+            (click)="openClientsModal()"
+          >
+            Select Client
+          </button>
+          @if(client != null){
+          <div
+            class="card border-secondary p-3 me-4"
+            (click)="openClientsModal()"
+          >
+            <label>
+              <span>&nbsp;&nbsp;Client Name:</span>
+              <span>&nbsp;{{ client.firstName }}</span>
+              <span>&nbsp;&nbsp;{{ client.lastName }}&nbsp;&nbsp;&nbsp;</span>
+            </label>
+            <label>
+              <span>&nbsp;&nbsp;Client Type:</span>
+              <span>&nbsp;{{ client.clientType }}&nbsp;</span>
+            </label>
+            <label>
+              <span>&nbsp;&nbsp;Client Address:</span>
+              <span>&nbsp;{{ client.address }}&nbsp;</span>
+            </label>
+          </div>
+
+          } @if(client == null){
+          <p style="color: rgba(229, 4, 4, 0.896)">{{ clientInvalid }}</p>
+          }
+        </div>
+        <br />
+        <div class="mb-2">
+          <label for="invoiceNum" class="form-label">Invoice Details</label>
+        </div>
+        <div class="mb-3">
+          <button
+            type="button"
+            class="btn btn-outline-primary me-2"
+            (click)="openAddItemModal()"
+          >
+            <i class="bi bi-plus-lg"></i> Item
+          </button>
+        </div>
+        <div class="mb-3">
+          <div class="card border-primary p-2">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Item</th>
+                  <th scope="col">Unit</th>
+                  <th scope="col">Unit Price</th>
+                  <th scope="col">Total Price</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for(data of invoiceDetails; track data){
+                <tr>
+                  <td>{{ data.quantity }}</td>
+                  <td>{{ getProductName(data.productId!) }}</td>
+                  <td>{{ getProductUnit(data.productId!) }}</td>
+                  <td>{{ data.unitPrice }}</td>
+                  <td>{{ data.totalPrice }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      (click)="removeItem(data)"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="mb-3">
+          <br />
+          <div class="d-flex justify-content-end">
+            <button
+              type="button"
+              class="btn btn-outline-secondary me-2"
+              [routerLink]="['/invoice/products']"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-outline-primary"
+              (click)="save()"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </form>
+      <div></div>
+    </div>
+    <!-- <div class="row">
       <div class="col-md me-4">
         <br />
         @if(extractedText == ''){
@@ -54,84 +205,7 @@
         </div>
         }
       </div>
-      <div class="col-md">
-        <form [formGroup]="invoiceForm" (submit)="saveInvoice()">
-          <div class="mb-3">
-            <label for="invoiceNum" class="form-label">Invoice Num</label>
-            <input
-              type="text"
-              class="form-control"
-              id="invoice num"
-              name="invoice num"
-              formControlName="invoiceNum"
-              placeholder="Enter invoice num "
-            />
-          </div>
-          <div class="mb-3">
-            <label for="invoicedate" class="form-label">Invoice date</label>
-            <input
-              type="datetime-local"
-              class="form-control"
-              id="invoicedate"
-              formControlName="invoiceDate"
-              name="invoice date"
-            />
-          </div>
-
-          <div class="mb-3">
-            <label for="duedate" class="form-label">Due date</label>
-            <input
-              type="datetime-local"
-              class="form-control"
-              id="duedate"
-              formControlName="dueDate"
-              name="duedate"
-            />
-          </div>
-          <label for="client" class="form-label">Client</label>
-          <input
-            type="text"
-            class="form-control"
-            id="client"
-            name="client"
-            formControlName="clientName"
-            placeholder="Enter Client"
-          />
-          <label for="supplier" class="form-label">Supplier</label>
-          <input
-            type="text"
-            class="form-control"
-            id="supplier"
-            name="supplier"
-            formControlName="supplierName"
-            placeholder="Enter Supplier "
-          />
-          <label for="total" class="form-label">Total</label>
-          <input
-            type="number"
-            class="form-control"
-            id="total"
-            name="total"
-            formControlName="totalAmount"
-            placeholder="Enter Total "
-          />
-          <div>
-            <br />
-            <div class="d-flex justify-content-end">
-              <button
-                type="button"
-                class="btn btn-outline-secondary me-2"
-                [routerLink]="['/invoice']"
-              >
-                Cancel
-              </button>
-              <button type="submit" class="btn btn-outline-primary">
-                Save
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+      
+    </div> -->
   </div>
 </div>

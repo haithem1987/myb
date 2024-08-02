@@ -26,7 +26,7 @@ export class TaxService extends RepositoryService<Tax> {
   }
 
   protected override mapSingleItem(result: any): Tax {
-    return result.data?.TaxById as Tax;
+    return result.data?.taxByID as Tax;
   }
 
   protected override mapCreateItem(result: any): Tax {
@@ -47,6 +47,13 @@ export class TaxService extends RepositoryService<Tax> {
         console.log('Taxs', taxes);
         this.taxSubject.next(taxes);
         return taxes;
+      })
+    );
+  }
+  override get(id: number): Observable<Tax> {
+    return super.get(id).pipe(
+      map((tax) => {
+        return tax;
       })
     );
   }

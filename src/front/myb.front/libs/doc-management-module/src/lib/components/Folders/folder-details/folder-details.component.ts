@@ -281,6 +281,8 @@ export class FolderDetailsComponent implements OnInit {
     this.folderService.create(folder).subscribe({
       next: (newFolder) => {
         console.log('Created Folder:', newFolder);
+        this.openFolder(newFolder.id); 
+
   
         const rootFolder = {
           moduleName: moduleName,
@@ -293,7 +295,6 @@ export class FolderDetailsComponent implements OnInit {
             console.log('Created RootFolder:', createdRootFolder);
             this.rootId = createdRootFolder.folderId!;
             this.fId = createdRootFolder.folderId!;
-            this.openFolder(createdRootFolder.folderId!); // Open the newly created root folder
           },
           error: (error) => {
             console.error('Error creating root folder:', error);

@@ -18,35 +18,48 @@ export const GET_ALL_INVOICES = gql`
       userId
       invoiceDetails {
         createdAt
+        description
         id
         invoiceID
         productId
         quantity
-        totalPrice
         unitPrice
+        unitPriceHT
         updatedAt
+        unit
       }
     }
   }
 `;
 
 export const GET_INVOICE_BY_ID = gql`
-  query invoiceById($id: Int!) {
+  query InvoiceByID($id: Int!) {
     invoiceByID(id: $id) {
+      clientID
+      companyId
+      createdAt
+      dueDate
       id
+      image
       invoiceDate
+      invoiceNum
+      status
       subTotal
       totalAmount
-      dueDate
-      status
-      createdAt
       updatedAt
-      clientName
-      clientAddress
-      supplierName
-      supplierAddress
       userId
-      companyId
+      invoiceDetails {
+        createdAt
+        description
+        id
+        invoiceID
+        productId
+        quantity
+        unitPrice
+        unitPriceHT
+        updatedAt
+        unit
+      }
     }
   }
 `;

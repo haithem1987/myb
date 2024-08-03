@@ -49,7 +49,6 @@ import { InvoiceDetails } from '../../../models/invoiceDetails.model';
 })
 export class CreateInvoiceComponent {
   private clientService = inject(ClientService);
-  private productService = inject(ProductService);
   private invoiceService = inject(InvoiceService);
   private dateUtils = inject(DateUtilsService);
   private toastService = inject(ToastService);
@@ -58,7 +57,6 @@ export class CreateInvoiceComponent {
   private router = inject(Router);
 
   clients$: Observable<Client[]> = this.clientService.clients$;
-  products$: Observable<Product[]> = this.productService.products$;
 
   client?: Client;
   clientInvalid: String = '';
@@ -105,23 +103,6 @@ export class CreateInvoiceComponent {
     );
   }
 
-  getProductName(productId: number): string {
-    let productName = '';
-    this.products$.subscribe((products) => {
-      const product = products.find((p) => p.id === productId);
-      productName = product ? product.name : 'Unknown Product';
-    });
-    return productName;
-  }
-  getProductUnit(productId: number): string {
-    let productUnit = '';
-    this.products$.subscribe((products) => {
-      const product = products.find((p) => p.id === productId);
-      productUnit = product ? product.unit : 'Unknown Product';
-    });
-    return productUnit;
-  }
-
   save() {
     if (this.invoiceForm.valid) {
       const invoiceDateControl = this.invoiceForm.get('invoicedate');
@@ -132,7 +113,6 @@ export class CreateInvoiceComponent {
       const dueDateStruct = dueDateControl?.value;
       const dueDate = this.dateUtils.fromDateStruct(dueDateStruct);
 
-
       const invoice = new Invoice();
       invoice.createdAt = new Date();
       invoice.updatedAt = new Date();
@@ -142,6 +122,7 @@ export class CreateInvoiceComponent {
       invoice.invoiceNum = this.invoiceForm.value.invoiceNum;
       invoice.invoiceDetails = this.invoiceDetails;
       invoice.totalAmount = this.getTotal(this.invoiceDetails);
+      invoice.subTotal = this.getSubTotal(this.invoiceDetails);
 
       this.invoiceService.create(invoice).subscribe(() => {
         this.toastService.show('Client created successfully!', {
@@ -159,7 +140,15 @@ export class CreateInvoiceComponent {
   getTotal(invoiceDetails: InvoiceDetails[]){
     var total = 0;
     for(var item of invoiceDetails){
-      total += item.totalPrice!;
+      total += (item.unitPrice! * item.quantity!);
+    }
+    return total;
+  }
+
+  getSubTotal(invoiceDetails: InvoiceDetails[]){
+    var total = 0;
+    for(var item of invoiceDetails){
+      total += (item.unitPriceHT! * item.quantity!);
     }
     return total;
   }

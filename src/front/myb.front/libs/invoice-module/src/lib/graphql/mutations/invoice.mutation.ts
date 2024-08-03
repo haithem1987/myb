@@ -18,13 +18,15 @@ export const CREATE_INVOICE = gql`
       userId
       invoiceDetails {
         createdAt
+        description
         id
         invoiceID
         productId
         quantity
-        totalPrice
         unitPrice
+        unitPriceHT
         updatedAt
+        unit
       }
     }
   }

@@ -27,6 +27,12 @@ export class InvoiceService extends RepositoryService<Invoice> {
   protected override mapCreateItem(result: any): Invoice {
     return result.data?.addInvoice as Invoice;
   }
+  protected override mapSingleItem(result: any): Invoice {
+    return result.data?.invoiceByID as Invoice;
+  }
+
+
+
   override getAll(): Observable<Invoice[]> {
     return super.getAll().pipe(
       map((invoices)=> {
@@ -35,6 +41,14 @@ export class InvoiceService extends RepositoryService<Invoice> {
         return invoices;
       })
     )
+  }
+  override get(id: number): Observable<Invoice> {
+    return super.get(id).pipe(
+      map((invoice) => {
+        console.log('invoice', invoice);
+        return invoice;
+      })
+    );
   }
 
   override create(item: Invoice): Observable<Invoice> {

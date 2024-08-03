@@ -1,7 +1,7 @@
 <div class="card border-primary p-3">
   <div class="container">
     <div class="col-md">
-      <form [formGroup]="invoiceForm" >
+      <form [formGroup]="invoiceForm">
         <div class="mb-3">
           <label for="invoiceNum" class="form-label">Invoice Num</label>
           <input
@@ -48,7 +48,6 @@
           <label class="form-label">Client</label>
         </div>
         <div class="d-flex align-items-center">
-          
           <button
             type="button"
             class="btn btn-outline-secondary me-4"
@@ -99,7 +98,7 @@
               <thead>
                 <tr>
                   <th scope="col">Quantity</th>
-                  <th scope="col">Item</th>
+                  <th scope="col">Description</th>
                   <th scope="col">Unit</th>
                   <th scope="col">Unit Price</th>
                   <th scope="col">Total Price</th>
@@ -110,10 +109,10 @@
                 @for(data of invoiceDetails; track data){
                 <tr>
                   <td>{{ data.quantity }}</td>
-                  <td>{{ getProductName(data.productId!) }}</td>
-                  <td>{{ getProductUnit(data.productId!) }}</td>
+                  <td>{{ data.description }}</td>
+                  <td>{{ data.unit }}</td>
                   <td>{{ data.unitPrice }}</td>
-                  <td>{{ data.totalPrice }}</td>
+                  <td>{{ data.unitPrice! * data.quantity! }}</td>
                   <td>
                     <button
                       type="button"
@@ -136,7 +135,7 @@
             <button
               type="button"
               class="btn btn-outline-secondary me-2"
-              [routerLink]="['/invoice/products']"
+              [routerLink]="['/invoice']"
             >
               Cancel
             </button>

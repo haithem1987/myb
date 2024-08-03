@@ -29,6 +29,7 @@ export class AddItemToInvoiceComponent {
   invoiceDetailsForm: FormGroup = new FormGroup({
     quantity: new FormControl('',Validators.required),
     salePrice: new FormControl(''),
+    description: new FormControl(''),
   });
 
   save(){  
@@ -37,15 +38,24 @@ export class AddItemToInvoiceComponent {
       invoiceDetails.productId = this.product.id;
       invoiceDetails.quantity = this.invoiceDetailsForm.value.quantity;
       if(this.invoiceDetailsForm.value.salePrice){
-        invoiceDetails.unitPrice = this.invoiceDetailsForm.value.salePrice;
+        invoiceDetails.unitPriceHT = this.invoiceDetailsForm.value.salePrice;
+        invoiceDetails.unitPrice = this.calculatePriceWithTax(this.invoiceDetailsForm.value.salePrice, this.tax);
       } 
       else{
+        invoiceDetails.unitPriceHT = this.product.price;
         invoiceDetails.unitPrice = this.calculatePriceWithTax(this.product.price, this.tax)
       }
-
-      invoiceDetails.totalPrice = invoiceDetails.unitPrice! * invoiceDetails.quantity!
+      if(this.invoiceDetailsForm.value.description){
+        invoiceDetails.description = this.invoiceDetailsForm.value.description;
+      }
+      else{
+        invoiceDetails.description = this.product.name;
+      }
+      invoiceDetails.unitPriceHT
       invoiceDetails.createdAt = new Date();
       invoiceDetails.updatedAt == new Date();
+      invoiceDetails.description = this.product.name;
+      invoiceDetails.unit = this.product.unit;
 
       this.addItem(invoiceDetails);
       this.closeModal()

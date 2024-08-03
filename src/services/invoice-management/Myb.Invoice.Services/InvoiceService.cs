@@ -46,7 +46,7 @@ namespace Myb.Invoice.Services
 
         public Task<InvoiceModel?> GetById(int id)
         {
-            return Task.FromResult<InvoiceModel?>(_invoiceRepository.GetById(id));
+            return Task.FromResult<InvoiceModel?>(_invoiceRepository.GetAll().Include(I => I.InvoiceDetails).FirstOrDefault(i => i.Id == id));
         }
 
         public Task<IEnumerable<InvoiceModel?>> GetByIds(IEnumerable<int?> ids)

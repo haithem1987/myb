@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Myb.Invoice.EntityFrameWork.Infra;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(InvoiceContext))]
-    partial class InvoiceContextModelSnapshot : ModelSnapshot
+    [Migration("20240803011421_SecondUpdateInvoiceDetails")]
+    partial class SecondUpdateInvoiceDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,9 +108,6 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 
                     b.Property<double?>("Quantity")
                         .HasColumnType("double precision");
-
-                    b.Property<string>("Unit")
-                        .HasColumnType("text");
 
                     b.Property<double?>("UnitPrice")
                         .HasColumnType("double precision");

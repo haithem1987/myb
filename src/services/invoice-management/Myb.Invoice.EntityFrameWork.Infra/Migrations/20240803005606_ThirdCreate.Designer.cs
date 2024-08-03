@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Myb.Invoice.EntityFrameWork.Infra;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 {
     [DbContext(typeof(InvoiceContext))]
-    partial class InvoiceContextModelSnapshot : ModelSnapshot
+    [Migration("20240803005606_ThirdCreate")]
+    partial class ThirdCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,9 +97,6 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
                     b.Property<int?>("InvoiceID")
                         .HasColumnType("integer");
 
@@ -106,13 +106,10 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Property<double?>("Quantity")
                         .HasColumnType("double precision");
 
-                    b.Property<string>("Unit")
-                        .HasColumnType("text");
-
-                    b.Property<double?>("UnitPrice")
+                    b.Property<double?>("TotalPrice")
                         .HasColumnType("double precision");
 
-                    b.Property<double?>("UnitPriceHT")
+                    b.Property<double?>("UnitPrice")
                         .HasColumnType("double precision");
 
                     b.Property<DateTime?>("UpdatedAt")

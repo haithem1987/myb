@@ -28,12 +28,24 @@ export class ClientService extends RepositoryService<Client>{
   protected override mapCreateItem(result: any): Client {
     return result.data?.addClient as Client;
   }
+  protected override mapSingleItem(result: any): Client {
+    return result.data?.clientByID as Client;
+  }
 
   override getAll(): Observable<Client[]> {
     return super.getAll().pipe(
       map((clients) => {
         this.clientSubject.next(clients);
         return clients;
+      })
+    );
+  }
+
+  override get(id: number): Observable<Client> {
+    return super.get(id).pipe(
+      map((client) => {
+        console.log('client', client);
+        return client;
       })
     );
   }

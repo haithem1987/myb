@@ -22,6 +22,7 @@
         <th scope="col" style="cursor: pointer">Invoice date</th>
         <th scope="col">Due date</th>
         <th scope="col" style="cursor: pointer">Client</th>
+        <th scope="col">SubTotal</th>
         <th scope="col">Total</th>
         <th scope="col">Actions</th>
       </tr>
@@ -35,6 +36,7 @@
         <td>{{ invoice.invoiceDate | date : 'MM/dd/yyyy' }}</td>
         <td>{{ invoice.dueDate | date : 'MM/dd/yyyy' }}</td>
         <td>{{getClientName(invoice.clientID!)}}</td>
+        <td>{{ invoice.subTotal }}</td>
         <td>{{ invoice.totalAmount }}</td>
         <td>
           <button

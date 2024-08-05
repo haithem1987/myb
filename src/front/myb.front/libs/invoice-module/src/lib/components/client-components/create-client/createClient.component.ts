@@ -82,6 +82,11 @@ export class CreateClientComponent implements OnInit {
       }
     });
   }
+  deleteContact(contactToDelete: Contact): void{
+    this.contacts = this.contacts.filter(
+      (contact) => contact != contactToDelete
+    );
+  }
   closeModal(): void {
     this.activeModal.dismiss();
   }

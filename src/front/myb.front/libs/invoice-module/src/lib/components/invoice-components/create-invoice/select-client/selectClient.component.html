@@ -24,6 +24,7 @@
             type="text"
             class="form-control mb-3"
             placeholder="Search clients..."
+            [(ngModel)]="searchTerm"
           />
       </div>
       <br/>
@@ -40,21 +41,24 @@
         </thead>
         <tbody>
           @for(client of clients$ | async ; track client){
-          <tr>
-            <td>{{ client.firstName }}</td>
-            <td>{{ client.lastName }}</td>
-            <td>{{ client.address }}</td>
-            <td>{{ client.clientType }}</td>
-            <td>
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                (click)="selectClient(client)"
-              >
-                <i class="bi bi-plus-lg"></i>
-              </button>
-            </td>
-          </tr>
+            @if(client.firstName!.toLowerCase().includes(searchTerm.toLowerCase()) || client.lastName!.toLowerCase().includes(searchTerm.toLowerCase())){
+              <tr>
+                <td>{{ client.firstName }}</td>
+                <td>{{ client.lastName }}</td>
+                <td>{{ client.address }}</td>
+                <td>{{ client.clientType }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="selectClient(client)"
+                  >
+                    <i class="bi bi-plus-lg"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          
           }
         </tbody>
       </table>

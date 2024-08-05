@@ -31,6 +31,9 @@ export class ClientService extends RepositoryService<Client>{
   protected override mapSingleItem(result: any): Client {
     return result.data?.clientByID as Client;
   }
+  protected override mapUpdateItem(result: any): Client {
+    return result.data?.updateClient as Client;
+  }
 
   override getAll(): Observable<Client[]> {
     return super.getAll().pipe(
@@ -60,5 +63,7 @@ export class ClientService extends RepositoryService<Client>{
       })
     );
   }
+
+  
 
 }

@@ -24,6 +24,7 @@
               type="text"
               class="form-control mb-3"
               placeholder="Search products..."
+              [(ngModel)]="searchTerm"
             />
         </div>
         <br/>
@@ -40,21 +41,24 @@
           </thead>
           <tbody>
             @for(product of products$ | async ; track product){
-            <tr>
-              <td>{{ product.name }}</td>
-              <td>{{ product.price }}</td>
-              <td>{{ product.productType }}</td>
-              <td>{{ product.unit }}</td>
-              <td>
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary"
-                  (click)="selectProduct(product)"
-                >
-                  <i class="bi bi-plus-lg"></i>
-                </button>
-              </td>
-            </tr>
+              @if(product.name!.toLowerCase().includes(searchTerm.toLowerCase())){
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>{{ product.price }}</td>
+                  <td>{{ product.productType }}</td>
+                  <td>{{ product.unit }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      (click)="selectProduct(product)"
+                    >
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            
             }
           </tbody>
         </table>

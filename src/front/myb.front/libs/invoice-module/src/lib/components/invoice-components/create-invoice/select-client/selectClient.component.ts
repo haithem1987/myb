@@ -5,11 +5,12 @@ import { CreateClientComponent } from '../../../client-components/create-client/
 import { Observable } from 'rxjs';
 import { ClientService } from 'libs/invoice-module/src/lib/services/client.service';
 import { Client } from 'libs/invoice-module/src/lib/models/client.model';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'myb-front-select-client',
   standalone: true,
-  imports: [CommonModule,CreateClientComponent],
+  imports: [CommonModule, CreateClientComponent,FormsModule],
   templateUrl: './selectClient.component.html',
   styleUrl: './selectClient.component.css',
 })
@@ -19,20 +20,19 @@ export class SelectClientComponent {
   activeModal = inject(NgbActiveModal);
   modalService = inject(NgbModal);
   clientService = inject(ClientService);
-  clients$ : Observable<Client[]> = this.clientService.clients$;
+  clients$: Observable<Client[]> = this.clientService.clients$;
+  searchTerm: string = '';
 
   closeModal(): void {
     this.activeModal.dismiss();
   }
 
-  
-
   openModal() {
-		this.modalService.open(CreateClientComponent, { size: 'lg' });
-	}
+    this.modalService.open(CreateClientComponent, { size: 'lg' });
+  }
 
   selectClient(client: Client): void {
-      this.clientEntered.emit(client);
-      this.closeModal();   
+    this.clientEntered.emit(client);
+    this.closeModal();
   }
 }

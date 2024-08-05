@@ -5,11 +5,12 @@ import { ProductService } from 'libs/invoice-module/src/lib/services/product.ser
 import { Observable } from 'rxjs';
 import { Product } from 'libs/invoice-module/src/lib/models/product.model';
 import { CreateProductComponent } from '../../../product-components/create-product/createProduct.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'myb-front-select-product',
   standalone: true,
-  imports: [CommonModule, CreateProductComponent],
+  imports: [CommonModule, CreateProductComponent, FormsModule],
   templateUrl: './selectProduct.component.html',
   styleUrl: './selectProduct.component.css',
 })
@@ -22,6 +23,7 @@ export class SelectProductComponent {
   productService = inject(ProductService);
 
   products$: Observable<Product[]> = this.productService.products$;
+  searchTerm: string = '';
 
   
 

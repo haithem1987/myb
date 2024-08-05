@@ -20,17 +20,17 @@
       <tr>
         <th scope="col" style="cursor: pointer">Invoice-Num</th>
         <th scope="col" style="cursor: pointer">Invoice date</th>
-        <th scope="col">Due date</th>
+        <th scope="col" style="cursor: pointer">Due date</th>
         <th scope="col" style="cursor: pointer">Client</th>
-        <th scope="col">SubTotal</th>
-        <th scope="col">Total</th>
-        <th scope="col">Actions</th>
+        <th scope="col" style="cursor: pointer">SubTotal</th>
+        <th scope="col" style="cursor: pointer">Total</th>
+        <th scope="col" style="cursor: pointer">Actions</th>
       </tr>
     </thead>
     <tbody>
       @for(invoice of invoices$ | async; track invoice){
-      <tr>
-        <td [routerLink]="['/invoice/details', invoice.id]">
+      <tr [routerLink]="['/invoice/details', invoice.id]">
+        <td >
           {{ invoice.invoiceNum }}
         </td>
         <td>{{ invoice.invoiceDate | date : 'MM/dd/yyyy' }}</td>

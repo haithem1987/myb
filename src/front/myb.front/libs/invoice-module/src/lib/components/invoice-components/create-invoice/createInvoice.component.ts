@@ -104,7 +104,7 @@ export class CreateInvoiceComponent {
   }
 
   save() {
-    if (this.invoiceForm.valid) {
+    if (this.invoiceForm.valid && this.invoiceDetails.length > 0) {
       const invoiceDateControl = this.invoiceForm.get('invoicedate');
       const invoiceDateStruct = invoiceDateControl?.value;
       const invoiceDate = this.dateUtils.fromDateStruct(invoiceDateStruct);

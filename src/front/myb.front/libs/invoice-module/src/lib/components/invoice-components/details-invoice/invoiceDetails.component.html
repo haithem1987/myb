@@ -4,44 +4,71 @@
   <div class="card border-primary p-3">
     <div class="container">
       <br />
+      <div class="mb-2" style="display: grid">
+        <h6>
+          <span>&nbsp;&nbsp;Forlink Group</span>
+        </h6>
+        <h6>
+          <span>&nbsp;&nbsp;Paris</span>
+        </h6>
+        <h6>
+          <span
+            >&nbsp;&nbsp;<i class="bi bi-phone">&nbsp;&nbsp;</i>12121212</span
+          >
+        </h6>
+        <h6>
+          <span class="email"
+            >&nbsp;&nbsp;<i class="bi bi-envelope"></i
+            >&nbsp;&nbsp;Forlink&#64;Forlink.com</span
+          >
+        </h6>
+      </div>
+      <br/>
+      <br/>
       <div class="d-flex justify-content-between mb-3">
-        <div class="mb-2" style="display: grid">
-          <label>
-            <span>&nbsp;&nbsp;Forlink Group</span>
-          </label>
-          <label>
-            <span>&nbsp;&nbsp;Paris</span>
-          </label>
-          <label>
-            <span>&nbsp;&nbsp;12121212</span>
-          </label>
-          <label>
-            <span class="email">&nbsp;&nbsp;Forlink&#64;Forlink.com</span>
-          </label>
-        </div>
         @if(client){
         <div class="mb-2" style="display: grid">
-          <label>
+          <h6>
             <span>&nbsp;&nbsp;Client Name:</span>
             <span>&nbsp;{{ client.firstName }}</span>
             <span>&nbsp;&nbsp;{{ client.lastName }}&nbsp;&nbsp;&nbsp;</span>
-          </label>
-          <label>
+          </h6>
+          <h6>
             <span>&nbsp;&nbsp;Client Address:</span>
             <span>&nbsp;{{ client.address }}&nbsp;</span>
-          </label>
+          </h6>
           @for(contact of client.contacts; track contact){
-          <span>&nbsp;&nbsp;{{ contact.credentials }}</span>
+            <h6>
+          <span
+            >&nbsp;&nbsp; @if(contact.type == 'PHONE'){
+            <i class="bi bi-phone"></i>&nbsp;&nbsp; } @if(contact.type ==
+            'EMAIL'){ <i class="bi bi-envelope"></i>&nbsp;&nbsp; }
+            {{ contact.credentials }}</span
+          ></h6>
           }
         </div>
         }
+        <div class="mb-2" style="display: grid">
+          <h6>
+            <span>&nbsp;&nbsp;Invoice N:</span>
+            <span>&nbsp;{{ invoice!.invoiceNum }}</span>
+          </h6>
+          <h6>
+            <span>&nbsp;&nbsp;Invoice Date:</span>
+            <span>&nbsp;{{ invoice!.invoiceDate | date : 'MM/dd/yyyy' }}</span>
+          </h6>
+          <h6>
+            <span>&nbsp;&nbsp;Due Date:</span>
+            <span>&nbsp;{{ invoice!.dueDate | date : 'MM/dd/yyyy' }}&nbsp;</span>
+          </h6>
+        </div>
       </div>
       <br />
-      <br />
-      <br />
+      
       <div class="me-4">
-        <table class="table table-hover">
-          <thead>
+        <div class="table-responsive">
+        <table class="table  ">
+          <thead class="table-secondary">
             <tr>
               <th scope="col">Quantity</th>
               <th scope="col">Description</th>
@@ -63,17 +90,20 @@
           </tbody>
         </table>
       </div>
-      <br/>
-      <br/>
-      <br/>
-      <div class="d-flex justify-content-between mb-3" style="margin-right: 100px;">
+      </div>
+      <br />
+      <br />
+      <br />
+      <div
+        class="d-flex justify-content-between mb-3"
+        style="margin-right: 100px"
+      >
         <div></div>
-        <div style="display: grid;">
-            <h5>SubTotal :&nbsp;&nbsp; {{invoice!.subTotal}}</h5>
-            <h5>tax :&nbsp;&nbsp; {{getTaxValue()}}</h5>
-            <h5>Total :&nbsp;&nbsp; {{invoice!.totalAmount}}</h5>
+        <div style="display: grid">
+          <h5>SubTotal :&nbsp;&nbsp; {{ invoice!.subTotal }}</h5>
+          <h5>tax :&nbsp;&nbsp; {{ getTaxValue() }}</h5>
+          <h5>Total :&nbsp;&nbsp; {{ invoice!.totalAmount }}</h5>
         </div>
-        
       </div>
     </div>
   </div>

@@ -1,60 +1,58 @@
-version: '3.4'
+
 
 services:
-  myb.usermanager:
-    image: ${DOCKER_REGISTRY-}m.y.b.usermanager-kh
+  myb-usermanager:
     build:
-      context: .
-      dockerfile: src/services/user-manager/Myb.UserManager/Dockerfile
-    environment:
-      - ConnectionStrings__DefaultConnection=Server=db;Port=5432;Database=usermanagerdb;UserId=postgres;Password=YourPassword
-
-  myb.timesheet:
-    image: ${DOCKER_REGISTRY-}m.y.b.timesheet-kh
-    build:
-      context: .
-      dockerfile: src/services/time-sheet/Myb.Timesheet/Dockerfile
-    environment:
-      - ConnectionStrings__DefaultConnection=Server=db;Port=5432;Database=timesheetdb;UserId=postgres;Password=YourPassword
-    depends_on:
-      - timesheetDB
-
-  timesheetDB:
-    image: postgres:16.2
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: timesheet-pwd
-      POSTGRES_DB: timesheetDB
-      POSTGRES_USER: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/timesheet/data
+      context: ./src/services/user-manager/Myb.UserManager
+      dockerfile: Dockerfile
+  # myb-timesheet:
+  #   build:
+  #     context: ./src/services/time-sheet/Myb.Timesheet
+  #     dockerfile: Dockerfile
+  # myb-docmanager:
+  #   build:
+  #     context: ./src/services/document-management/Myb.Document
+  #     dockerfile: Dockerfile
+  # myb-invoiceservice:
+  #   build:
+  #     context: ./src/services/invoice-management/Myb.Invoice
+  #     dockerfile: Dockerfile
+#   timesheetDB:
+#     image: postgres:16.2
+#     restart: always
+#     environment:
+#       POSTGRES_PASSWORD: timesheet-pwd
+#       POSTGRES_DB: timesheetDB
+#       POSTGRES_USER: postgres
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/timesheet/data
         
-  documentDB:
-    image: postgres:16.2
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: document-pwd
-      POSTGRES_DB: documentDB
-      POSTGRES_USER: postgres
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_document_data:/var/lib/postgresql/document/data
-  invoiceDB:
-    image: postgres:16.2
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: invoice-pwd
-      POSTGRES_DB: invoiceDB
-      POSTGRES_USER: postgres
-    ports:
-      - "5434:5432"
-    volumes:
-      - postgres_invoice_data:/var/lib/postgresql/invoice/data
+#   documentDB:
+#     image: postgres:16.2
+#     restart: always
+#     environment:
+#       POSTGRES_PASSWORD: document-pwd
+#       POSTGRES_DB: documentDB
+#       POSTGRES_USER: postgres
+#     ports:
+#       - "5433:5432"
+#     volumes:
+#       - postgres_document_data:/var/lib/postgresql/document/data
+#   invoiceDB:
+#     image: postgres:16.2
+#     restart: always
+#     environment:
+#       POSTGRES_PASSWORD: invoice-pwd
+#       POSTGRES_DB: invoiceDB
+#       POSTGRES_USER: postgres
+#     ports:
+#       - "5434:5432"
+#     volumes:
+#       - postgres_invoice_data:/var/lib/postgresql/invoice/data
 
-volumes:
-  postgres_data:
-  postgres_document_data:
-  postgres_invoice_data:
+# volumes:
+#   postgres_data:
+#   postgres_document_data:
+#   postgres_invoice_data:

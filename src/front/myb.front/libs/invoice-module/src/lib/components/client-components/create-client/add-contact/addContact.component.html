@@ -1,0 +1,71 @@
+<div class="card border-primary p-3">
+  <div class="container">
+    <h4 class="mb-0" style="color: var(--bs-darklight)">Add Contact</h4>
+    <br />
+    <div class="mb-3">
+      <form [formGroup]="contactForm" >
+        <div class="mb-3">
+            <label for="credentials" class="form-label">Credentials</label>
+            <input
+              type="text"
+              class="form-control"
+              id="credentials"
+              name="credentials"
+              formControlName="credentials"
+              placeholder="Enter Contact "
+              autofocus="false"
+              [ngClass]="{
+                'is-invalid':
+                contactForm.get('credentials')?.invalid &&
+                contactForm.get('credentials')?.touched
+              }"
+            />
+            @if(contactForm.get('credentials')?.invalid &&
+            contactForm.get('credentials')?.touched){
+            <div class="invalid-feedback">Credentials is required.</div>
+            }
+          </div>
+        <div class="mb-3">
+          <label for="contactType" class="form-label">Contact type</label>
+          <div
+            class="btn-group-horizontal"
+            role="group"
+            aria-label="horizontal radio toggle button group"
+          >
+            <input
+              type="radio"
+              class="btn-check"
+              name="vbtn-radio"
+              id="vbtn-radio4"
+              autocomplete="off"
+              checked=""
+            />
+            <label class="btn btn-outline-secondary me-2" for="vbtn-radio4" (click)="setTypeToEmail()"
+              >Email</label
+            >
+            <input
+              type="radio"
+              class="btn-check"
+              name="vbtn-radio"
+              id="vbtn-radio5"
+              autocomplete="off"
+            />
+            <label class="btn btn-outline-primary" for="vbtn-radio5" (click)="setTypeToPhone()"
+              >Phone</label
+            >
+          </div>
+        </div>
+        
+        <div>
+          <br />
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-outline-secondary me-2" (click)="closeModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-outline-primary" (click)="save()">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

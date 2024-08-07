@@ -1,0 +1,114 @@
+<div class="modal-header">
+  <h4 class="modal-title">Add Item</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="closeModal()"
+  ></button>
+</div>
+<div class="modal-body">
+  <div class="card border-primary p-3">
+    <div class="container">
+      <form [formGroup]="invoiceDetailsForm" >
+        <div class="mb-3">
+          <label for="quantity" class="form-label">Quantity</label>
+          <input
+            type="number"
+            class="form-control"
+            id="quantity"
+            name="quantity"
+            formControlName="quantity"
+            placeholder="Enter invoice num "
+            [ngClass]="{
+              'is-invalid':
+              invoiceDetailsForm.get('quantity')?.invalid &&
+              invoiceDetailsForm.get('quantity')?.touched
+            }"
+          />
+          @if(invoiceDetailsForm.get('quantity')?.invalid &&
+          invoiceDetailsForm.get('quantity')?.touched){
+          <div class="invalid-feedback">Quantity is required.</div>
+          }
+        </div>
+        <div class="mb-3">
+          <label for="salePrice" class="form-label"
+            >Sale price (Optional)</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="salePrice"
+            name="salePrice"
+            formControlName="salePrice"
+            placeholder="Enter sale price"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label"
+            >Description (Optional)</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="description"
+            name="description"
+            formControlName="description"
+            placeholder="Enter Description"
+          />
+        </div>
+        <div class="d-flex align-items-center">
+          @if(product == null){
+            <button
+            type="button"
+            class="btn btn-outline-secondary me-4"
+            (click)="openSelectProductModal()"
+          >
+            Select Product
+          </button>
+          }
+          
+          @if(product != null){
+            <div class="card border-secondary p-3 me-4" (click)="openSelectProductModal()">
+              <label>
+                <span>&nbsp;&nbsp;product Name:</span>
+                <span>&nbsp;{{ product.name }}</span>
+              </label>
+              <label>
+                <span>&nbsp;&nbsp;Unit:</span>
+                <span>&nbsp;{{ product.unit }}&nbsp;</span>
+              </label>
+              <label>
+                <span>&nbsp;&nbsp;Price:</span>
+                <span>&nbsp;{{ product.price }}&nbsp;</span>
+              </label>
+            </div>
+  
+            } @if(product == null){
+            <p style="color: rgba(229, 4, 4, 0.896)">{{ productInvalid }}</p>
+            }
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <div>
+    <br />
+    <div class="d-flex justify-content-end">
+      <button
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+      <button 
+      type="submit" 
+      class="btn btn-outline-primary"
+      (click)=" save()"
+      >Save</button>
+    </div>
+  </div>
+</div>

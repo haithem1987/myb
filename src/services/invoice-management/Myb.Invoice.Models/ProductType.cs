@@ -8,6 +8,6 @@ namespace Myb.Invoice.Models
 {
     public enum ProductType
     {
-        Service, Consommable
+        Service, Product
     }
 }

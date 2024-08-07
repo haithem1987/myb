@@ -15,7 +15,8 @@ const documentsRoutes: Routes = [
         path: '',
         component: FolderIndexComponent,
         data: { breadcrumb: 'Folders' },
-      },
+        
+      }, 
       {
         path: 'folder/:id',
         component: FolderDetailsComponent,

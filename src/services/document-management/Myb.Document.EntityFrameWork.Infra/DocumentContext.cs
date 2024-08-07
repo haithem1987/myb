@@ -21,6 +21,7 @@ namespace Myb.Document.EntityFramework.Infra
         public DbSet<DocumentModel> Documents { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<DocumentVersion> DocumentVersions { get; set; }
+        public DbSet<RootFolder> RootFolders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

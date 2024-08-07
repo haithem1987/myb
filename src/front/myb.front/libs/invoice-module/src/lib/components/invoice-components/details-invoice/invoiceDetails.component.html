@@ -1,0 +1,80 @@
+<div class="container my-4">
+  <h2 class="mb-0" style="color: var(--bs-darklight)">Invoice Details</h2>
+  <br />
+  <div class="card border-primary p-3">
+    <div class="container">
+      <br />
+      <div class="d-flex justify-content-between mb-3">
+        <div class="mb-2" style="display: grid">
+          <label>
+            <span>&nbsp;&nbsp;Forlink Group</span>
+          </label>
+          <label>
+            <span>&nbsp;&nbsp;Paris</span>
+          </label>
+          <label>
+            <span>&nbsp;&nbsp;12121212</span>
+          </label>
+          <label>
+            <span class="email">&nbsp;&nbsp;Forlink&#64;Forlink.com</span>
+          </label>
+        </div>
+        @if(client){
+        <div class="mb-2" style="display: grid">
+          <label>
+            <span>&nbsp;&nbsp;Client Name:</span>
+            <span>&nbsp;{{ client.firstName }}</span>
+            <span>&nbsp;&nbsp;{{ client.lastName }}&nbsp;&nbsp;&nbsp;</span>
+          </label>
+          <label>
+            <span>&nbsp;&nbsp;Client Address:</span>
+            <span>&nbsp;{{ client.address }}&nbsp;</span>
+          </label>
+          @for(contact of client.contacts; track contact){
+          <span>&nbsp;&nbsp;{{ contact.credentials }}</span>
+          }
+        </div>
+        }
+      </div>
+      <br />
+      <br />
+      <br />
+      <div class="me-4">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Quantity</th>
+              <th scope="col">Description</th>
+              <th scope="col">Unit</th>
+              <th scope="col">Unit Price</th>
+              <th scope="col">Total Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(data of invoice!.invoiceDetails; track data){
+            <tr>
+              <td>{{ data.quantity }}</td>
+              <td>{{ data.description }}</td>
+              <td>{{ data.unit }}</td>
+              <td>{{ data.unitPrice }}</td>
+              <td>{{ data.unitPrice! * data.quantity! }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <br/>
+      <br/>
+      <br/>
+      <div class="d-flex justify-content-between mb-3" style="margin-right: 100px;">
+        <div></div>
+        <div style="display: grid;">
+            <h5>SubTotal :&nbsp;&nbsp; {{invoice!.subTotal}}</h5>
+            <h5>tax :&nbsp;&nbsp; {{getTaxValue()}}</h5>
+            <h5>Total :&nbsp;&nbsp; {{invoice!.totalAmount}}</h5>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>

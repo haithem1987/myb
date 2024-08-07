@@ -59,14 +59,14 @@
   </tbody>
 </table> -->
 <div class="custom-file">
-  <label for="file" class="form-label">Upload File</label><br>
+  <!-- <label for="file" class="form-label">Upload File</label><br> -->
   <input 
  #file type="file" 
  class="custom-file-input form-control"
   id="customFile"
   (change)="onSelectFile(file.files , $event)" 
    [multiple]="'multiple'"
-  [accept]="'.jpg, .png, .jpeg, .pdf, .xlsx, .xls'">
+  [accept]="'.jpg, .png, .jpeg, .pdf, .xlsx, .xls ,.docx , .doc'">
 <!-- <label class="custom-file-label" 
   for="customFile">{{ 'reportClaim.chooseFile'}}</label> -->
 </div>

@@ -1,0 +1,77 @@
+<div class="modal-header">
+  <h4 class="modal-title">clients</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="closeModal()"
+  ></button>
+</div>
+<div class="modal-body">
+  <div class="card border-primary p-3">
+    <div class="container">
+      <div class="d-flex justify-content-between mb-3">
+        <div>
+          
+        </div>
+        <button type="button" class="btn btn-primary" (click)="openModal()">
+          <i class="bi bi-plus-lg"></i> new Client
+        </button>
+      </div>
+      <br />
+      <div class="mb-3">
+        <input
+            type="text"
+            class="form-control mb-3"
+            placeholder="Search clients..."
+          />
+      </div>
+      <br/>
+      
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Address</th>
+            <th scope="col">Type</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(client of clients$ | async ; track client){
+          <tr>
+            <td>{{ client.firstName }}</td>
+            <td>{{ client.lastName }}</td>
+            <td>{{ client.address }}</td>
+            <td>{{ client.clientType }}</td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="selectClient(client)"
+              >
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <div>
+    <br />
+    <div class="d-flex justify-content-end">
+      <button
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

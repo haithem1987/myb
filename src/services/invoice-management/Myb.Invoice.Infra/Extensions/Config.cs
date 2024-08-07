@@ -7,8 +7,12 @@ namespace Myb.Invoice.Infra.Extensions
         public static void RegisterServices(this IServiceCollection services)
         {
             services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddScoped<IContactService, ContactService>();
             services.AddScoped<IClientService, ClientService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IInvoiceDetailsService, InvoiceDetailsService>();
+            services.AddScoped<ITaxService, TaxService>();
+
         }
     }
 }

@@ -3,27 +3,27 @@ import { CommonModule } from '@angular/common';
 import { Invoice } from '../models/invoice.model';
 import { InvoiceService } from '../services/invoice.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EditInvoiceComponent } from '../components/edit-invoice/editInvoice.component';
-import { CreateInvoiceComponent } from '../components/create-invoice/createInvoice.component';
+import { EditInvoiceComponent } from '../components/invoice-components/edit-invoice/editInvoice.component';
+import { CreateInvoiceComponent } from '../components/invoice-components/create-invoice/createInvoice.component';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../components/navbar/navbar.component';
-import { ListInvoiceComponent } from '../components/list-invoice/listInvoice.component';
-import {BreadcrumbComponent} from '../../../../time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component'
-import {ToastsContainerComponent} from '../../../../shared/shared-ui/src/lib/components/toasts-container/toasts-container.component'
+import { ListInvoiceComponent } from '../components/invoice-components/list-invoice/listInvoice.component';
+import { BreadcrumbComponent } from '../../../../time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component';
+import { ToastsContainerComponent } from '../../../../shared/shared-ui/src/lib/components/toasts-container/toasts-container.component';
 
 
 @Component({
   selector: 'myb-front-invoice-module',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
+    CommonModule,
+    RouterModule,
     NavbarComponent,
-    RouterOutlet, 
-    ListInvoiceComponent, 
+    RouterOutlet,
+    ListInvoiceComponent,
     CreateInvoiceComponent,
     BreadcrumbComponent,
-    ToastsContainerComponent
+    ToastsContainerComponent,
   ],
   templateUrl: './invoice-module.component.html',
   styleUrl: './invoice-module.component.css',

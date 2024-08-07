@@ -30,11 +30,14 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("integer");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
 
                     b.Property<string>("DocumentName")
                         .HasColumnType("text");
@@ -45,8 +48,8 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
                     b.Property<int?>("DocumentType")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("EditedBy")
-                        .HasColumnType("integer");
+                    b.Property<string>("EditedBy")
+                        .HasColumnType("text");
 
                     b.Property<int?>("FolderId")
                         .HasColumnType("integer");
@@ -56,6 +59,9 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
 
                     b.Property<string>("file")
                         .HasColumnType("text");
@@ -102,14 +108,19 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("integer");
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("EditedBy")
-                        .HasColumnType("integer");
+                    b.Property<string>("EditedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("FolderName")
                         .IsRequired()
@@ -121,9 +132,40 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("Folders");
+                });
+
+            modelBuilder.Entity("Myb.document.Model.RootFolder", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("FolderId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ModuleName")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RootFolders");
                 });
 
             modelBuilder.Entity("Myb.document.Model.DocumentModel", b =>

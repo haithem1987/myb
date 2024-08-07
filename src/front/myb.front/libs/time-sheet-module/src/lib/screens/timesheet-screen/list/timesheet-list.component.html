@@ -37,6 +37,13 @@
     <div class="text-end mt-3">
       <button
         class="btn btn-primary fw-bold text-uppercase"
+        (click)="fillSelectedProjects()"
+        [disabled]="selectedProjects.size == 0"
+      >
+        {{ 'FILL' | translate }}
+      </button>
+      <button
+        class="btn btn-primary fw-bold text-uppercase ms-2"
         (click)="saveAllChanges()"
         [disabled]="isSaving"
       >
@@ -59,7 +66,14 @@
     <table class="table">
       <thead>
         <tr>
-          <th>{{ 'PROJECT' | translate }}</th>
+          <th>
+            <input
+              type="checkbox"
+              class="form-check-input"
+              (change)="toggleSelectAll($event)"
+            />
+          </th>
+          <th class="project-column">{{ 'PROJECT' | translate }}</th>
           <th
             class="text-center"
             [ngClass]="{
@@ -91,7 +105,15 @@
       </thead>
       <tbody>
         <tr *ngFor="let project of projects$ | async; trackBy: trackByProject">
-          <td style="min-width: 300px">{{ project.projectName }}</td>
+          <td>
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [checked]="isSelected(project.id)"
+              (change)="onRowSelectChange(project.id, $event)"
+            />
+          </td>
+          <td class="project-column">{{ project.projectName }}</td>
           <td
             class="text-center"
             style="width: 80px"
@@ -120,9 +142,9 @@
               [value]="getTotalQuantityForProject(project.id)"
               type="success"
               height="8px"
-              [max]="5"
+              [max]="totalPeriod"
             ></myb-front-progress-bar>
-            {{ getTotalQuantityForProject(project.id) }} / 5
+            {{ getTotalQuantityForProject(project.id) }} / {{ totalPeriod }}
           </td>
         </tr>
       </tbody>

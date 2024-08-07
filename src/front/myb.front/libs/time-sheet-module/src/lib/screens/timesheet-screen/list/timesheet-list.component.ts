@@ -21,6 +21,7 @@ import { TimesheetEditComponent } from '../edit/timesheet-edit.component';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import {
+  GeneralSettingsService,
   HolidayService,
   ProgressBarComponent,
 } from 'libs/shared/shared-ui/src';
@@ -46,7 +47,7 @@ import {
   styleUrls: ['./timesheet-list.component.css'],
 })
 export class TimesheetListComponent implements OnInit {
-  projects$: Observable<Project[]> = this.projectService.projects$;
+  projects$: Observable<Project[]> = this.projectService.activeProjects$;
   userId$: Observable<string | null> = this.keycloakService.userId$;
   updatedTimesheets: Timesheet[] = [];
   searchTerm: string = '';
@@ -54,6 +55,7 @@ export class TimesheetListComponent implements OnInit {
   isLoading = true;
   isSaving = false;
   selectedPeriod: 'week' | 'month' = 'week';
+  totalPeriod: number = 7;
   dateRange: {
     dateString: string;
     weekday: string;
@@ -64,6 +66,7 @@ export class TimesheetListComponent implements OnInit {
   }[] = [];
   timesheetQuantities: { [key: string]: number } = {};
   holidays: { [date: string]: string } = {};
+  selectedProjects: Set<number> = new Set<number>();
   quantityChange: Subject<{
     projectId: number;
     date: {
@@ -76,6 +79,7 @@ export class TimesheetListComponent implements OnInit {
     quantity: number;
   }> = new Subject();
   private langChangeSubscription!: Subscription;
+  private defaultHours: number = 1;
   weekendDays: string[] = [];
   constructor(
     private timesheetService: TimesheetService,
@@ -85,11 +89,15 @@ export class TimesheetListComponent implements OnInit {
     private toastService: ToastService,
     private modalService: NgbModal,
     private translate: TranslateService,
+    private settingsService: GeneralSettingsService,
     config: NgbDropdownConfig
   ) {
     config.placement = 'left-start';
     config.autoClose = true;
-
+    this.defaultHours = this.settingsService.getSetting(
+      'timesheet',
+      'defaultHours'
+    );
     this.quantityChange
       .pipe(debounceTime(300))
       .subscribe(({ projectId, date, quantity }) => {
@@ -129,18 +137,54 @@ export class TimesheetListComponent implements OnInit {
       }
     );
   }
+  fillSelectedProjects(): void {
+    for (const projectId of this.selectedProjects) {
+      for (const date of this.dateRange) {
+        const key = `${projectId}.${date.dateString}`;
+        if (!this.timesheetQuantities[key]) {
+          this.timesheetQuantities[key] = this.defaultHours;
+        }
+      }
+    }
+  }
+  toggleSelectAll(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
 
-  trackByDate(index: number, date: { weekday: string; day: string }) {
-    return date.weekday + ' ' + date.day;
+    this.projects$.subscribe((projects) => {
+      if (checked) {
+        projects.forEach((project) => this.selectedProjects.add(project.id));
+      } else {
+        this.selectedProjects.clear();
+      }
+    });
+  }
+
+  onRowSelectChange(projectId: number, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      this.selectedProjects.add(projectId);
+    } else {
+      this.selectedProjects.delete(projectId);
+    }
+  }
+
+  isSelected(projectId: number): boolean {
+    return this.selectedProjects.has(projectId);
+  }
+  trackByDate(
+    index: number,
+    date: { dateString: string; weekday: string; day: string }
+  ) {
+    return date.dateString;
   }
 
   trackByProject(index: number, project: Project) {
     return project.id;
   }
   calculateDateRange(): void {
-    const today = new Date();
+    const today = new Date(); // Ensuring this is the local current date
     const todayString = today.toISOString().split('T')[0];
-
+    console.log('todayString', todayString);
     this.dateRange = [];
 
     if (this.selectedPeriod === 'week') {
@@ -150,19 +194,18 @@ export class TimesheetListComponent implements OnInit {
       for (let i = 0; i < 7; i++) {
         const currentDate = new Date(startOfWeek);
         const currentDateString = currentDate.toISOString().split('T')[0];
-        const weekdayKey = currentDate
-          .toLocaleDateString(undefined, {
-            weekday: 'short',
-          })
-          .toLowerCase();
         this.translate
-          .get(`WEEKDAY.${weekdayKey}`)
+          .get(
+            `WEEKDAY.${currentDate
+              .toLocaleDateString(undefined, { weekday: 'short' })
+              .toLowerCase()}`
+          )
           .subscribe((translatedWeekday) => {
             this.dateRange.push({
               dateString: currentDateString,
               weekday: translatedWeekday,
               day: currentDate.getDate().toString(),
-              month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
+              month: (currentDate.getMonth() + 1).toString(),
               year: currentDate.getFullYear().toString(),
               isToday: currentDateString === todayString,
             });
@@ -170,28 +213,31 @@ export class TimesheetListComponent implements OnInit {
         startOfWeek.setDate(startOfWeek.getDate() + 1);
       }
     } else if (this.selectedPeriod === 'month') {
+      // Start from the first day of the month
       const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
       const daysInMonth = new Date(
         today.getFullYear(),
         today.getMonth() + 1,
         0
       ).getDate();
+      console.log('startOfMonth', startOfMonth);
+
       for (let i = 0; i < daysInMonth; i++) {
         const currentDate = new Date(startOfMonth);
-        const currentDateString = currentDate.toISOString().split('T')[0];
-        const weekdayKey = currentDate
-          .toLocaleDateString(undefined, {
-            weekday: 'short',
-          })
-          .toLowerCase();
+        // const currentDateString = currentDate.toISOString().split('T')[0];
+        const currentDateString = currentDate.toLocaleDateString('en-CA');
         this.translate
-          .get(`WEEKDAY.${weekdayKey}`)
+          .get(
+            `WEEKDAY.${currentDate
+              .toLocaleDateString(undefined, { weekday: 'short' })
+              .toLowerCase()}`
+          )
           .subscribe((translatedWeekday) => {
             this.dateRange.push({
               dateString: currentDateString,
               weekday: translatedWeekday,
               day: currentDate.getDate().toString(),
-              month: (currentDate.getMonth() + 1).toString(), // Mois numérique (1-12)
+              month: (currentDate.getMonth() + 1).toString(),
               year: currentDate.getFullYear().toString(),
               isToday: currentDateString === todayString,
             });
@@ -200,8 +246,8 @@ export class TimesheetListComponent implements OnInit {
       }
     }
 
-    // Log the dateRange array to verify
     console.log('Calculated Date Range:', this.dateRange);
+    this.totalPeriod = this.dateRange.length;
   }
 
   refreshView(): void {
@@ -231,6 +277,7 @@ export class TimesheetListComponent implements OnInit {
 
   setPeriod(period: 'week' | 'month'): void {
     this.selectedPeriod = period;
+
     this.refreshView();
   }
 
@@ -286,7 +333,7 @@ export class TimesheetListComponent implements OnInit {
   }
 
   saveAllChanges(): void {
-    this.isSaving = true; // Start loading spinner
+    this.isSaving = true;
 
     const timesheetUpdates: Timesheet[] = [];
 
@@ -332,22 +379,22 @@ export class TimesheetListComponent implements OnInit {
     if (timesheetUpdates.length > 0) {
       this.timesheetService
         .updateMultipleTimesheets(timesheetUpdates)
-        .subscribe(
-          () => {
+        .subscribe({
+          next: () => {
             console.log('updateMultipleTimesheets response');
             this.toastService.show('All changes saved successfully', {
               classname: 'toast-success',
             });
             this.refreshView();
-            this.isSaving = false; // Stop loading spinner
+            this.isSaving = false;
           },
-          (error) => {
+          error: (error) => {
             console.error('Error saving changes', error);
-            this.isSaving = false; // Stop loading spinner in case of error
-          }
-        );
+            this.isSaving = false;
+          },
+        });
     } else {
-      this.isSaving = false; // Stop loading spinner if there are no changes
+      this.isSaving = false;
     }
   }
 
@@ -414,6 +461,7 @@ export class TimesheetListComponent implements OnInit {
 
     return timesheet ? timesheet.status === ApprovalStatus.PENDING : false;
   }
+
   handleHoliday(date: {
     dateString: string;
     weekday: string;
@@ -421,20 +469,16 @@ export class TimesheetListComponent implements OnInit {
     month: string;
     year: string;
   }): { isHoliday: boolean; name: string } {
-    // Ensure month and day are two digits for consistent formatting
-    // const month = date.month.padStart(2, '0');
-    // const day = date.day.padStart(2, '0');
-
-    // Construct the date in YYYY-MM-DD format, assuming the time as midday to avoid timezone issues
-    const targetDate = new Date(`${date.dateString}T12:00:00Z`);
-
-    // Format the date to match the holiday format (YYYY-MM-DD)
+    // console.log('handleHoliday');
+    const [year, month, day] = date.dateString.split('-').map(Number);
+    const targetDate = new Date(Date.UTC(year, month - 1, day));
     const formattedDate = targetDate.toISOString().split('T')[0];
-
-    // Check if the formatted date is a holiday
+    // console.log('formattedDate', formattedDate);
+    // console.log(this.holidays);
+    // console.log(this.dateRange);
     return {
-      isHoliday: !!this.holidays[formattedDate],
-      name: this.holidays[formattedDate] ?? '',
+      isHoliday: !!this.holidays[date.dateString],
+      name: this.holidays[date.dateString] ?? '',
     };
   }
 

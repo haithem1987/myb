@@ -1,50 +1,70 @@
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
-import { InMemoryCache } from '@apollo/client/core';
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-// import { onError } from 'apollo-link-error';
-import { ApolloLink } from '@apollo/client/core';
+import { InMemoryCache, ApolloLink, from } from '@apollo/client/core';
 import { onError } from '@apollo/client/link/error';
+import { Router } from '@angular/router';
 
-// const errorLink = onError(({ graphQLErrors, networkError }) => {
-//   if (graphQLErrors) {
-//     console.error('GraphQL errors: ', graphQLErrors);
-//     // Show user-friendly error messages based on specific errors
-//   } else if (networkError) {
-//     console.error('Network error: ', networkError);
-//     // Handle network issues and inform user
-//   }
-// });
-//  }
-// }const httpLink = new HttpLink({
-//   uri: 'http://localhost:5117/graphql',
-// });
+// Define your microservices' endpoints
+const microserviceLinks = {
+  service1: 'http://localhost:5059/graphql',
+  service2: 'http://localhost:5117/graphql',
+  service3: 'http://localhost:5145/graphql',
+};
 
-// const httpLinkWithErrorHandling = ApolloLink.from([
-//    errorLink,
-//    httpLink,
-// ]);
+// Error handling link
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    console.error('GraphQL errors: ', graphQLErrors);
+    // Show user-friendly error messages based on specific errors
+  } else if (networkError) {
+    console.error('Network error: ', networkError);
+    // Handle network issues and inform user
+  }
+});
+
+// Custom routing link
+const createCustomLink = (httpLink: HttpLink, router: Router) => {
+  const serviceLinks = Object.entries(microserviceLinks).reduce(
+    (links, [key, uri]) => {
+      links[key] = httpLink.create({ uri });
+      return links;
+    },
+    {} as { [key: string]: ApolloLink }
+  );
+
+  return new ApolloLink((operation, forward) => {
+    const currentUrl = router.url;
+    console.log('currentUrl', currentUrl);
+    if (currentUrl.startsWith('/timesheet')) {
+      return serviceLinks['service1'].request(operation, forward);
+    } else if (currentUrl.startsWith('/documents')) {
+      return serviceLinks['service2'].request(operation, forward);
+    } else if (currentUrl.startsWith('/invoice')) {
+      return serviceLinks['service3'].request(operation, forward);
+    }
+
+    // Default to service1 if no specific route matches
+    return serviceLinks['service1'].request(operation, forward);
+  });
+};
 
 @NgModule({
   imports: [BrowserModule, ApolloModule, HttpClientModule],
   providers: [
     {
       provide: APOLLO_OPTIONS,
-      useFactory: (httpLink: HttpLink) => {
+      useFactory: (httpLink: HttpLink, router: Router) => {
         return {
           cache: new InMemoryCache({
             addTypename: false, // This is default, adds __typename automatically on read
           }),
-          link: httpLink.create({
-            uri: 'http://localhost:5059/graphql',
-            //uri: 'http://localhost:5117/graphql',
-            //  uri: 'http://localhost:5145/graphql/',
-          }),
+          link: from([errorLink, createCustomLink(httpLink, router)]),
         };
       },
-      deps: [HttpLink],
+      deps: [HttpLink, Router],
     },
   ],
 })

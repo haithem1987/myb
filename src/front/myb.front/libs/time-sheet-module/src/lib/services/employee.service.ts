@@ -26,6 +26,7 @@ export class EmployeeService extends RepositoryService<Employee> {
   }
 
   protected override mapCreateItem(result: any): Employee {
+    console.log('result', result);
     return result.data?.addEmployee as Employee;
   }
 
@@ -62,7 +63,9 @@ export class EmployeeService extends RepositoryService<Employee> {
   override create(item: Employee): Observable<Employee> {
     return super.create(item).pipe(
       map((newEmployee) => {
+        console.log('newEmployee', newEmployee);
         const employees = [...this.employeeSubject.value, newEmployee];
+        console.log('employees create', employees);
         this.employeeSubject.next(employees);
         return newEmployee;
       })

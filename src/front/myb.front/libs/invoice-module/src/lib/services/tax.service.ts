@@ -67,4 +67,16 @@ export class TaxService extends RepositoryService<Tax> {
       })
     );
   }
+
+  override update(id: number, item: Tax): Observable<Tax> {
+      return super.update(id, item).pipe(
+        map((updatedTax)=>{
+          const taxes = this.taxSubject.value.map((t)=>
+            t.id === id ? updatedTax : t
+          );
+          this.taxSubject.next(taxes);
+          return updatedTax;
+        })
+      );
+  }
 }

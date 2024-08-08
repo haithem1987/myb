@@ -11,9 +11,14 @@
             name="invoiceNum"
             formControlName="invoiceNum"
             placeholder="Enter invoice num "
+            [ngClass]="{
+              'is-invalid':
+              invoiceForm.get('invoiceNum')?.invalid &&
+              invoiceForm.get('invoiceNum')?.touched
+            }"
           />
-          @if(invoiceForm.get('quantity')?.invalid &&
-          invoiceForm.get('quantity')?.touched){
+          @if(invoiceForm.get('invoiceNum')?.invalid &&
+          invoiceForm.get('invoiceNum')?.touched){
           <div class="invalid-feedback">Invoice Num is required.</div>
           }
         </div>
@@ -26,6 +31,11 @@
             ngbDatepicker
             #invoicedatePicker="ngbDatepicker"
             (click)="invoicedatePicker.toggle()"
+            [ngClass]="{
+              'is-invalid':
+              invoiceForm.get('invoicedate')?.invalid &&
+              invoiceForm.get('invoicedate')?.touched
+            }"
           />
           @if(invoiceForm.get('invoicedate')?.invalid &&
           invoiceForm.get('invoicedate')?.touched){
@@ -42,7 +52,17 @@
             ngbDatepicker
             #duedatePicker="ngbDatepicker"
             (click)="duedatePicker.toggle()"
+            
+            [ngClass]="{
+              'is-invalid':
+              invoiceForm.get('dueDate')?.invalid &&
+              invoiceForm.get('dueDate')?.touched
+            }"
           />
+          @if(invoiceForm.get('dueDate')?.invalid &&
+          invoiceForm.get('dueDate')?.touched){
+          <div class="invalid-feedback">Due Date is required.</div>
+          }
         </div>
         <div class="mb-2">
           <label class="form-label">Client</label>

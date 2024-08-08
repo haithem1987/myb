@@ -32,7 +32,7 @@ export class SelectProductComponent {
   }
 
   openCreateProductModal() {
-    this.modalService.open(CreateProductComponent, { size: 'lg' });
+    this.modalService.open(CreateProductComponent, {fullscreen: true , scrollable: true});
   }
 
   selectProduct(product: Product): void {

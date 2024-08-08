@@ -26,10 +26,16 @@ export class ProductService extends RepositoryService<Product>{
   }
 
   protected override mapCreateItem(result: any): Product {
+    console.log('created',result.data);
     return result.data?.addProduct as Product;
   }
   protected override mapSingleItem(result: any): Product {
     return result.data?.productByID as Product;
+  }
+  protected override mapUpdateItem(result: any): Product {
+    console.log('updated',result.data);
+    return result.data?.updateProduct as Product;
+    
   }
 
 
@@ -58,6 +64,18 @@ export class ProductService extends RepositoryService<Product>{
         console.log('new product', newProduct);
         return newProduct;
         
+      })
+    );
+  }
+
+  override update(id: number, item: Product): Observable<Product> {
+    return super.update(id, item).pipe(
+      map((updatedProduct) => {
+        const products = this.productSubject.value.map((p) =>
+          p.id === id ? updatedProduct : p
+        );
+        this.productSubject.next(products);
+        return updatedProduct;
       })
     );
   }

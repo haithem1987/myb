@@ -34,6 +34,7 @@
             <tr>
               <th scope="col">Product Name</th>
               <th scope="col">Price</th>
+              <th scope="col">Tax</th>
               <th scope="col">Type</th>
               <th scope="col">Unit</th>
               <th scope="col">Actions</th>
@@ -45,6 +46,14 @@
                 <tr>
                   <td>{{ product.name }}</td>
                   <td>{{ product.price }}</td>
+                  <td><label 
+                    >{{ product.tax.name }}
+                    <span
+                      >:&nbsp;&nbsp;{{ product.tax.value }}@if(product.tax.isPercentage == true){
+                      <span> %</span>
+                      }</span
+                    ></label
+                  ></td>
                   <td>{{ product.productType }}</td>
                   <td>{{ product.unit }}</td>
                   <td>

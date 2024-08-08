@@ -70,14 +70,14 @@ export class CreateInvoiceComponent {
     this.invoiceForm = this.fb.group({
       invoiceNum: ['', Validators.required],
       invoicedate: [null, Validators.required],
-      dueDate: [null],
+      dueDate: [null,Validators.required],
       // Add other form controls as necessary
     });
   }
 
   openClientsModal() {
     const modalRef = this.modalService.open(SelectClientComponent, {
-      size: 'lg',
+      size: 'lg',scrollable: true
     });
     modalRef.componentInstance.clientEntered.subscribe((client: Client) => {
       if (client) {
@@ -133,6 +133,7 @@ export class CreateInvoiceComponent {
       
     } else {
       this.clientInvalid = 'Client is required!';
+      this.invoiceDetailsInvalid = 'Invoice details is required!';
       this.invoiceForm.markAllAsTouched();
     }
   }

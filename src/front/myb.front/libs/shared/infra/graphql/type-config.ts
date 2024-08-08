@@ -86,11 +86,11 @@ import {
   GET_ALL_INVOICES,
   GET_INVOICE_BY_ID,
 } from '../../../invoice-module/src/lib/graphql/queries/invoice.query';
-import { CREATE_TAX } from '../../../invoice-module/src/lib/graphql/mutations/tax.mutation';
+import { CREATE_TAX, UPDATE_TAX } from '../../../invoice-module/src/lib/graphql/mutations/tax.mutation';
 import { GET_ALL_Taxes, GET_Tax_BY_ID } from '../../../invoice-module/src/lib/graphql/queries/tax.query';
-import { CREATE_PRODUCT } from '../../../invoice-module/src/lib/graphql/mutations/product.mutation';
+import { CREATE_PRODUCT, UPDATE_PRODUCT } from '../../../invoice-module/src/lib/graphql/mutations/product.mutation';
 import { GET_ALL_PRODUCTS, GET_PRODUCT_BY_ID } from '../../../invoice-module/src/lib/graphql/queries/product.query';
-import { CREATE_CLIENT } from '../../..//invoice-module/src/lib/graphql/mutations/client.mutation';
+import { CREATE_CLIENT, UPDATE_CLIENT } from '../../..//invoice-module/src/lib/graphql/mutations/client.mutation';
 import { GET_ALL_CLIENTS, GET_CLIENT_BY_ID } from '../../../invoice-module/src/lib/graphql/queries/client.query';
 import { CREATE_INVOICE } from '../../../invoice-module/src/lib/graphql/mutations/invoice.mutation';
 
@@ -150,16 +150,20 @@ export const typeConfig: { [key: string]: any } = {
     create: CREATE_TAX,
     getAll: GET_ALL_Taxes,
     getById: GET_Tax_BY_ID,
+    update: UPDATE_TAX,
+    
   },
   Product: {
     create: CREATE_PRODUCT,
     getAll: GET_ALL_PRODUCTS,
-    getById: GET_PRODUCT_BY_ID
+    getById: GET_PRODUCT_BY_ID,
+    update: UPDATE_PRODUCT,
   },
   Client: {
     create: CREATE_CLIENT,
     getAll: GET_ALL_CLIENTS,
-    getById: GET_CLIENT_BY_ID
+    getById: GET_CLIENT_BY_ID,
+    update: UPDATE_CLIENT
   },
  
   DocumentModel: {

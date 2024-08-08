@@ -10,11 +10,12 @@ import { Tax } from '../../../models/tax.model';
 import { TaxService } from '../../../services/tax.service';
 import { ToastService } from '../../../../../../shared/infra/services/toast.service';
 import { Router, RouterLink } from '@angular/router';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'myb-front-create-tax',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink,ReactiveFormsModule],
   templateUrl: './createTax.component.html',
   styleUrl: './createTax.component.css',
 })
@@ -24,6 +25,7 @@ export class CreateTaxComponent {
   private taxService = inject(TaxService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  activeModal = inject(NgbActiveModal);
 
   taxForm: FormGroup = new FormGroup({
     name: new FormControl('', Validators.required),
@@ -52,10 +54,13 @@ export class CreateTaxComponent {
         this.toastService.show('Tax created successfully!', {
           classname: 'bg-success text-light',
         });
-        this.router.navigate(['/invoice/taxes']);
+        this.closeModal()
       });
     } else {
       this.taxForm.markAllAsTouched();
     }
+  }
+  closeModal(): void {
+    this.activeModal.dismiss();
   }
 }

@@ -16,15 +16,13 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
   styleUrl: './addItemToInvoice.component.css',
 })
 export class AddItemToInvoiceComponent {
-  @Output() itemAdded = new EventEmitter<Tax>();
+  @Output() itemAdded = new EventEmitter<InvoiceDetails>();
   activeModal = inject(NgbActiveModal);
   modalService = inject(NgbModal);
   taxService = inject(TaxService);
 
   product?: Product;
   productInvalid: String = '';
-
-  tax?: Tax;
 
   invoiceDetailsForm: FormGroup = new FormGroup({
     quantity: new FormControl('',Validators.required),
@@ -34,16 +32,16 @@ export class AddItemToInvoiceComponent {
 
   save(){  
     const invoiceDetails = new InvoiceDetails();
-    if(this.invoiceDetailsForm.valid && this.product != null && this.tax != null){
+    if(this.invoiceDetailsForm.valid && this.product != null && this.product.tax != null){
       invoiceDetails.productId = this.product.id;
       invoiceDetails.quantity = this.invoiceDetailsForm.value.quantity;
       if(this.invoiceDetailsForm.value.salePrice){
         invoiceDetails.unitPriceHT = this.invoiceDetailsForm.value.salePrice;
-        invoiceDetails.unitPrice = this.calculatePriceWithTax(this.invoiceDetailsForm.value.salePrice, this.tax);
+        invoiceDetails.unitPrice = this.calculatePriceWithTax(this.invoiceDetailsForm.value.salePrice, this.product.tax);
       } 
       else{
         invoiceDetails.unitPriceHT = this.product.price;
-        invoiceDetails.unitPrice = this.calculatePriceWithTax(this.product.price, this.tax)
+        invoiceDetails.unitPrice = this.calculatePriceWithTax(this.product.price, this.product.tax)
       }
       if(this.invoiceDetailsForm.value.description){
         invoiceDetails.description = this.invoiceDetailsForm.value.description;
@@ -73,12 +71,11 @@ export class AddItemToInvoiceComponent {
 
   openSelectProductModal() {
     const modalRef = this.modalService.open(SelectProductComponent, {
-      size: 'lg',
+      size: 'lg', scrollable: true
     });
     modalRef.componentInstance.productEntered.subscribe((product: Product) => {
       if (product) {
         this.product = product;
-        this.getTax(this.product?.taxId!);
       }
     });
   }
@@ -87,12 +84,6 @@ export class AddItemToInvoiceComponent {
     this.itemAdded.emit(item);
   }
 
-  
-  getTax(id: number){
-    this.taxService.get(id).subscribe((tax)=>{
-      this.tax = tax;
-    })
-  }
   calculatePriceWithTax(price: number, tax: Tax) : number{
     if(tax.isPercentage){
       var taxValue = (price/100) * tax.value!

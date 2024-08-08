@@ -28,7 +28,7 @@ export class SelectClientComponent {
   }
 
   openModal() {
-    this.modalService.open(CreateClientComponent, { size: 'lg' });
+    this.modalService.open(CreateClientComponent, { fullscreen: true});
   }
 
   selectClient(client: Client): void {

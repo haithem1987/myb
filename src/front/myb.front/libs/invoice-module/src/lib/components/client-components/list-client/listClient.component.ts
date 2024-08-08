@@ -32,4 +32,23 @@ export class ListClientComponent {
     this.activeTab = tab;
   }
   
+
+  showClient(client: Client) : boolean{
+    var result = true;
+    if(this.activeTab == 'ACTIVE' && client.isArchived == true){
+      return false;
+    }
+    if(this.activeTab == 'ARCHIVED' && client.isArchived == false){
+      return false;
+    }
+    if(client.firstName!.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+    client.lastName!.toLowerCase().includes(this.searchTerm.toLowerCase())){
+      result = true;
+    }
+    else{
+      result = false;
+    }
+
+    return result;
+  }
 }

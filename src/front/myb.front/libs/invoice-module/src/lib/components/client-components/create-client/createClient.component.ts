@@ -54,6 +54,7 @@ export class CreateClientComponent implements OnInit {
       client.lastName = this.clientForm.value.lastName;
       client.address = this.clientForm.value.clientAddress;
       client.clientType = this.clientType;
+      client.isArchived = false;
 
       this.clientService.create(client).subscribe(() => {
         this.toastService.show('Client created successfully!', {
@@ -94,4 +95,6 @@ export class CreateClientComponent implements OnInit {
   trackByFn(index: number, item: Contact): number {
     return index;
   }
+
+  
 }

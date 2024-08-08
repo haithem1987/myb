@@ -3,7 +3,7 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
 </div>
 <div class="modal-body">
-<div class="card border-primary p-3">
+<div class="card border-primary p-3 m-4">
   <div class="container">
     <form [formGroup]="productForm" >
       <div class="mb-3">
@@ -196,6 +196,11 @@
         <p style="color: rgba(229, 4, 4, 0.896)">{{ errorMessage }}</p>
         }
       </div>
+      <div style="margin-top: 10px;" (click)="openModal()"><button
+        class="btn btn-outline-secondary me-4">
+        new Tax
+      </button>
+    </div>
     </form>
   </div>
 </div>

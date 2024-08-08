@@ -19,11 +19,12 @@ import {
   NgbDropdownModule,
   NgbModal,
 } from '@ng-bootstrap/ng-bootstrap';
+import { CreateTaxComponent } from '../../tax-component/create-tax/createTax.component';
 
 @Component({
   selector: 'myb-front-create-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbDropdownModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbDropdownModule,CreateTaxComponent],
   templateUrl: './createProduct.component.html',
   styleUrl: './createProduct.component.css',
 })
@@ -32,6 +33,7 @@ export class CreateProductComponent {
   private productService = inject(ProductService);
   private toastService = inject(ToastService);
   activeModal = inject(NgbActiveModal);
+  private modalService = inject(NgbModal);
 
   errorMessage: string = '';
   tax!: Tax;
@@ -83,5 +85,9 @@ export class CreateProductComponent {
   }
   closeModal(): void {
     this.activeModal.dismiss();
+  }
+  openModal(): void {
+    this.modalService.open(CreateTaxComponent);
+    
   }
 }

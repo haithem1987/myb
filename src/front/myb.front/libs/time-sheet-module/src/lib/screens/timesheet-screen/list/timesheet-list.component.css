@@ -3,7 +3,14 @@
   right: 0;
   background-color: white;
   z-index: 1;
-  width: 100px;
+  min-width: 90px !important;
+}
+.project-column {
+  position: sticky;
+  left: 0;
+  background-color: white;
+  z-index: 1;
+  min-width: 250px !important;
 }
 
 .holiday-badge {

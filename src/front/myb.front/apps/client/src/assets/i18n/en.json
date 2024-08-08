@@ -106,5 +106,6 @@
   "ASSIGNED_TO": "Assigned to",
   "EMPLOYEE_REQUIRED": "Employee is required.",
   "PROJECT_REQUIRED": "Project is required.",
-  "SAVE": "Save"
+  "SAVE": "Save",
+  "FILL": "Fill"
 }

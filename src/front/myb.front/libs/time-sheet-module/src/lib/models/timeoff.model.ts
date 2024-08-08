@@ -1,4 +1,4 @@
-import { BaseModel } from './base.model';
+import { BaseModel } from 'libs/shared/infra/models/base.model';
 
 export interface TimeOff extends BaseModel {
   startDate: Date;

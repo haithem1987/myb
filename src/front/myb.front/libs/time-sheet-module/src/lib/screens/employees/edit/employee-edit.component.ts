@@ -50,6 +50,8 @@ export class EmployeeEditComponent implements OnInit {
       isManager: [false],
       managerId: ['', Validators.required],
       userId: [''],
+      createdAt: [new Date()],
+      updatedAt: [new Date()],
     });
     this.keycloakService.userId$.subscribe((userId) => {
       console.log('userId', userId);
@@ -146,7 +148,7 @@ export class EmployeeEditComponent implements OnInit {
           this.toastService.show("L'employee ajouté avec succès!", {
             classname: 'border border-success bg-success text-light',
           });
-          this.router.navigate(['/timesheet/employees']);
+          // this.router.navigate(['/timesheet/employees']);
         });
       }
     } else {

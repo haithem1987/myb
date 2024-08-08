@@ -1,4 +1,4 @@
-import { BaseModel } from './base.model';
+import { BaseModel } from 'libs/shared/infra/models/base.model';
 
 export enum ProjectStatus {
   Active,

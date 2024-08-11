@@ -8,7 +8,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/services/time-sheet/Myb.Timesheet/Myb.Timesheet.csproj", "src/services/time-sheet/Myb.Timesheet/"]
 COPY ["src/services/time-sheet/Myb.Timesheet.Models/Myb.UserManager.Models.csproj", "src/services/time-sheet/Myb.Timesheet.Models/"]
-COPY ["src/services/time-sheet/Myb.Timesheet.Sevices/Myb.UserManager.Sevices.csproj", "src/services/time-sheetr/Myb.Timesheet.Sevices/"]
+COPY ["src/services/time-sheet/Myb.Timesheet.Sevices/Myb.UserManager.Sevices.csproj", "src/services/time-sheet/Myb.Timesheet.Sevices/"]
 RUN dotnet restore "./src/services/time-sheet/Myb.Timesheet/Myb.Timesheet.csproj"
 COPY . .
 WORKDIR "/src/src/services/time-sheet/Myb.Timesheet"

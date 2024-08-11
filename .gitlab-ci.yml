@@ -24,12 +24,12 @@ build:
     # - dotnet restore $SOLUTION_FILE
     # - dotnet build $SOLUTION_FILE --configuration Release
     - docker build -t koutaibams1999/myb-documentmanager:latest -f ./src/services/document-management/Myb.Document/Dockerfile .
-    #- docker build -t koutaibams1999/myb-timesheet:latest -f ./src/services/time-sheet/Myb.Timesheet/Dockerfile .
+    - docker build -t koutaibams1999/myb-timesheet:latest -f ./src/services/time-sheet/Myb.Timesheet/Dockerfile .
     - docker build -t koutaibams1999/myb-invoicemanager:latest -f ./src/services/invoice-management/Myb.Invoice/Dockerfile .
     - docker build -t koutaibams1999/myb-usermanager:latest -f ./src/services/user-manager/Myb.UserManager/Dockerfile .
     - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
     - docker push koutaibams1999/myb-documentmanager:latest
-    #- docker push koutaibams1999/myb-timesheet:latest
+    - docker push koutaibams1999/myb-timesheet:latest
     - docker push koutaibams1999/myb-invoicemanager:latest
     - docker push koutaibams1999/myb-usermanager:latest
 deploy:

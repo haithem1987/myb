@@ -86,5 +86,13 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
         {
             return await timeoffService.AddTimeOffAsync(timeOff);
         }
+        
+        // Generate Timesheet PDF
+        public async Task<string> GenerateTimesheetPdf([Service] IPdfService pdfService, [Service] ITimesheetService timesheetService, List<int> projectIds)
+        {
+            var timesheets = await timesheetService.GetTimesheetsByProjectIds(projectIds);
+            var pdfBytes = pdfService.GenerateTimesheetPdf(timesheets);
+            return Convert.ToBase64String(pdfBytes);
+        }
     }
 }

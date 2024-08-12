@@ -147,6 +147,44 @@ export class TimesheetListComponent implements OnInit {
       }
     }
   }
+  extractPDF(): void {
+    const projectIds = Array.from(this.selectedProjects);
+    console.log('projectIds', projectIds);
+    if (projectIds.length === 0) {
+      this.toastService.show('Please select at least one project', {
+        classname: 'toast-warning',
+      });
+      return;
+    }
+
+    this.timesheetService.generateTimesheetPdf(projectIds).subscribe({
+      next: (pdfBase64: string) => {
+        console.log('pdfBase64', pdfBase64);
+        const linkSource = `data:application/pdf;base64,${pdfBase64}`;
+        const downloadLink = document.createElement('a');
+        const now = new Date();
+        const fileName = `timesheets_${now
+          .toISOString()
+          .replace(/[:.-]/g, '_')
+          .slice(0, 19)}.pdf`;
+
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        downloadLink.click();
+
+        this.toastService.show('PDF generated and downloaded successfully', {
+          classname: 'toast-success',
+        });
+      },
+      error: (error) => {
+        console.error('Error generating PDF:', error);
+        this.toastService.show('Failed to generate PDF', {
+          classname: 'toast-danger',
+        });
+      },
+    });
+  }
+
   toggleSelectAll(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
 
@@ -337,65 +375,82 @@ export class TimesheetListComponent implements OnInit {
 
     const timesheetUpdates: Timesheet[] = [];
 
-    for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
-      const [projectIdStr, dateString] = key.split('.');
-      console.log('dateString', dateString);
-      const projectId = Number(projectIdStr);
-      const date = new Date(`${dateString}`);
-      console.log('date', date);
-      let timesheet = this.updatedTimesheets.find(
-        (t: any) =>
-          t.projectId === projectId &&
-          new Date(t.date).toDateString() === date.toDateString()
-      );
+    this.projects$.subscribe((projects) => {
+      const projectMap = new Map<number, Project>();
+      projects.forEach((project) => {
+        projectMap.set(project.id, project);
+      });
 
-      if (!timesheet) {
-        const newTimesheet: Timesheet = {
-          id: 0,
-          date,
-          workedHours: 0,
-          description: '',
-          status: ApprovalStatus.PENDING,
-          employeeId: 0,
-          projectId,
-          quantity,
-          employeeName: '',
-          projectName: '',
-          userId: this.userId,
-          timeUnit: TimeUnit.DAY,
-        };
-        this.updatedTimesheets = [...this.updatedTimesheets, newTimesheet];
-        timesheet = newTimesheet;
-      } else {
-        timesheet = { ...timesheet, quantity };
-        this.updatedTimesheets = this.updatedTimesheets.map((t) =>
-          t.id === timesheet?.id ? timesheet : t
+      for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
+        const [projectIdStr, dateString] = key.split('.');
+        console.log('dateString', dateString);
+        const projectId = Number(projectIdStr);
+        const date = new Date(`${dateString}`);
+        console.log('date', date);
+        let timesheet = this.updatedTimesheets.find(
+          (t: any) =>
+            t.projectId === projectId &&
+            new Date(t.date).toDateString() === date.toDateString()
         );
+
+        const project = projectMap.get(projectId);
+
+        if (!project) {
+          continue;
+        }
+
+        if (!timesheet) {
+          const newTimesheet: Timesheet = {
+            id: 0,
+            date,
+            workedHours: 0,
+            description: '',
+            status: ApprovalStatus.PENDING,
+            employeeId: 0,
+            projectId,
+            quantity,
+            employeeName: '',
+            projectName: project.projectName,
+            userId: this.userId,
+            timeUnit: TimeUnit.DAY,
+          };
+          this.updatedTimesheets = [...this.updatedTimesheets, newTimesheet];
+          timesheet = newTimesheet;
+        } else {
+          timesheet = {
+            ...timesheet,
+            quantity,
+            projectName: project.projectName,
+          };
+          this.updatedTimesheets = this.updatedTimesheets.map((t) =>
+            t.id === timesheet?.id ? timesheet : t
+          );
+        }
+
+        timesheetUpdates.push(timesheet);
       }
 
-      timesheetUpdates.push(timesheet);
-    }
-
-    if (timesheetUpdates.length > 0) {
-      this.timesheetService
-        .updateMultipleTimesheets(timesheetUpdates)
-        .subscribe({
-          next: () => {
-            console.log('updateMultipleTimesheets response');
-            this.toastService.show('All changes saved successfully', {
-              classname: 'toast-success',
-            });
-            this.refreshView();
-            this.isSaving = false;
-          },
-          error: (error) => {
-            console.error('Error saving changes', error);
-            this.isSaving = false;
-          },
-        });
-    } else {
-      this.isSaving = false;
-    }
+      if (timesheetUpdates.length > 0) {
+        this.timesheetService
+          .updateMultipleTimesheets(timesheetUpdates)
+          .subscribe({
+            next: () => {
+              console.log('updateMultipleTimesheets response');
+              this.toastService.show('All changes saved successfully', {
+                classname: 'toast-success',
+              });
+              this.refreshView();
+              this.isSaving = false;
+            },
+            error: (error) => {
+              console.error('Error saving changes', error);
+              this.isSaving = false;
+            },
+          });
+      } else {
+        this.isSaving = false;
+      }
+    });
   }
 
   getTotalQuantityForProject(projectId: number): number {

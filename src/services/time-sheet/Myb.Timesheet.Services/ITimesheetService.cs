@@ -16,4 +16,5 @@ public interface ITimesheetService
     Task<IEnumerable<TimeSheet>> GetTimeSheetsByUserIdAsync(string userId);
     Task<IEnumerable<TimeSheet>> GetTimeSheetsByEmployeeIdAsync(int employeeId);
     Task<List<TimeSheet>> UpdateMultipleTimesheetsAsync(List<TimeSheet> timesheets);
+    Task<List<TimeSheet>> GetTimesheetsByProjectIds(List<int> projectIds);
 }

@@ -93,6 +93,16 @@ export class TimesheetService extends RepositoryService<Timesheet> {
         })
       );
   }
+  generateTimesheetPdf(projectIds: number[]): Observable<string> {
+    return this.apollo
+      .mutate({
+        mutation: gql`
+          ${this.typeOperations.generateTimesheetPdf}
+        `,
+        variables: { projectIds },
+      })
+      .pipe(map((response: any) => response.data.generateTimesheetPdf));
+  }
   override getAll(): Observable<Timesheet[]> {
     return super.getAll().pipe(
       map((timesheets) => {

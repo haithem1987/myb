@@ -185,6 +185,20 @@ public class TimesheetService:ITimesheetService
 
     return updatedTimesheets;
 }
+ 
+public async Task<List<TimeSheet>> GetTimesheetsByProjectIds(List<int> projectIds)
+{
+    try
+    {
+        var timesheets = _timesheetRepository.GetAll().Where(t => projectIds.Contains(t.ProjectId)).ToList();
+        return await Task.FromResult(timesheets);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error getting timesheets by project ids: {projectIds}", string.Join(", ", projectIds));
+        throw;
+    }
+}
 
 
 }

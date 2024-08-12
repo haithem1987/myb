@@ -61,3 +61,8 @@ export const DELETE_TIMESHEET = `
     deleteTimesheet(id: $id)
   }
 `;
+export const GENERATE_TIMESHEET_PDF = `
+  mutation GenerateTimesheetPdf($projectIds: [Int!]!) {
+        generateTimesheetPdf(projectIds: $projectIds)
+      }
+`;

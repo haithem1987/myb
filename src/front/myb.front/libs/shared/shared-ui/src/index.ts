@@ -39,3 +39,7 @@ export * from './lib/components/settings/settings.component';
 export * from './lib/components/avatar/avatar.component';
 
 export * from './lib/components/user-dropdown/user-dropdown.component';
+
+export * from './lib/components/loading-indicator/loading-indicator.component';
+
+export * from './lib/components/loading-indicator/loading-indicator.component';

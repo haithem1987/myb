@@ -107,5 +107,6 @@
   "EMPLOYEE_REQUIRED": "Employee is required.",
   "PROJECT_REQUIRED": "Project is required.",
   "SAVE": "Save",
-  "FILL": "Fill"
+  "FILL": "Fill",
+  "EXTRACT_PDF": "Extract PDF"
 }

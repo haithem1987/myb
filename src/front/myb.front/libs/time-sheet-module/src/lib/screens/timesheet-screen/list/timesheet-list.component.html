@@ -159,3 +159,35 @@
     </table>
   </div>
 </div>
+
+<!-- <myb-front-loading-indicator
+  [isLoading]="isLoading"
+></myb-front-loading-indicator>
+<div *ngIf="!isLoading" class="container my-4">
+  <myb-front-timesheet-header></myb-front-timesheet-header>
+  <myb-front-period-selector
+    [selectedPeriod]="selectedPeriod"
+    [weekQuantity]="getTotalQuantitiesForPeriod('week')"
+    [monthQuantity]="getTotalQuantitiesForPeriod('month')"
+    (periodChange)="setPeriod($event)"
+  ></myb-front-period-selector>
+  <myb-front-timesheet-action-buttons
+    [selectedProjectsSize]="selectedProjects.size"
+    [isSaving]="isSaving"
+    (fillProjects)="fillSelectedProjects()"
+    (extractPDF)="extractPDF()"
+    (saveChanges)="saveAllChanges()"
+  ></myb-front-timesheet-action-buttons>
+  <myb-front-timesheet-table
+    [projects]="projects$ | async"
+    [dateRange]="dateRange"
+    [selectedProjects]="selectedProjects"
+    [holidays]="holidays"
+    [totalPeriod]="totalPeriod"
+    (selectAll)="toggleSelectAll($event)"
+    (rowSelectChange)="onRowSelectChange($event.projectId, $event.event)"
+    (quantityChange)="
+      onQuantityChange($event.projectId, $event.date, $event.event)
+    "
+  ></myb-front-timesheet-table>
+</div> -->

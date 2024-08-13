@@ -1,0 +1,20 @@
+<div class="btn-group" ngbButtonGroup>
+  <button
+    type="button"
+    class="btn btn-outline-primary"
+    [class.active]="selectedPeriod === 'week'"
+    (click)="selectPeriod('week')"
+  >
+    {{ 'WEEK' | translate }}
+    <span class="badge bg-danger ms-1">{{ weekQuantity }}</span>
+  </button>
+  <button
+    type="button"
+    class="btn btn-outline-primary"
+    [class.active]="selectedPeriod === 'month'"
+    (click)="selectPeriod('month')"
+  >
+    {{ 'MONTH' | translate }}
+    <span class="badge bg-danger ms-1">{{ monthQuantity }}</span>
+  </button>
+</div>

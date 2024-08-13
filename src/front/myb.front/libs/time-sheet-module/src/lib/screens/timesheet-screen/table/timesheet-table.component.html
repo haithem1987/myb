@@ -1,0 +1,88 @@
+<div class="card table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>
+          <input
+            type="checkbox"
+            class="form-check-input"
+            (change)="toggleSelectAll($event)"
+          />
+        </th>
+        <th class="project-column">{{ 'PROJECT' | translate }}</th>
+        <th
+          class="text-center"
+          [ngClass]="{
+            'weekend-dark': isWeekend(date) && !date.isToday,
+            'today-column': date.isToday
+          }"
+          *ngFor="let date of dateRange; trackBy: trackByDate"
+        >
+          <div class="position-relative">
+            <span
+              *ngIf="handleHoliday(date).isHoliday"
+              class="holiday-badge bg-danger border border-light rounded-circle"
+              [ngbTooltip]="handleHoliday(date).name"
+            >
+              <span class="visually-hidden">New alerts</span>
+            </span>
+          </div>
+          <div class="text-muted fw-light">{{ date.weekday }}</div>
+          <div
+            [ngClass]="{
+              'badge bg-secondary rounded-pill': date.isToday
+            }"
+          >
+            {{ date.day }}
+          </div>
+        </th>
+        <th class="total-column">{{ 'TOTAL' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let project of projects; trackBy: trackByProject">
+        <td>
+          <input
+            type="checkbox"
+            class="form-check-input"
+            [checked]="isSelected(project.id)"
+            (change)="onRowSelectChange(project.id, $event)"
+          />
+        </td>
+        <td class="project-column">{{ project.projectName }}</td>
+        <td
+          class="text-center"
+          style="width: 80px"
+          *ngFor="let date of dateRange; trackBy: trackByDate"
+          [ngClass]="{
+            'weekend-dark': isWeekend(date) && !date.isToday,
+            'today-column': date.isToday
+          }"
+        >
+          <ng-container>
+            <input
+              type="number"
+              class="form-control text-center"
+              style="width: 60px"
+              [value]="getQuantityForDate(project.id, date.dateString)"
+              [ngClass]="{
+                'holiday-disabled': handleHoliday(date).isHoliday
+              }"
+              (input)="onQuantityChange(project.id, date, $event)"
+              [disabled]="handleHoliday(date).isHoliday"
+            />
+          </ng-container>
+        </td>
+        <td class="total-column text-end">
+          <myb-front-progress-bar
+            [value]="getTotalQuantityForProject(project.id)"
+            type="success"
+            height="8px"
+            [max]="totalPeriod"
+          ></myb-front-progress-bar>
+          {{ getTotalQuantityForProject(project.id) }} / {{ totalPeriod }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

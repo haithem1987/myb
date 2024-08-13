@@ -23,6 +23,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
 import {
   GeneralSettingsService,
   HolidayService,
+  LoadingIndicatorComponent,
   ProgressBarComponent,
 } from 'libs/shared/shared-ui/src';
 import {
@@ -30,6 +31,10 @@ import {
   TranslateModule,
   TranslateService,
 } from '@ngx-translate/core';
+import { TimesheetHeaderComponent } from '../timesheet-header/timesheet-header.component';
+import { TimesheetActionButtonsComponent } from '../action-buttons/timesheet-action-buttons.component';
+import { TimesheetTableComponent } from '../table/timesheet-table.component';
+import { PeriodSelectorComponent } from '../period-selector/period-selector.component';
 
 @Component({
   selector: 'myb-timesheet-list',
@@ -39,6 +44,11 @@ import {
     FormsModule,
     NgbDropdownModule,
     ProgressBarComponent,
+    LoadingIndicatorComponent,
+    TimesheetHeaderComponent,
+    TimesheetActionButtonsComponent,
+    TimesheetTableComponent,
+    PeriodSelectorComponent,
     NgbTooltip,
     TranslateModule,
   ],
@@ -456,8 +466,8 @@ export class TimesheetListComponent implements OnInit {
   getTotalQuantityForProject(projectId: number): number {
     let total = 0;
     for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
-      if (key.startsWith(`${projectId}.`)) {
-        total += quantity;
+      if (key.startsWith(`${projectId}.`) && quantity > 0) {
+        total++;
       }
     }
     return total;

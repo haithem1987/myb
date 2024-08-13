@@ -1,0 +1,21 @@
+.container-full-height {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+}
+.hero-section {
+  flex: 1;
+}
+
+.features-section {
+  flex: 1;
+}
+
+.apps-section {
+  flex: 1;
+}
+
+.footer-section {
+  flex: 0.5; /* Example: Make the footer take less space */
+}

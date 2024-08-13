@@ -1,0 +1,34 @@
+<div class="text-end mt-3">
+  <button
+    class="btn btn-primary fw-bold text-uppercase"
+    (click)="fillSelectedProjects()"
+    [disabled]="selectedProjectsSize === 0"
+  >
+    <i class="bi bi-calendar2-check-fill"></i> {{ 'FILL' | translate }}
+  </button>
+  <button
+    class="btn btn-primary fw-bold text-uppercase ms-2"
+    (click)="extractPdf()"
+    [disabled]="selectedProjectsSize === 0"
+  >
+    <i class="bi bi-file-earmark-pdf-fill"></i>
+    {{ 'EXTRACT_PDF' | translate }}
+  </button>
+  <button
+    class="btn btn-primary fw-bold text-uppercase ms-2"
+    (click)="saveAllChanges()"
+    [disabled]="isSaving"
+  >
+    <ng-container *ngIf="!isSaving">
+      <i class="bi bi-check-circle-fill"></i> {{ 'VALIDATE' | translate }}
+    </ng-container>
+    <ng-container *ngIf="isSaving">
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      {{ 'SAVING' | translate }}
+    </ng-container>
+  </button>
+</div>

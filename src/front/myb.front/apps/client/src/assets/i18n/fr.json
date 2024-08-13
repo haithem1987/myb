@@ -108,5 +108,6 @@
   "EMPLOYEE_REQUIRED": "L'employé est requis.",
   "PROJECT_REQUIRED": "Le projet est requis.",
   "SAVE": "Enregistrer",
-  "FILL": "Remplir"
+  "FILL": "Remplir",
+  "EXTRACT_PDF": "Extracter PDF"
 }

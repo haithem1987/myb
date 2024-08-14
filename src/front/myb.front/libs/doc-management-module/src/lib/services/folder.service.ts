@@ -5,6 +5,7 @@ import { Apollo, gql } from 'apollo-angular';
 import { BehaviorSubject, Observable, catchError, map, throwError } from 'rxjs';
 import { GET_FOLDERS_BY_PARENT_ID, GET_FOLDER_BY_ID } from '../GraphQl/Queries/Folder.graphql';
 import { RepositoryService } from 'libs/shared/infra/services/repository.service';
+import { UPDATE_FOLDER } from '../GraphQl/Mutations/FolderMutation';
 
 @Injectable({
   providedIn: 'root'
@@ -117,19 +118,18 @@ export class FolderService extends RepositoryService<Folder> {
       );
       
   }
-
-  // Update folder
-  updateFolder(folder: Folder): Observable<Folder> {
-    return super.update(folder.id, folder).pipe(
+  override update(id: number, item: Folder): Observable<Folder> {
+    return super.update(id, item).pipe(
       map((updatedFolder) => {
-        const updatedFolders = this.folderSubject.value.map(f =>
-          f.id === updatedFolder.id ? updatedFolder : f
+        const folders = this.folderSubject.value.map((t) =>
+          t.id === id ? updatedFolder : t
         );
-        this.folderSubject.next(updatedFolders);
-        return updatedFolder;
+        this.folderSubject.next(folders); 
+        return updatedFolder; 
       })
     );
   }
+  
 
   override delete(id: number): Observable<boolean> {
     return super.delete(id).pipe(

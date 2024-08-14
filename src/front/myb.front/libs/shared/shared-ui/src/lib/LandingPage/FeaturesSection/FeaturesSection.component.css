@@ -3,8 +3,21 @@
   left: -40%;
   width: 180%;
   /* height: 500px; */
-  border-top-left-radius: 100%;
-  border-top-right-radius: 100%;
+  border-top-left-radius: 100%; 
+  border-top-right-radius: 10%;
+  /* border-bottom-right-radius: 100%;
+  border-bottom-left-radius: -100%; */
+
+
+  background-color: rgba(229, 241, 241, 255);
+}
+.overlay2 {
+  position: relative;
+  left: -40%;
+  width: 180%;
+  /* height: 500px; */
+  border-bottom-left-radius: 100%;
+  border-bottom-right-radius: 100%;
   background-color: rgba(229, 241, 241, 255);
 }
 .ilustration-section-2 {

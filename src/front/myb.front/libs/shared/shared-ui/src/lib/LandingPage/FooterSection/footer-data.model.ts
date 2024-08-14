@@ -8,4 +8,6 @@ export interface ContactInfo {
 export interface FooterSection {
   title: string;
   content: string;
+  module2:string;
+  module3:string;
 }

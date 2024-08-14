@@ -27,7 +27,7 @@ export class FolderCreationComponent {
   folderName: string = '';
   @Output() folderCreated = new EventEmitter<Folder>();
   @Input() folderId!: number;
-  @Input() userId!: string;
+  //@Input() userId!: string;
   user$: Observable<KeycloakProfile | null>;
 
   constructor(
@@ -43,36 +43,39 @@ export class FolderCreationComponent {
   
   ngOnInit() {
     console.log('Received folderId from details:', this.folderId);
-    //console.log('Received parentid from details:', this.parentId);
-      // Get the userId from KeycloakService
+   
     
   }
 
   createFolder(): void {
     if (this.folderName) {
-      const folder = {
-        folderName: this.folderName,
-        parentId: this.folderId,
-        createdBy: '',
-        editedBy: '',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as Folder;
+      this.user$.subscribe({
+        next: (userProfile) => {
+          if (userProfile) {
+            const folder = {
+              folderName: this.folderName,
+              parentId: this.folderId,
+              createdBy: userProfile.username,
+              editedBy:  userProfile.username,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            } as Folder;
 
-      this.folderService.create(folder).subscribe({
-        next: (newFolder) => {
-          this.folderCreated.emit(newFolder);
-          this.activeModal.close();
-          console.log('creation id', newFolder.id);
-          console.log('creation parentId:', newFolder.parentId);
-          console.log('first', this.folderService.folders$);
-        },
-        error: (error) => {
-          console.error('Error creating folder:', error);
+            this.folderService.create(folder).subscribe({
+              next: (newFolder) => {
+                this.folderCreated.emit(newFolder);
+                this.activeModal.close();
+                console.log('userProfile.email', userProfile.email)
+                console.log('creation id', newFolder.id);
+                console.log('creation parentId:', newFolder.parentId);
+                console.log('first', this.folderService.folders$);
+              },
+              error: (error) => {
+                console.error('Error creating folder:', error);
+              },
+            });
+          }
         },
       });
-    } else {
-      //alert('Please enter a folder name');
-    }
-  }
-}
+
+    }}}

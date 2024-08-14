@@ -1,0 +1,3445 @@
+{
+  "version": "6.0",
+  "nxVersion": "18.0.5",
+  "deps": {
+    "@ngx-translate/core": "^15.0.0",
+    "@ngx-translate/http-loader": "^8.0.0",
+    "@swimlane/ngx-charts": "^20.5.0"
+  },
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {
+      "admin": [
+        {
+          "file": "src/front/myb.front/apps/admin/.eslintrc.json",
+          "hash": "8383725352201307912"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/jest.config.ts",
+          "hash": "11332091400877278078"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/project.json",
+          "hash": "6158969568496451937"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/app/app.component.html",
+          "hash": "12318721662159017535"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/app/app.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/app/app.component.spec.ts",
+          "hash": "18405072668117863868"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/app/app.component.ts",
+          "hash": "16978323965361674786"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/app/app.config.ts",
+          "hash": "7608249891914835571"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/app/app.routes.ts",
+          "hash": "12790378059371385261"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/app/nx-welcome.component.ts",
+          "hash": "2398438080454542440"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/index.html",
+          "hash": "11094087035816634090"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/main.ts",
+          "hash": "875041330523952236"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/styles.scss",
+          "hash": "13675609258312703358"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/src/test-setup.ts",
+          "hash": "10765977267162271731"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/tsconfig.app.json",
+          "hash": "15840844869456775012"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/tsconfig.editor.json",
+          "hash": "6816855480324741077"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/tsconfig.json",
+          "hash": "17021277375021554599"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin/tsconfig.spec.json",
+          "hash": "1930986853382524452"
+        }
+      ],
+      "myb-front": [
+        {
+          "file": "src/front/myb.front/apps/myb.front/.eslintrc.json",
+          "hash": "8383725352201307912"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/jest.config.ts",
+          "hash": "4784186800440849438"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/project.json",
+          "hash": "18433403157279897710"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/app/app.component.html",
+          "hash": "12341137063116659571"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/app/app.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/app/app.component.spec.ts",
+          "hash": "5011716637046786074"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/app/app.component.ts",
+          "hash": "2854407951467091598"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/app/app.config.ts",
+          "hash": "7608249891914835571"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/app/app.routes.ts",
+          "hash": "12790378059371385261"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/app/nx-welcome.component.ts",
+          "hash": "5025247633099134444"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/favicon.ico",
+          "hash": "9303420814833116677"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/index.html",
+          "hash": "10326021290353952684"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/main.ts",
+          "hash": "875041330523952236"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/styles.scss",
+          "hash": "2917954890128038984"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/src/test-setup.ts",
+          "hash": "10765977267162271731"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/tsconfig.app.json",
+          "hash": "15840844869456775012"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/tsconfig.editor.json",
+          "hash": "6816855480324741077"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/tsconfig.json",
+          "hash": "15416959435489415870"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front/tsconfig.spec.json",
+          "hash": "1930986853382524452"
+        }
+      ],
+      "invoice-module": [
+        {
+          "file": "src/front/myb.front/libs/invoice-module/.eslintrc.json",
+          "hash": "760773952144003802"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/README.md",
+          "hash": "8448209339514465098"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/jest.config.ts",
+          "hash": "7848770956967315770"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/ng-package.json",
+          "hash": "3271489785056376708"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/package.json",
+          "hash": "4724872366024296616",
+          "deps": [
+            "npm:tslib",
+            "npm:@angular/common",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/project.json",
+          "hash": "2595551811023398197"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/index.ts",
+          "hash": "9560900648505059457"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/client-card/clientCard.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/client-card/clientCard.component.html",
+          "hash": "17150938058556409481"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/client-card/clientCard.component.spec.ts",
+          "hash": "6470431940586733266"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/client-card/clientCard.component.ts",
+          "hash": "2517868318098942429"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/create-client/add-contact/addContact.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/create-client/add-contact/addContact.component.html",
+          "hash": "7625304703835252631"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/create-client/add-contact/addContact.component.spec.ts",
+          "hash": "14536265068335063115"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/create-client/add-contact/addContact.component.ts",
+          "hash": "10727402789460919401"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/create-client/createClient.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/create-client/createClient.component.html",
+          "hash": "14276153659140967358"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/create-client/createClient.component.spec.ts",
+          "hash": "18408664218321369883"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/create-client/createClient.component.ts",
+          "hash": "10289225926108372034"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/index/client.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/index/client.component.html",
+          "hash": "17385897758380840601"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/index/client.component.spec.ts",
+          "hash": "9445029341087476116"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/index/client.component.ts",
+          "hash": "8918673434214043686"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/list-client/listClient.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/list-client/listClient.component.html",
+          "hash": "11900105049875835551"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/list-client/listClient.component.spec.ts",
+          "hash": "14340618363259140544"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/client-components/list-client/listClient.component.ts",
+          "hash": "17941006596603261740"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/create-invoice/createInvoice.component.css",
+          "hash": "12458132152124755124"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/create-invoice/createInvoice.component.html",
+          "hash": "11693593118346385438"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/create-invoice/createInvoice.component.spec.ts",
+          "hash": "8627488956293601367"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/create-invoice/createInvoice.component.ts",
+          "hash": "9991295389682754312"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/details-invoice/invoiceDetails.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/details-invoice/invoiceDetails.component.html",
+          "hash": "11979797695469873131"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/details-invoice/invoiceDetails.component.spec.ts",
+          "hash": "4607727141556766523"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/details-invoice/invoiceDetails.component.ts",
+          "hash": "3718236775276247759"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/edit-invoice/editInvoice.component.css",
+          "hash": "15036214574332298676"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/edit-invoice/editInvoice.component.html",
+          "hash": "14149842464713559262"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/edit-invoice/editInvoice.component.spec.ts",
+          "hash": "15477514939358224152"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/edit-invoice/editInvoice.component.ts",
+          "hash": "1320722628810148838"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/index/invoiceIndex.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/index/invoiceIndex.component.html",
+          "hash": "2800569279773355278"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/index/invoiceIndex.component.spec.ts",
+          "hash": "3871012705851668953"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/index/invoiceIndex.component.ts",
+          "hash": "2619055623838753913"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/list-invoice/listInvoice.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/list-invoice/listInvoice.component.html",
+          "hash": "14288398439650269"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/list-invoice/listInvoice.component.spec.ts",
+          "hash": "1553449508220222802"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/invoice-components/list-invoice/listInvoice.component.ts",
+          "hash": "9124036034704702725"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/navbar/navbar.component.css",
+          "hash": "13010307796765433872"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/navbar/navbar.component.html",
+          "hash": "14933149937902345055"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/navbar/navbar.component.spec.ts",
+          "hash": "8726804886280984777"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/navbar/navbar.component.ts",
+          "hash": "2339547832198121523"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/create-product/createProduct.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/create-product/createProduct.component.html",
+          "hash": "15264708893684316280"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/create-product/createProduct.component.spec.ts",
+          "hash": "16159435675752364334"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/create-product/createProduct.component.ts",
+          "hash": "1247758870522505196"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/index/product.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/index/product.component.html",
+          "hash": "17385897758380840601"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/index/product.component.spec.ts",
+          "hash": "318419817250460671"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/index/product.component.ts",
+          "hash": "13674483539589742118"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/list-product/listProduct.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/list-product/listProduct.component.html",
+          "hash": "14984095119190211984"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/list-product/listProduct.component.spec.ts",
+          "hash": "16595076495465427275"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/product-components/list-product/listProduct.component.ts",
+          "hash": "4145148108649538444"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/create-tax/createTax.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/create-tax/createTax.component.html",
+          "hash": "6487930421402491983"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/create-tax/createTax.component.spec.ts",
+          "hash": "16456920995767674714"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/create-tax/createTax.component.ts",
+          "hash": "11013807808081227822"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/index/tax.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/index/tax.component.html",
+          "hash": "16498897523005705592"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/index/tax.component.spec.ts",
+          "hash": "12432687176899625610"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/index/tax.component.ts",
+          "hash": "10660066988200859198"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/list-tax/listTax.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/list-tax/listTax.component.html",
+          "hash": "6259954761541848998"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/list-tax/listTax.component.spec.ts",
+          "hash": "12480319693274407239"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/components/tax-component/list-tax/listTax.component.ts",
+          "hash": "7460467849431000962"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/graphql/mutations/client.mutation.ts",
+          "hash": "8829209402246729459"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/graphql/mutations/invoice.mutation.ts",
+          "hash": "16914028456710911416"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/graphql/mutations/product.mutation.ts",
+          "hash": "5529326052097177709"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/graphql/mutations/tax.mutation.ts",
+          "hash": "7806255425848619956"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/graphql/queries/client.query.ts",
+          "hash": "9240257861537348682"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/graphql/queries/contact.query.ts",
+          "hash": "397821467552323672"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/graphql/queries/invoice.query.ts",
+          "hash": "13043405279409985604"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/graphql/queries/product.query.ts",
+          "hash": "9185522962619193938"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/graphql/queries/tax.query.ts",
+          "hash": "1671818617260111412"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/invoice-module/invoice-module.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/invoice-module/invoice-module.component.html",
+          "hash": "4634625415157477519"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/invoice-module/invoice-module.component.spec.ts",
+          "hash": "10669440192124649992"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/invoice-module/invoice-module.component.ts",
+          "hash": "5676498061569430229"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/invoice.routing.module.ts",
+          "hash": "13538140611695421190"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/models/client.model.ts",
+          "hash": "8037138235556267821"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/models/clientType.ts",
+          "hash": "10936512951541178246"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/models/contact.model.ts",
+          "hash": "4534601742671299406"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/models/contactType.ts",
+          "hash": "8365728651731710751"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/models/invoice.model.ts",
+          "hash": "1402349323918847357"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/models/product.model.ts",
+          "hash": "8693885887001016198"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/models/productType.ts",
+          "hash": "3884406708354698481"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/models/tax.model.ts",
+          "hash": "1802738279049699330"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/client.service.spec.ts",
+          "hash": "6051879188584901257"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/client.service.ts",
+          "hash": "2481864351775369092"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/contact.service.spec.ts",
+          "hash": "14189248916365938417"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/contact.service.ts",
+          "hash": "13523517173743816051"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/invoice.service.spec.ts",
+          "hash": "8081028910364299494"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/invoice.service.ts",
+          "hash": "17510216566721045667"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/product.service.spec.ts",
+          "hash": "7588451018530731840"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/product.service.ts",
+          "hash": "762390980728616237"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/tax.service.spec.ts",
+          "hash": "14866597000571887968"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/tax.service.ts",
+          "hash": "4616325706330182557"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/upload-files.service.spec.ts",
+          "hash": "7475656893829989650"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/lib/services/upload-files.service.ts",
+          "hash": "4341891741131823777"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/src/test-setup.ts",
+          "hash": "10765977267162271731"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/tsconfig.json",
+          "hash": "7184861466157324158"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/tsconfig.lib.json",
+          "hash": "15304444604046903881"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/tsconfig.lib.prod.json",
+          "hash": "16219944552368449858"
+        },
+        {
+          "file": "src/front/myb.front/libs/invoice-module/tsconfig.spec.json",
+          "hash": "1930986853382524452"
+        }
+      ],
+      "client": [
+        {
+          "file": "src/front/myb.front/apps/client/.eslintrc.json",
+          "hash": "8383725352201307912"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/jest.config.ts",
+          "hash": "4943561339060861781"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/project.json",
+          "hash": "3711009163670964478"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/proxy.js",
+          "hash": "12087900594992526720"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/app/app.component.html",
+          "hash": "17385897758380840601"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/app/app.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/app/app.component.spec.ts",
+          "hash": "13443531135907351218"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/app/app.component.ts",
+          "hash": "14582107746600126877"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/app/app.config.ts",
+          "hash": "4734020384080022804"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/app/app.routes.ts",
+          "hash": "4654728855900076064"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/app/nx-welcome.component.ts",
+          "hash": "4696969433857838979"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/i18n/en.json",
+          "hash": "6964522072508536918"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/i18n/fr.json",
+          "hash": "18434257347771754306"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/apps.png",
+          "hash": "7535039626104690534"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/bills.png",
+          "hash": "9050732880203965541"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/chart.png",
+          "hash": "6058631051005109151"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/idea.png",
+          "hash": "1420623242222082098"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/illus.png",
+          "hash": "7162008666313028976"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/illustartion1.png",
+          "hash": "17309977309307068711"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/illustration1.svg",
+          "hash": "14459803648226595849"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/illustration1x2.png",
+          "hash": "12312683908387097745"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/illustration1x3.png",
+          "hash": "12105075468506898838"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/pc.png",
+          "hash": "8929416332808713584"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/rr.png",
+          "hash": "3893494134010322798"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/teamworking.png",
+          "hash": "8978398918995752729"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/images/timesheet.png",
+          "hash": "1016668524342974517"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/assets/wave-shape.svg",
+          "hash": "11351349994771144824"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/index.html",
+          "hash": "9805792589680386654"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/main.ts",
+          "hash": "875041330523952236"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/proxy.conf.json",
+          "hash": "17662846637991224457"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/styles.scss",
+          "hash": "17472203662558786185"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/src/test-setup.ts",
+          "hash": "10765977267162271731"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/tsconfig.app.json",
+          "hash": "15840844869456775012"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/tsconfig.editor.json",
+          "hash": "6816855480324741077"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/tsconfig.json",
+          "hash": "17021277375021554599"
+        },
+        {
+          "file": "src/front/myb.front/apps/client/tsconfig.spec.json",
+          "hash": "1930986853382524452"
+        }
+      ],
+      "custom-styles": [
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/.eslintrc.json",
+          "hash": "14281260702210394579"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/README.md",
+          "hash": "16006753465782482811"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/jest.config.ts",
+          "hash": "2908166295355331377"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/project.json",
+          "hash": "5513851021000174449"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/src/index.ts",
+          "hash": "9523559139071359367"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/src/lib/custom-styles/custom-styles.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/src/lib/custom-styles/custom-styles.component.html",
+          "hash": "5088426807725289723"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/src/lib/custom-styles/custom-styles.component.spec.ts",
+          "hash": "16520834555186078190"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/src/lib/custom-styles/custom-styles.component.ts",
+          "hash": "18306432108238091029"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/src/lib/themes/styles.scss",
+          "hash": "10137194263353907540"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/src/test-setup.ts",
+          "hash": "10765977267162271731"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/tsconfig.json",
+          "hash": "6922415355334431150"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/tsconfig.lib.json",
+          "hash": "5210152845168933800"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/custom-styles/tsconfig.spec.json",
+          "hash": "7652445452192956988"
+        }
+      ],
+      "time-sheet-module": [
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/.eslintrc.json",
+          "hash": "8383725352201307912"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/README.md",
+          "hash": "14313009297232675720"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/jest.config.ts",
+          "hash": "13142937369777511005"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/project.json",
+          "hash": "14598580988600031021"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/index.ts",
+          "hash": "2368654113114357295"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component.css",
+          "hash": "16915265522011593742"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component.html",
+          "hash": "16044127231992221426"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component.spec.ts",
+          "hash": "3296284493111630033"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component.ts",
+          "hash": "11707234212836253042"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/navbar/navbar.component.css",
+          "hash": "6969457585475780256"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/navbar/navbar.component.html",
+          "hash": "14239178657481206304"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/navbar/navbar.component.spec.ts",
+          "hash": "8726804886280984777"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/navbar/navbar.component.ts",
+          "hash": "2605578950582228473"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-actions/task-actions.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-actions/task-actions.component.html",
+          "hash": "17104673700023495164"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-actions/task-actions.component.spec.ts",
+          "hash": "4473456469678682987"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-actions/task-actions.component.ts",
+          "hash": "9798122473774966420"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-create/task-create.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-create/task-create.component.html",
+          "hash": "3641899259221633950"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-create/task-create.component.spec.ts",
+          "hash": "15991649437700858578"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-create/task-create.component.ts",
+          "hash": "11466517380647947356"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-edit/task-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-edit/task-edit.component.html",
+          "hash": "3154209445581137957"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-edit/task-edit.component.spec.ts",
+          "hash": "558438691224633433"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-edit/task-edit.component.ts",
+          "hash": "13009187168692863008"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-list/task-list.component.html",
+          "hash": "607306059720525543"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-list/task-list.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-list/task-list.component.spec.ts",
+          "hash": "5569736423385055591"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/components/task-list/task-list.component.ts",
+          "hash": "10166275082019346396"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/graphql.module.ts",
+          "hash": "3525907686490993970"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/mutations/employee.graphql.ts",
+          "hash": "9040067029081774927"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/mutations/project.graphql.ts",
+          "hash": "15628165063179358015"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/mutations/task.graphql.ts",
+          "hash": "5918831438036783429"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/mutations/timeoff.graphql.ts",
+          "hash": "8149287444818515750"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/mutations/timesheet.graphql.ts",
+          "hash": "16224241243972052528"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/queries/employee.graphql.ts",
+          "hash": "12445275597251307086"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/queries/project.graphql.ts",
+          "hash": "4652955599165966956"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/queries/task.graphql.ts",
+          "hash": "17187956630580722416"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/queries/timeoff.graphql.ts",
+          "hash": "16319445150415089144"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/queries/timesheet.graphql.ts",
+          "hash": "11424983403808462774"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/graphql/type-config.ts",
+          "hash": "11014152499035613144"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/models/base.model.ts",
+          "hash": "1672674431789035841"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/models/employee.ts",
+          "hash": "8484564161022578233"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/models/project.model.ts",
+          "hash": "13599428781677409447"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/models/task.model.ts",
+          "hash": "3491975830220568568"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/models/timeoff.model.ts",
+          "hash": "7126765710603075980"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/models/timesheet.model.ts",
+          "hash": "15718790145208686299"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/card/employee-card.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/card/employee-card.component.html",
+          "hash": "6810542789577275729"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/card/employee-card.component.spec.ts",
+          "hash": "7504066333604897140"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/card/employee-card.component.ts",
+          "hash": "6194746137280173574"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/edit/employee-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/edit/employee-edit.component.html",
+          "hash": "5496666797504732033"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/edit/employee-edit.component.spec.ts",
+          "hash": "7338622170096650824"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/edit/employee-edit.component.ts",
+          "hash": "15471471689257824017"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/index/employee-index.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/index/employee-index.component.html",
+          "hash": "17385897758380840601"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/index/employee-index.component.spec.ts",
+          "hash": "18175133179020945582"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/index/employee-index.component.ts",
+          "hash": "2350980363371068307"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/list/employee-list.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/list/employee-list.component.html",
+          "hash": "7839955371215847481"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/list/employee-list.component.spec.ts",
+          "hash": "3657158860047457225"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/list/employee-list.component.ts",
+          "hash": "4521834093139283057"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/stats/employee-stats.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/stats/employee-stats.component.html",
+          "hash": "13023340266337391497"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/stats/employee-stats.component.spec.ts",
+          "hash": "1177081973309002181"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/stats/employee-stats.component.ts",
+          "hash": "13060088309036188612"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/timeoff-list/timeoff-list.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/timeoff-list/timeoff-list.component.html",
+          "hash": "9325358310717463648"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/timeoff-list/timeoff-list.component.spec.ts",
+          "hash": "6671480698160372064"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/employees/timeoff-list/timeoff-list.component.ts",
+          "hash": "13747283439619444876"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/card/project-card.component.html",
+          "hash": "4050253756303576987"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/card/project-card.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/card/project-card.component.spec.ts",
+          "hash": "9300777822400924994"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/card/project-card.component.ts",
+          "hash": "5044196722486950615"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/edit/edit-project.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/edit/edit-project.component.html",
+          "hash": "14405888444230002290"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/edit/edit-project.component.spec.ts",
+          "hash": "13111687933271428460"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/edit/edit-project.component.ts",
+          "hash": "13603686522251878808"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/index/project-index.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/index/project-index.component.html",
+          "hash": "17385897758380840601"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/index/project-index.component.spec.ts",
+          "hash": "6068907724345515600"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/index/project-index.component.ts",
+          "hash": "11571924197026931819"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/list/project-list.component.css",
+          "hash": "752114438623310576"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/list/project-list.component.html",
+          "hash": "7490586237703072818"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/list/project-list.component.spec.ts",
+          "hash": "13655683038220880806"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/list/project-list.component.ts",
+          "hash": "1234170743977816195"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/tabs/project-tabs.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/tabs/project-tabs.component.html",
+          "hash": "5246365473170880572"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/tabs/project-tabs.component.spec.ts",
+          "hash": "10350778229551485329"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/projects/tabs/project-tabs.component.ts",
+          "hash": "2654936844304385788"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/settings/settings-page.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/settings/settings-page.component.html",
+          "hash": "16618841763187021913"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/settings/settings-page.component.spec.ts",
+          "hash": "3920562294760529576"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/settings/settings-page.component.ts",
+          "hash": "11826299597904765099"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/edit/task-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/edit/task-edit.component.html",
+          "hash": "621272142899992898"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/edit/task-edit.component.spec.ts",
+          "hash": "558438691224633433"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/edit/task-edit.component.ts",
+          "hash": "7261473006576684341"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/list/task-list.component.html",
+          "hash": "1722658739703131236"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/list/task-list.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/list/task-list.component.spec.ts",
+          "hash": "5569736423385055591"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/list/task-list.component.ts",
+          "hash": "3469853351734872885"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/task-screen.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/task-screen.component.html",
+          "hash": "7342620477430603241"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/task-screen.component.spec.ts",
+          "hash": "8149137988922751233"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/task-screen/task-screen.component.ts",
+          "hash": "9707207069563437578"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/create/timesheet-create.component.css",
+          "hash": "8666090684354792806"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/create/timesheet-create.component.html",
+          "hash": "1887705519356949832"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/create/timesheet-create.component.spec.ts",
+          "hash": "240878662361657923"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/create/timesheet-create.component.ts",
+          "hash": "16023288728214835833"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/edit/timesheet-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/edit/timesheet-edit.component.html",
+          "hash": "14141693725495975724"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/edit/timesheet-edit.component.spec.ts",
+          "hash": "17073852485537206858"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/edit/timesheet-edit.component.ts",
+          "hash": "3260153226441838049"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/list/timesheet-list.component.css",
+          "hash": "13062783937068655248"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/list/timesheet-list.component.html",
+          "hash": "13619615071133035382"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/list/timesheet-list.component.spec.ts",
+          "hash": "416002696412309941"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/list/timesheet-list.component.ts",
+          "hash": "10808338835778613478"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-screen.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-screen.component.html",
+          "hash": "3197943539090563607"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-screen.component.spec.ts",
+          "hash": "7714133239484832869"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-screen.component.ts",
+          "hash": "18382896737435929657"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/employee.service.spec.ts",
+          "hash": "3461775389778551104"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/employee.service.ts",
+          "hash": "5310168361819645036"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/nav-routes.service.ts",
+          "hash": "12772743381173815088"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/project.service.spec.ts",
+          "hash": "11281903511390088445"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/project.service.ts",
+          "hash": "7853796273470831380"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/task.service.spec.ts",
+          "hash": "10998048393397701504"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/task.service.ts",
+          "hash": "12904514469853749379"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/timeoff.service.ts",
+          "hash": "13650677778380398107"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/timesheet-settings.service.ts",
+          "hash": "13165335857765916322"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/timesheet.service.spec.ts",
+          "hash": "8787648706125984495"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/services/timesheet.service.ts",
+          "hash": "365267035861415546"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/time-sheet-module/time-sheet-module.component.css",
+          "hash": "5381268420755050499"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/time-sheet-module/time-sheet-module.component.html",
+          "hash": "1326611339767045624"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/time-sheet-module/time-sheet-module.component.spec.ts",
+          "hash": "14997193709438669265"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/time-sheet-module/time-sheet-module.component.ts",
+          "hash": "5552065649994444538"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/timesheet-routing.module.ts",
+          "hash": "17716805730955292066"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/lib/timesheet.module.ts",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/src/test-setup.ts",
+          "hash": "10765977267162271731"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/tsconfig.json",
+          "hash": "7184861466157324158"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/tsconfig.lib.json",
+          "hash": "8538462296474571866"
+        },
+        {
+          "file": "src/front/myb.front/libs/time-sheet-module/tsconfig.spec.json",
+          "hash": "1930986853382524452"
+        }
+      ],
+      "doc-management-module": [
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/.eslintrc.json",
+          "hash": "3313121791607399792"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/README.md",
+          "hash": "6309339621975437832"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/jest.config.ts",
+          "hash": "9024251412020009808"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/project.json",
+          "hash": "15215174402218353639"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/index.ts",
+          "hash": "9044959733445093890"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/GraphQl/Mutations/DocumentMutation.ts",
+          "hash": "15903454440703041126"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/GraphQl/Mutations/FolderMutation.ts",
+          "hash": "15035740975335649692"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/GraphQl/Queries/Document.graphql.ts",
+          "hash": "6599722939497641401"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql.ts",
+          "hash": "6347842158987113261"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/GraphQl/graphql.module.ts",
+          "hash": "6551188917269092179"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/base64-to-blob.ts",
+          "hash": "1751937605517381785"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Documents/document-details/document-details.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Documents/document-details/document-details.component.html",
+          "hash": "12571946976207006586"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Documents/document-details/document-details.component.spec.ts",
+          "hash": "12738613163200788589"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Documents/document-details/document-details.component.ts",
+          "hash": "11632213196858276956"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Documents/documents-list/documents-list.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Documents/documents-list/documents-list.component.html",
+          "hash": "15430521690525834576"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Documents/documents-list/documents-list.component.spec.ts",
+          "hash": "6377470530604192498"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Documents/documents-list/documents-list.component.ts",
+          "hash": "17909321723631023320"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/Edit/folder-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/Edit/folder-edit.component.html",
+          "hash": "7507404545906587644"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/Edit/folder-edit.component.spec.ts",
+          "hash": "627928146650164522"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/Edit/folder-edit.component.ts",
+          "hash": "2631235122774472666"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-cards/folder-cards.component.css",
+          "hash": "14078446311451368773"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-cards/folder-cards.component.html",
+          "hash": "12598458642425512881"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-cards/folder-cards.component.spec.ts",
+          "hash": "10643820257309698995"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-cards/folder-cards.component.ts",
+          "hash": "5836732654451832127"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-creation/folder-creation.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-creation/folder-creation.component.html",
+          "hash": "13083778556435676185"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-creation/folder-creation.component.spec.ts",
+          "hash": "16159580143917400128"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-creation/folder-creation.component.ts",
+          "hash": "9388289025465667633"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-details/folder-details.component.css",
+          "hash": "17659238785067352712"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-details/folder-details.component.html",
+          "hash": "18290589341724902619"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-details/folder-details.component.spec.ts",
+          "hash": "4865811598075024469"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-details/folder-details.component.ts",
+          "hash": "9727316029381720844"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component.css",
+          "hash": "7623427163705891192"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component.html",
+          "hash": "18385990493035843079"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component.spec.ts",
+          "hash": "14245972970435124799"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component.ts",
+          "hash": "1011921484583963797"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/index/folder-index.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/index/folder-index.component.html",
+          "hash": "7533560175429070474"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/index/folder-index.component.spec.ts",
+          "hash": "4729408540799230219"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/Folders/index/folder-index.component.ts",
+          "hash": "9633920003325362071"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-creation/document-creation.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-creation/document-creation.component.html",
+          "hash": "15249688588822812834"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-creation/document-creation.component.spec.ts",
+          "hash": "10974746918159619429"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-creation/document-creation.component.ts",
+          "hash": "3667738722223378508"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-edit/document-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-edit/document-edit.component.html",
+          "hash": "930532522277486404"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-edit/document-edit.component.spec.ts",
+          "hash": "3419946790219122451"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-edit/document-edit.component.ts",
+          "hash": "1335486777271276281"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-upload/document-upload.component.css",
+          "hash": "1237012292112944112"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-upload/document-upload.component.html",
+          "hash": "9840296750125719498"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-upload/document-upload.component.spec.ts",
+          "hash": "7097456877007260897"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/document-upload/document-upload.component.ts",
+          "hash": "46730494964781337"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/logs/logs.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/logs/logs.component.html",
+          "hash": "13240360337858170021"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/logs/logs.component.spec.ts",
+          "hash": "15429393330803490989"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/logs/logs.component.ts",
+          "hash": "4643179342510255249"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/FolderResolver/FolderResolver.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/FolderResolver/FolderResolver.component.html",
+          "hash": "9303426372995150060"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/FolderResolver/FolderResolver.component.spec.ts",
+          "hash": "14350693471991507526"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/FolderResolver/FolderResolver.component.ts",
+          "hash": "13471049729073468321"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component.html",
+          "hash": "5590095469679181840"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component.spec.ts",
+          "hash": "4004930158296224490"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component.ts",
+          "hash": "14448712302412395407"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/nav-links/nav-links.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/nav-links/nav-links.component.html",
+          "hash": "7012119036106939684"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/nav-links/nav-links.component.spec.ts",
+          "hash": "9191500717719266833"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/nav-links/nav-links.component.ts",
+          "hash": "13668139297346615098"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/navbar/navbar.component.css",
+          "hash": "13213090124537826914"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/navbar/navbar.component.html",
+          "hash": "11104903224776329037"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/navbar/navbar.component.spec.ts",
+          "hash": "11611426068913683136"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/components/navigation-components/navbar/navbar.component.ts",
+          "hash": "1340027235241200237"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/doc-management-module/doc-management-module.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/doc-management-module/doc-management-module.component.html",
+          "hash": "8630066514259875675"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/doc-management-module/doc-management-module.component.spec.ts",
+          "hash": "10388095099826811278"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/doc-management-module/doc-management-module.component.ts",
+          "hash": "12530446106022931256"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component.html",
+          "hash": "11085262438968789634"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component.spec.ts",
+          "hash": "4904764090822839393"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component.ts",
+          "hash": "2957795375353516981"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/document-routing-module.ts",
+          "hash": "8077001728185587882"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/models/BaseModel.ts",
+          "hash": "1784776351907321702"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/models/DocumentModel.ts",
+          "hash": "8473847202897628997"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/models/DocumentStatus.ts",
+          "hash": "12966509148830123352"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/models/DocumentType.ts",
+          "hash": "17185167978816127303"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/models/DocumentVersion.ts",
+          "hash": "16195613694120911794"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/models/Folder.ts",
+          "hash": "16098022073100487220"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/models/RootFolder.ts",
+          "hash": "15354166289549796147"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/models/SelectedFiles.ts",
+          "hash": "46916253225456567"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/BreadcumbService.ts",
+          "hash": "6453347931583032934"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/Document.service.ts",
+          "hash": "11448990798592568938"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/breadcrumbs.service.spec.ts",
+          "hash": "9990410354305422345"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/breadcrumbs.service.ts",
+          "hash": "16219369176183641427"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/download-files.service.spec.ts",
+          "hash": "113078496986255887"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/download-files.service.ts",
+          "hash": "7016523939927955240"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/folder.service.spec.ts",
+          "hash": "13568104151310832186"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/folder.service.ts",
+          "hash": "3503249325855878128"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/root-folder.service.spec.ts",
+          "hash": "7198977001815892306"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/root-folder.service.ts",
+          "hash": "11064961052696353774"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/safe.pipe.ts",
+          "hash": "6595368917032473202"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/upload-files.service.spec.ts",
+          "hash": "7475656893829989650"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/lib/services/upload-files.service.ts",
+          "hash": "2106789931338607180"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/src/test-setup.ts",
+          "hash": "12935735732682149507"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/tsconfig.json",
+          "hash": "15487755565970508470"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/tsconfig.lib.json",
+          "hash": "5796668385415907511"
+        },
+        {
+          "file": "src/front/myb.front/libs/doc-management-module/tsconfig.spec.json",
+          "hash": "2927375835638640771"
+        }
+      ],
+      "myb-front-e2e": [
+        {
+          "file": "src/front/myb.front/apps/myb.front-e2e/.eslintrc.json",
+          "hash": "10799368048025705622"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front-e2e/cypress.config.ts",
+          "hash": "6194239902129544872"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front-e2e/project.json",
+          "hash": "17063218086646861537"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front-e2e/src/e2e/app.cy.ts",
+          "hash": "2630785109389316018"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front-e2e/src/fixtures/example.json",
+          "hash": "13882982864087580737"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front-e2e/src/support/app.po.ts",
+          "hash": "5364106453863571025"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front-e2e/src/support/commands.ts",
+          "hash": "7570864621153670540"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front-e2e/src/support/e2e.ts",
+          "hash": "14369563060992369541"
+        },
+        {
+          "file": "src/front/myb.front/apps/myb.front-e2e/tsconfig.json",
+          "hash": "8511929940695645841"
+        }
+      ],
+      "shared-ui": [
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/.eslintrc.json",
+          "hash": "14281260702210394579"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/README.md",
+          "hash": "16598666316718665621"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/jest.config.ts",
+          "hash": "12578204109052841235"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/project.json",
+          "hash": "5888046759703718067"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/index.ts",
+          "hash": "2941155920008622865"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/Counter.ts",
+          "hash": "4561916300451796153"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/CounterService.ts",
+          "hash": "2299163632542145807"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/FeaturesSection.component.css",
+          "hash": "6926096983460032764"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/FeaturesSection.component.html",
+          "hash": "10486006490267132524"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/FeaturesSection.component.spec.ts",
+          "hash": "14575997543803129950"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/FeaturesSection.component.ts",
+          "hash": "6921229382736753088"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FooterSection/FooterSection.component.css",
+          "hash": "9459230749669611730"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FooterSection/FooterSection.component.html",
+          "hash": "907309269594912932"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FooterSection/FooterSection.component.spec.ts",
+          "hash": "15371407126813406058"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FooterSection/FooterSection.component.ts",
+          "hash": "12791543609658953461"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/FooterSection/footer-data.model.ts",
+          "hash": "13056540245182443977"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/HeroSection/HeroSection.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/HeroSection/HeroSection.component.html",
+          "hash": "16337648216932326304"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/HeroSection/HeroSection.component.spec.ts",
+          "hash": "7638794401344629867"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/HeroSection/HeroSection.component.ts",
+          "hash": "13456941953993246530"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/LandingPage.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/LandingPage.component.html",
+          "hash": "8309323304856351321"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/LandingPage.component.spec.ts",
+          "hash": "3107737837491078463"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/LandingPage.component.ts",
+          "hash": "7325069985142265718"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/NavBar/NavBar.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/NavBar/NavBar.component.html",
+          "hash": "6028496036779836338"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/NavBar/NavBar.component.spec.ts",
+          "hash": "14110314557534786977"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/NavBar/NavBar.component.ts",
+          "hash": "14906458502852144421"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/apps-section/apps-section.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/apps-section/apps-section.component.html",
+          "hash": "4842982336328115109"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/apps-section/apps-section.component.spec.ts",
+          "hash": "4928462309585936435"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/apps-section/apps-section.component.ts",
+          "hash": "17822433863323207062"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/overviewSection/overviewSection.component.css",
+          "hash": "8894484286378967897"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/overviewSection/overviewSection.component.html",
+          "hash": "14495549408914133027"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/overviewSection/overviewSection.component.spec.ts",
+          "hash": "293444642357790169"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/LandingPage/overviewSection/overviewSection.component.ts",
+          "hash": "15647803482622237415"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/avatar/avatar.component.css",
+          "hash": "9789597509668116566"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/avatar/avatar.component.html",
+          "hash": "2436549623953980272"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/avatar/avatar.component.spec.ts",
+          "hash": "8206493197797314504"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/avatar/avatar.component.ts",
+          "hash": "6913654401436192174"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/card/card.component.html",
+          "hash": "1720670167818160952"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/card/card.component.scss",
+          "hash": "3961562164225012636"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/card/card.component.spec.ts",
+          "hash": "10774891835369840542"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/card/card.component.ts",
+          "hash": "17174310020884961318"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component.css",
+          "hash": "7739925208983596324"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component.html",
+          "hash": "5113101830716776640"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component.spec.ts",
+          "hash": "438871800438153713"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component.ts",
+          "hash": "1904242418196785459"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/loader/loader.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/loader/loader.component.html",
+          "hash": "12219609459350649188"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/loader/loader.component.spec.ts",
+          "hash": "13912706479668678112"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/loader/loader.component.ts",
+          "hash": "149599657444939696"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/no-result/no-result.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/no-result/no-result.component.html",
+          "hash": "3564358669719648955"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/no-result/no-result.component.spec.ts",
+          "hash": "12764349752182342944"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/no-result/no-result.component.ts",
+          "hash": "3070974473792658496"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/progress-bar/progress-bar.component.css",
+          "hash": "7592621852715206942"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/progress-bar/progress-bar.component.html",
+          "hash": "17425206840866204421"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/progress-bar/progress-bar.component.spec.ts",
+          "hash": "8384260072188095963"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/progress-bar/progress-bar.component.ts",
+          "hash": "7347501678174182241"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/settings/settings.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/settings/settings.component.html",
+          "hash": "7846601598128661773"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/settings/settings.component.spec.ts",
+          "hash": "7131735937650661817"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/settings/settings.component.ts",
+          "hash": "14235142138867940173"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component.css",
+          "hash": "17104288259299660825"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component.html",
+          "hash": "17460791441196335058"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component.spec.ts",
+          "hash": "4424907427105193179"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component.ts",
+          "hash": "401365759063517481"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/user-dropdown/user-dropdown.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/user-dropdown/user-dropdown.component.html",
+          "hash": "16556550978720646942"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/user-dropdown/user-dropdown.component.spec.ts",
+          "hash": "12135665920515068908"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/user-dropdown/user-dropdown.component.ts",
+          "hash": "10040117054938574912"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/userCRUD.component.css",
+          "hash": "5633841967373600906"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/userCRUD.component.html",
+          "hash": "3178790095004566618"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/userCRUD.component.spec.ts",
+          "hash": "16790377262204986932"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/components/userCRUD.component.ts",
+          "hash": "17901778858083657385"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/graphql/mutations/project.graphql.ts",
+          "hash": "5185716934077758745"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/graphql/mutations/task.graphql.ts",
+          "hash": "5918831438036783429"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/graphql/queries/Document.graphql.ts",
+          "hash": "2012510274768108268"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/graphql/queries/project.graphql.ts",
+          "hash": "4426367622700470789"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/graphql/queries/task.graphql.ts",
+          "hash": "17187956630580722416"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/graphql/queries/timesheet.graphql.ts",
+          "hash": "15129290585699132579"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/graphql/type-config.ts",
+          "hash": "3642132366267548312"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/shared-ui/shared-ui.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/shared-ui/shared-ui.component.html",
+          "hash": "11616522187478015762"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/shared-ui/shared-ui.component.spec.ts",
+          "hash": "10704309122434490478"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/lib/shared-ui/shared-ui.component.ts",
+          "hash": "14915993962779915254"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/src/test-setup.ts",
+          "hash": "10765977267162271731"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/tsconfig.json",
+          "hash": "6922415355334431150"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/tsconfig.lib.json",
+          "hash": "5089222490394277493"
+        },
+        {
+          "file": "src/front/myb.front/libs/shared/shared-ui/tsconfig.spec.json",
+          "hash": "7652445452192956988"
+        }
+      ],
+      "client-e2e": [
+        {
+          "file": "src/front/myb.front/apps/client-e2e/.eslintrc.json",
+          "hash": "10799368048025705622"
+        },
+        {
+          "file": "src/front/myb.front/apps/client-e2e/cypress.config.ts",
+          "hash": "10689511355277973578"
+        },
+        {
+          "file": "src/front/myb.front/apps/client-e2e/project.json",
+          "hash": "10172239991676670402"
+        },
+        {
+          "file": "src/front/myb.front/apps/client-e2e/src/e2e/app.cy.ts",
+          "hash": "3227588115022036718"
+        },
+        {
+          "file": "src/front/myb.front/apps/client-e2e/src/fixtures/example.json",
+          "hash": "13882982864087580737"
+        },
+        {
+          "file": "src/front/myb.front/apps/client-e2e/src/support/app.po.ts",
+          "hash": "5364106453863571025"
+        },
+        {
+          "file": "src/front/myb.front/apps/client-e2e/src/support/commands.ts",
+          "hash": "7570864621153670540"
+        },
+        {
+          "file": "src/front/myb.front/apps/client-e2e/src/support/e2e.ts",
+          "hash": "14369563060992369541"
+        },
+        {
+          "file": "src/front/myb.front/apps/client-e2e/tsconfig.json",
+          "hash": "8511929940695645841"
+        }
+      ],
+      "admin-e2e": [
+        {
+          "file": "src/front/myb.front/apps/admin-e2e/.eslintrc.json",
+          "hash": "10799368048025705622"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin-e2e/cypress.config.ts",
+          "hash": "10520072026718012310"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin-e2e/project.json",
+          "hash": "5387752297569991192"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin-e2e/src/e2e/app.cy.ts",
+          "hash": "14271670090400935709"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin-e2e/src/fixtures/example.json",
+          "hash": "13882982864087580737"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin-e2e/src/support/app.po.ts",
+          "hash": "5364106453863571025"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin-e2e/src/support/commands.ts",
+          "hash": "7570864621153670540"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin-e2e/src/support/e2e.ts",
+          "hash": "14369563060992369541"
+        },
+        {
+          "file": "src/front/myb.front/apps/admin-e2e/tsconfig.json",
+          "hash": "8511929940695645841"
+        }
+      ],
+      "auth": [
+        {
+          "file": "src/front/myb.front/libs/auth/.eslintrc.json",
+          "hash": "16402751898759826414"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/README.md",
+          "hash": "12731602805966891383"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/jest.config.ts",
+          "hash": "6305202038595087094"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/package.json",
+          "hash": "14157780597021363872",
+          "deps": [
+            "npm:tslib"
+          ]
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/project.json",
+          "hash": "17592498006765961017"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/index.ts",
+          "hash": "4870893079870373866"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/auth.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/auth.component.html",
+          "hash": "13518466470038221810"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/auth.component.spec.ts",
+          "hash": "13579713027818042702"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/auth.component.ts",
+          "hash": "13193793539765227304"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/auth.guard.spec.ts",
+          "hash": "8826885499913990525"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/auth.guard.ts",
+          "hash": "4639062521810455332"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/auth.spec.ts",
+          "hash": "3212103323745325124"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/auth.ts",
+          "hash": "5649183672770272400"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/keycloak.config.ts",
+          "hash": "3790770742992420291"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/keycloak.initializer.ts",
+          "hash": "10409168834202301888"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/keycloak.service.spec.ts",
+          "hash": "6054758839603934104"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/src/lib/keycloak.service.ts",
+          "hash": "2074022259763461037"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/tsconfig.json",
+          "hash": "10294729341131714718"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/tsconfig.lib.json",
+          "hash": "17512648156706774563"
+        },
+        {
+          "file": "src/front/myb.front/libs/auth/tsconfig.spec.json",
+          "hash": "11194536110028348959"
+        }
+      ]
+    },
+    "nonProjectFiles": [
+      {
+        "file": ".dockerignore",
+        "hash": "15515784216164294350"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "1985032913826430843"
+      },
+      {
+        "file": ".gitlab-ci-build.yml",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": ".gitlab-ci-deploy.yml",
+        "hash": "18164486227812464591"
+      },
+      {
+        "file": ".gitlab-ci-pr.yml",
+        "hash": "7854490432917861692"
+      },
+      {
+        "file": ".gitlab-ci.yml",
+        "hash": "13462674233021324896"
+      },
+      {
+        "file": ".gitpod.yml",
+        "hash": "348354032395661785"
+      },
+      {
+        "file": "CONTRIBUTING.md",
+        "hash": "10184838484141251476"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "13627009382773712226"
+      },
+      {
+        "file": "Myb.sln",
+        "hash": "1906446922406765668"
+      },
+      {
+        "file": "README.md",
+        "hash": "5357876475756073800"
+      },
+      {
+        "file": "css/app.component.min.css",
+        "hash": "7941132426569944498"
+      },
+      {
+        "file": "css/app.component.min.css.map",
+        "hash": "8669147283273452386"
+      },
+      {
+        "file": "css/project-card.component.min.css",
+        "hash": "6813060304475369458"
+      },
+      {
+        "file": "css/project-card.component.min.css.map",
+        "hash": "17804721600171713968"
+      },
+      {
+        "file": "css/styles.min.css",
+        "hash": "10525097028275269259"
+      },
+      {
+        "file": "css/styles.min.css.map",
+        "hash": "10912890990254475176"
+      },
+      {
+        "file": "css/task-list.component.min.css",
+        "hash": "11876906461328117221"
+      },
+      {
+        "file": "css/task-list.component.min.css.map",
+        "hash": "6374990453650329910"
+      },
+      {
+        "file": "docker-compose.dcproj",
+        "hash": "11806114061967990031"
+      },
+      {
+        "file": "docker-compose.yml",
+        "hash": "1305031993332615334"
+      },
+      {
+        "file": "launchSettings.json",
+        "hash": "15347550725965177021"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "12899780495902976898"
+      },
+      {
+        "file": "package.json",
+        "hash": "9286083267010681289"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Consts/CommonKeycloakConsts.cs",
+        "hash": "4685901006462360436"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Consts/KeycloakAccessTokenConsts.cs",
+        "hash": "13753867648974318503"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Dtos/KeycloakTokenRequestDto.cs",
+        "hash": "9392721892936102621"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Dtos/KeycloakTokenResponseDto.cs",
+        "hash": "15414307133350108313"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Dtos/KeycloakUserDto.cs",
+        "hash": "10273653373624928700"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Exceptions/KeycloakException.cs",
+        "hash": "14412962443111596021"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Extensions/ObjectExtensions.cs",
+        "hash": "2092897398890066585"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Extensions/ServiceCollectionExtensions.cs",
+        "hash": "8380929973952262137"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Interfaces/IKeycloakTokenService.cs",
+        "hash": "2172236370902728916"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/KeycloakTokenUtils.cs",
+        "hash": "3124973874478218039"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj",
+        "hash": "2310142706451911748"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Services/KeycloakTokenService.cs",
+        "hash": "14038648192810053648"
+      },
+      {
+        "file": "src/common/Myb.Common.Authentification/Settings/KeycloakSettings.cs",
+        "hash": "1996197288212965653"
+      },
+      {
+        "file": "src/common/Myb.Common.GraphQL.Infra/GraphQlRegistration.cs",
+        "hash": "11714996926451231500"
+      },
+      {
+        "file": "src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj",
+        "hash": "15659409677164698722"
+      },
+      {
+        "file": "src/common/Myb.Common.Models/BaseEntity.cs",
+        "hash": "13145834616995894191"
+      },
+      {
+        "file": "src/common/Myb.Common.Models/IEntity.cs",
+        "hash": "7418504928100385458"
+      },
+      {
+        "file": "src/common/Myb.Common.Models/Myb.Common.Models.csproj",
+        "hash": "8280470538316900542"
+      },
+      {
+        "file": "src/common/Myb.Common.Models/QueryResult.cs",
+        "hash": "7605366100445763990"
+      },
+      {
+        "file": "src/common/Myb.Common.Repositories/GenericRepository.cs",
+        "hash": "15024214174255756345"
+      },
+      {
+        "file": "src/common/Myb.Common.Repositories/IGenericRepository.cs",
+        "hash": "18099367892924803381"
+      },
+      {
+        "file": "src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj",
+        "hash": "934164661628366822"
+      },
+      {
+        "file": "src/common/Myb.Common.Utils/Extensions/ObjectExtensions.cs",
+        "hash": "15796449394071878644"
+      },
+      {
+        "file": "src/common/Myb.Common.Utils/Myb.Common.Utils.csproj",
+        "hash": "14950051393726500125"
+      },
+      {
+        "file": "src/common/Myb.common.IdentityProvider/Class1.cs",
+        "hash": "11819662002467868922"
+      },
+      {
+        "file": "src/common/Myb.common.IdentityProvider/Myb.common.IdentityProvider.csproj",
+        "hash": "11495766956460635363"
+      },
+      {
+        "file": "src/front/myb.front/.editorconfig",
+        "hash": "11532813898455409296"
+      },
+      {
+        "file": "src/front/myb.front/.eslintignore",
+        "hash": "13404745306227114823"
+      },
+      {
+        "file": "src/front/myb.front/.eslintrc.json",
+        "hash": "4566917484430375526"
+      },
+      {
+        "file": "src/front/myb.front/.gitignore",
+        "hash": "11966908335120871298"
+      },
+      {
+        "file": "src/front/myb.front/.prettierignore",
+        "hash": "135344717789917661"
+      },
+      {
+        "file": "src/front/myb.front/.prettierrc",
+        "hash": "6820402234827505055"
+      },
+      {
+        "file": "src/front/myb.front/Dockerfile",
+        "hash": "10571600817315195544"
+      },
+      {
+        "file": "src/front/myb.front/README.md",
+        "hash": "1450619212539421605"
+      },
+      {
+        "file": "src/front/myb.front/jest.config.ts",
+        "hash": "3407785570333453138"
+      },
+      {
+        "file": "src/front/myb.front/jest.preset.js",
+        "hash": "7473220183190921152"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/graphql/graphql.module.ts",
+        "hash": "15989986901192150861"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/graphql/type-config.ts",
+        "hash": "83191080491039330"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/models/base.model.ts",
+        "hash": "10546238439128057372"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/models/todo.model.ts",
+        "hash": "15234643742444129866"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/models/user.model.ts",
+        "hash": "14065370853448958229"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/repositories/repository.interface.ts",
+        "hash": "2674299039119251088"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/date-utils.service.ts",
+        "hash": "13227058632706326318"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/functions-utils.service.ts",
+        "hash": "8820541565235681472"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/general-settings.service.ts",
+        "hash": "16823669429341133716"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/holiday.service.ts",
+        "hash": "2726505250989324577"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/language.service.ts",
+        "hash": "13091581216662211160"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/ocr.service.spec.ts",
+        "hash": "967454236995578758"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/ocr.service.ts",
+        "hash": "2213137645936145341"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/repository.service.spec.ts",
+        "hash": "11458476478077401305"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/repository.service.ts",
+        "hash": "3703390366091824703"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/toast.service.ts",
+        "hash": "5109598802744382911"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/todo.service.spec.ts",
+        "hash": "3022825463201700698"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/todo.service.ts",
+        "hash": "16453149543655568858"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/user.service.spec.ts",
+        "hash": "4722085246195160559"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/services/user.service.ts",
+        "hash": "7128311162507326443"
+      },
+      {
+        "file": "src/front/myb.front/libs/shared/infra/tokens/apolloToken.ts",
+        "hash": "11716684886190685053"
+      },
+      {
+        "file": "src/front/myb.front/nx.json",
+        "hash": "11311421328157808813"
+      },
+      {
+        "file": "src/front/myb.front/package-lock.json",
+        "hash": "1128148724551493725"
+      },
+      {
+        "file": "src/front/myb.front/package.json",
+        "hash": "9647008404235701391"
+      },
+      {
+        "file": "src/front/myb.front/tsconfig.base.json",
+        "hash": "13554048971396915811"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.EntityFrameWork.Infra/Class1.cs",
+        "hash": "352421286373673565"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.EntityFrameWork.Infra/DocumentContext.cs",
+        "hash": "1513234374892106144"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.EntityFrameWork.Infra/Migrations/20240621171514_NEWWMigration.Designer.cs",
+        "hash": "10421266164113329907"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.EntityFrameWork.Infra/Migrations/20240621171514_NEWWMigration.cs",
+        "hash": "4334348828792413458"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.EntityFrameWork.Infra/Migrations/20240722153308_rootfolder.Designer.cs",
+        "hash": "14009218465538339468"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.EntityFrameWork.Infra/Migrations/20240722153308_rootfolder.cs",
+        "hash": "18005670221163815857"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.EntityFrameWork.Infra/Migrations/DocumentContextModelSnapshot.cs",
+        "hash": "678178691279706158"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.EntityFrameWork.Infra/Myb.Document.EntityFrameWork.Infra.csproj",
+        "hash": "4701433020864603314"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Infra/Extensions/Config.cs",
+        "hash": "15644821633620779701"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Infra/GraqhQl/Mutations/DocumentMutation.cs",
+        "hash": "2316140597734873343"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Infra/GraqhQl/Queries/DocumentQuery.cs",
+        "hash": "711813600417343282"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Infra/Myb.Document.Infra.csproj",
+        "hash": "3253135482415211383"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/DocumentService.cs",
+        "hash": "2073138099415943839"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/DocumentUploadService.cs",
+        "hash": "297355354448749224"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/DocumentVersionService.cs",
+        "hash": "12377307167254346028"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/FolderService.cs",
+        "hash": "3905657181825622949"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/IDocumentService.cs",
+        "hash": "8521632964595800085"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/IDocumentVersionService.cs",
+        "hash": "3562949770007485206"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/IFolderService.cs",
+        "hash": "1208683582887158941"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/IRootFolderService.cs",
+        "hash": "7290791282130176519"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/Myb.Document.Services.csproj",
+        "hash": "11403050514362104577"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document.Services/RootFolderService.cs",
+        "hash": "7604286938711764580"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document/Dockerfile",
+        "hash": "1642858908577849048"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document/Myb.Document.csproj",
+        "hash": "9604541568685390031"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document/Myb.Document.http",
+        "hash": "15586854315905821819"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document/Program.cs",
+        "hash": "2923481143301312205"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document/Properties/launchSettings.json",
+        "hash": "3944839577704493238"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document/appsettings.Development.json",
+        "hash": "3339958947771738801"
+      },
+      {
+        "file": "src/services/document-management/Myb.Document/appsettings.json",
+        "hash": "13356155000611749861"
+      },
+      {
+        "file": "src/services/document-management/Myb.document.Model/Document.cs",
+        "hash": "16044137134783774498"
+      },
+      {
+        "file": "src/services/document-management/Myb.document.Model/DocumentModel.cs",
+        "hash": "2637024958015003350"
+      },
+      {
+        "file": "src/services/document-management/Myb.document.Model/DocumentStatus.cs",
+        "hash": "3899603979497969967"
+      },
+      {
+        "file": "src/services/document-management/Myb.document.Model/DocumentType.cs",
+        "hash": "16318284593282656103"
+      },
+      {
+        "file": "src/services/document-management/Myb.document.Model/DocumentVersion.cs",
+        "hash": "11158263831847622061"
+      },
+      {
+        "file": "src/services/document-management/Myb.document.Model/Folder.cs",
+        "hash": "7491141088328336296"
+      },
+      {
+        "file": "src/services/document-management/Myb.document.Model/Myb.document.Model.csproj",
+        "hash": "6160274282229506956"
+      },
+      {
+        "file": "src/services/document-management/Myb.document.Model/RootFolder.cs",
+        "hash": "7695424072212486638"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Client/Class1.cs",
+        "hash": "10951440858707685515"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Client/Myb.Invoice.Client.csproj",
+        "hash": "15617506615634057937"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.EntityFrameWork.Infra/InvoiceContext.cs",
+        "hash": "4585313193348600738"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.EntityFrameWork.Infra/Migrations/20240715080128_InitialCreate.Designer.cs",
+        "hash": "16886283119327238565"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.EntityFrameWork.Infra/Migrations/20240715080128_InitialCreate.cs",
+        "hash": "1926947144323044703"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.EntityFrameWork.Infra/Migrations/20240715085429_SecondCreate.Designer.cs",
+        "hash": "13375880061512721443"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.EntityFrameWork.Infra/Migrations/20240715085429_SecondCreate.cs",
+        "hash": "15551492830832774223"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.EntityFrameWork.Infra/Migrations/InvoiceContextModelSnapshot.cs",
+        "hash": "5075777415291328219"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.EntityFrameWork.Infra/Myb.Invoice.EntityFrameWork.Infra.csproj",
+        "hash": "16100396413848636975"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Infra/Extensions/Config.cs",
+        "hash": "3290328827943098082"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Infra/GraphQl/Mutations/InvoiceMutations.cs",
+        "hash": "11315889134156226736"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Infra/GraphQl/Querys/InvoiceQuery.cs",
+        "hash": "8489863363102135685"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Infra/Myb.Invoice.Infra.csproj",
+        "hash": "10160453421979577225"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/Client.cs",
+        "hash": "16507156973449096371"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/ClientType.cs",
+        "hash": "4199288166761206791"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/Contact.cs",
+        "hash": "3935474945708252379"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/ContactType.cs",
+        "hash": "4235782745259462590"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/InvoiceDetails.cs",
+        "hash": "2738169622900576528"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/InvoiceModel.cs",
+        "hash": "10755351403647980552"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/Myb.Invoice.Models.csproj",
+        "hash": "14565981645069326568"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/Product.cs",
+        "hash": "12190286629471590250"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/ProductType.cs",
+        "hash": "12875826291417177683"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Models/Tax.cs",
+        "hash": "858374942789576510"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/ClientService.cs",
+        "hash": "7115887375164712394"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/ContactService.cs",
+        "hash": "140419191476764790"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/IClientService.cs",
+        "hash": "7252561476109008506"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/IContactService.cs",
+        "hash": "12386698670301512067"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/IInvoiceDetailsService.cs",
+        "hash": "15972898316911315523"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/IInvoiceService.cs",
+        "hash": "7457927483302931151"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/IProductService.cs",
+        "hash": "13684214262587824799"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/ITaxService.cs",
+        "hash": "1160136209123961885"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/InvoiceDetailsService.cs",
+        "hash": "14867949601948095236"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/InvoiceService.cs",
+        "hash": "12461487680345096192"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/Myb.Invoice.Services.csproj",
+        "hash": "10411968384009398722"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/ProductService.cs",
+        "hash": "15326330179678716261"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice.Services/TaxService.cs",
+        "hash": "1509251230187197116"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice/Dockerfile",
+        "hash": "3840566582263618193"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice/Myb.Invoice.csproj",
+        "hash": "8481159716593615965"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice/Myb.Invoice.http",
+        "hash": "14588647863382324151"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice/Program.cs",
+        "hash": "17777795176468720755"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice/Properties/launchSettings.json",
+        "hash": "2085956456923272872"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice/appsettings.Development.json",
+        "hash": "3339958947771738801"
+      },
+      {
+        "file": "src/services/invoice-management/Myb.Invoice/appsettings.json",
+        "hash": "3944260133658126456"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/Migrations/20240625101400_addQuantityAndTimeUnitToTimesheet.Designer.cs",
+        "hash": "9822231591586580321"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/Migrations/20240625101400_addQuantityAndTimeUnitToTimesheet.cs",
+        "hash": "6483282856849958153"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/Migrations/20240702230631_addApprovaStatus.Designer.cs",
+        "hash": "6044202376817862050"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/Migrations/20240702230631_addApprovaStatus.cs",
+        "hash": "10830213524901493100"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/Migrations/TimesheetContextModelSnapshot.cs",
+        "hash": "11634681418651841978"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/Myb.Timesheet.EntityFrameWork.Infra.csproj",
+        "hash": "16660863648758570941"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/TimesheetContext.cs",
+        "hash": "4021656028139565168"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Infra/Extensions/Config.cs",
+        "hash": "18280777310727085944"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Infra/GraphQl/Mutations/TimesheetMutation.cs",
+        "hash": "13828521112258127122"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Infra/GraphQl/Querys/TimesheetQuery.cs",
+        "hash": "14223872028703975722"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Infra/Myb.Timesheet.Infra.csproj",
+        "hash": "4773383065500729248"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Infra/TimesheetResorver.cs",
+        "hash": "15688117665544478852"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/ApprovalStatus.cs",
+        "hash": "10978507838178403468"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/Employee.cs",
+        "hash": "18199705604516417520"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/Manager.cs",
+        "hash": "13811612398274792389"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/Myb.Timesheet.Models.csproj",
+        "hash": "1623116287925996456"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/Project.cs",
+        "hash": "15557011494429437715"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/ProjectStatus.cs",
+        "hash": "16227360717195371922"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/Status.cs",
+        "hash": "8228795407030066994"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/TimeEntry.cs",
+        "hash": "10583289501738340113"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/TimeOff.cs",
+        "hash": "549643620249820487"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/TimeOffType.cs",
+        "hash": "8330385392009150249"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/TimeSheet.cs",
+        "hash": "10300901756945208258"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/TimeUnit.cs",
+        "hash": "4273267141218810974"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Models/TimesheetTask.cs",
+        "hash": "4259967399212931276"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/EmployeeService.cs",
+        "hash": "17440765594759256429"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/IEmployeeService.cs",
+        "hash": "12164663604094843634"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/IProjectService.cs",
+        "hash": "10226234720102301008"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/ITaskService.cs",
+        "hash": "9282324835762628967"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/ITimeoffService.cs",
+        "hash": "16640625473841808547"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/ITimesheetService.cs",
+        "hash": "12477481012479960908"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/Myb.Timesheet.Services.csproj",
+        "hash": "16931075911936100804"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/ProjectService.cs",
+        "hash": "16697813784304182989"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/TaskService.cs",
+        "hash": "4989951809162557389"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/TimeoffService.cs",
+        "hash": "5683009686155392819"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet.Services/TimesheetService.cs",
+        "hash": "2027517056965570941"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet/Dockerfile",
+        "hash": "13827027084817497187"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet/Myb.Timesheet.csproj",
+        "hash": "11274162529337185412"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet/Myb.Timesheet.http",
+        "hash": "6319997533557353162"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet/Program.cs",
+        "hash": "12786249209189916556"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet/Properties/launchSettings.json",
+        "hash": "10266447746702899714"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet/appsettings.Development.json",
+        "hash": "3339958947771738801"
+      },
+      {
+        "file": "src/services/time-sheet/Myb.Timesheet/appsettings.json",
+        "hash": "9217012142634875822"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Client/GraphQlHttpClient.cs",
+        "hash": "14030205392742557082"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Client/IGraphQlHttpClient.cs",
+        "hash": "14932958000998228380"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Client/Myb.UserManager.Client.csproj",
+        "hash": "8280470538316900542"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Controllers/Program.cs",
+        "hash": "18013001224986476336"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Controllers/UserController.cs",
+        "hash": "5393524727502025323"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Data/Class1.cs",
+        "hash": "16931485955298881675"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Data/Myb.UserManager.Data.csproj",
+        "hash": "1292097677138460379"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.EntityFrameWork.Infra/Myb.UserManager.EntityFrameWork.Infra.csproj",
+        "hash": "1116254609573696888"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.EntityFrameWork.Infra/UserContext.cs",
+        "hash": "6138444884937557924"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Infra/Extensions/Config.cs",
+        "hash": "12428510390810690392"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Infra/GraphQl/Mutations/UserMutation.cs",
+        "hash": "12166467511938089650"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Infra/GraphQl/Querys/UserQuery.cs",
+        "hash": "15630790557506307253"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Infra/Myb.UserManager.Infra.csproj",
+        "hash": "9269653439333208634"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Models/Myb.UserManager.Models.csproj",
+        "hash": "16399895351724610672"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Models/User.cs",
+        "hash": "17978805076483019557"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Models/UserPermission.cs",
+        "hash": "4147039874110019236"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Models/UserRole.cs",
+        "hash": "6028583501752918785"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Sevices/IUserService.cs",
+        "hash": "13909491103301074840"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Sevices/Myb.UserManager.Sevices.csproj",
+        "hash": "18082877231329587834"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager.Sevices/UserService.cs",
+        "hash": "1089899071915457587"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager/Dockerfile",
+        "hash": "6429317431706499232"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager/Myb.UserManager.csproj",
+        "hash": "15101171954768683655"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager/Myb.UserManager.http",
+        "hash": "8057225238592079217"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager/Program.cs",
+        "hash": "13546080183047368776"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager/Properties/launchSettings.json",
+        "hash": "12290905167845033212"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager/appsettings.Development.json",
+        "hash": "3339958947771738801"
+      },
+      {
+        "file": "src/services/user-manager/Myb.UserManager/appsettings.json",
+        "hash": "1042852123853176361"
+      },
+      {
+        "file": "src/tests/end-2-end-tests/Myb.UserManager.E2e.Tests/GlobalUsings.cs",
+        "hash": "9391246863829943078"
+      },
+      {
+        "file": "src/tests/end-2-end-tests/Myb.UserManager.E2e.Tests/Myb.UserManager.E2e.Tests.csproj",
+        "hash": "1361856756957564713"
+      },
+      {
+        "file": "src/tests/end-2-end-tests/Myb.UserManager.E2e.Tests/UnitTest1.cs",
+        "hash": "18111163982426910379"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Data.Tests/GlobalUsings.cs",
+        "hash": "9391246863829943078"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Data.Tests/Myb.UserManager.Data.Tests.csproj",
+        "hash": "1361856756957564713"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Data.Tests/UnitTest1.cs",
+        "hash": "1607663901612053908"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Infra.Tests/GlobalUsings.cs",
+        "hash": "9391246863829943078"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Infra.Tests/Myb.UserManager.Infra.Tests.csproj",
+        "hash": "1361856756957564713"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Infra.Tests/UnitTest1.cs",
+        "hash": "13201326393624717882"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Models.Tests/GlobalUsings.cs",
+        "hash": "9391246863829943078"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Models.Tests/Myb.UserManager.Models.Tests.csproj",
+        "hash": "1361856756957564713"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Models.Tests/UnitTest1.cs",
+        "hash": "15310771580790645039"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Sevices.Tests/GlobalUsings.cs",
+        "hash": "9391246863829943078"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Sevices.Tests/Myb.UserManager.Sevices.Tests.csproj",
+        "hash": "1361856756957564713"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Sevices.Tests/UnitTest1.cs",
+        "hash": "1248853421452722632"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Tests/GlobalUsings.cs",
+        "hash": "9391246863829943078"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Tests/Myb.UserManager.Tests.csproj",
+        "hash": "1361856756957564713"
+      },
+      {
+        "file": "src/tests/unit-tests/user-manager/Myb.UserManager.Tests/UnitTest1.cs",
+        "hash": "5902766821971288936"
+      }
+    ]
+  }
+}

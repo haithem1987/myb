@@ -9,9 +9,9 @@ import { Router } from '@angular/router';
  
 // Define your microservices' endpoints
 const microserviceLinks = {
-  service1: 'http://localhost:5059/graphql',
+  service1: 'http://localhost:5117/graphql',
   service2: 'http://localhost:5117/graphql',
-  service3: 'http://localhost:5145/graphql',
+  service3: 'http://localhost:5117/graphql',
 };
  
 // Error handling link

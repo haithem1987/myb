@@ -6,6 +6,7 @@ import { HeroSectionComponent } from './HeroSection/HeroSection.component';
 import { FeaturesSectionComponent } from './FeaturesSection/FeaturesSection.component';
 import { FooterSectionComponent } from './FooterSection/FooterSection.component';
 import { ContactInfo, FooterSection } from './FooterSection/footer-data.model';
+import { OverviewSectionComponent } from "./overviewSection/overviewSection.component";
 
 @Component({
   selector: 'myb-front-landing-page',
@@ -17,25 +18,32 @@ import { ContactInfo, FooterSection } from './FooterSection/footer-data.model';
     HeroSectionComponent,
     FeaturesSectionComponent,
     FooterSectionComponent,
-  ],
+    OverviewSectionComponent
+],
   templateUrl: './LandingPage.component.html',
   styleUrl: './LandingPage.component.css',
 })
 export class LandingPageComponent {
   contactInfo: ContactInfo = {
     location: 'Beijing, China',
-    email: 'mohamed@gmail.com',
+    email: 'Forlink@gmail.com',
     phone: '+216 22 222 222',
   };
 
   aboutSection: FooterSection = {
     title: 'About',
-    content: 'some text some text some text some text some text',
+    content: 'some text some text ',
+    module2: '',
+    module3: '',
   };
 
   servicesSection: FooterSection = {
     title: 'Services',
-    content: 'some text some text some text some text some text',
+    content: ' Invoice ',
+    module2: 'TimeSheet',
+    module3:'Documents'
+
+    
   };
 
   copyRightText: string = '© M.Y.B 2024, all rights reserved';

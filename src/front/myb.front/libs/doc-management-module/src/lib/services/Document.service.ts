@@ -1,7 +1,5 @@
-import { LoaderComponent } from 'libs/shared/shared-ui/src';
-import { FolderService } from './folder.service';
-import { DocumentVersion } from './../models/DocumentVersion';
-import { inject, Injectable } from '@angular/core';
+
+import { Injectable } from '@angular/core';
 
 import { DocumentModel } from '../models/DocumentModel'; 
 import { Apollo, gql } from 'apollo-angular';
@@ -47,18 +45,7 @@ protected override mapUpdateItem(result: any): DocumentModel {
 protected override mapDeleteResult(result: any): boolean {
   return result.data?.deleteDocument === true;
 }
-//get all doc 
-// override getAll(): Observable<DocumentModel[]> {
-//     return this.apollo
-//         .watchQuery<{ allDocuments: DocumentModel[] }>({
-//             query: gql`
-//                 ${this.typeOperations.getAll}
-//             `,
-//         })
-//         .valueChanges.pipe(
-//             map((result: any) => result.data) 
-//         );
-// }
+
 override getAll(): Observable<DocumentModel[]> {
   return super.getAll().pipe(
     map((documents) => {
@@ -84,50 +71,6 @@ override delete(id: number): Observable<boolean> {
 }
 
 
-//update document
-// override update(id: number, document: DocumentModel): Observable<DocumentModel> {
-//   return this.apollo
-//     .mutate({
-//       mutation: gql`
-//         ${this.typeOperations.update}
-//       `,
-//       variables: {
-//         id,
-//         item: document,
-//       },
-//     })
-//     .pipe(
-//       map((result: any) => result.data.updateDocument, console.log(document.id)),
-     
-//       catchError((error) => {
-//         console.error('Error updating document:', error);
-//         return throwError(error);
-//       })
-//     );
-// }
-
-
-
-// getDocumentsByFolderId(folderId: number): Observable<DocumentModel[]> {
-//   return this.apollo.watchQuery<{ documentsByFolderId: DocumentModel[] }>({
-//     query: gql`
-//     ${this.typeOperations.documentsByFolderId}
-//   `,
-//     variables: {
-//       folderId,
-//     },
-//   })
-//   .valueChanges.pipe(
-//     // map((result: any) => result.data.documentsByFolderId)
-//     map((result: any) => {
-//       const documents = result.data.documentsByFolderId;
-//       this.documentSubject.next(documents);
-//       console.log('doc service',documents)
-
-//       return documents;
-//     })
-//   );
-// }
 
 createDocument(document: DocumentModel): Observable<DocumentModel> {
   return this.apollo
@@ -148,6 +91,9 @@ createDocument(document: DocumentModel): Observable<DocumentModel> {
     );
 }
 
+updateDocumentList(documents: DocumentModel[]): void {
+  this.documentSubject.next(documents);
+}
 
 updateDocument(document: DocumentModel): Observable<DocumentModel> {
   return this.apollo

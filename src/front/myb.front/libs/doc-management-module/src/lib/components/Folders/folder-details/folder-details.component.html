@@ -58,7 +58,7 @@
             </th>
             <th scope="col">Creation Date</th>
             <th scope="col">Update Date</th>
-            <!-- <th scope="col">created by</th> -->
+            <th scope="col">created by</th>
 
             <!-- <th scope="col">createdBy</th> -->
             <th scope="col" class="text-end">Actions</th>
@@ -76,12 +76,12 @@
               <td></td>
               <td>{{ folder.createdAt | date }}</td>
               <td>{{ folder.updatedAt | date }}</td>
-              <!-- <td>{{ folder.createdBy }}</td> -->
+              <td>{{ folder.createdBy }}</td>
               <td class="text-end">
                 <div class="d-flex justify-content-end align-items-center">
-                  <div ngbDropdown>
+                  <div ngbDropdown container="body" >
                     <i class="bi bi-three-dots-vertical" style="font-size: 30px; color: green;" ngbDropdownToggle></i>
-                    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                    <div ngbDropdownMenu  aria-labelledby="dropdownBasic1">
                       <button ngbDropdownItem (click)="openEditFolder(folder)"> 
                         <i class="bi bi-pencil-square"></i> Edit
                       </button>
@@ -104,10 +104,10 @@
             
             <td>
               <ng-container [ngSwitch]="document.documentType">
-                <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf-fill me-2" style="font-size: 25px;"></i>
-                <i *ngSwitchCase="'WORD'" class="bi bi-file-earmark-word me-2" style="font-size: 25px;"></i>
-                <i *ngSwitchCase="'EXCEL'" class="bi bi-filetype-xls me-2" style="font-size: 25px;"></i>
-                <i *ngSwitchCase="'IMAGE'" class="bi bi-file-image me-2" style="font-size: 25px;"></i>
+                <i *ngSwitchCase="'PDF'" class="bi bi-file-earmark-pdf me-2" style="font-size: 25px; color: red;"></i>
+                <i *ngSwitchCase="'WORD'" class="bi bi-file-earmark-word me-2" style="font-size: 25px;color: blue;"></i>
+                <i *ngSwitchCase="'EXCEL'" class="bi bi-filetype-xls me-2" style="font-size: 25px;color:green"></i>
+                <i *ngSwitchCase="'IMAGE'" class="bi bi-file-image me-2" style="font-size: 25px;color:rgb(145, 201, 254)"></i>
               </ng-container>
               {{ document.documentName }}
             </td>
@@ -115,10 +115,10 @@
             <td>{{ document.documentSize }} bytes</td>
             <td>{{ document.createdAt | date }}</td>
             <td>{{ document.updatedAt | date }}</td>
-            <!-- <td>{{ document.createdBy }}</td> -->
+            <td>{{ document.createdBy }}</td>
             <td class="text-end">
               <div class="d-flex justify-content-end align-items-center">
-                <div ngbDropdown>
+                <div ngbDropdown container="body" >
                   <i class="bi bi-three-dots-vertical" style="font-size: 30px; color: green;" ngbDropdownToggle></i>
                   <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
                     <button ngbDropdownItem>

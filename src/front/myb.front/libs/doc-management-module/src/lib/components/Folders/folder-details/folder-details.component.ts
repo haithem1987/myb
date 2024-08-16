@@ -6,12 +6,14 @@ import {
   Input,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DocumentModel } from '../../../models/DocumentModel';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DocumentService } from '../../../services/Document.service';
 import { NavbarComponent } from '../../navigation-components/navbar/navbar.component';
+import { DocumentStatus } from '../../../models/DocumentStatus';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentUploadComponent } from '../../document-upload/document-upload.component';
 import { DocumentEditComponent } from '../../document-edit/document-edit.component';
@@ -26,6 +28,7 @@ import { RootFolder } from '../../../models/RootFolder';
 import { FolderEditComponent } from '../Edit/folder-edit.component';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { KeycloakProfile } from 'keycloak-js';
+import { DownloadFilesService } from '../../../services/download-files.service';
 
 @Component({
   selector: 'myb-front-folder-details',
@@ -66,14 +69,13 @@ export class FolderDetailsComponent implements OnInit {
   @Output() folderPinned = new EventEmitter<Folder>();
 
   constructor(
-    private route: ActivatedRoute,
     private folderService: FolderService,
     private documentService: DocumentService,
     private modalService: NgbModal,
     private toastService: ToastService,
-    private router: Router,
     private RootFolderService: RootFolderService,
-    private keycloakService: KeycloakService
+    private keycloakService: KeycloakService,
+    private downloadService: DownloadFilesService
   ) {
     this.user$ = this.keycloakService.profile$;
 
@@ -182,7 +184,15 @@ export class FolderDetailsComponent implements OnInit {
     });
   }
 
- 
+  // openFolder(folderId: number): void {
+  //   this.fId = folderId;
+  //   this.loadFolderDetails();
+  //   // this.loadFoldersByParentId(this.fId);
+  //   console.log('openflder', folderId, this.fId);
+  //   console.log('this.documents$', this.documents$);
+
+  //   console.log('fid', this.fId, 'folderId', folderId);
+  // }
 
   goBackToPreviousFolder(): void {
     if (this.fId !== this.rootId) {
@@ -275,105 +285,123 @@ export class FolderDetailsComponent implements OnInit {
   
 
 
- 
+
+
   downloadDocument(document: DocumentModel): void {
-    console.log('Attempting to download document:', document);
-
-    const { file, documentName } = document;
-    console.log('Document file:', file);
-    console.log('Document name:', documentName);
-
-    if (file && documentName) {
-      try {
-        const base64String = file.split(',')[1]; // Remove the data type prefix if present
-        if (base64String) {
-          const blob = this.b64toBlob(base64String, 'application/pdf');
-          const link = window.document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = documentName;
-          link.click();
-          URL.revokeObjectURL(link.href);
-        } else {
-          console.error('Base64 string is missing or malformed.');
-        }
-      } catch (error) {
-        console.error('Error while processing base64 string:', error);
-      }
+    if (document.file && document.documentName) {
+      this.downloadService.downloadDocument(document.file, document.documentName);
     } else {
-      console.error('File data or document name is undefined', document);
+      console.error('File data or document name is undefined.');
     }
   }
-
-  b64toBlob(
-    b64Data: string,
-    contentType: string = '',
-    sliceSize: number = 512
-  ): Blob {
-    const byteCharacters = atob(b64Data);
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-      const slice = byteCharacters.slice(offset, offset + sliceSize);
-
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-      byteArrays.push(byteArray);
-    }
-
-    return new Blob(byteArrays, { type: contentType });
-  }
-
+  
   viewDocument(document: DocumentModel): void {
-    console.log('Attempting to view document:', document);
-    const { file, documentName } = document;
-    console.log('Document file:', file);
-    console.log('Document name:', documentName);
-
-    if (file && documentName) {
-      try {
-        const base64String = file.split(',')[1];
-        if (base64String) {
-          const contentType = this.getContentType(documentName);
-          const blob = this.b64toBlob(base64String, contentType);
-          const url = URL.createObjectURL(blob);
-          window.open(url, '_blank');
-        } else {
-          console.error('Base64 string is missing or malformed.');
-        }
-      } catch (error) {
-        console.error('Error while processing base64 string:', error);
-      }
+    if (document.file && document.documentName) {
+      this.downloadService.viewDocument(document.file, document.documentName);
     } else {
-      console.error('File data or document name is undefined', document);
+      console.error('File data or document name is undefined.');
     }
   }
+  
 
-  getContentType(fileName: string): string {
-    const extension = fileName.split('.').pop()?.toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return 'application/pdf';
-      case 'png':
-        return 'image/png';
-      case 'jpeg':
-      case 'jpg':
-        return 'image/jpeg';
-      case 'xls':
-        return 'application/vnd.ms-excel';
-      case 'xlsx':
-        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      case 'docx':
-        return 'application/msword';
+  // downloadDocument(document: DocumentModel): void {
+  //   console.log('Attempting to download document:', document);
 
-      // Add more cases for other file types if needed
-      default:
-        return 'application/octet-stream';
-    }
-  }
+  //   const { file, documentName } = document;
+  //   console.log('Document file:', file);
+  //   console.log('Document name:', documentName);
+
+  //   if (file && documentName) {
+  //     try {
+  //       const base64String = file.split(',')[1]; // Remove the data type prefix if present
+  //       if (base64String) {
+  //         const blob = this.b64toBlob(base64String, 'application/pdf');
+  //         const link = window.document.createElement('a');
+  //         link.href = URL.createObjectURL(blob);
+  //         link.download = documentName;
+  //         link.click();
+  //         URL.revokeObjectURL(link.href);
+  //       } else {
+  //         console.error('Base64 string is missing or malformed.');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error while processing base64 string:', error);
+  //     }
+  //   } else {
+  //     console.error('File data or document name is undefined', document);
+  //   }
+  // }
+
+  // b64toBlob(
+  //   b64Data: string,
+  //   contentType: string = '',
+  //   sliceSize: number = 512
+  // ): Blob {
+  //   const byteCharacters = atob(b64Data);
+  //   const byteArrays = [];
+
+  //   for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+  //     const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+  //     const byteNumbers = new Array(slice.length);
+  //     for (let i = 0; i < slice.length; i++) {
+  //       byteNumbers[i] = slice.charCodeAt(i);
+  //     }
+
+  //     const byteArray = new Uint8Array(byteNumbers);
+  //     byteArrays.push(byteArray);
+  //   }
+
+  //   return new Blob(byteArrays, { type: contentType });
+  // }
+
+  // viewDocument(document: DocumentModel): void {
+  //   console.log('Attempting to view document:', document);
+  //   const { file, documentName } = document;
+  //   console.log('Document file:', file);
+  //   console.log('Document name:', documentName);
+
+  //   if (file && documentName) {
+  //     try {
+  //       const base64String = file.split(',')[1];
+  //       if (base64String) {
+  //         const contentType = this.getContentType(documentName);
+  //         const blob = this.b64toBlob(base64String, contentType);
+  //         const url = URL.createObjectURL(blob);
+  //         window.open(url, '_blank');
+  //       } else {
+  //         console.error('Base64 string is missing or malformed.');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error while processing base64 string:', error);
+  //     }
+  //   } else {
+  //     console.error('File data or document name is undefined', document);
+  //   }
+  // }
+
+  // getContentType(fileName: string): string {
+  //   const extension = fileName.split('.').pop()?.toLowerCase();
+  //   switch (extension) {
+  //     case 'pdf':
+  //       return 'application/pdf';
+  //     case 'png':
+  //       return 'image/png';
+  //     case 'jpeg':
+  //     case 'jpg':
+  //       return 'image/jpeg';
+  //     case 'xls':
+  //       return 'application/vnd.ms-excel';
+  //     case 'xlsx':
+  //       return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  //     case 'docx':
+  //       return 'application/msword';
+
+  //     // Add more cases for other file types if needed
+  //     default:
+  //       return 'application/octet-stream';
+  //   }
+  // }
 
   deleteFolder(id: number): void {
     if (confirm('Are you sure you want to delete this folder?')) {

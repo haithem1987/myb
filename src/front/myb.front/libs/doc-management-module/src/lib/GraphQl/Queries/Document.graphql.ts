@@ -13,6 +13,8 @@ export const GET_ALL_DOCUMENTS = gql`
       createdAt
       updatedAt
       folderId
+      file
+
     }
   }
 `;
@@ -30,6 +32,8 @@ export const GET_DOCUMENT_BY_ID = gql`
       createdAt
       updatedAt
       folderId
+      file
+
     }
   }
 `;

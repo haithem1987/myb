@@ -4,6 +4,7 @@ import {
   DocManagementModuleComponent,
   FolderDetailsComponent,
 } from '@myb-front/doc-management-module';
+import { AccessDeniedPageComponent } from '@myb-front/shared-ui';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
 export const appRoutes: Route[] = [
   // {
@@ -25,11 +26,13 @@ export const appRoutes: Route[] = [
 
   {
     path: 'invoice',
+    canActivate: [authGuard],
     loadChildren: () =>
       import('@myb-front/invoice-module').then((c) => c.InvoiceRoutingModule),
   },
   {
     path: 'timesheet',
+    canActivate: [authGuard],
     loadChildren: () =>
       import('@myb-front/time-sheet-module').then(
         (c) => c.TimesheetRoutingModule
@@ -37,15 +40,21 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'documents',
+    canActivate: [authGuard],
     loadChildren: () =>
       import('@myb-front/doc-management-module').then(
         (m) => m.DocumentroutingModule
       ),
   },
+  // {
+  //   path: 'settings',
+  //   loadComponent: () =>
+  //     import('@myb-front/shared-ui').then((c) => c.SettingsComponent),
+  // },
   {
-    path: 'settings',
+    path: 'access-denied',
     loadComponent: () =>
-      import('@myb-front/shared-ui').then((c) => c.SettingsComponent),
+      import('@myb-front/shared-ui').then((c) => c.AccessDeniedPageComponent),
   },
   // {
   //   path:'folder/:id' , component:FolderDetailsComponent

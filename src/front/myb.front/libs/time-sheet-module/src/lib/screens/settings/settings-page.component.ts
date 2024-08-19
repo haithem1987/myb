@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SettingsComponent } from 'libs/shared/shared-ui/src';
+import { Component } from '@angular/core';
+import { TimesheetSettingsComponent } from '../../components/timesheet-settings/timesheet-settings.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-settings-page',
   standalone: true,
-  imports: [CommonModule, SettingsComponent],
+  imports: [CommonModule, TimesheetSettingsComponent, TranslateModule],
   templateUrl: './settings-page.component.html',
   styleUrl: './settings-page.component.css',
 })

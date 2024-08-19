@@ -1,39 +1,20 @@
-<div *ngIf="isLoading" class="text-center">
-  <p>{{ 'LOADING' | translate }}</p>
-</div>
+<myb-front-loading-indicator
+  [isLoading]="isLoading"
+></myb-front-loading-indicator>
 <div *ngIf="!isLoading" class="container my-4">
-  <div class="d-flex justify-content-between mb-3">
-    <h2 class="mb-0 w-50" style="color: var(--bs-darklight)">
-      {{ 'TIMESHEET_MANAGER' | translate }}
-    </h2>
-  </div>
-
+  <myb-front-timesheet-header></myb-front-timesheet-header>
   <div class="mb-3 d-flex justify-content-between align-items-center">
-    <div class="btn-group" ngbButtonGroup>
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        [class.active]="selectedPeriod === 'week'"
-        (click)="setPeriod('week')"
-      >
-        {{ 'WEEK' | translate }}
-        <span class="badge bg-danger ms-1">{{
-          getTotalQuantitiesForPeriod('week')
-        }}</span>
-      </button>
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        [class.active]="selectedPeriod === 'month'"
-        (click)="setPeriod('month')"
-      >
-        {{ 'MONTH' | translate }}
-        <span class="badge bg-danger ms-1">{{
-          getTotalQuantitiesForPeriod('month')
-        }}</span>
-      </button>
+    <div>
+      <myb-front-period-selector
+        [selectedPeriod]="selectedPeriod"
+        [weekQuantity]="getTotalQuantitiesForPeriod('week')"
+        [monthQuantity]="getTotalQuantitiesForPeriod('month')"
+        (periodChange)="setPeriod($event)"
+      ></myb-front-period-selector>
+      <span class="fw-bold ms-2 h5 m-0">{{
+        currentDay | date : 'MMMM yyyy' : translate.currentLang
+      }}</span>
     </div>
-
     <div class="text-end mt-3">
       <button
         class="btn btn-primary fw-bold text-uppercase"
@@ -150,9 +131,9 @@
               [value]="getTotalQuantityForProject(project.id)"
               type="success"
               height="8px"
-              [max]="totalPeriod"
+              [max]="31"
             ></myb-front-progress-bar>
-            {{ getTotalQuantityForProject(project.id) }} / {{ totalPeriod }}
+            {{ getTotalQuantityForProject(project.id) }} / 31
           </td>
         </tr>
       </tbody>

@@ -1,0 +1,58 @@
+<div class="">
+  <div class="form-group mb-3">
+    <label for="autoSave">{{ 'AUTO_SAVE' | translate }}:</label>
+    <div class="form-check">
+      <input
+        id="autoSave"
+        type="checkbox"
+        class="form-check-input"
+        [checked]="settings.autoSave"
+        (change)="onSettingChange('autoSave', $event)"
+      />
+      <label class="form-check-label" for="autoSave">
+        {{ 'ENABLE_AUTO_SAVE' | translate }}
+      </label>
+    </div>
+  </div>
+
+  <div class="form-group mb-3">
+    <label for="defaultHours">{{ 'DEFAULT_HOURS' | translate }}:</label>
+    <input
+      id="defaultHours"
+      type="number"
+      class="form-control"
+      [value]="settings.defaultHours"
+      (input)="onSettingChange('defaultHours', $event)"
+    />
+  </div>
+
+  <div class="form-group mb-3">
+    <label for="timeUnit">{{ 'TIME_UNIT' | translate }}:</label>
+    <select
+      id="timeUnit"
+      class="form-control"
+      [ngModel]="settings.timeUnit"
+      (ngModelChange)="onSettingChange('timeUnit', $event)"
+    >
+      <option *ngFor="let option of settings.timeUnitOptions" [value]="option">
+        {{ option | translate }}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-group mb-3">
+    <label for="notifications">{{ 'NOTIFICATIONS' | translate }}:</label>
+    <div class="form-check">
+      <input
+        id="notifications"
+        type="checkbox"
+        class="form-check-input"
+        [checked]="settings.notifications"
+        (change)="onSettingChange('notifications', $event)"
+      />
+      <label class="form-check-label" for="notifications">
+        {{ 'ENABLE_NOTIFICATIONS' | translate }}
+      </label>
+    </div>
+  </div>
+</div>

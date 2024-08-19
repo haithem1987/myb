@@ -8,8 +8,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class KeycloakService {
   private keycloak!: Keycloak;
-  private profileSubject: BehaviorSubject<KeycloakProfile | null> = new BehaviorSubject<KeycloakProfile | null>(null);
-  public profile$: Observable<KeycloakProfile | null> = this.profileSubject.asObservable();
+  private profileSubject: BehaviorSubject<KeycloakProfile | null> =
+    new BehaviorSubject<KeycloakProfile | null>(null);
+  public profile$: Observable<KeycloakProfile | null> =
+    this.profileSubject.asObservable();
 
   private adminToken: string | null = null;
   private userIdSubject: BehaviorSubject<string | null> = new BehaviorSubject<
@@ -17,9 +19,15 @@ export class KeycloakService {
   >(null);
   public userId$: Observable<string | null> = this.userIdSubject.asObservable();
 
+  private initialized = false;
+
   constructor(private http: HttpClient) {}
 
-  init(): Promise<boolean> {
+  async init(): Promise<boolean> {
+    if (this.initialized) {
+      return true;
+    }
+
     return new Promise((resolve, reject) => {
       this.keycloak = new Keycloak({
         url: 'https://www.keycloak.forlink-group.com/',
@@ -29,26 +37,18 @@ export class KeycloakService {
 
       this.keycloak
         .init({
-          onLoad: 'login-required',
+          onLoad: 'check-sso',
           checkLoginIframe: false,
         })
         .then((authenticated) => {
-          // console.log('Keycloak authentication success:', authenticated);
           if (authenticated) {
-            this.loadUserProfile()
-              .then(() => {
-                const profile = this.profileSubject.value;
-                if (profile && profile.id) {
-                  this.userIdSubject.next(profile.id);
-                }
-                resolve(authenticated);
-              })
-              .catch((err) => {
-                console.error('Failed to load user profile:', err);
-                reject(err);
-              });
+            this.loadUserProfile().then(() => {
+              this.initialized = true;
+              resolve(true);
+            });
           } else {
-            resolve(authenticated);
+            this.initialized = true;
+            resolve(false);
           }
         })
         .catch((err) => {
@@ -61,21 +61,24 @@ export class KeycloakService {
   login(): void {
     this.keycloak.login();
   }
+  register(): void {
+    this.keycloak.register();
+  }
 
   logout(): void {
     this.keycloak.logout();
   }
 
   getToken(): string | undefined {
-    return this.keycloak.token;
+    return this.keycloak?.token;
   }
 
   getProfile(): KeycloakProfile | null {
-    return this.profileSubject.value;
+    return this.profileSubject?.value;
   }
 
   isAuthenticated(): boolean | undefined {
-    return this.keycloak.authenticated;
+    return this.keycloak?.authenticated;
   }
 
   getUserRoles(): string[] {

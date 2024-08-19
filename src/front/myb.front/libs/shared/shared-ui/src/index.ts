@@ -43,3 +43,7 @@ export * from './lib/components/user-dropdown/user-dropdown.component';
 export * from './lib/components/loading-indicator/loading-indicator.component';
 
 export * from './lib/components/loading-indicator/loading-indicator.component';
+
+export * from './lib/components/auth-confirmation-modal/auth-confirmation-modal.component';
+
+export * from './lib/components/access-denied-page/access-denied-page.component';

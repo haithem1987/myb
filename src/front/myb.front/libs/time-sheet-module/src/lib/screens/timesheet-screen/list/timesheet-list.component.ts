@@ -74,6 +74,7 @@ export class TimesheetListComponent implements OnInit {
     year: string;
     isToday: boolean;
   }[] = [];
+  currentDay: Date = new Date();
   timesheetQuantities: { [key: string]: number } = {};
   holidays: { [date: string]: string } = {};
   selectedProjects: Set<number> = new Set<number>();
@@ -90,6 +91,7 @@ export class TimesheetListComponent implements OnInit {
   }> = new Subject();
   private langChangeSubscription!: Subscription;
   private defaultHours: number = 1;
+  timeUnit: string = 'Day';
   weekendDays: string[] = [];
   constructor(
     private timesheetService: TimesheetService,
@@ -98,7 +100,7 @@ export class TimesheetListComponent implements OnInit {
     private holidayService: HolidayService,
     private toastService: ToastService,
     private modalService: NgbModal,
-    private translate: TranslateService,
+    public translate: TranslateService,
     private settingsService: GeneralSettingsService,
     config: NgbDropdownConfig
   ) {
@@ -108,6 +110,7 @@ export class TimesheetListComponent implements OnInit {
       'timesheet',
       'defaultHours'
     );
+    this.timeUnit = this.settingsService.getSetting('timesheet', 'timeUnit');
     this.quantityChange
       .pipe(debounceTime(300))
       .subscribe(({ projectId, date, quantity }) => {

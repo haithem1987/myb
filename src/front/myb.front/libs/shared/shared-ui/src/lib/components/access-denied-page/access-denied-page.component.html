@@ -1,0 +1,13 @@
+<div class="container text-center mt-5">
+  <h1 class="display-4 text-danger">{{ 'ACCESS_DENIED' | translate }}</h1>
+  <p class="lead">{{ 'ACCESS_DENIED_MESSAGE' | translate }}</p>
+  <button
+    class="btn btn-link text-secondary text-decoration-none me-2"
+    (click)="goToHome()"
+  >
+    {{ 'GO_TO_HOME' | translate }}
+  </button>
+  <button class="btn btn-primary" (click)="goToLogin()">
+    {{ 'GO_TO_LOGIN' | translate }}
+  </button>
+</div>

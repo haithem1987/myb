@@ -5,21 +5,25 @@ import { Subscription } from 'rxjs';
 import { BreadcrumbComponent } from 'libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component';
 import { NavBarComponent } from '../../LandingPage/NavBar/NavBar.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TimesheetSettingsComponent } from '@myb-front/time-sheet-module';
 
 @Component({
   selector: 'myb-front-settings',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     BreadcrumbComponent,
     NavBarComponent,
     TranslateModule,
+    TimesheetSettingsComponent,
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css'],
 })
 export class SettingsComponent implements OnInit, OnDestroy {
-  @Input() categories: string[] = ['timesheet', 'invoice']; // You can pass the categories dynamically
+  @Input() categories: string[] = ['timesheet', 'invoice'];
   settings: { [key: string]: any } = {};
   keys: { [category: string]: string[] } = {};
   private subscription!: Subscription;
@@ -30,18 +34,18 @@ export class SettingsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscription = this.settingsService.settings$.subscribe((settings) => {
-      this.categories.forEach((category) => {
-        this.settings[category] = settings[category];
-        this.keys[category] = Object.keys(settings[category]);
-      });
-    });
+    // this.subscription = this.settingsService.settings$.subscribe((settings) => {
+    //   this.categories.forEach((category) => {
+    //     this.settings[category] = settings[category];
+    //     this.keys[category] = Object.keys(settings[category]);
+    //   });
+    // });
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    // if (this.subscription) {
+    //   this.subscription.unsubscribe();
+    // }
   }
 
   onSettingChange(category: string, key: string, event: Event): void {

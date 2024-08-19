@@ -28,24 +28,24 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     const browserLang: any = this.translate.getBrowserLang();
     this.translate.use(browserLang.match(/en|fr/) ? browserLang : 'en');
-    this.keycloakService
-      .init()
-      .then((authenticated) => {
-        console.log(`Authenticated: ${authenticated}`);
-        if (authenticated) {
-          this.logUserProfile();
-          this.router.events.subscribe((event) => {
-            if (event instanceof NavigationEnd) {
-              this.removeQueryParamsFromUrl();
-            }
-          });
-        } else {
-          this.keycloakService.login();
-        }
-      })
-      .catch((error) => {
-        console.error(`Keycloak initialization failed: ${error}`);
-      });
+    // this.keycloakService
+    //   .init()
+    //   .then((authenticated) => {
+    //     console.log(`Authenticated: ${authenticated}`);
+    //     if (authenticated) {
+    //       this.logUserProfile();
+    //       this.router.events.subscribe((event) => {
+    //         if (event instanceof NavigationEnd) {
+    //           this.removeQueryParamsFromUrl();
+    //         }
+    //       });
+    //     } else {
+    //       this.keycloakService.login();
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.error(`Keycloak initialization failed: ${error}`);
+    //   });
   }
   private removeQueryParamsFromUrl(): void {
     const urlWithoutParams = this.location.path().split('?')[0];

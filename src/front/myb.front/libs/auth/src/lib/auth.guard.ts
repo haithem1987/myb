@@ -6,7 +6,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   const keycloakService = inject(KeycloakService);
   const router = inject(Router);
 
-  // Initialize Keycloak, if it's not already initialized
   // const initialized = await keycloakService.init();
 
   // if (!initialized) {
@@ -14,7 +13,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   //   return router.createUrlTree(['/access-denied']);
   // }
 
-  // Check if the user is authenticated
   if (keycloakService.isAuthenticated()) {
     console.log(
       'keycloakService.isAuthenticated()',
@@ -22,7 +20,6 @@ export const authGuard: CanActivateFn = (route, state) => {
     );
     return true;
   } else {
-    // Redirect to the access-denied page if not authenticated
     return router.createUrlTree(['/access-denied']);
   }
 };

@@ -1,0 +1,41 @@
+.total-column {
+  position: sticky;
+  right: 0;
+  background-color: white;
+  z-index: 1;
+  min-width: 90px !important;
+}
+.project-column {
+  position: sticky;
+  left: 0;
+  background-color: white;
+  z-index: 1;
+  min-width: 250px !important;
+}
+
+.holiday-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  z-index: 1000;
+}
+.holiday-disabled {
+  background-color: #845bba40 !important;
+  color: #000; /* Change the text color if needed */
+}
+.weekend-dark {
+  background-color: #efefef !important; /* Darker gray */
+}
+.today-background {
+  /* width: 20px;
+  height: 20px; */
+  border-radius: 50px;
+  /* background-color: #845bba !important;
+  color: #fff; */
+}
+.today-column {
+  background-color: #ffbc0024;
+  z-index: 1500;
+}

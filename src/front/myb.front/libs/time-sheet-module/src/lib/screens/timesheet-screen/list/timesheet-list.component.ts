@@ -117,16 +117,35 @@ export class TimesheetListComponent implements OnInit {
         const key = `${projectId}.${date.dateString}`;
         this.timesheetQuantities[key] = quantity;
       });
+    this.langChangeSubscription = this.translate.onLangChange.subscribe(
+      (event: LangChangeEvent) => {
+        console.log('langChangeSubscription', this.updatedTimesheets);
+        this.setWeekendDays();
+        this.populateTimesheetQuantities(this.updatedTimesheets);
+        this.calculateDateRange();
+      }
+    );
   }
 
   ngOnInit(): void {
+    this.loadHolidays();
+    this.loadProjects();
+    this.loadTimesheets();
+  }
+
+  loadHolidays(): void {
     this.holidayService.getHolidays().subscribe((data) => {
-      console.log('holidays', data);
       this.holidays = data;
     });
-    this.projects$.subscribe(() => {
-      this.refreshView();
+  }
+
+  loadProjects(): void {
+    this.projects$.subscribe((projects) => {
+      // this.refreshView();
     });
+  }
+
+  loadTimesheets() {
     this.userId$.subscribe((userId) => {
       this.userId = userId;
       if (userId) {
@@ -141,14 +160,6 @@ export class TimesheetListComponent implements OnInit {
           });
       }
     });
-    this.langChangeSubscription = this.translate.onLangChange.subscribe(
-      (event: LangChangeEvent) => {
-        console.log('langChangeSubscription', this.updatedTimesheets);
-        this.setWeekendDays();
-        this.populateTimesheetQuantities(this.updatedTimesheets);
-        this.calculateDateRange();
-      }
-    );
   }
   fillSelectedProjects(): void {
     for (const projectId of this.selectedProjects) {
@@ -219,21 +230,8 @@ export class TimesheetListComponent implements OnInit {
     }
   }
 
-  isSelected(projectId: number): boolean {
-    return this.selectedProjects.has(projectId);
-  }
-  trackByDate(
-    index: number,
-    date: { dateString: string; weekday: string; day: string }
-  ) {
-    return date.dateString;
-  }
-
-  trackByProject(index: number, project: Project) {
-    return project.id;
-  }
   calculateDateRange(): void {
-    const today = new Date(); // Ensuring this is the local current date
+    const today = new Date();
     const todayString = today.toISOString().split('T')[0];
     console.log('todayString', todayString);
     this.dateRange = [];
@@ -264,7 +262,6 @@ export class TimesheetListComponent implements OnInit {
         startOfWeek.setDate(startOfWeek.getDate() + 1);
       }
     } else if (this.selectedPeriod === 'month') {
-      // Start from the first day of the month
       const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
       const daysInMonth = new Date(
         today.getFullYear(),
@@ -275,7 +272,6 @@ export class TimesheetListComponent implements OnInit {
 
       for (let i = 0; i < daysInMonth; i++) {
         const currentDate = new Date(startOfMonth);
-        // const currentDateString = currentDate.toISOString().split('T')[0];
         const currentDateString = currentDate.toLocaleDateString('en-CA');
         this.translate
           .get(
@@ -303,11 +299,6 @@ export class TimesheetListComponent implements OnInit {
 
   refreshView(): void {
     this.calculateDateRange();
-  }
-
-  getQuantityForDate(projectId: number, date: string): number {
-    const key = `${projectId}.${date}`;
-    return this.timesheetQuantities[key] || 0;
   }
 
   onQuantityChange(
@@ -466,16 +457,6 @@ export class TimesheetListComponent implements OnInit {
     });
   }
 
-  getTotalQuantityForProject(projectId: number): number {
-    let total = 0;
-    for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
-      if (key.startsWith(`${projectId}.`) && quantity > 0) {
-        total++;
-      }
-    }
-    return total;
-  }
-
   // approveTimeSheet(timesheet: Timesheet): void {
   //   const updatedTimesheet = {
   //     ...timesheet,
@@ -493,77 +474,9 @@ export class TimesheetListComponent implements OnInit {
   //       this.refreshView();
   //     });
   // }
-
-  editTimeSheet(id: number): void {
-    const timesheet = this.updatedTimesheets.find((t) => t.id === id);
-    if (timesheet) {
-      const modalRef = this.modalService.open(TimesheetEditComponent);
-      modalRef.componentInstance.timesheet = timesheet;
-    }
-  }
-
-  deleteTimeSheet(id: number): void {
-    if (confirm('Are you sure you want to delete this timesheet?')) {
-      this.timesheetService.delete(id).subscribe(() => {
-        this.toastService.show('Timesheet deleted successfully', {
-          classname: 'toast-success',
-        });
-        this.updatedTimesheets = this.updatedTimesheets.filter(
-          (t) => t.id !== id
-        );
-        this.refreshView();
-      });
-    }
-  }
-  isPending(project: Project, date: { weekday: string; day: string }): boolean {
-    const targetDate = new Date();
-    targetDate.setDate(Number(date.day));
-    targetDate.setMonth(new Date().getMonth());
-
-    const timesheet = this.updatedTimesheets.find(
-      (ts: Timesheet) =>
-        ts.projectId === project.id &&
-        new Date(ts.date || new Date()).toDateString() ===
-          targetDate.toDateString()
-    );
-
-    return timesheet ? timesheet.status === ApprovalStatus.PENDING : false;
-  }
-
-  handleHoliday(date: {
-    dateString: string;
-    weekday: string;
-    day: string;
-    month: string;
-    year: string;
-  }): { isHoliday: boolean; name: string } {
-    // console.log('handleHoliday');
-    const [year, month, day] = date.dateString.split('-').map(Number);
-    const targetDate = new Date(Date.UTC(year, month - 1, day));
-    const formattedDate = targetDate.toISOString().split('T')[0];
-    // console.log('formattedDate', formattedDate);
-    // console.log(this.holidays);
-    // console.log(this.dateRange);
-    return {
-      isHoliday: !!this.holidays[date.dateString],
-      name: this.holidays[date.dateString] ?? '',
-    };
-  }
-
-  // getApprovalStatus(timesheet: Timesheet): {
-  //   text: string;
-  //   badgeClass: string;
-  // } {
-  //   return timesheet.isApproved
-  //     ? { text: 'Approuvé', badgeClass: 'bg-success' }
-  //     : { text: 'En attente', badgeClass: 'bg-warning' };
-  // }
   setWeekendDays(): void {
     this.translate.get('WEEKDAY.weekend').subscribe((weekendDays: string[]) => {
       this.weekendDays = weekendDays;
     });
-  }
-  isWeekend(date: { weekday: string; day: string }): boolean {
-    return this.weekendDays.includes(date.weekday);
   }
 }

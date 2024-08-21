@@ -76,9 +76,14 @@ export class TimesheetTableComponent {
 
   getTotalQuantityForProject(projectId: number): number {
     let total = 0;
+    let datesChecked = 0;
     for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
-      if (key.startsWith(`${projectId}.`)) {
-        total += quantity;
+      if (datesChecked >= this.totalPeriod) {
+        break;
+      }
+      if (key.startsWith(`${projectId}.`) && quantity > 0) {
+        total++;
+        datesChecked++;
       }
     }
     return total;

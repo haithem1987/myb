@@ -11,7 +11,7 @@
             }}
           </h5>
           <form [formGroup]="employeeForm" (ngSubmit)="saveEmployee()">
-            <div class="mb-3">
+            <div class="mb-3 position-relative">
               <label for="email" class="form-label">{{
                 'EMAIL' | translate
               }}</label>
@@ -33,6 +33,19 @@
                 class="invalid-feedback"
               >
                 {{ 'VALID_EMAIL_REQUIRED' | translate }}
+              </div>
+              <!-- Suggestion Dropdown -->
+              <div
+                class="dropdown-menu show"
+                *ngIf="suggestions.length && employeeForm.get('email')?.value"
+              >
+                <button
+                  class="dropdown-item"
+                  *ngFor="let suggestion of suggestions"
+                  (click)="selectSuggestion(suggestion)"
+                >
+                  {{ suggestion.email }}
+                </button>
               </div>
             </div>
             <div class="mb-3">

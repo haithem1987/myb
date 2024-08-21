@@ -2,11 +2,11 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GeneralSettingsService } from 'libs/shared/infra/services/general-settings.service';
 import { Subscription } from 'rxjs';
-import { BreadcrumbComponent } from 'libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component';
 import { NavBarComponent } from '../../LandingPage/NavBar/NavBar.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TimesheetSettingsComponent } from '@myb-front/time-sheet-module';
+import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 
 @Component({
   selector: 'myb-front-settings',

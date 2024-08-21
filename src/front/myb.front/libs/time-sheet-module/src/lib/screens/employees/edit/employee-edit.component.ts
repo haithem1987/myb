@@ -33,7 +33,7 @@ export class EmployeeEditComponent implements OnInit {
   employeeForm: FormGroup;
   employeeId!: number | null;
   isEditMode = false;
-  suggestions: Employee[] = [];
+  suggestions: any[] = [];
   constructor(
     private fb: FormBuilder,
     private employeeService: EmployeeService,
@@ -82,14 +82,9 @@ export class EmployeeEditComponent implements OnInit {
     }
     this.employeeForm
       .get('email')
-      ?.valueChanges.pipe(
-        debounceTime(300), // wait for 300ms pause in events
-        distinctUntilChanged() // only emit if value is different from previous value
-      )
+      ?.valueChanges.pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((value) => {
-        if (this.employeeForm.get('email')?.valid) {
-          this.searchByEmail(value);
-        }
+        this.searchByEmail(value);
       });
     console.log('this.employeeForm.value', this.employeeForm.value);
   }
@@ -98,7 +93,6 @@ export class EmployeeEditComponent implements OnInit {
     this.keycloakService
       .getUsersByEmailForClient(email)
       .then((users) => {
-        console.log('users', users);
         this.suggestions = users;
       })
       .catch((err) => {
@@ -132,7 +126,14 @@ export class EmployeeEditComponent implements OnInit {
       // this.employeeForm.patchValue(employee);
     });
   }
-
+  selectSuggestion(user: any): void {
+    this.employeeForm.patchValue({
+      email: user.email,
+      name: user.firstName + ' ' + user.lastName,
+      userId: user.id,
+    });
+    this.suggestions = []; // Clear suggestions once selected
+  }
   saveEmployee(): void {
     if (this.employeeForm.valid) {
       const employee = this.employeeForm.value as Employee;

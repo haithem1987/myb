@@ -37,7 +37,7 @@ export class KeycloakService {
 
       this.keycloak
         .init({
-          onLoad: 'check-sso',
+          onLoad: 'login-required',
           checkLoginIframe: false,
         })
         .then((authenticated) => {
@@ -161,17 +161,19 @@ export class KeycloakService {
       });
   }
 
-  getUsersByEmailForClient(email: string): Promise<any> {
+  async getUsersByEmailForClient(partialEmail: string): Promise<any> {
     if (!this.adminToken) {
       return this.getAdminToken().then(() =>
-        this.queryUsersByEmailForClient(email)
+        this.queryUsersByPartialEmailForClient(partialEmail)
       );
     } else {
-      return this.queryUsersByEmailForClient(email);
+      return this.queryUsersByPartialEmailForClient(partialEmail);
     }
   }
 
-  private queryUsersByEmailForClient(email: string): Promise<any> {
+  private async queryUsersByPartialEmailForClient(
+    partialEmail: string
+  ): Promise<any> {
     if (!this.adminToken) {
       return Promise.reject('Admin token is not available');
     }
@@ -183,9 +185,10 @@ export class KeycloakService {
       'Access-Control-Allow-Headers': '*',
     });
 
+    // Use the partial email with the Keycloak search query
     return this.http
       .get(
-        `https://www.keycloak.forlink-group.com/admin/realms/MYB/users?email=${email}`,
+        `https://www.keycloak.forlink-group.com/admin/realms/MYB/users?email=${partialEmail}`,
         { headers }
       )
       .toPromise()
@@ -206,7 +209,7 @@ export class KeycloakService {
         );
       })
       .catch((err) => {
-        console.error('Error fetching users by email for client:', err);
+        console.error('Error fetching users by partial email for client:', err);
         throw err;
       });
   }

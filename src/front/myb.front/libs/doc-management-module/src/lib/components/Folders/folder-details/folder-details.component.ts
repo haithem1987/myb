@@ -13,7 +13,6 @@ import { DocumentModel } from '../../../models/DocumentModel';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DocumentService } from '../../../services/Document.service';
 import { NavbarComponent } from '../../navigation-components/navbar/navbar.component';
-import { DocumentStatus } from '../../../models/DocumentStatus';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentUploadComponent } from '../../document-upload/document-upload.component';
 import { DocumentEditComponent } from '../../document-edit/document-edit.component';
@@ -110,6 +109,7 @@ export class FolderDetailsComponent implements OnInit {
           console.error('Error fetching root folder:', error);
         },
       });
+    
   }
   
   getRootFolder(userId: string, moduleName: string): Observable<RootFolder | null> {
@@ -165,7 +165,8 @@ export class FolderDetailsComponent implements OnInit {
     this.loadFolderDetails();
     console.log('OpenFolder:', folderId, this.fId);
     console.log('This.documents$', this.documents$);
-    console.log('FID:', this.fId, 'FolderID:', folderId);
+    console.log('foldername',this.folderName);
+    console.log('this.folders$', this.folders$)
   }
   
   loadFolders() {
@@ -203,14 +204,12 @@ export class FolderDetailsComponent implements OnInit {
     }
   }
 
+
   loadFolderDetails(): void {
     this.folderService.get(this.fId).subscribe({
       next: (data: Folder) => {
         this.folder = data;
-        // this.documents = data.documents || [];
         this.folderName = data.folderName;
-        console.log('Loading fId', this.fId);
-        console.log('Loading parentid', this.folder.parentId);
         console.log('Folder details:', data);
       },
       error: (error) => {
@@ -241,24 +240,29 @@ export class FolderDetailsComponent implements OnInit {
     });
   }
 
+  // openEditFolder(folder: Folder): void {
+  //   const modalRef = this.modalService.open(FolderEditComponent);
+  //   modalRef.componentInstance.folder = { ...folder };
+  //   modalRef.componentInstance.folderUpdated.subscribe((updatedFolder: Folder) => {
+  //     this.folderService.update(updatedFolder.id, updatedFolder).subscribe();
+  //   });
+  // }
+
   openEditFolder(folder: Folder) {
     const modalRef = this.modalService.open(FolderEditComponent);
     modalRef.componentInstance.folder = { ...folder };
-    this.folders$.subscribe((folders) => {
-      modalRef.componentInstance.folders = folders;
-    });
+  
     modalRef.componentInstance.folderUpdated.subscribe(
       (updatedFolder: Folder) => {
-        const index = this.folders.findIndex(
-          (f) => f.id === updatedFolder.id
-        );
+        const index = this.folders.findIndex((f) => f.id === updatedFolder.id);
         if (index !== -1) {
-          this.folders[index] = updatedFolder;
+          this.folders[index] = updatedFolder; // Update the local list
+          this.folderService.update(updatedFolder.id, updatedFolder); // This will also update the BehaviorSubject
         }
       }
     );
+    
   }
-  
   
   
   openModal(document?: DocumentModel) {
@@ -276,7 +280,7 @@ export class FolderDetailsComponent implements OnInit {
           if (index !== -1) {
             const updatedDocuments = [...documents];
             updatedDocuments[index] = updatedDocument;
-            this.documentService.updateDocumentList(updatedDocuments); // Assuming you have a method to update the list
+          //  this.documentService.updateDocumentList(updatedDocuments); // Assuming you have a method to update the list
           }
         });
       }
@@ -286,7 +290,9 @@ export class FolderDetailsComponent implements OnInit {
 
 
 
-
+  filterDocument(): void {
+    // Implement filtering logic
+  }
   downloadDocument(document: DocumentModel): void {
     if (document.file && document.documentName) {
       this.downloadService.downloadDocument(document.file, document.documentName);

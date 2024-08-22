@@ -72,42 +72,65 @@ override delete(id: number): Observable<boolean> {
 
 
 
-createDocument(document: DocumentModel): Observable<DocumentModel> {
-  return this.apollo
-    .mutate<{ addDocument: DocumentModel }>({
-      mutation: gql`
-      ${this.typeOperations.create}
-    `,
-      variables: { document }
-    })
-    .pipe(
-      map((result: any) => {
-        const newDocument = result.data.addDocument;
-        const documents = [...this.documentSubject.value, newDocument];
-        this.documentSubject.next(documents);
-     //   this.folderService.loadInitialFolders();
-        return newDocument;
-      })
-    );
-}
+// createDocument(document: DocumentModel): Observable<DocumentModel> {
+//   return this.apollo
+//     .mutate<{ addDocument: DocumentModel }>({
+//       mutation: gql`
+//       ${this.typeOperations.create}
+//     `,
+//       variables: { document }
+//     })
+//     .pipe(
+//       map((result: any) => {
+//         const newDocument = result.data.addDocument;
+//         const documents = [...this.documentSubject.value, newDocument];
+//         this.documentSubject.next(documents);
+//      //   this.folderService.loadInitialFolders();
+//         return newDocument;
+//       })
+//     );
+// }
 
-updateDocumentList(documents: DocumentModel[]): void {
-  this.documentSubject.next(documents);
-}
+override create(item: DocumentModel): Observable<DocumentModel> {
+  return super.create(item).pipe(
+    map((newDocument) => {
+      const documents = [...this.documentSubject.value, newDocument];
+      this.documentSubject.next(documents);
+      console.log('first', newDocument)
 
-updateDocument(document: DocumentModel): Observable<DocumentModel> {
-  return this.apollo
-    .mutate<{ updateDocument: DocumentModel }>({
-      mutation: gql`
-         ${this.typeOperations.update}
-      `,
-      variables: { 
-        id: document.id, 
-        document: { ...document, id: undefined } }, 
+      return newDocument;
     })
+  );
+}
+// updateDocumentList(documents: DocumentModel[]): void {
+//   this.documentSubject.next(documents);
+// }
+
+// updateDocument(document: DocumentModel): Observable<DocumentModel> {
+//   return this.apollo
+//     .mutate<{ updateDocument: DocumentModel }>({
+//       mutation: gql`
+//          ${this.typeOperations.update}
+//       `,
+//       variables: { 
+//         id: document.id, 
+//         document: { ...document, id: undefined } }, 
+//     })
  
-    .pipe(
-      map((result: any) => { console.log(result.data); return result.data.updateDocument})
-    );
+//     .pipe(
+//       map((result: any) => { console.log(result.data); return result.data.updateDocument})
+//     );
+// }
+
+override update(id: number, item: DocumentModel): Observable<DocumentModel> {
+  return super.update(id, item).pipe(
+    map((updatedDoc) => {
+      const documents = this.documentSubject.value.map((t) =>
+        t.id === id ? updatedDoc : t
+      );
+      this.documentSubject.next(documents); 
+      return updatedDoc; 
+    })
+  );
 }
 }

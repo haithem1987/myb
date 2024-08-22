@@ -18,7 +18,7 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 export class FolderEditComponent implements OnInit {
   @Output() folderUpdated = new EventEmitter<Folder>();
   folderName: string = '';
-  @Input() folder!: Folder; // Marked as @Input() to receive data from parent component
+  @Input() folder!: Folder; 
   user$: Observable<KeycloakProfile | null>;
 
   constructor(
@@ -41,18 +41,31 @@ export class FolderEditComponent implements OnInit {
     if (this.folder && this.user$) {
       this.user$.pipe(take(1)).subscribe((userProfile) => {
         if (userProfile && this.folder) {
-          this.folder.folderName = this.folderName;
-          this.folder.editedBy = userProfile.username || 'Unknown User'; 
-          this.folderService.update(this.folder.id, this.folder).subscribe((folder) => {
-            this.folderUpdated.emit(folder);
-            this.activeModal.close();
-          });
+          const updatedFolder = {
+            ...this.folder,
+            folderName: this.folderName,
+            editedBy: userProfile.username || 'Unknown User',
+            updatedAt: new Date(),
+          };
+  
+          this.folderService.update(updatedFolder.id, updatedFolder).subscribe(
+            (updatedFolder) => {
+              this.folderUpdated.emit(updatedFolder);
+              console.log('Updated Folder:', updatedFolder);
+              this.activeModal.close();
+              
+            },
+            (error) => {
+              console.error('Error updating folder:', error);
+            }
+          );
         } else {
           console.error('User profile or folder is missing.');
         }
       });
     }
   }
+  
   
   
 }

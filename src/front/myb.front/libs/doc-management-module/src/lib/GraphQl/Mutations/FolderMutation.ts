@@ -23,8 +23,8 @@ mutation UpdateFolder( $item: FolderInput!) {
 `;
 // Folder Mutations
 export const ADD_FOLDER = gql`
-  mutation AddFolder($folder: FolderInput!) {
-    addFolder(folder: $folder) {
+  mutation AddFolder($item: FolderInput!) {
+    addFolder(folder: $item) {
       id
       folderName
       createdBy

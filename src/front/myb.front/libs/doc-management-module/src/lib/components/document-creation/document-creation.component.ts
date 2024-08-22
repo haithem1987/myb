@@ -68,7 +68,7 @@ export class DocumentCreationComponent implements OnInit {
           updatedAt: new Date(),
         };
   
-        this.documentService.createDocument(document).subscribe(
+        this.documentService.create(document).subscribe(
           (newDocument) => {
             this.documents.push(newDocument);
             this.documentCreated.emit(newDocument);

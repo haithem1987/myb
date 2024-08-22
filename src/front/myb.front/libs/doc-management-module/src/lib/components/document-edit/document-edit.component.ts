@@ -33,7 +33,7 @@ export class DocumentEditComponent {
     if (this.document) {
       const updatedDocument = { ...this.document, updatedAt: new Date() };
 
-      this.documentService.updateDocument(updatedDocument).subscribe(
+      this.documentService.update(this.document.id,updatedDocument).subscribe(
         (updatedDoc) => {
           this.documentUpdated.emit(updatedDoc);
           this.activeModal.close();

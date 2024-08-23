@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocumentModel } from '../models/DocumentModel';
 import { NavLinksComponent } from '../components/navigation-components/nav-links/nav-links.component';
-import { DocumentEditComponent } from '../components/document-edit/document-edit.component';
+import { DocumentEditComponent } from '../components/Documents/document-edit/document-edit.component';
 import { DocumentUploadComponent } from '../components/document-upload/document-upload.component';
 import { FolderCardsComponent } from '../components/Folders/folder-cards/folder-cards.component';
 import { Folder } from '../models/Folder';

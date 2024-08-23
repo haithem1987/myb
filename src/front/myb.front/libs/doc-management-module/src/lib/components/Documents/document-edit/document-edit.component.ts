@@ -1,9 +1,9 @@
-import { DocumentService } from './../../services/Document.service';
+import { DocumentService } from '../../../services/Document.service';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DocumentModel } from '../../models/DocumentModel';
+import { DocumentModel } from '../../../models/DocumentModel';
 import { FormsModule } from '@angular/forms';
 
 @Component({

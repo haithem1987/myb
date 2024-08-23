@@ -16,6 +16,9 @@ import { DocumentType } from '../../models/DocumentType';
 import { DocumentUploadComponent } from '../document-upload/document-upload.component';
 
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { KeycloakProfile } from 'keycloak-js';
+import { Observable } from 'rxjs';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   selector: 'myb-front-document-creation',
@@ -38,13 +41,17 @@ export class DocumentCreationComponent implements OnInit {
   @ViewChild(DocumentUploadComponent) documentUploadComponent:
     | DocumentUploadComponent
     | undefined;
+  user$: Observable<KeycloakProfile | null>;
 
   constructor(
     public activeModal: NgbActiveModal,
     private documentService: DocumentService,
     private folderService: FolderService,
-    private toastService: ToastService
-  ) {}
+    private toastService: ToastService,
+    private keycloakService: KeycloakService
+  ) {
+    this.user$ = this.keycloakService.profile$;
+  }
 
   ngOnInit(): void {
     // this.loadFolders();
@@ -54,39 +61,52 @@ export class DocumentCreationComponent implements OnInit {
     if (this.folderId !== null) {
       const selectedFiles = this.documentUploadComponent?.selectedFiles || [];
       if (selectedFiles.length > 0) {
-        const document = {
-          id: 0,
-          documentName: selectedFiles[0].ImageName,
-          documentType: this.getDocumentType(selectedFiles[0].fileType),
-          createdBy: '',
-          editedBy: '',
-          folderId: parseInt(this.folderId.toString()),
-          documentSize: selectedFiles[0].file.size,
-          file: selectedFiles[0].Image, // Save base64 string
-          url: selectedFiles[0].url,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-  
-        this.documentService.create(document).subscribe(
-          (newDocument) => {
-            this.documents.push(newDocument);
-            this.documentCreated.emit(newDocument);
-            this.toastService.show('Document Added successfully!', {
-              classname: 'bg-success text-light text-center ',
-            });
-            this.activeModal.close();
+        this.user$.subscribe({
+          next: (userProfile) => {
+            if (userProfile) {
+              const document = {
+                id: 0,
+                documentName: selectedFiles[0].ImageName,
+                documentType: this.getDocumentType(selectedFiles[0].fileType),
+                createdBy: userProfile.username || 'Unknown User',
+                editedBy: userProfile.username || 'Unknown User',
+                folderId: parseInt(this.folderId?.toString() || '0'),
+                documentSize: selectedFiles[0].file.size,
+                file: selectedFiles[0].Image,
+                url: selectedFiles[0].url,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              };
+
+              this.documentService.create(document).subscribe(
+                (newDocument) => {
+                  this.documents.push(newDocument);
+                  this.documentCreated.emit(newDocument);
+                  this.toastService.show('Document Added successfully!', {
+                    classname: 'bg-success text-light text-center ',
+                  });
+                  this.activeModal.close();
+                },
+                (error) => {
+                  console.error('Error creating document:', error);
+                  this.toastService.show(
+                    'An error occurred while creating the document. Please try again.',
+                    {
+                      classname: 'bg-danger text-light',
+                    }
+                  );
+                }
+              );
+            } else {
+              this.toastService.show('Unable to retrieve user information.', {
+                classname: 'bg-warning text-dark',
+              });
+            }
           },
-          (error) => {
-            console.error('Error creating document:', error);
-            this.toastService.show(
-              'An error occurred while creating the document. Please try again.',
-              {
-                classname: 'bg-danger text-light',
-              }
-            );
-          }
-        );
+          error: (error) => {
+            console.error('Error fetching user profile:', error);
+          },
+        });
       } else {
         this.toastService.show('Please upload a file', {
           classname: 'bg-warning text-dark',
@@ -102,16 +122,20 @@ export class DocumentCreationComponent implements OnInit {
   private getDocumentType(fileType: string | undefined): string {
     switch (fileType) {
       case 'application/pdf':
-        return 'PDF';
+        return DocumentType.PDF;
+
       case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
       case 'application/msword':
-        return 'WORD';
+        return DocumentType.Word;
+
       case 'application/vnd.ms-excel':
       case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-        return 'EXCEL';
+        return DocumentType.Excel;
+
       case 'image/jpeg':
       case 'image/png':
-        return 'IMAGE';
+        return DocumentType.Image;
+
       default:
         return 'UNKNOWN';
     }

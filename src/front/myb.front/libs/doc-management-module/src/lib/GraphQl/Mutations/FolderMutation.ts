@@ -56,8 +56,8 @@ export const ADD_FOLDER_WITH_DOCUMENTS = gql`
 
 // RootFolder Mutations
 export const ADD_ROOT_FOLDER = gql`
-  mutation AddRootFolder($rootFolder: RootFolderInput!) {
-    addRootFolder(rootFolder: $rootFolder) {
+  mutation AddRootFolder($item:RootFolderInput!) {
+    addRootFolder(rootFolder:$item) {
       id
       userId
       moduleName

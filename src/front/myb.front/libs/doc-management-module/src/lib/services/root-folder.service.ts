@@ -76,15 +76,8 @@ export class RootFolderService extends RepositoryService<RootFolder> {
     );
   }
 
-  override create(rootFolder: RootFolder): Observable<RootFolder> {
-    return this.apollo
-    .mutate<{ addRootFolder: RootFolder }>({
-      mutation: gql`
-        ${this.typeOperations.create}
-      `,
-      variables: { rootFolder }
-    })
-    .pipe(
+  override create(item: RootFolder): Observable<RootFolder> {
+    return super.create(item).pipe(
       map((result: any) => {
         const newRootFolder = result.data.addRootFolder;
         const currentRootFolders = this.rootFoldersSubject.value;

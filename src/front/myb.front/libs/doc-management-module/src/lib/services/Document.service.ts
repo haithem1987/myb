@@ -1,10 +1,8 @@
 
 import { Injectable } from '@angular/core';
-
 import { DocumentModel } from '../models/DocumentModel'; 
 import { Apollo, gql } from 'apollo-angular';
 import { BehaviorSubject, Observable, catchError, map, throwError } from 'rxjs';
-
 import { RepositoryService } from 'libs/shared/infra/services/repository.service';
 
 
@@ -56,8 +54,6 @@ override getAll(): Observable<DocumentModel[]> {
   );
 }
 
-
-
 override delete(id: number): Observable<boolean> {
   return super.delete(id).pipe(
     map((success) => {
@@ -70,27 +66,6 @@ override delete(id: number): Observable<boolean> {
   );
 }
 
-
-
-// createDocument(document: DocumentModel): Observable<DocumentModel> {
-//   return this.apollo
-//     .mutate<{ addDocument: DocumentModel }>({
-//       mutation: gql`
-//       ${this.typeOperations.create}
-//     `,
-//       variables: { document }
-//     })
-//     .pipe(
-//       map((result: any) => {
-//         const newDocument = result.data.addDocument;
-//         const documents = [...this.documentSubject.value, newDocument];
-//         this.documentSubject.next(documents);
-//      //   this.folderService.loadInitialFolders();
-//         return newDocument;
-//       })
-//     );
-// }
-
 override create(item: DocumentModel): Observable<DocumentModel> {
   return super.create(item).pipe(
     map((newDocument) => {
@@ -102,25 +77,6 @@ override create(item: DocumentModel): Observable<DocumentModel> {
     })
   );
 }
-// updateDocumentList(documents: DocumentModel[]): void {
-//   this.documentSubject.next(documents);
-// }
-
-// updateDocument(document: DocumentModel): Observable<DocumentModel> {
-//   return this.apollo
-//     .mutate<{ updateDocument: DocumentModel }>({
-//       mutation: gql`
-//          ${this.typeOperations.update}
-//       `,
-//       variables: { 
-//         id: document.id, 
-//         document: { ...document, id: undefined } }, 
-//     })
- 
-//     .pipe(
-//       map((result: any) => { console.log(result.data); return result.data.updateDocument})
-//     );
-// }
 
 override update(id: number, item: DocumentModel): Observable<DocumentModel> {
   return super.update(id, item).pipe(

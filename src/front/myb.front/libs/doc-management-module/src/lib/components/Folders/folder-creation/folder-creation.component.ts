@@ -27,7 +27,6 @@ export class FolderCreationComponent {
   folderName: string = '';
   @Output() folderCreated = new EventEmitter<Folder>();
   @Input() folderId!: number;
-  //@Input() userId!: string;
   user$: Observable<KeycloakProfile | null>;
 
   constructor(

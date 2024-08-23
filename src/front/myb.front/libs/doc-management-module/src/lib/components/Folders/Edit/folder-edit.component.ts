@@ -35,6 +35,7 @@ export class FolderEditComponent implements OnInit {
     if (this.folder) {
       this.folderName = this.folder.folderName;
     }
+    console.log('FolderEditComponent initialized', this.folderName);
   }
 
   editFolder(): void {
@@ -47,13 +48,12 @@ export class FolderEditComponent implements OnInit {
             editedBy: userProfile.username || 'Unknown User',
             updatedAt: new Date(),
           };
-  
-          this.folderService.update(updatedFolder.id, updatedFolder).subscribe(
-            (updatedFolder) => {
-              this.folderUpdated.emit(updatedFolder);
-              console.log('Updated Folder:', updatedFolder);
+
+          this.folderService.update(this.folder.id, updatedFolder).subscribe(
+            (updatedFo) => {
+              this.folderUpdated.emit(updatedFo);
+              console.log('Updated Folder:', updatedFo);
               this.activeModal.close();
-              
             },
             (error) => {
               console.error('Error updating folder:', error);
@@ -65,7 +65,6 @@ export class FolderEditComponent implements OnInit {
       });
     }
   }
-  
   
   
 }

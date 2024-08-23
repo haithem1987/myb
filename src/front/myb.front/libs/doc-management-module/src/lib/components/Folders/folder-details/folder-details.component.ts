@@ -15,7 +15,7 @@ import { DocumentService } from '../../../services/Document.service';
 import { NavbarComponent } from '../../navigation-components/navbar/navbar.component';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentUploadComponent } from '../../document-upload/document-upload.component';
-import { DocumentEditComponent } from '../../document-edit/document-edit.component';
+import { DocumentEditComponent } from '../../Documents/document-edit/document-edit.component';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { NoResultComponent } from 'libs/shared/shared-ui/src/lib/components/no-result/no-result.component';
@@ -82,7 +82,6 @@ export class FolderDetailsComponent implements OnInit {
 
 
  
-  //3
   ngOnInit(): void {
     this.keycloakService.userId$
       .pipe(
@@ -111,7 +110,7 @@ export class FolderDetailsComponent implements OnInit {
       });
     
   }
-  
+  //RootFolder
   getRootFolder(userId: string, moduleName: string): Observable<RootFolder | null> {
     return this.RootFolderService.getRootFolderByUserIdAndModuleName(userId, moduleName).pipe(
       map((data: RootFolder | null) => {
@@ -160,6 +159,8 @@ export class FolderDetailsComponent implements OnInit {
     });
   }
   
+
+  //folders
   openFolder(folderId: number): void {
     this.fId = folderId;
     this.loadFolderDetails();
@@ -184,17 +185,6 @@ export class FolderDetailsComponent implements OnInit {
       },
     });
   }
-
-  // openFolder(folderId: number): void {
-  //   this.fId = folderId;
-  //   this.loadFolderDetails();
-  //   // this.loadFoldersByParentId(this.fId);
-  //   console.log('openflder', folderId, this.fId);
-  //   console.log('this.documents$', this.documents$);
-
-  //   console.log('fid', this.fId, 'folderId', folderId);
-  // }
-
   goBackToPreviousFolder(): void {
     if (this.fId !== this.rootId) {
       this.fId = this.folder.parentId;
@@ -204,13 +194,18 @@ export class FolderDetailsComponent implements OnInit {
     }
   }
 
-
   loadFolderDetails(): void {
     this.folderService.get(this.fId).subscribe({
       next: (data: Folder) => {
-        this.folder = data;
-        this.folderName = data.folderName;
-        console.log('Folder details:', data);
+        if (data) {
+          this.folder = data;
+          this.folderName = data.folderName;
+          console.log('Folder details:', data);
+          console.log('Folder details:', data.id , this.fId);
+
+        } else {
+          console.error('Folder data is undefined');
+        }
       },
       error: (error) => {
         console.error('Error fetching folder details:', error);
@@ -218,19 +213,19 @@ export class FolderDetailsComponent implements OnInit {
     });
   }
 
-  loadFoldersByParentId(parentId: number): void {
-    this.folderService.getFoldersByParentId(parentId).subscribe({
-      next: (data: Folder[]) => {
-        this.folders = data;
-
-        console.log('allFolders by parentId:', data);
-      },
-      error: (error) => {
-        console.error('Error fetching folders by parentId:', error);
-      },
-    });
+  deleteFolder(id: number): void {
+    if (confirm('Are you sure you want to delete this folder?')) {
+      this.folderService.delete(id).subscribe({
+        next: () => {
+          console.log('Folder deleted');
+        },
+        error: (error) => console.error('Error deleting folder', error),
+      });
+    }
   }
 
+
+  // Documents
   deleteDocument(docId: number) {
     this.documentService.delete(docId).subscribe(() => {
       console.log('doc deleted');
@@ -240,59 +235,6 @@ export class FolderDetailsComponent implements OnInit {
     });
   }
 
-  // openEditFolder(folder: Folder): void {
-  //   const modalRef = this.modalService.open(FolderEditComponent);
-  //   modalRef.componentInstance.folder = { ...folder };
-  //   modalRef.componentInstance.folderUpdated.subscribe((updatedFolder: Folder) => {
-  //     this.folderService.update(updatedFolder.id, updatedFolder).subscribe();
-  //   });
-  // }
-
-  openEditFolder(folder: Folder) {
-    const modalRef = this.modalService.open(FolderEditComponent);
-    modalRef.componentInstance.folder = { ...folder };
-  
-    modalRef.componentInstance.folderUpdated.subscribe(
-      (updatedFolder: Folder) => {
-        const index = this.folders.findIndex((f) => f.id === updatedFolder.id);
-        if (index !== -1) {
-          this.folders[index] = updatedFolder; // Update the local list
-          this.folderService.update(updatedFolder.id, updatedFolder); // This will also update the BehaviorSubject
-        }
-      }
-    );
-    
-  }
-  
-  
-  openModal(document?: DocumentModel) {
-    const modalRef = this.modalService.open(DocumentEditComponent);
-    modalRef.componentInstance.document = { ...document };
-  
-    modalRef.componentInstance.documentUpdated.subscribe(
-      (updatedDocument: DocumentModel) => {
-        this.documents$.pipe(
-          take(1) // Take the first emission and complete the subscription
-        ).subscribe(documents => {
-          const index = documents.findIndex(
-            (doc: DocumentModel) => doc.id === updatedDocument.id
-          );
-          if (index !== -1) {
-            const updatedDocuments = [...documents];
-            updatedDocuments[index] = updatedDocument;
-          //  this.documentService.updateDocumentList(updatedDocuments); // Assuming you have a method to update the list
-          }
-        });
-      }
-    );
-  }
-  
-
-
-
-  filterDocument(): void {
-    // Implement filtering logic
-  }
   downloadDocument(document: DocumentModel): void {
     if (document.file && document.documentName) {
       this.downloadService.downloadDocument(document.file, document.documentName);
@@ -300,7 +242,6 @@ export class FolderDetailsComponent implements OnInit {
       console.error('File data or document name is undefined.');
     }
   }
-  
   viewDocument(document: DocumentModel): void {
     if (document.file && document.documentName) {
       this.downloadService.viewDocument(document.file, document.documentName);
@@ -310,134 +251,21 @@ export class FolderDetailsComponent implements OnInit {
   }
   
 
-  // downloadDocument(document: DocumentModel): void {
-  //   console.log('Attempting to download document:', document);
-
-  //   const { file, documentName } = document;
-  //   console.log('Document file:', file);
-  //   console.log('Document name:', documentName);
-
-  //   if (file && documentName) {
-  //     try {
-  //       const base64String = file.split(',')[1]; // Remove the data type prefix if present
-  //       if (base64String) {
-  //         const blob = this.b64toBlob(base64String, 'application/pdf');
-  //         const link = window.document.createElement('a');
-  //         link.href = URL.createObjectURL(blob);
-  //         link.download = documentName;
-  //         link.click();
-  //         URL.revokeObjectURL(link.href);
-  //       } else {
-  //         console.error('Base64 string is missing or malformed.');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error while processing base64 string:', error);
-  //     }
-  //   } else {
-  //     console.error('File data or document name is undefined', document);
-  //   }
-  // }
-
-  // b64toBlob(
-  //   b64Data: string,
-  //   contentType: string = '',
-  //   sliceSize: number = 512
-  // ): Blob {
-  //   const byteCharacters = atob(b64Data);
-  //   const byteArrays = [];
-
-  //   for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-  //     const slice = byteCharacters.slice(offset, offset + sliceSize);
-
-  //     const byteNumbers = new Array(slice.length);
-  //     for (let i = 0; i < slice.length; i++) {
-  //       byteNumbers[i] = slice.charCodeAt(i);
-  //     }
-
-  //     const byteArray = new Uint8Array(byteNumbers);
-  //     byteArrays.push(byteArray);
-  //   }
-
-  //   return new Blob(byteArrays, { type: contentType });
-  // }
-
-  // viewDocument(document: DocumentModel): void {
-  //   console.log('Attempting to view document:', document);
-  //   const { file, documentName } = document;
-  //   console.log('Document file:', file);
-  //   console.log('Document name:', documentName);
-
-  //   if (file && documentName) {
-  //     try {
-  //       const base64String = file.split(',')[1];
-  //       if (base64String) {
-  //         const contentType = this.getContentType(documentName);
-  //         const blob = this.b64toBlob(base64String, contentType);
-  //         const url = URL.createObjectURL(blob);
-  //         window.open(url, '_blank');
-  //       } else {
-  //         console.error('Base64 string is missing or malformed.');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error while processing base64 string:', error);
-  //     }
-  //   } else {
-  //     console.error('File data or document name is undefined', document);
-  //   }
-  // }
-
-  // getContentType(fileName: string): string {
-  //   const extension = fileName.split('.').pop()?.toLowerCase();
-  //   switch (extension) {
-  //     case 'pdf':
-  //       return 'application/pdf';
-  //     case 'png':
-  //       return 'image/png';
-  //     case 'jpeg':
-  //     case 'jpg':
-  //       return 'image/jpeg';
-  //     case 'xls':
-  //       return 'application/vnd.ms-excel';
-  //     case 'xlsx':
-  //       return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-  //     case 'docx':
-  //       return 'application/msword';
-
-  //     // Add more cases for other file types if needed
-  //     default:
-  //       return 'application/octet-stream';
-  //   }
-  // }
-
-  deleteFolder(id: number): void {
-    if (confirm('Are you sure you want to delete this folder?')) {
-      this.folderService.delete(id).subscribe({
-        next: () => {
-          console.log('Folder deleted');
-          //this.loadFoldersByParentId(this.fId); // Reload the folder list after deletion
-        },
-        error: (error) => console.error('Error deleting folder', error),
-      });
-    }
-  }
-
+  //Folders Pin
   pinFolder(folder: Folder): void {
-    this.folderPinned.emit(folder);
-  }
-
+    this.folderPinned.emit(folder);}
   togglePinFolder(folder: Folder) {
     const index = this.pinnedFolders.findIndex((f) => f.id === folder.id);
     if (index === -1) {
       this.pinnedFolders.push(folder);
     } else {
       this.pinnedFolders.splice(index, 1);
-    }
-  }
-
+}}
   isPinned(folder: Folder): boolean {
-    return this.pinnedFolders.some((f) => f.id === folder.id);
-  }
+    return this.pinnedFolders.some((f) => f.id === folder.id);}
 
+
+  //Modals
   openModalDoc(): void {
     const modalRef = this.modalService.open(DocumentCreationComponent);
     modalRef.componentInstance.folderId = this.fId;
@@ -463,4 +291,46 @@ export class FolderDetailsComponent implements OnInit {
 
     });
   }
+  openEditFolder(folder: Folder) {
+    const modalRef = this.modalService.open(FolderEditComponent);
+    modalRef.componentInstance.folder = { ...folder };
+    modalRef.componentInstance.folderUpdated.subscribe(
+      (updatedFolder: Folder) => {
+        this.folders$.pipe(
+          take(1) 
+        ).subscribe(folders => {
+        const index = this.folders.findIndex((f) => f.id === updatedFolder.id);
+        if (index !== -1) {
+          const updatedfolders = [...folders];
+          updatedfolders[index] = updatedFolder;
+         // this.folders[index] = updatedFolder; 
+          //this.folderService.update(updatedFolder.id, updatedFolder);
+        }
+      });
+      }
+    );}
+
+
+  openModal(document?: DocumentModel) {
+    const modalRef = this.modalService.open(DocumentEditComponent);
+    modalRef.componentInstance.document = { ...document };
+    modalRef.componentInstance.documentUpdated.subscribe(
+      (updatedDocument: DocumentModel) => {
+        this.documents$.pipe(
+          take(1) 
+        ).subscribe(documents => {
+          const index = documents.findIndex(
+            (doc: DocumentModel) => doc.id === updatedDocument.id
+          );
+          if (index !== -1) {
+            const updatedDocuments = [...documents];
+            updatedDocuments[index] = updatedDocument;
+
+          }
+        });
+      }
+    );
+  }
+  
+
 }

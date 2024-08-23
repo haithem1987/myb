@@ -42,7 +42,7 @@ export class FolderService extends RepositoryService<Folder> {
     return result.data?.deleteFolder === true;
   }
 
-  // Get all folders
+
   override getAll(): Observable<Folder[]> {
     return super.getAll().pipe(
       map((folders) => {
@@ -52,7 +52,7 @@ export class FolderService extends RepositoryService<Folder> {
     );
   }
 
-  // Get folder by ID
+
   override get(id: number): Observable<Folder> {
     return this.apollo
       .watchQuery<{ folderById: Folder }>({
@@ -72,29 +72,26 @@ export class FolderService extends RepositoryService<Folder> {
      
   }
 
-  // override get(id: number): Observable<Folder> {
-  //   return super.get(id).pipe(
-  //     map((folder) => {
-  //         const currentFolders = this.folderSubject.value;
-  //         const updatedFolders = currentFolders.map(f => f.id === folder.id ? folder : f);
-  //         this.folderSubject.next(updatedFolders);
-  //         return folder;
-  //     })
-  //   );
-  // }
-
 
   // override get(id: number): Observable<Folder> {
   //   return super.get(id).pipe(
   //     map((folder) => {
-  //       const folders = this.folderSubject.value.map((p) =>
-  //         p.id === id ? folder : p
+  //       console.log('Result from super.get(id):', folder);
+        
+  //       if (!folder) {
+  //         throw new Error(`Folder with ID ${id} not found`);
+  //       }
+  
+  //       const folders = this.folderSubject.value.map((f) =>
+  //         f.id === id ? folder : f
   //       );
   //       this.folderSubject.next(folders);
+  //       console.log('folder serv', folder);
   //       return folder;
   //     })
   //   );
   // }
+  
 
   getFoldersByParentId(parentId: number): Observable<Folder[]> {
     return this.apollo.watchQuery({
@@ -111,27 +108,6 @@ export class FolderService extends RepositoryService<Folder> {
     );
   }
 
-  // Create folder
-  // override create(folder: Folder
-  // ): Observable<Folder> {
-  //   return this.apollo
-  //     .mutate<{ addFolder: Folder }>({
-  //       mutation: gql`
-  //       ${this.typeOperations.create}
-  //     `,
-  //       variables: { folder }
-  //     })
-  //     .pipe(
-  //       map((result: any) => {
-  //         const newFolder = result.data.addFolder;
-  //         const currentFolders = this.folderSubject.value;
-  //         this.folderSubject.next([...currentFolders, newFolder]);
-
-  //         return newFolder;
-  //       })
-  //     );
-      
-  // }
   override create(item: Folder): Observable<Folder> {
     return super.create(item).pipe(
       map((newFolder) => {
@@ -141,6 +117,8 @@ export class FolderService extends RepositoryService<Folder> {
       })
     );
   }
+
+
   override update(id: number, item: Folder): Observable<Folder> {
     return super.update(id, item).pipe(
       map((updatedFolder) => {

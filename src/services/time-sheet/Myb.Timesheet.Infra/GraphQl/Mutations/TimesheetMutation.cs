@@ -71,7 +71,7 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
             return await employeeService.UpdateEmployeeAsync(employee);
         }
         
-        public async Task<bool> DeleteEmployee([Service] IEmployeeService employeeService, int id)
+        public async Task<bool> DeleteEmployee([Service] IEmployeeService employeeService, string id)
         {
             return  await employeeService.DeleteEmployeeAsync(id);
         }

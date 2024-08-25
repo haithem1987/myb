@@ -1,0 +1,5 @@
+.holiday-disabled {
+  background-color: #845bba40 !important;
+  color: #000;
+  cursor: not-allowed;
+}

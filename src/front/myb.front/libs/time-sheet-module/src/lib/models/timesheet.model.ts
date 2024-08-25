@@ -15,11 +15,10 @@ export interface Timesheet extends BaseModel {
   workedHours: number;
   description?: string;
   status: ApprovalStatus;
-  employeeId?: number | null;
   quantity?: number;
-  employeeName?: string;
   projectId: number;
   projectName?: string;
   userId?: string | null;
+  username?: string | null;
   timeUnit: TimeUnit;
 }

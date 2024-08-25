@@ -16,7 +16,7 @@ public class TimeoffService:ITimeoffService
         _timeoffRepository = timeoffRepository;
         _logger = logger;
     }
-    public Task<IEnumerable<TimeOff>> GetTimeOffsByEmployeeIdAsync(int employeeId)
+    public Task<IEnumerable<TimeOff>> GetTimeOffsByEmployeeIdAsync(string employeeId)
     {
         try
         {

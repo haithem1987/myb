@@ -20,15 +20,6 @@ namespace Myb.Timesheet.Infra;
             _timesheetService = timesheetService;
         }
 
-        public async Task<Employee?> GetEmployee(TimeSheet timesheet, IResolverContext context)
-        {
-            if (timesheet.EmployeeId!=0)
-            {
-                return await _employeeService.GetEmployeeByIdAsync(timesheet.EmployeeId);
-            }
-            return null;
-        }
-
         public async Task<Project?> GetProject(TimeSheet timesheet, IResolverContext context)
         {
             if (timesheet.ProjectId!=0)

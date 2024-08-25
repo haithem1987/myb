@@ -42,6 +42,7 @@
   "SAVING": "Saving...",
   "LIST": "List",
   "CREATE": "Create",
+  "ADD": "Add",
   "EDIT": "Edit",
   "INTERVANANTS": "Intervenants",
   "ACTIVE": "Active",
@@ -62,6 +63,7 @@
   "DEPARTMENT_REQUIRED": "Department is required.",
   "UPDATE_EMPLOYEE": "Update Employee",
   "CREATE_EMPLOYEE": "Create Employee",
+  "ADD_EMPLOYEE": "Add Employee",
   "CANCEL": "Cancel",
   "NO_RESULTS_FOUND": "No results found",
   "EDIT_PROJECT": "Edit Project",
@@ -118,5 +120,9 @@
   "ACCESS_DENIED": "Access Denied",
   "ACCESS_DENIED_MESSAGE": "You do not have permission to access this page. Please log in to continue.",
   "GO_TO_LOGIN": "Go to Login",
-  "GO_TO_HOME": "Go to Home"
+  "GO_TO_HOME": "Go to Home",
+  "SUBMIT": "Submit",
+  "INTERVENANTS_TIMESHEETS": "Intervenant's Timesheets",
+  "MY_TIMESHEETS": "My Timesheets",
+  "NO_USER_FOUND": "No user found in Keycloak with this email. You can't add a new employee unless they exist."
 }

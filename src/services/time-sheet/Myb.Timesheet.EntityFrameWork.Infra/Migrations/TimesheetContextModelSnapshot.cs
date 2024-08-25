@@ -24,11 +24,8 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
             modelBuilder.Entity("Myb.Timesheet.Models.Employee", b =>
                 {
-                    b.Property<int?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -47,9 +44,6 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
 
                     b.Property<bool>("isManager")
                         .HasColumnType("boolean");
@@ -108,8 +102,8 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("integer");
+                    b.Property<string>("EmployeeId")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
@@ -154,10 +148,7 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("EmployeeName")
+                    b.Property<string>("EmployeeId")
                         .HasColumnType("text");
 
                     b.Property<int>("ProjectId")
@@ -179,6 +170,9 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
                         .HasColumnType("text");
 
                     b.Property<float>("WorkedHours")
@@ -210,8 +204,8 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("integer");
+                    b.Property<string>("EmployeeId")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("timestamp with time zone");
@@ -247,28 +241,23 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
             modelBuilder.Entity("Myb.Timesheet.Models.TimeOff", b =>
                 {
                     b.HasOne("Myb.Timesheet.Models.Employee", "Employee")
-                        .WithMany("TimeOffs")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
 
                     b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Myb.Timesheet.Models.TimeSheet", b =>
                 {
-                    b.HasOne("Myb.Timesheet.Models.Employee", "Employee")
+                    b.HasOne("Myb.Timesheet.Models.Employee", null)
                         .WithMany("Timesheets")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EmployeeId");
 
                     b.HasOne("Myb.Timesheet.Models.Project", "Project")
                         .WithMany("Timesheets")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Employee");
 
                     b.Navigation("Project");
                 });
@@ -293,8 +282,6 @@ namespace Myb.Timesheet.EntityFrameWork.Infra.Migrations
             modelBuilder.Entity("Myb.Timesheet.Models.Employee", b =>
                 {
                     b.Navigation("Tasks");
-
-                    b.Navigation("TimeOffs");
 
                     b.Navigation("Timesheets");
                 });

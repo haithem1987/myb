@@ -20,7 +20,8 @@
     [disabled]="isSaving"
   >
     <ng-container *ngIf="!isSaving">
-      <i class="bi bi-check-circle-fill"></i> {{ 'VALIDATE' | translate }}
+      <i class="bi bi-check-circle-fill"></i>
+      {{ isManager ? 'VALIDATE' : ('SUBMIT' | translate) }}
     </ng-container>
     <ng-container *ngIf="isSaving">
       <span

@@ -2,7 +2,7 @@
   [isLoading]="isLoading"
 ></myb-front-loading-indicator>
 <div *ngIf="!isLoading" class="container my-4">
-  <myb-front-timesheet-header></myb-front-timesheet-header>
+  <!-- <myb-front-timesheet-header></myb-front-timesheet-header> -->
   <div class="mb-3 d-flex justify-content-between align-items-center">
     <div>
       <myb-front-period-selector
@@ -34,7 +34,7 @@
     (selectAll)="toggleSelectAll($event)"
     (rowSelectChange)="onRowSelectChange($event.projectId, $event.event)"
     (quantityChange)="
-      onQuantityChange($event.projectId, $event.date, $event.event)
+      onQuantityChange($event.projectId, $event.date, $event.quantity)
     "
   ></myb-front-timesheet-table>
 </div>

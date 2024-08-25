@@ -34,21 +34,17 @@ public class TimesheetContext:DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Project>()
-            .HasQueryFilter(p => p.Status != ProjectStatus.Deleted); // Filter out deleted projects
+        
         modelBuilder.Entity<Employee>()
             .ToTable("Employees");
+        modelBuilder.Entity<Project>()
+            .HasQueryFilter(p => p.Status != ProjectStatus.Deleted); 
 
       /*  modelBuilder.Entity<Manager>()
             .ToTable("Managers");*/
         
         modelBuilder.Entity<TimeSheet>(entity =>
         {
-           
-            entity.HasOne(ts => ts.Employee)
-                .WithMany(te => te.Timesheets)
-                .HasForeignKey(te => te.EmployeeId)
-                .OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(ts => ts.Project)
                 .WithMany(te => te.Timesheets)
                 .HasForeignKey(te => te.ProjectId)
@@ -56,7 +52,7 @@ public class TimesheetContext:DbContext
         });
             
           
-        modelBuilder.Entity<TimeOff>(entity =>
+       /* modelBuilder.Entity<TimeOff>(entity =>
         {
             entity.HasKey(to => to.Id);
 
@@ -64,7 +60,7 @@ public class TimesheetContext:DbContext
                 .WithMany(e => e.TimeOffs) 
                 .HasForeignKey(to => to.EmployeeId) 
                 .OnDelete(DeleteBehavior.Cascade); 
-        });
+        });*/
         modelBuilder.Entity<TimesheetTask>(entity =>
         {
             entity.HasKey(d => d.Id);

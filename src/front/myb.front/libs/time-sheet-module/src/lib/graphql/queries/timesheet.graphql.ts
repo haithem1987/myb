@@ -4,7 +4,6 @@ export const GET_ALL_TIMESHEETS = `
     createdAt
       date
       description
-      employeeId
       id
       status
       quantity
@@ -12,7 +11,7 @@ export const GET_ALL_TIMESHEETS = `
       updatedAt
       userId
       workedHours
-      employeeName
+      username
     projectName
     }
   }
@@ -24,7 +23,6 @@ export const GET_TIMESHEETS_BY_USER_ID = `
       createdAt
     date
     description
-    employeeId
     id
     status
     projectId
@@ -32,7 +30,7 @@ export const GET_TIMESHEETS_BY_USER_ID = `
     quantity
     userId
     workedHours
-    employeeName
+    username
     projectName
     }
   }

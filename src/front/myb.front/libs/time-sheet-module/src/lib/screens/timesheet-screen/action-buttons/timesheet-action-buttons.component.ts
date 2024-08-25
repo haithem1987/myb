@@ -12,6 +12,7 @@ import { TranslateModule } from '@ngx-translate/core';
 export class TimesheetActionButtonsComponent {
   @Input() selectedProjectsSize = 0;
   @Input() isSaving = false;
+  @Input() isManager = false;
   @Output() fillProjects = new EventEmitter<void>();
   @Output() extractPDF = new EventEmitter<void>();
   @Output() saveChanges = new EventEmitter<void>();

@@ -42,6 +42,7 @@
   "SAVING": "Enregistrement...",
   "LIST": "Liste",
   "CREATE": "Créer",
+  "ADD": "Ajouter",
   "EDIT": "Editer",
   "INTERVANANTS": "Intervenants",
   "ACTIVE": "Actif",
@@ -62,6 +63,7 @@
   "DEPARTMENT_REQUIRED": "Le département est requis.",
   "UPDATE_EMPLOYEE": "Mettre à jour l'employé",
   "CREATE_EMPLOYEE": "Créer un employé",
+  "ADD_EMPLOYEE": "Ajouter Employee",
   "CANCEL": "Annuler",
   "NO_RESULTS_FOUND": "Aucun résultat trouvé",
   "EDIT_PROJECT": "Éditer le projet",
@@ -118,5 +120,9 @@
   "ACCESS_DENIED": "Accès Refusé",
   "ACCESS_DENIED_MESSAGE": "Vous n'avez pas la permission d'accéder à cette page. Veuillez vous connecter pour continuer.",
   "GO_TO_LOGIN": "Aller à la connexion",
-  "GO_TO_HOME": "Aller à l'accueil"
+  "GO_TO_HOME": "Aller à l'accueil",
+  "SUBMIT": "Soumettre",
+  "INTERVENANTS_TIMESHEETS": "Feuilles de temps des intervenants",
+  "MY_TIMESHEETS": "Mes feuilles de temps",
+  "NO_USER_FOUND": "Aucun utilisateur trouvé dans Keycloak avec cet email. Vous ne pouvez pas ajouter un nouvel employé à moins qu'il n'existe déjà."
 }

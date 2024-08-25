@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import Keycloak, { KeycloakProfile } from 'keycloak-js';
-import { BehaviorSubject, Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  firstValueFrom,
+  lastValueFrom,
+  Observable,
+} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +19,7 @@ export class KeycloakService {
     this.profileSubject.asObservable();
 
   private adminToken: string | null = null;
+  private clientIdCache: string | null = null; // Cache clientId here
   private userIdSubject: BehaviorSubject<string | null> = new BehaviorSubject<
     string | null
   >(null);
@@ -61,6 +67,7 @@ export class KeycloakService {
   login(): void {
     this.keycloak.login();
   }
+
   register(): void {
     this.keycloak.register();
   }
@@ -93,7 +100,6 @@ export class KeycloakService {
 
   hasRole(role: string): boolean {
     const roles = this.getUserRoles();
-    console.log('roles', roles);
     return roles.includes(role);
   }
 
@@ -116,58 +122,89 @@ export class KeycloakService {
       this.keycloak
         .loadUserProfile()
         .then((profile) => {
-          // console.log('User profile loaded successfully:', profile);
           this.profileSubject.next(profile);
-          this.userIdSubject.next(profile?.id ?? null); // Set userId here
+          this.userIdSubject.next(profile?.id ?? null);
           resolve();
         })
         .catch((err) => {
           console.error('Error loading user profile:', err);
           this.profileSubject.next(null);
-          this.userIdSubject.next(null); // Reset userId on error
+          this.userIdSubject.next(null);
           reject(err);
         });
     });
   }
 
-  private getAdminToken(): Promise<void> {
+  private async getAdminToken(): Promise<void> {
     const body = new URLSearchParams();
     body.set('client_id', 'admin-cli');
-    body.set('username', 'user'); // replace with your admin username
-    body.set('password', 'bitnami'); // replace with your admin password
+    body.set('username', 'user');
+    body.set('password', 'bitnami');
     body.set('grant_type', 'password');
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': '*',
-      'Access-Control-Allow-Headers': '*',
     });
 
-    return this.http
-      .post<{ access_token: string }>(
-        'https://www.keycloak.forlink-group.com/realms/master/protocol/openid-connect/token',
-        body.toString(),
-        { headers }
-      )
-      .toPromise()
-      .then((response: any) => {
-        this.adminToken = response.access_token;
-      })
-      .catch((err) => {
-        console.error('Error obtaining admin token:', err);
-        this.adminToken = null;
-        throw err;
-      });
+    try {
+      const response: any = await firstValueFrom(
+        this.http.post(
+          'https://www.keycloak.forlink-group.com/realms/master/protocol/openid-connect/token',
+          body.toString(),
+          { headers }
+        )
+      );
+      this.adminToken = response.access_token;
+    } catch (err) {
+      console.error('Error obtaining admin token:', err);
+      this.adminToken = null;
+      throw err;
+    }
+  }
+
+  private async getClientId(): Promise<string | null> {
+    if (this.clientIdCache) {
+      return this.clientIdCache; // Return cached clientId
+    }
+
+    if (!this.adminToken) {
+      await this.getAdminToken();
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.adminToken}`,
+      'Content-Type': 'application/json',
+    });
+
+    try {
+      const clients: any = await firstValueFrom(
+        this.http.get(
+          'https://www.keycloak.forlink-group.com/admin/realms/MYB/clients?clientId=MYB-client',
+          { headers }
+        )
+      );
+
+      if (clients && clients.length > 0) {
+        this.clientIdCache = clients[0].id;
+        return this.clientIdCache;
+      } else {
+        throw new Error('Client ID not found');
+      }
+    } catch (err) {
+      console.error('Error fetching client ID:', err);
+      return null;
+    }
   }
 
   async getUsersByEmailForClient(partialEmail: string): Promise<any> {
-    if (!this.adminToken) {
-      return this.getAdminToken().then(() =>
-        this.queryUsersByPartialEmailForClient(partialEmail)
-      );
-    } else {
+    try {
+      if (!this.adminToken) {
+        await this.getAdminToken();
+      }
       return this.queryUsersByPartialEmailForClient(partialEmail);
+    } catch (err) {
+      console.error('Error fetching admin token:', err);
+      throw err;
     }
   }
 
@@ -175,42 +212,88 @@ export class KeycloakService {
     partialEmail: string
   ): Promise<any> {
     if (!this.adminToken) {
-      return Promise.reject('Admin token is not available');
+      throw new Error('Admin token is not available');
     }
 
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.adminToken}`,
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': '*',
-      'Access-Control-Allow-Headers': '*',
     });
 
-    // Use the partial email with the Keycloak search query
-    return this.http
-      .get(
-        `https://www.keycloak.forlink-group.com/admin/realms/MYB/users?email=${partialEmail}`,
-        { headers }
-      )
-      .toPromise()
-      .then((users: any) => {
-        // Filter users by client role
-        const clientRolesPromises = users.map((user: any) =>
-          this.http
-            .get(
-              `https://www.keycloak.forlink-group.com/admin/realms/MYB/users/${user.id}/role-mappings/clients/${this.keycloak.clientId}`,
-              { headers }
-            )
-            .toPromise()
-            .then((roles: any) => ({ ...user, roles }))
-        );
+    try {
+      const users: any = await firstValueFrom(
+        this.http.get(
+          `https://www.keycloak.forlink-group.com/admin/realms/MYB/users?email=${partialEmail}`,
+          { headers }
+        )
+      );
 
-        return Promise.all(clientRolesPromises).then((usersWithRoles) =>
-          usersWithRoles.filter((user: any) => user.roles.length > 0)
-        );
-      })
-      .catch((err) => {
-        console.error('Error fetching users by partial email for client:', err);
-        throw err;
+      console.log('users:', users);
+
+      const clientId = await this.getClientId();
+
+      const usersWithRoles = await Promise.all(
+        users.map(async (user: any) => {
+          console.log(
+            `Fetching role mappings for user: ${user.username} with clientId: ${clientId}`
+          );
+
+          try {
+            const roles: any = await firstValueFrom(
+              this.http.get(
+                `https://www.keycloak.forlink-group.com/admin/realms/MYB/users/${user.id}/role-mappings/clients/${clientId}`,
+                { headers }
+              )
+            );
+            return { ...user, roles: roles.map((role: any) => role.name) }; // Extract role names
+          } catch (error) {
+            console.error(
+              `Error fetching role mappings for user: ${user.username}`,
+              error
+            );
+            return { ...user, roles: [] };
+          }
+        })
+      );
+
+      console.log('Users with roles:', usersWithRoles);
+      const filteredUsers = usersWithRoles.filter(
+        (user: any) =>
+          !user.roles.includes('MYB_EMPLOYEE') &&
+          !user.roles.includes('MYB_MANAGER')
+      );
+
+      return filteredUsers;
+    } catch (err) {
+      console.error('Error fetching users by partial email for client:', err);
+      throw err;
+    }
+  }
+
+  async assignRoleToUser(userId: string, roleName: string): Promise<void> {
+    try {
+      if (!this.adminToken) {
+        await this.getAdminToken();
+      }
+
+      const clientId = await this.getClientId();
+      if (!clientId) {
+        throw new Error('Client ID could not be retrieved');
+      }
+
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${this.adminToken}`,
+        'Content-Type': 'application/json',
       });
+
+      const roleUrl = `https://www.keycloak.forlink-group.com/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
+      const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
+
+      const assignRoleUrl = `https://www.keycloak.forlink-group.com/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
+      await firstValueFrom(this.http.post(assignRoleUrl, [role], { headers }));
+
+      console.log(`Successfully assigned role ${roleName} to user ${userId}`);
+    } catch (err) {
+      console.error(`Error assigning role ${roleName} to user ${userId}:`, err);
+    }
   }
 }

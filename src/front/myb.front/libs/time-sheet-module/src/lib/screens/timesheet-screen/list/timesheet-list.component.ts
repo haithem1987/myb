@@ -93,6 +93,7 @@ export class TimesheetListComponent implements OnInit {
   private defaultHours: number = 1;
   timeUnit: string = 'Day';
   weekendDays: string[] = [];
+  isManager: boolean = false;
   constructor(
     private timesheetService: TimesheetService,
     private projectService: ProjectService,
@@ -106,6 +107,7 @@ export class TimesheetListComponent implements OnInit {
   ) {
     config.placement = 'left-start';
     config.autoClose = true;
+    this.isManager = this.keycloakService.isUserManager();
     this.defaultHours = this.settingsService.getSetting(
       'timesheet',
       'defaultHours'
@@ -310,10 +312,8 @@ export class TimesheetListComponent implements OnInit {
       month: string;
       year: string;
     },
-    event: Event
+    quantity: number
   ): void {
-    const inputElement = event.target as HTMLInputElement;
-    const quantity = Number(inputElement.value);
     this.quantityChange.next({ projectId, date, quantity });
   }
 
@@ -376,7 +376,7 @@ export class TimesheetListComponent implements OnInit {
 
   saveAllChanges(): void {
     this.isSaving = true;
-
+    const { id, firstName, lastName }: any = this.keycloakService.getProfile();
     const timesheetUpdates: Timesheet[] = [];
 
     this.projects$.subscribe((projects) => {
@@ -410,12 +410,11 @@ export class TimesheetListComponent implements OnInit {
             workedHours: 0,
             description: '',
             status: ApprovalStatus.PENDING,
-            employeeId: 0,
             projectId,
             quantity,
-            employeeName: '',
+            username: `${firstName} ${lastName}`,
             projectName: project.projectName,
-            userId: this.userId,
+            userId: id,
             timeUnit: TimeUnit.DAY,
           };
           this.updatedTimesheets = [...this.updatedTimesheets, newTimesheet];
@@ -423,6 +422,8 @@ export class TimesheetListComponent implements OnInit {
         } else {
           timesheet = {
             ...timesheet,
+            userId: id,
+            username: `${firstName} ${lastName}`,
             quantity,
             projectName: project.projectName,
           };

@@ -1,0 +1,17 @@
+<div class="position-relative">
+  <span
+    *ngIf="isHoliday"
+    class="holiday-badge bg-danger border border-light rounded-circle"
+    [ngbTooltip]="holidayName"
+  >
+    <span class="visually-hidden">New alerts</span>
+  </span>
+</div>
+<div class="text-muted fw-light">{{ date.weekday }}</div>
+<div
+  [ngClass]="{
+    'badge bg-secondary rounded-pill': date.isToday
+  }"
+>
+  {{ date.day }}
+</div>

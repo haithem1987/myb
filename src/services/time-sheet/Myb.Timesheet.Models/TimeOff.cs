@@ -9,6 +9,6 @@ public class TimeOff:BaseEntity
     public string Reason { get; set; }
     public bool IsApproved { get; set; }
     public TimeOffType? Type { get; set; }
-    public int? EmployeeId { get; set; } 
+    public string? EmployeeId { get; set; } 
     public virtual Employee? Employee { get; set; }
 }

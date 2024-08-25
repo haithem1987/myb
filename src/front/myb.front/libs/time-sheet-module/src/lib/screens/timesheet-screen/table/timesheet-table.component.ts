@@ -2,13 +2,24 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Project } from '../../../models/project.model';
 import { TranslateModule } from '@ngx-translate/core';
-import { ProgressBarComponent } from 'libs/shared/shared-ui/src';
+import {
+  DateCellComponent,
+  ProgressBarComponent,
+} from 'libs/shared/shared-ui/src';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { TimesheetQuantityInputComponent } from '../../../components/quantity-input/timesheet-quantity-input.component';
 
 @Component({
   selector: 'myb-front-timesheet-table',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ProgressBarComponent, NgbTooltip],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    ProgressBarComponent,
+    NgbTooltip,
+    DateCellComponent,
+    TimesheetQuantityInputComponent,
+  ],
   templateUrl: './timesheet-table.component.html',
   styleUrl: './timesheet-table.component.css',
 })
@@ -28,7 +39,7 @@ export class TimesheetTableComponent {
   @Output() quantityChange = new EventEmitter<{
     projectId: number;
     date: any;
-    event: Event;
+    quantity: number;
   }>();
 
   toggleSelectAll(event: Event) {
@@ -39,8 +50,8 @@ export class TimesheetTableComponent {
     this.rowSelectChange.emit({ projectId, event });
   }
 
-  onQuantityChange(projectId: number, date: any, event: Event) {
-    this.quantityChange.emit({ projectId, date, event });
+  onQuantityChange(projectId: number, date: any, newQuantity: number): void {
+    this.quantityChange.emit({ projectId, date, quantity: newQuantity });
   }
   isSelected(projectId: number): boolean {
     return this.selectedProjects.has(projectId);

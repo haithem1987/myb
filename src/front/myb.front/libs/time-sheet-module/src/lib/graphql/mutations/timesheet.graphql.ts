@@ -4,7 +4,6 @@ export const CREATE_TIMESHEET = `
       createdAt
       date
       description
-      employeeId
       id
       status
       projectId
@@ -12,7 +11,7 @@ export const CREATE_TIMESHEET = `
       quantity
       userId
       workedHours
-      employeeName
+      username
       projectName
     }
   }
@@ -24,7 +23,6 @@ export const UPDATE_TIMESHEET = `
       createdAt
       date
       description
-      employeeId
       id
       status
       projectId
@@ -32,7 +30,7 @@ export const UPDATE_TIMESHEET = `
       quantity
       userId
       workedHours
-      employeeName
+      username
       projectName
     }
   }
@@ -46,9 +44,8 @@ export const UPDATE_MULTIPLE_TIMESHEETS = `
       workedHours
       description
       status
-      employeeId
       quantity
-      employeeName
+      username
       projectId
       projectName
       userId

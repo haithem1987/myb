@@ -62,6 +62,7 @@ import {
 import {
   CREATE_TIMESHEET,
   DELETE_TIMESHEET,
+  GENERATE_TIMESHEET_PDF,
   UPDATE_MULTIPLE_TIMESHEETS,
   UPDATE_TIMESHEET,
 } from '../../../time-sheet-module/src/lib/graphql/mutations/timesheet.graphql';
@@ -96,10 +97,7 @@ import {
   GET_ALL_PRODUCTS,
   GET_PRODUCT_BY_ID,
 } from '../../../invoice-module/src/lib/graphql/queries/product.query';
-import {
-  CREATE_CLIENT,
-  UPDATE_CLIENT,
-} from '../../..//invoice-module/src/lib/graphql/mutations/client.mutation';
+import { CREATE_CLIENT, UPDATE_CLIENT } from '../../..//invoice-module/src/lib/graphql/mutations/client.mutation';
 import {
   GET_ALL_CLIENTS,
   GET_CLIENT_BY_ID,
@@ -127,6 +125,7 @@ export const typeConfig: { [key: string]: any } = {
     getTimesheetsByUserId: GET_TIMESHEETS_BY_USER_ID,
     getTimesheetsByEmployeeId: GET_TIMESHEETS_BY_EMPLOYEE_ID,
     updateMultipleTimesheets: UPDATE_MULTIPLE_TIMESHEETS,
+    generateTimesheetPdf: GENERATE_TIMESHEET_PDF,
   },
   Task: {
     getAll: GET_ALL_TASKS,

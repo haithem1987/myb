@@ -1,0 +1,26 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ 'ACCESS_CONFIRMATION' | translate }}</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="declineAccess()"
+  ></button>
+</div>
+<div class="modal-body">
+  <p>{{ 'CONFIRMATION_MESSAGE' | translate }}</p>
+</div>
+<div class="modal-footer">
+  <button
+    class="btn btn-link text-primary text-decoration-none"
+    (click)="login()"
+  >
+    {{ 'LOGIN' | translate }}
+  </button>
+  <button
+    class="btn btn-link text-secondary text-decoration-none"
+    (click)="register()"
+  >
+    {{ 'REGISTER' | translate }}
+  </button>
+</div>

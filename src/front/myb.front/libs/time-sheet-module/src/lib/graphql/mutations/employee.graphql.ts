@@ -9,7 +9,6 @@ export const CREATE_EMPLOYEE = `
       managerId
       name
       updatedAt
-      userId
     }
   }
 `;
@@ -25,13 +24,12 @@ export const UPDATE_EMPLOYEE = `
       managerId
       name
       updatedAt
-      userId
     }
   }
 `;
 
 export const DELETE_EMPLOYEE = `
-  mutation deleteEmployee($id: Int!) {
+  mutation deleteEmployee($id: String!) {
     deleteEmployee(id: $id)
   }
 `;

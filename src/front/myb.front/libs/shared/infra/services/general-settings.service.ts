@@ -15,7 +15,8 @@ export class GeneralSettingsService {
       autoSave: true,
       defaultHours: 8,
       notifications: false,
-      timeUnit: {},
+      timeUnit: 'Hour',
+      timeUnitOptions: ['Hour', 'Day'],
     },
     invoice: {
       autoSave: true,

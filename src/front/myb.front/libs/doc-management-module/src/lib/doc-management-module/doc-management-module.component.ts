@@ -1,36 +1,34 @@
-import { DocumentStatus } from './../models/DocumentStatus';
-import { DocumentsListComponent } from '../components/Documents/documents-list/documents-list.component';
-import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DocumentService } from '../services/Document.service';
-import { DocumentModel } from '../models/DocumentModel';
-import { DocumentType } from '../models/DocumentType';
-import { NavLinksComponent } from '../components/navigation-components/nav-links/nav-links.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+  ActivatedRoute,
+  RouterLink,
+  RouterModule,
+  RouterOutlet,
+} from '@angular/router';
 import { DocumentEditComponent } from '../components/document-edit/document-edit.component';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { DocumentUploadComponent } from '../components/document-upload/document-upload.component';
+import { DocumentsListComponent } from '../components/Documents/documents-list/documents-list.component';
 import { FolderCardsComponent } from '../components/Folders/folder-cards/folder-cards.component';
-import { Folder } from '../models/Folder';
-import { FolderService } from '../services/folder.service';
-import { ActivatedRoute, RouterLink, RouterModule , RouterOutlet } from '@angular/router';
-import { SelectedFiles, UploadFilesService } from '../services/upload-files.service';
+import { NavLinksComponent } from '../components/navigation-components/nav-links/nav-links.component';
 import { NavbarComponent } from '../components/navigation-components/navbar/navbar.component';
-import { BreadcrumbComponent } from 'libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component';
+import { DocumentModel } from '../models/DocumentModel';
+import { Folder } from '../models/Folder';
 // import { BreadcrumbComponent } from 'libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component';
 
+import { BreadcrumbComponent } from '@myb-front/shared-ui';
 import { ToastsContainerComponent } from 'libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component';
-import { DocModuleWidgetComponent } from '../doc-module-widget/doc-module-widget.component';
 import { FolderDetailsComponent } from '../components/Folders/folder-details/folder-details.component';
+import { DocModuleWidgetComponent } from '../doc-module-widget/doc-module-widget.component';
 @Component({
   selector: 'myb-front-doc-management-module',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule , 
-    NavLinksComponent , 
-    DocumentEditComponent ,
+    FormsModule,
+    NavLinksComponent,
+    DocumentEditComponent,
     DocumentUploadComponent,
     FolderCardsComponent,
     DocumentsListComponent,
@@ -42,25 +40,15 @@ import { FolderDetailsComponent } from '../components/Folders/folder-details/fol
     ToastsContainerComponent,
     DocModuleWidgetComponent,
     FolderDetailsComponent,
-
-    
-
   ],
   templateUrl: './doc-management-module.component.html',
   styleUrl: './doc-management-module.component.css',
 })
-export class DocManagementModuleComponent  {
-documents :DocumentModel[] = [];
-folders:Folder[] = []
-fId!: number;
+export class DocManagementModuleComponent {
+  documents: DocumentModel[] = [];
+  folders: Folder[] = [];
+  fId!: number;
 
-constructor(    private route: ActivatedRoute
-){}
-ngOnInit(): void {
-  
-}
-
-
-
-
+  constructor(private route: ActivatedRoute) {}
+  ngOnInit(): void {}
 }

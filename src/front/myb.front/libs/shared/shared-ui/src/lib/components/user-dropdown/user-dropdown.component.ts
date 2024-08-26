@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { KeycloakProfile } from 'keycloak-js';
@@ -15,6 +15,7 @@ import { RouterModule } from '@angular/router';
   styleUrl: './user-dropdown.component.css',
 })
 export class UserDropdownComponent implements OnInit {
+  @Input() rootPath: string = '';
   user$: Observable<KeycloakProfile | null>;
 
   constructor(private keycloakService: KeycloakService) {

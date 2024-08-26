@@ -8,9 +8,8 @@ import { CreateInvoiceComponent } from '../components/invoice-components/create-
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../components/navbar/navbar.component';
 import { ListInvoiceComponent } from '../components/invoice-components/list-invoice/listInvoice.component';
-import { BreadcrumbComponent } from '../../../../time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component';
 import { ToastsContainerComponent } from '../../../../shared/shared-ui/src/lib/components/toasts-container/toasts-container.component';
-
+import { BreadcrumbComponent } from '@myb-front/shared-ui';
 
 @Component({
   selector: 'myb-front-invoice-module',

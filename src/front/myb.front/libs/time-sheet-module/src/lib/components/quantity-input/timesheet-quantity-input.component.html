@@ -1,0 +1,11 @@
+<ng-container>
+  <input
+    type="number"
+    class="form-control text-center"
+    style="width: 60px"
+    [value]="quantity"
+    [ngClass]="{ 'holiday-disabled': isHoliday }"
+    (input)="onQuantityChange($event)"
+    [disabled]="isHoliday"
+  />
+</ng-container>

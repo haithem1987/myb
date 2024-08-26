@@ -1,0 +1,70 @@
+<div class="card table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>
+          <input
+            type="checkbox"
+            class="form-check-input"
+            (change)="toggleSelectAll($event)"
+          />
+        </th>
+        <th class="project-column">{{ 'PROJECT' | translate }}</th>
+        <th
+          class="text-center"
+          [ngClass]="{
+            'weekend-dark': isWeekend(date) && !date.isToday,
+            'today-column': date.isToday
+          }"
+          *ngFor="let date of dateRange; trackBy: trackByDate"
+        >
+          <myb-front-date-cell
+            [date]="date"
+            [holidayName]="handleHoliday(date).name"
+            [isHoliday]="handleHoliday(date).isHoliday"
+          ></myb-front-date-cell>
+        </th>
+        <th class="total-column">{{ 'TOTAL' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let project of projects; trackBy: trackByProject">
+        <td>
+          <input
+            type="checkbox"
+            class="form-check-input"
+            [checked]="isSelected(project.id)"
+            (change)="onRowSelectChange(project.id, $event)"
+          />
+        </td>
+        <td class="project-column">{{ project.projectName }}</td>
+        <td
+          class="text-center"
+          style="width: 80px"
+          *ngFor="let date of dateRange; trackBy: trackByDate"
+          [ngClass]="{
+            'weekend-dark': isWeekend(date) && !date.isToday,
+            'today-column': date.isToday
+          }"
+        >
+          <myb-front-timesheet-quantity-input
+            [projectId]="project.id"
+            [date]="date"
+            [quantity]="getQuantityForDate(project.id, date.dateString)"
+            [isHoliday]="handleHoliday(date).isHoliday"
+            (quantityChange)="onQuantityChange(project.id, date, $event)"
+          ></myb-front-timesheet-quantity-input>
+        </td>
+        <td class="total-column text-end">
+          <myb-front-progress-bar
+            [value]="getTotalQuantityForProject(project.id)"
+            type="success"
+            height="8px"
+            [max]="totalPeriod"
+          ></myb-front-progress-bar>
+          {{ getTotalQuantityForProject(project.id) }} / {{ totalPeriod }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,4 +1,8 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  ApplicationConfig,
+  importProvidersFrom,
+} from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
@@ -17,7 +21,10 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
 }
-
+export function initializeKeycloak(keycloak: KeycloakService) {
+  console.log('initializeKeycloak');
+  return () => (!keycloak?.isAuthenticated() ? keycloak.init() : false);
+}
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(appRoutes),
@@ -34,7 +41,13 @@ export const appConfig: ApplicationConfig = {
         },
       })
     ),
-    KeycloakService,
+    // KeycloakService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeKeycloak,
+      multi: true,
+      deps: [KeycloakService],
+    },
     { provide: TYPE_KEY_TOKEN, useValue: 'User' },
   ],
 };

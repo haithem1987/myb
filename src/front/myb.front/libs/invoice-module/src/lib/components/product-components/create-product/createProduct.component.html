@@ -1,9 +1,9 @@
 <div class="modal-header">
-  <h4 class="modal-title">Add Client</h4>
+  <h4 class="modal-title">Add Product</h4>
   <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
 </div>
 <div class="modal-body">
-<div class="card border-primary p-3">
+<div class="card border-primary p-3 m-4">
   <div class="container">
     <form [formGroup]="productForm" >
       <div class="mb-3">
@@ -126,38 +126,7 @@
       </div>
 
       <div style="display: flex; align-items: center">
-        <!-- <div class="dropdown me-4">
-          <button
-            class="btn btn-outline-secondary dropdown-toggle"
-            type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Tax
-          </button>
-          <ul class="dropdown-menu" style="height: 300px">
-            <div
-              data-bs-spy="scroll"
-              data-bs-smooth-scroll="true"
-              class="scrollspy-example-2"
-              tabindex="0"
-            >
-              @for(tax of taxes$ | async ; track tax){
-              <li>
-                <label class="dropdown-item" (click)="setTax(tax)"
-                  >{{ tax.name }}
-                  <span
-                    >:&nbsp;&nbsp;{{ tax.value }}@if(tax.isPercentage == true){
-                    <span> %</span>
-                    }</span
-                  ></label
-                >
-              </li>
-              }
-            </div>
-          </ul>
-        </div> -->
-        
+       
         <div ngbDropdown>
           <button
             class="btn btn-outline-secondary me-4"
@@ -196,6 +165,11 @@
         <p style="color: rgba(229, 4, 4, 0.896)">{{ errorMessage }}</p>
         }
       </div>
+      <div style="margin-top: 10px;" (click)="openModal()"><button
+        class="btn btn-outline-secondary me-4">
+        new Tax
+      </button>
+    </div>
     </form>
   </div>
 </div>

@@ -8,4 +8,7 @@ export class Client extends BaseModel{
     address!: string;
     clientType!: ClientType;
     contacts!: Contact[];
+    isArchived!: boolean;
+    companyId!: number;
+    userId!: string;
 }

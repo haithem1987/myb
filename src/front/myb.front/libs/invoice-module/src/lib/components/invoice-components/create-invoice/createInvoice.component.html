@@ -11,9 +11,14 @@
             name="invoiceNum"
             formControlName="invoiceNum"
             placeholder="Enter invoice num "
+            [ngClass]="{
+              'is-invalid':
+              invoiceForm.get('invoiceNum')?.invalid &&
+              invoiceForm.get('invoiceNum')?.touched
+            }"
           />
-          @if(invoiceForm.get('quantity')?.invalid &&
-          invoiceForm.get('quantity')?.touched){
+          @if(invoiceForm.get('invoiceNum')?.invalid &&
+          invoiceForm.get('invoiceNum')?.touched){
           <div class="invalid-feedback">Invoice Num is required.</div>
           }
         </div>
@@ -26,6 +31,11 @@
             ngbDatepicker
             #invoicedatePicker="ngbDatepicker"
             (click)="invoicedatePicker.toggle()"
+            [ngClass]="{
+              'is-invalid':
+              invoiceForm.get('invoicedate')?.invalid &&
+              invoiceForm.get('invoicedate')?.touched
+            }"
           />
           @if(invoiceForm.get('invoicedate')?.invalid &&
           invoiceForm.get('invoicedate')?.touched){
@@ -42,19 +52,34 @@
             ngbDatepicker
             #duedatePicker="ngbDatepicker"
             (click)="duedatePicker.toggle()"
+            
+            [ngClass]="{
+              'is-invalid':
+              invoiceForm.get('dueDate')?.invalid &&
+              invoiceForm.get('dueDate')?.touched
+            }"
           />
+          @if(invoiceForm.get('dueDate')?.invalid &&
+          invoiceForm.get('dueDate')?.touched){
+          <div class="invalid-feedback">Due Date is required.</div>
+          }
         </div>
+        
         <div class="mb-2">
           <label class="form-label">Client</label>
         </div>
         <div class="d-flex align-items-center">
-          <button
+          @if(client == null || client == undefined){
+            <button
             type="button"
             class="btn btn-outline-secondary me-4"
             (click)="openClientsModal()"
           >
             Select Client
           </button>
+        }
+          
+          
           @if(client != null){
           <div
             class="card border-secondary p-3 me-4"
@@ -82,7 +107,7 @@
         <br />
         <div class="mb-2">
           <label for="invoiceNum" class="form-label">Invoice Details</label>
-        </div>
+        
         <div class="mb-3">
           <button
             type="button"
@@ -92,6 +117,11 @@
             <i class="bi bi-plus-lg"></i> Item
           </button>
         </div>
+        @if(invoiceDetails.length == 0){
+        <p style="color: rgba(229, 4, 4, 0.896)">{{ invoiceDetailsInvalid }}</p>
+        }
+        </div>
+        @if(invoiceDetails.length>0){
         <div class="mb-3">
           <div class="card border-primary p-2">
             <table class="table table-hover">
@@ -129,6 +159,7 @@
             </table>
           </div>
         </div>
+      }
         <div class="mb-3">
           <br />
           <div class="d-flex justify-content-end">

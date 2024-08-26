@@ -58,7 +58,7 @@ export class CreateInvoiceComponent {
 
   clients$: Observable<Client[]> = this.clientService.clients$;
 
-  client?: Client;
+  client?: Client ;
   clientInvalid: String = '';
 
   invoiceDetails: InvoiceDetails[] = [];
@@ -70,14 +70,14 @@ export class CreateInvoiceComponent {
     this.invoiceForm = this.fb.group({
       invoiceNum: ['', Validators.required],
       invoicedate: [null, Validators.required],
-      dueDate: [null],
+      dueDate: [null,Validators.required],
       // Add other form controls as necessary
     });
   }
 
   openClientsModal() {
     const modalRef = this.modalService.open(SelectClientComponent, {
-      size: 'lg',
+      size: 'lg',scrollable: true
     });
     modalRef.componentInstance.clientEntered.subscribe((client: Client) => {
       if (client) {
@@ -104,7 +104,7 @@ export class CreateInvoiceComponent {
   }
 
   save() {
-    if (this.invoiceForm.valid) {
+    if (this.invoiceForm.valid && this.invoiceDetails.length > 0) {
       const invoiceDateControl = this.invoiceForm.get('invoicedate');
       const invoiceDateStruct = invoiceDateControl?.value;
       const invoiceDate = this.dateUtils.fromDateStruct(invoiceDateStruct);
@@ -123,6 +123,7 @@ export class CreateInvoiceComponent {
       invoice.invoiceDetails = this.invoiceDetails;
       invoice.totalAmount = this.getTotal(this.invoiceDetails);
       invoice.subTotal = this.getSubTotal(this.invoiceDetails);
+      invoice.isArchived = false;
 
       this.invoiceService.create(invoice).subscribe(() => {
         this.toastService.show('Client created successfully!', {
@@ -133,6 +134,7 @@ export class CreateInvoiceComponent {
       
     } else {
       this.clientInvalid = 'Client is required!';
+      this.invoiceDetailsInvalid = 'Invoice details is required!';
       this.invoiceForm.markAllAsTouched();
     }
   }

@@ -10,16 +10,15 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 export class TaxService extends RepositoryService<Tax> {
   private taxSubject = new BehaviorSubject<Tax[]>([]);
   public taxes$ = this.taxSubject.asObservable();
-  
+
   constructor(apollo: Apollo) {
     super(apollo, 'Tax');
-    this.loadInitialTaxes();
+    //this.loadInitialTaxes();
   }
 
-  private loadInitialTaxes(): void {
+  loadInitialTaxes(): void {
     this.getAll().subscribe((taxes) => this.taxSubject.next(taxes));
   }
-
 
   protected override mapAllItems(result: any): Tax[] {
     return result.data?.allTaxes || [];
@@ -64,6 +63,18 @@ export class TaxService extends RepositoryService<Tax> {
         const taxes = [...this.taxSubject.value, newTax];
         this.taxSubject.next(taxes);
         return newTax;
+      })
+    );
+  }
+
+  override update(id: number, item: Tax): Observable<Tax> {
+    return super.update(id, item).pipe(
+      map((updatedTax) => {
+        const taxes = this.taxSubject.value.map((t) =>
+          t.id === id ? updatedTax : t
+        );
+        this.taxSubject.next(taxes);
+        return updatedTax;
       })
     );
   }

@@ -26,10 +26,9 @@ import { Client } from '../../../models/client.model';
 })
 export class CreateClientComponent implements OnInit {
   private toastService = inject(ToastService);
-  private router = inject(Router);
-  clientService = inject(ClientService);
+  private clientService = inject(ClientService);
   private modalService = inject(NgbModal);
-	activeModal = inject(NgbActiveModal);
+	private activeModal = inject(NgbActiveModal);
 
   errorMessage: string = '';
 
@@ -54,6 +53,7 @@ export class CreateClientComponent implements OnInit {
       client.lastName = this.clientForm.value.lastName;
       client.address = this.clientForm.value.clientAddress;
       client.clientType = this.clientType;
+      client.isArchived = false;
 
       this.clientService.create(client).subscribe(() => {
         this.toastService.show('Client created successfully!', {
@@ -82,6 +82,11 @@ export class CreateClientComponent implements OnInit {
       }
     });
   }
+  deleteContact(contactToDelete: Contact): void{
+    this.contacts = this.contacts.filter(
+      (contact) => contact != contactToDelete
+    );
+  }
   closeModal(): void {
     this.activeModal.dismiss();
   }
@@ -89,4 +94,6 @@ export class CreateClientComponent implements OnInit {
   trackByFn(index: number, item: Contact): number {
     return index;
   }
+
+  
 }

@@ -31,16 +31,19 @@ export class InvoiceService extends RepositoryService<Invoice> {
     return result.data?.invoiceByID as Invoice;
   }
 
-
+  protected override mapUpdateItem(result: any): Invoice {
+    console.log('updated', result.data);
+    return result.data?.updateInvoice as Invoice;
+  }
 
   override getAll(): Observable<Invoice[]> {
     return super.getAll().pipe(
-      map((invoices)=> {
+      map((invoices) => {
         console.log('invoices', invoices);
         this.invoiceSubject.next(invoices);
         return invoices;
       })
-    )
+    );
   }
   override get(id: number): Observable<Invoice> {
     return super.get(id).pipe(
@@ -52,18 +55,25 @@ export class InvoiceService extends RepositoryService<Invoice> {
   }
 
   override create(item: Invoice): Observable<Invoice> {
-      return super.create(item).pipe(
-        map((newInvoice)=>{
-          const invoices = [...this.invoiceSubject.value, newInvoice];
-          this.invoiceSubject.next(invoices);
-          console.log('new invoice', newInvoice);
-          return newInvoice;
-        })
-      )
+    return super.create(item).pipe(
+      map((newInvoice) => {
+        const invoices = [...this.invoiceSubject.value, newInvoice];
+        this.invoiceSubject.next(invoices);
+        console.log('new invoice', newInvoice);
+        return newInvoice;
+      })
+    );
   }
-  
 
-  
-
-
+  override update(id: number, item: Invoice): Observable<Invoice> {
+    return super.update(id, item).pipe(
+      map((updatedInvoice) => {
+        const products = this.invoiceSubject.value.map((i) =>
+          i.id === id ? updatedInvoice : i
+        );
+        this.invoiceSubject.next(products);
+        return updatedInvoice;
+      })
+    );
+  }
 }

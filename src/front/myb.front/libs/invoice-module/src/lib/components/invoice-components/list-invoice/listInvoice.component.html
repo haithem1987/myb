@@ -13,46 +13,89 @@
     type="text"
     class="form-control mb-3"
     placeholder="Search invoices..."
+    [(ngModel)]="searchTerm"
   />
-  <div class="table-responsive"> 
-  <table class="table table-hover shadow">
-    <thead class="table-secondary">
-      <tr>
-        <th scope="col" style="cursor: pointer">Invoice-Num</th>
-        <th scope="col" style="cursor: pointer">Invoice date</th>
-        <th scope="col">Due date</th>
-        <th scope="col" style="cursor: pointer">Client</th>
-        <th scope="col">SubTotal</th>
-        <th scope="col">Total</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for(invoice of invoices$ | async; track invoice){
-      <tr>
-        <td [routerLink]="['/invoice/details', invoice.id]">
-          {{ invoice.invoiceNum }}
-        </td>
-        <td>{{ invoice.invoiceDate | date : 'MM/dd/yyyy' }}</td>
-        <td>{{ invoice.dueDate | date : 'MM/dd/yyyy' }}</td>
-        <td>{{getClientName(invoice.clientID!)}}</td>
-        <td>{{ invoice.subTotal }}</td>
-        <td>{{ invoice.totalAmount }}</td>
-        <td>
-          <button
-            type="button"
-            class="btn btn-outline-primary me-2"
-            (click)="openEditModal()"
+  <br />
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a
+            class="nav-link cursor-pointer"
+            [ngClass]="{ active: activeTab === 'ACTIVE' }"
+            (click)="setActiveTab('ACTIVE')"
           >
-            <i class="bi bi-pencil-square"></i>
-          </button>
-          <button type="button" class="btn btn-outline-secondary">
-            <i class="bi bi-trash"></i>
-          </button>
-        </td>
-      </tr>
-      }
-    </tbody>
-  </table>
+            {{ 'ACTIVE' | translate }}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [ngClass]="{ active: activeTab === 'ARCHIVED' }"
+            (click)="setActiveTab('ARCHIVED')"
+          >
+            {{ 'ARCHIVED' | translate }}
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover shadow">
+        <thead class="table-secondary">
+          <tr>
+            <th scope="col" style="cursor: pointer">Invoice-Num</th>
+            <th scope="col" style="cursor: pointer">Invoice date</th>
+            <th scope="col" style="cursor: pointer">Due date</th>
+            <th scope="col" style="cursor: pointer">Client</th>
+            <th scope="col" style="cursor: pointer">SubTotal</th>
+            <th scope="col" style="cursor: pointer">Total</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(invoice of invoices$ | async; track invoice){
+            @if(showInvoice(invoice)){
+          <tr>
+            <td [routerLink]="['/invoice/details', invoice.id]">
+              {{ invoice.invoiceNum }}
+            </td>
+            <td [routerLink]="['/invoice/details', invoice.id]">
+              {{ invoice.invoiceDate | date : 'MM/dd/yyyy' }}
+            </td>
+            <td [routerLink]="['/invoice/details', invoice.id]">
+              {{ invoice.dueDate | date : 'MM/dd/yyyy' }}
+            </td>
+            <td [routerLink]="['/invoice/details', invoice.id]">
+              {{ getClientName(invoice.clientID!) }}
+            </td>
+            <td [routerLink]="['/invoice/details', invoice.id]">
+              {{ invoice.subTotal }}
+            </td>
+            <td [routerLink]="['/invoice/details', invoice.id]">
+              {{ invoice.totalAmount }}
+            </td>
+            @if(!invoice.isArchived){
+            <td>
+              <button type="button" class="btn btn-outline-secondary" (click)="archiveInvoice(invoice)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          }
+          @if(invoice.isArchived){
+            <td>
+              <button
+              class="btn btn-outline-secondary btn-sm me-2"
+              (click)="restoreInvoice(invoice)"
+            >
+              <i class="bi bi-arrow-repeat me-2"></i>Restore
+            </button>
+            </td>
+          }
+          </tr>
+          }
+        }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

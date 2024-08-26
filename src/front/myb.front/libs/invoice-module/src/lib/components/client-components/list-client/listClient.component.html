@@ -1,39 +1,59 @@
 <div class="container my-4">
   <div class="d-flex justify-content-between mb-3">
     <h2 class="mb-0" style="color: var(--bs-darklight)">Client Manager</h2>
-    <button
-      type="button"
-      class="btn btn-primary"
-      (click)="open()"
-    >
-      <i class="bi bi-plus-lg"></i> Add Client
-    </button>
+    @if(activeTab == 'ACTIVE'){
+      <button type="button" class="btn btn-primary" (click)="open()">
+        <i class="bi bi-plus-lg"></i> Add Client
+      </button>
+    }
+    
   </div>
   <input
     type="text"
     class="form-control mb-3"
     placeholder="Search clients..."
+    [(ngModel)]="searchTerm"
   />
 </div>
 
+
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center">
-    <div class="d-flex align-items-center">
-      <h2 class="">Clients</h2>
-      <span class="badge rounded-pill bg-secondary badge-sm">{{(clients$ | async)?.length }}</span>
-    </div>
-    <br />
-    <br />
-    <br />
-  </div>
-  <div class="row">
-    @for(client of clients$ | async ; track client){
-      <div class="col-md-4 mb-4">
-        <myb-front-client-card
-        [client]="client"
-        ></myb-front-client-card>
-      </div>
-    }
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a
+          class="nav-link cursor-pointer"
+          [ngClass]="{ active: activeTab === 'ACTIVE' }"
+          (click)="setActiveTab('ACTIVE')"
+        >
+          {{ 'ACTIVE' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [ngClass]="{ active: activeTab === 'ARCHIVED' }"
+          (click)="setActiveTab('ARCHIVED')"
+        >
+          {{ 'ARCHIVED' | translate }}
+        </a>
+      </li>
+    </ul>
     
   </div>
+  
+  <div class="container border  rounded-bottom rounded-top">
+    <div class="container pt-3">
+    <br/>
+    <div class="row">
+    @for(client of clients$ | async ; track client){
+    @if(showClient(client)){
+    <div class="col-md-4 mb-4">
+      <myb-front-client-card [client]="client"></myb-front-client-card>
+    </div>
+    } }
+  </div>
+  </div>
+</div>
+  
 </div>

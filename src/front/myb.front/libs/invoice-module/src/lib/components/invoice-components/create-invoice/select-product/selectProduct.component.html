@@ -24,6 +24,7 @@
               type="text"
               class="form-control mb-3"
               placeholder="Search products..."
+              [(ngModel)]="searchTerm"
             />
         </div>
         <br/>
@@ -32,6 +33,8 @@
           <thead>
             <tr>
               <th scope="col">Product Name</th>
+              <th scope="col">Price HT</th>
+              <th scope="col">Tax</th>
               <th scope="col">Price</th>
               <th scope="col">Type</th>
               <th scope="col">Unit</th>
@@ -40,21 +43,33 @@
           </thead>
           <tbody>
             @for(product of products$ | async ; track product){
-            <tr>
-              <td>{{ product.name }}</td>
-              <td>{{ product.price }}</td>
-              <td>{{ product.productType }}</td>
-              <td>{{ product.unit }}</td>
-              <td>
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary"
-                  (click)="selectProduct(product)"
-                >
-                  <i class="bi bi-plus-lg"></i>
-                </button>
-              </td>
-            </tr>
+              @if(product.name!.toLowerCase().includes(searchTerm.toLowerCase())){
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>{{ product.price }}</td>
+                  <td><label 
+                    >{{ product.tax.name }}
+                    <span
+                      >:&nbsp;&nbsp;{{ product.tax.value }}@if(product.tax.isPercentage == true){
+                      <span> %</span>
+                      }</span
+                    ></label
+                  ></td>
+                  <td>{{ calculatePriceWithTax(product.price, product.tax) }}</td>
+                  <td>{{ product.productType }}</td>
+                  <td>{{ product.unit }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      (click)="selectProduct(product)"
+                    >
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            
             }
           </tbody>
         </table>

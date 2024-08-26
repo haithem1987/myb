@@ -9,6 +9,41 @@ export const CREATE_INVOICE = gql`
       dueDate
       id
       image
+      isArchived
+      invoiceDate
+      invoiceNum
+      status
+      subTotal
+      totalAmount
+      updatedAt
+      userId
+      invoiceDetails {
+        createdAt
+        description
+        id
+        invoiceID
+        productId
+        quantity
+        unitPrice
+        unitPriceHT
+        updatedAt
+        unit
+      }
+    }
+  }
+`;
+
+
+export const UPDATE_INVOICE = gql`
+  mutation UpdateInvoice($item: InvoiceModelInput!) {
+    updateInvoice(invoice: $item) {
+      clientID
+      companyId
+      createdAt
+      dueDate
+      id
+      image
+      isArchived
       invoiceDate
       invoiceNum
       status

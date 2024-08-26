@@ -7,6 +7,9 @@ export const GET_ALL_CLIENTS = gql`
       clientType
       createdAt
       firstName
+      isArchived
+      companyId
+      userId
       id
       lastName
       updatedAt
@@ -29,6 +32,9 @@ export const GET_CLIENT_BY_ID = gql`
       clientType
       createdAt
       firstName
+      isArchived
+      companyId
+      userId
       id
       lastName
       updatedAt

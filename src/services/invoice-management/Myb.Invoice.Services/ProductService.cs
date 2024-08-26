@@ -1,4 +1,5 @@
-﻿using Myb.Common.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using Myb.Common.Repositories;
 using Myb.Invoice.EntityFrameWork.Infra;
 using Myb.Invoice.Models;
 using System;
@@ -20,8 +21,8 @@ namespace Myb.Invoice.Services
 
         public async Task<Product?> Add(Product product)
         {
-            var responce = await _productRepository.InsertAsync(product);
-            return responce.Entity;
+            await _productRepository.InsertAsync(product);
+            return await GetById(product.Id);
         }
 
         public async Task<Product?> Delete(int id)
@@ -32,12 +33,12 @@ namespace Myb.Invoice.Services
 
         public Task<IEnumerable<Product?>> GetAll()
         {
-            return Task.FromResult<IEnumerable<Product?>>(_productRepository.GetAll());
+            return Task.FromResult<IEnumerable<Product?>>(_productRepository.GetAll().Include(P => P.Tax));
         }
 
-        public Task<Product?> GetById(int id)
+        public Task<Product?> GetById(int? id)
         {
-            return Task.FromResult<Product?>(_productRepository.GetById(id));
+            return Task.FromResult<Product?>(_productRepository.GetAll().Include(P => P.Tax).FirstOrDefault(P => P.Id == id));
         }
 
         public Task<IEnumerable<Product?>> GetByIds(IEnumerable<int?> ids)

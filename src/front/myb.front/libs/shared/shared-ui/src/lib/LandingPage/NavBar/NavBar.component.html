@@ -30,6 +30,7 @@
         <button
           *ngIf="!keycloakService.isAuthenticated()"
           class="btn btn-outline-secondary btn-sm ms-1"
+          (click)="onRegister()"
         >
           Register
         </button>

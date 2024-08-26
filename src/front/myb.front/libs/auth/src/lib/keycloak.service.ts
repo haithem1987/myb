@@ -43,7 +43,7 @@ export class KeycloakService {
 
       this.keycloak
         .init({
-          onLoad: 'login-required',
+          onLoad: 'check-sso',
           checkLoginIframe: false,
         })
         .then((authenticated) => {

@@ -1,0 +1,111 @@
+<div class="modal-header">
+  <h4 class="modal-title">Edit Tax</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="closeModal()"
+  ></button>
+</div>
+<div class="modal-body">
+  <div class="card border-primary p-3">
+    <div class="container">
+      <form [formGroup]="taxForm">
+        <div class="mb-3">
+          <label for="name" class="form-label">Tax Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            name="name"
+            formControlName="name"
+            placeholder="Enter Tax Name "
+            [ngClass]="{
+              'is-invalid':
+                taxForm.get('name')?.invalid && taxForm.get('name')?.touched
+            }"
+          />
+          @if(taxForm.get('name')?.invalid && taxForm.get('name')?.touched){
+          <div class="invalid-feedback">Tax name is required.</div>
+          }
+        </div>
+        <div class="mb-3">
+          @if(isPercentage){
+          <label for="value" class="form-label">Tax Value (%)</label>
+          } @if(isPercentage == false){
+          <label for="value" class="form-label">Tax Value (fix)</label>
+          }
+          <input
+            type="number"
+            class="form-control"
+            id="value"
+            name="value"
+            formControlName="value"
+            placeholder="Enter Tax Value"
+            [ngClass]="{
+              'is-invalid':
+                taxForm.get('value')?.invalid && taxForm.get('value')?.touched
+            }"
+          />
+          @if(taxForm.get('value')?.invalid && taxForm.get('value')?.touched){
+          <div class="invalid-feedback">Tax value is required.</div>
+          }
+        </div>
+        <div class="mb-3">
+          <label for="clientType" class="form-label">Tax type</label>
+          <div
+            class="btn-group-horizontal"
+            role="group"
+            aria-label="horizontal radio toggle button group"
+          >
+            <input
+              type="radio"
+              class="btn-check"
+              name="vbtn-radio"
+              id="vbtn-radio1"
+              autocomplete="off"
+              [checked]="isPercentage == true"
+            />
+            <label
+              class="btn btn-outline-secondary me-2"
+              for="vbtn-radio1"
+              (click)="setIsPercentageTrue()"
+              >percentage</label
+            >
+            <input
+              type="radio"
+              class="btn-check"
+              name="vbtn-radio"
+              id="vbtn-radio2"
+              autocomplete="off"
+              [checked]="isPercentage == false"
+            />
+            <label
+              class="btn btn-outline-primary"
+              for="vbtn-radio2"
+              (click)="setIsPercentageFalse()"
+              >fixed value</label
+            >
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <div>
+    <br />
+    <div class="d-flex justify-content-end">
+      <button
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-outline-primary" (click)="save()">
+        Save
+      </button>
+    </div>
+  </div>
+</div>

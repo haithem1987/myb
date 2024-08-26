@@ -32,7 +32,7 @@ export class CreateProductComponent {
   private taxService = inject(TaxService);
   private productService = inject(ProductService);
   private toastService = inject(ToastService);
-  activeModal = inject(NgbActiveModal);
+  private activeModal = inject(NgbActiveModal);
   private modalService = inject(NgbModal);
 
   errorMessage: string = '';
@@ -71,6 +71,7 @@ export class CreateProductComponent {
       product.taxId = this.tax.id;
       product.productType = this.productType;
       product.unit = this.productForm.value.unit;
+      product.isArchived = false;
 
       this.productService.create(product).subscribe(() => {
         this.toastService.show('Product created successfully!', {
@@ -87,7 +88,6 @@ export class CreateProductComponent {
     this.activeModal.dismiss();
   }
   openModal(): void {
-    this.modalService.open(CreateTaxComponent);
-    
+    this.modalService.open(CreateTaxComponent); 
   }
 }

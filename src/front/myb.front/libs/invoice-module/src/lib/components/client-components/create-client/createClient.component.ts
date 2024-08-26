@@ -26,10 +26,9 @@ import { Client } from '../../../models/client.model';
 })
 export class CreateClientComponent implements OnInit {
   private toastService = inject(ToastService);
-  private router = inject(Router);
-  clientService = inject(ClientService);
+  private clientService = inject(ClientService);
   private modalService = inject(NgbModal);
-	activeModal = inject(NgbActiveModal);
+	private activeModal = inject(NgbActiveModal);
 
   errorMessage: string = '';
 

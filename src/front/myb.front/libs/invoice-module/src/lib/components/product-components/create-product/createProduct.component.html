@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h4 class="modal-title">Add Client</h4>
+  <h4 class="modal-title">Add Product</h4>
   <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
 </div>
 <div class="modal-body">
@@ -126,38 +126,7 @@
       </div>
 
       <div style="display: flex; align-items: center">
-        <!-- <div class="dropdown me-4">
-          <button
-            class="btn btn-outline-secondary dropdown-toggle"
-            type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Tax
-          </button>
-          <ul class="dropdown-menu" style="height: 300px">
-            <div
-              data-bs-spy="scroll"
-              data-bs-smooth-scroll="true"
-              class="scrollspy-example-2"
-              tabindex="0"
-            >
-              @for(tax of taxes$ | async ; track tax){
-              <li>
-                <label class="dropdown-item" (click)="setTax(tax)"
-                  >{{ tax.name }}
-                  <span
-                    >:&nbsp;&nbsp;{{ tax.value }}@if(tax.isPercentage == true){
-                    <span> %</span>
-                    }</span
-                  ></label
-                >
-              </li>
-              }
-            </div>
-          </ul>
-        </div> -->
-        
+       
         <div ngbDropdown>
           <button
             class="btn btn-outline-secondary me-4"

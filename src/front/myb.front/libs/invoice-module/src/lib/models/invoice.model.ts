@@ -12,4 +12,5 @@ export class Invoice extends BaseModel {
   status?: string;
   clientID?: number;
   invoiceDetails?: InvoiceDetails[];
+  isArchived!: boolean;
 }

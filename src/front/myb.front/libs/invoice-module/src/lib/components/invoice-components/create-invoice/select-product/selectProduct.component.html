@@ -33,8 +33,9 @@
           <thead>
             <tr>
               <th scope="col">Product Name</th>
-              <th scope="col">Price</th>
+              <th scope="col">Price HT</th>
               <th scope="col">Tax</th>
+              <th scope="col">Price</th>
               <th scope="col">Type</th>
               <th scope="col">Unit</th>
               <th scope="col">Actions</th>
@@ -54,6 +55,7 @@
                       }</span
                     ></label
                   ></td>
+                  <td>{{ calculatePriceWithTax(product.price, product.tax) }}</td>
                   <td>{{ product.productType }}</td>
                   <td>{{ product.unit }}</td>
                   <td>

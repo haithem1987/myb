@@ -42,9 +42,10 @@
             <tr>
               <th scope="col" style="cursor: pointer">Product Name</th>
               <th scope="col" style="cursor: pointer">Description</th>
-              <th scope="col" style="cursor: pointer">Price</th>
+              <th scope="col" style="cursor: pointer">Price HT</th>
               <th scope="col" style="cursor: pointer">Tax</th>
-              <th scope="col" style="cursor: pointer">Product Type</th>
+              <th scope="col" style="cursor: pointer">Price</th>
+              <th scope="col" style="cursor: pointer">Type</th>
               <th scope="col">Unit</th>
               <th scope="col">Actions</th>
             </tr>
@@ -56,6 +57,7 @@
               <td>{{ product.name }}</td>
               <td>{{ product.description }}</td>
               <td>{{ product.price }}</td>
+
               <td>
                 <label
                   >{{ product.tax.name }}
@@ -68,12 +70,16 @@
                   ></label
                 >
               </td>
+              <td>{{ calculatePriceWithTax(product.price, product.tax) }}</td>
               <td>{{ product.productType }}</td>
               <td>{{ product.unit }}</td>
               @if(!product.isArchived){
               <td>
                 <button type="button" class="btn btn-outline-primary me-2">
-                  <i class="bi bi-pencil-square"></i>
+                  <i
+                    class="bi bi-pencil-square"
+                    (click)="openEditModal(product)"
+                  ></i>
                 </button>
                 <button
                   type="button"
@@ -84,14 +90,14 @@
                 </button>
               </td>
               } @if(product.isArchived){
-                <td>
-              <button
-                class="btn btn-outline-secondary btn-sm me-2"
-                (click)="restoreProduct(product)"
-              >
-                <i class="bi bi-arrow-repeat me-2"></i>Restore
-              </button>
-            </td>
+              <td>
+                <button
+                  class="btn btn-outline-secondary btn-sm me-2"
+                  (click)="restoreProduct(product)"
+                >
+                  <i class="bi bi-arrow-repeat me-2"></i>Restore
+                </button>
+              </td>
               }
             </tr>
             } }

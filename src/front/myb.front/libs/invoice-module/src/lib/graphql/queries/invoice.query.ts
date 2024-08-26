@@ -16,6 +16,7 @@ export const GET_ALL_INVOICES = gql`
       totalAmount
       updatedAt
       userId
+      isArchived
       invoiceDetails {
         createdAt
         description
@@ -48,6 +49,7 @@ export const GET_INVOICE_BY_ID = gql`
       totalAmount
       updatedAt
       userId
+      isArchived
       invoiceDetails {
         createdAt
         description

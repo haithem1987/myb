@@ -58,7 +58,7 @@ export class CreateInvoiceComponent {
 
   clients$: Observable<Client[]> = this.clientService.clients$;
 
-  client?: Client;
+  client?: Client ;
   clientInvalid: String = '';
 
   invoiceDetails: InvoiceDetails[] = [];
@@ -123,6 +123,7 @@ export class CreateInvoiceComponent {
       invoice.invoiceDetails = this.invoiceDetails;
       invoice.totalAmount = this.getTotal(this.invoiceDetails);
       invoice.subTotal = this.getSubTotal(this.invoiceDetails);
+      invoice.isArchived = false;
 
       this.invoiceService.create(invoice).subscribe(() => {
         this.toastService.show('Client created successfully!', {

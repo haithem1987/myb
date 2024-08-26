@@ -50,6 +50,7 @@ export class CreateTaxComponent {
       tax.isPercentage = this.isPercentage;
       tax.createdAt = new Date();
       tax.updatedAt = new Date();
+      tax.isArchived = false;
       this.taxService.create(tax).subscribe(() => {
         this.toastService.show('Tax created successfully!', {
           classname: 'bg-success text-light',

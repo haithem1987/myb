@@ -64,17 +64,22 @@
           <div class="invalid-feedback">Due Date is required.</div>
           }
         </div>
+        
         <div class="mb-2">
           <label class="form-label">Client</label>
         </div>
         <div class="d-flex align-items-center">
-          <button
+          @if(client == null || client == undefined){
+            <button
             type="button"
             class="btn btn-outline-secondary me-4"
             (click)="openClientsModal()"
           >
             Select Client
           </button>
+        }
+          
+          
           @if(client != null){
           <div
             class="card border-secondary p-3 me-4"

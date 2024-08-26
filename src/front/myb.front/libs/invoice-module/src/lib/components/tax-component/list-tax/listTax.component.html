@@ -64,7 +64,7 @@
               <td>{{ tax.updatedAt | date : 'MM/dd/yyyy' }}</td>
               @if(!tax.isArchived){
                 <td>
-                  <button type="button" class="btn btn-outline-primary me-2">
+                  <button type="button" class="btn btn-outline-primary me-2" (click)="openEditModal(tax)">
                     <i class="bi bi-pencil-square"></i>
                   </button>
                   <button

@@ -38,3 +38,9 @@ export * from './lib/components/invoice-components/create-invoice/select-client/
 export * from './lib/components/invoice-components/create-invoice/add-item/addItemToInvoice.component';
 
 export * from './lib/components/invoice-components/create-invoice/select-product/selectProduct.component';
+
+export * from './lib/components/client-components/edit-client/editClient.component';
+
+export * from './lib/components/tax-component/edit-tax/editTax.component';
+
+export * from './lib/components/product-components/edit-product/editProduct.component';

@@ -14,28 +14,23 @@
 
     } @if(client.isArchived == false){
     <div class="mt-auto d-flex justify-content-between align-items-center">
-      
-      <button class="btn btn-outline-primary btn-sm">
-        <i class="bi bi-pencil me-2"></i>Editer
+      <button class="btn btn-outline-primary btn-sm" (click)="openEditModal()">
+        <i class="bi bi-pencil me-2"></i>Edit
       </button>
       <button
         class="btn btn-outline-secondary btn-sm"
         (click)="archiveClient()"
       >
-        <i class="bi bi-trash"></i>Archiver
+        <i class="bi bi-trash"></i>Archive
       </button>
     </div>
 
-    } 
-    @if(client.isArchived == true){
-    <br/>
-      <button
-        class="btn btn-outline-secondary btn-sm"
-        (click)="restoreClient()"
-      >
-        <i class="bi bi-arrow-repeat me-2"></i>Restore
-      </button>
-    
+    } @if(client.isArchived == true){
+    <br />
+    <button class="btn btn-outline-secondary btn-sm" (click)="restoreClient()">
+      <i class="bi bi-arrow-repeat me-2"></i>Restore
+    </button>
+
     }
   </div>
 </myb-front-card>

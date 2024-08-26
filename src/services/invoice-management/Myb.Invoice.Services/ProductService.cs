@@ -21,7 +21,7 @@ namespace Myb.Invoice.Services
 
         public async Task<Product?> Add(Product product)
         {
-            var responce = await _productRepository.InsertAsync(product);
+            await _productRepository.InsertAsync(product);
             return await GetById(product.Id);
         }
 

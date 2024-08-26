@@ -30,9 +30,9 @@ export class KeycloakService {
   constructor(private http: HttpClient) {}
 
   async init(): Promise<boolean> {
-    if (this.initialized) {
-      return true;
-    }
+    // if (this.initialized) {
+    //   return true;
+    // }
 
     return new Promise((resolve, reject) => {
       this.keycloak = new Keycloak({
@@ -89,17 +89,20 @@ export class KeycloakService {
   }
 
   getUserRoles(): string[] {
-    if (!this.keycloak.tokenParsed || !this.keycloak.tokenParsed.realm_access) {
+    if (!this.keycloak.tokenParsed) {
       return [];
     }
 
-    const resourceAccess = this.keycloak.tokenParsed.realm_access;
-    const clientRoles = resourceAccess?.roles || [];
-    return clientRoles;
+    const realmRoles = this.keycloak.tokenParsed.realm_access?.roles || [];
+    const clientRoles =
+      this.keycloak.tokenParsed.resource_access?.['MYB-client']?.roles || [];
+
+    return [...realmRoles, ...clientRoles];
   }
 
   hasRole(role: string): boolean {
     const roles = this.getUserRoles();
+    console.log('roles', roles);
     return roles.includes(role);
   }
 

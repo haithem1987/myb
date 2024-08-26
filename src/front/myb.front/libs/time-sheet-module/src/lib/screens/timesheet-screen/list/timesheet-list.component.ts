@@ -35,6 +35,7 @@ import { TimesheetHeaderComponent } from '../timesheet-header/timesheet-header.c
 import { TimesheetActionButtonsComponent } from '../action-buttons/timesheet-action-buttons.component';
 import { TimesheetTableComponent } from '../table/timesheet-table.component';
 import { PeriodSelectorComponent } from '../period-selector/period-selector.component';
+import { TimesheetUtilityService } from '../../../services/timesheet-utility.service';
 
 @Component({
   selector: 'myb-timesheet-list',
@@ -103,6 +104,7 @@ export class TimesheetListComponent implements OnInit {
     private modalService: NgbModal,
     public translate: TranslateService,
     private settingsService: GeneralSettingsService,
+    private timesheetUtility: TimesheetUtilityService,
     config: NgbDropdownConfig
   ) {
     config.placement = 'left-start';
@@ -233,69 +235,10 @@ export class TimesheetListComponent implements OnInit {
   }
 
   calculateDateRange(): void {
-    const today = new Date();
-    const todayString = today.toISOString().split('T')[0];
-    console.log('todayString', todayString);
-    this.dateRange = [];
-
-    if (this.selectedPeriod === 'week') {
-      const startOfWeek = new Date(
-        today.setDate(today.getDate() - today.getDay())
-      );
-      for (let i = 0; i < 7; i++) {
-        const currentDate = new Date(startOfWeek);
-        const currentDateString = currentDate.toISOString().split('T')[0];
-        this.translate
-          .get(
-            `WEEKDAY.${currentDate
-              .toLocaleDateString(undefined, { weekday: 'short' })
-              .toLowerCase()}`
-          )
-          .subscribe((translatedWeekday) => {
-            this.dateRange.push({
-              dateString: currentDateString,
-              weekday: translatedWeekday,
-              day: currentDate.getDate().toString(),
-              month: (currentDate.getMonth() + 1).toString(),
-              year: currentDate.getFullYear().toString(),
-              isToday: currentDateString === todayString,
-            });
-          });
-        startOfWeek.setDate(startOfWeek.getDate() + 1);
-      }
-    } else if (this.selectedPeriod === 'month') {
-      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-      const daysInMonth = new Date(
-        today.getFullYear(),
-        today.getMonth() + 1,
-        0
-      ).getDate();
-      console.log('startOfMonth', startOfMonth);
-
-      for (let i = 0; i < daysInMonth; i++) {
-        const currentDate = new Date(startOfMonth);
-        const currentDateString = currentDate.toLocaleDateString('en-CA');
-        this.translate
-          .get(
-            `WEEKDAY.${currentDate
-              .toLocaleDateString(undefined, { weekday: 'short' })
-              .toLowerCase()}`
-          )
-          .subscribe((translatedWeekday) => {
-            this.dateRange.push({
-              dateString: currentDateString,
-              weekday: translatedWeekday,
-              day: currentDate.getDate().toString(),
-              month: (currentDate.getMonth() + 1).toString(),
-              year: currentDate.getFullYear().toString(),
-              isToday: currentDateString === todayString,
-            });
-          });
-        startOfMonth.setDate(startOfMonth.getDate() + 1);
-      }
-    }
-
-    console.log('Calculated Date Range:', this.dateRange);
+    this.dateRange = this.timesheetUtility.calculateDateRange(
+      this.selectedPeriod,
+      new Date()
+    );
     this.totalPeriod = this.dateRange.length;
   }
 
@@ -335,43 +278,10 @@ export class TimesheetListComponent implements OnInit {
   }
 
   getTotalQuantitiesForPeriod(period: 'week' | 'month'): number {
-    const totalQuantities = this.updatedTimesheets.reduce(
-      (total, timesheet) => {
-        const timesheetDate = new Date(timesheet.date || new Date());
-        const today = new Date();
-
-        if (period === 'week') {
-          const startOfWeek = new Date(
-            today.setDate(today.getDate() - today.getDay())
-          );
-          const endOfWeek = new Date(startOfWeek);
-          endOfWeek.setDate(endOfWeek.getDate() + 6);
-
-          if (timesheetDate >= startOfWeek && timesheetDate <= endOfWeek) {
-            return total + (timesheet.quantity || 0);
-          }
-        } else if (period === 'month') {
-          const startOfMonth = new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            1
-          );
-          const endOfMonth = new Date(
-            today.getFullYear(),
-            today.getMonth() + 1,
-            0
-          );
-
-          if (timesheetDate >= startOfMonth && timesheetDate <= endOfMonth) {
-            return total + (timesheet.quantity || 0);
-          }
-        }
-        return total;
-      },
-      0
+    return this.timesheetUtility.getTotalQuantitiesForPeriod(
+      this.updatedTimesheets,
+      period
     );
-
-    return totalQuantities;
   }
 
   saveAllChanges(): void {

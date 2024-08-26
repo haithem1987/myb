@@ -7,6 +7,7 @@ import { ProjectCardComponent } from '../card/project-card.component';
 import { Observable, map } from 'rxjs';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   selector: 'myb-front-project-list',
@@ -18,12 +19,18 @@ import { TranslateModule } from '@ngx-translate/core';
 export class ProjectListComponent implements OnInit {
   @Input() isArchived: boolean = false;
   @Input() projects?: Observable<Project[]>;
-
+  canEdit: boolean = false;
   constructor(
     private projectService: ProjectService,
     private router: Router,
-    private toastService: ToastService
-  ) {}
+    private toastService: ToastService,
+    private keycloakService: KeycloakService
+  ) {
+    this.canEdit = this.keycloakService.hasAllRoles([
+      'MYB_MANAGER',
+      'MYB_PROJECT_RW',
+    ]);
+  }
 
   ngOnInit(): void {}
 

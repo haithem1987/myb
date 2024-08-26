@@ -29,9 +29,10 @@ import { LanguageSwitcherComponent } from 'libs/shared/shared-ui/src/lib/compone
 })
 export class NavbarComponent implements OnInit {
   user$: Observable<KeycloakProfile | null>;
-
+  isManager: boolean = false;
   constructor(private keycloakService: KeycloakService) {
     this.user$ = this.keycloakService.profile$;
+    this.isManager = this.keycloakService.hasRole('MYB_MANAGER');
   }
 
   ngOnInit(): void {

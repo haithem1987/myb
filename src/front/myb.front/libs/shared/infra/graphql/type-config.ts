@@ -31,6 +31,7 @@ import {
   GET_ALL_TIMESHEETS,
   GET_TIMESHEETS_BY_EMPLOYEE_ID,
   GET_TIMESHEETS_BY_USER_ID,
+  GET_TIMESHEETS_BY_MANAGER_ID,
 } from '../../../time-sheet-module/src/lib/graphql/queries/timesheet.graphql';
 
 import {
@@ -114,6 +115,7 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_TIMESHEET,
     delete: DELETE_TIMESHEET,
     getTimesheetsByUserId: GET_TIMESHEETS_BY_USER_ID,
+    getTimesheetsByManagerId: GET_TIMESHEETS_BY_MANAGER_ID,
     getTimesheetsByEmployeeId: GET_TIMESHEETS_BY_EMPLOYEE_ID,
     updateMultipleTimesheets: UPDATE_MULTIPLE_TIMESHEETS,
     generateTimesheetPdf: GENERATE_TIMESHEET_PDF,

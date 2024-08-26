@@ -10,6 +10,9 @@ import { RepositoryService } from 'libs/shared/infra/services/repository.service
 export class TimesheetService extends RepositoryService<Timesheet> {
   private timesheetSubject = new BehaviorSubject<Timesheet[]>([]);
   public timesheets$ = this.timesheetSubject.asObservable();
+
+  private timesheetsByManagerSubject = new BehaviorSubject<Timesheet[]>([]);
+  public timesheetsByManager$ = this.timesheetsByManagerSubject.asObservable();
   constructor(apollo: Apollo) {
     super(apollo, 'Timesheet');
   }
@@ -34,6 +37,22 @@ export class TimesheetService extends RepositoryService<Timesheet> {
     return result.data?.deleteTimesheet === true;
   }
 
+  getTimesheetsByManagerId(managerId: string): Observable<Timesheet[]> {
+    return this.apollo
+      .watchQuery<{ timesheetsByUserId: Timesheet[] }>({
+        query: gql`
+          ${this.typeOperations.getTimesheetsByManagerId}
+        `,
+        variables: { managerId },
+      })
+      .valueChanges.pipe(
+        map((result: any) => {
+          const timesheets = result.data.timesheetsByManagerId;
+          this.timesheetsByManagerSubject.next(timesheets);
+          return timesheets;
+        })
+      );
+  }
   getTimesheetsByUserId(userId: string): Observable<Timesheet[]> {
     return this.apollo
       .watchQuery<{ timesheetsByUserId: Timesheet[] }>({
@@ -47,7 +66,7 @@ export class TimesheetService extends RepositoryService<Timesheet> {
           const timesheets = result.data.timesheetsByUserId;
           this.timesheetSubject.next(timesheets);
           return timesheets;
-        }) // Map to the allTimesheets property
+        })
       );
   }
   getTimesheetsByEmployeeId(employeeId: number): Observable<Timesheet[]> {

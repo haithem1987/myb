@@ -28,7 +28,7 @@
             {{ 'PROJECTS' | translate }}
           </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="isManager">
           <a
             class="nav-link"
             routerLink="/timesheet/employees"

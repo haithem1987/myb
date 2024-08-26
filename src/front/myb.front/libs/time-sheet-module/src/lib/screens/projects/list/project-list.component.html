@@ -7,7 +7,7 @@
       }}</span>
     </div> -->
     <button
-      *ngIf="!isArchived"
+      *ngIf="canEdit && !isArchived"
       class="btn btn-primary text-bold mb-4 p-3"
       (click)="addProject()"
     >

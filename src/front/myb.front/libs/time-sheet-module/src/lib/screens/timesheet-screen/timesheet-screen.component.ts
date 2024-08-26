@@ -28,7 +28,7 @@ export class TimesheetScreenComponent implements OnInit {
 
   ngOnInit(): void {
     // Determine if the user is a manager
-    this.isManager = this.keycloakService.isUserManager();
+    this.isManager = this.keycloakService.hasRole('MYB_MANAGER');
   }
 
   setActiveTab(tab: 'MY_TIMESHEETS' | 'INTERVENANTS_TIMESHEETS'): void {

@@ -6,6 +6,7 @@ import { BehaviorSubject, Observable, catchError, map, throwError } from 'rxjs';
 import { GET_FOLDERS_BY_PARENT_ID, GET_FOLDER_BY_ID } from '../GraphQl/Queries/Folder.graphql';
 import { RepositoryService } from 'libs/shared/infra/services/repository.service';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -41,7 +42,7 @@ export class FolderService extends RepositoryService<Folder> {
     return result.data?.deleteFolder === true;
   }
 
-  // Get all folders
+
   override getAll(): Observable<Folder[]> {
     return super.getAll().pipe(
       map((folders) => {
@@ -51,7 +52,7 @@ export class FolderService extends RepositoryService<Folder> {
     );
   }
 
-  // Get folder by ID
+
   override get(id: number): Observable<Folder> {
     return this.apollo
       .watchQuery<{ folderById: Folder }>({
@@ -64,22 +65,13 @@ export class FolderService extends RepositoryService<Folder> {
           const currentFolders = this.folderSubject.value;
           const updatedFolders = currentFolders.map(f => f.id === folder.id ? folder : f);
           this.folderSubject.next(updatedFolders);
+          console.log('folder serv', folder)
           return folder;
         })
       );
      
   }
-  // override get(id: number): Observable<Folder> {
-  //   return super.get(id).pipe(
-  //     map((folder) => {
-  //       const folders = this.folderSubject.value.map((p) =>
-  //         p.id === id ? folder : p
-  //       );
-  //       this.folderSubject.next(folders);
-  //       return folder;
-  //     })
-  //   );
-  // }
+
 
   getFoldersByParentId(parentId: number): Observable<Folder[]> {
     return this.apollo.watchQuery({
@@ -96,40 +88,30 @@ export class FolderService extends RepositoryService<Folder> {
     );
   }
 
-  // Create folder
-  override create(folder: Folder
-  ): Observable<Folder> {
-    return this.apollo
-      .mutate<{ addFolder: Folder }>({
-        mutation: gql`
-        ${this.typeOperations.create}
-      `,
-        variables: { folder }
-      })
-      .pipe(
-        map((result: any) => {
-          const newFolder = result.data.addFolder;
-          const currentFolders = this.folderSubject.value;
-          this.folderSubject.next([...currentFolders, newFolder]);
-
-          return newFolder;
-        })
-      );
-      
-  }
-
-  // Update folder
-  updateFolder(folder: Folder): Observable<Folder> {
-    return super.update(folder.id, folder).pipe(
-      map((updatedFolder) => {
-        const updatedFolders = this.folderSubject.value.map(f =>
-          f.id === updatedFolder.id ? updatedFolder : f
-        );
-        this.folderSubject.next(updatedFolders);
-        return updatedFolder;
+  override create(item: Folder): Observable<Folder> {
+    return super.create(item).pipe(
+      map((newFolder) => {
+        const folders = [...this.folderSubject.value, newFolder];
+        this.folderSubject.next(folders);
+        return newFolder;
       })
     );
   }
+
+
+  override update(id: number, item: Folder): Observable<Folder> {
+    return super.update(id, item).pipe(
+      map((updatedFolder) => {
+        const folders = this.folderSubject.value.map((f) =>
+          f.id === id ? updatedFolder : f
+        );
+        this.folderSubject.next(folders);  
+        return updatedFolder; 
+      })
+    );
+  }
+  
+  
 
   override delete(id: number): Observable<boolean> {
     return super.delete(id).pipe(

@@ -1,0 +1,48 @@
+.overlay {
+    position: relative;
+    left: -40%;
+    width: 180%;
+    /* height: 500px; */
+    border-top-left-radius: 100%; 
+    border-top-right-radius: 100%;
+    /* border-bottom-right-radius: 100%;
+    border-bottom-left-radius: -100%; */
+  
+  
+    background-color: rgba(229, 241, 241, 255);
+  }
+  .overlay2 {
+    position: relative;
+    left: -40%;
+    width: 180%;
+    /* height: 500px; */
+    border-bottom-left-radius: 100%;
+    border-bottom-right-radius: 10%;
+    background-color: rgba(229, 241, 241, 255);
+  }
+  .ilustration-section-2 {
+    position: relative;
+    top: -120px;
+    left: -60px;
+  }
+  
+  .custom-shape-divider-top-1712699786 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+  }
+  
+  .custom-shape-divider-top-1712699786 svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 176px;
+  }
+  
+  .custom-shape-divider-top-1712699786 .shape-fill {
+    fill: #00a6abb3;
+  }
+  

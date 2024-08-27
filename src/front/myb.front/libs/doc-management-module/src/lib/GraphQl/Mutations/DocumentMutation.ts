@@ -16,8 +16,8 @@ import gql from 'graphql-tag';
 //   }
 // `;
 export const ADD_DOCUMENT = gql`
-  mutation AddDocument($document: DocumentModelInput!) {
-    addDocument(document: $document) {
+  mutation AddDocument($item: DocumentModelInput!) {
+    addDocument(document: $item) {
       id
       documentName
       documentType
@@ -36,8 +36,8 @@ export const ADD_DOCUMENT = gql`
 `;
 
 export const UPDATE_DOCUMENT = gql`
-  mutation UpdateDocument($id: Int!, $document: DocumentModelInput!) {
-          updateDocument(id: $id, document: $document) {
+  mutation UpdateDocument($item: DocumentModelInput!) {
+          updateDocument(document: $item) {
       id
             documentName
             documentType

@@ -45,12 +45,6 @@ namespace Myb.Document.EntityFramework.Infra
           
 
 
-            /* // Folder - Folder Relationship (Self-Referencing)
-             modelBuilder.Entity<Folder>()
-                 .HasOne(f => f.Parent)
-                 .WithMany(f => f.Children)
-                 .HasForeignKey(f => f.ParentId)
-                 .IsRequired(false);*/
         }
     }
 }

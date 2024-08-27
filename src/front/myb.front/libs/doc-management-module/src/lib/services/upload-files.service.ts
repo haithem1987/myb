@@ -1,27 +1,17 @@
 import { Injectable } from '@angular/core';
-import { AsyncSubject, Observable } from 'rxjs';
+import { AsyncSubject, BehaviorSubject, Observable } from 'rxjs';
+import { SelectedFiles } from '../models/SelectedFiles';
 
-
-
-export interface SelectedFiles {
-  ImageName: string;
-  Image?: string;
-  file: any;
-  url?: string;
-  fileType?: string; 
-
-}
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UploadFilesService {
+  private selectedFilesSubject = new BehaviorSubject<SelectedFiles[]>([]);
+  public selectedFiles$ = this.selectedFilesSubject.asObservable();
 
- 
-  constructor() { }
+  constructor() {}
 
-  public toBase64(files: File[], selectedFiles: SelectedFiles[]): Observable<SelectedFiles[]> {
-    const result = new AsyncSubject<SelectedFiles[]>();
-
+  public toBase64(files: File[], selectedFiles: SelectedFiles[]): void {
     if (files?.length) {
       Object.keys(files)?.forEach((file, i) => {
         const url = URL.createObjectURL(files[i]);
@@ -29,37 +19,25 @@ export class UploadFilesService {
         reader.readAsDataURL(files[i]);
 
         reader.onload = (e) => {
-          selectedFiles = selectedFiles?.filter(f => f?.ImageName != files[i]?.name);
-          selectedFiles.push({ 
-            ImageName: files[i]?.name, 
-            file: files[i], 
-            Image: reader?.result as string, 
-            url: url ,
-            fileType: files[i].type 
+          selectedFiles = selectedFiles?.filter(
+            (f) => f?.ImageName != files[i]?.name
+          );
+          selectedFiles.push({
+            ImageName: files[i]?.name,
+            file: files[i],
+            Image: reader?.result as string,
+            url: url,
+            fileType: files[i].type,
           });
-          result.next(selectedFiles);
-
-          if (files?.length === (i + 1)) {
-            result.complete();
-          }
-          
-          console.log('result',selectedFiles);
-          console.log('type  of file ',selectedFiles[0].file.type);
-
-          // selectedFiles.forEach((selectedFile) => {
-          //   const fileSize = selectedFile.file.size; // Accessing the size property of the file
-          //   console.log("File Size:", fileSize);
-            
-          // });
-
-
+          this.selectedFilesSubject.next(selectedFiles);
         };
       });
-      return result;
     } else {
-      result.next([]);
-      result.complete();
-      return result;
+      this.selectedFilesSubject.next([]);
     }
+  }
+
+  public getSelectedFiles(): Observable<SelectedFiles[]> {
+    return this.selectedFiles$;
   }
 }

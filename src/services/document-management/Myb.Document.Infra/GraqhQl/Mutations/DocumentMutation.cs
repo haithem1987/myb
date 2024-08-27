@@ -17,9 +17,9 @@ namespace Myb.Document.Infra.GraphQl.Mutations
             return await documentService.AddDocumentAsync(document);
         }
 
-        public async Task<DocumentModel> UpdateDocument([Service] IDocumentService documentService, int id, DocumentModel document)
+        public async Task<DocumentModel> UpdateDocument([Service] IDocumentService documentService, DocumentModel document)
         {
-            document.Id = id; 
+           // document.Id = id; 
             return await documentService.UpdateDocumentAsync(document);
         }
 

@@ -1,4 +1,4 @@
-import { BaseModel } from "./BaseModel";
+import { BaseModel } from '../../../../shared/infra/models/base.model';
 
 export interface DocumentVersion extends BaseModel {
     documentId: number;

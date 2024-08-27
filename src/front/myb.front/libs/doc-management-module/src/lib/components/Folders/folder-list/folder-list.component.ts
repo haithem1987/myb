@@ -64,41 +64,7 @@ export class FolderListComponent implements OnInit {
       }
     });
   }
-  // openFolder(folderId: number): void {
-  //   // this.folderService.pushToHistory(this.fId); 
-  //       this.fId = folderId;
-  //       this.loadFolderDetails();
-  //       this.loadFoldersByParentId(this.fId);
 
-  //   console.log('fid', this.fId, 'folderId', folderId);
-  // }
-  // loadFoldersByParentId(parentId: number): void {
-  //   this.folderService.getFoldersByParentId(parentId).subscribe({
-  //     next: (data: Folder[]) => {
-  //       this.folders = data;
-  //       console.log('allFolders by parentId:', data);
-  //     },
-  //     error: (error) => {
-  //       console.error('Error fetching folders by parentId:', error);
-  //     }
-  //   });
-  // }
-  // loadFolderDetails(): void {
-  //   this.folderService.get(this.fId).subscribe({
-  //     next: (data: Folder) => {
-  //       this.folder = data;
-  //       this.documents = data.documents || [];
-  //       this.folderName = data.folderName;
-  //       console.log('Loading fId', this.fId);
-  //       console.log('Loading parentid', this.folder.parentId);
-  //       console.log('Folder details:', data);
-
-  //     },
-  //     error: (error) => {
-  //       console.error('Error fetching folder details:', error);
-  //     }
-  //   });
-  // }
 
   openModal(): void {
     const modalRef = this.modalService.open(FolderCreationComponent);
@@ -110,9 +76,7 @@ export class FolderListComponent implements OnInit {
       (newFolder: Folder) => {
         this.folders = [...this.folders, newFolder];
 
-      // this.folders.push(newFolder);
-      // this.loadFoldersByParentId(this.fId);
-      // this.loadFolderDetails();
+  
     });
   }
   
@@ -130,16 +94,6 @@ export class FolderListComponent implements OnInit {
     
   }
 
-  // updateFolder(folder: Folder) {
-  //   this.folderService.update(folder.id, folder).subscribe(
-  //     (updatedFolder) => {
-  //       this.folderUpdated.emit(updatedFolder);
-  //     },
-  //     (error) => {
-  //       console.error('Error updating folder:', error);
-  //     }
-  //   );
-  // }
 
   openModalEdit() {
     const modalRef = this.modalService.open(FolderEditComponent);

@@ -1,12 +1,8 @@
-import { LoaderComponent } from 'libs/shared/shared-ui/src';
-import { FolderService } from './folder.service';
-import { DocumentVersion } from './../models/DocumentVersion';
-import { inject, Injectable } from '@angular/core';
 
+import { Injectable } from '@angular/core';
 import { DocumentModel } from '../models/DocumentModel'; 
 import { Apollo, gql } from 'apollo-angular';
 import { BehaviorSubject, Observable, catchError, map, throwError } from 'rxjs';
-
 import { RepositoryService } from 'libs/shared/infra/services/repository.service';
 
 
@@ -47,18 +43,7 @@ protected override mapUpdateItem(result: any): DocumentModel {
 protected override mapDeleteResult(result: any): boolean {
   return result.data?.deleteDocument === true;
 }
-//get all doc 
-// override getAll(): Observable<DocumentModel[]> {
-//     return this.apollo
-//         .watchQuery<{ allDocuments: DocumentModel[] }>({
-//             query: gql`
-//                 ${this.typeOperations.getAll}
-//             `,
-//         })
-//         .valueChanges.pipe(
-//             map((result: any) => result.data) 
-//         );
-// }
+
 override getAll(): Observable<DocumentModel[]> {
   return super.getAll().pipe(
     map((documents) => {
@@ -68,8 +53,6 @@ override getAll(): Observable<DocumentModel[]> {
     })
   );
 }
-
-
 
 override delete(id: number): Observable<boolean> {
   return super.delete(id).pipe(
@@ -83,85 +66,27 @@ override delete(id: number): Observable<boolean> {
   );
 }
 
+override create(item: DocumentModel): Observable<DocumentModel> {
+  return super.create(item).pipe(
+    map((newDocument) => {
+      const documents = [...this.documentSubject.value, newDocument];
+      this.documentSubject.next(documents);
+      console.log('first', newDocument)
 
-//update document
-// override update(id: number, document: DocumentModel): Observable<DocumentModel> {
-//   return this.apollo
-//     .mutate({
-//       mutation: gql`
-//         ${this.typeOperations.update}
-//       `,
-//       variables: {
-//         id,
-//         item: document,
-//       },
-//     })
-//     .pipe(
-//       map((result: any) => result.data.updateDocument, console.log(document.id)),
-     
-//       catchError((error) => {
-//         console.error('Error updating document:', error);
-//         return throwError(error);
-//       })
-//     );
-// }
-
-
-
-// getDocumentsByFolderId(folderId: number): Observable<DocumentModel[]> {
-//   return this.apollo.watchQuery<{ documentsByFolderId: DocumentModel[] }>({
-//     query: gql`
-//     ${this.typeOperations.documentsByFolderId}
-//   `,
-//     variables: {
-//       folderId,
-//     },
-//   })
-//   .valueChanges.pipe(
-//     // map((result: any) => result.data.documentsByFolderId)
-//     map((result: any) => {
-//       const documents = result.data.documentsByFolderId;
-//       this.documentSubject.next(documents);
-//       console.log('doc service',documents)
-
-//       return documents;
-//     })
-//   );
-// }
-
-createDocument(document: DocumentModel): Observable<DocumentModel> {
-  return this.apollo
-    .mutate<{ addDocument: DocumentModel }>({
-      mutation: gql`
-      ${this.typeOperations.create}
-    `,
-      variables: { document }
+      return newDocument;
     })
-    .pipe(
-      map((result: any) => {
-        const newDocument = result.data.addDocument;
-        const documents = [...this.documentSubject.value, newDocument];
-        this.documentSubject.next(documents);
-     //   this.folderService.loadInitialFolders();
-        return newDocument;
-      })
-    );
+  );
 }
 
-
-updateDocument(document: DocumentModel): Observable<DocumentModel> {
-  return this.apollo
-    .mutate<{ updateDocument: DocumentModel }>({
-      mutation: gql`
-         ${this.typeOperations.update}
-      `,
-      variables: { 
-        id: document.id, 
-        document: { ...document, id: undefined } }, 
+override update(id: number, item: DocumentModel): Observable<DocumentModel> {
+  return super.update(id, item).pipe(
+    map((updatedDoc) => {
+      const documents = this.documentSubject.value.map((t) =>
+        t.id === id ? updatedDoc : t
+      );
+      this.documentSubject.next(documents); 
+      return updatedDoc; 
     })
- 
-    .pipe(
-      map((result: any) => { console.log(result.data); return result.data.updateDocument})
-    );
+  );
 }
 }

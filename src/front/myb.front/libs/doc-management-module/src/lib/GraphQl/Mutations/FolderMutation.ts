@@ -9,23 +9,22 @@ export const DELETE_FOLDER = gql`
 
 
 export const UPDATE_FOLDER = gql`
-  mutation UpdateFolder($id: Int!, $folder: FolderInput!) {
-    updateFolder(id: $id, folder: $folder) {
-      id
-      folderName
-      createdBy
-      editedBy
-      createdDate
-      lastModifiedDate
-      updatedAt
-      parentId
-    }
+mutation UpdateFolder( $item: FolderInput!) {
+  updateFolder(folder: $item) {
+    id
+    folderName
+    createdBy
+    editedBy
+    createdAt
+    updatedAt
+    parentId
   }
+}
 `;
 // Folder Mutations
 export const ADD_FOLDER = gql`
-  mutation AddFolder($folder: FolderInput!) {
-    addFolder(folder: $folder) {
+  mutation AddFolder($item: FolderInput!) {
+    addFolder(folder: $item) {
       id
       folderName
       createdBy
@@ -57,8 +56,8 @@ export const ADD_FOLDER_WITH_DOCUMENTS = gql`
 
 // RootFolder Mutations
 export const ADD_ROOT_FOLDER = gql`
-  mutation AddRootFolder($rootFolder: RootFolderInput!) {
-    addRootFolder(rootFolder: $rootFolder) {
+  mutation AddRootFolder($item:RootFolderInput!) {
+    addRootFolder(rootFolder:$item) {
       id
       userId
       moduleName

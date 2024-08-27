@@ -54,25 +54,7 @@ export class FolderCardsComponent  implements OnInit {
     );
   }
 
-  // openModal() {
-  //   const modalRef = this.modalService.open(FolderCreationComponent);
-  //   modalRef.componentInstance.folderCreated.subscribe((newFolder: Folder) => {
-  //     this.folders = [...this.folders, newFolder]; 
-  //   });
-  // }
-
-  // openModalDoc() {
-  //   const modalRef = this.modalService.open(DocumentCreationComponent);
-  //   modalRef.componentInstance.documentCreated.subscribe((newDoc: DocumentModel) => {
-  //     this.documents = [...this.documents, newDoc]; 
-  //   });
-  // }
-  // filterTimesheets(): void {
-  //   // Implement filtering logic
-  // }
-
  
-
 pinFolder(folder: Folder): void {
   if (!this.isPinned(folder)) {
     this.pinnedFolders.push(folder);

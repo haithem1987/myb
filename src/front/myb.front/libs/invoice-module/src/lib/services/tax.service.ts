@@ -13,7 +13,7 @@ export class TaxService extends RepositoryService<Tax> {
 
   constructor(apollo: Apollo) {
     super(apollo, 'Tax');
-    //this.loadInitialTaxes();
+    this.loadInitialTaxes();
   }
 
   loadInitialTaxes(): void {

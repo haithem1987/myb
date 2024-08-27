@@ -34,7 +34,7 @@ export class ListTaxComponent implements OnInit {
   activeTab: string = 'ACTIVE';
 
   ngOnInit(): void {
-    this.taxService.loadInitialTaxes();
+    // this.taxService.loadInitialTaxes();
   }
   openModal(): void {
     this.modalService.open(CreateTaxComponent);

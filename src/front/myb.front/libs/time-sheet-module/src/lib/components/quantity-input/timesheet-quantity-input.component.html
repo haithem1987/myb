@@ -7,5 +7,6 @@
     [ngClass]="{ 'holiday-disabled': isHoliday }"
     (input)="onQuantityChange($event)"
     [disabled]="isHoliday"
+    [readonly]="!editable"
   />
 </ng-container>

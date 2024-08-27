@@ -28,6 +28,7 @@
                     employeeForm.get('email')?.invalid &&
                     employeeForm.get('email')?.touched
                 }"
+                [readOnly]="isEditMode"
               />
               <datalist id="emailSuggestions">
                 <option

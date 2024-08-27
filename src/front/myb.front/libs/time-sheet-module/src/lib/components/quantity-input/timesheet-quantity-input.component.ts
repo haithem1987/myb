@@ -13,6 +13,7 @@ export class TimesheetQuantityInputComponent {
   @Input() date!: { dateString: string; weekday: string; day: string };
   @Input() quantity: number = 0;
   @Input() isHoliday: boolean = false;
+  @Input() editable: boolean = true;
 
   @Output() quantityChange = new EventEmitter<number>();
 

@@ -17,7 +17,7 @@ export class ProjectService extends RepositoryService<Project> {
   public archivedProjects$ = this.archivedProjectsSubject.asObservable();
 
   constructor(apollo: Apollo) {
-    super(apollo, 'Project');
+    super(apollo, 'Project', 'timesheetService');
     this.loadInitialProjects();
   }
 
@@ -140,6 +140,9 @@ export class ProjectService extends RepositoryService<Project> {
         query: gql`
           ${this.typeOperations.getActiveProjects}
         `,
+        context: {
+          service: 'timesheetService',
+        },
       })
       .valueChanges.pipe(
         map((result: any) => {
@@ -156,6 +159,9 @@ export class ProjectService extends RepositoryService<Project> {
         query: gql`
           ${this.typeOperations.getArchivedProjects}
         `,
+        context: {
+          service: 'timesheetService',
+        },
       })
       .valueChanges.pipe(
         map((result: any) => {

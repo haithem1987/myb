@@ -14,7 +14,7 @@ export class TimesheetService extends RepositoryService<Timesheet> {
   private timesheetsByManagerSubject = new BehaviorSubject<Timesheet[]>([]);
   public timesheetsByManager$ = this.timesheetsByManagerSubject.asObservable();
   constructor(apollo: Apollo) {
-    super(apollo, 'Timesheet');
+    super(apollo, 'Timesheet', 'timesheetService');
   }
 
   protected override mapAllItems(result: any): Timesheet[] {
@@ -44,6 +44,9 @@ export class TimesheetService extends RepositoryService<Timesheet> {
           ${this.typeOperations.getTimesheetsByManagerId}
         `,
         variables: { managerId },
+        context: {
+          service: 'timesheetService',
+        },
       })
       .valueChanges.pipe(
         map((result: any) => {
@@ -60,6 +63,9 @@ export class TimesheetService extends RepositoryService<Timesheet> {
           ${this.typeOperations.getTimesheetsByUserId}
         `,
         variables: { userId },
+        context: {
+          service: 'timesheetService',
+        },
       })
       .valueChanges.pipe(
         map((result: any) => {
@@ -76,6 +82,9 @@ export class TimesheetService extends RepositoryService<Timesheet> {
           ${this.typeOperations.getTimesheetsByEmployeeId}
         `,
         variables: { employeeId },
+        context: {
+          service: 'timesheetService',
+        },
       })
       .valueChanges.pipe(
         map((result: any) => {
@@ -93,6 +102,9 @@ export class TimesheetService extends RepositoryService<Timesheet> {
           ${this.typeOperations.updateMultipleTimesheets}
         `,
         variables: { timesheets },
+        context: {
+          service: 'timesheetService',
+        },
       })
       .pipe(
         map((result: any) => {

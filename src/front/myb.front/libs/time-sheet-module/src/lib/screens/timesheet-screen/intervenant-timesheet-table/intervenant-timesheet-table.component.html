@@ -51,6 +51,7 @@
               [quantity]="getQuantityForGroupDate(group, date.dateString)"
               [isHoliday]="handleHoliday(date).isHoliday"
               (quantityChange)="onQuantityChange(group.projectId, date, $event)"
+              [editable]="false"
             ></myb-front-timesheet-quantity-input>
           </td>
           <td class="total-column text-end">

@@ -11,7 +11,7 @@ export class TaskService extends RepositoryService<Task> {
   private taskSubject = new BehaviorSubject<Task[]>([]);
   public tasks$ = this.taskSubject.asObservable();
   constructor(apollo: Apollo) {
-    super(apollo, 'Task');
+    super(apollo, 'Task', 'timesheetService');
     // this.loadInitialTasks();
   }
 

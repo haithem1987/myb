@@ -12,7 +12,8 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
 
   constructor(
     protected apollo: Apollo,
-    @Inject(TYPE_KEY_TOKEN) typeKey: string
+    @Inject(TYPE_KEY_TOKEN) typeKey: string,
+    private serviceName: string = 'timesheetService'
   ) {
     if (!typeConfig[typeKey]) {
       throw new Error(
@@ -20,6 +21,14 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
       );
     }
     this.typeOperations = typeConfig[typeKey];
+  }
+
+  private getServiceContext() {
+    return {
+      context: {
+        service: this.serviceName,
+      },
+    };
   }
 
   protected mapAllItems(result: any): T[] {
@@ -48,6 +57,7 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
         query: gql`
           ${this.typeOperations.getAll}
         `,
+        ...this.getServiceContext(),
       })
       .valueChanges.pipe(map((result) => this.mapAllItems(result)));
   }
@@ -59,18 +69,19 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
           ${this.typeOperations.getById}
         `,
         variables: { id },
+        ...this.getServiceContext(),
       })
       .pipe(map((result) => this.mapSingleItem(result)));
   }
 
   create(item: T): Observable<T> {
-    console.log(item);
     return this.apollo
       .mutate<{ createItem: T }>({
         mutation: gql`
           ${this.typeOperations.create}
         `,
         variables: { item },
+        ...this.getServiceContext(),
       })
       .pipe(map((result) => this.mapCreateItem(result)));
   }
@@ -83,6 +94,7 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
           ${this.typeOperations.update}
         `,
         variables: { id, item: itemInputWithoutTypename },
+        ...this.getServiceContext(),
       })
       .pipe(map((result) => this.mapUpdateItem(result)));
   }
@@ -94,6 +106,7 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
           ${this.typeOperations.delete}
         `,
         variables: { id },
+        ...this.getServiceContext(),
       })
       .pipe(map((result) => this.mapDeleteResult(result)));
   }

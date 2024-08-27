@@ -14,19 +14,15 @@ const microserviceLinks = {
   invoiceService: 'http://localhost:5145/graphql',
 };
 
-// Error handling link
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     console.error('GraphQL errors: ', graphQLErrors);
-    // Show user-friendly error messages based on specific errors
   } else if (networkError) {
     console.error('Network error: ', networkError);
-    // Handle network issues and inform user
   }
 });
 
-// Custom routing link
-const createCustomLink = (httpLink: HttpLink, router: Router) => {
+const createServiceLink = (httpLink: HttpLink) => {
   const serviceLinks = Object.entries(microserviceLinks).reduce(
     (links, [key, uri]) => {
       links[key] = httpLink.create({ uri });
@@ -34,20 +30,21 @@ const createCustomLink = (httpLink: HttpLink, router: Router) => {
     },
     {} as { [key: string]: ApolloLink }
   );
-
+  // const serviceLinks = {
+  //   timesheetService: httpLink.create({ uri: 'http://localhost:5059/graphql' }),
+  //   documentService: httpLink.create({ uri: 'http://localhost:5117/graphql' }),
+  //   invoiceService: httpLink.create({ uri: 'http://localhost:5145/graphql' }),
+  // };
+  console.log('httpLink', httpLink);
   return new ApolloLink((operation, forward) => {
-    const currentUrl = router.url;
-    console.log('currentUrl', currentUrl);
-    if (currentUrl.startsWith('/timesheet')) {
-      return serviceLinks['timesheetService'].request(operation, forward);
-    } else if (currentUrl.startsWith('/documents')) {
-      return serviceLinks['documentService'].request(operation, forward);
-    } else if (currentUrl.startsWith('/invoice')) {
-      return serviceLinks['invoiceService'].request(operation, forward);
-    }
+    console.log('operation', operation);
+    const targetService =
+      operation?.getContext()['service'] ?? 'timesheetService';
 
-    // Default to timesheetService if no specific route matches
-    return serviceLinks['timesheetService'].request(operation, forward);
+    console.log('targetService', targetService);
+    console.log('serviceLinks[targetService]', serviceLinks[targetService]);
+
+    return serviceLinks[targetService].request(operation, forward);
   });
 };
 
@@ -59,9 +56,9 @@ const createCustomLink = (httpLink: HttpLink, router: Router) => {
       useFactory: (httpLink: HttpLink, router: Router) => {
         return {
           cache: new InMemoryCache({
-            addTypename: false, // This is default, adds __typename automatically on read
+            addTypename: false,
           }),
-          link: from([errorLink, createCustomLink(httpLink, router)]),
+          link: from([errorLink, createServiceLink(httpLink)]),
         };
       },
       deps: [HttpLink, Router],

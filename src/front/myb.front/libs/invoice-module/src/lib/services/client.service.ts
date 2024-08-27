@@ -12,7 +12,7 @@ export class ClientService extends RepositoryService<Client> {
   public clients$ = this.clientSubject.asObservable();
 
   constructor(apollo: Apollo) {
-    super(apollo, 'Client');
+    super(apollo, 'Client', 'invoiceService');
     this.loadInitialClients();
   }
 

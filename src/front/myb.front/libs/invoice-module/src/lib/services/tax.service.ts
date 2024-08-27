@@ -12,7 +12,7 @@ export class TaxService extends RepositoryService<Tax> {
   public taxes$ = this.taxSubject.asObservable();
 
   constructor(apollo: Apollo) {
-    super(apollo, 'Tax');
+    super(apollo, 'Tax', 'invoiceService');
     this.loadInitialTaxes();
   }
 

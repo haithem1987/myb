@@ -5,15 +5,14 @@ import { Apollo } from 'apollo-angular';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class ProductService extends RepositoryService<Product>{
-
+export class ProductService extends RepositoryService<Product> {
   private productSubject = new BehaviorSubject<Product[]>([]);
   public products$ = this.productSubject.asObservable();
 
   constructor(apollo: Apollo) {
-    super(apollo, 'Product');
+    super(apollo, 'Product', 'invoiceService');
     this.loadInitialProducts();
   }
 
@@ -26,18 +25,16 @@ export class ProductService extends RepositoryService<Product>{
   }
 
   protected override mapCreateItem(result: any): Product {
-    console.log('created',result.data);
+    console.log('created', result.data);
     return result.data?.addProduct as Product;
   }
   protected override mapSingleItem(result: any): Product {
     return result.data?.productByID as Product;
   }
   protected override mapUpdateItem(result: any): Product {
-    console.log('updated',result.data);
+    console.log('updated', result.data);
     return result.data?.updateProduct as Product;
-    
   }
-
 
   override getAll(): Observable<Product[]> {
     return super.getAll().pipe(
@@ -63,7 +60,6 @@ export class ProductService extends RepositoryService<Product>{
         this.productSubject.next(products);
         console.log('new product', newProduct);
         return newProduct;
-        
       })
     );
   }

@@ -12,7 +12,7 @@ export class TimeoffService extends RepositoryService<TimeOff> {
   private timeOffSubject = new BehaviorSubject<TimeOff[]>([]);
   public timeoffs$ = this.timeOffSubject.asObservable();
   constructor(apollo: Apollo) {
-    super(apollo, 'TimeOff');
+    super(apollo, 'TimeOff', 'timesheetService');
   }
   protected override mapAllItems(result: any): TimeOff[] {
     return result.data?.allEmployees || [];

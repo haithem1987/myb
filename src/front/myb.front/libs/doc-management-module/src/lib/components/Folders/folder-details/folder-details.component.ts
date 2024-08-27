@@ -30,7 +30,7 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
-  selector: 'myb-front-folder-details',
+  selector: 'myb-front-documents-widget',
   standalone: true,
   imports: [
     CommonModule,
@@ -65,7 +65,7 @@ export class FolderDetailsComponent implements OnInit {
   user$: Observable<KeycloakProfile | null>;
 
   @Output() folderPinned = new EventEmitter<Folder>();
-  CanView=false;
+  CanView = false;
 
   constructor(
     private folderService: FolderService,
@@ -101,7 +101,6 @@ export class FolderDetailsComponent implements OnInit {
             this.rootId = rootFolder.folderId!;
             this.fId = rootFolder.folderId!;
             this.openFolder(rootFolder.folderId!);
-        
           }
         },
         error: (error) => {
@@ -109,10 +108,16 @@ export class FolderDetailsComponent implements OnInit {
         },
       });
   }
- 
+
   //RootFolder
-  getRootFolder(userId: string,moduleName: string): Observable<RootFolder | null> {
-    return this.RootFolderService.getRootFolderByUserIdAndModuleName(userId,moduleName).pipe(
+  getRootFolder(
+    userId: string,
+    moduleName: string
+  ): Observable<RootFolder | null> {
+    return this.RootFolderService.getRootFolderByUserIdAndModuleName(
+      userId,
+      moduleName
+    ).pipe(
       map((data: RootFolder | null) => {
         console.log('RootFolder:', data);
         return data;
@@ -161,7 +166,7 @@ export class FolderDetailsComponent implements OnInit {
   //folders
   openFolder(folderId: number): void {
     this.fId = folderId;
-    
+
     this.loadFolderDetails();
     console.log('OpenFolder:', folderId, this.fId);
     console.log('This.documents$', this.documents$);
@@ -170,24 +175,23 @@ export class FolderDetailsComponent implements OnInit {
   }
 
   loadFolders() {
-    if(this.CanView){
-    this.folderService.getAll().subscribe({
-      next: (data: Folder[]) => {
-        this.folders = data;
-        console.log('loaded folders func', data);
-      },
+    if (this.CanView) {
+      this.folderService.getAll().subscribe({
+        next: (data: Folder[]) => {
+          this.folders = data;
+          console.log('loaded folders func', data);
+        },
 
-      error: (error) => {
-        console.error('Error loading folders', error);
-      },
-      complete: () => {
-        console.log('Folders loading completed');
-      },
-    });
-  }
+        error: (error) => {
+          console.error('Error loading folders', error);
+        },
+        complete: () => {
+          console.log('Folders loading completed');
+        },
+      });
+    }
   }
 
-  
   goBackToPreviousFolder(): void {
     if (this.fId !== this.rootId) {
       this.fId = this.folder.parentId;

@@ -30,20 +30,9 @@ const createServiceLink = (httpLink: HttpLink) => {
     },
     {} as { [key: string]: ApolloLink }
   );
-  // const serviceLinks = {
-  //   timesheetService: httpLink.create({ uri: 'http://localhost:5059/graphql' }),
-  //   documentService: httpLink.create({ uri: 'http://localhost:5117/graphql' }),
-  //   invoiceService: httpLink.create({ uri: 'http://localhost:5145/graphql' }),
-  // };
-  console.log('httpLink', httpLink);
   return new ApolloLink((operation, forward) => {
-    console.log('operation', operation);
     const targetService =
       operation?.getContext()['service'] ?? 'timesheetService';
-
-    console.log('targetService', targetService);
-    console.log('serviceLinks[targetService]', serviceLinks[targetService]);
-
     return serviceLinks[targetService].request(operation, forward);
   });
 };

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Apollo ,gql} from 'apollo-angular';
+import { Apollo, gql } from 'apollo-angular';
 import { RootFolder } from '../models/RootFolder';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -14,12 +14,14 @@ export class RootFolderService extends RepositoryService<RootFolder> {
   public rootFolders$ = this.rootFoldersSubject.asObservable();
 
   constructor(apollo: Apollo) {
-    super(apollo, 'RootFolder');
+    super(apollo, 'RootFolder', 'documentService');
     this.loadInitialRootFolders();
   }
 
   private loadInitialRootFolders(): void {
-    this.getAll().subscribe((rootFolders) => this.rootFoldersSubject.next(rootFolders));
+    this.getAll().subscribe((rootFolders) =>
+      this.rootFoldersSubject.next(rootFolders)
+    );
   }
 
   protected override mapAllItems(result: any): RootFolder[] {
@@ -63,17 +65,25 @@ export class RootFolderService extends RepositoryService<RootFolder> {
     );
   }
 
-  getRootFolderByUserIdAndModuleName(userId: string, moduleName: string): Observable<RootFolder> {
-    return this.apollo.watchQuery({
-      query:  GET_ROOT_FOLDER_BY_USER_AND_MODULE,
-      variables: { userId, moduleName }
-    }).valueChanges.pipe(
-      map((result: any) => {
-        const rfolders = result.data.rootFolderByUserIdAndModuleName;
-        this.rootFoldersSubject.next(rfolders);
-        return rfolders;
+  getRootFolderByUserIdAndModuleName(
+    userId: string,
+    moduleName: string
+  ): Observable<RootFolder> {
+    return this.apollo
+      .watchQuery({
+        query: GET_ROOT_FOLDER_BY_USER_AND_MODULE,
+        variables: { userId, moduleName },
+        context: {
+          service: 'documentService',
+        },
       })
-    );
+      .valueChanges.pipe(
+        map((result: any) => {
+          const rfolders = result.data.rootFolderByUserIdAndModuleName;
+          this.rootFoldersSubject.next(rfolders);
+          return rfolders;
+        })
+      );
   }
 
   override create(item: RootFolder): Observable<RootFolder> {
@@ -113,6 +123,4 @@ export class RootFolderService extends RepositoryService<RootFolder> {
       })
     );
   }
-
-  
 }

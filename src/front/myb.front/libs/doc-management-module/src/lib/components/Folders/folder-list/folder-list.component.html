@@ -1,14 +1,10 @@
 <div class="container mt-3">
+  <p>This section allows you to manage your folders and documents</p>
 
-  <p> This section allows you to manage your folders and  documents</p>
-
-  <myb-front-folder-details 
-    
-  [title]="''" 
-  [canCreateFolder]="true"
-  [moduleName]="'document'"
-
-  
->
-</myb-front-folder-details>
+  <myb-front-documents-widget
+    [title]="''"
+    [canCreateFolder]="true"
+    [moduleName]="'document'"
+  >
+  </myb-front-documents-widget>
 </div>

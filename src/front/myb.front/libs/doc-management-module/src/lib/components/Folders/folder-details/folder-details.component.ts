@@ -17,17 +17,17 @@ import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentUploadComponent } from '../../document-upload/document-upload.component';
 import { DocumentEditComponent } from '../../Documents/document-edit/document-edit.component';
 import { FormsModule } from '@angular/forms';
-import { ToastService } from 'libs/shared/infra/services/toast.service';
-import { NoResultComponent } from 'libs/shared/shared-ui/src/lib/components/no-result/no-result.component';
 import { Folder } from '../../../models/Folder';
 import { FolderCreationComponent } from '../folder-creation/folder-creation.component';
 import { DocumentCreationComponent } from '../../document-creation/document-creation.component';
 import { filter, map, Observable, switchMap, take } from 'rxjs';
 import { RootFolder } from '../../../models/RootFolder';
 import { FolderEditComponent } from '../Edit/folder-edit.component';
-import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { KeycloakProfile } from 'keycloak-js';
 import { DownloadFilesService } from '../../../services/download-files.service';
+import { NoResultComponent } from '@myb-front/shared-ui';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
   selector: 'myb-front-folder-details',

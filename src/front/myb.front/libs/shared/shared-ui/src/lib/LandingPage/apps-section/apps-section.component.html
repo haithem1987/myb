@@ -1,9 +1,9 @@
 <section class="container py-5 apps-section">
-  <h2 class="fw-bold text-center">
-    <img src="assets/images/apps.png" width="50" height="50" alt="" />
+  <h1 class="fw-bold text-center text-uppercase">
+    <img src="assets/images/application.png" width="70" height="70" alt="" />
     {{ 'OUR_APPS' | translate }}
-  </h2>
-  <p class="mx-4 text-center">{{ 'ALL_TOOLS' | translate }}</p>
+  </h1>
+  <p class="mt-3 mb-5 text-center fs-4">{{ 'ALL_TOOLS' | translate }}</p>
   <div class="row mx-auto" style="width: 60%">
     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let app of list">
       <myb-front-card>
@@ -14,8 +14,8 @@
         >
           <img
             [src]="'assets/images/' + app.icon"
-            width="50"
-            height="50"
+            width="70"
+            height="70"
             [alt]="app.name | translate"
           />
           <h5 class="my-3 fw-bolder text-capitalize">

@@ -25,23 +25,23 @@ interface App {
 export class AppsSectionComponent {
   list: App[] = [
     {
-      id: 1,
-      name: 'TIMESHEET',
-      icon: 'timesheet.png',
-      description: 'TIMESHEET_DESC',
-      route: '/timesheet',
-    },
-    {
       id: 2,
       name: 'DOCUMENT_MANAGEMENT',
-      icon: 'timesheet.png',
+      icon: 'evaluation.png',
       description: 'DOCUMENT_MANAGEMENT_DESC',
       route: '/documents',
     },
     {
+      id: 1,
+      name: 'TIMESHEET_MANAGEMENT',
+      icon: 'calendar.png',
+      description: 'TIMESHEET_DESC',
+      route: '/timesheet',
+    },
+    {
       id: 3,
       name: 'INVOICE_MANAGEMENT',
-      icon: 'bills.png',
+      icon: 'finance.png',
       description: 'INVOICE_MANAGEMENT_DESC',
       route: '/invoice',
     },

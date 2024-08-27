@@ -64,8 +64,8 @@ export class FolderDetailsComponent implements OnInit {
   documents$: Observable<DocumentModel[]> = this.documentService.documents$;
   user$: Observable<KeycloakProfile | null>;
 
-
   @Output() folderPinned = new EventEmitter<Folder>();
+  CanView=false;
 
   constructor(
     private folderService: FolderService,
@@ -77,12 +77,11 @@ export class FolderDetailsComponent implements OnInit {
     private downloadService: DownloadFilesService
   ) {
     this.user$ = this.keycloakService.profile$;
-
   }
 
-
- 
   ngOnInit(): void {
+    this.CanView = this.keycloakService.hasRole('Myb_Manger_Doc');
+
     this.keycloakService.userId$
       .pipe(
         filter((userId) => !!userId),
@@ -90,7 +89,7 @@ export class FolderDetailsComponent implements OnInit {
           this.userId = userId!;
           console.log('User ID:', this.userId);
           console.log('Module name:', this.moduleName);
-  
+
           return this.getRootFolder(userId!, this.moduleName);
         })
       )
@@ -101,25 +100,26 @@ export class FolderDetailsComponent implements OnInit {
           } else {
             this.rootId = rootFolder.folderId!;
             this.fId = rootFolder.folderId!;
-           this.openFolder(rootFolder.folderId!);
+            this.openFolder(rootFolder.folderId!);
+        
           }
         },
         error: (error) => {
           console.error('Error fetching root folder:', error);
         },
       });
-    
   }
+ 
   //RootFolder
-  getRootFolder(userId: string, moduleName: string): Observable<RootFolder | null> {
-    return this.RootFolderService.getRootFolderByUserIdAndModuleName(userId, moduleName).pipe(
+  getRootFolder(userId: string,moduleName: string): Observable<RootFolder | null> {
+    return this.RootFolderService.getRootFolderByUserIdAndModuleName(userId,moduleName).pipe(
       map((data: RootFolder | null) => {
         console.log('RootFolder:', data);
         return data;
       })
     );
   }
-  
+
   createRootFolderAndFolder(userId: string, moduleName: string) {
     const folder = {
       folderName: 'root',
@@ -129,19 +129,18 @@ export class FolderDetailsComponent implements OnInit {
       createdAt: new Date(),
       updatedAt: new Date(),
     } as Folder;
-  
+
     this.folderService.create(folder).subscribe({
       next: (newFolder) => {
         console.log('Created Folder:', newFolder);
-        this.openFolder(newFolder.id); 
+        this.openFolder(newFolder.id);
 
-  
         const rootFolder = {
           moduleName: moduleName,
           userId: userId,
           folderId: newFolder.id,
         } as RootFolder;
-  
+
         this.RootFolderService.create(rootFolder).subscribe({
           next: (createdRootFolder) => {
             console.log('Created RootFolder:', createdRootFolder);
@@ -158,19 +157,20 @@ export class FolderDetailsComponent implements OnInit {
       },
     });
   }
-  
 
   //folders
   openFolder(folderId: number): void {
     this.fId = folderId;
+    
     this.loadFolderDetails();
     console.log('OpenFolder:', folderId, this.fId);
     console.log('This.documents$', this.documents$);
-    console.log('foldername',this.folderName);
-    console.log('this.folders$', this.folders$)
+    console.log('foldername', this.folderName);
+    console.log('this.folders$', this.folders$);
   }
-  
+
   loadFolders() {
+    if(this.CanView){
     this.folderService.getAll().subscribe({
       next: (data: Folder[]) => {
         this.folders = data;
@@ -185,6 +185,9 @@ export class FolderDetailsComponent implements OnInit {
       },
     });
   }
+  }
+
+  
   goBackToPreviousFolder(): void {
     if (this.fId !== this.rootId) {
       this.fId = this.folder.parentId;
@@ -201,8 +204,7 @@ export class FolderDetailsComponent implements OnInit {
           this.folder = data;
           this.folderName = data.folderName;
           console.log('Folder details:', data);
-          console.log('Folder details:', data.id , this.fId);
-
+          console.log('Folder details:', data.id, this.fId);
         } else {
           console.error('Folder data is undefined');
         }
@@ -224,7 +226,6 @@ export class FolderDetailsComponent implements OnInit {
     }
   }
 
-
   // Documents
   deleteDocument(docId: number) {
     this.documentService.delete(docId).subscribe(() => {
@@ -237,7 +238,10 @@ export class FolderDetailsComponent implements OnInit {
 
   downloadDocument(document: DocumentModel): void {
     if (document.file && document.documentName) {
-      this.downloadService.downloadDocument(document.file, document.documentName);
+      this.downloadService.downloadDocument(
+        document.file,
+        document.documentName
+      );
     } else {
       console.error('File data or document name is undefined.');
     }
@@ -249,21 +253,22 @@ export class FolderDetailsComponent implements OnInit {
       console.error('File data or document name is undefined.');
     }
   }
-  
 
   //Folders Pin
   pinFolder(folder: Folder): void {
-    this.folderPinned.emit(folder);}
+    this.folderPinned.emit(folder);
+  }
   togglePinFolder(folder: Folder) {
     const index = this.pinnedFolders.findIndex((f) => f.id === folder.id);
     if (index === -1) {
       this.pinnedFolders.push(folder);
     } else {
       this.pinnedFolders.splice(index, 1);
-}}
+    }
+  }
   isPinned(folder: Folder): boolean {
-    return this.pinnedFolders.some((f) => f.id === folder.id);}
-
+    return this.pinnedFolders.some((f) => f.id === folder.id);
+  }
 
   //Modals
   openModalDoc(): void {
@@ -283,12 +288,11 @@ export class FolderDetailsComponent implements OnInit {
   openFolderCreationModal(): void {
     const modalRef = this.modalService.open(FolderCreationComponent);
     modalRef.componentInstance.folderId = this.fId;
-     modalRef.componentInstance.parentId = this.folder?.id;
+    modalRef.componentInstance.parentId = this.folder?.id;
     console.log('Passing folderId  fId  to modal:', this.fId);
     console.log('passing parentid', this.folder.parentId);
     modalRef.componentInstance.folderCreated.subscribe((newFolder: Folder) => {
       this.folders = [...this.folders, newFolder];
-
     });
   }
   openEditFolder(folder: Folder) {
@@ -296,41 +300,36 @@ export class FolderDetailsComponent implements OnInit {
     modalRef.componentInstance.folder = { ...folder };
     modalRef.componentInstance.folderUpdated.subscribe(
       (updatedFolder: Folder) => {
-        this.folders$.pipe(
-          take(1) 
-        ).subscribe(folders => {
-        const index = this.folders.findIndex((f) => f.id === updatedFolder.id);
-        if (index !== -1) {
-          const updatedfolders = [...folders];
-          updatedfolders[index] = updatedFolder;
-         // this.folders[index] = updatedFolder; 
-          //this.folderService.update(updatedFolder.id, updatedFolder);
-        }
-      });
+        this.folders$.pipe(take(1)).subscribe((folders) => {
+          const index = this.folders.findIndex(
+            (f) => f.id === updatedFolder.id
+          );
+          if (index !== -1) {
+            const updatedfolders = [...folders];
+            updatedfolders[index] = updatedFolder;
+            // this.folders[index] = updatedFolder;
+            //this.folderService.update(updatedFolder.id, updatedFolder);
+          }
+        });
       }
-    );}
-
+    );
+  }
 
   openModal(document?: DocumentModel) {
     const modalRef = this.modalService.open(DocumentEditComponent);
     modalRef.componentInstance.document = { ...document };
     modalRef.componentInstance.documentUpdated.subscribe(
       (updatedDocument: DocumentModel) => {
-        this.documents$.pipe(
-          take(1) 
-        ).subscribe(documents => {
+        this.documents$.pipe(take(1)).subscribe((documents) => {
           const index = documents.findIndex(
             (doc: DocumentModel) => doc.id === updatedDocument.id
           );
           if (index !== -1) {
             const updatedDocuments = [...documents];
             updatedDocuments[index] = updatedDocument;
-
           }
         });
       }
     );
   }
-  
-
 }

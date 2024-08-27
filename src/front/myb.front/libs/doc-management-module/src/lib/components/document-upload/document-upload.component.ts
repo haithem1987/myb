@@ -19,7 +19,7 @@ export class DocumentUploadComponent {
 
   onSelectFile(filesData: any, fileInput: any) {
     const { files } = fileInput.target;
-    console.log('files', fileInput)
+ 
     this.filesService.toBase64(files, this.selectedFiles);
     this.filesService.getSelectedFiles().subscribe((res) => {
       if (res) {

@@ -73,26 +73,6 @@ export class FolderService extends RepositoryService<Folder> {
   }
 
 
-  // override get(id: number): Observable<Folder> {
-  //   return super.get(id).pipe(
-  //     map((folder) => {
-  //       console.log('Result from super.get(id):', folder);
-        
-  //       if (!folder) {
-  //         throw new Error(`Folder with ID ${id} not found`);
-  //       }
-  
-  //       const folders = this.folderSubject.value.map((f) =>
-  //         f.id === id ? folder : f
-  //       );
-  //       this.folderSubject.next(folders);
-  //       console.log('folder serv', folder);
-  //       return folder;
-  //     })
-  //   );
-  // }
-  
-
   getFoldersByParentId(parentId: number): Observable<Folder[]> {
     return this.apollo.watchQuery({
       query:  gql`

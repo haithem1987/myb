@@ -57,7 +57,7 @@ namespace Myb.Timesheet.Infra.GraphQl.Querys
             return await employeeService.GetEmployeesByManagerIdAsync(managerId);
         }
         
-        public async Task<Employee> GetEmployeeById([Service] IEmployeeService employeeService, int id)
+        public async Task<Employee> GetEmployeeById([Service] IEmployeeService employeeService, string id)
         {
             return await employeeService.GetEmployeeByIdAsync(id);
         }
@@ -73,13 +73,18 @@ namespace Myb.Timesheet.Infra.GraphQl.Querys
             return await timesheetService.GetTimeSheetsByUserIdAsync(userId);
         }
 
-        public async Task<IEnumerable<TimeSheet>> GetTimesheetsByEmployeeId([Service] ITimesheetService timesheetService, int employeeId)
+        public async Task<IEnumerable<TimeSheet>> GetTimesheetsByEmployeeId([Service] ITimesheetService timesheetService, string employeeId)
         {
             return await timesheetService.GetTimeSheetsByEmployeeIdAsync(employeeId);
         }
-
+        
+        public async Task<IEnumerable<TimeSheet>> GetTimesheetsByManagerId([Service] ITimesheetService timesheetService, string managerId)
+        {
+            return await timesheetService.GetTimesheetsByManagerIdAsync(managerId);
+        }
+        
         // TimeOff queries
-        public async Task<IEnumerable<TimeOff>> GetTimeOffsByEmployeeId([Service] ITimeoffService timeoffService, int employeeId)
+        public async Task<IEnumerable<TimeOff>> GetTimeOffsByEmployeeId([Service] ITimeoffService timeoffService, string employeeId)
         {
             return await timeoffService.GetTimeOffsByEmployeeIdAsync(employeeId);
         }

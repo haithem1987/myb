@@ -1,6 +1,11 @@
-<div class="card border-primary p-3">
+<div class="modal-header">
+  <h4 class="modal-title">Add Product</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+</div>
+<div class="modal-body">
+<div class="card border-primary p-3 m-4">
   <div class="container">
-    <form [formGroup]="productForm" (ngSubmit)="save()">
+    <form [formGroup]="productForm" >
       <div class="mb-3">
         <label for="clientType" class="form-label">Product type</label>
         <div
@@ -121,23 +126,17 @@
       </div>
 
       <div style="display: flex; align-items: center">
-        <div class="dropdown me-4">
+       
+        <div ngbDropdown>
           <button
-            class="btn btn-outline-secondary dropdown-toggle"
-            type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
+            class="btn btn-outline-secondary me-4"
+            ngbDropdownToggle
           >
             Tax
           </button>
-          <ul class="dropdown-menu" style="height: 300px; overflow: auto">
-            <div
-              data-bs-spy="scroll"
-              data-bs-smooth-scroll="true"
-              class="scrollspy-example-2"
-              tabindex="0"
-            >
-              @for(tax of taxes$ | async ; track tax){
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            @for(tax of taxes$ | async ; track tax){
+              <div ngbDropdownItem>
               <li>
                 <label class="dropdown-item" (click)="setTax(tax)"
                   >{{ tax.name }}
@@ -148,9 +147,9 @@
                   ></label
                 >
               </li>
-              }
             </div>
-          </ul>
+              }
+          </div>
         </div>
         @if(tax != null){
         <label>
@@ -166,20 +165,27 @@
         <p style="color: rgba(229, 4, 4, 0.896)">{{ errorMessage }}</p>
         }
       </div>
-
-      <div>
-        <br />
-        <div class="d-flex justify-content-end">
-          <button
-            type="button"
-            class="btn btn-outline-secondary me-2"
-            [routerLink]="['/invoice/products']"
-          >
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-outline-primary">Save</button>
-        </div>
-      </div>
+      <div style="margin-top: 10px;" (click)="openModal()"><button
+        class="btn btn-outline-secondary me-4">
+        new Tax
+      </button>
+    </div>
     </form>
+  </div>
+</div>
+</div>
+<div class="modal-footer">
+  <div>
+    <br />
+    <div class="d-flex justify-content-end">
+      <button
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-outline-primary" (click)="save()">Save</button>
+    </div>
   </div>
 </div>

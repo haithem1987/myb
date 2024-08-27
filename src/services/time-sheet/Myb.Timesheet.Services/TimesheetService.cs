@@ -8,11 +8,13 @@ namespace Myb.Timesheet.Services;
 public class TimesheetService:ITimesheetService
 {
     private readonly IGenericRepository<int?, TimeSheet, TimesheetContext> _timesheetRepository;
+    private readonly IGenericRepository<string?, Employee, TimesheetContext> _employeeRepository;
     private readonly ILogger _logger;
 
-    public TimesheetService(IGenericRepository<int?, TimeSheet, TimesheetContext> timesheetRepository,ILogger<TimesheetService> logger)
+    public TimesheetService(IGenericRepository<int?, TimeSheet, TimesheetContext> timesheetRepository,IGenericRepository<string?, Employee, TimesheetContext> employeeRepository,ILogger<TimesheetService> logger)
     {
         _timesheetRepository = timesheetRepository;
+        _employeeRepository = employeeRepository;
         _logger = logger;
     }
     
@@ -123,11 +125,11 @@ public class TimesheetService:ITimesheetService
             throw;
         }
     }
-    public Task<IEnumerable<TimeSheet>> GetTimeSheetsByEmployeeIdAsync(int employeeId)
+    public Task<IEnumerable<TimeSheet>> GetTimeSheetsByEmployeeIdAsync(string employeeId)
     {
         try
         {
-            var timesheets = _timesheetRepository.GetAll().Where(t => t.EmployeeId == employeeId);
+            var timesheets = _timesheetRepository.GetAll().Where(t => t.UserId == employeeId);
             return Task.FromResult<IEnumerable<TimeSheet>>(timesheets);
         }
         catch (Exception ex)
@@ -185,6 +187,44 @@ public class TimesheetService:ITimesheetService
 
     return updatedTimesheets;
 }
+ 
+public async Task<List<TimeSheet>> GetTimesheetsByProjectIds(List<int> projectIds)
+{
+    try
+    {
+        var timesheets = _timesheetRepository.GetAll().Where(t => projectIds.Contains(t.ProjectId)).ToList();
+        return await Task.FromResult(timesheets);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error getting timesheets by project ids: {projectIds}", string.Join(", ", projectIds));
+        throw;
+    }
+}
+public async Task<IEnumerable<TimeSheet>> GetTimesheetsByManagerIdAsync(string managerId)
+{
+    try
+    {
+
+        var employeeIds = _employeeRepository
+            .GetAll()
+            .Where(e => e.ManagerId == managerId)
+            .Select(e => e.Id)
+            .ToList();
+
+        var timesheets = _timesheetRepository
+            .GetAll()
+            .Where(t => employeeIds.Contains(t.UserId));
+
+        return await Task.FromResult(timesheets);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error getting timesheets by manager id: {managerId}", managerId);
+        throw;
+    }
+}
+
 
 
 }

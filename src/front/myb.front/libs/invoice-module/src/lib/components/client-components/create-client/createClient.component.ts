@@ -26,9 +26,9 @@ import { Client } from '../../../models/client.model';
 })
 export class CreateClientComponent implements OnInit {
   private toastService = inject(ToastService);
-  private router = inject(Router);
-  clientService = inject(ClientService);
-  modalService = inject(NgbModal);
+  private clientService = inject(ClientService);
+  private modalService = inject(NgbModal);
+	private activeModal = inject(NgbActiveModal);
 
   errorMessage: string = '';
 
@@ -53,12 +53,13 @@ export class CreateClientComponent implements OnInit {
       client.lastName = this.clientForm.value.lastName;
       client.address = this.clientForm.value.clientAddress;
       client.clientType = this.clientType;
+      client.isArchived = false;
 
       this.clientService.create(client).subscribe(() => {
         this.toastService.show('Client created successfully!', {
           classname: 'bg-success text-light',
         });
-        this.router.navigate(['/invoice/clients']);
+        this.closeModal()
       });
     }else {
       this.errorMessage = 'contact is required !';
@@ -81,8 +82,18 @@ export class CreateClientComponent implements OnInit {
       }
     });
   }
+  deleteContact(contactToDelete: Contact): void{
+    this.contacts = this.contacts.filter(
+      (contact) => contact != contactToDelete
+    );
+  }
+  closeModal(): void {
+    this.activeModal.dismiss();
+  }
 
   trackByFn(index: number, item: Contact): number {
     return index;
   }
+
+  
 }

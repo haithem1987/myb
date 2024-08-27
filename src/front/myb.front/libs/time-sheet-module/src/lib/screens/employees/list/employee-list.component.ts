@@ -33,17 +33,18 @@ export class EmployeeListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      this.userId$.subscribe((userId) => {
-        if (!userId) return;
-        this.employeeService.getEmployeesByManagerId(userId).subscribe();
-      })
-    );
+    // this.subscriptions.add(
+    this.userId$.subscribe((userId) => {
+      console.log('userId', userId);
+      if (!userId) return;
+      this.employeeService.getEmployeesByManagerId(userId).subscribe();
+    });
+    // );
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
+  // ngOnDestroy(): void {
+  //   this.subscriptions.unsubscribe();
+  // }
 
   addEmployee(): void {
     this.router.navigate(['/timesheet/employees/new']);

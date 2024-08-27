@@ -1,131 +1,40 @@
-<div *ngIf="isLoading" class="text-center">
-  <p>{{ 'LOADING' | translate }}</p>
-</div>
+<myb-front-loading-indicator
+  [isLoading]="isLoading"
+></myb-front-loading-indicator>
 <div *ngIf="!isLoading" class="container my-4">
-  <div class="d-flex justify-content-between mb-3">
-    <h2 class="mb-0 w-50" style="color: var(--bs-darklight)">
-      {{ 'TIMESHEET_MANAGER' | translate }}
-    </h2>
-  </div>
-
+  <!-- <myb-front-timesheet-header></myb-front-timesheet-header> -->
   <div class="mb-3 d-flex justify-content-between align-items-center">
-    <div class="btn-group" ngbButtonGroup>
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        [class.active]="selectedPeriod === 'week'"
-        (click)="setPeriod('week')"
-      >
-        {{ 'WEEK' | translate }}
-        <span class="badge bg-danger ms-1">{{
-          getTotalQuantitiesForPeriod('week')
-        }}</span>
-      </button>
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        [class.active]="selectedPeriod === 'month'"
-        (click)="setPeriod('month')"
-      >
-        {{ 'MONTH' | translate }}
-        <span class="badge bg-danger ms-1">{{
-          getTotalQuantitiesForPeriod('month')
-        }}</span>
-      </button>
+    <div>
+      <myb-front-period-selector
+        [selectedPeriod]="selectedPeriod"
+        [weekQuantity]="getTotalQuantitiesForPeriod('week')"
+        [monthQuantity]="getTotalQuantitiesForPeriod('month')"
+        (periodChange)="setPeriod($event)"
+      ></myb-front-period-selector>
+      <span class="fw-bold ms-2 h5 m-0">{{
+        currentDay | date : 'MMMM yyyy' : translate.currentLang
+      }}</span>
     </div>
-
-    <div class="text-end mt-3">
-      <button
-        class="btn btn-primary fw-bold text-uppercase"
-        (click)="saveAllChanges()"
-        [disabled]="isSaving"
-      >
-        <ng-container *ngIf="!isSaving">
-          {{ 'VALIDATE' | translate }}
-        </ng-container>
-        <ng-container *ngIf="isSaving">
-          <span
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
-          {{ 'SAVING' | translate }}
-        </ng-container>
-      </button>
-    </div>
+    <myb-front-timesheet-action-buttons
+      [selectedProjectsSize]="selectedProjects.size"
+      [isSaving]="isSaving"
+      (fillProjects)="fillSelectedProjects()"
+      (extractPDF)="extractPDF()"
+      (saveChanges)="saveAllChanges()"
+    ></myb-front-timesheet-action-buttons>
   </div>
-
-  <div class="card table-responsive">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>{{ 'PROJECT' | translate }}</th>
-          <th
-            class="text-center"
-            [ngClass]="{
-              'weekend-dark': isWeekend(date) && !date.isToday,
-              'today-column': date.isToday
-            }"
-            *ngFor="let date of dateRange; trackBy: trackByDate"
-          >
-            <div class="position-relative">
-              <span
-                *ngIf="handleHoliday(date).isHoliday"
-                class="holiday-badge bg-danger border border-light rounded-circle"
-                [ngbTooltip]="handleHoliday(date).name"
-              >
-                <span class="visually-hidden">New alerts</span>
-              </span>
-            </div>
-            <div class="text-muted fw-light">{{ date.weekday }}</div>
-            <div
-              [ngClass]="{
-                'badge bg-secondary rounded-pill': date.isToday
-              }"
-            >
-              {{ date.day }}
-            </div>
-          </th>
-          <th class="total-column">{{ 'TOTAL' | translate }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let project of projects$ | async; trackBy: trackByProject">
-          <td style="min-width: 300px">{{ project.projectName }}</td>
-          <td
-            class="text-center"
-            style="width: 80px"
-            *ngFor="let date of dateRange; trackBy: trackByDate"
-            [ngClass]="{
-              'weekend-dark': isWeekend(date) && !date.isToday,
-              'today-column': date.isToday
-            }"
-          >
-            <ng-container>
-              <input
-                type="number"
-                class="form-control text-center"
-                style="width: 60px"
-                [value]="getQuantityForDate(project.id, date.dateString)"
-                [ngClass]="{
-                  'holiday-disabled': handleHoliday(date).isHoliday
-                }"
-                (input)="onQuantityChange(project.id, date, $event)"
-                [disabled]="handleHoliday(date).isHoliday"
-              />
-            </ng-container>
-          </td>
-          <td class="total-column text-end">
-            <myb-front-progress-bar
-              [value]="getTotalQuantityForProject(project.id)"
-              type="success"
-              height="8px"
-              [max]="5"
-            ></myb-front-progress-bar>
-            {{ getTotalQuantityForProject(project.id) }} / 5
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <myb-front-timesheet-table
+    [projects]="projects$ | async"
+    [dateRange]="dateRange"
+    [selectedProjects]="selectedProjects"
+    [holidays]="holidays"
+    [weekendDays]="weekendDays"
+    [totalPeriod]="totalPeriod"
+    [timesheetQuantities]="timesheetQuantities"
+    (selectAll)="toggleSelectAll($event)"
+    (rowSelectChange)="onRowSelectChange($event.projectId, $event.event)"
+    (quantityChange)="
+      onQuantityChange($event.projectId, $event.date, $event.quantity)
+    "
+  ></myb-front-timesheet-table>
 </div>

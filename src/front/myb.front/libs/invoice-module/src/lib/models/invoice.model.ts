@@ -1,4 +1,5 @@
 import { BaseModel } from 'libs/shared/infra/models/base.model';
+import { InvoiceDetails } from './invoiceDetails.model';
 
 export class Invoice extends BaseModel {
   invoiceNum?: string;
@@ -9,9 +10,7 @@ export class Invoice extends BaseModel {
   totalAmount?: number;
   subTotal?: number;
   status?: string;
-  clientName?: string;
-  clientAddress?: string;
-  supplierName?: string;
-  supplierAddress?: string;
-  image?: string;
+  clientID?: number;
+  invoiceDetails?: InvoiceDetails[];
+  isArchived!: boolean;
 }

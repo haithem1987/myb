@@ -1,16 +1,8 @@
-footer {
-  .overlay {
-    position: relative;
-    &:before {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: url('../../../../../../../apps/client/src/assets/wave-shape.svg')
-        no-repeat bottom;
-      background-size: cover;
-      height: 150px;
-    }
-  }
+.custom-footer {
+  background-image: url('../../../../../../../apps/client/src/assets/images/footer_layer.png');
+  background-size: cover; /* Ensures the image fits within the container */
+  background-position: top;
+  background-repeat: no-repeat;
+  height: 600px;
+  width: 100%;
 }

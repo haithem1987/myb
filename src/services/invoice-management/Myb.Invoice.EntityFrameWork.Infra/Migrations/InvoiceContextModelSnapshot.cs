@@ -36,17 +36,26 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Property<int?>("ClientType")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
 
+                    b.Property<bool?>("IsArchived")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -94,6 +103,9 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
                     b.Property<int?>("InvoiceID")
                         .HasColumnType("integer");
 
@@ -103,10 +115,13 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Property<double?>("Quantity")
                         .HasColumnType("double precision");
 
-                    b.Property<double?>("TotalPrice")
-                        .HasColumnType("double precision");
+                    b.Property<string>("Unit")
+                        .HasColumnType("text");
 
                     b.Property<double?>("UnitPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("UnitPriceHT")
                         .HasColumnType("double precision");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -150,6 +165,9 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Property<string>("InvoiceNum")
                         .HasColumnType("text");
 
+                    b.Property<bool?>("IsArchived")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Status")
                         .HasColumnType("text");
 
@@ -180,11 +198,17 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<bool?>("IsArchived")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -204,6 +228,9 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("TaxId");
@@ -219,8 +246,14 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
 
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool?>("IsArchived")
+                        .HasColumnType("boolean");
 
                     b.Property<bool?>("IsPercentage")
                         .HasColumnType("boolean");
@@ -230,6 +263,9 @@ namespace Myb.Invoice.EntityFrameWork.Infra.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
 
                     b.Property<double?>("Value")
                         .HasColumnType("double precision");

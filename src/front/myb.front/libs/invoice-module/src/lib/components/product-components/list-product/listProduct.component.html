@@ -1,51 +1,109 @@
 <div class="container my-4">
   <div class="d-flex justify-content-between mb-3">
     <h2 class="mb-0" style="color: var(--bs-darklight)">Product Manager</h2>
-    <button
-      type="button"
-      class="btn btn-primary"
-      [routerLink]="['/invoice/products/createProduct']"
-    >
+    <button type="button" class="btn btn-primary" (click)="openModal()">
       <i class="bi bi-plus-lg"></i> Add Product
     </button>
   </div>
   <input
     type="text"
     class="form-control mb-3"
-    placeholder="Search invoices..."
+    placeholder="Search products..."
+    [(ngModel)]="searchTerm"
   />
   <br />
-  <div class="card border-primary p-2">
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th scope="col" style="cursor: pointer">Product Name</th>
-          <th scope="col" style="cursor: pointer">Description</th>
-          <th scope="col" style="cursor: pointer">Price</th>
-          <th scope="col" style="cursor: pointer">Product Type</th>
-          <th scope="col">Unit</th>
-          <th scope="col">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for(product of products$ | async ; track product){
-        <tr>
-          <td>{{ product.name }}</td>
-          <td>{{ product.description }}</td>
-          <td>{{ product.price }}</td>
-          <td>{{ product.productType }}</td>
-          <td>{{ product.unit }}</td>
-          <td>
-            <button type="button" class="btn btn-outline-primary me-2">
-              <i class="bi bi-pencil-square"></i>
-            </button>
-            <button type="button" class="btn btn-outline-secondary">
-              <i class="bi bi-trash"></i>
-            </button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a
+            class="nav-link cursor-pointer"
+            [ngClass]="{ active: activeTab === 'ACTIVE' }"
+            (click)="setActiveTab('ACTIVE')"
+          >
+            {{ 'ACTIVE' | translate }}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [ngClass]="{ active: activeTab === 'ARCHIVED' }"
+            (click)="setActiveTab('ARCHIVED')"
+          >
+            {{ 'ARCHIVED' | translate }}
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="card border-primary p-2">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col" style="cursor: pointer">Product Name</th>
+              <th scope="col" style="cursor: pointer">Description</th>
+              <th scope="col" style="cursor: pointer">Price HT</th>
+              <th scope="col" style="cursor: pointer">Tax</th>
+              <th scope="col" style="cursor: pointer">Price</th>
+              <th scope="col" style="cursor: pointer">Type</th>
+              <th scope="col">Unit</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(product of products$ | async ; track product){
+            @if(showProduct(product)){
+            <tr>
+              <td>{{ product.name }}</td>
+              <td>{{ product.description }}</td>
+              <td>{{ product.price }}</td>
+
+              <td>
+                <label
+                  >{{ product.tax.name }}
+                  <span
+                    >:&nbsp;&nbsp;{{
+                      product.tax.value
+                    }}@if(product.tax.isPercentage == true){
+                    <span> %</span>
+                    }</span
+                  ></label
+                >
+              </td>
+              <td>{{ calculatePriceWithTax(product.price, product.tax) }}</td>
+              <td>{{ product.productType }}</td>
+              <td>{{ product.unit }}</td>
+              @if(!product.isArchived){
+              <td>
+                <button type="button" class="btn btn-outline-primary me-2">
+                  <i
+                    class="bi bi-pencil-square"
+                    (click)="openEditModal(product)"
+                  ></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="archiveProduct(product)"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+              } @if(product.isArchived){
+              <td>
+                <button
+                  class="btn btn-outline-secondary btn-sm me-2"
+                  (click)="restoreProduct(product)"
+                >
+                  <i class="bi bi-arrow-repeat me-2"></i>Restore
+                </button>
+              </td>
+              }
+            </tr>
+            } }
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>

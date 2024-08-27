@@ -5,10 +5,28 @@ export const CREATE_TAX = gql`
     addTax(tax: $item) {
       createdAt
       id
-      isPercentage
       name
       updatedAt
       value
+      isPercentage
+      isArchived
+      companyId
+      userId
+    }
+  }
+`;
+export const UPDATE_TAX = gql`
+  mutation updateTax($item: TaxInput!) {
+    updateTax(tax: $item) {
+     createdAt
+      id
+      name
+      updatedAt
+      value
+      isPercentage
+      isArchived
+      companyId
+      userId
     }
   }
 `;

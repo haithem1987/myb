@@ -1,1 +1,36 @@
-<myb-timesheet-list></myb-timesheet-list>
+<ul class="nav border-bottom">
+  <li class="nav-item">
+    <a
+      class="nav-link cursor-pointer text-muted"
+      [ngClass]="{
+        active: activeTab === 'MY_TIMESHEETS',
+        'border-primary border-0 border-bottom border-3 text-dark fw-bold':
+          activeTab === 'MY_TIMESHEETS'
+      }"
+      (click)="setActiveTab('MY_TIMESHEETS')"
+    >
+      {{ 'MY_TIMESHEETS' | translate }}
+    </a>
+  </li>
+  <li class="nav-item" *ngIf="isManager">
+    <a
+      class="nav-link cursor-pointer text-muted"
+      [ngClass]="{
+        active: activeTab === 'INTERVENANTS_TIMESHEETS',
+        'border-primary border-0 border-bottom border-3 text-dark fw-bold':
+          activeTab === 'INTERVENANTS_TIMESHEETS'
+      }"
+      (click)="setActiveTab('INTERVENANTS_TIMESHEETS')"
+    >
+      {{ 'INTERVENANTS_TIMESHEETS' | translate }}
+    </a>
+  </li>
+</ul>
+<div class="container">
+  <div *ngIf="activeTab === 'MY_TIMESHEETS'">
+    <myb-timesheet-list></myb-timesheet-list>
+  </div>
+  <div *ngIf="activeTab === 'INTERVENANTS_TIMESHEETS'">
+    <myb-front-intervenant-timesheet-table></myb-front-intervenant-timesheet-table>
+  </div>
+</div>

@@ -1,1 +1,110 @@
-<h2>Invoice details</h2>
+<div class="container my-4">
+  <h2 class="mb-0" style="color: var(--bs-darklight)">Invoice Details</h2>
+  <br />
+  <div class="card border-primary p-3">
+    <div class="container">
+      <br />
+      <div class="mb-2" style="display: grid">
+        <h6>
+          <span>&nbsp;&nbsp;Forlink Group</span>
+        </h6>
+        <h6>
+          <span>&nbsp;&nbsp;78 avenue des champs elysees 75008 Paris 8</span>
+        </h6>
+        <h6>
+          <span
+            >&nbsp;&nbsp;<i class="bi bi-phone">&nbsp;&nbsp;</i>+33 6 46 82 33 05</span
+          >
+        </h6>
+        <h6>
+          <span class="email"
+            >&nbsp;&nbsp;<i class="bi bi-envelope"></i
+            >&nbsp;&nbsp;haithem.khalifa&#64;forlink-group.com</span
+          >
+        </h6>
+      </div>
+      <br/>
+      <br/>
+      <div class="d-flex justify-content-between mb-3">
+        @if(client){
+        <div class="mb-2" style="display: grid">
+          <h6>
+            <span>&nbsp;&nbsp;Client Name:</span>
+            <span>&nbsp;{{ client.firstName }}</span>
+            <span>&nbsp;&nbsp;{{ client.lastName }}&nbsp;&nbsp;&nbsp;</span>
+          </h6>
+          <h6>
+            <span>&nbsp;&nbsp;Client Address:</span>
+            <span>&nbsp;{{ client.address }}&nbsp;</span>
+          </h6>
+          @for(contact of client.contacts; track contact){
+            <h6>
+          <span
+            >&nbsp;&nbsp; @if(contact.type == 'PHONE'){
+            <i class="bi bi-phone"></i>&nbsp;&nbsp; } @if(contact.type ==
+            'EMAIL'){ <i class="bi bi-envelope"></i>&nbsp;&nbsp; }
+            {{ contact.credentials }}</span
+          ></h6>
+          }
+        </div>
+        }
+        <div class="mb-2" style="display: grid">
+          <h6>
+            <span>&nbsp;&nbsp;Invoice N:</span>
+            <span>&nbsp;{{ invoice!.invoiceNum }}</span>
+          </h6>
+          <h6>
+            <span>&nbsp;&nbsp;Invoice Date:</span>
+            <span>&nbsp;{{ invoice!.invoiceDate | date : 'MM/dd/yyyy' }}</span>
+          </h6>
+          <h6>
+            <span>&nbsp;&nbsp;Due Date:</span>
+            <span>&nbsp;{{ invoice!.dueDate | date : 'MM/dd/yyyy' }}&nbsp;</span>
+          </h6>
+        </div>
+      </div>
+      <br />
+      
+      <div class="me-4">
+        <div class="table-responsive">
+        <table class="table  ">
+          <thead class="table-secondary">
+            <tr>
+              <th scope="col">Quantity</th>
+              <th scope="col">Description</th>
+              <th scope="col">Unit</th>
+              <th scope="col">Unit Price</th>
+              <th scope="col">Total Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(data of invoice!.invoiceDetails; track data){
+            <tr>
+              <td>{{ data.quantity }}</td>
+              <td>{{ data.description }}</td>
+              <td>{{ data.unit }}</td>
+              <td>{{ data.unitPrice }}</td>
+              <td>{{ data.unitPrice! * data.quantity! }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      </div>
+      <br />
+      <br />
+      <br />
+      <div
+        class="d-flex justify-content-between mb-3"
+        style="margin-right: 100px"
+      >
+        <div></div>
+        <div style="display: grid">
+          <h5>SubTotal :&nbsp;&nbsp; {{ invoice!.subTotal }}</h5>
+          <h5>tax :&nbsp;&nbsp; {{ getTaxValue() }}</h5>
+          <h5>Total :&nbsp;&nbsp; {{ invoice!.totalAmount }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

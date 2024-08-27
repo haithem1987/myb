@@ -1,9 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using Myb.Common.Models;
 
 namespace Myb.Timesheet.Models;
 
-public class Employee:BaseEntity
+public class Employee: IEntity<string?>
 {
+    [Key]
+    public string? Id { get; set; }
     public string? Name { get; set; }
     public string? Department { get; set; }
     public string? Email { get; set; }
@@ -12,8 +15,10 @@ public class Employee:BaseEntity
 
     // Navigation properties
     public virtual ICollection<TimeSheet>? Timesheets { get; set; } = new List<TimeSheet>();
-    public virtual ICollection<TimeOff>? TimeOffs { get; set; } = new List<TimeOff>();
+    //public virtual ICollection<TimeOff>? TimeOffs { get; set; }
     
     public virtual ICollection<TimesheetTask>? Tasks { get; set; } = new List<TimesheetTask>();
-    public string? UserId { get; set; }
+    public DateTime? CreatedAt { get; set; } 
+    public DateTime? UpdatedAt { get; set; }
+
 }

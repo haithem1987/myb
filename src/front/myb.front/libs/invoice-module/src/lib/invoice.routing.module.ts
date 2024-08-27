@@ -57,13 +57,13 @@ export const invoiceRoutes: Routes = [
               breadcrumb: 'Clients',
             },
           },
-          {
+          /* {
             path: 'createClient',
             component: CreateClientComponent,
             data: {
               breadcrumb: 'new Client',
             },
-          },
+          }, */
         ],
       },
       {
@@ -80,13 +80,13 @@ export const invoiceRoutes: Routes = [
               breadcrumb: 'Products',
             },
           },
-          {
+         /*  {
             path: 'createProduct',
             component: CreateProductComponent,
             data: {
               breadcrumb: 'new Product',
             },
-          },
+          }, */
         ],
       },
       {

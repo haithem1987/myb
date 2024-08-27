@@ -77,9 +77,7 @@ export class TimesheetEditComponent implements OnInit {
   }
 
   async onEmployeeSelect(event: any): Promise<void> {
-    const selectedEmployee = this.findEmployeeById(
-      parseInt(event.target.value)
-    );
+    const selectedEmployee = this.findEmployeeById(event.target.value);
     console.log('selectedEmployee', selectedEmployee);
     if (selectedEmployee) {
       this.editForm.patchValue({
@@ -146,7 +144,7 @@ export class TimesheetEditComponent implements OnInit {
     return foundProject;
   }
 
-  private findEmployeeById(id: number): Employee | null {
+  private findEmployeeById(id: string): Employee | null {
     let foundEmployee: Employee | null = null;
     this.employees$.subscribe((employees) => {
       foundEmployee = employees.find((employee) => employee.id === id) || null;

@@ -6,14 +6,14 @@ import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache, ApolloLink, from } from '@apollo/client/core';
 import { onError } from '@apollo/client/link/error';
 import { Router } from '@angular/router';
- 
+
 // Define your microservices' endpoints
 const microserviceLinks = {
-  service1: 'http://localhost:5117/graphql',
-  service2: 'http://localhost:5117/graphql',
-  service3: 'http://localhost:5117/graphql',
+  timesheetService: 'http://localhost:5059/graphql',
+  documentService: 'http://localhost:5117/graphql',
+  invoiceService: 'http://localhost:5145/graphql',
 };
- 
+
 // Error handling link
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
@@ -24,7 +24,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     // Handle network issues and inform user
   }
 });
- 
+
 // Custom routing link
 const createCustomLink = (httpLink: HttpLink, router: Router) => {
   const serviceLinks = Object.entries(microserviceLinks).reduce(
@@ -34,23 +34,23 @@ const createCustomLink = (httpLink: HttpLink, router: Router) => {
     },
     {} as { [key: string]: ApolloLink }
   );
- 
+
   return new ApolloLink((operation, forward) => {
     const currentUrl = router.url;
     console.log('currentUrl', currentUrl);
     if (currentUrl.startsWith('/timesheet')) {
-      return serviceLinks['service1'].request(operation, forward);
+      return serviceLinks['timesheetService'].request(operation, forward);
     } else if (currentUrl.startsWith('/documents')) {
-      return serviceLinks['service2'].request(operation, forward);
+      return serviceLinks['documentService'].request(operation, forward);
     } else if (currentUrl.startsWith('/invoice')) {
-      return serviceLinks['service3'].request(operation, forward);
+      return serviceLinks['invoiceService'].request(operation, forward);
     }
- 
-    // Default to service1 if no specific route matches
-    return serviceLinks['service1'].request(operation, forward);
+
+    // Default to timesheetService if no specific route matches
+    return serviceLinks['timesheetService'].request(operation, forward);
   });
 };
- 
+
 @NgModule({
   imports: [BrowserModule, ApolloModule, HttpClientModule],
   providers: [

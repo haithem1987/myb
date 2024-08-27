@@ -35,6 +35,9 @@ export class NavBarComponent {
   onLogin(): void {
     this.keycloakService.login();
   }
+  onRegister(): void {
+    this.keycloakService.register();
+  }
 
   onLogout(): void {
     this.keycloakService.logout();

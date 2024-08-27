@@ -7,18 +7,18 @@ namespace Myb.Timesheet.Services;
 
 public class EmployeeService:IEmployeeService
 {
-    private readonly IGenericRepository<int?, Employee, TimesheetContext> _employeeRepository;
+    private readonly IGenericRepository<string?, Employee, TimesheetContext> _employeeRepository;
     private readonly IGenericRepository<int?, TimeOff, TimesheetContext> _timeoffRepository;
     private readonly ILogger _logger;
 
-    public EmployeeService(IGenericRepository<int?, Employee, TimesheetContext> employeeRepository, IGenericRepository<int?, TimeOff, TimesheetContext> timeoffRepository,ILogger<EmployeeService> logger)
+    public EmployeeService(IGenericRepository<string?, Employee, TimesheetContext> employeeRepository, IGenericRepository<int?, TimeOff, TimesheetContext> timeoffRepository,ILogger<EmployeeService> logger)
     {
         _employeeRepository = employeeRepository;
         _timeoffRepository = timeoffRepository;
         _logger = logger;
     }
     
-    public Task<Employee> GetEmployeeByIdAsync(int id)
+    public Task<Employee> GetEmployeeByIdAsync(string id)
     {
         try
         {
@@ -47,7 +47,7 @@ public class EmployeeService:IEmployeeService
     {
         try
         {
-            await _employeeRepository.UpdateAsync(employee);
+            await _employeeRepository.InsertAsync(employee);
             return employee;
         }
         catch (Exception ex)
@@ -69,7 +69,7 @@ public class EmployeeService:IEmployeeService
             throw;
         }
     }
-    public async Task<bool> DeleteEmployeeAsync(int id)
+    public async Task<bool> DeleteEmployeeAsync(string id)
     {
         try
         {

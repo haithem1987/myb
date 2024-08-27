@@ -7,24 +7,34 @@
             {{
               isEditMode
                 ? ('EDIT_EMPLOYEE' | translate)
-                : ('CREATE_EMPLOYEE' | translate)
+                : ('ADD_EMPLOYEE' | translate)
             }}
           </h5>
           <form [formGroup]="employeeForm" (ngSubmit)="saveEmployee()">
-            <div class="mb-3">
+            <div class="mb-3 position-relative">
               <label for="email" class="form-label">{{
                 'EMAIL' | translate
               }}</label>
               <input
                 id="email"
+                autocomplete="off"
                 formControlName="email"
                 class="form-control"
+                list="emailSuggestions"
+                (input)="onEmailChange($event)"
+                (select)="onEmailChange($event)"
                 [ngClass]="{
                   'is-invalid':
                     employeeForm.get('email')?.invalid &&
                     employeeForm.get('email')?.touched
                 }"
               />
+              <datalist id="emailSuggestions">
+                <option
+                  *ngFor="let suggestion of suggestions"
+                  [value]="suggestion.email"
+                ></option>
+              </datalist>
               <div
                 *ngIf="
                   employeeForm.get('email')?.invalid &&
@@ -34,7 +44,13 @@
               >
                 {{ 'VALID_EMAIL_REQUIRED' | translate }}
               </div>
+
+              <!-- Display message when no user is found -->
+              <div *ngIf="emailErrorMessage" class="text-danger mt-2">
+                {{ emailErrorMessage }}
+              </div>
             </div>
+
             <div class="mb-3">
               <label for="name" class="form-label">{{
                 'NAME' | translate
@@ -87,11 +103,12 @@
             <button
               type="submit"
               class="btn btn-primary fw-bold text-uppercase me-2"
+              [disabled]="employeeForm.invalid || emailErrorMessage"
             >
               {{
                 isEditMode
                   ? ('UPDATE_EMPLOYEE' | translate)
-                  : ('CREATE_EMPLOYEE' | translate)
+                  : ('ADD_EMPLOYEE' | translate)
               }}
             </button>
             <button
@@ -105,17 +122,5 @@
         </div>
       </div>
     </div>
-    <!-- <div *ngIf="isEditMode" class="col-6 d-flex">
-      <div class="card p-3 flex-fill">
-        <myb-front-employee-stats
-          [employeeId]="employeeId"
-        ></myb-front-employee-stats>
-      </div>
-    </div>
-    <div *ngIf="isEditMode" class="col-12 mt-4">
-      <myb-front-timeoff-list
-        [employeeId]="employeeId"
-      ></myb-front-timeoff-list>
-    </div> -->
   </div>
 </div>

@@ -52,7 +52,7 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
       .valueChanges.pipe(map((result) => this.mapAllItems(result)));
   }
 
-  get(id: number): Observable<T> {
+  get(id: number | string): Observable<T> {
     return this.apollo
       .query<{ item: T }>({
         query: gql`
@@ -75,9 +75,7 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
       .pipe(map((result) => this.mapCreateItem(result)));
   }
 
-
-  
-  update(id: number, item: T): Observable<T> {
+  update(id: number | string, item: T): Observable<T> {
     const { __typename, ...itemInputWithoutTypename } = item;
     return this.apollo
       .mutate<{ updateItem: T }>({
@@ -88,8 +86,8 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
       })
       .pipe(map((result) => this.mapUpdateItem(result)));
   }
-  
-  delete(id: number): Observable<any> {
+
+  delete(id: number | string): Observable<any> {
     return this.apollo
       .mutate<{ deleteItem: { success: boolean } }>({
         mutation: gql`

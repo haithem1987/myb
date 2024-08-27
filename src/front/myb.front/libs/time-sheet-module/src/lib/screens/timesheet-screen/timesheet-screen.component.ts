@@ -4,39 +4,34 @@ import { Router } from '@angular/router';
 import { TimesheetService } from '../../services/timesheet.service';
 import { Timesheet } from '../../models/timesheet.model';
 import { TimesheetListComponent } from './list/timesheet-list.component';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { IntervenantTimesheetTableComponent } from './intervenant-timesheet-table/intervenant-timesheet-table.component';
 
 @Component({
   selector: 'myb-front-timesheet-screen',
   standalone: true,
-  imports: [CommonModule, TimesheetListComponent],
+  imports: [
+    CommonModule,
+    TimesheetListComponent,
+    IntervenantTimesheetTableComponent,
+    TranslateModule,
+  ],
   templateUrl: './timesheet-screen.component.html',
   styleUrls: ['./timesheet-screen.component.css'],
 })
 export class TimesheetScreenComponent implements OnInit {
-  constructor(
-    private timesheetService: TimesheetService,
-    private router: Router
-  ) {}
+  activeTab: 'MY_TIMESHEETS' | 'INTERVENANTS_TIMESHEETS' = 'MY_TIMESHEETS';
+  isManager = false;
+
+  constructor(private keycloakService: KeycloakService) {}
 
   ngOnInit(): void {
-    this.loadTimesheets();
+    // Determine if the user is a manager
+    this.isManager = this.keycloakService.hasRole('MYB_MANAGER');
   }
 
-  loadTimesheets(): void {
-    // this.timesheetService.getTimesheetsByUserId('1').subscribe(
-    // );
-  }
-
-  editTimeSheet(id: number): void {
-    this.router.navigate(['/timesheet/edit', id]);
-  }
-
-  deleteTimeSheet(id: number): void {
-    if (confirm('Are you sure you want to delete this timesheet?')) {
-      this.timesheetService.delete(id).subscribe(
-        () => this.loadTimesheets(),
-        (error) => console.error('Error deleting timesheet', error)
-      );
-    }
+  setActiveTab(tab: 'MY_TIMESHEETS' | 'INTERVENANTS_TIMESHEETS'): void {
+    this.activeTab = tab;
   }
 }

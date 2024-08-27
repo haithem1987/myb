@@ -1,4 +1,3 @@
-
 import {
   GET_ALL_FOLDERS,
   GET_FOLDERS_BY_PARENT_ID,
@@ -28,13 +27,11 @@ import {
   GET_DOCUMENT_BY_ID,
 } from './../../../doc-management-module/src/lib/GraphQl/Queries/Document.graphql';
 
-
-
-
 import {
   GET_ALL_TIMESHEETS,
   GET_TIMESHEETS_BY_EMPLOYEE_ID,
   GET_TIMESHEETS_BY_USER_ID,
+  GET_TIMESHEETS_BY_MANAGER_ID,
 } from '../../../time-sheet-module/src/lib/graphql/queries/timesheet.graphql';
 
 import {
@@ -66,6 +63,7 @@ import {
 import {
   CREATE_TIMESHEET,
   DELETE_TIMESHEET,
+  GENERATE_TIMESHEET_PDF,
   UPDATE_MULTIPLE_TIMESHEETS,
   UPDATE_TIMESHEET,
 } from '../../../time-sheet-module/src/lib/graphql/mutations/timesheet.graphql';
@@ -80,19 +78,35 @@ import {
 } from '../../../time-sheet-module/src/lib/graphql/mutations/timeoff.graphql';
 import { GET_TIMEOFFS_BY_EMPLOYEE_ID } from '../../../time-sheet-module/src/lib/graphql/queries/timeoff.graphql';
 
-
-
 import {
   GET_ALL_INVOICES,
   GET_INVOICE_BY_ID,
 } from '../../../invoice-module/src/lib/graphql/queries/invoice.query';
-import { CREATE_TAX } from '../../../invoice-module/src/lib/graphql/mutations/tax.mutation';
-import { GET_ALL_Taxes } from '../../../invoice-module/src/lib/graphql/queries/tax.query';
-import { CREATE_PRODUCT } from '../../../invoice-module/src/lib/graphql/mutations/product.mutation';
-import { GET_ALL_PRODUCTS } from '../../../invoice-module/src/lib/graphql/queries/product.query';
-import { CREATE_CLIENT } from '../../..//invoice-module/src/lib/graphql/mutations/client.mutation';
-import { GET_ALL_CLIENTS } from '../../../invoice-module/src/lib/graphql/queries/client.query';
-import { CREATE_INVOICE } from '../../../invoice-module/src/lib/graphql/mutations/invoice.mutation';
+import {
+  CREATE_TAX,
+  UPDATE_TAX,
+} from '../../../invoice-module/src/lib/graphql/mutations/tax.mutation';
+import {
+  GET_ALL_Taxes,
+  GET_Tax_BY_ID,
+} from '../../../invoice-module/src/lib/graphql/queries/tax.query';
+import {
+  CREATE_PRODUCT,
+  UPDATE_PRODUCT,
+} from '../../../invoice-module/src/lib/graphql/mutations/product.mutation';
+import {
+  GET_ALL_PRODUCTS,
+  GET_PRODUCT_BY_ID,
+} from '../../../invoice-module/src/lib/graphql/queries/product.query';
+import { CREATE_CLIENT, UPDATE_CLIENT } from '../../..//invoice-module/src/lib/graphql/mutations/client.mutation';
+import {
+  GET_ALL_CLIENTS,
+  GET_CLIENT_BY_ID,
+} from '../../../invoice-module/src/lib/graphql/queries/client.query';
+import {
+  CREATE_INVOICE,
+  UPDATE_INVOICE,
+} from '../../../invoice-module/src/lib/graphql/mutations/invoice.mutation';
 
 // src/app/graphql/type-config.ts
 export const typeConfig: { [key: string]: any } = {
@@ -110,8 +124,10 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_TIMESHEET,
     delete: DELETE_TIMESHEET,
     getTimesheetsByUserId: GET_TIMESHEETS_BY_USER_ID,
+    getTimesheetsByManagerId: GET_TIMESHEETS_BY_MANAGER_ID,
     getTimesheetsByEmployeeId: GET_TIMESHEETS_BY_EMPLOYEE_ID,
     updateMultipleTimesheets: UPDATE_MULTIPLE_TIMESHEETS,
+    generateTimesheetPdf: GENERATE_TIMESHEET_PDF,
   },
   Task: {
     getAll: GET_ALL_TASKS,
@@ -145,20 +161,27 @@ export const typeConfig: { [key: string]: any } = {
     getAll: GET_ALL_INVOICES,
     getById: GET_INVOICE_BY_ID,
     create: CREATE_INVOICE,
+    update: UPDATE_INVOICE,
   },
   Tax: {
     create: CREATE_TAX,
     getAll: GET_ALL_Taxes,
+    getById: GET_Tax_BY_ID,
+    update: UPDATE_TAX,
   },
   Product: {
     create: CREATE_PRODUCT,
     getAll: GET_ALL_PRODUCTS,
+    getById: GET_PRODUCT_BY_ID,
+    update: UPDATE_PRODUCT,
   },
   Client: {
     create: CREATE_CLIENT,
     getAll: GET_ALL_CLIENTS,
+    getById: GET_CLIENT_BY_ID,
+    update: UPDATE_CLIENT,
   },
- 
+
   DocumentModel: {
     getById: GET_DOCUMENT_BY_ID,
     getAll: GET_ALL_DOCUMENTS,

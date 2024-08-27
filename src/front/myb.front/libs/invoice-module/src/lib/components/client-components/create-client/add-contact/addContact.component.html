@@ -3,7 +3,7 @@
     <h4 class="mb-0" style="color: var(--bs-darklight)">Add Contact</h4>
     <br />
     <div class="mb-3">
-      <form [formGroup]="contactForm" (ngSubmit)="save()">
+      <form [formGroup]="contactForm" >
         <div class="mb-3">
             <label for="credentials" class="form-label">Credentials</label>
             <input
@@ -13,6 +13,7 @@
               name="credentials"
               formControlName="credentials"
               placeholder="Enter Contact "
+              autofocus="false"
               [ngClass]="{
                 'is-invalid':
                 contactForm.get('credentials')?.invalid &&
@@ -61,7 +62,7 @@
             <button type="button" class="btn btn-outline-secondary me-2" (click)="closeModal()">
               Cancel
             </button>
-            <button type="submit" class="btn btn-outline-primary">Save</button>
+            <button type="submit" class="btn btn-outline-primary" (click)="save()">Save</button>
           </div>
         </div>
       </form>

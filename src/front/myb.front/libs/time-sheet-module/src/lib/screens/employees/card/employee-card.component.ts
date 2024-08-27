@@ -26,7 +26,7 @@ export class EmployeeCardComponent {
       state: { employee },
     });
   }
-  deleteEmployee(id: number): void {
+  deleteEmployee(id: string): void {
     if (confirm('Are you sure you want to delete this employee?')) {
       this.employeeService.delete(id).subscribe(() => {
         // this.employees$ = this.employeeService.getAll(); // Refresh the list

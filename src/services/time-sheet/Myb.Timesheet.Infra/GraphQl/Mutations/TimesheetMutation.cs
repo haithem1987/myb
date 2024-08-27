@@ -71,6 +71,11 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
             return await employeeService.UpdateEmployeeAsync(employee);
         }
         
+        public async Task<bool> DeleteEmployee([Service] IEmployeeService employeeService, string id)
+        {
+            return  await employeeService.DeleteEmployeeAsync(id);
+        }
+        
         // TimeOff mutations
         public async Task<TimeOff> UpdateTimeOff([Service] ITimeoffService timeoffService, TimeOff timeOff)
         {
@@ -80,6 +85,14 @@ namespace Myb.Timesheet.Infra.GraphQl.Mutations
         public async Task<TimeOff> AddTimeOff([Service] ITimeoffService timeoffService, TimeOff timeOff)
         {
             return await timeoffService.AddTimeOffAsync(timeOff);
+        }
+        
+        // Generate Timesheet PDF
+        public async Task<string> GenerateTimesheetPdf([Service] IPdfService pdfService, [Service] ITimesheetService timesheetService, List<int> projectIds)
+        {
+            var timesheets = await timesheetService.GetTimesheetsByProjectIds(projectIds);
+            var pdfBytes = pdfService.GenerateTimesheetPdf(timesheets);
+            return Convert.ToBase64String(pdfBytes);
         }
     }
 }

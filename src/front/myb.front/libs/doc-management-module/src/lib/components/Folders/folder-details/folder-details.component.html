@@ -85,7 +85,7 @@
                       <button ngbDropdownItem class="btn btn-outline-secondary me-2" (click)="pinFolder(folder)">
                         <i class="bi bi-pin-angle"></i> Pin
                       </button>
-                      <button ngbDropdownItem class="delete-button" (click)="deleteFolder(folder.id != null ? folder.id : -1)">
+                      <button ngbDropdownItem class="delete-button" (click)="deleteFolder(folder.id !== null ? folder.id : -1)">
                         <i class="bi bi-trash"></i> Delete
                       </button>
                     </div>

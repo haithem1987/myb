@@ -28,13 +28,16 @@ namespace Myb.Invoice.Services
             client.Contacts = null;
             var responce = await _clientRepository.InsertAsync(client);
             var newClient = responce.Entity;
+            List<Contact> contactsList = new List<Contact>();
             foreach (var contact in contacts!)
             {
                 contact.ClientID = newClient!.Id;
-                await _contactService.Add(contact);
+                var newContact = await _contactService.Add(contact);
+                contactsList.Add(newContact);
 
             }
-            return await GetById(newClient!.Id);
+            newClient.Contacts = contactsList;
+            return newClient;
         }
 
         public async Task<Client?> Delete(int id)

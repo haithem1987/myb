@@ -11,6 +11,7 @@ namespace Myb.Invoice.Models
         public string? InvoiceNum { get; set; }
         public string? UserId { get; set; }
         public int? CompanyId { get; set; }
+        public bool? IsArchived { get; set; }
         public DateTime? InvoiceDate { get; set; }
         public DateTime? DueDate { get; set;}
         public double? TotalAmount { get; set; }

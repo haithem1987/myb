@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { BreadcrumbComponent } from '../components/breadcrumb/breadcrumb.component';
 import { NavbarComponent } from '../components/navbar/navbar.component';
-import { ToastsContainerComponent } from 'libs/shared/shared-ui/src';
+import {
+  BreadcrumbComponent,
+  ToastsContainerComponent,
+} from 'libs/shared/shared-ui/src';
 
 @Component({
   selector: 'myb-front-time-sheet-module',
@@ -14,7 +16,6 @@ import { ToastsContainerComponent } from 'libs/shared/shared-ui/src';
     RouterOutlet,
     NavbarComponent,
     ToastsContainerComponent,
-    
   ],
   templateUrl: './time-sheet-module.component.html',
   styleUrl: './time-sheet-module.component.css',

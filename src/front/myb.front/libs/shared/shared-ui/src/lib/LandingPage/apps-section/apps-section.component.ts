@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { CardComponent } from '../../components/card/card.component';
+import { AuthConfirmationModalComponent } from '../../components/auth-confirmation-modal/auth-confirmation-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 interface App {
   id: number;
@@ -45,9 +48,24 @@ export class AppsSectionComponent {
     // Add more modules as needed
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private modalService: NgbModal,
+    private keycloakService: KeycloakService
+  ) {}
 
   navigateToApp(route: string): void {
-    this.router.navigate([route]);
+    if (this.keycloakService.isAuthenticated()) {
+      this.router.navigate([route]);
+    } else {
+      const modalRef = this.modalService.open(AuthConfirmationModalComponent);
+      modalRef.componentInstance.confirmEvent.subscribe(
+        (confirmed: boolean) => {
+          if (confirmed) {
+            this.router.navigate([route]);
+          }
+        }
+      );
+    }
   }
 }

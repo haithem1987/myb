@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, Inject, inject, Input, OnInit } from '@angular/core';
 import { InvoiceService } from '../../../services/invoice.service';
 import {
   SelectedFiles,
@@ -7,62 +7,155 @@ import {
 } from '../../../services/upload-files.service';
 import { Invoice } from '../../../models/invoice.model';
 import {
+  FormBuilder,
   FormGroup,
   ReactiveFormsModule,
-  FormControl,
   Validators,
 } from '@angular/forms';
 import { DateUtilsService } from '../../../../../../shared/infra/services/date-utils.service';
 import { ToastService } from '../../../../../../shared/infra/services/toast.service';
 import { HttpClientModule } from '@angular/common/http';
 import { OcrService } from '../../../../../../shared/infra/services/ocr.service';
-import { NgbScrollSpyModule } from '@ng-bootstrap/ng-bootstrap';
-import { RouterLink } from '@angular/router';
+import {
+  NgbDatepickerModule,
+  NgbModal,
+  NgbScrollSpyModule,
+} from '@ng-bootstrap/ng-bootstrap';
+import { Router, RouterLink } from '@angular/router';
+import { ClientService } from '../../../services/client.service';
+import { ProductService } from '../../../services/product.service';
+import { Observable } from 'rxjs';
+import { Client } from '../../../models/client.model';
+import { Product } from '../../../models/product.model';
+import { SelectClientComponent } from './select-client/selectClient.component';
+import { AddItemToInvoiceComponent } from './add-item/addItemToInvoice.component';
+import { InvoiceDetails } from '../../../models/invoiceDetails.model';
 
 @Component({
   selector: 'myb-front-create-invoice',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     HttpClientModule,
     NgbScrollSpyModule,
-    RouterLink
+    RouterLink,
+    ReactiveFormsModule,
+    NgbDatepickerModule,
+    SelectClientComponent,
+    AddItemToInvoiceComponent,
   ],
   templateUrl: './createInvoice.component.html',
   styleUrl: './createInvoice.component.css',
 })
 export class CreateInvoiceComponent {
-  invoiceForm: FormGroup = new FormGroup({
-    invoiceNum: new FormControl(''),
-    createdAt: new FormControl(new Date('2024-06-01T08:00:00Z')),
-    updatedAt: new FormControl(new Date('2024-06-01T08:00:00Z')),
-    invoiceDate: new FormControl(new Date('2024-06-01T08:00:00Z')),
-    dueDate: new FormControl(new Date('2024-06-01T08:00:00Z')),
-    clientName: new FormControl(''),
-    clientAddress: new FormControl(''),
-    supplierName: new FormControl(''),
-    supplierAddress: new FormControl(''),
-    status: new FormControl(''),
-    totalAmount: new FormControl(0),
-    subTotal: new FormControl(0),
-  });
-  selectedFile: File | null = null;
-  selectedFiles: SelectedFiles[] = [];
-  extractedText: string = '';
-  extractedTexts: string[] = [];
-
-  @Input() name?: string;
-
+  private clientService = inject(ClientService);
   private invoiceService = inject(InvoiceService);
   private dateUtils = inject(DateUtilsService);
-  private files = inject(UploadFilesService);
   private toastService = inject(ToastService);
-  private ocrService = inject(OcrService);
+  modalService = inject(NgbModal);
+  fb = inject(FormBuilder);
+  private router = inject(Router);
 
-  constructor() {}
+  clients$: Observable<Client[]> = this.clientService.clients$;
 
-  onSelectFile(filesData: any, fileInput: any) {
+  client?: Client ;
+  clientInvalid: String = '';
+
+  invoiceDetails: InvoiceDetails[] = [];
+  invoiceDetailsInvalid: String = '';
+
+  invoiceForm: FormGroup;
+
+  constructor() {
+    this.invoiceForm = this.fb.group({
+      invoiceNum: ['', Validators.required],
+      invoicedate: [null, Validators.required],
+      dueDate: [null,Validators.required],
+      // Add other form controls as necessary
+    });
+  }
+
+  openClientsModal() {
+    const modalRef = this.modalService.open(SelectClientComponent, {
+      size: 'lg',scrollable: true
+    });
+    modalRef.componentInstance.clientEntered.subscribe((client: Client) => {
+      if (client) {
+        this.client = client;
+      }
+    });
+  }
+
+  openAddItemModal() {
+    const modalRef = this.modalService.open(AddItemToInvoiceComponent, {
+      size: 'lg',
+    });
+    modalRef.componentInstance.itemAdded.subscribe((item: InvoiceDetails) => {
+      if (item) {
+        this.invoiceDetails.push(item);
+      }
+    });
+  }
+
+  removeItem(item: InvoiceDetails) {
+    this.invoiceDetails = this.invoiceDetails.filter(
+      (invoiceDetails) => invoiceDetails != item
+    );
+  }
+
+  save() {
+    if (this.invoiceForm.valid && this.invoiceDetails.length > 0) {
+      const invoiceDateControl = this.invoiceForm.get('invoicedate');
+      const invoiceDateStruct = invoiceDateControl?.value;
+      const invoiceDate = this.dateUtils.fromDateStruct(invoiceDateStruct);
+
+      const dueDateControl = this.invoiceForm.get('dueDate');
+      const dueDateStruct = dueDateControl?.value;
+      const dueDate = this.dateUtils.fromDateStruct(dueDateStruct);
+
+      const invoice = new Invoice();
+      invoice.createdAt = new Date();
+      invoice.updatedAt = new Date();
+      invoice.clientID = this.client?.id;
+      invoice.invoiceDate = invoiceDate;
+      invoice.dueDate = dueDate;
+      invoice.invoiceNum = this.invoiceForm.value.invoiceNum;
+      invoice.invoiceDetails = this.invoiceDetails;
+      invoice.totalAmount = this.getTotal(this.invoiceDetails);
+      invoice.subTotal = this.getSubTotal(this.invoiceDetails);
+      invoice.isArchived = false;
+
+      this.invoiceService.create(invoice).subscribe(() => {
+        this.toastService.show('Client created successfully!', {
+          classname: 'bg-success text-light',
+        });
+        this.router.navigate(['/invoice']);
+      });
+      
+    } else {
+      this.clientInvalid = 'Client is required!';
+      this.invoiceDetailsInvalid = 'Invoice details is required!';
+      this.invoiceForm.markAllAsTouched();
+    }
+  }
+
+  getTotal(invoiceDetails: InvoiceDetails[]){
+    var total = 0;
+    for(var item of invoiceDetails){
+      total += (item.unitPrice! * item.quantity!);
+    }
+    return total;
+  }
+
+  getSubTotal(invoiceDetails: InvoiceDetails[]){
+    var total = 0;
+    for(var item of invoiceDetails){
+      total += (item.unitPriceHT! * item.quantity!);
+    }
+    return total;
+  }
+
+  /* onSelectFile(filesData: any, fileInput: any) {
     const { files } = fileInput.target;
     const file = files[0];
     if (files && file) {
@@ -110,28 +203,7 @@ export class CreateInvoiceComponent {
     this.selectedFiles.splice(index, 1);
   }
 
-  saveInvoice(): void {
-    const newInvoice = new Invoice();
-    newInvoice.invoiceNum = this.invoiceForm.value.invoiceNum;
-    newInvoice.createdAt = this.invoiceForm.value.createdAt;
-    newInvoice.updatedAt = this.invoiceForm.value.updatedAt;
-    newInvoice.invoiceDate = this.invoiceForm.value.invoiceDate;
-    newInvoice.dueDate = this.invoiceForm.value.dueDate;
-    newInvoice.status = this.invoiceForm.value.status;
-    newInvoice.totalAmount = this.invoiceForm.value.totalAmount;
-    newInvoice.subTotal = this.invoiceForm.value.subTotal;
-    newInvoice.clientName = this.invoiceForm.value.clientName;
-    newInvoice.clientAddress = this.invoiceForm.value.clientAddress;
-    newInvoice.supplierName = this.invoiceForm.value.supplierName;
-    newInvoice.supplierAddress = this.invoiceForm.value.supplierAddress;
-    console.log('invoice', newInvoice);
-
-    this.invoiceService.create(newInvoice).subscribe(() => {
-      this.toastService.show('Invoice created successfully!', {
-        classname: 'bg-success text-light',
-      });
-    });
-  }
+  
 
   preformOcr(files: File[]) {
     this.ocrService.performOCR(files).subscribe(
@@ -148,5 +220,5 @@ export class CreateInvoiceComponent {
   }
   closeOcr(){
     this.extractedText = '';
-  }
+  } */
 }

@@ -4,4 +4,7 @@ export class Tax extends BaseModel {
     name?: string;
     value?: number;
     isPercentage?: boolean;
+    isArchived!: boolean;
+    companyId!: number;
+    userId!: string;
 }

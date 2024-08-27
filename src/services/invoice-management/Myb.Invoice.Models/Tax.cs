@@ -13,5 +13,8 @@ namespace Myb.Invoice.Models
         public double? Value { get; set; }
         public bool? IsPercentage { get; set; }
         public virtual ICollection<Product>? Products { get; set; }
+        public string? UserId { get; set; }
+        public int? CompanyId { get; set; }
+        public bool? IsArchived { get; set; }
     }
 }

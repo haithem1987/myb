@@ -1,0 +1,193 @@
+<div class="modal-header">
+    <h4 class="modal-title">Edit Product</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+  </div>
+  <div class="modal-body">
+  <div class="card border-primary p-3 m-4">
+    <div class="container">
+      <form [formGroup]="productForm" >
+        <div class="mb-3">
+          <label for="clientType" class="form-label">Product type</label>
+          <div
+            class="btn-group-horizontal"
+            role="group"
+            aria-label="horizontal radio toggle button group"
+          >
+            <input
+              type="radio"
+              class="btn-check"
+              name="vbtn-radio"
+              id="vbtn-radio1"
+              autocomplete="off"
+              [checked]="isService() == false"
+            />
+            <label
+              class="btn btn-outline-secondary me-2"
+              for="vbtn-radio1"
+              (click)="setTypeToProduct()"
+              >Product</label
+            >
+            <input
+              type="radio"
+              class="btn-check"
+              name="vbtn-radio"
+              id="vbtn-radio2"
+              autocomplete="off"
+              [checked]="isService() == true"
+            />
+            <label
+              class="btn btn-outline-primary"
+              for="vbtn-radio2"
+              (click)="setTypeToService()"
+              >Service</label
+            >
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="productName" class="form-label">Product Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="productName"
+            name="productName"
+            formControlName="productName"
+            placeholder="Enter Product Name "
+            [ngClass]="{
+              'is-invalid':
+                productForm.get('productName')?.invalid &&
+                productForm.get('productName')?.touched
+            }"
+          />
+          @if(productForm.get('productName')?.invalid &&
+          productForm.get('productName')?.touched){
+          <div class="invalid-feedback">Product name is required.</div>
+          }
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <input
+            type="text"
+            class="form-control"
+            id="description"
+            name="description"
+            formControlName="description"
+            placeholder="Enter Product Description "
+            [ngClass]="{
+              'is-invalid':
+                productForm.get('description')?.invalid &&
+                productForm.get('description')?.touched
+            }"
+          />
+          @if(productForm.get('description')?.invalid &&
+          productForm.get('description')?.touched){
+          <div class="invalid-feedback">Description is required.</div>
+          }
+        </div>
+  
+        <div class="mb-3">
+          <label for="unit" class="form-label">Unit</label>
+          <input
+            type="text"
+            class="form-control"
+            id="unit"
+            name="unit"
+            formControlName="unit"
+            placeholder="Enter Product Unit "
+            [ngClass]="{
+              'is-invalid':
+                productForm.get('unit')?.invalid &&
+                productForm.get('unit')?.touched
+            }"
+          />
+          @if(productForm.get('unit')?.invalid &&
+          productForm.get('unit')?.touched){
+          <div class="invalid-feedback">Unit is required.</div>
+          }
+        </div>
+  
+        <div class="mb-3">
+          <label for="price" class="form-label">Price</label>
+          <input
+            type="number"
+            class="form-control"
+            id="price"
+            name="price"
+            formControlName="price"
+            placeholder="Enter Product Price "
+            [ngClass]="{
+              'is-invalid':
+                productForm.get('price')?.invalid &&
+                productForm.get('price')?.touched
+            }"
+          />
+          @if(productForm.get('price')?.invalid &&
+          productForm.get('price')?.touched){
+          <div class="invalid-feedback">Price is required.</div>
+          }
+        </div>
+  
+        <div style="display: flex; align-items: center">
+         
+          <div ngbDropdown>
+            <button
+              class="btn btn-outline-secondary me-4"
+              ngbDropdownToggle
+            >
+              Tax
+            </button>
+            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+              @for(tax of taxes$ | async ; track tax){
+                <div ngbDropdownItem>
+                <li>
+                  <label class="dropdown-item" (click)="setTax(tax)"
+                    >{{ tax.name }}
+                    <span
+                      >:&nbsp;&nbsp;{{ tax.value }}@if(tax.isPercentage == true){
+                      <span> %</span>
+                      }</span
+                    ></label
+                  >
+                </li>
+              </div>
+                }
+            </div>
+          </div>
+          @if(tax != null){
+          <label>
+            <span>&nbsp;&nbsp;{{ tax.name }}&nbsp;:</span>
+            <span
+              >&nbsp;&nbsp;{{ tax.value }}@if(tax.isPercentage == true){
+              <span> %</span>
+  
+              }</span
+            ></label
+          >
+          } @if(tax == null){
+          <p style="color: rgba(229, 4, 4, 0.896)">{{ errorMessage }}</p>
+          }
+        </div>
+        <div style="margin-top: 10px;" (click)="openModal()"><button
+          class="btn btn-outline-secondary me-4">
+          new Tax
+        </button>
+      </div>
+      </form>
+    </div>
+  </div>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <br />
+      <div class="d-flex justify-content-end">
+        <button
+          type="button"
+          class="btn btn-outline-secondary me-2"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-outline-primary" (click)="save()">Save</button>
+      </div>
+    </div>
+  </div>
+  

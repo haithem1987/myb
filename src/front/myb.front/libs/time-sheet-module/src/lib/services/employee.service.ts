@@ -26,6 +26,7 @@ export class EmployeeService extends RepositoryService<Employee> {
   }
 
   protected override mapCreateItem(result: any): Employee {
+    console.log('result', result);
     return result.data?.addEmployee as Employee;
   }
 
@@ -47,7 +48,7 @@ export class EmployeeService extends RepositoryService<Employee> {
     );
   }
 
-  override get(id: number): Observable<Employee> {
+  override get(id: string): Observable<Employee> {
     return super.get(id).pipe(
       map((employee) => {
         // const employees = this.employeeSubject.value.map((p) =>
@@ -62,14 +63,16 @@ export class EmployeeService extends RepositoryService<Employee> {
   override create(item: Employee): Observable<Employee> {
     return super.create(item).pipe(
       map((newEmployee) => {
+        console.log('newEmployee', newEmployee);
         const employees = [...this.employeeSubject.value, newEmployee];
+        console.log('employees create', employees);
         this.employeeSubject.next(employees);
         return newEmployee;
       })
     );
   }
 
-  override update(id: number, item: Employee): Observable<Employee> {
+  override update(id: string, item: Employee): Observable<Employee> {
     return super.update(id, item).pipe(
       map((updatedEmployee) => {
         console.log('updatedEmployee', updatedEmployee);
@@ -83,7 +86,7 @@ export class EmployeeService extends RepositoryService<Employee> {
     );
   }
 
-  override delete(id: number): Observable<boolean> {
+  override delete(id: string): Observable<boolean> {
     return super.delete(id).pipe(
       map((success) => {
         if (success) {

@@ -1,0 +1,69 @@
+<div class="container mt-5">
+  <div class="card table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="username-column">{{ 'INTERVANANTS' | translate }}</th>
+          <th class="project-column">{{ 'PROJECT' | translate }}</th>
+          <th
+            class="text-center"
+            [ngClass]="{
+              'weekend-dark': isWeekend(date) && !date.isToday,
+              'today-column': date.isToday
+            }"
+            *ngFor="let date of dateRange; trackBy: trackByDate"
+          >
+            <myb-front-date-cell
+              [date]="date"
+              [holidayName]="handleHoliday(date).name"
+              [isHoliday]="handleHoliday(date).isHoliday"
+            ></myb-front-date-cell>
+          </th>
+          <th class="total-column">{{ 'TOTAL' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let group of groupedTimesheets">
+          <td class="username-column">
+            <div class="d-flex">
+              <myb-front-avatar
+                [text]="group?.username?.toLocaleUpperCase()"
+                [size]="25"
+              ></myb-front-avatar>
+              <span class="ms-2">
+                {{ group.username }}
+              </span>
+            </div>
+          </td>
+          <td class="project-column">{{ group.projectName }}</td>
+          <td
+            class="text-center"
+            style="width: 80px"
+            *ngFor="let date of dateRange; trackBy: trackByDate"
+            [ngClass]="{
+              'weekend-dark': isWeekend(date) && !date.isToday,
+              'today-column': date.isToday
+            }"
+          >
+            <myb-front-timesheet-quantity-input
+              [projectId]="group.projectId"
+              [date]="date"
+              [quantity]="getQuantityForGroupDate(group, date.dateString)"
+              [isHoliday]="handleHoliday(date).isHoliday"
+              (quantityChange)="onQuantityChange(group.projectId, date, $event)"
+            ></myb-front-timesheet-quantity-input>
+          </td>
+          <td class="total-column text-end">
+            <myb-front-progress-bar
+              [value]="getTotalQuantityForGroup(group)"
+              type="success"
+              height="8px"
+              [max]="totalPeriod"
+            ></myb-front-progress-bar>
+            {{ getTotalQuantityForGroup(group) }} / {{ totalPeriod }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

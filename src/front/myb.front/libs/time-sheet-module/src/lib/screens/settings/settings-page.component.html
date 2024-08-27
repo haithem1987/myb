@@ -1,5 +1,29 @@
-<!-- settings-page.component.html -->
-<div class="container mt-4">
-  <h2>Settings</h2>
-  <myb-front-settings category="timesheet"></myb-front-settings>
+<div class="container">
+  <h2>{{ 'SETTINGS' | translate }}</h2>
+  <div class="accordion" id="settingsAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button
+          class="accordion-button"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#timesheetSettings"
+          aria-expanded="true"
+          aria-controls="timesheetSettings"
+        >
+          {{ 'TIMESHEET_SETTINGS' | translate }}
+        </button>
+      </h2>
+      <div
+        id="timesheetSettings"
+        class="accordion-collapse collapse show"
+        aria-labelledby="timesheetSettingsHeader"
+        data-bs-parent="#settingsAccordion"
+      >
+        <div class="accordion-body">
+          <myb-front-timesheet-settings></myb-front-timesheet-settings>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

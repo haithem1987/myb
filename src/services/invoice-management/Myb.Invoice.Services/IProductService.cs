@@ -13,7 +13,7 @@ namespace Myb.Invoice.Services
         Task<Product?> Update(Product product);
         Task<IEnumerable<Product?>> GetAll();
         Task<IEnumerable<Product?>> GetByIds(IEnumerable<int?> ids);
-        Task<Product?> GetById(int id);
+        Task<Product?> GetById(int? id);
         Task<Product?> Delete(int id);
     }
 }

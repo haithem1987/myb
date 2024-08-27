@@ -9,7 +9,6 @@ export const GET_ALL_EMPLOYEES = `
       managerId
       name
       updatedAt
-      userId
     }
   }
 `;
@@ -25,7 +24,6 @@ export const GET_EMPLOYEE_BY_ID = `
       managerId
       name
       updatedAt
-      userId
     }
   }
 `;
@@ -40,7 +38,6 @@ export const GET_EMPLOYEES_BY_MANAGER_ID = `
       managerId
       name
       updatedAt
-      userId
     }
   }
 `;

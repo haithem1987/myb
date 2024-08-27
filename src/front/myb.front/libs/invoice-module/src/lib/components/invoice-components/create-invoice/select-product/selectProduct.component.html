@@ -1,0 +1,92 @@
+<div class="modal-header">
+    <h4 class="modal-title">Products</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="closeModal()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="card border-primary p-3">
+      <div class="container">
+        <div class="d-flex justify-content-between mb-3">
+          <div>
+            
+          </div>
+          <button type="button" class="btn btn-primary" (click)="openCreateProductModal()">
+            <i class="bi bi-plus-lg"></i> new Product
+          </button>
+        </div>
+        <br />
+        <div class="mb-3">
+          <input
+              type="text"
+              class="form-control mb-3"
+              placeholder="Search products..."
+              [(ngModel)]="searchTerm"
+            />
+        </div>
+        <br/>
+        
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Product Name</th>
+              <th scope="col">Price HT</th>
+              <th scope="col">Tax</th>
+              <th scope="col">Price</th>
+              <th scope="col">Type</th>
+              <th scope="col">Unit</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(product of products$ | async ; track product){
+              @if(product.name!.toLowerCase().includes(searchTerm.toLowerCase())){
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>{{ product.price }}</td>
+                  <td><label 
+                    >{{ product.tax.name }}
+                    <span
+                      >:&nbsp;&nbsp;{{ product.tax.value }}@if(product.tax.isPercentage == true){
+                      <span> %</span>
+                      }</span
+                    ></label
+                  ></td>
+                  <td>{{ calculatePriceWithTax(product.price, product.tax) }}</td>
+                  <td>{{ product.productType }}</td>
+                  <td>{{ product.unit }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      (click)="selectProduct(product)"
+                    >
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <br />
+      <div class="d-flex justify-content-end">
+        <button
+          type="button"
+          class="btn btn-outline-secondary me-2"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>

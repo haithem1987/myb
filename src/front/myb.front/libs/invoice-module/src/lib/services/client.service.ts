@@ -5,10 +5,9 @@ import { BehaviorSubject, Observable, map } from 'rxjs';
 import { Client } from '../models/client.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class ClientService extends RepositoryService<Client>{
-
+export class ClientService extends RepositoryService<Client> {
   private clientSubject = new BehaviorSubject<Client[]>([]);
   public clients$ = this.clientSubject.asObservable();
 
@@ -28,12 +27,27 @@ export class ClientService extends RepositoryService<Client>{
   protected override mapCreateItem(result: any): Client {
     return result.data?.addClient as Client;
   }
+  protected override mapSingleItem(result: any): Client {
+    return result.data?.clientByID as Client;
+  }
+  protected override mapUpdateItem(result: any): Client {
+    return result.data?.updateClient as Client;
+  }
 
   override getAll(): Observable<Client[]> {
     return super.getAll().pipe(
       map((clients) => {
         this.clientSubject.next(clients);
         return clients;
+      })
+    );
+  }
+
+  override get(id: number): Observable<Client> {
+    return super.get(id).pipe(
+      map((client) => {
+        console.log('client', client);
+        return client;
       })
     );
   }
@@ -49,4 +63,15 @@ export class ClientService extends RepositoryService<Client>{
     );
   }
 
+  override update(id: number, item: Client): Observable<Client> {
+    return super.update(id, item).pipe(
+      map((updatedClient) => {
+        const taxes = this.clientSubject.value.map((c) =>
+          c.id === id ? updatedClient : c
+        );
+        this.clientSubject.next(taxes);
+        return updatedClient;
+      })
+    );
+  }
 }

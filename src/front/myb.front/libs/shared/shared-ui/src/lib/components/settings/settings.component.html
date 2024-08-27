@@ -1,82 +1,31 @@
 <myb-front-nav-bar></myb-front-nav-bar>
-<div class="container" style="margin-top: 70px">
-  <h2 class="mt-4">{{ 'SETTINGS' | translate }}</h2>
-  <myb-front-breadcrumb></myb-front-breadcrumb>
+<div class="container">
+  <h2>{{ 'SETTINGS' | translate }}</h2>
   <div class="accordion" id="settingsAccordion">
-    <div class="accordion-item" *ngFor="let category of categories">
-      <h2 class="accordion-header" [id]="category + 'SettingsHeader'">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
         <button
           class="accordion-button"
           type="button"
           data-bs-toggle="collapse"
-          [attr.data-bs-target]="'#' + category + 'Settings'"
+          data-bs-target="#timesheetSettings"
           aria-expanded="true"
-          [attr.aria-controls]="category + 'Settings'"
+          aria-controls="timesheetSettings"
         >
-          {{ category.toUpperCase() + '_SETTINGS' | translate }}
+          {{ 'TIMESHEET_SETTINGS' | translate }}
         </button>
       </h2>
       <div
-        [id]="category + 'Settings'"
+        id="timesheetSettings"
         class="accordion-collapse collapse show"
-        [attr.aria-labelledby]="category + 'SettingsHeader'"
+        aria-labelledby="timesheetSettingsHeader"
         data-bs-parent="#settingsAccordion"
       >
         <div class="accordion-body">
-          <div *ngFor="let key of keys[category]" class="mb-3">
-            <label [for]="key" class="form-label"
-              >{{ key.toUpperCase() | translate }}:</label
-            >
-
-            <ng-container [ngSwitch]="getType(settings[category][key])">
-              <input
-                *ngSwitchCase="'string'"
-                type="text"
-                [id]="key"
-                class="form-control"
-                [value]="settings[category][key]"
-                (input)="onSettingChange(category, key, $event)"
-              />
-
-              <input
-                *ngSwitchCase="'number'"
-                type="number"
-                [id]="key"
-                class="form-control"
-                [value]="settings[category][key]"
-                (input)="onSettingChange(category, key, $event)"
-              />
-
-              <select
-                *ngSwitchCase="'object'"
-                [id]="key"
-                class="form-control"
-                (change)="onSettingChange(category, key, $event)"
-              >
-                <option
-                  *ngFor="let option of settings[category][key]"
-                  [value]="option"
-                >
-                  {{ option }}
-                </option>
-              </select>
-
-              <div *ngSwitchCase="'boolean'" class="form-check">
-                <input
-                  type="checkbox"
-                  [id]="key"
-                  class="form-check-input"
-                  [checked]="settings[category][key]"
-                  (change)="onSettingChange(category, key, $event)"
-                />
-                <label class="form-check-label" [for]="key">{{
-                  key.toUpperCase() | translate
-                }}</label>
-              </div>
-            </ng-container>
-          </div>
+          <!-- <myb-front-timesheet-settings></myb-front-timesheet-settings> -->
         </div>
       </div>
     </div>
+    <!-- Add more settings categories similarly -->
   </div>
 </div>

@@ -33,6 +33,7 @@ export class ProjectCardComponent implements OnInit {
 
   ngOnInit(): void {
     this.canEdit = this.keycloakService.hasRole('PROJECT_RW');
+    console.log('PROJECT_RW', this.keycloakService.hasRole('PROJECT_RW'));
     this.canDelete = this.keycloakService.hasRole('PROJECT_RW');
   }
 

@@ -26,7 +26,7 @@ export class ProjectListComponent implements OnInit {
     private toastService: ToastService,
     private keycloakService: KeycloakService
   ) {
-    this.canEdit = this.keycloakService.hasAllRoles([
+    this.canEdit = this.keycloakService.hasAnyRole([
       'MYB_MANAGER',
       'MYB_PROJECT_RW',
     ]);

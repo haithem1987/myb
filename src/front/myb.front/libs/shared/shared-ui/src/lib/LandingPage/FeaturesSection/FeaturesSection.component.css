@@ -8,6 +8,14 @@
   border-top-right-radius: 100%;
   background-color: rgba(229, 241, 241, 255);
 }
+.feature-backround {
+  background-image: url('../../../../../../../apps/client/src/assets/images/feature-background.png');
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  height: 700px;
+  width: 100%;
+}
 .ilustration-section-2 {
   position: relative;
   top: -120px;

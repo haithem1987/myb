@@ -1,6 +1,6 @@
 //MYB custom variables colors
 $primary: #55A697;
-$secondary: #845bba;
+$secondary: #8e50a3; //#845bba;
 //$light:rgba(215, 239, 232, 0.07);
 
 // import the functions & variables
@@ -11,7 +11,6 @@ $secondary: #845bba;
 $custom-theme-colors: (
   "altlight": rgba(229, 241, 241, 255),
   "altdark": #8e50a3,
-  
   "darklight": #275556
 );
 
@@ -30,4 +29,8 @@ $gray-900: #275556;
 
 :root {
   --bs-body-font-family: "Poppins", sans-serif;
+}
+
+.btn {
+  font-weight: bold;
 }

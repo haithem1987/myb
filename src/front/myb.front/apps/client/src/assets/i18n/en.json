@@ -126,5 +126,14 @@
   "SUBMIT": "Submit",
   "INTERVENANTS_TIMESHEETS": "Intervenant's Timesheets",
   "MY_TIMESHEETS": "My Timesheets",
-  "NO_USER_FOUND": "No user found in Keycloak with this email. You can't add a new employee unless they exist."
+  "NO_USER_FOUND": "No user found in Keycloak with this email. You can't add a new employee unless they exist.",
+  "APPROVE": "Approve",
+  "DISAPPROVE": "Disapprove",
+  "TOAST": {
+    "TIMESHEETS_APPROVED_SUCCESS": "Timesheets approved successfully",
+    "TIMESHEETS_APPROVE_ERROR": "Error approving timesheets",
+    "TIMESHEETS_DISAPPROVED_SUCCESS": "Timesheets disapproved successfully",
+    "TIMESHEETS_DISAPPROVE_ERROR": "Error disapproving timesheets",
+    "NO_TIMESHEETS_SELECTED": "No timesheets selected"
+  }
 }

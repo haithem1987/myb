@@ -1,0 +1,31 @@
+<div class="container mt-5">
+  <div class="mb-3 d-flex justify-content-between align-items-center">
+    <div>
+      <myb-front-period-selector
+        [selectedPeriod]="selectedPeriod"
+        [weekQuantity]="getTotalQuantitiesForPeriod('week')"
+        [monthQuantity]="getTotalQuantitiesForPeriod('month')"
+        (periodChange)="setPeriod($event)"
+      ></myb-front-period-selector>
+    </div>
+    <myb-front-timesheet-status-buttons
+      [selectedProjectsSize]="selectedGroups.size"
+      [isApprovedLoading]="isApprovedLoading"
+      [isDisApprovedLoading]="isDisApprovedLoading"
+      (approveTimesheets)="approveSelectedTimesheets()"
+      (disapproveTimesheets)="disapproveSelectedTimesheets()"
+    ></myb-front-timesheet-status-buttons>
+  </div>
+
+  <myb-front-intervenant-timesheet-table
+    [managerId]="managerId"
+    [dateRange]="dateRange"
+    [selectedPeriod]="selectedPeriod"
+    [groupedTimesheets]="groupedTimesheets"
+    [totalPeriod]="totalPeriod"
+    (quantityChange)="
+      onQuantityChange($event.projectId, $event.date, $event.quantity)
+    "
+    (selectedGroupsChange)="updateSelectedGroups($event)"
+  ></myb-front-intervenant-timesheet-table>
+</div>

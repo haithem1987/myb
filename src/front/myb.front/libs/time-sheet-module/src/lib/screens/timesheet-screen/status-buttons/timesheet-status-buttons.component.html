@@ -1,0 +1,38 @@
+<div class="d-flex align-items-center">
+  <button
+    class="btn btn-outline-success me-2"
+    [disabled]="isApprovedLoading || selectedProjectsSize === 0"
+    (click)="onApprove()"
+  >
+    <ng-container *ngIf="!isApprovedLoading">
+      <i class="bi bi-check-circle"></i>
+      {{ 'APPROVE' | translate }}
+    </ng-container>
+    <ng-container *ngIf="isApprovedLoading">
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      {{ 'SAVING' | translate }}
+    </ng-container>
+  </button>
+  <button
+    class="btn btn-outline-danger"
+    [disabled]="isDisApprovedLoading || selectedProjectsSize === 0"
+    (click)="onDisapprove()"
+  >
+    <ng-container *ngIf="!isDisApprovedLoading">
+      <i class="bi bi-x-circle"></i>
+      {{ 'DISAPPROVE' | translate }}
+    </ng-container>
+    <ng-container *ngIf="isDisApprovedLoading">
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      {{ 'SAVING' | translate }}
+    </ng-container>
+  </button>
+</div>

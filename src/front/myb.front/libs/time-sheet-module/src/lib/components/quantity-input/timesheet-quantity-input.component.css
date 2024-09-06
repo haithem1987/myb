@@ -3,3 +3,15 @@
   color: #000;
   cursor: not-allowed;
 }
+
+/* Style for approved timesheet */
+.approved {
+  background-color: #00800036;
+  color: black;
+}
+
+/* Style for rejected timesheet */
+.rejected {
+  background-color: #ff000036;
+  color: black;
+}

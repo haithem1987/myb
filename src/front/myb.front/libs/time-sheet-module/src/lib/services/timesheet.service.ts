@@ -95,7 +95,10 @@ export class TimesheetService extends RepositoryService<Timesheet> {
       );
   }
 
-  updateMultipleTimesheets(timesheets: Timesheet[]): Observable<Timesheet[]> {
+  updateMultipleTimesheets(
+    timesheets: Timesheet[],
+    type: string = 'MyTimesheets'
+  ): Observable<Timesheet[]> {
     return this.apollo
       .mutate<{ updateMultipleTimesheets: Timesheet[] }>({
         mutation: gql`
@@ -109,8 +112,12 @@ export class TimesheetService extends RepositoryService<Timesheet> {
       .pipe(
         map((result: any) => {
           const updatedTimesheets = result.data.updateMultipleTimesheets;
-          // Make a mutable copy of the existing timesheets
-          const existingTimesheets = [...this.timesheetSubject.value];
+          let existingTimesheets: Timesheet[] = [];
+          if (type == 'MyTimesheets')
+            existingTimesheets = [...this.timesheetSubject.value];
+          if (type == 'OtherTimesheets')
+            existingTimesheets = [...this.timesheetsByManagerSubject.value];
+
           updatedTimesheets.forEach((updated: Timesheet) => {
             const index = existingTimesheets.findIndex(
               (ts) => ts.id === updated.id
@@ -119,7 +126,10 @@ export class TimesheetService extends RepositoryService<Timesheet> {
               existingTimesheets[index] = updated;
             }
           });
-          this.timesheetSubject.next(existingTimesheets);
+          if (type == 'MyTimesheets')
+            this.timesheetSubject.next(existingTimesheets);
+          if (type == 'OtherTimesheets')
+            this.timesheetsByManagerSubject.next(existingTimesheets);
           return updatedTimesheets;
         })
       );

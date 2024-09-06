@@ -89,6 +89,7 @@ export class TimesheetListComponent implements OnInit {
       year: string;
     };
     quantity: number;
+    status: ApprovalStatus;
   }> = new Subject();
   private langChangeSubscription!: Subscription;
   private defaultHours: number = 1;
@@ -257,7 +258,9 @@ export class TimesheetListComponent implements OnInit {
     },
     quantity: number
   ): void {
-    this.quantityChange.next({ projectId, date, quantity });
+    const newStatus = ApprovalStatus.PENDING;
+
+    this.quantityChange.next({ projectId, date, quantity, status: newStatus });
   }
 
   setPeriod(period: 'week' | 'month'): void {

@@ -20,12 +20,15 @@
       class="mt-auto d-flex justify-content-between align-items-center"
       *ngIf="!isArchived; else restoreTemplate"
     >
-      <button class="btn btn-primary btn-sm w-100" (click)="showTasks(project)">
+      <button
+        class="btn btn-outline-primary btn-sm w-100"
+        (click)="showTasks(project)"
+      >
         <div><i class="bi bi-ui-checks"></i></div>
         <div>{{ 'TASKS' | translate }}</div>
       </button>
       <button
-        class="btn btn-primary btn-sm w-100"
+        class="btn btn-outline-primary mx-2 btn-sm w-100"
         (click)="editProject(project)"
       >
         <div><i class="bi bi-pencil-fill"></i></div>

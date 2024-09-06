@@ -4,7 +4,11 @@
     class="form-control text-center"
     style="width: 60px"
     [value]="quantity"
-    [ngClass]="{ 'holiday-disabled': isHoliday }"
+    [ngClass]="{
+      'holiday-disabled': isHoliday,
+      approved: status === 'APPROVED',
+      rejected: status === 'REJECTED'
+    }"
     (input)="onQuantityChange($event)"
     [disabled]="isHoliday"
     [readonly]="!editable"

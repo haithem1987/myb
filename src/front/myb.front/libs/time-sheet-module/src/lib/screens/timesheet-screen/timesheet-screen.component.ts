@@ -1,12 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { TimesheetService } from '../../services/timesheet.service';
-import { Timesheet } from '../../models/timesheet.model';
-import { TimesheetListComponent } from './list/timesheet-list.component';
-import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { TranslateModule } from '@ngx-translate/core';
-import { IntervenantTimesheetTableComponent } from './intervenant-timesheet-table/intervenant-timesheet-table.component';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { IntervenantTimesheetComponent } from './intervenant-timesheet/intervenant-timesheet.component';
+import { TimesheetListComponent } from './list/timesheet-list.component';
 
 @Component({
   selector: 'myb-front-timesheet-screen',
@@ -14,7 +11,7 @@ import { IntervenantTimesheetTableComponent } from './intervenant-timesheet-tabl
   imports: [
     CommonModule,
     TimesheetListComponent,
-    IntervenantTimesheetTableComponent,
+    IntervenantTimesheetComponent,
     TranslateModule,
   ],
   templateUrl: './timesheet-screen.component.html',

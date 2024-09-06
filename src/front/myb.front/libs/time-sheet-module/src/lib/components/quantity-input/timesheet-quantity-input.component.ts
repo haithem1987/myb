@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
+import { ApprovalStatus } from '../../models/timesheet.model';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'myb-front-timesheet-quantity-input',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgClass],
   templateUrl: './timesheet-quantity-input.component.html',
   styleUrl: './timesheet-quantity-input.component.css',
 })
@@ -14,7 +16,7 @@ export class TimesheetQuantityInputComponent {
   @Input() quantity: number = 0;
   @Input() isHoliday: boolean = false;
   @Input() editable: boolean = true;
-
+  @Input() status: ApprovalStatus = ApprovalStatus.PENDING;
   @Output() quantityChange = new EventEmitter<number>();
 
   onQuantityChange(event: Event): void {

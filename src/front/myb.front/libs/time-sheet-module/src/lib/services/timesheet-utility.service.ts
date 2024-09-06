@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { Timesheet } from '../models/timesheet.model';
+import { GroupedTimesheet } from '../models/groupedTiesheet.model';
 
 @Injectable({
   providedIn: 'root',
@@ -117,5 +119,26 @@ export class TimesheetUtilityService {
       }
       return total;
     }, 0);
+  }
+
+  groupByProjectAndUsername(timesheets: Timesheet[]): GroupedTimesheet[] {
+    let idCounter = 1;
+
+    const grouped = timesheets.reduce((acc, timesheet) => {
+      const key = `${timesheet.projectName}-${timesheet.username}`;
+      if (!acc[key]) {
+        acc[key] = {
+          id: idCounter++,
+          projectName: timesheet?.projectName ?? '',
+          username: timesheet?.username ?? '',
+          projectId: timesheet.projectId,
+          timesheets: [],
+        };
+      }
+      acc[key].timesheets.push(timesheet);
+      return acc;
+    }, {} as { [key: string]: GroupedTimesheet });
+
+    return Object.values(grouped);
   }
 }

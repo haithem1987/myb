@@ -126,5 +126,14 @@
   "SUBMIT": "Soumettre",
   "INTERVENANTS_TIMESHEETS": "Feuilles de temps des intervenants",
   "MY_TIMESHEETS": "Mes feuilles de temps",
-  "NO_USER_FOUND": "Aucun utilisateur trouvé dans Keycloak avec cet email. Vous ne pouvez pas ajouter un nouvel employé à moins qu'il n'existe déjà."
+  "NO_USER_FOUND": "Aucun utilisateur trouvé dans Keycloak avec cet email. Vous ne pouvez pas ajouter un nouvel employé à moins qu'il n'existe déjà.",
+  "APPROVE": "Approuver",
+  "DISAPPROVE": "Désapprouver",
+  "TOAST": {
+    "TIMESHEETS_APPROVED_SUCCESS": "Les feuilles de temps ont été approuvées avec succès",
+    "TIMESHEETS_APPROVE_ERROR": "Erreur lors de l'approbation des feuilles de temps",
+    "TIMESHEETS_DISAPPROVED_SUCCESS": "Les feuilles de temps ont été rejetées avec succès",
+    "TIMESHEETS_DISAPPROVE_ERROR": "Erreur lors du rejet des feuilles de temps",
+    "NO_TIMESHEETS_SELECTED": "Aucune feuille de temps sélectionnée"
+  }
 }

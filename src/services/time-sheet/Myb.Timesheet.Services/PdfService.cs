@@ -39,12 +39,14 @@ namespace Myb.Timesheet.Services
                                 columns.RelativeColumn(2);
                                 columns.RelativeColumn(2);
                                 columns.RelativeColumn(2);
+                                columns.RelativeColumn(2);
                                 // Add more columns as necessary
                             });
 
                             // Add the header row
                             table.Header(header =>
                             {
+                                header.Cell().Element(CellStyle).Text("Username").SemiBold();
                                 header.Cell().Element(CellStyle).Text("Project").SemiBold();
                                 header.Cell().Element(CellStyle).Text("Date").SemiBold();
                                 header.Cell().Element(CellStyle).Text("Hours").SemiBold();
@@ -59,6 +61,7 @@ namespace Myb.Timesheet.Services
                             // Add the data rows
                             foreach (var timesheet in timesheets)
                             {
+                                table.Cell().Element(CellStyle).Text(timesheet.Username);
                                 table.Cell().Element(CellStyle).Text(timesheet.ProjectName);
                                 table.Cell().Element(CellStyle).Text(timesheet.Date.ToString("yyyy-MM-dd"));
                                 table.Cell().Element(CellStyle).Text(timesheet.Quantity.ToString());

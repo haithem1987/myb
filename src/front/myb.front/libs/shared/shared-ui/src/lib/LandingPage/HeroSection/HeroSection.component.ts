@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   selector: 'myb-front-hero-section',
@@ -10,5 +11,5 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './HeroSection.component.css',
 })
 export class HeroSectionComponent {
-  
+  constructor(public keycloakService: KeycloakService) {}
 }

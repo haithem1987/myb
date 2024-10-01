@@ -29,7 +29,10 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let group of groupedTimesheets; trackBy: trackByTimesheet">
+      <tr
+        *ngFor="let group of groupedTimesheets; trackBy: trackByTimesheet"
+        [ngClass]="{ 'table-active': isSelected(group.id) }"
+      >
         <td>
           <input
             type="checkbox"

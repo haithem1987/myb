@@ -35,7 +35,7 @@ export class IntervenantTimesheetComponent implements OnInit {
   groupedTimesheets: GroupedTimesheet[] = [];
   managerId: string = '';
   dateRange: any[] = [];
-  selectedGroups: Set<number> = new Set<number>(); // Track selected groups
+  selectedGroups: Set<number> = new Set<number>();
 
   constructor(
     private timesheetUtility: TimesheetUtilityService,
@@ -184,7 +184,7 @@ export class IntervenantTimesheetComponent implements OnInit {
                 });
               });
             this.isApprovedLoading = false;
-            this.selectedGroups = new Set<number>();
+            this.selectedGroups.clear();
           },
           error: (error) => {
             this.translate
@@ -237,7 +237,7 @@ export class IntervenantTimesheetComponent implements OnInit {
                 });
               });
             this.isDisApprovedLoading = false;
-            this.selectedGroups = new Set<number>();
+            this.selectedGroups.clear();
           },
           error: (error) => {
             this.translate
@@ -268,10 +268,4 @@ export class IntervenantTimesheetComponent implements OnInit {
   fillSelectedProjects(): void {}
 
   extractPDF(): void {}
-
-  saveAllChanges(): void {
-    this.isSaving = true;
-    // Logic to save changes
-    this.isSaving = false;
-  }
 }

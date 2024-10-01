@@ -1,6 +1,6 @@
 <ul class="nav border-bottom">
   <li class="nav-item">
-    <a
+    <button
       class="nav-link cursor-pointer text-muted"
       [ngClass]="{
         active: activeTab === 'MY_TIMESHEETS',
@@ -10,11 +10,11 @@
       (click)="setActiveTab('MY_TIMESHEETS')"
     >
       {{ 'MY_TIMESHEETS' | translate }}
-    </a>
+    </button>
   </li>
-  <li class="nav-item" *ngIf="isManager">
-    <a
-      class="nav-link cursor-pointer text-muted"
+  <li class="nav-item cursor-pointer" *ngIf="isManager">
+    <button
+      class="nav-link cursor text-muted"
       [ngClass]="{
         active: activeTab === 'INTERVENANTS_TIMESHEETS',
         'border-primary border-0 border-bottom border-3 text-dark fw-bold':
@@ -23,7 +23,7 @@
       (click)="setActiveTab('INTERVENANTS_TIMESHEETS')"
     >
       {{ 'INTERVENANTS_TIMESHEETS' | translate }}
-    </a>
+    </button>
   </li>
 </ul>
 <div class="container">

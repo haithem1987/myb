@@ -38,7 +38,7 @@ export class IntervenantTimesheetTableComponent implements OnInit {
     quantity: number;
   }>();
   @Input() managerId: string = '';
-  selectedGroups: Set<number> = new Set<number>();
+  @Input() selectedGroups: Set<number> = new Set<number>();
   @Output() selectedGroupsChange = new EventEmitter<Set<number>>();
   constructor(private timesheetUtility: TimesheetUtilityService) {
     // this.managerId = this.keycloakService?.getProfile()?.id ?? '';
@@ -107,25 +107,27 @@ export class IntervenantTimesheetTableComponent implements OnInit {
   }
   onGroupSelectChange(groupId: number, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
+    const updatedSelectedGroup = this.selectedGroups;
     if (checked) {
-      this.selectedGroups.add(groupId);
+      updatedSelectedGroup.add(groupId);
     } else {
-      this.selectedGroups.delete(groupId);
+      updatedSelectedGroup.delete(groupId);
     }
-    this.selectedGroupsChange.emit(this.selectedGroups);
+    this.selectedGroupsChange.emit(updatedSelectedGroup);
   }
   isSelected(groupId: number): boolean {
     return this.selectedGroups.has(groupId);
   }
   toggleSelectAll(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
+    const updatedSelectedGroup = this.selectedGroups;
     if (checked) {
       this.groupedTimesheets.forEach((group) =>
-        this.selectedGroups.add(group.id)
+        updatedSelectedGroup.add(group.id)
       );
     } else {
-      this.selectedGroups.clear();
+      updatedSelectedGroup.clear();
     }
-    this.selectedGroupsChange.emit(this.selectedGroups);
+    this.selectedGroupsChange.emit(updatedSelectedGroup);
   }
 }

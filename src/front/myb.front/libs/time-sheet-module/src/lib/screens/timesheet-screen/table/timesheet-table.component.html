@@ -28,7 +28,10 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let project of projects; trackBy: trackByProject">
+      <tr
+        *ngFor="let project of projects; trackBy: trackByProject"
+        [ngClass]="{ 'table-active': isSelected(project.id) }"
+      >
         <td>
           <input
             type="checkbox"

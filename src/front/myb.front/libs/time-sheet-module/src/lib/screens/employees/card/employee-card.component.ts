@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { EmployeeService } from '../../../services/employee.service';
 import { CardComponent } from 'libs/shared/shared-ui/src';
 import { TranslateModule } from '@ngx-translate/core';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   selector: 'myb-front-employee-card',
@@ -18,7 +19,8 @@ export class EmployeeCardComponent {
 
   constructor(
     private router: Router,
-    private employeeService: EmployeeService
+    private employeeService: EmployeeService,
+    private keycloakService: KeycloakService
   ) {}
 
   editEmployee(employee: Employee): void {
@@ -26,10 +28,10 @@ export class EmployeeCardComponent {
       state: { employee },
     });
   }
-  deleteEmployee(id: string): void {
+  async deleteEmployee(id: string): Promise<void> {
     if (confirm('Are you sure you want to delete this employee?')) {
-      this.employeeService.delete(id).subscribe(() => {
-        // this.employees$ = this.employeeService.getAll(); // Refresh the list
+      this.employeeService.delete(id).subscribe(async () => {
+        await this.keycloakService.unassignRoleFromUser(id, 'MYB_EMPLOYEE');
       });
     }
   }

@@ -167,7 +167,7 @@ export class KeycloakService {
 
   private async getClientId(): Promise<string | null> {
     if (this.clientIdCache) {
-      return this.clientIdCache; // Return cached clientId
+      return this.clientIdCache;
     }
 
     if (!this.adminToken) {
@@ -297,6 +297,46 @@ export class KeycloakService {
       console.log(`Successfully assigned role ${roleName} to user ${userId}`);
     } catch (err) {
       console.error(`Error assigning role ${roleName} to user ${userId}:`, err);
+    }
+  }
+
+  async unassignRoleFromUser(userId: string, roleName: string): Promise<void> {
+    try {
+      if (!this.adminToken) {
+        await this.getAdminToken();
+      }
+
+      const clientId = await this.getClientId();
+      if (!clientId) {
+        throw new Error('Client ID could not be retrieved');
+      }
+
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${this.adminToken}`,
+        'Content-Type': 'application/json',
+      });
+
+      // Fetch the role information for the specified role
+      const roleUrl = `https://www.keycloak.forlink-group.com/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
+      const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
+
+      // Unassign the role from the user
+      const unassignRoleUrl = `https://www.keycloak.forlink-group.com/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
+      await firstValueFrom(
+        this.http.request('delete', unassignRoleUrl, {
+          headers,
+          body: [role], // Pass the role object in the body to remove
+        })
+      );
+
+      console.log(
+        `Successfully unassigned role ${roleName} from user ${userId}`
+      );
+    } catch (err) {
+      console.error(
+        `Error unassigning role ${roleName} from user ${userId}:`,
+        err
+      );
     }
   }
 }

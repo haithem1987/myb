@@ -31,6 +31,7 @@ export class EmployeeService extends RepositoryService<Employee> {
   }
 
   protected override mapUpdateItem(result: any): Employee {
+    console.log('result', result);
     return result.data?.updateEmployee as Employee;
   }
 

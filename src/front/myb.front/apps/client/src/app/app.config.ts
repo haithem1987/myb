@@ -17,6 +17,8 @@ import {
   TranslateService,
 } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { NgxStripeModule } from 'ngx-stripe';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
@@ -33,6 +35,9 @@ export const appConfig: ApplicationConfig = {
       GraphQLModule,
       HttpClientModule,
       FormsModule,
+      NgxStripeModule.forRoot(
+        'pk_test_51Q56AdGECxm7PWS6WYLmqYSjRR6Y685I3kIqfysdBgGASYswh0f6k7Wyl5haDtThwMlwKAwPGuOuUO3VIhlXfCf400B6QeNp5o'
+      ),
       TranslateModule.forRoot({
         loader: {
           provide: TranslateLoader,

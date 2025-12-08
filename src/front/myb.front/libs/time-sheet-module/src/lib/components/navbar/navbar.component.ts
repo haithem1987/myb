@@ -7,10 +7,13 @@ import { KeycloakProfile } from 'keycloak-js';
 import { Observable } from 'rxjs';
 import {
   AvatarComponent,
+  NotificationDropdownComponent,
+  NotificationService,
   UserDropdownComponent,
 } from 'libs/shared/shared-ui/src';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageSwitcherComponent } from 'libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component';
+import { Notification } from 'libs/shared/infra/models/notification.model';
 
 @Component({
   selector: 'myb-front-navbar',
@@ -23,22 +26,34 @@ import { LanguageSwitcherComponent } from 'libs/shared/shared-ui/src/lib/compone
     UserDropdownComponent,
     TranslateModule,
     LanguageSwitcherComponent,
+    NotificationDropdownComponent,
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
+  notifications: any[] = [];
   user$: Observable<KeycloakProfile | null>;
   isManager: boolean = false;
-  constructor(private keycloakService: KeycloakService) {
+  constructor(
+    private keycloakService: KeycloakService,
+    private notificationService: NotificationService
+  ) {
     this.user$ = this.keycloakService.profile$;
     this.isManager = this.keycloakService.hasRole('MYB_MANAGER');
   }
 
   ngOnInit(): void {
     if (this.keycloakService.isAuthenticated()) {
-      this.user$ = this.keycloakService.profile$;
+      this.keycloakService.profile$.subscribe((profile) => {
+        this.notificationService.getNotificationsByUserId(profile?.id || '');
+      });
     }
+    this.notificationService.notifications$.subscribe(
+      (notifs: Notification[]) => {
+        this.notifications = notifs;
+      }
+    );
   }
 
   logout(): void {

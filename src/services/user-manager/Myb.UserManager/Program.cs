@@ -18,7 +18,7 @@ builder.Services.AddServices();
 
 builder.Services.AddPooledDbContextFactory<UserContext>(options=>options.UseNpgsql(""));
 
-builder.Services.RegisterGraphQl<UserContext, UserQuery, UserMutation>();
+builder.Services.RegisterGraphQl<UserContext, UserQuery, UserMutation>("usermanager");
 builder.Services.RegisterServices();
 builder.AddKeycloakAuthorization();
 

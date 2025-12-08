@@ -24,6 +24,7 @@ import {
   GeneralSettingsService,
   HolidayService,
   LoadingIndicatorComponent,
+  NotificationService,
   ProgressBarComponent,
 } from 'libs/shared/shared-ui/src';
 import {
@@ -36,6 +37,7 @@ import { TimesheetActionButtonsComponent } from '../action-buttons/timesheet-act
 import { TimesheetTableComponent } from '../table/timesheet-table.component';
 import { PeriodSelectorComponent } from '../period-selector/period-selector.component';
 import { TimesheetUtilityService } from '../../../services/timesheet-utility.service';
+import { EmployeeService } from '../../../services/employee.service';
 
 @Component({
   selector: 'myb-timesheet-list',
@@ -99,6 +101,7 @@ export class TimesheetListComponent implements OnInit {
   constructor(
     private timesheetService: TimesheetService,
     private projectService: ProjectService,
+    private employeeService: EmployeeService,
     private keycloakService: KeycloakService,
     private holidayService: HolidayService,
     private toastService: ToastService,
@@ -106,6 +109,7 @@ export class TimesheetListComponent implements OnInit {
     public translate: TranslateService,
     private settingsService: GeneralSettingsService,
     private timesheetUtility: TimesheetUtilityService,
+    private notificationService: NotificationService,
     config: NgbDropdownConfig
   ) {
     config.placement = 'left-start';
@@ -289,7 +293,7 @@ export class TimesheetListComponent implements OnInit {
 
   saveAllChanges(): void {
     this.isSaving = true;
-    const { id, firstName, lastName }: any = this.keycloakService.getProfile();
+    const { id, username }: any = this.keycloakService.getProfile();
     const timesheetUpdates: Timesheet[] = [];
 
     this.projects$.subscribe((projects) => {
@@ -297,6 +301,8 @@ export class TimesheetListComponent implements OnInit {
       projects.forEach((project) => {
         projectMap.set(project.id, project);
       });
+
+      console.log('projectMap', projectMap);
 
       for (const [key, quantity] of Object.entries(this.timesheetQuantities)) {
         const [projectIdStr, dateString] = key.split('.');
@@ -313,8 +319,14 @@ export class TimesheetListComponent implements OnInit {
         const project = projectMap.get(projectId);
 
         if (!project) {
+          console.log(
+            `No project found for projectId ${projectId} and dateString ${dateString}`
+          );
           continue;
         }
+
+        console.log('timesheet', timesheet);
+        console.log('project', project);
 
         if (!timesheet) {
           const newTimesheet: Timesheet = {
@@ -325,21 +337,23 @@ export class TimesheetListComponent implements OnInit {
             status: ApprovalStatus.PENDING,
             projectId,
             quantity,
-            username: `${firstName} ${lastName}`,
+            username: `${username}`,
             projectName: project.projectName,
             userId: id,
             timeUnit: TimeUnit.DAY,
           };
+          console.log('newTimesheet', newTimesheet);
           this.updatedTimesheets = [...this.updatedTimesheets, newTimesheet];
           timesheet = newTimesheet;
         } else {
           timesheet = {
             ...timesheet,
             userId: id,
-            username: `${firstName} ${lastName}`,
+            username: `${username}`,
             quantity,
             projectName: project.projectName,
           };
+          console.log('updated timesheet', timesheet);
           this.updatedTimesheets = this.updatedTimesheets.map((t) =>
             t.id === timesheet?.id ? timesheet : t
           );
@@ -349,6 +363,7 @@ export class TimesheetListComponent implements OnInit {
       }
 
       if (timesheetUpdates.length > 0) {
+        console.log('timesheetUpdates', timesheetUpdates);
         this.timesheetService
           .updateMultipleTimesheets(timesheetUpdates)
           .subscribe({
@@ -359,6 +374,24 @@ export class TimesheetListComponent implements OnInit {
               });
               this.refreshView();
               this.isSaving = false;
+              if (!this.keycloakService.isUserManager()) {
+                console.log('Sending notification to manager');
+
+                this.employeeService
+                  .getManagerIdByUserId(id ?? '')
+                  .subscribe((managerId) => {
+                    if (managerId) {
+                      console.log(
+                        `Sending notification to manager ${managerId}`
+                      );
+                      this.notificationService.sendToUser({
+                        senderId: id,
+                        receiverId: managerId,
+                        message: `Timesheet updated by ${username}`,
+                      });
+                    }
+                  });
+              }
             },
             error: (error) => {
               console.error('Error saving changes', error);
@@ -366,6 +399,7 @@ export class TimesheetListComponent implements OnInit {
             },
           });
       } else {
+        console.log('No updates to save');
         this.isSaving = false;
       }
     });

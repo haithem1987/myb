@@ -88,5 +88,10 @@ namespace Myb.Timesheet.Infra.GraphQl.Querys
         {
             return await timeoffService.GetTimeOffsByEmployeeIdAsync(employeeId);
         }
+        
+        public async Task<string?> GetManagerIdByUserId([Service] IEmployeeService employeeService, string userId)
+        {
+            return await employeeService.GetManagerIdByUserIdAsync(userId);
+        }
     }
 }

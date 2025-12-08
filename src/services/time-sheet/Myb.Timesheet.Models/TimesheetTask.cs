@@ -8,7 +8,7 @@ public class TimesheetTask:BaseEntity
     [Required]
     public string name { get; set; }
     public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
+    public DateTime? EndTime { get; set; }
     public string? Description { get; set; }
     public bool IsCompleted { get; set; }
     public DateTime? DueDate { get; set; }

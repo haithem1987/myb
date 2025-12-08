@@ -1,10 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+    <ItemGroup>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+        <None Update="appsettings.Development.json">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
 
     <PropertyGroup>
+        <EnableDefaultContentItems>false</EnableDefaultContentItems>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <AspireComponent>true</AspireComponent>
+        <AspireAppHostProjectName>Myb.Orchestration</AspireAppHostProjectName>
     </PropertyGroup>
 
     <ItemGroup>

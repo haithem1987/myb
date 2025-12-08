@@ -117,6 +117,16 @@ export class EmployeeService extends RepositoryService<Employee> {
         })
       );
   }
+  getManagerIdByUserId(userId: string): Observable<string> {
+    return this.apollo
+      .watchQuery<{ managerIdByUserId: string }>({
+        query: gql`
+          ${this.typeOperations.getManagerIdByUserId}
+        `,
+        variables: { userId },
+      })
+      .valueChanges.pipe(map((result) => result.data.managerIdByUserId));
+  }
   getTimeOffsByEmployeeId(employeeId: number): Observable<TimeOff[]> {
     return this.apollo
       .watchQuery<{ timeOffsByEmployeeId: TimeOff[] }>({

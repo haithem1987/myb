@@ -95,7 +95,7 @@ export class TaskEditComponent implements OnInit {
       name: ['', Validators.required],
       description: ['', Validators.required],
       startTime: ['', Validators.required],
-      endTime: ['', Validators.required],
+      endTime: [null],
       isCompleted: [false],
       employeeId: [null, Validators.required],
       projectId: [null, Validators.required],

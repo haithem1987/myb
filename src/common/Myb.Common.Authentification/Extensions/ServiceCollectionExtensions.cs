@@ -45,6 +45,7 @@ namespace Myb.Common.Authentification.Extensions
                 {
                     options.Authority = settings.Authority;
                     options.Audience = settings.ClientId;
+                    options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidIssuer = settings.Authority,

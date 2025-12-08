@@ -125,6 +125,11 @@
   "GO_TO_HOME": "Aller à l'accueil",
   "SUBMIT": "Soumettre",
   "INTERVENANTS_TIMESHEETS": "Feuilles de temps des intervenants",
+  "NO_NOTIFICATIONS": "Pass de notifications",
+  "NOTIFICATION": {
+    "TIMESHEET_APPROVED": "Votre feuille de temps a été approuvée.",
+    "TIMESHEET_REJECTED": "Votre feuille de temps a été rejetée."
+  },
   "MY_TIMESHEETS": "Mes feuilles de temps",
   "NO_USER_FOUND": "Aucun utilisateur trouvé dans Keycloak avec cet email. Vous ne pouvez pas ajouter un nouvel employé à moins qu'il n'existe déjà.",
   "APPROVE": "Approuver",
@@ -135,5 +140,31 @@
     "TIMESHEETS_DISAPPROVED_SUCCESS": "Les feuilles de temps ont été rejetées avec succès",
     "TIMESHEETS_DISAPPROVE_ERROR": "Erreur lors du rejet des feuilles de temps",
     "NO_TIMESHEETS_SELECTED": "Aucune feuille de temps sélectionnée"
+  },
+  "SUBSCRIPTIONS": {
+    "TITLE": "Mes Abonnements",
+    "SERVICE_NAME": "Nom du Service",
+    "PRICE": "Prix",
+    "STATUS": "Statut",
+    "EXPIRY_DATE": "Date d'expiration",
+    "UNSUBSCRIBE": "Se désabonner",
+    "ACTION": "Action",
+    "NO_SUBSCRIPTIONS": "Vous n'avez pas d'abonnements."
+  },
+  "SUBSCRIBED": "Abonné",
+  "VIEW_SERVICE": "Voir le Service",
+  "UNSUBSCRIBE": "Annuler",
+  "PAYMENT": {
+    "COMPLETE_PAYMENT": "Effectuer le paiement",
+    "SUCCESS_TITLE": "Paiement réussi !",
+    "FAILURE_TITLE": "Échec du paiement",
+    "NAME_ON_CARD": "Nom sur la carte",
+    "CARDHOLDER_NAME_PLACEHOLDER": "Nom du titulaire de la carte",
+    "SUBMIT": "Payer",
+    "SUCCESS_MESSAGE": "Votre paiement a été effectué avec succès !",
+    "FAILURE_MESSAGE": "Oups ! Votre paiement a échoué.",
+    "THANK_YOU": "Merci pour votre achat.",
+    "RETRY": "Veuillez réessayer.",
+    "CLOSE": "Fermer"
   }
 }

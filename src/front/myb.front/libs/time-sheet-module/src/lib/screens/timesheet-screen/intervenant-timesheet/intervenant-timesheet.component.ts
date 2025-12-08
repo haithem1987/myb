@@ -11,6 +11,7 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { TimesheetStatusButtonsComponent } from '../status-buttons/timesheet-status-buttons.component';
 import { ApprovalStatus, Timesheet } from '../../../models/timesheet.model';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { NotificationService } from 'libs/shared/shared-ui/src';
 
 @Component({
   selector: 'myb-front-intervenant-timesheet',
@@ -42,7 +43,8 @@ export class IntervenantTimesheetComponent implements OnInit {
     private timesheetService: TimesheetService,
     private keycloakService: KeycloakService,
     private translate: TranslateService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private notificationService: NotificationService
   ) {
     this.managerId = this.keycloakService?.getProfile()?.id ?? '';
   }
@@ -163,6 +165,7 @@ export class IntervenantTimesheetComponent implements OnInit {
         group.timesheets.forEach((timesheet) => {
           const updatedTimesheet = {
             ...timesheet,
+
             status: ApprovalStatus.APPROVED,
           };
           selectedTimesheets.push(updatedTimesheet);
@@ -183,6 +186,20 @@ export class IntervenantTimesheetComponent implements OnInit {
                   classname: 'toast-success',
                 });
               });
+            // Send notification to each unique user
+            const notifiedUsers = new Set<string>();
+            selectedTimesheets.forEach((timesheet) => {
+              if (timesheet.userId && !notifiedUsers.has(timesheet.userId)) {
+                this.notificationService.sendToUser({
+                  senderId: this.managerId,
+                  receiverId: timesheet.userId,
+                  message: this.translate.instant(
+                    'NOTIFICATION.TIMESHEET_APPROVED'
+                  ),
+                });
+                notifiedUsers.add(timesheet.userId);
+              }
+            });
             this.isApprovedLoading = false;
             this.selectedGroups.clear();
           },
@@ -216,6 +233,7 @@ export class IntervenantTimesheetComponent implements OnInit {
         group.timesheets.forEach((timesheet) => {
           const updatedTimesheet = {
             ...timesheet,
+            quantity: 0,
             status: ApprovalStatus.REJECTED,
           };
           selectedTimesheets.push(updatedTimesheet);
@@ -236,6 +254,20 @@ export class IntervenantTimesheetComponent implements OnInit {
                   classname: 'toast-success',
                 });
               });
+            // Send notification to each unique user
+            const notifiedUsers = new Set<string>();
+            selectedTimesheets.forEach((timesheet) => {
+              if (timesheet.userId && !notifiedUsers.has(timesheet.userId)) {
+                this.notificationService.sendToUser({
+                  senderId: this.managerId,
+                  receiverId: timesheet.userId,
+                  message: this.translate.instant(
+                    'NOTIFICATION.TIMESHEET_REJECTED'
+                  ),
+                });
+                notifiedUsers.add(timesheet.userId);
+              }
+            });
             this.isDisApprovedLoading = false;
             this.selectedGroups.clear();
           },

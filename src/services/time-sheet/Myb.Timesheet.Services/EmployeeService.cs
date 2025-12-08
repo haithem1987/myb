@@ -96,5 +96,19 @@ public class EmployeeService:IEmployeeService
             throw;
         }
     }
+    
+    public Task<string?> GetManagerIdByUserIdAsync(string userId)
+    {
+        try
+        {
+            var employee = _employeeRepository.GetAll().FirstOrDefault(e => e.Id == userId);
+            return Task.FromResult(employee?.ManagerId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting managerId by userId: {UserId}", userId);
+            throw;
+        }
+    }
 
 }

@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Myb.Common.Repositories;
+using Myb.Common.Stripe;
 using Myb.Timesheet.Infra;
 
 namespace Myb.Common.GraphQL.Infra
 {
     public static class GraphQlRegistration
     {
-        public static void RegisterGraphQl<TDbContext, TQuery, TMutation>(this IServiceCollection serviceCollection) 
+        public static void RegisterGraphQl<TDbContext, TQuery, TMutation>(this IServiceCollection serviceCollection,string schemaName) 
             where TDbContext : DbContext, new() 
             where TQuery : class 
             where TMutation : class
@@ -23,16 +24,17 @@ namespace Myb.Common.GraphQL.Infra
             });
             serviceCollection.AddScoped(typeof(IGenericRepository<,,>), typeof(GenericRepository<,,>));
 
-            serviceCollection.AddGraphQLServer()
+            serviceCollection.AddGraphQLServer(schemaName)
                 .AddAuthorization()
                 .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true)
                 .AddSorting()
                 .AddFiltering()
-                .AddType<TimesheetResolver>()
+                //.AddType<TimesheetResolver>()
+                //.AddMutationType<PaymentMutation>()
                 //.AddAuthorizationCore()
                 .RegisterDbContext<TDbContext>()
                 .AddQueryType<TQuery>()
-                .AddMutationType<TMutation>();
+                .AddMutationType<TMutation>();     
         }
     }
 }

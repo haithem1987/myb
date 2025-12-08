@@ -6,7 +6,7 @@ export class Task extends BaseModel {
   name: string = '';
   description: string = '';
   startTime: string = new Date().toUTCString();
-  endTime: string = new Date().toISOString();
+  endTime?: string | null = null;
   isCompleted: boolean = false;
   employeeId?: number;
   dueDate?: string;

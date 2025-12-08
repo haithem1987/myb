@@ -1,58 +1,159 @@
-
+version: "3.8"
 
 services:
+  keycloak:
+    image: docker.io/bitnami/keycloak:22
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+    networks:
+      - my-network
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+
+  # Service PostgreSQL pour Timesheet
+  timesheetDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: timesheet-pwd
+      POSTGRES_DB: timesheetDB
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/timesheet/data
+    ports:
+      - "5448:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/timesheet/data
+
+  # Service PostgreSQL pour Document
+  documentDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: document-pwd
+      POSTGRES_DB: documentDB
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/document/data
+    ports:
+      - "5433:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_document_data:/var/lib/postgresql/document/data
+
+  # Service PostgreSQL pour Invoice
+  invoiceDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: invoice-pwd
+      POSTGRES_DB: invoiceDB
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/invoice/data
+    ports:
+      - "5434:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_invoice_data:/var/lib/postgresql/invoice/data
+
+  # your UserManager service (optionnel si vous l’utilisez)
   myb-usermanager:
     build:
-      context: ./src/services/user-manager/Myb.UserManager
+      context: ./src/services/user-manager/Myb.UserManager.Sevices
       dockerfile: Dockerfile
-  # myb-timesheet:
-  #   build:
-  #     context: ./src/services/time-sheet/Myb.Timesheet
-  #     dockerfile: Dockerfile
-  # myb-docmanager:
-  #   build:
-  #     context: ./src/services/document-management/Myb.Document
-  #     dockerfile: Dockerfile
-  # myb-invoiceservice:
-  #   build:
-  #     context: ./src/services/invoice-management/Myb.Invoice
-  #     dockerfile: Dockerfile
-#   timesheetDB:
-#     image: postgres:16.2
-#     restart: always
-#     environment:
-#       POSTGRES_PASSWORD: timesheet-pwd
-#       POSTGRES_DB: timesheetDB
-#       POSTGRES_USER: postgres
-#     ports:
-#       - "5432:5432"
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/timesheet/data
-        
-#   documentDB:
-#     image: postgres:16.2
-#     restart: always
-#     environment:
-#       POSTGRES_PASSWORD: document-pwd
-#       POSTGRES_DB: documentDB
-#       POSTGRES_USER: postgres
-#     ports:
-#       - "5433:5432"
-#     volumes:
-#       - postgres_document_data:/var/lib/postgresql/document/data
-#   invoiceDB:
-#     image: postgres:16.2
-#     restart: always
-#     environment:
-#       POSTGRES_PASSWORD: invoice-pwd
-#       POSTGRES_DB: invoiceDB
-#       POSTGRES_USER: postgres
-#     ports:
-#       - "5434:5432"
-#     volumes:
-#       - postgres_invoice_data:/var/lib/postgresql/invoice/data
+    depends_on:
+      - keycloak
+      - timesheetDB    # ou userDB si vous avez un service userDB séparé
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__UserDBConnection=Host=timesheetDB;Port=5432;Database=timesheetDB;Username=postgres;Password=timesheet-pwd
+      - Keycloak__BaseUrl=http://keycloak:8080/realms/MYB/protocol/openid-connect
+      - Keycloak__Authority=http://keycloak:8080/realms/MYB
+      - Keycloak__ClientId=MYB-client
+      - Keycloak__ClientSecret=f4umyKKCMYgaipA3f3MndHeTg8ubvyD2
 
-# volumes:
-#   postgres_data:
-#   postgres_document_data:
-#   postgres_invoice_data:
+  # votre service Timesheet
+  myb-timesheet:
+    build:
+      context: ./src/services/time-sheet/Myb.Timesheet
+      dockerfile: Dockerfile
+    depends_on:
+      - keycloak
+      - timesheetDB
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__TimesheetDBConnection=Host=timesheetDB;Port=5432;Database=timesheetDB;Username=postgres;Password=timesheet-pwd
+      - Keycloak__BaseUrl=http://keycloak:8080/realms/MYB/protocol/openid-connect
+      - Keycloak__Authority=http://keycloak:8080/realms/MYB
+      - Keycloak__ClientId=MYB-client
+      - Keycloak__ClientSecret=f4umyKKCMYgaipA3f3MndHeTg8ubvyD2
+  myb-front:
+    build:
+      context: ./src/front/myb.front
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    networks:
+      - my-network
+    depends_on:
+      - keycloak
+      - myb-invoice
+      - myb-docmanager
+      - myb-timesheet
+    environment:
+      - NODE_ENV=development
+  # votre service Document
+  myb-docmanager:
+    build:
+      context: ./src/services/document-management/Myb.Document
+      dockerfile: Dockerfile
+    depends_on:
+      - keycloak
+      - documentDB
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DocumentDBConnection=Host=documentDB;Port=5432;Database=documentDB;Username=postgres;Password=document-pwd
+      - Keycloak__BaseUrl=http://keycloak:8080/realms/MYB/protocol/openid-connect
+      - Keycloak__Authority=http://keycloak:8080/realms/MYB
+      - Keycloak__ClientId=MYB-client
+      - Keycloak__ClientSecret=f4umyKKCMYgaipA3f3MndHeTg8ubvyD2
+
+  # votre service Invoice
+  myb-invoice:
+    build:
+      context: ./src/services/invoice-management/Myb.Invoice
+      dockerfile: Dockerfile
+    depends_on:
+      - keycloak
+      - invoiceDB
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__InvoiceDBConnection=Host=invoiceDB;Port=5432;Database=invoiceDB;Username=postgres;Password=invoice-pwd
+      - Keycloak__BaseUrl=http://keycloak:8080/realms/MYB/protocol/openid-connect
+      - Keycloak__Authority=http://keycloak:8080/realms/MYB
+      - Keycloak__ClientId=MYB-client
+      - Keycloak__ClientSecret=f4umyKKCMYgaipA3f3MndHeTg8ubvyD2
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  keycloak_data:
+  postgres_data:
+  postgres_document_data:
+  postgres_invoice_data:

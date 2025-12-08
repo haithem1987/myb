@@ -125,6 +125,11 @@
   "GO_TO_HOME": "Go to Home",
   "SUBMIT": "Submit",
   "INTERVENANTS_TIMESHEETS": "Intervenant's Timesheets",
+  "NO_NOTIFICATIONS": "No notifications",
+  "NOTIFICATION": {
+    "TIMESHEET_APPROVED": "Your timesheet has been approved.",
+    "TIMESHEET_REJECTED": "Your timesheet has been rejected."
+  },
   "MY_TIMESHEETS": "My Timesheets",
   "NO_USER_FOUND": "No user found in Keycloak with this email. You can't add a new employee unless they exist.",
   "APPROVE": "Approve",
@@ -135,5 +140,30 @@
     "TIMESHEETS_DISAPPROVED_SUCCESS": "Timesheets disapproved successfully",
     "TIMESHEETS_DISAPPROVE_ERROR": "Error disapproving timesheets",
     "NO_TIMESHEETS_SELECTED": "No timesheets selected"
+  },
+  "SUBSCRIPTIONS": {
+    "TITLE": "My Subscriptions",
+    "SERVICE_NAME": "Service Name",
+    "PRICE": "Price",
+    "STATUS": "Status",
+    "EXPIRY_DATE": "Expiry Date",
+    "UNSUBSCRIBE": "Unsubscribe",
+    "ACTION": "Action",
+    "NO_SUBSCRIPTIONS": "You have no subscriptions."
+  },
+  "SUBSCRIBED": "Subscribed",
+  "UNSUBSCRIBE": "Annuler",
+  "PAYMENT": {
+    "COMPLETE_PAYMENT": "Complete Payment",
+    "SUCCESS_TITLE": "Payment Successful!",
+    "FAILURE_TITLE": "Payment Failed",
+    "NAME_ON_CARD": "Name on Card",
+    "CARDHOLDER_NAME_PLACEHOLDER": "Cardholder Name",
+    "SUBMIT": "Submit Payment",
+    "SUCCESS_MESSAGE": "Your payment was successful!",
+    "FAILURE_MESSAGE": "Oops! Your payment failed.",
+    "THANK_YOU": "Thank you for your purchase.",
+    "RETRY": "Please try again.",
+    "CLOSE": "Close"
   }
 }

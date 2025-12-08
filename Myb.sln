@@ -68,6 +68,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Timesheet.EntityFrameWork.Infra", "src\services\time-sheet\Myb.Timesheet.EntityFrameWork.Infra\Myb.Timesheet.EntityFrameWork.Infra.csproj", "{6DA7D137-CE7E-4CE0-A60C-E59AC57105D0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "document-management", "document-management", "{B2BA43CE-B2E9-4758-BF9F-99115F28257F}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+		.dockerignore = .dockerignore
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Myb.Document", "src\services\document-management\Myb.Document\Myb.Document.csproj", "{2EEBEEAF-79A9-4865-ADB7-7C48656F411E}"
 EndProject
@@ -98,7 +102,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Invoice.Models", "src\s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Invoice.Services", "src\services\invoice-management\Myb.Invoice.Services\Myb.Invoice.Services.csproj", "{10FCFC1D-85A5-4248-92C0-AFD6A1D20C0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Common.Stripe", "Myb.Common.Stripe\Myb.Common.Stripe.csproj", "{11609F0E-89BF-4546-B64C-B3212957379D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Common.Stripe", "src\common\Myb.Common.Stripe\Myb.Common.Stripe.csproj", "{F5ED7437-A9F0-4524-90E8-78830CD9E749}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "payment-service", "payment-service", "{F7CA9EE1-302C-4210-AFDC-8B7F15B7CFF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Payment", "src\services\payment-service\Myb.Payment\Myb.Payment.csproj", "{B265486D-629E-42A8-AA78-F94EDACB9718}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Payment.Models", "src\services\payment-service\Myb.Payment.Models\Myb.Payment.Models.csproj", "{59C3FD86-46CB-4852-A778-EA7CA886746B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Payment.EntityFrameWork.Infra", "src\services\payment-service\Myb.Payment.EntityFrameWork.Infra\Myb.Payment.EntityFrameWork.Infra.csproj", "{C9A37566-DD8F-4540-BCAE-4B79DD1F7C54}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "orchestration", "orchestration", "{F4FC7D17-7071-4701-8374-C8F4DA9E5213}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Orchestration", "src\orchestration\Myb.Orchestration\Myb.Orchestration.csproj", "{8110C6A0-B09C-423E-9B89-947F1A969DDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "notification-service", "notification-service", "{402840DE-C941-4FA8-8FA6-21596929020E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myb.Notification", "src\services\notification-service\Myb.Notification\Myb.Notification.csproj", "{8B7C8F27-55D1-4FE8-9FDD-BA69FD61B1DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AllServicesStarter", "src\services\AllServicesStarter\AllServicesStarter.csproj", "{ED25A548-7690-4A17-8F08-F0977969F8A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -246,10 +268,34 @@ Global
 		{10FCFC1D-85A5-4248-92C0-AFD6A1D20C0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10FCFC1D-85A5-4248-92C0-AFD6A1D20C0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10FCFC1D-85A5-4248-92C0-AFD6A1D20C0F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{11609F0E-89BF-4546-B64C-B3212957379D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{11609F0E-89BF-4546-B64C-B3212957379D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{11609F0E-89BF-4546-B64C-B3212957379D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{11609F0E-89BF-4546-B64C-B3212957379D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5ED7437-A9F0-4524-90E8-78830CD9E749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5ED7437-A9F0-4524-90E8-78830CD9E749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5ED7437-A9F0-4524-90E8-78830CD9E749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5ED7437-A9F0-4524-90E8-78830CD9E749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B265486D-629E-42A8-AA78-F94EDACB9718}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B265486D-629E-42A8-AA78-F94EDACB9718}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B265486D-629E-42A8-AA78-F94EDACB9718}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B265486D-629E-42A8-AA78-F94EDACB9718}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59C3FD86-46CB-4852-A778-EA7CA886746B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59C3FD86-46CB-4852-A778-EA7CA886746B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59C3FD86-46CB-4852-A778-EA7CA886746B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59C3FD86-46CB-4852-A778-EA7CA886746B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9A37566-DD8F-4540-BCAE-4B79DD1F7C54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9A37566-DD8F-4540-BCAE-4B79DD1F7C54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9A37566-DD8F-4540-BCAE-4B79DD1F7C54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9A37566-DD8F-4540-BCAE-4B79DD1F7C54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8110C6A0-B09C-423E-9B89-947F1A969DDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8110C6A0-B09C-423E-9B89-947F1A969DDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8110C6A0-B09C-423E-9B89-947F1A969DDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8110C6A0-B09C-423E-9B89-947F1A969DDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B7C8F27-55D1-4FE8-9FDD-BA69FD61B1DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B7C8F27-55D1-4FE8-9FDD-BA69FD61B1DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B7C8F27-55D1-4FE8-9FDD-BA69FD61B1DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B7C8F27-55D1-4FE8-9FDD-BA69FD61B1DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED25A548-7690-4A17-8F08-F0977969F8A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED25A548-7690-4A17-8F08-F0977969F8A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED25A548-7690-4A17-8F08-F0977969F8A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED25A548-7690-4A17-8F08-F0977969F8A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -296,7 +342,15 @@ Global
 		{B1C67AC5-7A41-4794-8CF2-54028A367252} = {BDDBC706-6D31-438A-9AD6-D74E3E4D6635}
 		{87639C12-5F9A-4A2C-BEE6-D1440DBE1310} = {BDDBC706-6D31-438A-9AD6-D74E3E4D6635}
 		{10FCFC1D-85A5-4248-92C0-AFD6A1D20C0F} = {BDDBC706-6D31-438A-9AD6-D74E3E4D6635}
-		{11609F0E-89BF-4546-B64C-B3212957379D} = {98C61478-44B0-4A55-A735-0BC13CA54212}
+		{F5ED7437-A9F0-4524-90E8-78830CD9E749} = {98C61478-44B0-4A55-A735-0BC13CA54212}
+		{F7CA9EE1-302C-4210-AFDC-8B7F15B7CFF6} = {37E15B0B-E56E-4E11-94F2-21C4193E2CB0}
+		{B265486D-629E-42A8-AA78-F94EDACB9718} = {F7CA9EE1-302C-4210-AFDC-8B7F15B7CFF6}
+		{59C3FD86-46CB-4852-A778-EA7CA886746B} = {F7CA9EE1-302C-4210-AFDC-8B7F15B7CFF6}
+		{C9A37566-DD8F-4540-BCAE-4B79DD1F7C54} = {F7CA9EE1-302C-4210-AFDC-8B7F15B7CFF6}
+		{8110C6A0-B09C-423E-9B89-947F1A969DDB} = {F4FC7D17-7071-4701-8374-C8F4DA9E5213}
+		{402840DE-C941-4FA8-8FA6-21596929020E} = {37E15B0B-E56E-4E11-94F2-21C4193E2CB0}
+		{8B7C8F27-55D1-4FE8-9FDD-BA69FD61B1DA} = {402840DE-C941-4FA8-8FA6-21596929020E}
+		{ED25A548-7690-4A17-8F08-F0977969F8A1} = {37E15B0B-E56E-4E11-94F2-21C4193E2CB0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {34C7383E-9796-48B2-8928-9E1E96C528F0}

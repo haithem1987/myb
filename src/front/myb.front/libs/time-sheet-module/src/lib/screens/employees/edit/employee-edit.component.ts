@@ -59,6 +59,7 @@ export class EmployeeEditComponent implements OnInit {
     this.keycloakService.userId$.subscribe((userId) => {
       if (userId) {
         this.employeeForm.get('managerId')?.setValue(userId);
+        this.employeeForm.get('userId')?.setValue(userId);
       }
     });
   }

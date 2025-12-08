@@ -6,12 +6,14 @@ import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache, ApolloLink, from } from '@apollo/client/core';
 import { onError } from '@apollo/client/link/error';
 import { Router } from '@angular/router';
+import { environment } from '../../../../apps/client/envirements/envirement';
 
 // Define your microservices' endpoints
+const baseUri = environment.baseUri;
 const microserviceLinks = {
-  timesheetService: 'http://localhost:5059/graphql',
-  documentService: 'http://localhost:5117/graphql',
-  invoiceService: 'http://localhost:5145/graphql',
+  timesheetService: `${baseUri}/timesheet/graphql`,
+  documentService: `${baseUri}/document/graphql`,
+  invoiceService: `${baseUri}/invoice/graphql`,
 };
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {

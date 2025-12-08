@@ -49,6 +49,10 @@
       </ul>
       <div class="d-flex align-items-center">
         <myb-front-language-switcher class="ms-3"></myb-front-language-switcher>
+        <myb-front-notification-dropdown
+          [notifications]="notifications"
+          class="ms-3"
+        ></myb-front-notification-dropdown>
         <myb-front-user-dropdown
           rootPath="/timesheet"
         ></myb-front-user-dropdown>

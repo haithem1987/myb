@@ -1,0 +1,55 @@
+.
+├── bin
+│   └── Debug
+├── CONTRIBUTING.md
+├── css
+│   ├── app.component.min.css
+│   ├── app.component.min.css.map
+│   ├── project-card.component.min.css
+│   ├── project-card.component.min.css.map
+│   ├── styles.min.css
+│   ├── styles.min.css.map
+│   ├── task-list.component.min.css
+│   └── task-list.component.min.css.map
+├── docker-compose.dcproj
+├── docker-compose.yml
+├── Dockerfile
+├── keycloak-db-init
+│   └── create-keycloak-db.sql
+├── launchSettings.json
+├── LICENSE
+├── myb-architecture.txt
+├── myb-documentation.md
+├── Myb.sln
+├── obj
+│   └── Debug
+│       └── docker-compose.dcproj.FileListAbsolute.txt
+├── package-lock.json
+├── package.json
+├── README.md
+└── src
+    ├── common
+    │   ├── Myb.Common.Authentification
+    │   ├── Myb.Common.GraphQL.Infra
+    │   ├── Myb.common.IdentityProvider
+    │   ├── Myb.Common.Models
+    │   ├── Myb.Common.Repositories
+    │   ├── Myb.Common.Stripe
+    │   └── Myb.Common.Utils
+    ├── front
+    │   └── myb.front
+    ├── orchestration
+    │   └── Myb.Orchestration
+    ├── services
+    │   ├── AllServicesStarter
+    │   ├── document-management
+    │   ├── invoice-management
+    │   ├── notification-service
+    │   ├── payment-service
+    │   ├── time-sheet
+    │   └── user-manager
+    └── tests
+        ├── end-2-end-tests
+        └── unit-tests
+
+31 directories, 22 files

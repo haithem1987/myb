@@ -46,11 +46,11 @@ export const appRoutes: Route[] = [
         (m) => m.DocumentroutingModule
       ),
   },
-  // {
-  //   path: 'settings',
-  //   loadComponent: () =>
-  //     import('@myb-front/shared-ui').then((c) => c.SettingsComponent),
-  // },
+  {
+    path: 'subscriptions',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.SubscriptionsComponent),
+  },
   {
     path: 'access-denied',
     loadComponent: () =>

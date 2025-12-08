@@ -1,0 +1,26 @@
+.dropdown-item {
+  white-space: normal;
+  min-width: 300px;
+}
+
+.dropdown-menu {
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: 0.5rem;
+}
+
+.nav-link[ngbDropdownToggle]::after {
+  display: none !important; /* removes the default dropdown arrow */
+}
+li.nav-item.dropdown::marker {
+  display: none !important; /* removes the default dropdown arrow */
+}
+.dropdown-menu {
+  min-width: 280px;
+  max-height: 350px;
+  overflow-y: auto;
+  border-radius: 0.5rem;
+}
+.dropdown-item:last-child {
+  border-bottom: none;
+}

@@ -4,24 +4,56 @@
     {{ 'OUR_APPS' | translate }}
   </h1>
   <p class="mt-3 mb-5 text-center fs-4">{{ 'ALL_TOOLS' | translate }}</p>
-  <div class="row mx-auto" style="width: 60%">
-    <div class="col-lg-4 col-md-6 mb-4" *ngFor="let app of list">
+  <div class="row mx-auto" style="width: 70%">
+    <div class="col-xl-4 col-md-6 mb-4" *ngFor="let app of list">
       <myb-front-card>
         <div
           class="card-body text-center"
-          (click)="navigateToApp(app.route)"
           style="cursor: pointer"
+          (click)="navigateToApp(app)"
         >
-          <img
-            [src]="'assets/images/' + app.icon"
-            width="70"
-            height="70"
-            [alt]="app.name | translate"
-          />
-          <h5 class="my-3 fw-bolder text-capitalize">
-            {{ app.name | translate }}
-          </h5>
-          <p class="card-text">{{ app.description | translate }}</p>
+          <div class="h-100 d-flex flex-column justify-content-between">
+            <div>
+              <img
+                [src]="'assets/images/' + app.icon"
+                width="70"
+                height="70"
+                [alt]="app.name | translate"
+              />
+              <h5 class="my-3 fw-bolder text-capitalize">
+                {{ app.name | translate }}
+              </h5>
+              <p class="card-text">{{ app.description | translate }}</p>
+            </div>
+
+            <div
+              *ngIf="!(subscribedServices$ | async)?.includes(app.id)"
+              class="card-text"
+            >
+              <p>
+                <span class="fs-4 fw-semibold text-secondary">{{
+                  app.price
+                }}</span>
+                {{ app.currency }} /
+                <span style="font-size: small">{{ 'MONTH' | translate }}</span>
+              </p>
+              <button
+                class="btn btn-primary w-100 text-white"
+                (click)="openPaymentModal(app); $event.stopPropagation()"
+              >
+                {{ 'SUBSCRIBE' | translate }}
+              </button>
+            </div>
+
+            <div *ngIf="isSubscribed(app.id) | async" class="card-text">
+              <button
+                class="btn btn-light w-100 fs-6"
+                (click)="unsubscribe(app.id); $event.stopPropagation()"
+              >
+                {{ 'UNSUBSCRIBE' | translate }}
+              </button>
+            </div>
+          </div>
         </div>
       </myb-front-card>
     </div>

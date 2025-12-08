@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import Keycloak, { KeycloakProfile } from 'keycloak-js';
-import {
-  BehaviorSubject,
-  firstValueFrom,
-  lastValueFrom,
-  Observable,
-} from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -36,7 +31,7 @@ export class KeycloakService {
 
     return new Promise((resolve, reject) => {
       this.keycloak = new Keycloak({
-        url: 'https://www.keycloak.forlink-group.com/',
+        url: 'http://localhost:8080',
         realm: 'MYB',
         clientId: 'MYB-client',
       });
@@ -45,8 +40,11 @@ export class KeycloakService {
         .init({
           onLoad: 'check-sso',
           checkLoginIframe: false,
+          pkceMethod: 'S256',
+          flow: 'standard',
+          redirectUri: window.location.origin,
         })
-        .then((authenticated) => {
+        .then((authenticated: any) => {
           if (authenticated) {
             this.loadUserProfile().then(() => {
               this.initialized = true;
@@ -57,7 +55,7 @@ export class KeycloakService {
             resolve(false);
           }
         })
-        .catch((err) => {
+        .catch((err: any) => {
           console.error('Keycloak initialization error:', err);
           reject(err);
         });
@@ -77,7 +75,17 @@ export class KeycloakService {
   }
 
   getToken(): string | undefined {
-    return this.keycloak?.token;
+    return this.keycloak?.token || undefined;
+  }
+
+  async updateToken(): Promise<void> {
+    if (this.keycloak?.isTokenExpired()) {
+      try {
+        await this.keycloak.updateToken(30);
+      } catch (err) {
+        console.error('Erreur lors du rafraîchissement du token', err);
+      }
+    }
   }
 
   getProfile(): KeycloakProfile | null {
@@ -141,8 +149,9 @@ export class KeycloakService {
   private async getAdminToken(): Promise<void> {
     const body = new URLSearchParams();
     body.set('client_id', 'admin-cli');
-    body.set('username', 'user');
-    body.set('password', 'bitnami');
+    //body.set('client_secret', 'RvzjCKDdaxuhPB6bkHYSbR2Sx9f8lNMm');
+    body.set('username', 'admin');
+    body.set('password', 'admin');
     body.set('grant_type', 'password');
 
     const headers = new HttpHeaders({
@@ -152,7 +161,7 @@ export class KeycloakService {
     try {
       const response: any = await firstValueFrom(
         this.http.post(
-          'https://www.keycloak.forlink-group.com/realms/master/protocol/openid-connect/token',
+          'http://localhost:8080/realms/master/protocol/openid-connect/token',
           body.toString(),
           { headers }
         )
@@ -182,7 +191,7 @@ export class KeycloakService {
     try {
       const clients: any = await firstValueFrom(
         this.http.get(
-          'https://www.keycloak.forlink-group.com/admin/realms/MYB/clients?clientId=MYB-client',
+          'http://localhost:8080/admin/realms/MYB/clients?clientId=MYB-client',
           { headers }
         )
       );
@@ -225,7 +234,7 @@ export class KeycloakService {
     try {
       const users: any = await firstValueFrom(
         this.http.get(
-          `https://www.keycloak.forlink-group.com/admin/realms/MYB/users?email=${partialEmail}`,
+          `http://localhost:8080/admin/realms/MYB/users?email=${partialEmail}`,
           { headers }
         )
       );
@@ -243,7 +252,7 @@ export class KeycloakService {
           try {
             const roles: any = await firstValueFrom(
               this.http.get(
-                `https://www.keycloak.forlink-group.com/admin/realms/MYB/users/${user.id}/role-mappings/clients/${clientId}`,
+                `http://localhost:8080/admin/realms/MYB/users/${user.id}/role-mappings/clients/${clientId}`,
                 { headers }
               )
             );
@@ -288,10 +297,10 @@ export class KeycloakService {
         'Content-Type': 'application/json',
       });
 
-      const roleUrl = `https://www.keycloak.forlink-group.com/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
+      const roleUrl = `http://localhost:8080/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
       const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
 
-      const assignRoleUrl = `https://www.keycloak.forlink-group.com/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
+      const assignRoleUrl = `http://localhost:8080/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
       await firstValueFrom(this.http.post(assignRoleUrl, [role], { headers }));
 
       console.log(`Successfully assigned role ${roleName} to user ${userId}`);
@@ -317,11 +326,11 @@ export class KeycloakService {
       });
 
       // Fetch the role information for the specified role
-      const roleUrl = `https://www.keycloak.forlink-group.com/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
+      const roleUrl = `http://localhost:8080/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
       const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
 
       // Unassign the role from the user
-      const unassignRoleUrl = `https://www.keycloak.forlink-group.com/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
+      const unassignRoleUrl = `http://localhost:8080/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
       await firstValueFrom(
         this.http.request('delete', unassignRoleUrl, {
           headers,

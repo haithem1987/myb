@@ -54,6 +54,7 @@ import {
   GET_ALL_EMPLOYEES,
   GET_EMPLOYEES_BY_MANAGER_ID,
   GET_EMPLOYEE_BY_ID,
+  GET_MANAGER_ID_BY_USER_ID,
 } from '../../../time-sheet-module/src/lib/graphql/queries/employee.graphql';
 import {
   CREATE_PROJECT,
@@ -98,7 +99,10 @@ import {
   GET_ALL_PRODUCTS,
   GET_PRODUCT_BY_ID,
 } from '../../../invoice-module/src/lib/graphql/queries/product.query';
-import { CREATE_CLIENT, UPDATE_CLIENT } from '../../..//invoice-module/src/lib/graphql/mutations/client.mutation';
+import {
+  CREATE_CLIENT,
+  UPDATE_CLIENT,
+} from '../../..//invoice-module/src/lib/graphql/mutations/client.mutation';
 import {
   GET_ALL_CLIENTS,
   GET_CLIENT_BY_ID,
@@ -153,6 +157,7 @@ export const typeConfig: { [key: string]: any } = {
     update: UPDATE_EMPLOYEE,
     delete: DELETE_EMPLOYEE,
     getEmployeesByManagerId: GET_EMPLOYEES_BY_MANAGER_ID,
+    getManagerIdByUserId: GET_MANAGER_ID_BY_USER_ID,
     getTimeoffsByEmployeeId: GET_TIMEOFFS_BY_EMPLOYEE_ID,
     addTimeOff: CREATE_TIMEOFF,
     updateTimeOff: UPDATE_TIMEOFF,

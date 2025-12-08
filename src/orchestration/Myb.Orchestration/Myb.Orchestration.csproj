@@ -8,6 +8,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <UserSecretsId>F650883C-C082-4719-910A-A4CC05F7931F</UserSecretsId>
+        <AspireHostingMode>None</AspireHostingMode>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,6 +22,7 @@
         <ProjectReference Include="..\..\services\document-management\Myb.Document\Myb.Document.csproj" />
         <ProjectReference Include="..\..\services\invoice-management\Myb.Invoice\Myb.Invoice.csproj" />
         <ProjectReference Include="..\..\services\payment-service\Myb.Payment\Myb.Payment.csproj" />
+        <ProjectReference Include="..\..\services\notification-service\Myb.Notification\Myb.Notification.csproj" />
     </ItemGroup>
 
 

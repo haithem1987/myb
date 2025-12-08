@@ -1,8 +1,8 @@
 export const keycloakConfig = {
   realm: 'MYB',
   clientId: 'MYB-client',
-  url: 'https://www.keycloak.forlink-group.com',
+  url: 'http://localhost:8080',
   credentials: {
-    secret: 'YOUR_CLIENT_SECRET', // Replace with your client secret
+    secret: 'daqzazd352GGYoZonnhaqXT6e5oI62H2', // Replace with your client secret
   },
 };

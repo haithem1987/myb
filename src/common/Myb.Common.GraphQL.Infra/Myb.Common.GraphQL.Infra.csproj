@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\services\time-sheet\Myb.Timesheet.Infra\Myb.Timesheet.Infra.csproj" />
     <ProjectReference Include="..\Myb.Common.Repositories\Myb.Common.Repositories.csproj" />
+    <ProjectReference Include="..\Myb.Common.Stripe\Myb.Common.Stripe.csproj" />
   </ItemGroup>
 
 </Project>

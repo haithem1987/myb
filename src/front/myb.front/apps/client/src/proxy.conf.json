@@ -1,6 +1,6 @@
 {
   "/auth": {
-    "target": "https://www.keycloak.forlink-group.com",
+    "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
@@ -8,8 +8,8 @@
     },
     "logLevel": "debug"
   },
-  "/realms/*": {
-    "target": "https://www.keycloak.forlink-group.com",
+  "admin/realms/*": {
+    "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true
   }

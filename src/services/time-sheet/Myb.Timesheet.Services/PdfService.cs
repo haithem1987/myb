@@ -25,7 +25,6 @@ namespace Myb.Timesheet.Services
                     page.Margin(2, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(12));
-
                     page.Header().Element(ComposeHeader);
 
                     page.Content().Element(ComposeContent);

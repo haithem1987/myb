@@ -24,7 +24,11 @@ export * from '../../infra/services/functions-utils.service';
 
 export * from '../../infra/services/holiday.service';
 
+export * from '../../infra/services/notification.service';
+
 export * from '../../infra/services/language.service';
+
+export * from '../../infra/services/subscription.service';
 
 export * from '../../infra/services/timesheet-utils';
 
@@ -53,3 +57,9 @@ export * from './lib/components/access-denied-page/access-denied-page.component'
 export * from './lib/components/breadcrumb/breadcrumb.component';
 
 export * from './lib/components/date-cell/date-cell.component';
+
+export * from './lib/components/payment/payment.component';
+
+export * from './lib/subscriptions/subscriptions.component';
+
+export * from './lib/components/notification-dropdown/notification-dropdown.component';

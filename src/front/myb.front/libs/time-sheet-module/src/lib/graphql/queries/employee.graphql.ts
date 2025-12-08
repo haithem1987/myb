@@ -41,3 +41,8 @@ export const GET_EMPLOYEES_BY_MANAGER_ID = `
     }
   }
 `;
+
+export const GET_MANAGER_ID_BY_USER_ID = `
+query GetManagerIdByUserId($userId: String!) {
+  managerIdByUserId(userId: $userId)
+}`;

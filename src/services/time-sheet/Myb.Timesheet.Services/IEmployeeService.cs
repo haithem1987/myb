@@ -10,5 +10,7 @@ public interface IEmployeeService
     Task<Employee> UpdateEmployeeAsync(Employee employee);
     Task<bool> DeleteEmployeeAsync(string id);
     Task<IQueryable<Employee>> GetEmployeesByManagerIdAsync(string managerId);
+    Task<string?> GetManagerIdByUserIdAsync(string userId);
+
 
 }

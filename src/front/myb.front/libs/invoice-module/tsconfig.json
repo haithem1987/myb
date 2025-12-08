@@ -10,7 +10,8 @@
     "noFallthroughCasesInSwitch": true
   },
   "files": [],
-  "include": [],
+   "exclude": ["**/*.spec.ts", "**/*.test.ts"],
+  "include": ["**/*.ts", "../../libs/shared/**/*.ts"],
   "references": [
     {
       "path": "./tsconfig.lib.json"

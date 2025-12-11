@@ -1117,19 +1117,252 @@ docker-compose up -d
 
 ---
 
+## GitFlow Workflow
+
+### Branch Structure
+
+The project follows **GitFlow** branching strategy to ensure stable releases and organized development:
+
+#### Main Branches (Long-lived)
+
+- **`main`**: Production-ready code. All releases are tagged here.
+- **`develop`**: Integration branch for the next release. Latest features are merged here.
+
+#### Supporting Branches (Short-lived)
+
+- **`feature/*`**: New features and enhancements
+  - Created from: `develop`
+  - Merged into: `develop`
+  - Example: `feature/invoice-pdf-export`, `feature/user-authentication`
+
+- **`release/*`**: Prepare for production release
+  - Created from: `develop`
+  - Merged into: `main` AND `develop`
+  - Example: `release/1.2.0`, `release/2.0.0`
+
+- **`hotfix/*`**: Critical production bug fixes
+  - Created from: `main`
+  - Merged into: `main` AND `develop`
+  - Example: `hotfix/login-error`, `hotfix/payment-bug`
+
+- **`bugfix/*`** (optional): Non-critical bug fixes
+  - Created from: `develop`
+  - Merged into: `develop`
+  - Example: `bugfix/invoice-calculation`
+
+### GitFlow Commands
+
+#### Working with Features
+
+```bash
+# Start a new feature
+git checkout develop
+git pull origin-haithem develop
+git checkout -b feature/my-new-feature
+
+# Develop your feature...
+git add .
+git commit -m "feat: implement new feature"
+
+# Push feature branch
+git push origin-haithem feature/my-new-feature
+
+# Merge feature into develop (via Pull Request recommended)
+git checkout develop
+git merge feature/my-new-feature
+git push origin-haithem develop
+
+# Delete feature branch after merge
+git branch -d feature/my-new-feature
+git push origin-haithem --delete feature/my-new-feature
+```
+
+#### Preparing a Release
+
+```bash
+# Create release branch from develop
+git checkout develop
+git pull origin-haithem develop
+git checkout -b release/1.1.0
+
+# Make final adjustments, update version numbers, changelog
+git commit -m "chore: prepare release 1.1.0"
+
+# Merge into main
+git checkout main
+git merge release/1.1.0
+git tag -a v1.1.0 -m "Release version 1.1.0"
+git push origin-haithem main --tags
+
+# Merge back into develop
+git checkout develop
+git merge release/1.1.0
+git push origin-haithem develop
+
+# Delete release branch
+git branch -d release/1.1.0
+```
+
+#### Hotfix Critical Bugs
+
+```bash
+# Create hotfix from main
+git checkout main
+git pull origin-haithem main
+git checkout -b hotfix/1.0.1
+
+# Fix the bug
+git commit -m "fix: resolve critical production bug"
+
+# Merge into main
+git checkout main
+git merge hotfix/1.0.1
+git tag -a v1.0.1 -m "Hotfix version 1.0.1"
+git push origin-haithem main --tags
+
+# Merge into develop
+git checkout develop
+git merge hotfix/1.0.1
+git push origin-haithem develop
+
+# Delete hotfix branch
+git branch -d hotfix/1.0.1
+```
+
+### Working with Multiple Remotes
+
+Since this repository has multiple remotes, always specify `origin-haithem` for push/pull operations:
+
+```bash
+# List all remotes
+git remote -v
+
+# Fetch from specific remote
+git fetch origin-haithem
+
+# Push to specific remote
+git push origin-haithem branch-name
+
+# Pull from specific remote
+git pull origin-haithem branch-name
+
+# Set upstream for current branch
+git branch --set-upstream-to=origin-haithem/develop develop
+```
+
+### Branch Protection Rules
+
+- **`main`** branch should be protected:
+  - Require pull request reviews before merging
+  - Require status checks to pass (CI/CD)
+  - No force pushes allowed
+  - No direct commits (merge via PR only)
+
+- **`develop`** branch recommendations:
+  - Require pull request for features
+  - Encourage code reviews
+  - Run automated tests before merge
+
+### Pull Request Guidelines
+
+When creating a Pull Request:
+
+1. Use descriptive title: `feat: add invoice export` or `fix: resolve login issue`
+2. Fill out the PR template (see `.github/pull_request_template.md`)
+3. Link related issues: `Closes #123`
+4. Ensure CI checks pass
+5. Request reviews from team members
+6. Squash commits if needed for clean history
+
+### Commit Message Convention
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add new feature
+fix: resolve bug
+docs: update documentation
+style: code formatting
+refactor: code restructuring
+test: add tests
+chore: maintenance tasks
+```
+
+---
+
+## Migration Roadmap
+
+### Planned Migrations
+
+The project is undergoing major technology upgrades:
+
+#### Backend Migration: .NET 10
+
+**Target**: Migrate all services from .NET 8 to .NET 10
+
+**Services to migrate:**
+- User Management Service
+- Document Management Service
+- Invoice Management Service
+- Timesheet Management Service
+- Payment Service
+- Notification Service
+
+**Migration checklist per service:**
+- [ ] Update `.csproj` target framework to `net10.0`
+- [ ] Update NuGet packages to .NET 10 compatible versions
+- [ ] Test GraphQL endpoints
+- [ ] Update Dockerfile base images
+- [ ] Run integration tests
+- [ ] Update CI/CD pipelines
+
+**Track progress**: [GitHub Project Board](https://github.com/users/haithem1987/projects/1)
+
+#### Frontend Migration: Angular 21
+
+**Target**: Migrate all Angular applications to version ^21.0.0
+
+**Applications to migrate:**
+- Client App (main application)
+- Admin Dashboard (if separate)
+- All shared libraries
+
+**Migration checklist per app:**
+- [ ] Update `package.json` Angular dependencies to ^21.0.0
+- [ ] Update `@angular/cli` and build tools
+- [ ] Resolve breaking changes (refer to [Angular Update Guide](https://update.angular.io/))
+- [ ] Update TypeScript to compatible version
+- [ ] Test all components and modules
+- [ ] Update e2e tests
+- [ ] Verify production build
+
+**Track progress**: [GitHub Project Board](https://github.com/users/haithem1987/projects/1)
+
+#### CI/CD Updates
+
+After migrations:
+- Update GitHub Actions / GitLab CI pipelines
+- Update Docker base images
+- Update deployment configurations
+- Run full regression test suite
+
+---
+
 ## References
 
 - [Complete Documentation](./myb-documentation.md)
 - [Architecture Details](./myb-architecture.txt)
 - [Contributing Guidelines](./CONTRIBUTING.md)
+- [GitHub Project Board](https://github.com/users/haithem1987/projects/1)
 
 ---
 
 ## Support & Contact
 
-- **Technical Issues**: Create issue in GitLab
+- **Technical Issues**: Create issue in GitHub
 - **Documentation**: See `myb-documentation.md`
 - **Architecture Questions**: See `myb-architecture.txt`
+- **Project Tracking**: [GitHub Projects](https://github.com/users/haithem1987/projects/1)
 
-**Last Updated**: December 2024  
+**Last Updated**: December 11, 2025  
 **Version**: 1.0.0

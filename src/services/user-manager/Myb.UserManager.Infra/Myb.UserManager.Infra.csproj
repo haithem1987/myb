@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="GraphQL.Upload.AspNetCore" Version="3.0.3" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="13.8.1" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.8.1" />
-    <PackageReference Include="HotChocolate.Types" Version="13.8.1" />
-    <PackageReference Include="HotChocolate.Types.Json" Version="13.8.1" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="14.1.0" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="14.1.0" />
+    <PackageReference Include="HotChocolate.Types" Version="14.1.0" />
+    <PackageReference Include="HotChocolate.Types.Json" Version="14.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

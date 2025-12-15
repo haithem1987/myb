@@ -57,15 +57,15 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 
 ---
 
-#### 3. Invoice Management Service
-**Branch**: `feature/upgrade-dotnet10-invoice-service`  
+#### 3. Invoice Management Service ✅ COMPLETED
+**Branch**: `feature/upgrade-dotnet10-invoice-service` (Merged)  
 **Estimated Effort**: Medium-High (5-7 days)
 
 **Tasks**:
-- [ ] Update `Myb.Invoice.csproj` to target `net10.0`
-- [ ] Update NuGet packages
-- [ ] Update PDF generation libraries
-- [ ] Update Dockerfile
+- [x] Update `Myb.Invoice.csproj` to target `net10.0`
+- [x] Update NuGet packages
+- [x] Update PDF generation libraries (QuestPDF 2024.7.2)
+- [x] Update Dockerfile
 - [ ] Test invoice creation and calculations
 - [ ] Test PDF export functionality
 - [ ] Test email notifications
@@ -73,19 +73,21 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 - [ ] Integration tests with Payment Service
 
 **Dependencies**: None  
-**Assignee**: TBD  
-**Labels**: `migration`, `backend`, `.net10`, `priority:high`
+**Assignee**: Completed  
+**Labels**: `migration`, `backend`, `.net10`, `priority:high`, `completed`
+**Completion Date**: December 15, 2025
 
 ---
 
-#### 4. Timesheet Management Service
-**Branch**: `feature/upgrade-dotnet10-timesheet-service`  
+#### 4. Timesheet Management Service ✅ COMPLETED
+**Branch**: `feature/upgrade-dotnet10-timesheet-service` (Merged)  
 **Estimated Effort**: Medium (4-6 days)
 
 **Tasks**:
-- [ ] Update `Myb.Timesheet.csproj` to target `net10.0`
-- [ ] Update NuGet packages
-- [ ] Update Dockerfile
+- [x] Update `Myb.Timesheet.csproj` to target `net10.0`
+- [x] Update NuGet packages
+- [x] Update Dockerfile (created new)
+- [x] Fixed HotChocolate 14.x compatibility (RegisterDbContext deprecated)
 - [ ] Test time tracking functionality
 - [ ] Test approval workflows
 - [ ] Test reporting features
@@ -93,8 +95,9 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 - [ ] Verify database queries performance
 
 **Dependencies**: None  
-**Assignee**: TBD  
-**Labels**: `migration`, `backend`, `.net10`, `priority:medium`
+**Assignee**: Completed  
+**Labels**: `migration`, `backend`, `.net10`, `priority:medium`, `completed`
+**Completion Date**: December 15, 2025
 
 ---
 

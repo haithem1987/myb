@@ -62,11 +62,13 @@ services:
     volumes:
       - postgres_invoice_data:/var/lib/postgresql/invoice/data
 
-  # your UserManager service (optionnel si vous l’utilisez)
+  # your UserManager service (optionnel si vous l'utilisez)
   myb-usermanager:
     build:
-      context: ./src/services/user-manager/Myb.UserManager.Sevices
+      context: ./src/services/user-manager/Myb.UserManager
       dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
     depends_on:
       - keycloak
       - timesheetDB    # ou userDB si vous avez un service userDB séparé
@@ -85,6 +87,8 @@ services:
     build:
       context: ./src/services/time-sheet/Myb.Timesheet
       dockerfile: Dockerfile
+    ports:
+      - "8082:8080"
     depends_on:
       - keycloak
       - timesheetDB
@@ -117,6 +121,8 @@ services:
     build:
       context: ./src/services/document-management/Myb.Document
       dockerfile: Dockerfile
+    ports:
+      - "8086:8080"
     depends_on:
       - keycloak
       - documentDB
@@ -135,6 +141,8 @@ services:
     build:
       context: ./src/services/invoice-management/Myb.Invoice
       dockerfile: Dockerfile
+    ports:
+      - "8083:8080"
     depends_on:
       - keycloak
       - invoiceDB
@@ -147,6 +155,46 @@ services:
       - Keycloak__Authority=http://keycloak:8080/realms/MYB
       - Keycloak__ClientId=MYB-client
       - Keycloak__ClientSecret=f4umyKKCMYgaipA3f3MndHeTg8ubvyD2
+
+  # votre service Payment
+  myb-payment:
+    build:
+      context: ./src/services/payment-service/Myb.Payment
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8080"
+    depends_on:
+      - keycloak
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Keycloak__BaseUrl=http://keycloak:8080/realms/MYB/protocol/openid-connect
+      - Keycloak__Authority=http://keycloak:8080/realms/MYB
+      - Keycloak__ClientId=MYB-client
+      - Keycloak__ClientSecret=f4umyKKCMYgaipA3f3MndHeTg8ubvyD2
+      - Stripe__SecretKey=${STRIPE_SECRET_KEY:-sk_test_dummy_key}
+      - Stripe__PublishableKey=${STRIPE_PUBLISHABLE_KEY:-pk_test_dummy_key}
+
+  # votre service Notification
+  myb-notification:
+    build:
+      context: ./src/services/notification-service/Myb.Notification
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8080"
+    depends_on:
+      - keycloak
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Keycloak__BaseUrl=http://keycloak:8080/realms/MYB/protocol/openid-connect
+      - Keycloak__Authority=http://keycloak:8080/realms/MYB
+      - Keycloak__ClientId=MYB-client
+      - Keycloak__ClientSecret=f4umyKKCMYgaipA3f3MndHeTg8ubvyD2
+      - SendGrid__ApiKey=${SENDGRID_API_KEY:-sg_test_dummy_key}
+      - Email__FromAddress=${EMAIL_FROM_ADDRESS:-noreply@myb.com}
 
 networks:
   my-network:

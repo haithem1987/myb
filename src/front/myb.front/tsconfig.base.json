@@ -3,12 +3,16 @@
   "compilerOptions": {
     "rootDir": ".",
     "rootDirs": [
+      ".",
       "libs/auth/src",
       "libs/custom-styles/src",
       "libs/doc-management-module/src",
       "libs/invoice-module/src",
       "libs/shared-ui/src",
       "libs/shared/custom-styles/src",
+      "libs/shared/ui",
+      "libs/shared/infra",
+      "libs/shared/shared-ui/src",
       "libs/time-sheet-module/src"
     ],
     "sourceMap": true,

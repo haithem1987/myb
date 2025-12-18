@@ -8,15 +8,20 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+# Copy project files (payment project + its referenced projects) first to leverage layer caching
 COPY ["src/services/payment-service/Myb.Payment/Myb.Payment.csproj", "src/services/payment-service/Myb.Payment/"]
-RUN dotnet restore "./src/services/payment-service/Myb.Payment/./Myb.Payment.csproj"
+COPY ["src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj", "src/common/Myb.Common.Authentification/"]
+COPY ["src/services/payment-service/Myb.Payment.EntityFrameWork.Infra/Myb.Payment.EntityFrameWork.Infra.csproj", "src/services/payment-service/Myb.Payment.EntityFrameWork.Infra/"]
+RUN dotnet restore "src/services/payment-service/Myb.Payment/Myb.Payment.csproj"
+# Copy the rest of the repository into the image
 COPY . .
 WORKDIR "/src/src/services/payment-service/Myb.Payment"
-RUN dotnet build "./Myb.Payment.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "Myb.Payment.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Myb.Payment.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/src/services/payment-service/Myb.Payment"
+RUN dotnet publish "Myb.Payment.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

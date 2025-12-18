@@ -1,0 +1,1294 @@
+=== Deployment Log ===
+Started: Thu Dec 18 18:21:22 CET 2025
+Operation: deploy
+
+
+ >  NX   --skip-nx-cache disables the connection to Nx Cloud for the current run.
+
+   The remote cache will not be read from or written to during this run.
+
+
+ >  NX   Running target build for project client and 1 task it depends on:
+
+ 
+
+> nx run auth:build
+
+Compiling TypeScript files for project "auth"...
+Done compiling TypeScript files for project "auth".
+
+> nx run client:build:production
+
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+- Generating browser application bundles (phase: setup)...
+[32m✔[39m Browser application bundle generation complete.
+[32m✔[39m Browser application bundle generation complete.
+- Copying assets...
+[32m✔[39m Copying assets complete.
+- Generating index html...
+- Generating index html...
+[1m[33mUnable to locate stylesheet: /Users/nidhalbenmaad/Workspace/myb-dev/myb/src/front/myb.front/dist/apps/client/css/styles.min.css[39m[22m
+[1m[33m2 rules skipped due to selector errors:[39m[22m
+[1m[33m  .form-floating>~label -> Did not expect successive traversals.[39m[22m
+[1m[33m  .form-floating>~label -> Did not expect successive traversals.[39m[22m
+[32m✔[39m Index html generation complete.
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0m/Users/nidhalbenmaad/Workspace/myb-dev/myb/src/front/myb.front/node_modules/keycloak-js/dist/keycloak.mjs depends on 'js-sha256'. CommonJS or AMD dependencies can cause optimization bailouts.[39m[22m
+[1m[33mFor more info see: https://angular.io/guide/build#configuring-commonjs-dependencies[39m[22m
+[1m[33m[39m[22m
+[1m[33m[0m[33mWarning: [39m[33m[0mbundle initial exceeded maximum budget. Budget 1.50 MB was not met by 30.85 kB with a total of 1.53 MB.[39m[22m
+[1m[33m[39m[22m
+[1m[33m[39m[22m
+[37m[0m[0m[39m
+[37m[0m[1mInitial chunk files[22m          [2m | [22m[1mNames[22m                      [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m[0m[39m
+[37m[0m[32mmain.b541905047a370b3.js[39m[37m     [2m | [22m[2mmain[22m                       [2m | [22m  [36m1.27 MB[39m[37m[2m | [22m              [36m259.07 kB[39m[37m[0m[39m
+[37m[0m[32mstyles.bdd5a6fbf5406ebf.css[39m[37m  [2m | [22m[2mstyles[22m                     [2m | [22m[36m229.40 kB[39m[37m[2m | [22m               [36m22.54 kB[39m[37m[0m[39m
+[37m[0m[32mpolyfills.5692fea145d372a2.js[39m[37m[2m | [22m[2mpolyfills[22m                  [2m | [22m [36m33.98 kB[39m[37m[2m | [22m               [36m11.08 kB[39m[37m[0m[39m
+[37m[0m[32mruntime.423fa6facbd89f0a.js[39m[37m  [2m | [22m[2mruntime[22m                    [2m | [22m  [36m2.73 kB[39m[37m[2m | [22m                [36m1.31 kB[39m[37m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1m [22m                            [2m | [22m[1mInitial total[22m              [2m | [22m  [1m[93m1.53 MB[39m[37m[22m[2m | [22m              [1m294.00 kB[22m[0m[39m
+[37m[0m[0m[39m
+[37m[0m[1mLazy chunk files[22m             [2m | [22m[1mNames[22m                      [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m[0m[39m
+[37m[0m[32m729.90b9c7efc43ab9f9.js[39m[37m      [2m | [22m[2mmyb-front-time-sheet-module[22m[2m | [22m [36m97.63 kB[39m[37m[2m | [22m               [36m17.86 kB[39m[37m[0m[39m
+[37m[0m[32m270.9e9265fdbf249011.js[39m[37m      [2m | [22m[2mmyb-front-invoice-module[22m   [2m | [22m [36m97.17 kB[39m[37m[2m | [22m               [36m12.36 kB[39m[37m[0m[39m
+[37m[0m[32m512.9148ba2668db02a5.js[39m[37m      [2m | [22m[2mmyb-front-invoice-module[22m   [2m | [22m [36m43.08 kB[39m[37m[2m | [22m                [36m9.01 kB[39m[37m[0m[39m
+[37m[0m[32mcommon.c3bbeca99608fc18.js[39m[37m   [2m | [22m[2mcommon[22m                     [2m | [22m[36m187 bytes[39m[37m[2m | [22m              [36m126 bytes[39m[37m[0m[39m
+[37m[0m[0m[39m
+[37m[0mBuild at: [1m[37m2025-12-18T17:22:07.861Z[39m[37m[22m - Hash: [1m[39m[37m[37m2f021b0afcccfe9e[39m[37m[22m - Time: [1m[37m14935[39m[37m[22mms[0m[39m
+
+ 
+
+ >  NX   Successfully ran target build for project client and 1 task it depends on
+
+
+#1 [myb-myb-front internal] load build definition from Dockerfile
+#1 transferring dockerfile: 957B 0.0s done
+#1 DONE 0.1s
+
+#2 [myb-myb-timesheet internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.57kB 0.0s done
+#2 DONE 0.1s
+
+#3 [myb-myb-payment internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.50kB 0.0s done
+#3 DONE 0.1s
+
+#4 [myb-myb-notification internal] load build definition from Dockerfile
+#4 transferring dockerfile: 1.06kB 0.0s done
+#4 DONE 0.1s
+
+#5 [myb-myb-usermanager internal] load build definition from Dockerfile
+#5 transferring dockerfile: 1.44kB 0.0s done
+#5 DONE 0.1s
+
+#6 [myb-myb-docmanager internal] load build definition from Dockerfile
+#6 transferring dockerfile: 849B 0.0s done
+#6 DONE 0.1s
+
+#7 [myb-myb-invoice internal] load build definition from Dockerfile
+#7 transferring dockerfile: 835B 0.0s done
+#7 DONE 0.1s
+
+#8 [myb-myb-invoice internal] load metadata for mcr.microsoft.com/dotnet/aspnet:8.0
+#8 DONE 0.6s
+
+#9 [myb-myb-payment internal] load metadata for mcr.microsoft.com/dotnet/sdk:8.0
+#9 DONE 0.6s
+
+#10 [myb-myb-docmanager internal] load .dockerignore
+#10 transferring context: 435B 0.0s done
+#10 DONE 0.0s
+
+#11 [myb-myb-notification internal] load .dockerignore
+#11 transferring context: 435B 0.0s done
+#11 DONE 0.1s
+
+#12 [myb-myb-payment internal] load .dockerignore
+#12 transferring context: 435B 0.0s done
+#12 DONE 0.1s
+
+#13 [myb-myb-timesheet internal] load .dockerignore
+#13 transferring context: 435B 0.0s done
+#13 DONE 0.1s
+
+#14 [myb-myb-invoice internal] load .dockerignore
+#14 transferring context: 435B 0.0s done
+#14 DONE 0.1s
+
+#15 [myb-myb-usermanager internal] load .dockerignore
+#15 transferring context: 435B 0.0s done
+#15 DONE 0.1s
+
+#16 [myb-myb-front internal] load metadata for docker.io/library/nginx:alpine
+#16 ...
+
+#17 [myb-myb-docmanager build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 resolve mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde 0.1s done
+#17 CACHED
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 resolve mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33 0.1s done
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 0B / 18.53MB 0.2s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 0B / 30.83MB 0.2s
+#18 ...
+
+#19 [auth] library/nginx:pull token for registry-1.docker.io
+#19 DONE 0.0s
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#16 [myb-myb-front internal] load metadata for docker.io/library/nginx:alpine
+#16 DONE 2.8s
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#20 [myb-myb-front internal] load .dockerignore
+#20 transferring context: 435B 0.1s done
+#20 DONE 0.1s
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#21 [myb-myb-front internal] load build context
+#21 DONE 0.0s
+
+#22 [myb-myb-front 1/4] FROM docker.io/library/nginx:alpine@sha256:fd9f8ce722ab13edb2e47ebdd16b843939280457bf1567a6cd155203f9ce98d8
+#22 resolve docker.io/library/nginx:alpine@sha256:fd9f8ce722ab13edb2e47ebdd16b843939280457bf1567a6cd155203f9ce98d8 0.0s done
+#22 DONE 0.0s
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#23 [auth] library/myb-front:pull token for registry-1.docker.io
+#23 DONE 0.0s
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#24 [myb-myb-front] importing cache manifest from myb-front:latest
+#24 ERROR: failed to configure registry cache importer: pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 1.05MB / 18.53MB 4.2s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 0B / 30.83MB 5.3s
+#18 ...
+
+#21 [myb-myb-front internal] load build context
+#21 transferring context: 3.57MB 2.6s done
+#21 DONE 2.8s
+
+#25 [myb-myb-front 2/4] RUN rm -rf /usr/share/nginx/html/*
+#25 CACHED
+
+#26 [myb-myb-front 3/4] COPY src/front/myb.front/dist/apps/client /usr/share/nginx/html
+#26 CACHED
+
+#27 [myb-myb-front 4/4] COPY src/front/myb.front/nginx.conf /etc/nginx/conf.d/default.conf
+#27 CACHED
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 2.10MB / 18.53MB 6.8s
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 3.15MB / 18.53MB 8.7s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 2.10MB / 30.83MB 8.7s
+#18 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 3.15MB / 31.27MB 10.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 2.10MB / 174.87MB 10.4s
+#17 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 23.45MB 11.1s
+#33 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 5.24MB / 18.53MB 15.8s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 4.19MB / 30.83MB 15.8s
+#18 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 40.71MB 16.3s
+#33 ...
+
+#34 [myb-myb-front] exporting to docker image format
+#34 exporting layers done
+#34 exporting manifest sha256:ed147ae122ea4fba4398f38f4f6aec070d262bd883b928f352dc1f1c70001f6f 0.0s done
+#34 exporting config sha256:6c352049108e2fb9c3662d1bce9567f6bafc37ede256088ca69bbca69be26626 0.0s done
+#34 sending tarball
+#34 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#35 importing to docker
+#35 DONE 0.1s
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#34 [myb-myb-front] exporting to docker image format
+#34 sending tarball 13.3s done
+#34 DONE 13.4s
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 5.24MB / 31.27MB 20.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 5.24MB / 174.87MB 20.4s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 6.29MB / 18.53MB 20.7s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 5.24MB / 30.83MB 20.8s
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 7.34MB / 18.53MB 22.2s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 7.34MB / 31.27MB 24.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 6.29MB / 174.87MB 25.5s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 9.44MB / 18.53MB 28.9s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 7.34MB / 30.83MB 28.9s
+#18 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 81.59MB 30.1s
+#33 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 10.49MB / 18.53MB 30.3s
+#18 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 11.53MB / 18.53MB 34.0s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 8.39MB / 30.83MB 34.0s
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 12.58MB / 18.53MB 37.6s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 10.49MB / 30.83MB 37.8s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 10.49MB / 31.27MB 39.1s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 10.49MB / 174.87MB 39.0s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 13.63MB / 18.53MB 39.6s
+#18 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 116.17MB 40.4s
+#33 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 11.53MB / 30.83MB 42.9s
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 14.68MB / 18.53MB 43.2s
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 15.73MB / 18.53MB 47.1s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 12.58MB / 30.83MB 48.0s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 13.63MB / 31.27MB 49.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 13.63MB / 174.87MB 49.3s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 16.78MB / 18.53MB 49.6s
+#18 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 164.45MB 50.6s
+#33 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 14.68MB / 30.83MB 52.2s
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 17.83MB / 18.53MB 53.2s
+#18 sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 18.53MB / 18.53MB 54.5s done
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 0B / 28.10MB 0.2s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 15.73MB / 30.83MB 57.3s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 15.73MB / 31.27MB 59.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 17.83MB / 174.87MB 59.4s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 1.05MB / 28.10MB 5.3s
+#18 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 211.80MB 60.9s
+#33 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 16.78MB / 30.83MB 62.4s
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 3.15MB / 28.10MB 9.5s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 18.87MB / 30.83MB 66.6s
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 4.19MB / 28.10MB 14.6s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 18.87MB / 31.27MB 69.1s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 19.92MB / 174.87MB 69.1s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 251.79MB 71.1s
+#33 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 19.92MB / 30.83MB 71.7s
+#18 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 6.29MB / 28.10MB 18.2s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 20.97MB / 30.83MB 76.8s
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 7.34MB / 28.10MB 23.3s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 20.97MB / 31.27MB 79.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 23.07MB / 174.87MB 79.5s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 23.07MB / 30.83MB 80.2s
+#18 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 297.50MB 81.4s
+#33 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 9.44MB / 28.10MB 28.2s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 24.12MB / 30.83MB 85.3s
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 11.53MB / 28.10MB 33.0s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 24.12MB / 31.27MB 89.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 26.21MB / 174.87MB 89.5s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 25.17MB / 30.83MB 90.4s
+#18 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 transferring context: 340.30MB 91.4s
+#28 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 12.58MB / 28.10MB 38.1s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 27.26MB / 30.83MB 94.3s
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 14.68MB / 28.10MB 40.7s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 28.31MB / 30.83MB 99.4s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 26.21MB / 31.27MB 99.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 29.36MB / 174.87MB 99.7s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 15.73MB / 28.10MB 45.8s
+#18 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 transferring context: 381.03MB 101.7s
+#28 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 30.41MB / 30.83MB 103.9s
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 17.83MB / 28.10MB 50.0s
+#18 sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 30.83MB / 30.83MB 104.8s done
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 29.36MB / 31.27MB 109.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 32.51MB / 174.87MB 109.2s
+#17 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 transferring context: 416.72MB 112.0s
+#28 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 18.87MB / 28.10MB 57.5s
+#18 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 30.41MB / 31.27MB 115.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 33.55MB / 174.87MB 115.7s
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 31.27MB / 31.27MB 118.9s done
+#17 sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 31.27MB / 31.27MB 118.9s done
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 34.60MB / 174.87MB 120.7s
+#17 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 431.71MB 122.5s
+#33 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 22.02MB / 28.10MB 68.0s
+#18 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 24.12MB / 28.10MB 70.8s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 36.70MB / 174.87MB 129.6s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 25.17MB / 28.10MB 75.9s
+#18 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 478.35MB 132.7s
+#33 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 26.21MB / 28.10MB 81.0s
+#18 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 38.80MB / 174.87MB 139.8s
+#17 ...
+
+#18 [myb-myb-notification base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 27.26MB / 28.10MB 86.1s
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 28.10MB / 28.10MB 87.0s done
+#18 sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 28.10MB / 28.10MB 87.0s done
+#18 extracting sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87
+#18 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 520.02MB 142.8s
+#33 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 transferring context: 539.51MB 147.5s
+#31 ...
+
+#17 [myb-myb-payment build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 40.89MB / 174.87MB 148.9s
+#17 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#18 [myb-myb-usermanager base 1/2] FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:86cbca9fc08f712273edef23b0dff38d81fe0d20486662946f98b164c3af6d33
+#18 extracting sha256:8a4a7306158c2bef7a131de3110e384f4822829cbcce20bc6b4ba32dd82a1d87 5.1s done
+#18 extracting sha256:338233cfe5825ef52ea16e649bd02d27b8cd8966e6f05fd20a3fba18bb32c852 1.6s done
+#18 extracting sha256:7786bd19b0caa83b6e0c415cfaff81034f0f297ace22ba39f10afd4d30e97939 0.0s done
+#18 extracting sha256:0a1f01f2790f3ba892999bdedcbba28385c430d28917c1f109d354a6a3928c3b 2.9s done
+#18 extracting sha256:e6b478fe080f2c09e9a0cb03570d1d4e44262c7910f0c494f55b5f12550cc6f5 0.1s done
+#18 extracting sha256:64d1f3e92805e3bd6b1d8e7f01a227cfc20d5438093a88cc04e4892a32e056c7 1.3s done
+#18 DONE 152.8s
+
+#31 [myb-myb-docmanager internal] load build context
+#31 transferring context: 558.29MB 152.7s
+#31 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#17 [myb-myb-docmanager build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 extracting sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43
+#17 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#17 [myb-myb-docmanager build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#36 [myb-myb-docmanager base 2/2] WORKDIR /app
+#36 DONE 1.1s
+
+#37 [myb-myb-timesheet base 2/2] WORKDIR /app
+#37 DONE 1.2s
+
+#38 [myb-myb-docmanager final 1/2] WORKDIR /app
+#38 DONE 0.2s
+
+#17 [myb-myb-docmanager build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#39 [myb-myb-timesheet final 1/2] WORKDIR /app
+#39 DONE 0.2s
+
+#17 [myb-myb-docmanager build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 42.99MB / 174.87MB 154.0s
+#17 extracting sha256:4b1132a4618d7325acede7eb9f5e3f6105ff2bef5c2ff2826cee2a8cbd65ef43 5.6s done
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 44.04MB / 174.87MB 159.1s
+#17 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 transferring context: 591.55MB 162.8s
+#31 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 transferring context: 601.78MB 167.8s
+#29 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 46.14MB / 174.87MB 169.2s
+#17 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 transferring context: 622.65MB 173.0s
+#31 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 47.19MB / 174.87MB 174.3s
+#17 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 transferring context: 651.51MB 179.0s
+#29 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 48.23MB / 174.87MB 179.4s
+#17 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 transferring context: 671.83MB 184.2s
+#32 transferring context: 697.40MB 189.2s
+#32 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 50.33MB / 174.87MB 189.6s
+#17 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 transferring context: 715.95MB 194.4s
+#28 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 51.38MB / 174.87MB 194.7s
+#17 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 transferring context: 744.69MB 199.5s
+#32 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 52.43MB / 174.87MB 199.8s
+#17 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 transferring context: 759.19MB 204.6s
+#28 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 transferring context: 781.19MB 209.5s
+#30 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 54.53MB / 174.87MB 209.8s
+#17 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 transferring context: 800.92MB 214.7s
+#28 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 55.57MB / 174.87MB 214.9s
+#17 ...
+
+#30 [myb-myb-notification internal] load build context
+#30 transferring context: 823.89MB 219.6s
+#30 ...
+
+#32 [myb-myb-usermanager internal] load build context
+#32 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 56.62MB / 174.87MB 220.0s
+#17 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 ...
+
+#29 [myb-myb-invoice internal] load build context
+#29 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#33 [myb-myb-payment internal] load build context
+#33 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 ...
+
+#28 [myb-myb-timesheet internal] load build context
+#28 transferring context: 838.67MB 225.0s
+#28 ...
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 58.72MB / 174.87MB 225.1s
+#17 ...
+
+#31 [myb-myb-docmanager internal] load build context
+#31 transferring context: 843.20MB 227.2s done
+#31 DONE 227.7s
+
+#29 [myb-myb-invoice internal] load build context
+#29 transferring context: 843.20MB 227.1s done
+#29 DONE 227.7s
+
+#28 [myb-myb-timesheet internal] load build context
+#28 transferring context: 843.20MB 227.4s done
+#28 DONE 227.7s
+
+#32 [myb-myb-usermanager internal] load build context
+#32 transferring context: 843.20MB 227.2s done
+#32 DONE 227.7s
+
+#30 [myb-myb-notification internal] load build context
+#30 transferring context: 843.20MB 227.2s done
+#30 DONE 227.7s
+
+#33 [myb-myb-payment internal] load build context
+#33 transferring context: 843.20MB 227.7s done
+#33 DONE 227.8s
+
+#17 [myb-myb-timesheet build 1/7] FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:8f710c2f7f3e60392fba1d408dcd9c30c26295bd4ded326cb7cf6cc6fd66cfde
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 59.77MB / 174.87MB 230.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 60.82MB / 174.87MB 235.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 61.87MB / 174.87MB 240.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 62.91MB / 174.87MB 245.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 63.96MB / 174.87MB 250.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 66.06MB / 174.87MB 255.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 67.11MB / 174.87MB 261.1s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 68.16MB / 174.87MB 266.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 69.21MB / 174.87MB 271.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 70.25MB / 174.87MB 276.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 71.30MB / 174.87MB 281.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 72.35MB / 174.87MB 287.1s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 73.40MB / 174.87MB 292.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 74.45MB / 174.87MB 297.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 75.50MB / 174.87MB 302.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 76.55MB / 174.87MB 307.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 77.59MB / 174.87MB 312.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 78.64MB / 174.87MB 317.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 79.69MB / 174.87MB 323.1s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 81.79MB / 174.87MB 328.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 82.84MB / 174.87MB 333.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 83.89MB / 174.87MB 338.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 84.93MB / 174.87MB 343.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 85.98MB / 174.87MB 348.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 88.08MB / 174.87MB 353.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 90.18MB / 174.87MB 358.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 91.23MB / 174.87MB 364.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 92.27MB / 174.87MB 369.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 94.37MB / 174.87MB 374.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 95.42MB / 174.87MB 379.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 96.47MB / 174.87MB 384.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 97.52MB / 174.87MB 389.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 97.52MB / 174.87MB 395.1s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 98.57MB / 174.87MB 400.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 98.57MB / 174.87MB 405.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 99.61MB / 174.87MB 410.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 100.66MB / 174.87MB 415.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 102.76MB / 174.87MB 420.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 103.81MB / 174.87MB 425.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 105.91MB / 174.87MB 431.1s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 106.95MB / 174.87MB 436.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 108.00MB / 174.87MB 441.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 109.05MB / 174.87MB 446.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 110.10MB / 174.87MB 451.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 111.15MB / 174.87MB 456.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 113.25MB / 174.87MB 461.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 114.29MB / 174.87MB 466.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 115.34MB / 174.87MB 472.0s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 117.44MB / 174.87MB 477.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 119.54MB / 174.87MB 482.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 119.54MB / 174.87MB 487.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 120.59MB / 174.87MB 492.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 121.63MB / 174.87MB 498.0s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 122.68MB / 174.87MB 503.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 122.68MB / 174.87MB 508.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 123.73MB / 174.87MB 513.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 123.73MB / 174.87MB 518.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 124.78MB / 174.87MB 523.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 125.83MB / 174.87MB 529.0s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 126.88MB / 174.87MB 534.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 127.93MB / 174.87MB 539.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 128.97MB / 174.87MB 544.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 130.02MB / 174.87MB 549.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 131.07MB / 174.87MB 554.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 132.12MB / 174.87MB 559.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 133.17MB / 174.87MB 564.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 134.22MB / 174.87MB 570.0s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 135.27MB / 174.87MB 575.1s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 136.31MB / 174.87MB 580.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 137.36MB / 174.87MB 585.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 138.41MB / 174.87MB 590.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 139.46MB / 174.87MB 595.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 139.46MB / 174.87MB 600.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 140.51MB / 174.87MB 605.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 140.51MB / 174.87MB 610.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 141.56MB / 174.87MB 616.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 142.61MB / 174.87MB 621.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 142.61MB / 174.87MB 626.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 143.65MB / 174.87MB 631.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 144.70MB / 174.87MB 636.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 145.75MB / 174.87MB 642.0s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 145.75MB / 174.87MB 647.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 146.80MB / 174.87MB 652.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 148.90MB / 174.87MB 657.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 149.95MB / 174.87MB 662.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 150.99MB / 174.87MB 667.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 150.99MB / 174.87MB 672.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 152.04MB / 174.87MB 678.0s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 153.09MB / 174.87MB 683.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 154.14MB / 174.87MB 688.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 155.19MB / 174.87MB 693.4s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 156.24MB / 174.87MB 698.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 158.33MB / 174.87MB 703.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 159.38MB / 174.87MB 708.7s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 160.43MB / 174.87MB 713.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 161.48MB / 174.87MB 718.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 162.53MB / 174.87MB 724.0s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 164.63MB / 174.87MB 729.3s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 165.68MB / 174.87MB 734.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 165.68MB / 174.87MB 739.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 166.72MB / 174.87MB 744.8s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 167.77MB / 174.87MB 749.9s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 168.82MB / 174.87MB 755.0s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 169.87MB / 174.87MB 760.1s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 171.97MB / 174.87MB 765.2s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 173.02MB / 174.87MB 770.5s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 174.06MB / 174.87MB 775.6s
+#17 sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 174.87MB / 174.87MB 777.7s done
+#17 extracting sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5
+#17 extracting sha256:cb146a30224656a37d9b3b87fa7fc183c0630c1a14b324ec01fbe49135ccafa5 8.9s done
+#17 extracting sha256:a8c63be991a4cb97c3142c64e3781878618de6a65e1e3d53be0e81ed5ee44749 0.0s done
+#17 extracting sha256:a8c63be991a4cb97c3142c64e3781878618de6a65e1e3d53be0e81ed5ee44749 0.0s done
+#17 extracting sha256:f06c6d475015bfb353ca1af632882a90f745029535380d0b83ea9b81780e1db7
+#17 extracting sha256:f06c6d475015bfb353ca1af632882a90f745029535380d0b83ea9b81780e1db7 0.8s done
+#17 DONE 787.7s
+
+#40 [myb-myb-docmanager build 2/7] WORKDIR /src
+#40 DONE 1.2s
+
+#41 [myb-myb-invoice build 3/7] COPY [src/services/invoice-management/Myb.Invoice/Myb.Invoice.csproj, src/services/invoice-management/Myb.Invoice/]
+#41 DONE 0.1s
+
+#42 [myb-myb-docmanager build 3/7] COPY [src/services/document-management/Myb.Document/Myb.Document.csproj, src/services/document-management/Myb.Document/]
+#42 DONE 0.1s
+
+#43 [myb-myb-payment build 3/9] COPY [src/services/payment-service/Myb.Payment/Myb.Payment.csproj, src/services/payment-service/Myb.Payment/]
+#43 DONE 0.1s
+
+#44 [myb-myb-usermanager build  3/10] COPY [src/services/user-manager/Myb.UserManager/Myb.UserManager.csproj, src/services/user-manager/Myb.UserManager/]
+#44 DONE 0.1s
+
+#45 [myb-myb-notification build 3/7] COPY [src/services/notification-service/Myb.Notification/Myb.Notification.csproj, src/services/notification-service/Myb.Notification/]
+#45 DONE 0.1s
+
+#46 [myb-myb-timesheet build  3/11] COPY [src/services/time-sheet/Myb.Timesheet/Myb.Timesheet.csproj, src/services/time-sheet/Myb.Timesheet/]
+#46 DONE 0.1s
+
+#47 [myb-myb-payment build 4/9] COPY [src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj, src/common/Myb.Common.Authentification/]
+#47 DONE 0.1s
+
+#48 [myb-myb-timesheet build  4/11] COPY [src/services/time-sheet/Myb.Timesheet.Models/Myb.Timesheet.Models.csproj, src/services/time-sheet/Myb.Timesheet.Models/]
+#48 DONE 0.1s
+
+#49 [myb-myb-usermanager build  4/10] COPY [src/services/user-manager/Myb.UserManager.Models/Myb.UserManager.Models.csproj, src/services/user-manager/Myb.UserManager.Models/]
+#49 DONE 0.1s
+
+#50 [myb-myb-payment build 5/9] COPY [src/services/payment-service/Myb.Payment.EntityFrameWork.Infra/Myb.Payment.EntityFrameWork.Infra.csproj, src/services/payment-service/Myb.Payment.EntityFrameWork.Infra/]
+#50 DONE 0.1s
+
+#51 [myb-myb-usermanager build  5/10] COPY [src/services/user-manager/Myb.UserManager.Sevices/Myb.UserManager.Sevices.csproj, src/services/user-manager/Myb.UserManager.Sevices/]
+#51 DONE 0.1s
+
+#52 [myb-myb-timesheet build  5/11] COPY [src/services/time-sheet/Myb.Timesheet.Services/Myb.Timesheet.Services.csproj, src/services/time-sheet/Myb.Timesheet.Services/]
+#52 DONE 0.1s
+
+#53 [myb-myb-notification build 4/7] RUN dotnet restore "./src/services/notification-service/Myb.Notification/./Myb.Notification.csproj"
+#53 ...
+
+#54 [myb-myb-timesheet build  6/11] COPY [src/services/time-sheet/Myb.Timesheet.Infra/Myb.Timesheet.Infra.csproj, src/services/time-sheet/Myb.Timesheet.Infra/]
+#54 DONE 0.2s
+
+#55 [myb-myb-usermanager build  6/10] COPY [src/services/user-manager/Myb.UserManager.Data/Myb.UserManager.Data.csproj, src/services/user-manager/Myb.UserManager.Data/]
+#55 DONE 0.2s
+
+#56 [myb-myb-timesheet build  7/11] COPY [src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/Myb.Timesheet.EntityFrameWork.Infra.csproj, src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/]
+#56 DONE 0.1s
+
+#57 [myb-myb-timesheet build  8/11] RUN dotnet restore "./src/services/time-sheet/Myb.Timesheet/./Myb.Timesheet.csproj"
+#57 3.614   Determining projects to restore...
+#57 3.628   Skipping project "/src/src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj" because it was not found.
+#57 3.628   Skipping project "/src/src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj" because it was not found.
+#57 3.628   Skipping project "/src/src/services/user-manager/Myb.UserManager.EntityFrameWork.Infra/Myb.UserManager.EntityFrameWork.Infra.csproj" because it was not found.
+#57 3.628   Skipping project "/src/src/services/user-manager/Myb.UserManager.Infra/Myb.UserManager.Infra.csproj" because it was not found.
+#57 4.993   Skipping project "/src/src/common/Myb.Common.Models/Myb.Common.Models.csproj" because it was not found.
+#57 ...
+
+#58 [myb-myb-docmanager build 4/7] RUN dotnet restore "src/services/document-management/Myb.Document/Myb.Document.csproj"
+#0 4.444   Determining projects to restore...
+#0 4.486   Skipping project "/src/src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj" because it was not found.
+#0 4.487   Skipping project "/src/src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj" because it was not found.
+#0 4.490   Skipping project "/src/src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj" because it was not found.
+#0 4.493   Skipping project "/src/src/services/user-manager/Myb.UserManager.EntityFrameWork.Infra/Myb.UserManager.EntityFrameWork.Infra.csproj" because it was not found.
+#0 4.496   Skipping project "/src/src/services/user-manager/Myb.UserManager.Infra/Myb.UserManager.Infra.csproj" because it was not found.
+#0 4.497   Skipping project "/src/src/services/user-manager/Myb.UserManager.Models/Myb.UserManager.Models.csproj" because it was not found.
+#0 4.499   Skipping project "/src/src/services/document-management/Myb.Document.EntityFrameWork.Infra/Myb.Document.EntityFrameWork.Infra.csproj" because it was not found.
+#0 4.500   Skipping project "/src/src/services/document-management/Myb.Document.Infra/Myb.Document.Infra.csproj" because it was not found.
+#0 4.501   Skipping project "/src/src/services/document-management/Myb.document.Model/Myb.document.Model.csproj" because it was not found.
+#0 4.501   Skipping project "/src/src/services/document-management/Myb.Document.Services/Myb.Document.Services.csproj" because it was not found.
+#0 4.526   Skipping project "/src/src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj" because it was not found.
+#0 4.530   Skipping project "/src/src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj" because it was not found.
+#0 4.533   Skipping project "/src/src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj" because it was not found.
+#0 4.535   Skipping project "/src/src/services/user-manager/Myb.UserManager.EntityFrameWork.Infra/Myb.UserManager.EntityFrameWork.Infra.csproj" because it was not found.
+#0 4.535   Skipping project "/src/src/services/user-manager/Myb.UserManager.Infra/Myb.UserManager.Infra.csproj" because it was not found.
+#0 4.537   Skipping project "/src/src/services/user-manager/Myb.UserManager.Models/Myb.UserManager.Models.csproj" because it was not found.
+#0 4.538   Skipping project "/src/src/services/document-management/Myb.Document.EntityFrameWork.Infra/Myb.Document.EntityFrameWork.Infra.csproj" because it was not found.
+#0 4.539   Skipping project "/src/src/services/document-management/Myb.Document.Infra/Myb.Document.Infra.csproj" because it was not found.
+#0 4.539   Skipping project "/src/src/services/document-management/Myb.document.Model/Myb.document.Model.csproj" because it was not found.
+#0 4.540   Skipping project "/src/src/services/document-management/Myb.Document.Services/Myb.Document.Services.csproj" because it was not found.
+#58 ...
+
+#57 [myb-myb-timesheet build  8/11] RUN dotnet restore "./src/services/time-sheet/Myb.Timesheet/./Myb.Timesheet.csproj"
+#57 6.277   Skipping project "/src/src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj" because it was not found.
+#57 6.424   Skipping project "/src/src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj" because it was not found.
+#57 6.424   Skipping project "/src/src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj" because it was not found.
+#57 6.424   Skipping project "/src/src/services/user-manager/Myb.UserManager.EntityFrameWork.Infra/Myb.UserManager.EntityFrameWork.Infra.csproj" because it was not found.
+#57 6.424   Skipping project "/src/src/services/user-manager/Myb.UserManager.Infra/Myb.UserManager.Infra.csproj" because it was not found.
+#57 6.424   Skipping project "/src/src/common/Myb.Common.Models/Myb.Common.Models.csproj" because it was not found.
+#57 6.424   Skipping project "/src/src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj" because it was not found.
+#57 ...
+
+#59 [myb-myb-invoice build 4/7] RUN dotnet restore "src/services/invoice-management/Myb.Invoice/Myb.Invoice.csproj"
+#0 4.162   Determining projects to restore...
+#0 4.170   Skipping project "/src/src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj" because it was not found.
+#0 4.170   Skipping project "/src/src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj" because it was not found.
+#0 4.171   Skipping project "/src/src/services/invoice-management/Myb.Invoice.EntityFrameWork.Infra/Myb.Invoice.EntityFrameWork.Infra.csproj" because it was not found.
+#0 4.171   Skipping project "/src/src/services/invoice-management/Myb.Invoice.Infra/Myb.Invoice.Infra.csproj" because it was not found.
+#0 4.171   Skipping project "/src/src/services/invoice-management/Myb.Invoice.Models/Myb.Invoice.Models.csproj" because it was not found.
+#0 4.171   Skipping project "/src/src/services/invoice-management/Myb.Invoice.Services/Myb.Invoice.Services.csproj" because it was not found.
+#0 4.174   Skipping project "/src/src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj" because it was not found.
+#0 4.174   Skipping project "/src/src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj" because it was not found.
+#0 4.175   Skipping project "/src/src/services/invoice-management/Myb.Invoice.EntityFrameWork.Infra/Myb.Invoice.EntityFrameWork.Infra.csproj" because it was not found.
+#0 4.175   Skipping project "/src/src/services/invoice-management/Myb.Invoice.Infra/Myb.Invoice.Infra.csproj" because it was not found.
+#0 4.175   Skipping project "/src/src/services/invoice-management/Myb.Invoice.Models/Myb.Invoice.Models.csproj" because it was not found.
+#0 4.175   Skipping project "/src/src/services/invoice-management/Myb.Invoice.Services/Myb.Invoice.Services.csproj" because it was not found.
+#59 ...
+
+#60 [myb-myb-usermanager build  7/10] RUN dotnet restore "./src/services/user-manager/Myb.UserManager/./Myb.UserManager.csproj"
+#0 4.404   Determining projects to restore...
+#0 4.521   Skipping project "/src/src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj" because it was not found.
+#0 4.521   Skipping project "/src/src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj" because it was not found.
+#0 4.521   Skipping project "/src/src/services/user-manager/Myb.UserManager.Infra/Myb.UserManager.Infra.csproj" because it was not found.
+#0 5.080   Skipping project "/src/src/common/Myb.Common.Models/Myb.Common.Models.csproj" because it was not found.
+#0 6.208   Skipping project "/src/src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj" because it was not found.
+#0 6.218   Skipping project "/src/src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj" because it was not found.
+#0 6.222   Skipping project "/src/src/services/user-manager/Myb.UserManager.EntityFrameWork.Infra/Myb.UserManager.EntityFrameWork.Infra.csproj" because it was not found.
+#0 6.432   Skipping project "/src/src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj" because it was not found.
+#0 6.432   Skipping project "/src/src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj" because it was not found.
+#0 6.432   Skipping project "/src/src/services/user-manager/Myb.UserManager.Infra/Myb.UserManager.Infra.csproj" because it was not found.
+#0 6.432   Skipping project "/src/src/common/Myb.Common.Models/Myb.Common.Models.csproj" because it was not found.
+#0 6.432   Skipping project "/src/src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj" because it was not found.
+#0 6.432   Skipping project "/src/src/services/user-manager/Myb.UserManager.EntityFrameWork.Infra/Myb.UserManager.EntityFrameWork.Infra.csproj" because it was not found.
+#60 ...
+
+#61 [myb-myb-payment build 6/9] RUN dotnet restore "src/services/payment-service/Myb.Payment/Myb.Payment.csproj"
+#0 3.914   Determining projects to restore...
+#0 4.764   Skipping project "/src/src/services/user-manager/Myb.UserManager.Models/Myb.UserManager.Models.csproj" because it was not found.
+#0 6.337   Skipping project "/src/src/services/payment-service/Myb.Payment.Models/Myb.Payment.Models.csproj" because it was not found.
+#0 6.404   Skipping project "/src/src/services/user-manager/Myb.UserManager.Models/Myb.UserManager.Models.csproj" because it was not found.
+#0 6.404   Skipping project "/src/src/services/payment-service/Myb.Payment.Models/Myb.Payment.Models.csproj" because it was not found.
+#61 ...
+
+#53 [myb-myb-notification build 4/7] RUN dotnet restore "./src/services/notification-service/Myb.Notification/./Myb.Notification.csproj"
+#53 4.498   Determining projects to restore...
+#53 4.552   Skipping project "/src/src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj" because it was not found.
+#53 4.569   Skipping project "/src/src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj" because it was not found.

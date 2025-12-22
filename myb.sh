@@ -221,15 +221,33 @@ list_myb_images() {
 clean_duplicate_images() {
   print_section "Cleaning Duplicate Images"
   
+  # First stop all MYB containers
+  print_info "Stopping running containers..."
+  docker-compose -f "$PROJECT_DIR/docker-compose.yml" down 2>/dev/null || true
+  sleep 2
+  
+  # Force remove any remaining MYB containers
+  docker ps -a --format "{{.Names}}" | grep -E "myb|keycloak" | while read container; do
+    if [ ! -z "$container" ]; then
+      print_info "Removing container: $container"
+      docker rm -f "$container" 2>/dev/null || true
+    fi
+  done
+  
+  # Now remove duplicate images (keep only newest)
   local cleaned=0
-  docker images --format "{{.Repository}}:{{.Tag}}\t{{.CreatedAt}}" | \
-    sort -k2 -r | awk '{print $1}' | tail -n +2 | while read tag; do
-    if [ ! -z "$tag" ]; then
-      print_info "Removing: $tag"
-      docker rmi "$tag" 2>/dev/null || print_warning "Could not remove $tag"
+  docker images --format "{{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.ID}}" | \
+    grep -v "^<none>" | sort -k2 -r | awk '{print $1}' | tail -n +2 | while read tag; do
+    if [ ! -z "$tag" ] && [ "$tag" != "<none>:<none>" ]; then
+      print_info "Removing duplicate: $tag"
+      docker rmi -f "$tag" 2>/dev/null || true
       ((cleaned++))
     fi
   done
+  
+  # Clean dangling images
+  print_info "Cleaning dangling images..."
+  docker image prune -f --filter "dangling=true" 2>/dev/null || true
   
   print_success "Duplicate image cleanup complete"
 }
@@ -306,11 +324,16 @@ build_frontend() {
   
   cd "$FRONTEND_DIR"
   
-  print_info "Installing dependencies..."
-  npm install --legacy-peer-deps --no-audit --silent 2>&1 | tee -a "$LOG_FILE"
+  # Only install if node_modules is missing or package.json changed
+  if [ ! -d "node_modules" ] || [ "package.json" -nt "node_modules" ]; then
+    print_info "Installing dependencies..."
+    npm install --legacy-peer-deps --no-audit --silent 2>&1 | tee -a "$LOG_FILE"
+  else
+    print_info "Dependencies up to date, skipping npm install"
+  fi
   
-  print_info "Building client app..."
-  npx nx build client --configuration=production --skip-nx-cache 2>&1 | tee -a "$LOG_FILE"
+  print_info "Building client app (with cache)..."
+  npx nx build client --configuration=production 2>&1 | tee -a "$LOG_FILE"
   
   if [ ! -d "$FRONTEND_DIR/dist/apps/client" ]; then
     print_error "Frontend build failed - $FRONTEND_DIR/dist/apps/client not created"
@@ -343,9 +366,80 @@ build_docker_images() {
 start_services() {
   print_section "Starting Services"
   
-  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d 2>&1 | tee -a "$LOG_FILE"
+  # Step 1: Start databases
+  print_info "Step 1/6: Starting databases..."
+  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d keycloak-db timesheetDB documentDB invoiceDB 2>&1 | tee -a "$LOG_FILE"
+  if [ $? -ne 0 ]; then
+    print_error "Failed to start databases"
+    exit 1
+  fi
+  print_success "Databases starting..."
+  sleep 8
   
-  print_success "Services started in detached mode"
+  # Step 2: Start Keycloak
+  print_info "Step 2/6: Starting Keycloak..."
+  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d keycloak 2>&1 | tee -a "$LOG_FILE"
+  if [ $? -ne 0 ]; then
+    print_error "Failed to start Keycloak"
+    exit 1
+  fi
+  print_success "Keycloak starting..."
+  
+  # Wait for Keycloak to be healthy
+  print_info "Waiting for Keycloak to be healthy (max 60s)..."
+  local keycloak_wait=0
+  while [ $keycloak_wait -lt 60 ]; do
+    if docker ps --filter "name=keycloak" --filter "health=healthy" 2>/dev/null | grep -q keycloak; then
+      print_success "Keycloak is healthy!"
+      break
+    fi
+    sleep 3
+    keycloak_wait=$((keycloak_wait + 3))
+    echo -n "."
+  done
+  echo ""
+  
+  # Step 3: Start payment service
+  print_info "Step 3/6: Starting payment service..."
+  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d myb-payment 2>&1 | tee -a "$LOG_FILE"
+  if [ $? -ne 0 ]; then
+    print_error "Failed to start payment service"
+    exit 1
+  fi
+  print_success "Payment service started"
+  sleep 3
+  
+  # Step 4: Start invoice service
+  print_info "Step 4/6: Starting invoice service..."
+  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d myb-invoice 2>&1 | tee -a "$LOG_FILE"
+  if [ $? -ne 0 ]; then
+    print_error "Failed to start invoice service"
+    exit 1
+  fi
+  print_success "Invoice service started"
+  sleep 3
+  
+  # Step 5: Start remaining backend services
+  print_info "Step 5/6: Starting remaining backend services (timesheet, document, usermanager, notification)..."
+  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d myb-timesheet myb-docmanager myb-usermanager myb-notification 2>&1 | tee -a "$LOG_FILE"
+  if [ $? -ne 0 ]; then
+    print_error "Failed to start backend services"
+    exit 1
+  fi
+  print_success "Backend services started"
+  sleep 5
+  
+  # Step 6: Start frontend
+  print_info "Step 6/6: Starting frontend..."
+  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d myb-front 2>&1 | tee -a "$LOG_FILE"
+  if [ $? -ne 0 ]; then
+    print_error "Failed to start frontend"
+    exit 1
+  fi
+  print_success "Frontend started"
+  
+  echo ""
+  print_success "All services started successfully!"
 }
 
 # ============================================================================
@@ -573,12 +667,16 @@ main() {
       print_header "MYB - Full Deployment"
       
       check_docker
-      find_duplicate_images
-      list_myb_images
       
-      if [ "$CLEAN_FIRST" = true ]; then
+      # Check for duplicates and auto-clean them
+      if ! find_duplicate_images; then
+        print_warning "Duplicate images detected - removing them automatically..."
         clean_duplicate_images
+        print_info "Duplicates cleaned, will rebuild fresh images"
+        FORCE_REBUILD=true
       fi
+      
+      list_myb_images
       
       check_required_files
       check_env_file
@@ -596,22 +694,19 @@ main() {
       ;;
     
     quick)
-      print_header "MYB - Quick Deploy"
+      print_header "MYB - Quick Start (No Rebuild)"
       
-      if [ ! -d "$FRONTEND_DIR/dist/apps/client" ]; then
-        print_error "Frontend dist not found!"
-        print_info "Run: ./myb.sh (full deployment)"
-        exit 1
-      fi
+      check_docker
       
-      print_info "Starting services (using existing images)..."
-      docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d 2>&1 | tail -5
-      
+      # Just start services in order without rebuilding
+      start_services
       sleep 3
       display_service_status
       
-      print_header "Quick Deploy Complete"
-      print_success "Services restarted successfully!"
+      print_header "Quick Start Complete"
+      print_success "Services started successfully!"
+      echo ""
+      echo "Log file: $LOG_FILE"
       ;;
     
     frontend)

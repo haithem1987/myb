@@ -8,13 +8,21 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Copy project files first for layer caching
 COPY ["src/services/time-sheet/Myb.Timesheet/Myb.Timesheet.csproj", "src/services/time-sheet/Myb.Timesheet/"]
 COPY ["src/services/time-sheet/Myb.Timesheet.Models/Myb.Timesheet.Models.csproj", "src/services/time-sheet/Myb.Timesheet.Models/"]
 COPY ["src/services/time-sheet/Myb.Timesheet.Services/Myb.Timesheet.Services.csproj", "src/services/time-sheet/Myb.Timesheet.Services/"]
 COPY ["src/services/time-sheet/Myb.Timesheet.Infra/Myb.Timesheet.Infra.csproj", "src/services/time-sheet/Myb.Timesheet.Infra/"]
 COPY ["src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/Myb.Timesheet.EntityFrameWork.Infra.csproj", "src/services/time-sheet/Myb.Timesheet.EntityFrameWork.Infra/"]
+
 RUN dotnet restore "./src/services/time-sheet/Myb.Timesheet/./Myb.Timesheet.csproj"
-COPY . .
+
+# Copy timesheet, common, and user-manager models (needed by Common.Authentification)
+COPY src/services/time-sheet/ src/services/time-sheet/
+COPY src/common/ src/common/
+COPY src/services/user-manager/Myb.UserManager.Models/ src/services/user-manager/Myb.UserManager.Models/
+
 WORKDIR "/src/src/services/time-sheet/Myb.Timesheet"
 RUN dotnet build "./Myb.Timesheet.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

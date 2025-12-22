@@ -15,19 +15,23 @@ services:
       - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD:-keycloak-pwd}
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USER:-admin}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME_STRICT=false
+      - KC_HTTP_ENABLED=true
     networks:
       - my-network
     volumes:
       - keycloak_data:/opt/keycloak/data
     command: start --db=postgres
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
     depends_on:
-      - keycloak-db
+      keycloak-db:
+        condition: service_healthy
 
   # Keycloak PostgreSQL Database
   keycloak-db:
@@ -122,8 +126,10 @@ services:
     ports:
       - "8087:8080"
     depends_on:
-      - keycloak
-      - timesheetDB
+      keycloak:
+        condition: service_healthy
+      timesheetDB:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -143,8 +149,10 @@ services:
     ports:
       - "8082:8080"
     depends_on:
-      - keycloak
-      - timesheetDB
+      keycloak:
+        condition: service_healthy
+      timesheetDB:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -190,8 +198,10 @@ services:
     ports:
       - "8086:8080"
     depends_on:
-      - keycloak
-      - documentDB
+      keycloak:
+        condition: service_healthy
+      documentDB:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -211,8 +221,10 @@ services:
     ports:
       - "8083:8080"
     depends_on:
-      - keycloak
-      - invoiceDB
+      keycloak:
+        condition: service_healthy
+      invoiceDB:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -232,7 +244,8 @@ services:
     ports:
       - "8084:8080"
     depends_on:
-      - keycloak
+      keycloak:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -253,7 +266,8 @@ services:
     ports:
       - "8085:8080"
     depends_on:
-      - keycloak
+      keycloak:
+        condition: service_healthy
     networks:
       - my-network
     environment:

@@ -34,6 +34,7 @@ builder.Services.AddDbContext<PaymentContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PaymentDBConnection")));
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.AddKeycloakSettings();
 builder.Services.AddServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

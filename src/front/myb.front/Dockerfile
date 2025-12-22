@@ -7,7 +7,7 @@
 #   cd src/front/myb.front && npx nx build client --configuration=production
 #   cd ../../.. && docker compose build myb-front
 
-FROM --platform=linux/amd64 nginx:alpine
+FROM nginx:alpine
 
 # Remove default nginx content
 RUN rm -rf /usr/share/nginx/html/*

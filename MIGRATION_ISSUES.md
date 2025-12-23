@@ -1,12 +1,12 @@
 # Migration Issues & Tasks
 
-This document tracks the migration tasks for upgrading the MYB platform to .NET 8 and Angular 21.
+This document tracks the migration tasks for upgrading the MYB platform to .NET 10 and Angular 21.
 
 **Project Board**: [GitHub Projects](https://github.com/users/haithem1987/projects/1)
 
 ---
 
-## Backend Migration: .NET 8
+## Backend Migration: .NET 10
 
 ### Priority: High
 **Target Completion**: Q1 2025
@@ -242,7 +242,7 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 **Estimated Effort**: Medium (3-5 days)
 
 **Tasks**:
-- [ ] Update GitHub Actions workflows for .NET 8
+- [ ] Update GitHub Actions workflows for .NET 10
 - [ ] Update Node.js version for Angular builds
 - [ ] Update Docker build pipelines
 - [ ] Update test runners
@@ -261,7 +261,7 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 **Estimated Effort**: Low-Medium (2-3 days)
 
 **Tasks**:
-- [ ] Update all Dockerfiles to use .NET 8 base images
+- [ ] Update all Dockerfiles to use .NET 10 base images
 - [ ] Update `docker-compose.yml`
 - [ ] Update Node.js images for frontend builds
 - [ ] Test all container builds
@@ -300,7 +300,7 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 ## Migration Phases
 
 ### Phase 1: Preparation (Week 1)
-- Set up .NET 8 development environment
+- Set up .NET 10 development environment
 - Set up Angular 21 development environment
 - Review breaking changes documentation
 - Create feature branches
@@ -347,7 +347,7 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 
 ```markdown
 **Service**: [Service Name]
-**Migration Type**: .NET 8 Upgrade
+**Migration Type**: .NET 10 Upgrade
 **Priority**: High/Medium/Low
 **Estimated Effort**: [X days]
 
@@ -394,7 +394,7 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 
 ## Resources
 
-- [.NET 8 Release Notes](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-10)
+- [.NET 10 Release Notes](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-10)
 - [Angular 21 Update Guide](https://update.angular.io/)
 - [GitHub Project Board](https://github.com/users/haithem1987/projects/1)
 

@@ -149,9 +149,9 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 **Estimated Effort**: Medium (3-4 days)
 
 **Tasks**:
-- [ ] Update `Myb.Common.Authentification.csproj` to target `net10.0`
-- [ ] Update Keycloak libraries
-- [ ] Update JWT handling packages
+- [x] Update `Myb.Common.Authentification.csproj` to target `net10.0`
+- [x] Update Keycloak libraries
+- [x] Update JWT handling packages
 - [ ] Run all unit tests
 - [ ] Test with all services
 
@@ -166,8 +166,8 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 **Estimated Effort**: Medium (3-4 days)
 
 **Tasks**:
-- [ ] Update `Myb.Common.GraphQL.Infra.csproj` to target `net10.0`
-- [ ] Update HotChocolate packages
+- [x] Update `Myb.Common.GraphQL.Infra.csproj` to target `net10.0`
+- [x] Update HotChocolate packages
 - [ ] Test GraphQL schema generation
 - [ ] Run all tests
 

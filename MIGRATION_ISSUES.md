@@ -127,10 +127,10 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 **Estimated Effort**: Low-Medium (2-4 days)
 
 **Tasks**:
-- [ ] Update `Myb.Notification.csproj` to target `net10.0`
-- [ ] Update NuGet packages
-- [ ] Update email service libraries (SendGrid, SMTP, etc.)
-- [ ] Update Dockerfile
+- [x] Update `Myb.Notification.csproj` to target `net10.0`
+- [x] Update NuGet packages
+- [x] Update email service libraries (SendGrid, SMTP, etc.)
+- [x] Update Dockerfile
 - [ ] Test email notifications
 - [ ] Test SMS notifications (if applicable)
 - [ ] Test push notifications (if applicable)

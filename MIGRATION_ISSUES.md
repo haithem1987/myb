@@ -189,10 +189,10 @@ This document tracks the migration tasks for upgrading the MYB platform to .NET 
 **Estimated Effort**: High (7-10 days)
 
 **Tasks**:
-- [ ] Update `package.json` Angular dependencies to ^21.0.0
-- [ ] Update `@angular/cli` to 21.x
-- [ ] Update `@angular/core`, `@angular/common`, etc.
-- [ ] Update TypeScript to compatible version (5.4+)
+- [x] Update `package.json` Angular dependencies to ^21.0.0
+- [x] Update `@angular/cli` to 21.x
+- [x] Update `@angular/core`, `@angular/common`, etc.
+- [x] Update TypeScript to compatible version (5.4+)
 - [ ] Update `tsconfig.json` compiler options
 - [ ] Review [Angular Update Guide](https://update.angular.io/)
 - [ ] Address breaking changes:

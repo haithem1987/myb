@@ -125,7 +125,7 @@ export class KeycloakService {
   }
 
   isUserManager(): boolean {
-    return this.hasRole('manager_myb');
+    return this.hasRole('MYB_MANAGER');
   }
 
   private loadUserProfile(): Promise<void> {

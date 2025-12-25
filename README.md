@@ -952,7 +952,7 @@ docker ps | grep keycloak
 5. **Create Roles**
    - Navigate to "Realm roles"
    - Click "Create role"
-   - Create roles: `admin`, `manager`, `employee`, `client`
+   - Create roles: `MYB_ADMIN`, `MYB_MANAGER`, `MYB_EMPLOYEE`, `MYB_CLIENT`
    - Click "Save" for each
 
 6. **Create Users**

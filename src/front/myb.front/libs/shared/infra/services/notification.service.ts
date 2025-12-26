@@ -5,6 +5,7 @@ import { ToastService } from './toast.service';
 import { BehaviorSubject } from 'rxjs';
 import { Notification } from '../models/notification.model';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { API_CONFIG } from '../config/api.config';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
@@ -22,7 +23,7 @@ export class NotificationService {
     const token = (await this.keycloakService.getToken()) || '';
     console.log('startConnection', this.keycloakService);
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5040/notificationhub', {
+      .withUrl(`${API_CONFIG.notification}/notificationhub`, {
         accessTokenFactory: () => token,
         withCredentials: false,
       })
@@ -49,7 +50,7 @@ export class NotificationService {
   public sendToUser({ senderId, receiverId, message }: any): void {
     console.log('Notification envoyée au user >>>>>>> ', message);
     this.http
-      .post('http://localhost:5040/api/Notifications', {
+      .post(`${API_CONFIG.notification}/api/Notifications`, {
         senderId,
         receiverId,
         message,
@@ -62,7 +63,9 @@ export class NotificationService {
 
   public getNotificationsByUserId(userId: string): void {
     this.http
-      .get<Notification[]>(`http://localhost:5040/api/Notifications/${userId}`)
+      .get<Notification[]>(
+        `${API_CONFIG.notification}/api/Notifications/${userId}`
+      )
       .subscribe({
         next: (notifications) => this.notificationsSubject.next(notifications),
         error: (err) => console.error('Failed to fetch notifications', err),

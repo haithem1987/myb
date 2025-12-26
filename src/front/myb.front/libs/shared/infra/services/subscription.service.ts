@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap, switchMap, map } from 'rxjs/operators';
 import { Subscription } from '../models/subscription.model';
+import { API_CONFIG } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +19,7 @@ export class SubscriptionService {
   loadSubscriptions(userId: string): Observable<Subscription[]> {
     return this.http
       .get<Subscription[]>(
-        `http://localhost:5000/api/payment/subscriptions/${userId}`
+        `${API_CONFIG.payment}/api/payment/subscriptions/${userId}`
       )
       .pipe(
         tap((subscriptions) => {
@@ -29,7 +30,7 @@ export class SubscriptionService {
 
   // Unsubscribe from a service and update the BehaviorSubject
   unsubscribe(userId: string, serviceId: number): Observable<void> {
-    const url = `http://localhost:5000/api/payment/unsubscribe/${userId}/${serviceId}`;
+    const url = `${API_CONFIG.payment}/api/payment/unsubscribe/${userId}/${serviceId}`;
 
     return this.http
       .delete<string>(url, { responseType: 'text' as 'json' })

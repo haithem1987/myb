@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="GraphQL.Upload.AspNetCore" Version="3.0.3" />
-    <PackageReference Include="HotChocolate.Types" Version="14.1.0" />
+    <PackageReference Include="HotChocolate.Types" Version="14.2.0" />
   </ItemGroup>
 
   <ItemGroup>

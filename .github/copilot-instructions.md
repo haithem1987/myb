@@ -656,5 +656,6 @@ When suggesting code:
 4. **Include comments** for complex business logic
 5. **Suggest tests** when implementing new features
 6. **Consider performance** implications of queries and operations
+7. **Always when creating md files, save them inside docs/ folder of the root**
 
 **For Questions:** Refer to README.md sections for detailed architecture and setup inform

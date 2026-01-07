@@ -1,9 +1,11 @@
+using Myb.Common.Models;
+
 namespace Myb.Coproperty.Models;
 
 /// <summary>
 /// Represents a coproperty (condominium) building or complex
 /// </summary>
-public class Coproperty
+public class Coproperty : IEntity<Guid>
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -15,8 +17,8 @@ public class Coproperty
     public int TotalUnits { get; set; }
     public int TotalShares { get; set; }
     public string? CommonAreas { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     public bool IsActive { get; set; } = true;
     
     // Foreign Key

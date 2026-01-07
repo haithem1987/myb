@@ -1,9 +1,11 @@
+using Myb.Common.Models;
+
 namespace Myb.Coproperty.Models;
 
 /// <summary>
 /// Represents an invoice for coproperty charges
 /// </summary>
-public class CopropertyInvoice
+public class CopropertyInvoice : IEntity<Guid>
 {
     public Guid Id { get; set; }
     public string InvoiceNumber { get; set; } = string.Empty;
@@ -19,7 +21,8 @@ public class CopropertyInvoice
     public DateTime? PaidDate { get; set; }
     public string? PaymentMethod { get; set; }
     public string? Notes { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     
     // Navigation Properties
     public Charge Charge { get; set; } = null!;

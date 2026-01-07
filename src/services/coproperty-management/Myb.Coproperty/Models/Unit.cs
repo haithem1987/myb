@@ -1,9 +1,11 @@
+using Myb.Common.Models;
+
 namespace Myb.Coproperty.Models;
 
 /// <summary>
 /// Represents a unit (lot) within a coproperty
 /// </summary>
-public class Unit
+public class Unit : IEntity<Guid>
 {
     public Guid Id { get; set; }
     public Guid CopropertyId { get; set; }
@@ -14,8 +16,8 @@ public class Unit
     public string? UnitType { get; set; }
     public string? Description { get; set; }
     public bool IsOccupied { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     
     // Navigation Properties
     public Coproperty Coproperty { get; set; } = null!;

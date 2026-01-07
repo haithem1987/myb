@@ -1,9 +1,11 @@
+using Myb.Common.Models;
+
 namespace Myb.Coproperty.Models;
 
 /// <summary>
 /// Represents a charge (expense) for a coproperty
 /// </summary>
-public class Charge
+public class Charge : IEntity<Guid>
 {
     public Guid Id { get; set; }
     public Guid CopropertyId { get; set; }
@@ -16,8 +18,9 @@ public class Charge
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public bool IsActive { get; set; } = true;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public Guid CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     
     // Navigation Properties
     public Coproperty Coproperty { get; set; } = null!;

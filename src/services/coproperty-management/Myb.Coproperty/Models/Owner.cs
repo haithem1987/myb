@@ -1,9 +1,11 @@
+using Myb.Common.Models;
+
 namespace Myb.Coproperty.Models;
 
 /// <summary>
 /// Represents an owner of a unit in a coproperty
 /// </summary>
-public class Owner
+public class Owner : IEntity<Guid>
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
@@ -12,7 +14,8 @@ public class Owner
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public bool IsMainOwner { get; set; } = true;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     
     // Navigation Properties
     public Unit Unit { get; set; } = null!;

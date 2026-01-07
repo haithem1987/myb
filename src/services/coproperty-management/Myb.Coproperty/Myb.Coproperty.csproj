@@ -21,4 +21,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\common\Myb.Common.Repositories\Myb.Common.Repositories.csproj" />
+  </ItemGroup>
+
 </Project>

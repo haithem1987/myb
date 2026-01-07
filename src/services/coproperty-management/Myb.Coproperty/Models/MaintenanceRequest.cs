@@ -1,9 +1,11 @@
+using Myb.Common.Models;
+
 namespace Myb.Coproperty.Models;
 
 /// <summary>
 /// Represents a maintenance request for a coproperty
 /// </summary>
-public class MaintenanceRequest
+public class MaintenanceRequest : IEntity<Guid>
 {
     public Guid Id { get; set; }
     public Guid CopropertyId { get; set; }
@@ -19,8 +21,8 @@ public class MaintenanceRequest
     public decimal? ActualCost { get; set; }
     public DateTime? ScheduledDate { get; set; }
     public DateTime? CompletedDate { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     
     // Navigation Properties
     public Coproperty Coproperty { get; set; } = null!;

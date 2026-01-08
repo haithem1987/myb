@@ -4,6 +4,7 @@ A comprehensive, modular SaaS platform combining ERP and CRM functionalities des
 
 ## Table of Contents
 
+- [Quick Start](#quick-start)
 - [Project Overview](#project-overview)
 - [System Architecture](#system-architecture)
 - [Dependencies](#dependencies)
@@ -14,6 +15,46 @@ A comprehensive, modular SaaS platform combining ERP and CRM functionalities des
 - [Keycloak Configuration](#keycloak-configuration)
 - [Development Workflow](#development-workflow)
 - [Troubleshooting](#troubleshooting)
+
+---
+
+## Quick Start
+
+**Deploy entire stack with ONE command:**
+
+```bash
+./myb.sh
+```
+
+This unified master script will:
+1. ✅ Check Docker installation and health
+2. ✅ Detect and clean duplicate images
+3. ✅ Build frontend (Angular) locally
+4. ✅ Build all Docker images
+5. ✅ Start all services (9 services + 4 databases)
+6. ✅ Monitor service health
+7. ✅ Display access URLs and commands
+
+**Quick reference:**
+```bash
+./myb.sh                    # Full deployment (everything)
+./myb.sh --quick            # Fast restart (no rebuild)
+./myb.sh --clean            # Clean + deploy
+./myb.sh --rebuild          # Force full rebuild
+./myb.sh --cleanup          # Cleanup resources
+./myb.sh --cleanup-all      # Full cleanup
+./myb.sh --frontend-only    # Build frontend only
+./myb.sh --status           # Show service status
+./myb.sh --logs             # Tail service logs
+./myb.sh --help             # Show all commands
+```
+
+**After deployment:**
+- 🌐 **Frontend**: http://localhost:4200
+- 🔐 **Keycloak**: http://localhost:8080 (admin/admin)
+- 🛠️ **APIs**: http://localhost:8082-8087
+
+See documentation for more: `./myb.sh --help`
 
 ---
 

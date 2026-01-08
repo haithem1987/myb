@@ -1,16 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    // logical root is the monorepo root
-    "rootDir": "../../",
-    // merge these folders under that same root
-    "rootDirs": [
-      "libs/invoice-module/src",
-      "libs/doc-management-module/src",
-      "libs/shared/infra",
-      "libs/time-sheet-module/src"
-    ],
-    "outDir": "../../dist/out-tsc/libs/invoice-module",
+    "outDir": "../../dist/out-tsc",
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,

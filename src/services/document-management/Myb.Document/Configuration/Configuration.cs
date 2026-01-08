@@ -15,7 +15,8 @@ public static class Configuration
         builder.Services.AddPooledDbContextFactory<DocumentContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DocumentDBConnection")));
 
-         builder.Services.RegisterGraphQl<DocumentContext, DocumentQuery, DocumentMutation>("document");
+        builder.AddKeycloakSettings();
+        builder.Services.RegisterGraphQl<DocumentContext, DocumentQuery, DocumentMutation>("document");
 
     }
 

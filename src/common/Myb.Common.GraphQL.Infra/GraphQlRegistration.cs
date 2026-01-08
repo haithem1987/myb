@@ -32,7 +32,8 @@ namespace Myb.Common.GraphQL.Infra
                 //.AddType<TimesheetResolver>()
                 //.AddMutationType<PaymentMutation>()
                 //.AddAuthorizationCore()
-                .RegisterDbContext<TDbContext>()
+                // RegisterDbContext replaced with EF Core integration in HotChocolate 14.x
+                // DbContext is now registered through DI and automatically detected
                 .AddQueryType<TQuery>()
                 .AddMutationType<TMutation>();     
         }

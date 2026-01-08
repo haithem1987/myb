@@ -28,3 +28,18 @@ README.md
 !.git/config
 !.git/packed-refs
 !.git/refs/heads/**
+
+# Additional exclusions for faster builds
+*.md
+!README.md
+*.log
+deployment.log
+src/tests/
+**/test-results/
+src/front/myb.front/tmp/
+src/front/myb.front/.nx/
+src/front/myb.front/.angular/
+src/front/myb.front/coverage/
+.DS_Store
+*.sh
+*.ps1

@@ -56,6 +56,15 @@ export class AppsSectionComponent implements OnInit {
       price: 30,
       currency: 'USD',
     },
+    {
+      id: 4,
+      name: 'COPROPERTY_MANAGEMENT',
+      icon: 'building.png',
+      description: 'COPROPERTY_MANAGEMENT_DESC',
+      route: '/coproperty',
+      price: 25,
+      currency: 'USD',
+    },
   ];
 
   subscribedServices$ = new BehaviorSubject<number[]>([]);
@@ -127,14 +136,7 @@ export class AppsSectionComponent implements OnInit {
   }
 
   navigateToApp(app: App): void {
-    this.isSubscribed(app.id).subscribe((subscribed) => {
-      if (!subscribed) {
-        confirm(
-          'You are not subscribed to this service. Do you want to subscribe?'
-        );
-      } else {
-        this.router.navigate([app.route]);
-      }
-    });
+    // Allow direct access without subscription check for testing
+    this.router.navigate([app.route]);
   }
 }

@@ -367,8 +367,8 @@ start_services() {
   print_section "Starting Services"
   
   # Step 1: Start databases
-  print_info "Step 1/6: Starting databases..."
-  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d keycloak-db timesheetDB documentDB invoiceDB 2>&1 | tee -a "$LOG_FILE"
+  print_info "Step 1/7: Starting databases..."
+  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d keycloak-db timesheetDB documentDB invoiceDB copropertyDB 2>&1 | tee -a "$LOG_FILE"
   if [ $? -ne 0 ]; then
     print_error "Failed to start databases"
     exit 1
@@ -377,7 +377,7 @@ start_services() {
   sleep 8
   
   # Step 2: Start Keycloak
-  print_info "Step 2/6: Starting Keycloak..."
+  print_info "Step 2/7: Starting Keycloak..."
   docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d keycloak 2>&1 | tee -a "$LOG_FILE"
   if [ $? -ne 0 ]; then
     print_error "Failed to start Keycloak"
@@ -400,7 +400,7 @@ start_services() {
   echo ""
   
   # Step 3: Start payment service
-  print_info "Step 3/6: Starting payment service..."
+  print_info "Step 3/7: Starting payment service..."
   docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d myb-payment 2>&1 | tee -a "$LOG_FILE"
   if [ $? -ne 0 ]; then
     print_error "Failed to start payment service"
@@ -410,7 +410,7 @@ start_services() {
   sleep 3
   
   # Step 4: Start invoice service
-  print_info "Step 4/6: Starting invoice service..."
+  print_info "Step 4/7: Starting invoice service..."
   docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d myb-invoice 2>&1 | tee -a "$LOG_FILE"
   if [ $? -ne 0 ]; then
     print_error "Failed to start invoice service"
@@ -420,8 +420,8 @@ start_services() {
   sleep 3
   
   # Step 5: Start remaining backend services
-  print_info "Step 5/6: Starting remaining backend services (timesheet, document, usermanager, notification)..."
-  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d myb-timesheet myb-docmanager myb-usermanager myb-notification 2>&1 | tee -a "$LOG_FILE"
+  print_info "Step 5/7: Starting remaining backend services (timesheet, document, usermanager, notification, coproperty)..."
+  docker-compose -f "$PROJECT_DIR/docker-compose.yml" up -d myb-timesheet myb-docmanager myb-usermanager myb-notification myb-coproperty 2>&1 | tee -a "$LOG_FILE"
   if [ $? -ne 0 ]; then
     print_error "Failed to start backend services"
     exit 1
@@ -497,6 +497,7 @@ display_service_status() {
   echo -e "  📁 Document Manager: http://localhost:8086"
   echo -e "  💳 Payment:          http://localhost:8084"
   echo -e "  🔔 Notification:     http://localhost:8085"
+  echo -e "  🏢 Coproperty:       http://localhost:8088"
   echo ""
   
   echo -e "${GREEN}Databases${NC}"
@@ -504,6 +505,7 @@ display_service_status() {
   echo -e "  🗄️  Timesheet DB: localhost:5448"
   echo -e "  🗄️  Document DB:  localhost:5433"
   echo -e "  🗄️  Invoice DB:   localhost:5434"
+  echo -e "  🗄️  Coproperty DB: localhost:5435"
 }
 
 # ============================================================================

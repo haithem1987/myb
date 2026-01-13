@@ -47,6 +47,14 @@ export const appRoutes: Route[] = [
       ),
   },
   {
+    path: 'coproperty',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('@myb-front/coproperty-module').then(
+        (m) => m.COPROPERTY_ROUTES
+      ),
+  },
+  {
     path: 'subscriptions',
     loadComponent: () =>
       import('@myb-front/shared-ui').then((c) => c.SubscriptionsComponent),

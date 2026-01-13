@@ -1,0 +1,4585 @@
+{
+  "version": "6.0",
+  "nxVersion": "22.3.3",
+  "pathMappings": {
+    "@myb-front/auth": [
+      "libs/auth/src/index.ts"
+    ],
+    "@myb-front/custom-styles": [
+      "libs/shared/custom-styles/src/index.ts"
+    ],
+    "@myb-front/doc-management-module": [
+      "libs/doc-management-module/src/index.ts"
+    ],
+    "@myb-front/coproperty-module": [
+      "libs/coproperty-module/src/index.ts"
+    ],
+    "@myb-front/invoice-module": [
+      "libs/invoice-module/src/index.ts"
+    ],
+    "@myb-front/shared-ui": [
+      "libs/shared/shared-ui/src/index.ts"
+    ],
+    "@myb-front/sharedModels": [
+      "libs/shared/shared-ui/src/lib/models"
+    ],
+    "@myb-front/theme-styles": [
+      "libs/shared/custom-styles/src/lib/themes/styles.scss"
+    ],
+    "@myb-front/time-sheet-module": [
+      "libs/time-sheet-module/src/index.ts"
+    ]
+  },
+  "nxJsonPlugins": [
+    {
+      "name": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    },
+    {
+      "name": "@nx/jest/plugin",
+      "options": {
+        "targetName": "test"
+      }
+    },
+    {
+      "name": "@nx/cypress/plugin",
+      "options": {
+        "targetName": "e2e",
+        "componentTestingTargetName": "component-test"
+      }
+    }
+  ],
+  "fileMap": {
+    "projectFileMap": {
+      "shared-ui": [
+        {
+          "file": "libs/shared/shared-ui/.eslintrc.json",
+          "hash": "8064283629420047219"
+        },
+        {
+          "file": "libs/shared/shared-ui/README.md",
+          "hash": "16248885516767211022"
+        },
+        {
+          "file": "libs/shared/shared-ui/jest.config.ts",
+          "hash": "18169724135993306763"
+        },
+        {
+          "file": "libs/shared/shared-ui/project.json",
+          "hash": "14493331127849411372"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/index.ts",
+          "hash": "5613296172000144096"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/Counter.ts",
+          "hash": "7413972282622857485"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/CounterService.ts",
+          "hash": "17486573683387722799",
+          "deps": [
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/FeaturesSection.component.css",
+          "hash": "1885969033740043935"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/FeaturesSection.component.html",
+          "hash": "13698180169244696610"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/FeaturesSection.component.spec.ts",
+          "hash": "15346121649925961484",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FeaturesSection/FeaturesSection.component.ts",
+          "hash": "1161490017444751898",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FooterSection/FooterSection.component.css",
+          "hash": "7269902647844867418"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FooterSection/FooterSection.component.html",
+          "hash": "7028659808669623298"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FooterSection/FooterSection.component.spec.ts",
+          "hash": "13535836074756174158",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FooterSection/FooterSection.component.ts",
+          "hash": "14669493244595550985",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/FooterSection/footer-data.model.ts",
+          "hash": "16825708108589563237"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/HeroSection/HeroSection.component.css",
+          "hash": "15270867974150848980"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/HeroSection/HeroSection.component.html",
+          "hash": "10267257124157904098"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/HeroSection/HeroSection.component.spec.ts",
+          "hash": "15932049740189936927",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/HeroSection/HeroSection.component.ts",
+          "hash": "17699874003471702524",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core",
+            "auth"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/LandingPage.component.css",
+          "hash": "8870418698010035072"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/LandingPage.component.html",
+          "hash": "9539935121632672682"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/LandingPage.component.spec.ts",
+          "hash": "6288936997145385111",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/LandingPage.component.ts",
+          "hash": "17036110142719380294",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/NavBar/NavBar.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/NavBar/NavBar.component.html",
+          "hash": "7997723574854745659"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/NavBar/NavBar.component.spec.ts",
+          "hash": "6012425849040413344",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/NavBar/NavBar.component.ts",
+          "hash": "9766166636492844155",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "auth",
+            "npm:rxjs",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/apps-section/apps-section.component.css",
+          "hash": "8205991614908183933"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/apps-section/apps-section.component.html",
+          "hash": "9027042967471981247"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/apps-section/apps-section.component.spec.ts",
+          "hash": "284532533396008940",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/apps-section/apps-section.component.ts",
+          "hash": "7005449831386472655",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:@ngx-translate/core",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "auth",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/overviewSection/overviewSection.component.css",
+          "hash": "1893960287263530258"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/overviewSection/overviewSection.component.html",
+          "hash": "14495549408914133027"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/overviewSection/overviewSection.component.spec.ts",
+          "hash": "293444642357790169",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/LandingPage/overviewSection/overviewSection.component.ts",
+          "hash": "15647803482622237415",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/access-denied-page/access-denied-page.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/access-denied-page/access-denied-page.component.html",
+          "hash": "15786506165981927397"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/access-denied-page/access-denied-page.component.spec.ts",
+          "hash": "8490845981472911884",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/access-denied-page/access-denied-page.component.ts",
+          "hash": "4136309692367957532",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "auth",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/auth-confirmation-modal/auth-confirmation-modal.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/auth-confirmation-modal/auth-confirmation-modal.component.html",
+          "hash": "10948182224904421968"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/auth-confirmation-modal/auth-confirmation-modal.component.spec.ts",
+          "hash": "2518740415727862165",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/auth-confirmation-modal/auth-confirmation-modal.component.ts",
+          "hash": "3135318434409019362",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "auth",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/avatar/avatar.component.css",
+          "hash": "12310713331237661884"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/avatar/avatar.component.html",
+          "hash": "6039712413363583609"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/avatar/avatar.component.spec.ts",
+          "hash": "2786026690826250300",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/avatar/avatar.component.ts",
+          "hash": "14970845870979371357",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/breadcrumb/breadcrumb.component.css",
+          "hash": "14860305808243091029"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/breadcrumb/breadcrumb.component.html",
+          "hash": "11743910631430954174"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/breadcrumb/breadcrumb.component.spec.ts",
+          "hash": "6899403219942339488",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/breadcrumb/breadcrumb.component.ts",
+          "hash": "15757178865041521976",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/card/card.component.html",
+          "hash": "12839832864889799808"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/card/card.component.scss",
+          "hash": "5290410209172964336"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/card/card.component.spec.ts",
+          "hash": "4866811482984287303",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/card/card.component.ts",
+          "hash": "15818548961447721331",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/date-cell/date-cell.component.css",
+          "hash": "14317308761027911432"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/date-cell/date-cell.component.html",
+          "hash": "617106402468541691"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/date-cell/date-cell.component.spec.ts",
+          "hash": "5925457984361338508",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/date-cell/date-cell.component.ts",
+          "hash": "12855489903042090722",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component.css",
+          "hash": "8922745004832174883"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component.html",
+          "hash": "16542651796877051774"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component.spec.ts",
+          "hash": "2165826228566930014",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/language-switcher/language-switcher.component.ts",
+          "hash": "13502309102084678922",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/loader/loader.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/loader/loader.component.html",
+          "hash": "17377461496991235797"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/loader/loader.component.spec.ts",
+          "hash": "11584030806388004486",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/loader/loader.component.ts",
+          "hash": "1010732058281742263",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/loading-indicator/loading-indicator.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/loading-indicator/loading-indicator.component.spec.ts",
+          "hash": "10777937148282111646",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/loading-indicator/loading-indicator.component.ts",
+          "hash": "14397390542668468355",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/no-result/no-result.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/no-result/no-result.component.html",
+          "hash": "2620642362276720625"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/no-result/no-result.component.spec.ts",
+          "hash": "8646730711410276738",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/no-result/no-result.component.ts",
+          "hash": "15187719210166672082",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/notification-dropdown/notification-dropdown.component.css",
+          "hash": "18053866030939656368"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/notification-dropdown/notification-dropdown.component.html",
+          "hash": "14351900335477324773"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/notification-dropdown/notification-dropdown.component.spec.ts",
+          "hash": "15626815324135702181",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/notification-dropdown/notification-dropdown.component.ts",
+          "hash": "11804767143575541065",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@ngx-translate/core",
+            "npm:date-fns"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/payment/payment.component.css",
+          "hash": "4825134820331892478"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/payment/payment.component.html",
+          "hash": "12624925652477820667"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/payment/payment.component.spec.ts",
+          "hash": "11326148976494984860",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/payment/payment.component.ts",
+          "hash": "3003455455122189567",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:ngx-stripe",
+            "npm:@stripe/stripe-js",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "auth",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/progress-bar/progress-bar.component.css",
+          "hash": "953994635150820403"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/progress-bar/progress-bar.component.html",
+          "hash": "9233063586493130577"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/progress-bar/progress-bar.component.spec.ts",
+          "hash": "10217844067894068975",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/progress-bar/progress-bar.component.ts",
+          "hash": "18333406898739315174",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/settings/settings.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/settings/settings.component.html",
+          "hash": "9387342987541406074"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/settings/settings.component.spec.ts",
+          "hash": "11220787347026323686",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/settings/settings.component.ts",
+          "hash": "12134521624802704730",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:rxjs",
+            "npm:@ngx-translate/core",
+            "npm:@angular/forms",
+            "time-sheet-module"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component.css",
+          "hash": "6397914176802560612"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component.html",
+          "hash": "10428872339162032946"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component.spec.ts",
+          "hash": "6342327297238971318",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/toasts-container/toasts-container.component.ts",
+          "hash": "13151621406627370084",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/user-dropdown/user-dropdown.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/user-dropdown/user-dropdown.component.html",
+          "hash": "3058663304500838491"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/user-dropdown/user-dropdown.component.spec.ts",
+          "hash": "11229480520959759958",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/user-dropdown/user-dropdown.component.ts",
+          "hash": "8395445293214804931",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "auth",
+            "npm:keycloak-js",
+            "npm:rxjs",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/userCRUD.component.css",
+          "hash": "11241984956285512790"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/userCRUD.component.html",
+          "hash": "7140008904494182554"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/userCRUD.component.spec.ts",
+          "hash": "5820121600590790602",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/components/userCRUD.component.ts",
+          "hash": "6223865714609958128",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/forms",
+            "npm:apollo-angular"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/shared-ui/shared-ui.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/shared-ui/shared-ui.component.html",
+          "hash": "6195570130184266428"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/shared-ui/shared-ui.component.spec.ts",
+          "hash": "6577538746703376072",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/shared-ui/shared-ui.component.ts",
+          "hash": "17515712263109236842",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/subscriptions/subscriptions.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/subscriptions/subscriptions.component.html",
+          "hash": "15402592450963253359"
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/subscriptions/subscriptions.component.spec.ts",
+          "hash": "9291426928518180998",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/lib/subscriptions/subscriptions.component.ts",
+          "hash": "9583656750464366278",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core",
+            "auth",
+            "npm:rxjs",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/src/test-setup.ts",
+          "hash": "12935735732682149507",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/shared/shared-ui/tsconfig.json",
+          "hash": "8526453262384300416"
+        },
+        {
+          "file": "libs/shared/shared-ui/tsconfig.lib.json",
+          "hash": "16351983720727980268"
+        },
+        {
+          "file": "libs/shared/shared-ui/tsconfig.spec.json",
+          "hash": "7159729809249402441"
+        }
+      ],
+      "admin": [
+        {
+          "file": "apps/admin/.eslintrc.json",
+          "hash": "3313121791607399792"
+        },
+        {
+          "file": "apps/admin/jest.config.ts",
+          "hash": "5232312042154059799"
+        },
+        {
+          "file": "apps/admin/project.json",
+          "hash": "3808292948359542304"
+        },
+        {
+          "file": "apps/admin/src/app/app.component.html",
+          "hash": "12318721662159017535"
+        },
+        {
+          "file": "apps/admin/src/app/app.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/admin/src/app/app.component.spec.ts",
+          "hash": "12310621412184580469",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/admin/src/app/app.component.ts",
+          "hash": "16786745779157814757",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/admin/src/app/app.config.ts",
+          "hash": "10618457967269332155",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/admin/src/app/app.routes.ts",
+          "hash": "6185150965714414910",
+          "deps": [
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/admin/src/app/nx-welcome.component.ts",
+          "hash": "2969840696515854783",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "apps/admin/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/admin/src/index.html",
+          "hash": "7168009588964157798"
+        },
+        {
+          "file": "apps/admin/src/main.ts",
+          "hash": "16635586463787978962",
+          "deps": [
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
+          "file": "apps/admin/src/styles.scss",
+          "hash": "13675609258312703358"
+        },
+        {
+          "file": "apps/admin/src/test-setup.ts",
+          "hash": "12935735732682149507",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "apps/admin/tsconfig.app.json",
+          "hash": "8365644956319658761"
+        },
+        {
+          "file": "apps/admin/tsconfig.editor.json",
+          "hash": "17511610827034788226"
+        },
+        {
+          "file": "apps/admin/tsconfig.json",
+          "hash": "12094030803572703611"
+        },
+        {
+          "file": "apps/admin/tsconfig.spec.json",
+          "hash": "2927375835638640771"
+        }
+      ],
+      "custom-styles": [
+        {
+          "file": "libs/shared/custom-styles/.eslintrc.json",
+          "hash": "8064283629420047219"
+        },
+        {
+          "file": "libs/shared/custom-styles/README.md",
+          "hash": "16725439357338083472"
+        },
+        {
+          "file": "libs/shared/custom-styles/jest.config.ts",
+          "hash": "12343231366617184600"
+        },
+        {
+          "file": "libs/shared/custom-styles/project.json",
+          "hash": "15698623220126418623"
+        },
+        {
+          "file": "libs/shared/custom-styles/src/index.ts",
+          "hash": "3095897668470763822"
+        },
+        {
+          "file": "libs/shared/custom-styles/src/lib/custom-styles/custom-styles.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/shared/custom-styles/src/lib/custom-styles/custom-styles.component.html",
+          "hash": "14456826553027083732"
+        },
+        {
+          "file": "libs/shared/custom-styles/src/lib/custom-styles/custom-styles.component.spec.ts",
+          "hash": "6750068241854516618",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/shared/custom-styles/src/lib/custom-styles/custom-styles.component.ts",
+          "hash": "17787582508209983138",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/shared/custom-styles/src/lib/themes/styles.scss",
+          "hash": "14937709748981033716"
+        },
+        {
+          "file": "libs/shared/custom-styles/src/test-setup.ts",
+          "hash": "12935735732682149507",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/shared/custom-styles/tsconfig.json",
+          "hash": "8526453262384300416"
+        },
+        {
+          "file": "libs/shared/custom-styles/tsconfig.lib.json",
+          "hash": "6020606002228403423"
+        },
+        {
+          "file": "libs/shared/custom-styles/tsconfig.spec.json",
+          "hash": "7159729809249402441"
+        }
+      ],
+      "myb-front-e2e": [
+        {
+          "file": "apps/myb.front-e2e/.eslintrc.json",
+          "hash": "14060216369337943343"
+        },
+        {
+          "file": "apps/myb.front-e2e/cypress.config.ts",
+          "hash": "10592768388789431319",
+          "deps": [
+            "npm:@nx/cypress",
+            "npm:cypress"
+          ]
+        },
+        {
+          "file": "apps/myb.front-e2e/project.json",
+          "hash": "4525675941528088137"
+        },
+        {
+          "file": "apps/myb.front-e2e/src/e2e/app.cy.ts",
+          "hash": "12058761536864819380"
+        },
+        {
+          "file": "apps/myb.front-e2e/src/fixtures/example.json",
+          "hash": "11785586596216172004"
+        },
+        {
+          "file": "apps/myb.front-e2e/src/support/app.po.ts",
+          "hash": "11157016311132186162"
+        },
+        {
+          "file": "apps/myb.front-e2e/src/support/commands.ts",
+          "hash": "5397443931564808659"
+        },
+        {
+          "file": "apps/myb.front-e2e/src/support/e2e.ts",
+          "hash": "1054106023200826784"
+        },
+        {
+          "file": "apps/myb.front-e2e/tsconfig.json",
+          "hash": "4332380883180617610"
+        }
+      ],
+      "client": [
+        {
+          "file": "apps/client/.eslintrc.json",
+          "hash": "3313121791607399792"
+        },
+        {
+          "file": "apps/client/envirements/envirement.ts",
+          "hash": "4744131969428740528"
+        },
+        {
+          "file": "apps/client/jest.config.ts",
+          "hash": "325689089722790099"
+        },
+        {
+          "file": "apps/client/project.json",
+          "hash": "3540337662823965431"
+        },
+        {
+          "file": "apps/client/proxy.js",
+          "hash": "16767477727229033828",
+          "deps": [
+            "npm:http-proxy-middleware"
+          ]
+        },
+        {
+          "file": "apps/client/src/app/app.component.html",
+          "hash": "7030490907263572193"
+        },
+        {
+          "file": "apps/client/src/app/app.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/app/app.component.spec.ts",
+          "hash": "1284699184960814131",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/client/src/app/app.component.ts",
+          "hash": "14279303132792159505",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/localize",
+            "npm:@angular/router",
+            "auth",
+            "npm:@ngx-translate/core",
+            "npm:@angular/common",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "apps/client/src/app/app.config.ts",
+          "hash": "9971275110818713129",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/platform-browser",
+            "npm:@angular/router",
+            "auth",
+            "npm:@angular/forms",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core",
+            "npm:@ngx-translate/http-loader",
+            "npm:ngx-stripe"
+          ]
+        },
+        {
+          "file": "apps/client/src/app/app.routes.ts",
+          "hash": "10724261622626765374",
+          "deps": [
+            "doc-management-module",
+            "npm:@angular/router",
+            "shared-ui",
+            "auth",
+            [
+              "shared-ui",
+              "dynamic"
+            ],
+            [
+              "invoice-module",
+              "dynamic"
+            ],
+            [
+              "time-sheet-module",
+              "dynamic"
+            ],
+            [
+              "doc-management-module",
+              "dynamic"
+            ]
+          ]
+        },
+        {
+          "file": "apps/client/src/app/nx-welcome.component.ts",
+          "hash": "4859763362931926183",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "apps/client/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/i18n/en.json",
+          "hash": "5531721911153872135"
+        },
+        {
+          "file": "apps/client/src/assets/i18n/fr.json",
+          "hash": "13861631181619877708"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!71999!illustartion1.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72000!Ellipse 51.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72001!application.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72003!Ellipse 52.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72004!financial.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72005!evaluation.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72006!time.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72007!apps.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72008!bills.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72009!doc.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72010!feature-background.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72011!time-management.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72012!rr.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72013!footer_layer.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72014!illustration1x2.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72015!illustration1x3.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72016!chart.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72017!pc.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72018!footer_layer@x2.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72019!calendar.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72020!illus.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72021!footer.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72022!inv.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72023!analytics.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72024!idea.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72025!application1.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72026!teamworking.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72027!timesheet.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/.!72028!finance.png",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/client/src/assets/images/Ellipse 51.png",
+          "hash": "2803278998614364166"
+        },
+        {
+          "file": "apps/client/src/assets/images/Ellipse 52.png",
+          "hash": "8168475074009012009"
+        },
+        {
+          "file": "apps/client/src/assets/images/analytics.png",
+          "hash": "18357880346968647197"
+        },
+        {
+          "file": "apps/client/src/assets/images/application.png",
+          "hash": "14472886440516613243"
+        },
+        {
+          "file": "apps/client/src/assets/images/application1.png",
+          "hash": "10184308382953285824"
+        },
+        {
+          "file": "apps/client/src/assets/images/apps.png",
+          "hash": "7535039626104690534"
+        },
+        {
+          "file": "apps/client/src/assets/images/bills.png",
+          "hash": "9050732880203965541"
+        },
+        {
+          "file": "apps/client/src/assets/images/calendar.png",
+          "hash": "5547396947724562332"
+        },
+        {
+          "file": "apps/client/src/assets/images/chart.png",
+          "hash": "6058631051005109151"
+        },
+        {
+          "file": "apps/client/src/assets/images/doc.png",
+          "hash": "1378567954566862899"
+        },
+        {
+          "file": "apps/client/src/assets/images/evaluation.png",
+          "hash": "8144409238995426197"
+        },
+        {
+          "file": "apps/client/src/assets/images/feature-background.png",
+          "hash": "7734180661421216402"
+        },
+        {
+          "file": "apps/client/src/assets/images/finance.png",
+          "hash": "15680462239994872344"
+        },
+        {
+          "file": "apps/client/src/assets/images/financial.png",
+          "hash": "4185323663928959770"
+        },
+        {
+          "file": "apps/client/src/assets/images/footer.png",
+          "hash": "2166335347540800007"
+        },
+        {
+          "file": "apps/client/src/assets/images/footer_layer.png",
+          "hash": "8496064886125202303"
+        },
+        {
+          "file": "apps/client/src/assets/images/footer_layer@x2.png",
+          "hash": "17254961239381033553"
+        },
+        {
+          "file": "apps/client/src/assets/images/idea.png",
+          "hash": "1420623242222082098"
+        },
+        {
+          "file": "apps/client/src/assets/images/illus.png",
+          "hash": "7162008666313028976"
+        },
+        {
+          "file": "apps/client/src/assets/images/illustartion1.png",
+          "hash": "17309977309307068711"
+        },
+        {
+          "file": "apps/client/src/assets/images/illustration1.svg",
+          "hash": "4174712621339363998"
+        },
+        {
+          "file": "apps/client/src/assets/images/illustration1x2.png",
+          "hash": "12312683908387097745"
+        },
+        {
+          "file": "apps/client/src/assets/images/illustration1x3.png",
+          "hash": "12105075468506898838"
+        },
+        {
+          "file": "apps/client/src/assets/images/inv.png",
+          "hash": "15439341440788283208"
+        },
+        {
+          "file": "apps/client/src/assets/images/pc.png",
+          "hash": "8929416332808713584"
+        },
+        {
+          "file": "apps/client/src/assets/images/rr.png",
+          "hash": "3893494134010322798"
+        },
+        {
+          "file": "apps/client/src/assets/images/teamworking.png",
+          "hash": "8978398918995752729"
+        },
+        {
+          "file": "apps/client/src/assets/images/time-management.png",
+          "hash": "17483037512008924769"
+        },
+        {
+          "file": "apps/client/src/assets/images/time.png",
+          "hash": "4552399828425493292"
+        },
+        {
+          "file": "apps/client/src/assets/images/timesheet.png",
+          "hash": "1016668524342974517"
+        },
+        {
+          "file": "apps/client/src/assets/wave-shape.svg",
+          "hash": "7830533792012445831"
+        },
+        {
+          "file": "apps/client/src/index.html",
+          "hash": "7080087300440123933"
+        },
+        {
+          "file": "apps/client/src/main.ts",
+          "hash": "16635586463787978962",
+          "deps": [
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
+          "file": "apps/client/src/proxy.conf.json",
+          "hash": "4068254891443291836"
+        },
+        {
+          "file": "apps/client/src/styles.scss",
+          "hash": "17569988449258021192"
+        },
+        {
+          "file": "apps/client/src/test-setup.ts",
+          "hash": "12935735732682149507",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "apps/client/tsconfig.app.json",
+          "hash": "8365644956319658761"
+        },
+        {
+          "file": "apps/client/tsconfig.editor.json",
+          "hash": "17511610827034788226"
+        },
+        {
+          "file": "apps/client/tsconfig.json",
+          "hash": "12094030803572703611"
+        },
+        {
+          "file": "apps/client/tsconfig.spec.json",
+          "hash": "2927375835638640771"
+        }
+      ],
+      "invoice-module": [
+        {
+          "file": "libs/invoice-module/.eslintrc.json",
+          "hash": "16889520487470251467"
+        },
+        {
+          "file": "libs/invoice-module/README.md",
+          "hash": "11262018836823170486"
+        },
+        {
+          "file": "libs/invoice-module/jest.config.ts",
+          "hash": "10206697435517524245"
+        },
+        {
+          "file": "libs/invoice-module/ng-package.json",
+          "hash": "1325745301815485693"
+        },
+        {
+          "file": "libs/invoice-module/package.json",
+          "hash": "7229168327439666476",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:tslib"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/project.json",
+          "hash": "6373905397587873248"
+        },
+        {
+          "file": "libs/invoice-module/src/index.ts",
+          "hash": "13122825914593453427"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/client-card/clientCard.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/client-card/clientCard.component.html",
+          "hash": "7680445007718748419"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/client-card/clientCard.component.spec.ts",
+          "hash": "9847270141008575927",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/client-card/clientCard.component.ts",
+          "hash": "6473255040253774386",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "shared-ui",
+            "npm:@ng-bootstrap/ng-bootstrap"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/create-client/add-contact/addContact.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/create-client/add-contact/addContact.component.html",
+          "hash": "339073657801687177"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/create-client/add-contact/addContact.component.spec.ts",
+          "hash": "17122510449452355102",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/create-client/add-contact/addContact.component.ts",
+          "hash": "4705346053437333364",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/create-client/createClient.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/create-client/createClient.component.html",
+          "hash": "4718845045391630504"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/create-client/createClient.component.spec.ts",
+          "hash": "1396887741645251739",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/create-client/createClient.component.ts",
+          "hash": "2955867720412728027",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/edit-client/editClient.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/edit-client/editClient.component.html",
+          "hash": "10564237589130587099"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/edit-client/editClient.component.spec.ts",
+          "hash": "2022096137237698982",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/edit-client/editClient.component.ts",
+          "hash": "11560504215472659688",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/index/client.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/index/client.component.html",
+          "hash": "17816966185630879015"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/index/client.component.spec.ts",
+          "hash": "6388166627971348425",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/index/client.component.ts",
+          "hash": "15825541612186048150",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/list-client/listClient.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/list-client/listClient.component.html",
+          "hash": "18254773147381393649"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/list-client/listClient.component.spec.ts",
+          "hash": "13199661266439733690",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/client-components/list-client/listClient.component.ts",
+          "hash": "7133517670339048177",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:rxjs",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/add-item/addItemToInvoice.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/add-item/addItemToInvoice.component.html",
+          "hash": "11179888497921705242"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/add-item/addItemToInvoice.component.spec.ts",
+          "hash": "6908883494136428258",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/add-item/addItemToInvoice.component.ts",
+          "hash": "16170437668275424541",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/createInvoice.component.css",
+          "hash": "4821617534892499103"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/createInvoice.component.html",
+          "hash": "10769978701021476442"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/createInvoice.component.spec.ts",
+          "hash": "16590479905613435180",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/createInvoice.component.ts",
+          "hash": "15613662332050815606",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/router",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/select-client/selectClient.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/select-client/selectClient.component.html",
+          "hash": "13226259535607317481"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/select-client/selectClient.component.spec.ts",
+          "hash": "7000194898471124091",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/select-client/selectClient.component.ts",
+          "hash": "12784716568453959675",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:rxjs",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/select-product/selectProduct.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/select-product/selectProduct.component.html",
+          "hash": "14243256507285494544"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/select-product/selectProduct.component.spec.ts",
+          "hash": "103130605870367168",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/create-invoice/select-product/selectProduct.component.ts",
+          "hash": "13142247443680373818",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:rxjs",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/details-invoice/invoiceDetails.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/details-invoice/invoiceDetails.component.html",
+          "hash": "7342604843226921706"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/details-invoice/invoiceDetails.component.spec.ts",
+          "hash": "12612300285326983886",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/details-invoice/invoiceDetails.component.ts",
+          "hash": "10061038546974181256",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/edit-invoice/editInvoice.component.css",
+          "hash": "4055606894390288348"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/edit-invoice/editInvoice.component.html",
+          "hash": "16064650019400666750"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/edit-invoice/editInvoice.component.spec.ts",
+          "hash": "12289290647745196234",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/edit-invoice/editInvoice.component.ts",
+          "hash": "17382312676398253639",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:@ng-bootstrap/ng-bootstrap"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/index/invoiceIndex.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/index/invoiceIndex.component.html",
+          "hash": "5456377025674841802"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/index/invoiceIndex.component.spec.ts",
+          "hash": "13596520248418491111",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/index/invoiceIndex.component.ts",
+          "hash": "15291170693028809494",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/list-invoice/listInvoice.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/list-invoice/listInvoice.component.html",
+          "hash": "11368168421772843855"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/list-invoice/listInvoice.component.spec.ts",
+          "hash": "6471834780421095057",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/invoice-components/list-invoice/listInvoice.component.ts",
+          "hash": "12119509127928103749",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/router",
+            "npm:rxjs",
+            "npm:@ngx-translate/core",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/navbar/navbar.component.css",
+          "hash": "6221327778453440183"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/navbar/navbar.component.html",
+          "hash": "5513632264660983343"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/navbar/navbar.component.spec.ts",
+          "hash": "11611426068913683136",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/navbar/navbar.component.ts",
+          "hash": "15782630939906331331",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "auth",
+            "npm:keycloak-js",
+            "npm:rxjs",
+            "shared-ui",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/create-product/createProduct.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/create-product/createProduct.component.html",
+          "hash": "2211072723637929577"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/create-product/createProduct.component.spec.ts",
+          "hash": "18325862956537214162",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/create-product/createProduct.component.ts",
+          "hash": "5994855769096379969",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/forms",
+            "npm:rxjs",
+            "npm:@angular/router",
+            "npm:@ng-bootstrap/ng-bootstrap"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/edit-product/editProduct.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/edit-product/editProduct.component.html",
+          "hash": "3827990504047274339"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/edit-product/editProduct.component.spec.ts",
+          "hash": "929077240390977184",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/edit-product/editProduct.component.ts",
+          "hash": "8593584049257122225",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/index/product.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/index/product.component.html",
+          "hash": "17816966185630879015"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/index/product.component.spec.ts",
+          "hash": "12563227817121234580",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/index/product.component.ts",
+          "hash": "1967953078094398333",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/list-product/listProduct.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/list-product/listProduct.component.html",
+          "hash": "15125029405745939386"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/list-product/listProduct.component.spec.ts",
+          "hash": "5540251280775639494",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/product-components/list-product/listProduct.component.ts",
+          "hash": "1537529078378157592",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:rxjs",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/create-tax/createTax.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/create-tax/createTax.component.html",
+          "hash": "13914055804110958953"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/create-tax/createTax.component.spec.ts",
+          "hash": "3032103346989595011",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/create-tax/createTax.component.ts",
+          "hash": "1376052947223391433",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "npm:@ng-bootstrap/ng-bootstrap"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/edit-tax/editTax.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/edit-tax/editTax.component.html",
+          "hash": "2667027904143336493"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/edit-tax/editTax.component.spec.ts",
+          "hash": "375020930572525642",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/edit-tax/editTax.component.ts",
+          "hash": "2136583490807461772",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/index/tax.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/index/tax.component.html",
+          "hash": "16498897523005705592"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/index/tax.component.spec.ts",
+          "hash": "13533884258870756716",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/index/tax.component.ts",
+          "hash": "16896244328166815903",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/list-tax/listTax.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/list-tax/listTax.component.html",
+          "hash": "5413457626632799849"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/list-tax/listTax.component.spec.ts",
+          "hash": "1400590636981200276",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/components/tax-component/list-tax/listTax.component.ts",
+          "hash": "3241021478455462154",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:rxjs",
+            "npm:@angular/forms",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/mutations/client.mutation.ts",
+          "hash": "3378697082449251103",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/mutations/contact.mutation.ts",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/mutations/invoice.mutation.ts",
+          "hash": "14361986297068145617",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/mutations/product.mutation.ts",
+          "hash": "2351758296377532424",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/mutations/tax.mutation.ts",
+          "hash": "72357343843647887",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/queries/client.query.ts",
+          "hash": "2212598324650230851",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/queries/contact.query.ts",
+          "hash": "10016976774682818034",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/queries/invoice.query.ts",
+          "hash": "13198991866159159990",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/queries/product.query.ts",
+          "hash": "735415442520226989",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/graphql/queries/tax.query.ts",
+          "hash": "2212531805547652677",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/invoice-module/invoice-module.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/invoice-module/invoice-module.component.html",
+          "hash": "12755897047051363240"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/invoice-module/invoice-module.component.spec.ts",
+          "hash": "17007370210633467867",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/invoice-module/invoice-module.component.ts",
+          "hash": "11351526777540235511",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/router",
+            "shared-ui",
+            "doc-management-module"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/invoice.routing.module.ts",
+          "hash": "13468858104596158391",
+          "deps": [
+            "npm:@angular/router",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/models/client.model.ts",
+          "hash": "18328028746297764259"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/models/clientType.ts",
+          "hash": "4897317854978335813"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/models/contact.model.ts",
+          "hash": "3618398580411290112"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/models/contactType.ts",
+          "hash": "17241564146111338333"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/models/invoice.model.ts",
+          "hash": "5216164707327414115"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/models/invoiceDetails.model.ts",
+          "hash": "4526140236324961261"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/models/product.model.ts",
+          "hash": "8239066976684707583"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/models/productType.ts",
+          "hash": "13358880612996639213"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/models/tax.model.ts",
+          "hash": "2141344403665850935"
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/client.service.spec.ts",
+          "hash": "17874778475165669055",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/client.service.ts",
+          "hash": "10167653569380073158",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/contact.service.spec.ts",
+          "hash": "11029342691440084871",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/contact.service.ts",
+          "hash": "15524522817700429965",
+          "deps": [
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/invoice.service.spec.ts",
+          "hash": "3733789932237487655",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/invoice.service.ts",
+          "hash": "2979770241908743816",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/product.service.spec.ts",
+          "hash": "15641537539620615365",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/product.service.ts",
+          "hash": "15654723538556980660",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/tax.service.spec.ts",
+          "hash": "16753912007716139376",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/tax.service.ts",
+          "hash": "3775983714668429618",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/upload-files.service.spec.ts",
+          "hash": "2717277868974826716",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/lib/services/upload-files.service.ts",
+          "hash": "1028648448704223789",
+          "deps": [
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/src/test-setup.ts",
+          "hash": "12935735732682149507",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/invoice-module/tsconfig.json",
+          "hash": "730722751773567484"
+        },
+        {
+          "file": "libs/invoice-module/tsconfig.lib.json",
+          "hash": "14769835859940345083"
+        },
+        {
+          "file": "libs/invoice-module/tsconfig.lib.prod.json",
+          "hash": "10809217796916261822"
+        },
+        {
+          "file": "libs/invoice-module/tsconfig.spec.json",
+          "hash": "2927375835638640771"
+        }
+      ],
+      "auth": [
+        {
+          "file": "libs/auth/.eslintrc.json",
+          "hash": "16896711999632553762"
+        },
+        {
+          "file": "libs/auth/README.md",
+          "hash": "5126697487225917289"
+        },
+        {
+          "file": "libs/auth/jest.config.ts",
+          "hash": "18336331386858165184"
+        },
+        {
+          "file": "libs/auth/package.json",
+          "hash": "9458128604157013764",
+          "deps": [
+            "npm:tslib"
+          ]
+        },
+        {
+          "file": "libs/auth/project.json",
+          "hash": "15013931467991378418"
+        },
+        {
+          "file": "libs/auth/src/index.ts",
+          "hash": "17667608979020697680"
+        },
+        {
+          "file": "libs/auth/src/lib/auth.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/auth/src/lib/auth.component.html",
+          "hash": "9454873126651798027"
+        },
+        {
+          "file": "libs/auth/src/lib/auth.component.spec.ts",
+          "hash": "5188219778723573435",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/auth/src/lib/auth.component.ts",
+          "hash": "13398531344866114049",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/auth/src/lib/auth.guard.spec.ts",
+          "hash": "12942416802736267153",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/auth/src/lib/auth.guard.ts",
+          "hash": "15891425679153933139",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/auth/src/lib/auth.spec.ts",
+          "hash": "14026045505144020983"
+        },
+        {
+          "file": "libs/auth/src/lib/auth.ts",
+          "hash": "6890438946885032332"
+        },
+        {
+          "file": "libs/auth/src/lib/keycloak.config.ts",
+          "hash": "6877754875866872212"
+        },
+        {
+          "file": "libs/auth/src/lib/keycloak.initializer.ts",
+          "hash": "13385457013999277396"
+        },
+        {
+          "file": "libs/auth/src/lib/keycloak.service.spec.ts",
+          "hash": "6531288643420357873",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/auth/src/lib/keycloak.service.ts",
+          "hash": "11823447259468216476",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:keycloak-js",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/auth/tsconfig.json",
+          "hash": "6199369645861239278"
+        },
+        {
+          "file": "libs/auth/tsconfig.lib.json",
+          "hash": "3632393694954060084"
+        },
+        {
+          "file": "libs/auth/tsconfig.spec.json",
+          "hash": "11550347367511341917"
+        }
+      ],
+      "time-sheet-module": [
+        {
+          "file": "libs/time-sheet-module/.eslintrc.json",
+          "hash": "3313121791607399792"
+        },
+        {
+          "file": "libs/time-sheet-module/README.md",
+          "hash": "13011888917688226133"
+        },
+        {
+          "file": "libs/time-sheet-module/jest.config.ts",
+          "hash": "5262806959372649518"
+        },
+        {
+          "file": "libs/time-sheet-module/project.json",
+          "hash": "2978979379597389711"
+        },
+        {
+          "file": "libs/time-sheet-module/src/index.ts",
+          "hash": "15634756605433833408"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component.css",
+          "hash": "14860305808243091029"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component.html",
+          "hash": "11743910631430954174"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component.spec.ts",
+          "hash": "6899403219942339488",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/breadcrumb/breadcrumb.component.ts",
+          "hash": "15757178865041521976",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/navbar/navbar.component.css",
+          "hash": "11257872563998929995"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/navbar/navbar.component.html",
+          "hash": "8099457869301367100"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/navbar/navbar.component.spec.ts",
+          "hash": "11611426068913683136",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/navbar/navbar.component.ts",
+          "hash": "9450797512825383892",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "auth",
+            "npm:keycloak-js",
+            "npm:rxjs",
+            "shared-ui",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/quantity-input/timesheet-quantity-input.component.css",
+          "hash": "5038011909747874175"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/quantity-input/timesheet-quantity-input.component.html",
+          "hash": "7640292206290528875"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/quantity-input/timesheet-quantity-input.component.spec.ts",
+          "hash": "9175217409765801091",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/quantity-input/timesheet-quantity-input.component.ts",
+          "hash": "9237255017021909609",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-actions/task-actions.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-actions/task-actions.component.html",
+          "hash": "2106797339187633120"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-actions/task-actions.component.spec.ts",
+          "hash": "7470239856798798938",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-actions/task-actions.component.ts",
+          "hash": "15337999389295615911",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-create/task-create.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-create/task-create.component.html",
+          "hash": "13534529677446749244"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-create/task-create.component.spec.ts",
+          "hash": "15436808725159828769",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-create/task-create.component.ts",
+          "hash": "15157007678033057875",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-edit/task-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-edit/task-edit.component.html",
+          "hash": "10016645094243502518"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-edit/task-edit.component.spec.ts",
+          "hash": "12932518914376606107",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-edit/task-edit.component.ts",
+          "hash": "15523848947547579557",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-list/task-list.component.html",
+          "hash": "2180395042217400219"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-list/task-list.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-list/task-list.component.spec.ts",
+          "hash": "18058447697285617100",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/task-list/task-list.component.ts",
+          "hash": "932235116103988208",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/timesheet-settings/timesheet-settings.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/timesheet-settings/timesheet-settings.component.html",
+          "hash": "2832342074855070444"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/timesheet-settings/timesheet-settings.component.spec.ts",
+          "hash": "14272390843643202975",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/components/timesheet-settings/timesheet-settings.component.ts",
+          "hash": "1144875106180971437",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "shared-ui",
+            "npm:@ngx-translate/core",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/mutations/employee.graphql.ts",
+          "hash": "17946804681412036270"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/mutations/project.graphql.ts",
+          "hash": "10969925855666213602",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/mutations/task.graphql.ts",
+          "hash": "16931081319384586495"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/mutations/timeoff.graphql.ts",
+          "hash": "12063934133762816477"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/mutations/timesheet.graphql.ts",
+          "hash": "6239329540839465574"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/queries/employee.graphql.ts",
+          "hash": "12692058925722883826"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/queries/project.graphql.ts",
+          "hash": "14200928959393751609"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/queries/task.graphql.ts",
+          "hash": "7792544089088657757"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/queries/timeoff.graphql.ts",
+          "hash": "9286081377964949475"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/graphql/queries/timesheet.graphql.ts",
+          "hash": "1696589606454854908"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/models/base.model.ts",
+          "hash": "8193627510124312577"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/models/employee.ts",
+          "hash": "13620467098893108724"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/models/groupedTiesheet.model.ts",
+          "hash": "4340466369239912479"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/models/project.model.ts",
+          "hash": "16063941012431041309"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/models/task.model.ts",
+          "hash": "9990355310518796315"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/models/timeoff.model.ts",
+          "hash": "12594961133440698000"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/models/timesheet.model.ts",
+          "hash": "16385378822644970415"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/card/employee-card.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/card/employee-card.component.html",
+          "hash": "6116731656930890747"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/card/employee-card.component.spec.ts",
+          "hash": "16757126488556287114",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/card/employee-card.component.ts",
+          "hash": "13069902042490063109",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "shared-ui",
+            "npm:@ngx-translate/core",
+            "auth"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/edit/employee-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/edit/employee-edit.component.html",
+          "hash": "10882264367044427564"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/edit/employee-edit.component.spec.ts",
+          "hash": "8491399288003166023",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/edit/employee-edit.component.ts",
+          "hash": "12252515617126693598",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "npm:rxjs",
+            "auth",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/index/employee-index.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/index/employee-index.component.html",
+          "hash": "17816966185630879015"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/index/employee-index.component.spec.ts",
+          "hash": "15846267419426716421",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/index/employee-index.component.ts",
+          "hash": "14882066126549777771",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/list/employee-list.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/list/employee-list.component.html",
+          "hash": "15193238352384261707"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/list/employee-list.component.spec.ts",
+          "hash": "16927867402292318079",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/list/employee-list.component.ts",
+          "hash": "7681249009542933092",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:rxjs",
+            "npm:@angular/router",
+            "auth",
+            "shared-ui",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/stats/employee-stats.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/stats/employee-stats.component.html",
+          "hash": "5902791237646631958"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/stats/employee-stats.component.spec.ts",
+          "hash": "9643218881632866778",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/stats/employee-stats.component.ts",
+          "hash": "10385630186814056888",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@swimlane/ngx-charts",
+            "npm:@angular/animations"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/timeoff-list/timeoff-list.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/timeoff-list/timeoff-list.component.html",
+          "hash": "15990825414988581070"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/timeoff-list/timeoff-list.component.spec.ts",
+          "hash": "12744864221941476999",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/employees/timeoff-list/timeoff-list.component.ts",
+          "hash": "16837579633680913111",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:rxjs",
+            "auth"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/card/project-card.component.html",
+          "hash": "12829103003508419498"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/card/project-card.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/card/project-card.component.spec.ts",
+          "hash": "14383522106011902457",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/card/project-card.component.ts",
+          "hash": "16456182939070836797",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "shared-ui",
+            "auth",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/edit/edit-project.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/edit/edit-project.component.html",
+          "hash": "10441677183925257467"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/edit/edit-project.component.spec.ts",
+          "hash": "8607984843387186747",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/edit/edit-project.component.ts",
+          "hash": "6851730220801264537",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "shared-ui",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/index/project-index.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/index/project-index.component.html",
+          "hash": "17816966185630879015"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/index/project-index.component.spec.ts",
+          "hash": "17621927615845072540",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/index/project-index.component.ts",
+          "hash": "17686208938842647938",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/list/project-list.component.css",
+          "hash": "4701701742591582446"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/list/project-list.component.html",
+          "hash": "3358169850469380561"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/list/project-list.component.spec.ts",
+          "hash": "3769177595162928479",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/list/project-list.component.ts",
+          "hash": "3179242071322871644",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:rxjs",
+            "npm:@ngx-translate/core",
+            "auth"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/tabs/project-tabs.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/tabs/project-tabs.component.html",
+          "hash": "13035148474232969864"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/tabs/project-tabs.component.spec.ts",
+          "hash": "12411331184412577403",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/projects/tabs/project-tabs.component.ts",
+          "hash": "14947592412025807676",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:rxjs",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/settings/settings-page.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/settings/settings-page.component.html",
+          "hash": "2526274370138019898"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/settings/settings-page.component.spec.ts",
+          "hash": "4361065148432374649",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/settings/settings-page.component.ts",
+          "hash": "198695960234010298",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/edit/task-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/edit/task-edit.component.html",
+          "hash": "18217750948638071001"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/edit/task-edit.component.spec.ts",
+          "hash": "12932518914376606107",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/edit/task-edit.component.ts",
+          "hash": "18032268778802525312",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:rxjs",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/list/task-list.component.html",
+          "hash": "1397811080589418160"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/list/task-list.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/list/task-list.component.spec.ts",
+          "hash": "18058447697285617100",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/list/task-list.component.ts",
+          "hash": "16921155348350316747",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "shared-ui",
+            "npm:rxjs",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/task-screen.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/task-screen.component.html",
+          "hash": "17175416564018964270"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/task-screen.component.spec.ts",
+          "hash": "9792524061979860451",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/task-screen/task-screen.component.ts",
+          "hash": "9915187282040422919",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/action-buttons/timesheet-action-buttons.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/action-buttons/timesheet-action-buttons.component.html",
+          "hash": "7695523588468389398"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/action-buttons/timesheet-action-buttons.component.spec.ts",
+          "hash": "7519798852288390103",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/action-buttons/timesheet-action-buttons.component.ts",
+          "hash": "1157867542815784211",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/create/timesheet-create.component.css",
+          "hash": "10596273148088663150"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/create/timesheet-create.component.html",
+          "hash": "6863823791326812975"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/create/timesheet-create.component.spec.ts",
+          "hash": "18318237792701861743",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/create/timesheet-create.component.ts",
+          "hash": "1088431843775519772",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:rxjs",
+            "shared-ui",
+            "auth",
+            "npm:ngx-mask"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/edit/timesheet-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/edit/timesheet-edit.component.html",
+          "hash": "14247636996069225203"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/edit/timesheet-edit.component.spec.ts",
+          "hash": "8326129082544398226",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/edit/timesheet-edit.component.ts",
+          "hash": "14398447647741068444",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/forms",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:rxjs",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/intervenant-timesheet-table/intervenant-timesheet-table.component.css",
+          "hash": "705578851360904353"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/intervenant-timesheet-table/intervenant-timesheet-table.component.html",
+          "hash": "12277224554983593890"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/intervenant-timesheet-table/intervenant-timesheet-table.component.spec.ts",
+          "hash": "13279304160987089047",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/intervenant-timesheet-table/intervenant-timesheet-table.component.ts",
+          "hash": "8754275402677776789",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:@ngx-translate/core",
+            "auth",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/intervenant-timesheet/intervenant-timesheet.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/intervenant-timesheet/intervenant-timesheet.component.html",
+          "hash": "4353760988691003922"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/intervenant-timesheet/intervenant-timesheet.component.spec.ts",
+          "hash": "11094552694455676132",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/intervenant-timesheet/intervenant-timesheet.component.ts",
+          "hash": "9891545864144067368",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core",
+            "auth",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/list/timesheet-list.component.css",
+          "hash": "705578851360904353"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/list/timesheet-list.component.html",
+          "hash": "1343378904473142328"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/list/timesheet-list.component.spec.ts",
+          "hash": "13231829392910150987",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/list/timesheet-list.component.ts",
+          "hash": "728892877038882846",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:@angular/forms",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:rxjs",
+            "auth",
+            "shared-ui",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/period-selector/period-selector.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/period-selector/period-selector.component.html",
+          "hash": "1413380574969115546"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/period-selector/period-selector.component.spec.ts",
+          "hash": "11514141675637671320",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/period-selector/period-selector.component.ts",
+          "hash": "15632594470977179993",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/status-buttons/timesheet-status-buttons.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/status-buttons/timesheet-status-buttons.component.html",
+          "hash": "17026076478564141484"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/status-buttons/timesheet-status-buttons.component.spec.ts",
+          "hash": "4941906152676130946",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/status-buttons/timesheet-status-buttons.component.ts",
+          "hash": "13852127922214552330",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/table/timesheet-table.component.css",
+          "hash": "705578851360904353"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/table/timesheet-table.component.html",
+          "hash": "670002421272522096"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/table/timesheet-table.component.spec.ts",
+          "hash": "2888693491577376495",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/table/timesheet-table.component.ts",
+          "hash": "5315425665932336516",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core",
+            "shared-ui",
+            "npm:@ng-bootstrap/ng-bootstrap"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-header/timesheet-header.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-header/timesheet-header.component.html",
+          "hash": "11809628535086839465"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-header/timesheet-header.component.spec.ts",
+          "hash": "14756884475869273500",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-header/timesheet-header.component.ts",
+          "hash": "14436767649346486576",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-screen.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-screen.component.html",
+          "hash": "13575725665978733333"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-screen.component.spec.ts",
+          "hash": "2406589399953379772",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/screens/timesheet-screen/timesheet-screen.component.ts",
+          "hash": "15045314489928265211",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:@ngx-translate/core",
+            "auth"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/employee.service.spec.ts",
+          "hash": "15429087640471980754",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/employee.service.ts",
+          "hash": "12480014899863391976",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/nav-routes.service.ts",
+          "hash": "9139605404225816080",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/project.service.spec.ts",
+          "hash": "13163049655775858451",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/project.service.ts",
+          "hash": "13912693572437440330",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/task.service.spec.ts",
+          "hash": "12144199161912751038",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/task.service.ts",
+          "hash": "212338421242707800",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/timeoff.service.ts",
+          "hash": "6120747009903320717",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/timesheet-settings.service.ts",
+          "hash": "11118602069543829803",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/timesheet-utility.service.ts",
+          "hash": "10337364162798082608",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/timesheet.service.spec.ts",
+          "hash": "13530031137416881213",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/timesheet.service.ts",
+          "hash": "15631212767201746684",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/services/utils.service.ts",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/time-sheet-module/time-sheet-module.component.css",
+          "hash": "14879732287078600251"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/time-sheet-module/time-sheet-module.component.html",
+          "hash": "2549249596083134403"
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/time-sheet-module/time-sheet-module.component.spec.ts",
+          "hash": "16990145020044704451",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/time-sheet-module/time-sheet-module.component.ts",
+          "hash": "17509308098668264147",
+          "deps": [
+            "npm:@angular/common",
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/timesheet-routing.module.ts",
+          "hash": "1544941111490695211",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router",
+            "npm:@ngx-translate/core"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/src/lib/timesheet.module.ts",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/time-sheet-module/src/test-setup.ts",
+          "hash": "12935735732682149507",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/time-sheet-module/tsconfig.json",
+          "hash": "15487755565970508470"
+        },
+        {
+          "file": "libs/time-sheet-module/tsconfig.lib.json",
+          "hash": "12267165349295619586"
+        },
+        {
+          "file": "libs/time-sheet-module/tsconfig.spec.json",
+          "hash": "2927375835638640771"
+        }
+      ],
+      "myb-front": [
+        {
+          "file": "apps/myb.front/.eslintrc.json",
+          "hash": "3313121791607399792"
+        },
+        {
+          "file": "apps/myb.front/jest.config.ts",
+          "hash": "9391350230773195914"
+        },
+        {
+          "file": "apps/myb.front/project.json",
+          "hash": "13536635467409783758"
+        },
+        {
+          "file": "apps/myb.front/src/.!71920!favicon.ico",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/myb.front/src/app/app.component.html",
+          "hash": "11867344502279764410"
+        },
+        {
+          "file": "apps/myb.front/src/app/app.component.scss",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/myb.front/src/app/app.component.spec.ts",
+          "hash": "4053690678399662816",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/myb.front/src/app/app.component.ts",
+          "hash": "4800233019256534824",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/myb.front/src/app/app.config.ts",
+          "hash": "10618457967269332155",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/myb.front/src/app/app.routes.ts",
+          "hash": "6185150965714414910",
+          "deps": [
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "apps/myb.front/src/app/nx-welcome.component.ts",
+          "hash": "2390290593157740313",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "apps/myb.front/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/myb.front/src/favicon.ico",
+          "hash": "9303420814833116677"
+        },
+        {
+          "file": "apps/myb.front/src/index.html",
+          "hash": "9986527626695951028"
+        },
+        {
+          "file": "apps/myb.front/src/main.ts",
+          "hash": "16635586463787978962",
+          "deps": [
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
+          "file": "apps/myb.front/src/styles.scss",
+          "hash": "5195668842064076916"
+        },
+        {
+          "file": "apps/myb.front/src/test-setup.ts",
+          "hash": "12935735732682149507",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "apps/myb.front/tsconfig.app.json",
+          "hash": "8365644956319658761"
+        },
+        {
+          "file": "apps/myb.front/tsconfig.editor.json",
+          "hash": "17511610827034788226"
+        },
+        {
+          "file": "apps/myb.front/tsconfig.json",
+          "hash": "11271817794535700763"
+        },
+        {
+          "file": "apps/myb.front/tsconfig.spec.json",
+          "hash": "2927375835638640771"
+        }
+      ],
+      "client-e2e": [
+        {
+          "file": "apps/client-e2e/.eslintrc.json",
+          "hash": "14060216369337943343"
+        },
+        {
+          "file": "apps/client-e2e/cypress.config.ts",
+          "hash": "13149736485544786275",
+          "deps": [
+            "npm:@nx/cypress",
+            "npm:cypress"
+          ]
+        },
+        {
+          "file": "apps/client-e2e/project.json",
+          "hash": "8245748717556881866"
+        },
+        {
+          "file": "apps/client-e2e/src/e2e/app.cy.ts",
+          "hash": "4604656125477134902"
+        },
+        {
+          "file": "apps/client-e2e/src/fixtures/example.json",
+          "hash": "11785586596216172004"
+        },
+        {
+          "file": "apps/client-e2e/src/support/app.po.ts",
+          "hash": "11157016311132186162"
+        },
+        {
+          "file": "apps/client-e2e/src/support/commands.ts",
+          "hash": "5397443931564808659"
+        },
+        {
+          "file": "apps/client-e2e/src/support/e2e.ts",
+          "hash": "1054106023200826784"
+        },
+        {
+          "file": "apps/client-e2e/tsconfig.json",
+          "hash": "4332380883180617610"
+        }
+      ],
+      "doc-management-module": [
+        {
+          "file": "libs/doc-management-module/.eslintrc.json",
+          "hash": "3313121791607399792"
+        },
+        {
+          "file": "libs/doc-management-module/README.md",
+          "hash": "6309339621975437832"
+        },
+        {
+          "file": "libs/doc-management-module/jest.config.ts",
+          "hash": "9024251412020009808"
+        },
+        {
+          "file": "libs/doc-management-module/project.json",
+          "hash": "15215174402218353639"
+        },
+        {
+          "file": "libs/doc-management-module/src/index.ts",
+          "hash": "9044959733445093890"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/GraphQl/Mutations/DocumentMutation.ts",
+          "hash": "18015152221237538369",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/GraphQl/Mutations/FolderMutation.ts",
+          "hash": "4756494306304771476",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/GraphQl/Queries/Document.graphql.ts",
+          "hash": "12239469213605739189",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/GraphQl/Queries/Folder.graphql.ts",
+          "hash": "3387856494479093726",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/GraphQl/graphql.module.ts",
+          "hash": "5802023112020777978",
+          "deps": [
+            "npm:@angular/common",
+            "npm:apollo-angular",
+            "npm:@apollo/client",
+            "npm:@angular/core",
+            "npm:@angular/platform-browser"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/document-details/document-details.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/document-details/document-details.component.html",
+          "hash": "12571946976207006586"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/document-details/document-details.component.spec.ts",
+          "hash": "12738613163200788589",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/document-details/document-details.component.ts",
+          "hash": "11632213196858276956",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/document-edit/document-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/document-edit/document-edit.component.html",
+          "hash": "930532522277486404"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/document-edit/document-edit.component.spec.ts",
+          "hash": "3419946790219122451",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/document-edit/document-edit.component.ts",
+          "hash": "1834983107892107356",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/documents-list/documents-list.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/documents-list/documents-list.component.html",
+          "hash": "15430521690525834576"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/documents-list/documents-list.component.spec.ts",
+          "hash": "6377470530604192498",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Documents/documents-list/documents-list.component.ts",
+          "hash": "17909321723631023320",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/Edit/folder-edit.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/Edit/folder-edit.component.html",
+          "hash": "7507404545906587644"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/Edit/folder-edit.component.spec.ts",
+          "hash": "627928146650164522",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/Edit/folder-edit.component.ts",
+          "hash": "3256657034715284756",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:keycloak-js",
+            "npm:rxjs",
+            "auth"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-cards/folder-cards.component.css",
+          "hash": "14413052348063887240"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-cards/folder-cards.component.html",
+          "hash": "12566946039803148238"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-cards/folder-cards.component.spec.ts",
+          "hash": "10643820257309698995",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-cards/folder-cards.component.ts",
+          "hash": "18150859405884428958",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:@angular/forms"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-creation/folder-creation.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-creation/folder-creation.component.html",
+          "hash": "13083778556435676185"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-creation/folder-creation.component.spec.ts",
+          "hash": "16159580143917400128",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-creation/folder-creation.component.ts",
+          "hash": "12208720119578060370",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "auth",
+            "npm:keycloak-js",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-details/folder-details.component.css",
+          "hash": "12653278539877647389"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-details/folder-details.component.html",
+          "hash": "8938670169714687858"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-details/folder-details.component.spec.ts",
+          "hash": "4865811598075024469",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-details/folder-details.component.ts",
+          "hash": "9549555318768504310",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:rxjs",
+            "npm:keycloak-js",
+            "shared-ui",
+            "auth"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component.css",
+          "hash": "18223262715280332529"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component.html",
+          "hash": "14018185216600840569"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component.spec.ts",
+          "hash": "14245972970435124799",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/folder-list/folder-list.component.ts",
+          "hash": "4858961397543581397",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/index/folder-index.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/index/folder-index.component.html",
+          "hash": "7533560175429070474"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/index/folder-index.component.spec.ts",
+          "hash": "4729408540799230219",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/Folders/index/folder-index.component.ts",
+          "hash": "9633920003325362071",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/document-creation/document-creation.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/document-creation/document-creation.component.html",
+          "hash": "15249688588822812834"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/document-creation/document-creation.component.spec.ts",
+          "hash": "10974746918159619429",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/document-creation/document-creation.component.ts",
+          "hash": "5516015466681293502",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/forms",
+            "npm:keycloak-js",
+            "npm:rxjs",
+            "auth"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/document-upload/document-upload.component.css",
+          "hash": "7018077195581815911"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/document-upload/document-upload.component.html",
+          "hash": "9840296750125719498"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/document-upload/document-upload.component.spec.ts",
+          "hash": "7097456877007260897",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/document-upload/document-upload.component.ts",
+          "hash": "8335297912855569088",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/logs/logs.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/logs/logs.component.html",
+          "hash": "13240360337858170021"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/logs/logs.component.spec.ts",
+          "hash": "15429393330803490989",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/logs/logs.component.ts",
+          "hash": "4643179342510255249",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/FolderResolver/FolderResolver.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/FolderResolver/FolderResolver.component.html",
+          "hash": "9303426372995150060"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/FolderResolver/FolderResolver.component.spec.ts",
+          "hash": "14350693471991507526",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/FolderResolver/FolderResolver.component.ts",
+          "hash": "13471049729073468321",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component.html",
+          "hash": "5590095469679181840"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component.spec.ts",
+          "hash": "4004930158296224490",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/breadcrumb/breadcumb.component.ts",
+          "hash": "14448712302412395407",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/nav-links/nav-links.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/nav-links/nav-links.component.html",
+          "hash": "7012119036106939684"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/nav-links/nav-links.component.spec.ts",
+          "hash": "9191500717719266833",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/nav-links/nav-links.component.ts",
+          "hash": "13668139297346615098",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "npm:@angular/router"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/navbar/navbar.component.css",
+          "hash": "2644599564799274293"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/navbar/navbar.component.html",
+          "hash": "4001238492434536755"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/navbar/navbar.component.spec.ts",
+          "hash": "11611426068913683136",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/components/navigation-components/navbar/navbar.component.ts",
+          "hash": "1340027235241200237",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "npm:@ng-bootstrap/ng-bootstrap",
+            "auth",
+            "npm:keycloak-js",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/doc-management-module/doc-management-module.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/doc-management-module/doc-management-module.component.html",
+          "hash": "18405660727709261738"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/doc-management-module/doc-management-module.component.spec.ts",
+          "hash": "10388095099826811278",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/doc-management-module/doc-management-module.component.ts",
+          "hash": "15483330067454929048",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/forms",
+            "npm:@angular/router",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component.css",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component.html",
+          "hash": "11085262438968789634"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component.spec.ts",
+          "hash": "4904764090822839393",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/doc-module-widget/doc-module-widget.component.ts",
+          "hash": "5255880580489321942",
+          "deps": [
+            "npm:@angular/core",
+            "npm:@angular/common",
+            "npm:@angular/router",
+            "shared-ui"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/document-routing-module.ts",
+          "hash": "14899648282468660958",
+          "deps": [
+            "npm:@angular/router",
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/models/DocumentModel.ts",
+          "hash": "16970744805592518855"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/models/DocumentStatus.ts",
+          "hash": "13315540274274294461"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/models/DocumentType.ts",
+          "hash": "15341636531961911938"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/models/DocumentVersion.ts",
+          "hash": "17938517243289522970"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/models/Folder.ts",
+          "hash": "10779575369913236139"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/models/RootFolder.ts",
+          "hash": "220494309228919191"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/models/SelectedFiles.ts",
+          "hash": "5221295469324750814"
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/BreadcumbService.ts",
+          "hash": "1587827818932841000",
+          "deps": [
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/Document.service.ts",
+          "hash": "11813920487715285753",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/breadcrumbs.service.spec.ts",
+          "hash": "15794351816250908594",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/breadcrumbs.service.ts",
+          "hash": "3371490650464904973",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/download-files.service.spec.ts",
+          "hash": "12935425005751640120",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/download-files.service.ts",
+          "hash": "6311280294647865267",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/folder.service.spec.ts",
+          "hash": "12265045952634904425",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/folder.service.ts",
+          "hash": "18334943142130677565",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/root-folder.service.spec.ts",
+          "hash": "6696073140310627828",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/root-folder.service.ts",
+          "hash": "1517454771684815467",
+          "deps": [
+            "npm:@angular/core",
+            "npm:apollo-angular",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/upload-files.service.spec.ts",
+          "hash": "2717277868974826716",
+          "deps": [
+            "npm:@angular/core"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/lib/services/upload-files.service.ts",
+          "hash": "8415732378357004166",
+          "deps": [
+            "npm:@angular/core",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/src/test-setup.ts",
+          "hash": "12935735732682149507",
+          "deps": [
+            "npm:jest-preset-angular"
+          ]
+        },
+        {
+          "file": "libs/doc-management-module/tsconfig.json",
+          "hash": "15487755565970508470"
+        },
+        {
+          "file": "libs/doc-management-module/tsconfig.lib.json",
+          "hash": "5796668385415907511"
+        },
+        {
+          "file": "libs/doc-management-module/tsconfig.spec.json",
+          "hash": "2927375835638640771"
+        }
+      ],
+      "admin-e2e": [
+        {
+          "file": "apps/admin-e2e/.eslintrc.json",
+          "hash": "14060216369337943343"
+        },
+        {
+          "file": "apps/admin-e2e/cypress.config.ts",
+          "hash": "12926192948156709158",
+          "deps": [
+            "npm:@nx/cypress",
+            "npm:cypress"
+          ]
+        },
+        {
+          "file": "apps/admin-e2e/project.json",
+          "hash": "10800201405267508187"
+        },
+        {
+          "file": "apps/admin-e2e/src/e2e/app.cy.ts",
+          "hash": "13195148276539214705"
+        },
+        {
+          "file": "apps/admin-e2e/src/fixtures/example.json",
+          "hash": "11785586596216172004"
+        },
+        {
+          "file": "apps/admin-e2e/src/support/app.po.ts",
+          "hash": "11157016311132186162"
+        },
+        {
+          "file": "apps/admin-e2e/src/support/commands.ts",
+          "hash": "5397443931564808659"
+        },
+        {
+          "file": "apps/admin-e2e/src/support/e2e.ts",
+          "hash": "1054106023200826784"
+        },
+        {
+          "file": "apps/admin-e2e/tsconfig.json",
+          "hash": "4332380883180617610"
+        }
+      ]
+    },
+    "nonProjectFiles": [
+      {
+        "file": ".editorconfig",
+        "hash": "5443105041930014821"
+      },
+      {
+        "file": ".eslintignore",
+        "hash": "7663861978715868291"
+      },
+      {
+        "file": ".eslintrc.json",
+        "hash": "18315524891129148814"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "13101392942105189479"
+      },
+      {
+        "file": ".prettierignore",
+        "hash": "3395189204293871444"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "16267754514737964994"
+      },
+      {
+        "file": "Dockerfile",
+        "hash": "1027829364999357813"
+      },
+      {
+        "file": "README.md",
+        "hash": "49583778296073197"
+      },
+      {
+        "file": "jest.config.ts",
+        "hash": "12333515226966617182"
+      },
+      {
+        "file": "jest.preset.js",
+        "hash": "9430166341120122740"
+      },
+      {
+        "file": "libs/coproperty-module/src/index.ts",
+        "hash": "16343192970617389487"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/models/charge.model.ts",
+        "hash": "14197272602420824338"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/models/coproperty.model.ts",
+        "hash": "16609507840999379301"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/models/index.ts",
+        "hash": "13681213137801569184"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/models/invoice.model.ts",
+        "hash": "18394334508177063334"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/models/maintenance.model.ts",
+        "hash": "3851474708116726609"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/models/owner.model.ts",
+        "hash": "2941115120146248936"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/models/unit.model.ts",
+        "hash": "5452060719277612175"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/services/charge.service.ts",
+        "hash": "11460945996331383208"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/services/coproperty.service.ts",
+        "hash": "10935832759180662680"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/services/index.ts",
+        "hash": "2831958718799140599"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/services/maintenance.service.ts",
+        "hash": "6092044268419184729"
+      },
+      {
+        "file": "libs/coproperty-module/src/lib/services/unit.service.ts",
+        "hash": "12665168282892807403"
+      },
+      {
+        "file": "libs/shared/infra/graphql/graphql.module.ts",
+        "hash": "191475237803522090"
+      },
+      {
+        "file": "libs/shared/infra/graphql/type-config.ts",
+        "hash": "18090709955350782344"
+      },
+      {
+        "file": "libs/shared/infra/models/base.model.ts",
+        "hash": "11927228969128995159"
+      },
+      {
+        "file": "libs/shared/infra/models/notification.model.ts",
+        "hash": "850256226247255088"
+      },
+      {
+        "file": "libs/shared/infra/models/subscription.model.ts",
+        "hash": "4283876681511375713"
+      },
+      {
+        "file": "libs/shared/infra/models/todo.model.ts",
+        "hash": "17931829926590306427"
+      },
+      {
+        "file": "libs/shared/infra/models/user.model.ts",
+        "hash": "12419320901539805781"
+      },
+      {
+        "file": "libs/shared/infra/repositories/repository.interface.ts",
+        "hash": "16361632088994182864"
+      },
+      {
+        "file": "libs/shared/infra/services/date-utils.service.ts",
+        "hash": "10141176312775723788"
+      },
+      {
+        "file": "libs/shared/infra/services/functions-utils.service.ts",
+        "hash": "11519251345322656815"
+      },
+      {
+        "file": "libs/shared/infra/services/general-settings.service.ts",
+        "hash": "17779626136607605114"
+      },
+      {
+        "file": "libs/shared/infra/services/holiday.service.ts",
+        "hash": "1010291491002206139"
+      },
+      {
+        "file": "libs/shared/infra/services/language.service.ts",
+        "hash": "4856880445914865129"
+      },
+      {
+        "file": "libs/shared/infra/services/notification.service.ts",
+        "hash": "13388588560039976072"
+      },
+      {
+        "file": "libs/shared/infra/services/ocr.service.spec.ts",
+        "hash": "8251272976698197851"
+      },
+      {
+        "file": "libs/shared/infra/services/ocr.service.ts",
+        "hash": "1395103507194943208"
+      },
+      {
+        "file": "libs/shared/infra/services/repository.service.spec.ts",
+        "hash": "7649801942291434097"
+      },
+      {
+        "file": "libs/shared/infra/services/repository.service.ts",
+        "hash": "9298386133577086216"
+      },
+      {
+        "file": "libs/shared/infra/services/subscription.service.ts",
+        "hash": "13671933214101001375"
+      },
+      {
+        "file": "libs/shared/infra/services/timesheet-utils.ts",
+        "hash": "4421621675659878132"
+      },
+      {
+        "file": "libs/shared/infra/services/toast.service.ts",
+        "hash": "15676830770221246791"
+      },
+      {
+        "file": "libs/shared/infra/services/todo.service.spec.ts",
+        "hash": "8818861391814372170"
+      },
+      {
+        "file": "libs/shared/infra/services/todo.service.ts",
+        "hash": "18382990037093996494"
+      },
+      {
+        "file": "libs/shared/infra/services/user.service.spec.ts",
+        "hash": "6916997602216291827"
+      },
+      {
+        "file": "libs/shared/infra/services/user.service.ts",
+        "hash": "1961144777618785767"
+      },
+      {
+        "file": "libs/shared/infra/tokens/apolloToken.ts",
+        "hash": "17503523150238745630"
+      },
+      {
+        "file": "nginx.conf",
+        "hash": "16287358926120893939"
+      },
+      {
+        "file": "nx.json",
+        "hash": "11311421328157808813"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "14500245250430487411"
+      },
+      {
+        "file": "package.json",
+        "hash": "16817833276975158716"
+      },
+      {
+        "file": "start-clientApp.sh",
+        "hash": "4123677447214857307"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "12520449004749749847"
+      }
+    ]
+  },
+  "externalNodesHash": "12695105979826424916"
+}

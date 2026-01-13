@@ -15,9 +15,10 @@ services:
       - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD:-keycloak-pwd}
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USER:-admin}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
-      - KC_HOSTNAME=localhost
       - KC_HOSTNAME_STRICT=false
       - KC_HTTP_ENABLED=true
+      - KC_PROXY=edge
+      - KC_HOSTNAME_URL=http://localhost:8080
     networks:
       - my-network
     volumes:
@@ -112,6 +113,27 @@ services:
       - my-network
     volumes:
       - postgres_invoice_data:/var/lib/postgresql/invoice/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service PostgreSQL pour Coproperty
+  copropertyDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${COPROPERTY_DB_PASSWORD:-coproperty-pwd}
+      POSTGRES_DB: ${COPROPERTY_DB_NAME:-copropertyDB}
+      POSTGRES_USER: ${COPROPERTY_DB_USER:-postgres}
+      PGDATA: /var/lib/postgresql/coproperty/data
+    ports:
+      - "5435:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_coproperty_data:/var/lib/postgresql/coproperty/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -280,6 +302,29 @@ services:
       - Email__FromAddress=${EMAIL_FROM_ADDRESS:-noreply@myb.com}
     restart: on-failure
 
+  # votre service Coproperty Management
+  myb-coproperty:
+    build:
+      context: .
+      dockerfile: ./src/services/coproperty-management/Myb.Coproperty/Dockerfile
+    ports:
+      - "8088:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      copropertyDB:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__CopropertyDBConnection=Host=copropertyDB;Port=5432;Database=${COPROPERTY_DB_NAME:-copropertyDB};Username=${COPROPERTY_DB_USER:-postgres};Password=${COPROPERTY_DB_PASSWORD:-coproperty-pwd}
+      - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+    restart: on-failure
+
 networks:
   my-network:
     driver: bridge
@@ -290,3 +335,4 @@ volumes:
   postgres_data:
   postgres_document_data:
   postgres_invoice_data:
+  postgres_coproperty_data:

@@ -27,22 +27,9 @@
             </div>
 
             <div
-              *ngIf="!(subscribedServices$ | async)?.includes(app.id)"
               class="card-text"
             >
-              <p>
-                <span class="fs-4 fw-semibold text-secondary">{{
-                  app.price
-                }}</span>
-                {{ app.currency }} /
-                <span style="font-size: small">{{ 'MONTH' | translate }}</span>
-              </p>
-              <button
-                class="btn btn-primary w-100 text-white"
-                (click)="openPaymentModal(app); $event.stopPropagation()"
-              >
-                {{ 'SUBSCRIBE' | translate }}
-              </button>
+              <!-- Subscription temporarily disabled for testing: allow direct navigation -->
             </div>
 
             <div *ngIf="isSubscribed(app.id) | async" class="card-text">

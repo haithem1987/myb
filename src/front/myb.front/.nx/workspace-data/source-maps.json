@@ -1,0 +1,3190 @@
+{
+  "apps/admin": {
+    "root": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "apps/admin/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.test": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.cache": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.inputs": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.outputs": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.executor": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.cwd": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.env": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.command": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies.0": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.description": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.command": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.example": [
+      "apps/admin/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "name": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.executor": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.outputs": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.defaultConfiguration": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.outputPath": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.index": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.main": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.polyfills": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.tsConfig": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.inlineStyleLanguage": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.assets": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.styles": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.scripts": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.production": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.production.budgets": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.production.outputHashing": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.buildOptimizer": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.optimization": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.vendorChunk": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.extractLicenses": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.sourceMap": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.namedChunks": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.executor": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.defaultConfiguration": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.production": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.production.buildTarget": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.development": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.development.buildTarget": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n.executor": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n.options": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n.options.buildTarget": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.executor": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.options": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.options.buildTarget": [
+      "apps/admin/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.build.dependsOn": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.build.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.build.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ]
+  },
+  "apps/admin-e2e": {
+    "root": [
+      "apps/admin-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "apps/admin-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "projectType": [
+      "apps/admin-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "metadata.targetGroups": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "metadata.targetGroups.E2E (CI)": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "metadata.targetGroups.E2E (CI).0": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "metadata.targetGroups.E2E (CI).1": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.cache": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.inputs": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.outputs": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.dependsOn": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.configurations": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.executor": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options.cwd": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options.env": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options.command": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.configurations.production": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.configurations.production.command": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.technologies": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.technologies.0": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.description": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.help": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.help.command": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.help.example": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.outputs": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.inputs": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.cache": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.dependsOn": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.executor": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options.cwd": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options.env": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options.command": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.technologies": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.technologies.0": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.description": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.help": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.help.command": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.help.example": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.executor": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.cache": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.inputs": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.outputs": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.dependsOn": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.technologies": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.technologies.0": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.description": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.nonAtomizedTarget": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.help": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.help.command": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.help.example": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.executor": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options.cwd": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options.env": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options.command": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.technologies": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.technologies.0": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.description": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.help": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.help.command": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.help.example": [
+      "apps/admin-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "name": [
+      "apps/admin-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "apps/admin-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "apps/admin-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "apps/admin-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "implicitDependencies": [
+      "apps/admin-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "implicitDependencies.admin": [
+      "apps/admin-e2e/project.json",
+      "nx/core/project-json"
+    ]
+  },
+  "apps/client": {
+    "root": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "apps/client/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.test": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.cache": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.inputs": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.outputs": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.executor": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.cwd": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.env": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.command": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies.0": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.description": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.command": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.example": [
+      "apps/client/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "name": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.executor": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.outputs": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.defaultConfiguration": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.outputPath": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.index": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.browser": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.polyfills": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.tsConfig": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.inlineStyleLanguage": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.assets": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.styles": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.scripts": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.production": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.production.budgets": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.production.outputHashing": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.buildOptimizer": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.optimization": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.vendorChunk": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.extractLicenses": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.sourceMap": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.namedChunks": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.executor": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.defaultConfiguration": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.options": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.options.proxyConfig": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.options.port": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.production": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.production.buildTarget": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.development": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.development.buildTarget": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n.executor": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n.options": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n.options.buildTarget": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.executor": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.options": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.options.buildTarget": [
+      "apps/client/project.json",
+      "nx/core/project-json"
+    ]
+  },
+  "apps/client-e2e": {
+    "root": [
+      "apps/client-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "apps/client-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "projectType": [
+      "apps/client-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "metadata.targetGroups": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "metadata.targetGroups.E2E (CI)": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "metadata.targetGroups.E2E (CI).0": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "metadata.targetGroups.E2E (CI).1": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.cache": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.inputs": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.outputs": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.dependsOn": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.configurations": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.executor": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options.cwd": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options.env": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options.command": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.configurations.production": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.configurations.production.command": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.technologies": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.technologies.0": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.description": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.help": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.help.command": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.help.example": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.outputs": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.inputs": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.cache": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.dependsOn": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.executor": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options.cwd": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options.env": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options.command": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.technologies": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.technologies.0": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.description": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.help": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.help.command": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.help.example": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.executor": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.cache": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.inputs": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.outputs": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.dependsOn": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.technologies": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.technologies.0": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.description": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.nonAtomizedTarget": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.help": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.help.command": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.help.example": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.executor": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options.cwd": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options.env": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options.command": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.technologies": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.technologies.0": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.description": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.help": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.help.command": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.help.example": [
+      "apps/client-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "name": [
+      "apps/client-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "apps/client-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "apps/client-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "apps/client-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "implicitDependencies": [
+      "apps/client-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "implicitDependencies.client": [
+      "apps/client-e2e/project.json",
+      "nx/core/project-json"
+    ]
+  },
+  "apps/myb.front": {
+    "root": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "apps/myb.front/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.test": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.cache": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.inputs": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.outputs": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.executor": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.cwd": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.env": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.command": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies.0": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.description": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.command": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.example": [
+      "apps/myb.front/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "name": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.executor": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.outputs": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.defaultConfiguration": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.outputPath": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.index": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.browser": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.polyfills": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.tsConfig": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.inlineStyleLanguage": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.assets": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.styles": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.scripts": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.production": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.production.budgets": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.production.outputHashing": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.optimization": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.extractLicenses": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.configurations.development.sourceMap": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.executor": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.defaultConfiguration": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.production": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.production.buildTarget": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.development": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.configurations.development.buildTarget": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n.executor": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n.options": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.extract-i18n.options.buildTarget": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.executor": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.options": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.options.buildTarget": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve-static.options.staticFilePath": [
+      "apps/myb.front/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.build.dependsOn": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.build.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.build.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ]
+  },
+  "apps/myb.front-e2e": {
+    "root": [
+      "apps/myb.front-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "apps/myb.front-e2e/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "projectType": [
+      "apps/myb.front-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "metadata.targetGroups": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "metadata.targetGroups.E2E (CI)": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "metadata.targetGroups.E2E (CI).0": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "metadata.targetGroups.E2E (CI).1": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.cache": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.inputs": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.outputs": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.dependsOn": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.configurations": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.executor": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options.cwd": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options.env": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.options.command": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.configurations.production": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.configurations.production.command": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.technologies": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.technologies.0": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.description": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.help": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.help.command": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e.metadata.help.example": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.outputs": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.inputs": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.cache": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.dependsOn": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.executor": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options.cwd": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options.env": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.options.command": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.technologies": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.technologies.0": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.description": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.help": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.help.command": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci--src/e2e/app.cy.ts.metadata.help.example": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.executor": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.cache": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.inputs": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.outputs": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.dependsOn": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.technologies": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.technologies.0": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.description": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.nonAtomizedTarget": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.help": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.help.command": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.e2e-ci.metadata.help.example": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.executor": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options.cwd": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options.env": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.options.command": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.technologies": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.technologies.0": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.description": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.help": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.help.command": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "targets.open-cypress.metadata.help.example": [
+      "apps/myb.front-e2e/cypress.config.ts",
+      "@nx/cypress/plugin"
+    ],
+    "name": [
+      "apps/myb.front-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "apps/myb.front-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "apps/myb.front-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "apps/myb.front-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "implicitDependencies": [
+      "apps/myb.front-e2e/project.json",
+      "nx/core/project-json"
+    ],
+    "implicitDependencies.myb-front": [
+      "apps/myb.front-e2e/project.json",
+      "nx/core/project-json"
+    ]
+  },
+  "libs/auth": {
+    "root": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "libs/auth/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.test": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.cache": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.inputs": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.outputs": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.executor": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.cwd": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.env": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.command": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies.0": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.description": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.command": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.example": [
+      "libs/auth/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "name": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:public": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageMain": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish.executor": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish.dependsOn": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish.options": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "$schema": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.executor": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.outputs": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.outputPath": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.main": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.tsConfig": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.assets": [
+      "libs/auth/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.build.dependsOn": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.build.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.build.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ]
+  },
+  "libs/doc-management-module": {
+    "root": [
+      "libs/doc-management-module/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "libs/doc-management-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.test": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.cache": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.inputs": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.outputs": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.executor": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.cwd": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.env": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.command": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies.0": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.description": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.command": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.example": [
+      "libs/doc-management-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "name": [
+      "libs/doc-management-module/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/doc-management-module/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/doc-management-module/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/doc-management-module/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/doc-management-module/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/doc-management-module/project.json",
+      "nx/core/project-json"
+    ]
+  },
+  "libs/invoice-module": {
+    "root": [
+      "libs/invoice-module/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "libs/invoice-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.test": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.cache": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.inputs": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.outputs": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.executor": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.cwd": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.env": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.command": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies.0": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.description": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.command": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.example": [
+      "libs/invoice-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "name": [
+      "libs/invoice-module/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:public": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish.executor": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish.dependsOn": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish.options": [
+      "libs/invoice-module/package.json",
+      "nx/core/package-json"
+    ],
+    "$schema": [
+      "libs/invoice-module/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/invoice-module/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/invoice-module/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/invoice-module/project.json",
+      "nx/core/project-json"
+    ]
+  },
+  "libs/shared/custom-styles": {
+    "root": [
+      "libs/shared/custom-styles/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "libs/shared/custom-styles/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.test": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.cache": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.inputs": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.outputs": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.executor": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.cwd": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.env": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.command": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies.0": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.description": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.command": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.example": [
+      "libs/shared/custom-styles/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "name": [
+      "libs/shared/custom-styles/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/shared/custom-styles/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/shared/custom-styles/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/shared/custom-styles/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/shared/custom-styles/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/shared/custom-styles/project.json",
+      "nx/core/project-json"
+    ]
+  },
+  "libs/shared/shared-ui": {
+    "root": [
+      "libs/shared/shared-ui/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "libs/shared/shared-ui/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.test": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.cache": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.inputs": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.outputs": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.executor": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.cwd": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.env": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.command": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies.0": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.description": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.command": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.example": [
+      "libs/shared/shared-ui/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "name": [
+      "libs/shared/shared-ui/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/shared/shared-ui/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/shared/shared-ui/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/shared/shared-ui/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/shared/shared-ui/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/shared/shared-ui/project.json",
+      "nx/core/project-json"
+    ]
+  },
+  "libs/time-sheet-module": {
+    "root": [
+      "libs/time-sheet-module/project.json",
+      "nx/core/project-json"
+    ],
+    "targets": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.cache": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.inputs": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.outputs": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.executor": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.cwd": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.options.command": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.technologies.0": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.description": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.command": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.lint.metadata.help.example": [
+      "libs/time-sheet-module/.eslintrc.json",
+      "@nx/eslint/plugin"
+    ],
+    "targets.test": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.cache": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.inputs": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.outputs": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.executor": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.cwd": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.env": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.options.command": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.technologies.0": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.description": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.command": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "targets.test.metadata.help.example": [
+      "libs/time-sheet-module/jest.config.ts",
+      "@nx/jest/plugin"
+    ],
+    "name": [
+      "libs/time-sheet-module/project.json",
+      "nx/core/project-json"
+    ],
+    "$schema": [
+      "libs/time-sheet-module/project.json",
+      "nx/core/project-json"
+    ],
+    "sourceRoot": [
+      "libs/time-sheet-module/project.json",
+      "nx/core/project-json"
+    ],
+    "prefix": [
+      "libs/time-sheet-module/project.json",
+      "nx/core/project-json"
+    ],
+    "projectType": [
+      "libs/time-sheet-module/project.json",
+      "nx/core/project-json"
+    ],
+    "tags": [
+      "libs/time-sheet-module/project.json",
+      "nx/core/project-json"
+    ]
+  }
+}

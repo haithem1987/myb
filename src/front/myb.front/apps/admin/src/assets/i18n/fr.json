@@ -1,0 +1,83 @@
+{
+  "coproperty": {
+    "dashboard": {
+      "title": "Tableau de bord Copropriété",
+      "treasury": "Solde de Trésorerie",
+      "charges": "Charges à Recouvrer",
+      "units": "Nombre Total de Lots",
+      "maintenance": "Maintenance en Attente",
+      "treasuryEvolution": "Évolution de la Trésorerie (12 mois)",
+      "chargesDistribution": "Répartition des Charges",
+      "recentActivities": "Activités Récentes",
+      "quickActions": "Actions Rapides",
+      "createFundCall": "Créer un Appel de Fonds",
+      "createAssembly": "Créer une AG",
+      "generateReport": "Générer un Rapport"
+    },
+    "charge": {
+      "title": "Gestion des Charges",
+      "details": "Détails de la Charge",
+      "distributionPreview": "Aperçu de la Répartition",
+      "distributionMethod": "Méthode de Répartition",
+      "byShares": "Par Tantièmes",
+      "byArea": "Par Surface",
+      "equal": "Répartition Égalitaire",
+      "custom": "Répartition Personnalisée",
+      "total": "Total",
+      "amount": "Montant",
+      "name": "Nom de la Charge",
+      "type": "Type de Charge",
+      "totalAmount": "Montant Total",
+      "frequency": "Fréquence",
+      "description": "Description",
+      "calculateDistribution": "Calculer la Répartition"
+    },
+    "unit": {
+      "management": "Gestion des Lots",
+      "list": "Lots",
+      "addUnit": "Ajouter un Lot",
+      "editUnit": "Modifier le Lot",
+      "number": "Numéro du Lot",
+      "floor": "Étage",
+      "area": "Superficie",
+      "shares": "Tantièmes",
+      "type": "Type",
+      "occupancyStatus": "Statut d'Occupation",
+      "owners": "Copropriétaires",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce lot ?"
+    },
+    "owner": {
+      "management": "Gestion des Copropriétaires",
+      "list": "Copropriétaires",
+      "addOwner": "Ajouter un Copropriétaire",
+      "editOwner": "Modifier le Copropriétaire",
+      "name": "Nom du Copropriétaire",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "units": "Lots Possédés",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce copropriétaire ?"
+    },
+    "maintenance": {
+      "title": "Demandes de Maintenance",
+      "requests": "Demandes de Maintenance",
+      "newRequest": "Nouvelle Demande",
+      "filterStatus": "Filtrer par Statut",
+      "filterPriority": "Filtrer par Priorité",
+      "description": "Description",
+      "category": "Catégorie",
+      "priority": "Priorité",
+      "status": "Statut"
+    }
+  },
+  "common": {
+    "email": "Email",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "actions": "Actions",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "reset": "Réinitialiser",
+    "createdAt": "Créé le",
+    "updatedAt": "Modifié le"
+  }
+}

@@ -1,0 +1,199 @@
+<div class="charge-distribution-container">
+  <div class="distribution-header">
+    <h2>{{ 'coproperty.charge.title' | translate }}</h2>
+  </div>
+
+  <!-- Charge Form -->
+  <div class="card form-card">
+    <div class="card-header">
+      <h5>{{ 'coproperty.charge.details' | translate }}</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="chargeForm">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="name" class="form-label">{{ 'coproperty.charge.name' | translate }}</label>
+              <input type="text" class="form-control" id="name" formControlName="name" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="chargeType" class="form-label">{{ 'coproperty.charge.type' | translate }}</label>
+              <select class="form-select" id="chargeType" formControlName="chargeType">
+                <option *ngFor="let type of chargeTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="totalAmount" class="form-label">{{ 'coproperty.charge.totalAmount' | translate }}</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="totalAmount" formControlName="totalAmount" step="0.01" />
+                <span class="input-group-text">€</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="frequency" class="form-label">{{ 'coproperty.charge.frequency' | translate }}</label>
+              <select class="form-select" id="frequency" formControlName="frequency">
+                <option *ngFor="let freq of frequencies" [value]="freq">{{ freq }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">{{ 'coproperty.charge.description' | translate }}</label>
+          <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Distribution Method Selection -->
+  <div class="card method-card">
+    <div class="card-header">
+      <h5>{{ 'coproperty.charge.distributionMethod' | translate }}</h5>
+    </div>
+    <div class="card-body">
+      <div class="method-options">
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="method"
+            id="byShares"
+            [value]="DistributionMethod.ByShares"
+            [(ngModel)]="selectedMethod"
+          />
+          <label class="form-check-label" for="byShares">
+            {{ 'coproperty.charge.byShares' | translate }}
+          </label>
+          <small class="text-muted d-block">Based on ownership shares (tantièmes)</small>
+        </div>
+
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="method"
+            id="byArea"
+            [value]="DistributionMethod.ByArea"
+            [(ngModel)]="selectedMethod"
+          />
+          <label class="form-check-label" for="byArea">
+            {{ 'coproperty.charge.byArea' | translate }}
+          </label>
+          <small class="text-muted d-block">Based on unit area (m²)</small>
+        </div>
+
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="method"
+            id="equal"
+            [value]="DistributionMethod.Equal"
+            [(ngModel)]="selectedMethod"
+          />
+          <label class="form-check-label" for="equal">
+            {{ 'coproperty.charge.equal' | translate }}
+          </label>
+          <small class="text-muted d-block">Equal distribution among all units</small>
+        </div>
+
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="method"
+            id="custom"
+            [value]="DistributionMethod.Custom"
+            [(ngModel)]="selectedMethod"
+          />
+          <label class="form-check-label" for="custom">
+            {{ 'coproperty.charge.custom' | translate }}
+          </label>
+          <small class="text-muted d-block">Manual amount entry per unit</small>
+        </div>
+      </div>
+
+      <button class="btn btn-primary mt-3" (click)="calculateDistribution()" [disabled]="!chargeForm.valid">
+        <i class="fas fa-calculator"></i>
+        {{ 'coproperty.charge.calculateDistribution' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Distribution Preview -->
+  <div *ngIf="showPreview" class="card distribution-preview">
+    <div class="card-header">
+      <h5>{{ 'coproperty.charge.distributionPreview' | translate }}</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>{{ 'coproperty.unit.number' | translate }}</th>
+              <th>{{ 'coproperty.owner.name' | translate }}</th>
+              <th>{{ 'coproperty.unit.area' | translate }}</th>
+              <th>{{ 'coproperty.unit.shares' | translate }}</th>
+              <th>{{ 'coproperty.charge.amount' | translate }}</th>
+              <th>%</th>
+              <th *ngIf="selectedMethod === DistributionMethod.Custom">Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of distributionPreview; let i = index">
+              <td>{{ item.unitNumber }}</td>
+              <td>{{ item.ownerName }}</td>
+              <td>{{ item.area }} m²</td>
+              <td>{{ item.shares }}</td>
+              <td>
+                <span *ngIf="selectedMethod !== DistributionMethod.Custom">
+                  {{ item.amount | currency: 'EUR' }}
+                </span>
+                <input
+                  *ngIf="selectedMethod === DistributionMethod.Custom"
+                  type="number"
+                  class="form-control form-control-sm"
+                  [(ngModel)]="item.amount"
+                  (change)="updateCustomAmount(i, item.amount)"
+                  step="0.01"
+                />
+              </td>
+              <td>{{ item.percentage.toFixed(2) }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="preview-summary">
+        <div class="summary-row">
+          <strong>{{ 'coproperty.charge.total' | translate }}:</strong>
+          <strong>{{ getTotalAmount() | currency: 'EUR' }}</strong>
+        </div>
+        <div class="summary-note" *ngIf="selectedMethod !== DistributionMethod.Custom && Math.abs(getTotalAmount() - totalAmount) > 0.01">
+          <small class="text-warning">Note: Rounding differences may apply</small>
+        </div>
+      </div>
+
+      <div class="preview-actions">
+        <button class="btn btn-success" (click)="saveDistribution()" [disabled]="!chargeForm.valid">
+          <i class="fas fa-save"></i>
+          {{ 'common.save' | translate }}
+        </button>
+        <button class="btn btn-secondary" (click)="reset()">
+          <i class="fas fa-redo"></i>
+          {{ 'common.reset' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

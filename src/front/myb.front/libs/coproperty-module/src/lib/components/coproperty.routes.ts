@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { CopropertyComponent } from './coproperty.component';
 import { CopropertyListComponent } from './coproperty-list.component';
 import { CopropertyDetailComponent } from './coproperty-detail.component';
+import { CopropertyDashboardComponent } from './dashboard/coproperty-dashboard.component';
 
 export const COPROPERTY_ROUTES: Routes = [
   {
@@ -10,14 +11,18 @@ export const COPROPERTY_ROUTES: Routes = [
     children: [
       {
         path: '',
+        component: CopropertyDashboardComponent,
+      },
+      {
+        path: 'coproperties',
         component: CopropertyListComponent,
       },
       {
-        path: ':id',
+        path: 'coproperties/:id',
         component: CopropertyDetailComponent,
       },
       {
-        path: ':id/edit',
+        path: 'coproperties/:id/edit',
         component: CopropertyDetailComponent,
       },
     ],

@@ -1,0 +1,148 @@
+<div class="unit-management-container">
+  <div class="management-header">
+    <h2>{{ 'coproperty.unit.management' | translate }}</h2>
+    <button class="btn btn-primary" (click)="openAddForm()">
+      <i class="fas fa-plus"></i>
+      {{ 'coproperty.unit.addUnit' | translate }}
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-section">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Search units..."
+      [(ngModel)]="searchTerm"
+    />
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div *ngIf="showAddForm" class="card form-card">
+    <div class="card-header">
+      <h5>{{ editingUnitId ? ('coproperty.unit.editUnit' | translate) : ('coproperty.unit.addUnit' | translate) }}</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="unitForm" (ngSubmit)="saveUnit()">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="unitNumber" class="form-label">{{ 'coproperty.unit.number' | translate }}</label>
+              <input type="text" class="form-control" id="unitNumber" formControlName="unitNumber" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="unitType" class="form-label">{{ 'coproperty.unit.type' | translate }}</label>
+              <select class="form-select" id="unitType" formControlName="unitType">
+                <option *ngFor="let type of unitTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="floor" class="form-label">{{ 'coproperty.unit.floor' | translate }}</label>
+              <input type="number" class="form-control" id="floor" formControlName="floor" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="area" class="form-label">{{ 'coproperty.unit.area' | translate }} (m²)</label>
+              <input type="number" class="form-control" id="area" formControlName="area" step="0.1" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="shares" class="form-label">{{ 'coproperty.unit.shares' | translate }}</label>
+              <input type="number" class="form-control" id="shares" formControlName="shares" />
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="occupancyStatus" class="form-label">{{ 'coproperty.unit.occupancyStatus' | translate }}</label>
+          <select class="form-select" id="occupancyStatus" formControlName="occupancyStatus">
+            <option *ngFor="let status of occupancyStatuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" [disabled]="!unitForm.valid">
+            <i class="fas fa-save"></i>
+            Save
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Units Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5>{{ 'coproperty.unit.list' | translate }} ({{ filteredUnits.length }})</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>{{ 'coproperty.unit.number' | translate }}</th>
+              <th>{{ 'coproperty.unit.floor' | translate }}</th>
+              <th>{{ 'coproperty.unit.area' | translate }}</th>
+              <th>{{ 'coproperty.unit.shares' | translate }}</th>
+              <th>{{ 'coproperty.unit.occupancyStatus' | translate }}</th>
+              <th>{{ 'coproperty.unit.owners' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let unit of filteredUnits">
+              <td>
+                <strong>{{ unit.unitNumber }}</strong>
+              </td>
+              <td>{{ unit.floor }}</td>
+              <td>{{ unit.area }} m²</td>
+              <td>{{ unit.shares }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'bg-success': unit.occupancyStatus === 'Occupied',
+                    'bg-warning': unit.occupancyStatus === 'Vacant',
+                    'bg-info': unit.occupancyStatus === 'Rented'
+                  }"
+                >
+                  {{ unit.occupancyStatus }}
+                </span>
+              </td>
+              <td>
+                <span *ngIf="unit.owners.length > 0">
+                  <span *ngFor="let owner of unit.owners; let last = last">
+                    {{ owner.firstName }} {{ owner.lastName }}
+                    <span *ngIf="!last">, </span>
+                  </span>
+                </span>
+                <span *ngIf="unit.owners.length === 0" class="text-muted">No owners</span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-primary" (click)="editUnit(unit)" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteUnit(unit)" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

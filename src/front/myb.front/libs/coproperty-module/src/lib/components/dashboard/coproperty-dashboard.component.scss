@@ -1,0 +1,276 @@
+.dashboard-container {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    color: #333;
+    font-weight: 600;
+    font-size: 2rem;
+    margin: 0;
+  }
+}
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .kpi-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+
+    &.treasury {
+      background-color: #3f51b5;
+    }
+
+    &.charges {
+      background-color: #ff9800;
+    }
+
+    &.units {
+      background-color: #4caf50;
+    }
+
+    &.maintenance {
+      background-color: #f44336;
+    }
+  }
+
+  .kpi-content {
+    flex: 1;
+
+    h3 {
+      font-size: 0.95rem;
+      color: #666;
+      margin: 0 0 0.5rem 0;
+      font-weight: 500;
+    }
+
+    .amount,
+    .count {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #333;
+      margin: 0;
+    }
+  }
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  .card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+
+    h5 {
+      margin: 0;
+      color: #333;
+      font-weight: 600;
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+    min-height: 300px;
+
+    .chart-container {
+      width: 100%;
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      border: 2px dashed #ddd;
+      border-radius: 4px;
+      background-color: #fafafa;
+    }
+
+    .chart-data-info {
+      display: none; // Hide for now, will be replaced by actual charts
+    }
+  }
+}
+
+.actions-card,
+.activities-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+
+  .card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+
+    h5 {
+      margin: 0;
+      color: #333;
+      font-weight: 600;
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+.actions-card {
+  .card-body {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    button {
+      flex: 1;
+      min-width: 150px;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      i {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+.activities-card {
+  .timeline {
+    .timeline-item {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+
+      &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .timeline-marker {
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.6rem;
+
+        &.badge-success {
+          background-color: #4caf50;
+        }
+
+        &.badge-warning {
+          background-color: #ff9800;
+        }
+
+        &.badge-info {
+          background-color: #3f51b5;
+        }
+
+        &.badge-secondary {
+          background-color: #999;
+        }
+      }
+
+      .timeline-content {
+        flex: 1;
+        padding-top: 0.25rem;
+
+        .timeline-description {
+          margin: 0;
+          color: #333;
+          font-weight: 500;
+        }
+
+        small {
+          display: block;
+          margin-top: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .actions-card .card-body {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}

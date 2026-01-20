@@ -165,5 +165,85 @@
     "THANK_YOU": "Thank you for your purchase.",
     "RETRY": "Please try again.",
     "CLOSE": "Close"
+  },
+  "coproperty": {
+    "dashboard": {
+      "title": "Coproperty Dashboard",
+      "treasury": "Treasury Balance",
+      "charges": "Charges to Collect",
+      "units": "Total Units",
+      "maintenance": "Pending Maintenance",
+      "treasuryEvolution": "Treasury Evolution (12 months)",
+      "chargesDistribution": "Charges Distribution",
+      "recentActivities": "Recent Activities",
+      "quickActions": "Quick Actions",
+      "createFundCall": "Create Fund Call",
+      "createAssembly": "Create Assembly",
+      "generateReport": "Generate Report"
+    },
+    "charge": {
+      "title": "Charge Management",
+      "details": "Charge Details",
+      "distributionPreview": "Distribution Preview",
+      "distributionMethod": "Distribution Method",
+      "byShares": "By Ownership Shares",
+      "byArea": "By Unit Area",
+      "equal": "Equal Distribution",
+      "custom": "Custom Distribution",
+      "total": "Total",
+      "amount": "Amount",
+      "name": "Charge Name",
+      "type": "Charge Type",
+      "totalAmount": "Total Amount",
+      "frequency": "Frequency",
+      "description": "Description",
+      "calculateDistribution": "Calculate Distribution"
+    },
+    "unit": {
+      "management": "Unit Management",
+      "list": "Units",
+      "addUnit": "Add Unit",
+      "editUnit": "Edit Unit",
+      "number": "Unit Number",
+      "floor": "Floor",
+      "area": "Area",
+      "shares": "Shares (Tantièmes)",
+      "type": "Type",
+      "occupancyStatus": "Occupancy Status",
+      "owners": "Owners",
+      "deleteConfirm": "Are you sure you want to delete this unit?"
+    },
+    "owner": {
+      "management": "Owner Management",
+      "list": "Owners",
+      "addOwner": "Add Owner",
+      "editOwner": "Edit Owner",
+      "name": "Owner Name",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "units": "Units Owned",
+      "deleteConfirm": "Are you sure you want to delete this owner?"
+    },
+    "maintenance": {
+      "title": "Maintenance Requests",
+      "requests": "Maintenance Requests",
+      "newRequest": "New Request",
+      "filterStatus": "Filter by Status",
+      "filterPriority": "Filter by Priority",
+      "description": "Description",
+      "category": "Category",
+      "priority": "Priority",
+      "status": "Status"
+    }
+  },
+  "common": {
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "actions": "Actions",
+    "save": "Save",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "createdAt": "Created",
+    "updatedAt": "Updated"
   }
-}

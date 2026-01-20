@@ -1,0 +1,123 @@
+<div class="owner-management-container">
+  <div class="management-header">
+    <h2>{{ 'coproperty.owner.management' | translate }}</h2>
+    <button class="btn btn-primary" (click)="openAddForm()">
+      <i class="fas fa-plus"></i>
+      {{ 'coproperty.owner.addOwner' | translate }}
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-section">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Search owners..."
+      [(ngModel)]="searchTerm"
+    />
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div *ngIf="showAddForm" class="card form-card">
+    <div class="card-header">
+      <h5>{{ editingOwnerId ? ('coproperty.owner.editOwner' | translate) : ('coproperty.owner.addOwner' | translate) }}</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="ownerForm" (ngSubmit)="saveOwner()">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="firstName" class="form-label">{{ 'coproperty.owner.firstName' | translate }}</label>
+              <input type="text" class="form-control" id="firstName" formControlName="firstName" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="lastName" class="form-label">{{ 'coproperty.owner.lastName' | translate }}</label>
+              <input type="text" class="form-control" id="lastName" formControlName="lastName" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="email" class="form-label">{{ 'common.email' | translate }}</label>
+              <input type="email" class="form-control" id="email" formControlName="email" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="phone" class="form-label">{{ 'common.phone' | translate }}</label>
+              <input type="tel" class="form-control" id="phone" formControlName="phone" />
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="address" class="form-label">{{ 'common.address' | translate }}</label>
+          <input type="text" class="form-control" id="address" formControlName="address" />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" [disabled]="!ownerForm.valid">
+            <i class="fas fa-save"></i>
+            Save
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Owners Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5>{{ 'coproperty.owner.list' | translate }} ({{ filteredOwners.length }})</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>{{ 'coproperty.owner.name' | translate }}</th>
+              <th>{{ 'common.email' | translate }}</th>
+              <th>{{ 'common.phone' | translate }}</th>
+              <th>{{ 'coproperty.owner.units' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let owner of filteredOwners">
+              <td>
+                <strong>{{ getOwnerFullName(owner) }}</strong>
+              </td>
+              <td>{{ owner.email }}</td>
+              <td>{{ owner.phone }}</td>
+              <td>
+                <span *ngIf="owner.units.length > 0">
+                  <span *ngFor="let unit of owner.units; let last = last">
+                    {{ unit.unitNumber }}
+                    <span *ngIf="!last">, </span>
+                  </span>
+                </span>
+                <span *ngIf="owner.units.length === 0" class="text-muted">No units</span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-primary" (click)="editOwner(owner)" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteOwner(owner)" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

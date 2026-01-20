@@ -138,8 +138,8 @@ export class CopropertyDetailComponent implements OnInit {
 
   loadCoproperty(id: string): void {
     this.copropertyService.getCoproperty(id).subscribe({
-      next: (result: any) => {
-        this.coproperty = result.data.coproperty;
+      next: (coproperty: Coproperty) => {
+        this.coproperty = coproperty;
       },
       error: (error) => {
         console.error('Error loading coproperty:', error);

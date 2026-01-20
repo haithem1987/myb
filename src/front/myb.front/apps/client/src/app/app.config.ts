@@ -24,8 +24,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
 }
 export function initializeKeycloak(keycloak: KeycloakService) {
-  console.log('initializeKeycloak');
-  return () => (!keycloak?.isAuthenticated() ? keycloak.init() : false);
+  console.log('Initializing Keycloak...');
+  return () => keycloak.init();
 }
 export const appConfig: ApplicationConfig = {
   providers: [

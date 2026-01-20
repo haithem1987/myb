@@ -10,6 +10,10 @@ public class Owner : IEntity<Guid>
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public Guid UnitId { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? Phone { get; set; }
     public decimal OwnershipPercentage { get; set; } = 100.00m;
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }

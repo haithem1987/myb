@@ -43,6 +43,7 @@ export class ChargeDistributionComponent implements OnInit {
 
   DistributionMethod = DistributionMethod;
   selectedMethod: DistributionMethod = DistributionMethod.ByShares;
+  Math = Math; // Make Math available in template
 
   chargeTypes = ['General', 'Special', 'Works'];
   frequencies = ['Monthly', 'Quarterly', 'Annually'];

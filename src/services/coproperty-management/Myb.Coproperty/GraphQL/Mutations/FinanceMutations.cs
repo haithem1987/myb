@@ -35,8 +35,8 @@ public class FinanceMutations
     /// </summary>
     public async Task<bool> SendPaymentReminder(
         Guid invoiceId,
-        int level = 1,
-        [Service] IFinanceService financeService)
+        [Service] IFinanceService financeService,
+        int level = 1)
     {
         await financeService.SendPaymentReminderAsync(invoiceId, level);
         return true;

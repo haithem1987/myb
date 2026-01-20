@@ -181,6 +181,9 @@
       "createAssembly": "Create Assembly",
       "generateReport": "Generate Report"
     },
+    "charges": {
+      "management": "Charge Management"
+    },
     "charge": {
       "title": "Charge Management",
       "details": "Charge Details",
@@ -195,9 +198,41 @@
       "name": "Charge Name",
       "type": "Charge Type",
       "totalAmount": "Total Amount",
+      "paidAmount": "Paid Amount",
+      "unpaidAmount": "Unpaid Amount",
+      "dueDate": "Due Date",
+      "status": "Status",
+      "unitStats": "Units Paid/Total",
       "frequency": "Frequency",
       "description": "Description",
       "calculateDistribution": "Calculate Distribution"
+    },
+    "filters": {
+      "period": "Period",
+      "currentMonth": "Current Month",
+      "currentQuarter": "Current Quarter",
+      "currentYear": "Current Year",
+      "customPeriod": "Custom Period",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status",
+      "all": "All"
+    },
+    "status": {
+      "paid": "Paid",
+      "partiallyPaid": "Partially Paid",
+      "unpaid": "Unpaid",
+      "overdue": "Overdue"
+    },
+    "summary": {
+      "totalCharges": "Total Charges",
+      "totalPaid": "Total Paid",
+      "totalUnpaid": "Total Unpaid",
+      "collectionRate": "Collection Rate"
+    },
+    "actions": {
+      "export": "Export",
+      "sendReminders": "Send Reminders"
     },
     "unit": {
       "management": "Unit Management",
@@ -236,6 +271,47 @@
       "status": "Status"
     }
   },
+  "owner": {
+    "payments": {
+      "title": "My Payments",
+      "totalToPay": "Total to Pay",
+      "totalPaid": "Total Paid",
+      "myUnits": "My Units",
+      "payNow": "Pay Now",
+      "noPayments": "No payments found"
+    },
+    "payment": {
+      "unit": "Unit",
+      "charge": "Charge",
+      "amount": "Amount",
+      "dueDate": "Due Date",
+      "paidDate": "Paid Date",
+      "status": "Status"
+    },
+    "filters": {
+      "period": "Period",
+      "thisMonth": "This Month",
+      "thisQuarter": "This Quarter",
+      "thisYear": "This Year",
+      "customPeriod": "Custom Period",
+      "from": "From",
+      "to": "To",
+      "status": "Status",
+      "all": "All",
+      "unit": "Unit",
+      "allUnits": "All Units"
+    },
+    "status": {
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "overdue": "Overdue"
+    },
+    "actions": {
+      "payNow": "Pay Now",
+      "downloadInvoice": "Download Invoice",
+      "downloadReceipt": "Download Receipt"
+    }
+  },
   "common": {
     "email": "Email",
     "phone": "Phone",
@@ -244,6 +320,9 @@
     "save": "Save",
     "cancel": "Cancel",
     "reset": "Reset",
+    "view": "View",
+    "export": "Export",
     "createdAt": "Created",
     "updatedAt": "Updated"
   }
+}

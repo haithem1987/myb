@@ -2,13 +2,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Myb.Common.Repositories;
 using Myb.Common.Stripe;
-using Myb.Timesheet.Infra;
 
 namespace Myb.Common.GraphQL.Infra
 {
     public static class GraphQlRegistration
     {
-        public static void RegisterGraphQl<TDbContext, TQuery, TMutation>(this IServiceCollection serviceCollection,string schemaName) 
+        public static void RegisterGraphQl<TDbContext, TQuery, TMutation>(this IServiceCollection serviceCollection, string schemaName) 
             where TDbContext : DbContext, new() 
             where TQuery : class 
             where TMutation : class
@@ -29,11 +28,6 @@ namespace Myb.Common.GraphQL.Infra
                 .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true)
                 .AddSorting()
                 .AddFiltering()
-                //.AddType<TimesheetResolver>()
-                //.AddMutationType<PaymentMutation>()
-                //.AddAuthorizationCore()
-                // RegisterDbContext replaced with EF Core integration in HotChocolate 14.x
-                // DbContext is now registered through DI and automatically detected
                 .AddQueryType<TQuery>()
                 .AddMutationType<TMutation>();     
         }

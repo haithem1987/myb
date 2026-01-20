@@ -29,6 +29,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@env/*": ["apps/client/src/environments/*"],
       "@myb-front/auth": ["libs/auth/src/index.ts"],
       "@myb-front/custom-styles": ["libs/shared/custom-styles/src/index.ts"],
       "@myb-front/doc-management-module": ["libs/doc-management-module/src/index.ts"],

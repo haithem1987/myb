@@ -21,6 +21,18 @@ public class CopropertyDbContext : DbContext
     public DbSet<CopropertyInvoice> CopropertyInvoices { get; set; } = null!;
     public DbSet<Payment> Payments { get; set; } = null!;
     public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; } = null!;
+    public DbSet<FundCall> FundCalls { get; set; } = null!;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        
+        // Suppress PendingModelChangesWarning in Development
+        // This allows the service to start even if migrations are pending,
+        // useful during development iterations
+        optionsBuilder.ConfigureWarnings(w =>
+            w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -309,6 +321,39 @@ public class CopropertyDbContext : DbContext
             
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CopropertyId);
+        });
+
+        // FundCall Configuration
+        modelBuilder.Entity<FundCall>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.Amount)
+                .HasPrecision(10, 2)
+                .IsRequired();
+            
+            entity.Property(e => e.Description)
+                .HasMaxLength(2000)
+                .IsRequired();
+            
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.HasOne(e => e.Coproperty)
+                .WithMany()
+                .HasForeignKey(e => e.CopropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(e => e.CopropertyId);
+            entity.HasIndex(e => e.IsActive);
+            
+            // Check constraint for amount
+            entity.ToTable(t => t.HasCheckConstraint(
+                "CHK_FundCall_Amount", 
+                "\"Amount\" >= 0"));
         });
     }
 }

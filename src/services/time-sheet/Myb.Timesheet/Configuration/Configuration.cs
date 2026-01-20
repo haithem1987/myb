@@ -13,11 +13,25 @@ public static class Configuration
         builder.Services.AddPooledDbContextFactory<TimesheetContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("TimesheetDBConnection")));
 
+        // Add CORS for GraphQL endpoint
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+
         builder.Services.RegisterGraphQl<TimesheetContext, TimesheetQuery, TimesheetMutation>("timesheet");
     }
 
     public static void ConfigureTimesheetModuleApp(this WebApplication app)
     {
+        app.UseCors("AllowAll");
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapGraphQL("/timesheet/graphql", "timesheet");
     }
 }

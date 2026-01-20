@@ -8,12 +8,12 @@ import { onError } from '@apollo/client/link/error';
 import { Router } from '@angular/router';
 import { environment } from '../../../../apps/client/envirements/envirement';
 
-// Define your microservices' endpoints
-const baseUri = environment.baseUri;
+// Define your microservices' endpoints (use explicit per-service URIs)
 const microserviceLinks = {
-  timesheetService: `${baseUri}/timesheet/graphql`,
-  documentService: `${baseUri}/document/graphql`,
-  invoiceService: `${baseUri}/invoice/graphql`,
+  timesheetService: environment.services?.timesheet ?? 'http://localhost:8082/graphql',
+  documentService: environment.services?.document ?? 'http://localhost:8086/graphql',
+  invoiceService: environment.services?.invoice ?? 'http://localhost:8083/graphql',
+  copropertyService: environment.services?.coproperty ?? 'http://localhost:8088/graphql',
 };
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -33,9 +33,9 @@ const createServiceLink = (httpLink: HttpLink) => {
     {} as { [key: string]: ApolloLink }
   );
   return new ApolloLink((operation, forward) => {
-    const targetService =
-      operation?.getContext()['service'] ?? 'timesheetService';
-    return serviceLinks[targetService].request(operation, forward);
+    const targetService = operation?.getContext()['service'] ?? 'timesheetService';
+    const link = serviceLinks[targetService];
+    return link.request(operation, forward);
   });
 };
 

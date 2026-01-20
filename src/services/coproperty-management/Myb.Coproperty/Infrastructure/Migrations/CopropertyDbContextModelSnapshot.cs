@@ -36,7 +36,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<Guid>("CopropertyId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("CreatedBy")
@@ -74,6 +74,9 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CopropertyId");
@@ -102,8 +105,17 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<Guid>("ChargeId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("numeric");
+
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -142,7 +154,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasDefaultValue("France");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -173,7 +185,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<int>("TotalUnits")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -200,11 +212,23 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<Guid>("ChargeId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<Guid>("CopropertyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("FundCallId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("InvoiceDate")
                         .HasColumnType("timestamp with time zone");
@@ -248,9 +272,14 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ChargeId");
+
+                    b.HasIndex("FundCallId");
 
                     b.HasIndex("InvoiceNumber")
                         .IsUnique();
@@ -262,6 +291,55 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.HasIndex("UnitId");
 
                     b.ToTable("CopropertyInvoices");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.FundCall", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<Guid>("CopropertyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CopropertyId");
+
+                    b.HasIndex("IsActive");
+
+                    b.ToTable("FundCalls", t =>
+                        {
+                            t.HasCheckConstraint("CHK_FundCall_Amount", "\"Amount\" >= 0");
+                        });
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.MaintenanceRequest", b =>
@@ -288,7 +366,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<Guid>("CopropertyId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -328,7 +406,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<Guid?>("UnitId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -348,14 +426,26 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsMainOwner")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<decimal>("OwnershipPercentage")
                         .ValueGeneratedOnAdd()
@@ -363,11 +453,17 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasColumnType("numeric(5,2)")
                         .HasDefaultValue(100.00m);
 
+                    b.Property<string>("Phone")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -394,7 +490,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("CreatedBy")
@@ -419,6 +515,9 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("InvoiceId");
@@ -439,7 +538,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<Guid>("CopropertyId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -451,6 +550,9 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.Property<bool>("IsOccupied")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("OccupancyStatus")
+                        .HasColumnType("text");
 
                     b.Property<int>("Shares")
                         .HasColumnType("integer");
@@ -464,7 +566,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -515,6 +617,10 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Myb.Coproperty.Models.FundCall", null)
+                        .WithMany("Invoices")
+                        .HasForeignKey("FundCallId");
+
                     b.HasOne("Myb.Coproperty.Models.Owner", "Owner")
                         .WithMany("Invoices")
                         .HasForeignKey("OwnerId")
@@ -532,6 +638,17 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Navigation("Owner");
 
                     b.Navigation("Unit");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.FundCall", b =>
+                {
+                    b.HasOne("Myb.Coproperty.Models.Coproperty", "Coproperty")
+                        .WithMany()
+                        .HasForeignKey("CopropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coproperty");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.MaintenanceRequest", b =>
@@ -604,6 +721,11 @@ namespace Myb.Coproperty.Infrastructure.Migrations
             modelBuilder.Entity("Myb.Coproperty.Models.CopropertyInvoice", b =>
                 {
                     b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.FundCall", b =>
+                {
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.Owner", b =>

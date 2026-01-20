@@ -169,3 +169,36 @@ export enum MaintenanceStatus {
   COMPLETED = 'Completed',
   CANCELLED = 'Cancelled',
 }
+
+// Dashboard Models
+export interface DashboardStats {
+  totalCoproperties: number;
+  totalUnits: number;
+  totalBalance: number;
+  totalCharges: number;
+  pendingMaintenance: number;
+  overdueInvoices: number;
+}
+
+export interface TreasuryDataPoint {
+  month: number;
+  year: number;
+  balance: number;
+  income: number;
+  expenses: number;
+}
+
+export interface ChargeDistributionData {
+  chargeType: string;
+  amount: number;
+  percentage: number;
+}
+
+export interface FinancialReport {
+  copropertyId: string;
+  period: string;
+  totalIncome: number;
+  totalExpenses: number;
+  balance: number;
+  chargesBreakdown: ChargeDistributionData[];
+}

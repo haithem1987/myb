@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="HotChocolate" Version="14.1.0" />
-      <PackageReference Include="HotChocolate.Abstractions" Version="14.1.0" />
+      <PackageReference Include="HotChocolate" Version="14.2.0" />
+      <PackageReference Include="HotChocolate.Abstractions" Version="14.2.0" />
       <PackageReference Include="Stripe.net" Version="46.0.0" />
     </ItemGroup>
 

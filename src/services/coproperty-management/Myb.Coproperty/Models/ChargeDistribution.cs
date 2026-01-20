@@ -11,6 +11,7 @@ public class ChargeDistribution : IEntity<Guid>
     public Guid ChargeId { get; set; }
     public Guid UnitId { get; set; }
     public decimal Amount { get; set; }
+    public decimal Percentage { get; set; }
     public DateTime CalculatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;

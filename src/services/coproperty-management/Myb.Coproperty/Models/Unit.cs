@@ -16,6 +16,7 @@ public class Unit : IEntity<Guid>
     public string? UnitType { get; set; }
     public string? Description { get; set; }
     public bool IsOccupied { get; set; }
+    public string? OccupancyStatus { get; set; }
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     

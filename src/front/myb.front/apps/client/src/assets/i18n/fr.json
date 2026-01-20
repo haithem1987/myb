@@ -182,6 +182,9 @@
       "createAssembly": "Créer une AG",
       "generateReport": "Générer un Rapport"
     },
+    "charges": {
+      "management": "Gestion des Charges"
+    },
     "charge": {
       "title": "Gestion des Charges",
       "details": "Détails de la Charge",
@@ -196,9 +199,41 @@
       "name": "Nom de la Charge",
       "type": "Type de Charge",
       "totalAmount": "Montant Total",
+      "paidAmount": "Montant Payé",
+      "unpaidAmount": "Montant Impayé",
+      "dueDate": "Date d'Échéance",
+      "status": "Statut",
+      "unitStats": "Lots Payés/Total",
       "frequency": "Fréquence",
       "description": "Description",
       "calculateDistribution": "Calculer la Répartition"
+    },
+    "filters": {
+      "period": "Période",
+      "currentMonth": "Mois en Cours",
+      "currentQuarter": "Trimestre en Cours",
+      "currentYear": "Année en Cours",
+      "customPeriod": "Période Personnalisée",
+      "startDate": "Date de Début",
+      "endDate": "Date de Fin",
+      "status": "Statut",
+      "all": "Tous"
+    },
+    "status": {
+      "paid": "Payé",
+      "partiallyPaid": "Partiellement Payé",
+      "unpaid": "Impayé",
+      "overdue": "En Retard"
+    },
+    "summary": {
+      "totalCharges": "Total des Charges",
+      "totalPaid": "Total Payé",
+      "totalUnpaid": "Total Impayé",
+      "collectionRate": "Taux de Recouvrement"
+    },
+    "actions": {
+      "export": "Exporter",
+      "sendReminders": "Envoyer des Rappels"
     },
     "unit": {
       "management": "Gestion des Lots",
@@ -237,6 +272,47 @@
       "status": "Statut"
     }
   },
+  "owner": {
+    "payments": {
+      "title": "Mes Paiements",
+      "totalToPay": "Total à Payer",
+      "totalPaid": "Total Payé",
+      "myUnits": "Mes Lots",
+      "payNow": "Payer Maintenant",
+      "noPayments": "Aucun paiement trouvé"
+    },
+    "payment": {
+      "unit": "Lot",
+      "charge": "Charge",
+      "amount": "Montant",
+      "dueDate": "Date d'Échéance",
+      "paidDate": "Date de Paiement",
+      "status": "Statut"
+    },
+    "filters": {
+      "period": "Période",
+      "thisMonth": "Ce Mois",
+      "thisQuarter": "Ce Trimestre",
+      "thisYear": "Cette Année",
+      "customPeriod": "Période Personnalisée",
+      "from": "De",
+      "to": "À",
+      "status": "Statut",
+      "all": "Tous",
+      "unit": "Lot",
+      "allUnits": "Tous les Lots"
+    },
+    "status": {
+      "paid": "Payé",
+      "unpaid": "Impayé",
+      "overdue": "En Retard"
+    },
+    "actions": {
+      "payNow": "Payer Maintenant",
+      "downloadInvoice": "Télécharger la Facture",
+      "downloadReceipt": "Télécharger le Reçu"
+    }
+  },
   "common": {
     "email": "Email",
     "phone": "Téléphone",
@@ -245,6 +321,9 @@
     "save": "Enregistrer",
     "cancel": "Annuler",
     "reset": "Réinitialiser",
+    "view": "Voir",
+    "export": "Exporter",
     "createdAt": "Créé le",
     "updatedAt": "Modifié le"
   }
+}

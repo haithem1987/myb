@@ -6,8 +6,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 // Add DbContext
-builder.Services.AddDbContext<CopropertyDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Prefer container-provided connection string; fall back to DefaultConnection for local dev
+var connectionString = builder.Configuration.GetConnectionString("CopropertyDBConnection")
+                      ?? builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContextFactory<CopropertyDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// Add HttpContextAccessor for authentication
+builder.Services.AddHttpContextAccessor();
 
 // Add Repositories
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.ICopropertyRepository, Myb.Coproperty.Infrastructure.Repositories.CopropertyRepository>();
@@ -16,6 +22,8 @@ builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IOwnerRepo
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IChargeRepository, Myb.Coproperty.Infrastructure.Repositories.ChargeRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IMaintenanceRepository, Myb.Coproperty.Infrastructure.Repositories.MaintenanceRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IInvoiceRepository, Myb.Coproperty.Infrastructure.Repositories.InvoiceRepository>();
+// Register ChargeDistribution generic repository
+builder.Services.AddScoped<Myb.Common.Repositories.IGenericRepository<Guid, Myb.Coproperty.Models.ChargeDistribution, CopropertyDbContext>, Myb.Common.Repositories.GenericRepository<Guid, Myb.Coproperty.Models.ChargeDistribution, CopropertyDbContext>>();
 
 // Add Services
 builder.Services.AddScoped<Myb.Coproperty.Services.ICopropertyService, Myb.Coproperty.Services.CopropertyService>();
@@ -24,6 +32,8 @@ builder.Services.AddScoped<Myb.Coproperty.Services.IOwnerService, Myb.Coproperty
 builder.Services.AddScoped<Myb.Coproperty.Services.IChargeService, Myb.Coproperty.Services.ChargeService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IMaintenanceService, Myb.Coproperty.Services.MaintenanceService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IFinanceService, Myb.Coproperty.Services.FinanceService>();
+builder.Services.AddScoped<Myb.Coproperty.Services.IFundCallService, Myb.Coproperty.Services.FundCallService>();
+builder.Services.AddScoped<Myb.Coproperty.GraphQL.Mutations.IAuthenticationService, Myb.Coproperty.Services.AuthenticationService>();
 
 // Add GraphQL
 builder.Services
@@ -35,6 +45,7 @@ builder.Services
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.ChargeQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.MaintenanceQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.InvoiceQueries>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.FundCallQueries>()
     .AddMutationType(d => d.Name("Mutation"))
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.CopropertyMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.UnitMutations>()
@@ -42,6 +53,7 @@ builder.Services
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.ChargeMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.MaintenanceMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.FinanceMutations>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.FundCallMutations>()
     .AddType<Myb.Coproperty.GraphQL.Types.CopropertyType>()
     .AddType<Myb.Coproperty.GraphQL.Types.UnitType>()
     .AddType<Myb.Coproperty.GraphQL.Types.OwnerType>()
@@ -73,30 +85,64 @@ builder.Services.AddCors(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Swagger disabled for GraphQL-only API
+// builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Swagger disabled for GraphQL-only API
+    // app.UseSwagger();
+    // app.UseSwaggerUI();
 
-    // Seed database with sample data in development
+    // Seed database with sample data in development (with retry logic)
     using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<CopropertyDbContext>();
-    await SeedData.SeedAsync(dbContext);
+    var contextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<CopropertyDbContext>>();
+    
+    int retryCount = 0;
+    const int maxRetries = 5;
+    
+    while (retryCount < maxRetries)
+    {
+        try
+        {
+            using var dbContext = contextFactory.CreateDbContext();
+            await dbContext.Database.MigrateAsync();
+            await SeedData.SeedAsync(dbContext);
+            break;
+        }
+        catch (Exception ex)
+        {
+            retryCount++;
+            if (retryCount >= maxRetries)
+            {
+                app.Logger.LogError(ex, "Failed to seed database after {retries} retries", maxRetries);
+            }
+            else
+            {
+                app.Logger.LogWarning(ex, "Failed to seed database, retrying ({attempt}/{max})...", retryCount, maxRetries);
+                await Task.Delay(2000); // Wait 2 seconds before retry
+            }
+        }
+    }
 }
 
-app.UseHttpsRedirection();
+// Only redirect to HTTPS when configured (avoid warning in containers)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
-app.MapControllers();
+// GraphQL only - no REST controllers needed
+// app.MapControllers();
 
 app.MapGraphQL();
+app.MapGraphQL("/coproperty/graphql"); // Support legacy path for backward compatibility
 
 app.Run();

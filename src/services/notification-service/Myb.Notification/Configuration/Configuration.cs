@@ -16,6 +16,17 @@ public static class Configuration
         builder.Services.AddPooledDbContextFactory<NotificationContext>(opts =>
             opts.UseNpgsql(builder.Configuration.GetConnectionString("NotificationDBConnection")));
 
+        // Add CORS for SignalR and HTTP endpoints
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<IUserIdProvider, KeycloakUserIdProvider>();
         builder.Services.AddScoped<INotificationService, NotificationService>();
@@ -24,6 +35,9 @@ public static class Configuration
 
     public static void ConfigureNotificationModuleApp(this WebApplication app)
     {
+        app.UseCors("AllowAll");
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapControllers();
         app.MapHub<NotificationHub>("/notificationhub")
             .RequireAuthorization();  // protects the hub with JWT auth

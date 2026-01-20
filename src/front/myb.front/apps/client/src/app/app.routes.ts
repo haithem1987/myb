@@ -1,10 +1,4 @@
-import { DocumentroutingModule } from './../../../../libs/doc-management-module/src/lib/document-routing-module';
 import { Route } from '@angular/router';
-import {
-  DocManagementModuleComponent,
-  FolderDetailsComponent,
-} from '@myb-front/doc-management-module';
-import { AccessDeniedPageComponent } from '@myb-front/shared-ui';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
 export const appRoutes: Route[] = [
   // {
@@ -58,6 +52,24 @@ export const appRoutes: Route[] = [
     path: 'subscriptions',
     loadComponent: () =>
       import('@myb-front/shared-ui').then((c) => c.SubscriptionsComponent),
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'coproperties',
+        pathMatch: 'full',
+      },
+      {
+        path: 'coproperties',
+        loadChildren: () =>
+          import('@myb-front/coproperty-module').then(
+            (m) => m.COPROPERTY_ROUTES
+          ),
+      },
+    ],
   },
   {
     path: 'access-denied',

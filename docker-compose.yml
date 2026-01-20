@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   keycloak:
     image: quay.io/keycloak/keycloak:23.0.4
@@ -19,6 +17,7 @@ services:
       - KC_HTTP_ENABLED=true
       - KC_PROXY=edge
       - KC_HOSTNAME_URL=http://localhost:8080
+      - KC_HOSTNAME_STRICT_HTTPS=false
     networks:
       - my-network
     volumes:
@@ -191,8 +190,6 @@ services:
     build:
       context: .
       dockerfile: ./src/front/myb.front/Dockerfile
-      cache_from:
-        - myb-front:latest
     ports:
       - "4200:80"
     networks:

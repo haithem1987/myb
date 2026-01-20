@@ -8,6 +8,7 @@ namespace Myb.Coproperty.Models;
 public class CopropertyInvoice : IEntity<Guid>
 {
     public Guid Id { get; set; }
+    public Guid CopropertyId { get; set; }
     public string InvoiceNumber { get; set; } = string.Empty;
     public Guid ChargeId { get; set; }
     public Guid UnitId { get; set; }
@@ -21,7 +22,9 @@ public class CopropertyInvoice : IEntity<Guid>
     public DateTime? PaidDate { get; set; }
     public string? PaymentMethod { get; set; }
     public string? Notes { get; set; }
+    public string? Description { get; set; }
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public Guid CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     
     // Navigation Properties

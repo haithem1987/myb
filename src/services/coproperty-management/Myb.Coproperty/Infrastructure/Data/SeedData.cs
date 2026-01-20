@@ -129,8 +129,11 @@ public static class SeedData
             CopropertyId = coproperty1.Id,
             Name = "Entretien parties communes",
             Description = "Nettoyage et entretien des espaces communs",
-            Amount = 5000,
-            Frequency = "Quarterly",
+            TotalAmount = 5000,
+            ChargeType = ChargeType.Maintenance,
+            Frequency = ChargeFrequency.Quarterly,
+            DistributionMethod = DistributionMethod.Equal,
+            StartDate = DateTime.UtcNow.AddMonths(-3),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -141,8 +144,11 @@ public static class SeedData
             CopropertyId = coproperty1.Id,
             Name = "Charges de chauffage",
             Description = "Charges liées au chauffage collectif",
-            Amount = 3000,
-            Frequency = "Monthly",
+            TotalAmount = 3000,
+            ChargeType = ChargeType.Electricity,
+            Frequency = ChargeFrequency.Monthly,
+            DistributionMethod = DistributionMethod.Equal,
+            StartDate = DateTime.UtcNow.AddMonths(-1),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -153,8 +159,11 @@ public static class SeedData
             CopropertyId = coproperty1.Id,
             Name = "Travaux de rénovation",
             Description = "Rénovation de la toiture",
-            Amount = 10000,
-            Frequency = "OneTime",
+            TotalAmount = 10000,
+            ChargeType = ChargeType.Maintenance,
+            Frequency = ChargeFrequency.Exceptional,
+            DistributionMethod = DistributionMethod.ByShares,
+            StartDate = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -186,7 +195,7 @@ public static class SeedData
 
         foreach (var distribution in distributions)
         {
-            var invoiceAmount = (charge1.Amount * distribution.Percentage) / 100;
+            var invoiceAmount = (charge1.TotalAmount * distribution.Percentage) / 100;
 
             invoices.Add(new CopropertyInvoice
             {
@@ -194,14 +203,16 @@ public static class SeedData
                 InvoiceNumber = $"INV-{invoiceNumber:D6}",
                 ChargeId = charge1.Id,
                 UnitId = distribution.UnitId,
-                OwnerId = context.Units.First(u => u.Id == distribution.UnitId).Owners?.FirstOrDefault()?.Id,
+                OwnerId = context.Units.First(u => u.Id == distribution.UnitId).Owners?.FirstOrDefault()?.Id ?? Guid.Empty,
+                CopropertyId = coproperty1.Id,
                 Amount = invoiceAmount,
                 TaxAmount = invoiceAmount * 0.1m,
                 TotalAmount = invoiceAmount * 1.1m,
                 InvoiceDate = DateTime.UtcNow.AddMonths(-3),
                 DueDate = DateTime.UtcNow.AddMonths(-2),
                 Status = InvoiceStatus.Pending,
-                CreatedBy = "seed",
+                CreatedBy = Guid.Empty,
+                Description = "Quarterly charges",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             });
@@ -225,7 +236,7 @@ public static class SeedData
                 PaymentDate = invoice.PaidDate.Value,
                 PaymentMethod = "Bank Transfer",
                 TransactionId = $"TXN-{Guid.NewGuid():N}".Substring(0, 20),
-                CreatedBy = "seed",
+                CreatedBy = Guid.Empty,
                 CreatedAt = invoice.PaidDate.Value
             };
 
@@ -244,10 +255,11 @@ public static class SeedData
                 Id = Guid.NewGuid(),
                 CopropertyId = coproperty1.Id,
                 UnitId = coproperty1Units[i].Id,
-                RequestedBy = $"Owner {i + 1}",
+                RequestedBy = Guid.Empty,
                 Description = $"Maintenance issue {i + 1}",
-                Priority = i % 2 == 0 ? "High" : "Medium",
-                Status = i % 3 == 0 ? "Completed" : "Pending",
+                Category = MaintenanceCategory.Plumbing,
+                Priority = i % 2 == 0 ? Priority.High : Priority.Normal,
+                Status = i % 3 == 0 ? MaintenanceStatus.Completed : MaintenanceStatus.Pending,
                 CreatedAt = DateTime.UtcNow.AddDays(-10 + i),
                 UpdatedAt = DateTime.UtcNow
             });

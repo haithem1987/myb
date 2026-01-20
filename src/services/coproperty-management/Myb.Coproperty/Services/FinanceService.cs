@@ -11,20 +11,20 @@ namespace Myb.Coproperty.Services;
 /// </summary>
 public class FinanceService : IFinanceService
 {
-    private readonly CopropertyDbContext _context;
+    private readonly IDbContextFactory<CopropertyDbContext> _contextFactory;
     private readonly IChargeRepository _chargeRepository;
     private readonly ICopropertyRepository _copropertyRepository;
     private readonly IUnitRepository _unitRepository;
     private readonly IOwnerRepository _ownerRepository;
 
     public FinanceService(
-        CopropertyDbContext context,
+        IDbContextFactory<CopropertyDbContext> contextFactory,
         IChargeRepository chargeRepository,
         ICopropertyRepository copropertyRepository,
         IUnitRepository unitRepository,
         IOwnerRepository ownerRepository)
     {
-        _context = context;
+        _contextFactory = contextFactory;
         _chargeRepository = chargeRepository;
         _copropertyRepository = copropertyRepository;
         _unitRepository = unitRepository;
@@ -36,6 +36,8 @@ public class FinanceService : IFinanceService
     /// </summary>
     public async Task<List<TreasuryDataPoint>> GetTreasuryEvolutionAsync(Guid copropertyId, int months = 12)
     {
+        using var context = _contextFactory.CreateDbContext();
+        
         var dataPoints = new List<TreasuryDataPoint>();
         var currentDate = DateTime.UtcNow;
         
@@ -44,8 +46,7 @@ public class FinanceService : IFinanceService
             .AddMonths(-months + 1);
 
         // Get payments grouped by month
-        var payments = await _context.Payments
-            .Where(p => p.Invoice.ChargeId.HasValue)
+        var payments = await context.Payments
             .Include(p => p.Invoice)
             .Where(p => p.PaymentDate >= startDate)
             .ToListAsync();
@@ -78,8 +79,10 @@ public class FinanceService : IFinanceService
     /// </summary>
     public async Task<List<CopropertyInvoice>> GenerateInvoicesFromChargeAsync(Guid chargeId, string createdBy)
     {
-        var charge = await _context.Charges
-            .Include(c => c.ChargeDistributions)
+        using var context = _contextFactory.CreateDbContext();
+        
+        var charge = await context.Charges
+            .Include(c => c.Distributions)
             .FirstOrDefaultAsync(c => c.Id == chargeId);
 
         if (charge == null)
@@ -88,37 +91,40 @@ public class FinanceService : IFinanceService
         var invoices = new List<CopropertyInvoice>();
 
         // Get all charge distributions for this charge
-        var distributions = charge.ChargeDistributions.ToList();
+        var distributions = charge.Distributions.ToList();
 
         foreach (var distribution in distributions)
         {
             // Calculate invoice amount based on distribution
             var invoiceAmount = distribution.Percentage > 0 
-                ? (charge.Amount * distribution.Percentage) / 100 
-                : charge.Amount / distributions.Count;
+                ? (charge.TotalAmount * distribution.Percentage) / 100 
+                : charge.TotalAmount / distributions.Count;
 
             // Create invoice
             var invoice = new CopropertyInvoice
             {
                 Id = Guid.NewGuid(),
                 InvoiceNumber = $"INV-{charge.CopropertyId:N}-{chargeId:N}-{distribution.UnitId:N}".Substring(0, 50),
+                CopropertyId = charge.CopropertyId,
                 ChargeId = chargeId,
                 UnitId = distribution.UnitId,
+                OwnerId = Guid.Empty,
                 Amount = invoiceAmount,
                 TaxAmount = 0, // Calculate based on tax settings
                 TotalAmount = invoiceAmount,
                 InvoiceDate = DateTime.UtcNow,
                 DueDate = DateTime.UtcNow.AddDays(30),
                 Status = InvoiceStatus.Pending,
-                CreatedBy = createdBy,
+                CreatedBy = Guid.TryParse(createdBy, out var userGuid) ? userGuid : Guid.Empty,
+                Description = charge.Description,
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.CopropertyInvoices.Add(invoice);
+            context.CopropertyInvoices.Add(invoice);
             invoices.Add(invoice);
         }
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
         return invoices;
     }
 
@@ -127,7 +133,9 @@ public class FinanceService : IFinanceService
     /// </summary>
     public async Task<Payment> RecordPaymentAsync(RecordPaymentInput input, string createdBy)
     {
-        var invoice = await _context.CopropertyInvoices
+        using var context = _contextFactory.CreateDbContext();
+        
+        var invoice = await context.CopropertyInvoices
             .Include(i => i.Payments)
             .FirstOrDefaultAsync(i => i.Id == input.InvoiceId);
 
@@ -144,11 +152,11 @@ public class FinanceService : IFinanceService
             PaymentMethod = input.PaymentMethod,
             TransactionId = input.Reference,
             Notes = input.Notes,
-            CreatedBy = createdBy,
+            CreatedBy = Guid.TryParse(createdBy, out var userGuid) ? userGuid : Guid.Empty,
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.Payments.Add(payment);
+        context.Payments.Add(payment);
 
         // Update invoice status
         var totalPaid = (invoice.Payments?.Sum(p => p.Amount) ?? 0) + input.Amount;
@@ -165,7 +173,7 @@ public class FinanceService : IFinanceService
 
         invoice.UpdatedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
         return payment;
     }
 
@@ -174,7 +182,9 @@ public class FinanceService : IFinanceService
     /// </summary>
     public async Task SendPaymentReminderAsync(Guid invoiceId, int level = 1)
     {
-        var invoice = await _context.CopropertyInvoices
+        using var context = _contextFactory.CreateDbContext();
+        
+        var invoice = await context.CopropertyInvoices
             .Include(i => i.Unit)
             .Include(i => i.Owner)
             .FirstOrDefaultAsync(i => i.Id == invoiceId);
@@ -200,16 +210,18 @@ public class FinanceService : IFinanceService
     /// </summary>
     public async Task<FinancialReport> GenerateFinancialReportAsync(Guid copropertyId, int year)
     {
-        var charges = await _context.Charges
-            .Where(c => c.CopropertyId == copropertyId && c.CreatedAt.Year == year)
+        using var context = _contextFactory.CreateDbContext();
+        
+        var charges = await context.Charges
+            .Where(c => c.CopropertyId == copropertyId && c.CreatedAt.HasValue && c.CreatedAt.Value.Year == year)
             .ToListAsync();
 
-        var invoices = await _context.CopropertyInvoices
-            .Where(i => i.Charge.CopropertyId == copropertyId && i.CreatedAt.Year == year)
+        var invoices = await context.CopropertyInvoices
+            .Where(i => i.Charge.CopropertyId == copropertyId && i.CreatedAt.HasValue && i.CreatedAt.Value.Year == year)
             .Include(i => i.Payments)
             .ToListAsync();
 
-        var totalCharges = charges.Sum(c => c.Amount);
+        var totalCharges = charges.Sum(c => c.TotalAmount);
         var totalCollected = invoices.Sum(i => i.Payments.Sum(p => p.Amount));
         var totalOverdue = invoices
             .Where(i => i.Status == InvoiceStatus.Overdue || 
@@ -235,16 +247,18 @@ public class FinanceService : IFinanceService
     /// </summary>
     public async Task<DashboardStats> GetDashboardStatsAsync(Guid? copropertyId = null)
     {
-        var copropertiesQuery = _context.Coproperties.AsQueryable();
+        using var context = _contextFactory.CreateDbContext();
+        
+        var copropertiesQuery = context.Coproperties.AsQueryable();
         if (copropertyId.HasValue)
             copropertiesQuery = copropertiesQuery.Where(c => c.Id == copropertyId);
 
         var totalCoproperties = await copropertiesQuery.CountAsync();
-        var totalUnits = await _context.Units
+        var totalUnits = await context.Units
             .Where(u => !copropertyId.HasValue || u.CopropertyId == copropertyId)
             .CountAsync();
 
-        var invoicesQuery = _context.CopropertyInvoices.AsQueryable();
+        var invoicesQuery = context.CopropertyInvoices.AsQueryable();
         if (copropertyId.HasValue)
             invoicesQuery = invoicesQuery.Where(i => i.Charge.CopropertyId == copropertyId);
 
@@ -254,16 +268,16 @@ public class FinanceService : IFinanceService
                        i.DueDate < DateTime.UtcNow)
             .CountAsync();
 
-        var pendingMaintenance = await _context.MaintenanceRequests
+        var pendingMaintenance = await context.MaintenanceRequests
             .Where(m => !copropertyId.HasValue || m.CopropertyId == copropertyId)
-            .Where(m => m.Status != "Completed" && m.Status != "Cancelled")
+            .Where(m => m.Status != MaintenanceStatus.Completed && m.Status != MaintenanceStatus.Cancelled)
             .CountAsync();
 
-        var totalBalance = await invoicesQuery
+        var totalBalance = invoicesQuery
             .Where(i => i.Status != InvoiceStatus.Paid)
             .Include(i => i.Payments)
             .ToListAsync()
-            .ContinueWith(task => task.Result.Sum(i => i.TotalAmount - (i.Payments?.Sum(p => p.Amount) ?? 0)));
+            .ContinueWith(task => (decimal)task.Result.Sum(i => i.TotalAmount - (i.Payments?.Sum(p => p.Amount) ?? 0)));
 
         return new DashboardStats
         {

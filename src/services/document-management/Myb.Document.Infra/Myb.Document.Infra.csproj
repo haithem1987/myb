@@ -12,8 +12,8 @@
 
   <ItemGroup>
     <PackageReference Include="GraphQL.Upload.AspNetCore" Version="3.0.3" />
-    <PackageReference Include="HotChocolate" Version="14.1.0" />
-    <PackageReference Include="HotChocolate.Abstractions" Version="14.1.0" />
+    <PackageReference Include="HotChocolate" Version="14.2.0" />
+    <PackageReference Include="HotChocolate.Abstractions" Version="14.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
     <PackageReference Include="System.IO.Abstractions" Version="21.0.2" />
   </ItemGroup>

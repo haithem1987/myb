@@ -22,8 +22,8 @@ namespace Myb.Coproperty.GraphQL.Queries
         /// Get dashboard statistics for coproperties
         /// </summary>
         public async Task<DashboardStats> GetDashboardStats(
-            Guid? copropertyId = null,
-            [Service] IFinanceService financeService) =>
+            [Service] IFinanceService financeService,
+            Guid? copropertyId = null) =>
             await financeService.GetDashboardStatsAsync(copropertyId);
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace Myb.Coproperty.GraphQL.Queries
         /// </summary>
         public async Task<List<TreasuryDataPoint>> GetTreasuryEvolution(
             Guid copropertyId,
-            int months = 12,
-            [Service] IFinanceService financeService) =>
+            [Service] IFinanceService financeService,
+            int months = 12) =>
             await financeService.GetTreasuryEvolutionAsync(copropertyId, months);
 
         /// <summary>

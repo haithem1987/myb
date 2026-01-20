@@ -1,0 +1,314 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.4
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=${KEYCLOAK_ADMIN_USER:-admin}
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/keycloak
+      - KC_DB_USERNAME=${KEYCLOAK_DB_USER:-keycloak}
+      - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD:-keycloak-pwd}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USER:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      - KC_HOSTNAME_STRICT=false
+      - KC_HTTP_ENABLED=true
+      - KC_PROXY=edge
+      - KC_HOSTNAME_URL=http://localhost:8080
+      - KC_HOSTNAME_STRICT_HTTPS=false
+    networks:
+      - my-network
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    command: start --db=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+
+  # Keycloak PostgreSQL Database
+  keycloak-db:
+    image: postgres:16.2
+    container_name: keycloak-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME:-keycloak}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER:-keycloak}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak-pwd}
+      PGDATA: /var/lib/postgresql/keycloak/data
+    ports:
+      - "5450:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_keycloak_data:/var/lib/postgresql/keycloak/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${KEYCLOAK_DB_USER:-keycloak}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service PostgreSQL pour Timesheet
+  timesheetDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${TIMESHEET_DB_PASSWORD:-timesheet-pwd}
+      POSTGRES_DB: ${TIMESHEET_DB_NAME:-timesheetDB}
+      POSTGRES_USER: ${TIMESHEET_DB_USER:-postgres}
+      PGDATA: /var/lib/postgresql/timesheet/data
+    ports:
+      - "5448:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/timesheet/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service PostgreSQL pour Document
+  documentDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DOCUMENT_DB_PASSWORD:-document-pwd}
+      POSTGRES_DB: ${DOCUMENT_DB_NAME:-documentDB}
+      POSTGRES_USER: ${DOCUMENT_DB_USER:-postgres}
+      PGDATA: /var/lib/postgresql/document/data
+    ports:
+      - "5433:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_document_data:/var/lib/postgresql/document/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service PostgreSQL pour Invoice
+  invoiceDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${INVOICE_DB_PASSWORD:-invoice-pwd}
+      POSTGRES_DB: ${INVOICE_DB_NAME:-invoiceDB}
+      POSTGRES_USER: ${INVOICE_DB_USER:-postgres}
+      PGDATA: /var/lib/postgresql/invoice/data
+    ports:
+      - "5434:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_invoice_data:/var/lib/postgresql/invoice/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service PostgreSQL pour Coproperty
+  copropertyDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${COPROPERTY_DB_PASSWORD:-coproperty-pwd}
+      POSTGRES_DB: ${COPROPERTY_DB_NAME:-copropertyDB}
+      POSTGRES_USER: ${COPROPERTY_DB_USER:-postgres}
+      PGDATA: /var/lib/postgresql/coproperty/data
+    ports:
+      - "5435:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_coproperty_data:/var/lib/postgresql/coproperty/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # UserManager service
+  myb-usermanager:
+    build:
+      context: .
+      dockerfile: ./src/services/user-manager/Myb.UserManager/Dockerfile
+    ports:
+      - "8087:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      timesheetDB:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__UserDBConnection=Host=timesheetDB;Port=5432;Database=${TIMESHEET_DB_NAME:-timesheetDB};Username=${TIMESHEET_DB_USER:-postgres};Password=${TIMESHEET_DB_PASSWORD:-timesheet-pwd}
+      - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+    restart: on-failure
+
+  # Timesheet service
+  myb-timesheet:
+    build:
+      context: .
+      dockerfile: ./src/services/time-sheet/Myb.Timesheet/Dockerfile
+    ports:
+      - "8082:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      timesheetDB:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__TimesheetDBConnection=Host=timesheetDB;Port=5432;Database=${TIMESHEET_DB_NAME:-timesheetDB};Username=${TIMESHEET_DB_USER:-postgres};Password=${TIMESHEET_DB_PASSWORD:-timesheet-pwd}
+      - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+    restart: on-failure
+
+  # Document service
+  myb-docmanager:
+    build:
+      context: .
+      dockerfile: ./src/services/document-management/Myb.Document/Dockerfile
+    ports:
+      - "8086:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      documentDB:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__DocumentDBConnection=Host=documentDB;Port=5432;Database=${DOCUMENT_DB_NAME:-documentDB};Username=${DOCUMENT_DB_USER:-postgres};Password=${DOCUMENT_DB_PASSWORD:-document-pwd}
+      - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+    restart: on-failure
+
+  # Invoice service
+  myb-invoice:
+    build:
+      context: .
+      dockerfile: ./src/services/invoice-management/Myb.Invoice/Dockerfile
+    ports:
+      - "8083:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      invoiceDB:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__InvoiceDBConnection=Host=invoiceDB;Port=5432;Database=${INVOICE_DB_NAME:-invoiceDB};Username=${INVOICE_DB_USER:-postgres};Password=${INVOICE_DB_PASSWORD:-invoice-pwd}
+      - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+    restart: on-failure
+
+  # Payment service
+  myb-payment:
+    build:
+      context: .
+      dockerfile: ./src/services/payment-service/Myb.Payment/Dockerfile
+    ports:
+      - "8084:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+      - Stripe__SecretKey=${STRIPE_SECRET_KEY:-sk_test_dummy_key}
+      - Stripe__PublishableKey=${STRIPE_PUBLISHABLE_KEY:-pk_test_dummy_key}
+    restart: on-failure
+
+  # Notification service
+  myb-notification:
+    build:
+      context: .
+      dockerfile: ./src/services/notification-service/Myb.Notification/Dockerfile
+    ports:
+      - "8085:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+      - SendGrid__ApiKey=${SENDGRID_API_KEY:-sg_test_dummy_key}
+      - Email__FromAddress=${EMAIL_FROM_ADDRESS:-noreply@myb.com}
+    restart: on-failure
+
+  # Coproperty Management service
+  myb-coproperty:
+    build:
+      context: .
+      dockerfile: ./src/services/coproperty-management/Myb.Coproperty/Dockerfile
+    ports:
+      - "8088:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      copropertyDB:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__CopropertyDBConnection=Host=copropertyDB;Port=5432;Database=${COPROPERTY_DB_NAME:-copropertyDB};Username=${COPROPERTY_DB_USER:-postgres};Password=${COPROPERTY_DB_PASSWORD:-coproperty-pwd}
+      - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+    restart: on-failure
+
+  # NOTE: Frontend (myb-front) is NOT included in this dev compose file
+  # Run it locally with: npm run start or nx serve
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  keycloak_data:
+  postgres_keycloak_data:
+  postgres_data:
+  postgres_document_data:
+  postgres_invoice_data:
+  postgres_coproperty_data:

@@ -17,6 +17,7 @@ import { HttpClient } from '@angular/common/http';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { environment } from '@env/environment';
 
 interface Service {
   serviceId: number;
@@ -44,6 +45,9 @@ export class PaymentComponent implements OnDestroy {
 
   @ViewChild(StripeCardComponent) card: StripeCardComponent | undefined;
   private activeModal: NgbModalRef | undefined;
+
+  private paymentBaseUrl = environment.services.payment.baseUrl;
+  private paymentApiPath = environment.services.payment.apiPath;
 
   cardForm: FormGroup;
   isLoading = false;
@@ -120,7 +124,7 @@ export class PaymentComponent implements OnDestroy {
 
             this.http
               .post(
-                'http://localhost:5000/api/payment/create-payment-intent',
+                `${this.paymentBaseUrl}${this.paymentApiPath}/create-payment-intent`,
                 paymentData
               )
               .subscribe(

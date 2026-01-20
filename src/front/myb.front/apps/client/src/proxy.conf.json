@@ -12,5 +12,34 @@
     "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true
+  },
+  "/api/payment/*": {
+    "target": "http://localhost:8084",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/payment": "/api/payment"
+    },
+    "logLevel": "debug"
+  },
+  "/api/document/*": {
+    "target": "http://localhost:8086",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/invoice/*": {
+    "target": "http://localhost:8083",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/timesheet/*": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/graphql": {
+    "target": "http://localhost:5117",
+    "secure": false,
+    "changeOrigin": true
   }
 }

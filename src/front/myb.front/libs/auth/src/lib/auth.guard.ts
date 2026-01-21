@@ -2,24 +2,25 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { KeycloakService } from './keycloak.service';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async (route, state) => {
   const keycloakService = inject(KeycloakService);
   const router = inject(Router);
 
-  // const initialized = await keycloakService.init();
+  try {
+    // Wait for Keycloak to initialize
+    const initialized = await keycloakService.init();
 
-  // if (!initialized) {
-  //   // If initialization failed, or the user is not authenticated
-  //   return router.createUrlTree(['/access-denied']);
-  // }
+    if (!initialized || !keycloakService.isAuthenticated()) {
+      console.log('User not authenticated, redirecting to login');
+      // Redirect to Keycloak login
+      keycloakService.login();
+      return false;
+    }
 
-  if (keycloakService.isAuthenticated()) {
-    console.log(
-      'keycloakService.isAuthenticated()',
-      keycloakService.isAuthenticated()
-    );
+    console.log('User authenticated:', keycloakService.isAuthenticated());
     return true;
-  } else {
+  } catch (error) {
+    console.error('Auth guard error:', error);
     return router.createUrlTree(['/access-denied']);
   }
 };

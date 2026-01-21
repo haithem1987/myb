@@ -1,219 +1,121 @@
-import { Injectable } from '@angular/core';
-import { Apollo, gql } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { 
-  MaintenanceRequest, 
-  CreateMaintenanceInput, 
-  UpdateMaintenanceInput 
-} from '../models';
+import { Injectable, inject } from '@angular/core';
+import { Apollo } from 'apollo-angular';
+import { Observable, map } from 'rxjs';
+import {
+  GET_ALL_MAINTENANCE_REQUESTS,
+  GET_MAINTENANCE_REQUEST_BY_ID,
+  GET_MAINTENANCE_BY_COPROPERTY,
+  GET_MAINTENANCE_BY_STATUS,
+} from '../graphql/queries/maintenance.query';
+import {
+  CREATE_MAINTENANCE_REQUEST,
+  UPDATE_MAINTENANCE_REQUEST,
+  DELETE_MAINTENANCE_REQUEST,
+  UPDATE_MAINTENANCE_STATUS,
+} from '../graphql/mutations/maintenance.mutation';
 
-const GET_MAINTENANCE_REQUESTS = gql`
-  query GetMaintenanceRequests($copropertyId: UUID!) {
-    maintenanceRequests(copropertyId: $copropertyId) {
-      id
-      copropertyId
-      unitId
-      requestedBy
-      title
-      description
-      category
-      priority
-      status
-      assignedTo
-      estimatedCost
-      actualCost
-      scheduledDate
-      completedDate
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const GET_MAINTENANCE_REQUEST = gql`
-  query GetMaintenanceRequest($id: UUID!) {
-    maintenanceRequest(id: $id) {
-      id
-      copropertyId
-      unitId
-      requestedBy
-      title
-      description
-      category
-      priority
-      status
-      assignedTo
-      estimatedCost
-      actualCost
-      scheduledDate
-      completedDate
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const GET_MY_MAINTENANCE_REQUESTS = gql`
-  query GetMyMaintenanceRequests($userId: UUID!) {
-    myMaintenanceRequests(userId: $userId) {
-      id
-      copropertyId
-      unitId
-      title
-      category
-      priority
-      status
-      scheduledDate
-      createdAt
-    }
-  }
-`;
-
-const CREATE_MAINTENANCE_REQUEST = gql`
-  mutation CreateMaintenanceRequest($input: CreateMaintenanceInput!) {
-    createMaintenanceRequest(input: $input) {
-      id
-      copropertyId
-      unitId
-      requestedBy
-      title
-      description
-      category
-      priority
-      status
-      estimatedCost
-      scheduledDate
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const UPDATE_MAINTENANCE_REQUEST = gql`
-  mutation UpdateMaintenanceRequest($id: UUID!, $input: UpdateMaintenanceInput!) {
-    updateMaintenanceRequest(id: $id, input: $input) {
-      id
-      title
-      description
-      category
-      priority
-      status
-      estimatedCost
-      actualCost
-      scheduledDate
-      updatedAt
-    }
-  }
-`;
-
-const ASSIGN_MAINTENANCE = gql`
-  mutation AssignMaintenance($id: UUID!, $technicianId: UUID!) {
-    assignMaintenance(id: $id, technicianId: $technicianId) {
-      id
-      assignedTo
-      status
-      updatedAt
-    }
-  }
-`;
-
-const COMPLETE_MAINTENANCE_REQUEST = gql`
-  mutation CompleteMaintenanceRequest($id: UUID!, $actualCost: Decimal) {
-    completeMaintenanceRequest(id: $id, actualCost: $actualCost) {
-      id
-      status
-      actualCost
-      completedDate
-      updatedAt
-    }
-  }
-`;
+export interface MaintenanceRequestExtended {
+  id?: number;
+  copropertyId: number;
+  unitId?: number;
+  unitNumber?: string;
+  title: string;
+  description: string;
+  category: 'PLUMBING' | 'ELECTRICAL' | 'HEATING' | 'ELEVATOR' | 'ROOF' | 'FACADE' | 'OTHER';
+  priority: 'LOW' | 'NORMAL' | 'HIGH' | 'EMERGENCY';
+  status: 'PENDING' | 'ASSIGNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  reportedBy: string;
+  assignedTo?: string;
+  estimatedCost?: number;
+  actualCost?: number;
+  scheduledDate?: Date;
+  completedDate?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MaintenanceService {
-  constructor(private apollo: Apollo) {}
+  private apollo = inject(Apollo);
 
-  getMaintenanceRequests(copropertyId: string): Observable<MaintenanceRequest[]> {
+  getAllMaintenanceRequests(): Observable<MaintenanceRequestExtended[]> {
     return this.apollo
-      .watchQuery<{ maintenanceRequests: MaintenanceRequest[] }>({
-        query: GET_MAINTENANCE_REQUESTS,
-        variables: { copropertyId }
+      .query<{ allMaintenanceRequests: MaintenanceRequestExtended[] }>({
+        query: GET_ALL_MAINTENANCE_REQUESTS,
+        context: { serviceName: 'copropertyService' },
       })
-      .valueChanges.pipe(
-        map(result => result.data.maintenanceRequests)
-      );
+      .pipe(map((result) => result.data.allMaintenanceRequests));
   }
 
-  getMaintenanceRequest(id: string): Observable<MaintenanceRequest> {
+  getMaintenanceRequestById(id: number): Observable<MaintenanceRequestExtended> {
     return this.apollo
-      .watchQuery<{ maintenanceRequest: MaintenanceRequest }>({
-        query: GET_MAINTENANCE_REQUEST,
-        variables: { id }
+      .query<{ maintenanceRequestById: MaintenanceRequestExtended }>({
+        query: GET_MAINTENANCE_REQUEST_BY_ID,
+        variables: { id },
+        context: { serviceName: 'copropertyService' },
       })
-      .valueChanges.pipe(
-        map(result => result.data.maintenanceRequest)
-      );
+      .pipe(map((result) => result.data.maintenanceRequestById));
   }
 
-  getMyMaintenanceRequests(userId: string): Observable<MaintenanceRequest[]> {
+  getMaintenanceByCoproperty(copropertyId: number): Observable<MaintenanceRequestExtended[]> {
     return this.apollo
-      .watchQuery<{ myMaintenanceRequests: MaintenanceRequest[] }>({
-        query: GET_MY_MAINTENANCE_REQUESTS,
-        variables: { userId }
+      .query<{ maintenanceByCoproperty: MaintenanceRequestExtended[] }>({
+        query: GET_MAINTENANCE_BY_COPROPERTY,
+        variables: { copropertyId },
+        context: { serviceName: 'copropertyService' },
       })
-      .valueChanges.pipe(
-        map(result => result.data.myMaintenanceRequests)
-      );
+      .pipe(map((result) => result.data.maintenanceByCoproperty));
   }
 
-  createMaintenanceRequest(input: CreateMaintenanceInput): Observable<MaintenanceRequest> {
+  getMaintenanceByStatus(copropertyId: number, status: string): Observable<MaintenanceRequestExtended[]> {
     return this.apollo
-      .mutate<{ createMaintenanceRequest: MaintenanceRequest }>({
+      .query<{ maintenanceByStatus: MaintenanceRequestExtended[] }>({
+        query: GET_MAINTENANCE_BY_STATUS,
+        variables: { copropertyId, status },
+        context: { serviceName: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data.maintenanceByStatus));
+  }
+
+  createMaintenanceRequest(request: MaintenanceRequestExtended): Observable<MaintenanceRequestExtended> {
+    return this.apollo
+      .mutate<{ createMaintenanceRequest: MaintenanceRequestExtended }>({
         mutation: CREATE_MAINTENANCE_REQUEST,
-        variables: { input },
-        refetchQueries: [{ 
-          query: GET_MAINTENANCE_REQUESTS,
-          variables: { copropertyId: input.copropertyId }
-        }]
+        variables: { item: request },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.createMaintenanceRequest)
-      );
+      .pipe(map((result) => result.data!.createMaintenanceRequest));
   }
 
-  updateMaintenanceRequest(id: string, input: UpdateMaintenanceInput): Observable<MaintenanceRequest> {
+  updateMaintenanceRequest(request: MaintenanceRequestExtended): Observable<MaintenanceRequestExtended> {
     return this.apollo
-      .mutate<{ updateMaintenanceRequest: MaintenanceRequest }>({
+      .mutate<{ updateMaintenanceRequest: MaintenanceRequestExtended }>({
         mutation: UPDATE_MAINTENANCE_REQUEST,
-        variables: { id, input }
+        variables: { item: request },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.updateMaintenanceRequest)
-      );
+      .pipe(map((result) => result.data!.updateMaintenanceRequest));
   }
 
-  assignMaintenance(id: string, technicianId: string): Observable<MaintenanceRequest> {
+  deleteMaintenanceRequest(id: number): Observable<boolean> {
     return this.apollo
-      .mutate<{ assignMaintenance: MaintenanceRequest }>({
-        mutation: ASSIGN_MAINTENANCE,
-        variables: { id, technicianId }
+      .mutate<{ deleteMaintenanceRequest: boolean }>({
+        mutation: DELETE_MAINTENANCE_REQUEST,
+        variables: { id },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.assignMaintenance)
-      );
+      .pipe(map((result) => result.data!.deleteMaintenanceRequest));
   }
 
-  completeMaintenanceRequest(id: string, actualCost?: number): Observable<MaintenanceRequest> {
+  updateMaintenanceStatus(id: number, status: string): Observable<MaintenanceRequestExtended> {
     return this.apollo
-      .mutate<{ completeMaintenanceRequest: MaintenanceRequest }>({
-        mutation: COMPLETE_MAINTENANCE_REQUEST,
-        variables: { id, actualCost }
+      .mutate<{ updateMaintenanceStatus: MaintenanceRequestExtended }>({
+        mutation: UPDATE_MAINTENANCE_STATUS,
+        variables: { id, status },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.completeMaintenanceRequest)
-      );
+      .pipe(map((result) => result.data!.updateMaintenanceStatus));
   }
 }

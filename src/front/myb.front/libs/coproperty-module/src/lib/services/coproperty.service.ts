@@ -35,7 +35,7 @@ const GET_COPROPERTIES = gql`
 `;
 
 const GET_COPROPERTY = gql`
-  query GetCoproperty($id: UUID!) {
+  query GetCopropertyById($id: UUID!) {
     getCopropertyById(id: $id) {
       id
       name
@@ -73,8 +73,29 @@ const GET_COPROPERTIES_BY_MANAGER = gql`
 `;
 
 const CREATE_COPROPERTY = gql`
-  mutation CreateCoproperty($input: CreateCopropertyInput!) {
-    createCoproperty(input: $input) {
+  mutation CreateCoproperty($coproperty: CopropertyInput!) {
+    createCoproperty(coproperty: $coproperty) {
+      id
+      name
+      address
+      city
+      postalCode
+      country
+      description
+      totalUnits
+      totalShares
+      commonAreas
+      managerId
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const UPDATE_COPROPERTY = gql`
+  mutation UpdateCoproperty($id: UUID!, $coproperty: CopropertyInput!) {
+    updateCoproperty(id: $id, coproperty: $coproperty) {
       id
       name
       address
@@ -178,15 +199,16 @@ export class CopropertyService {
 
   getCoproperty(id: string): Observable<Coproperty> {
     return this.apollo
-      .watchQuery<{ getCopropertyById: Coproperty }>({
+        .watchQuery<{ copropertyById: Coproperty }>({
         query: GET_COPROPERTY,
         variables: { id },
         context: { service: 'copropertyService' }
       })
       .valueChanges.pipe(
-        map(result => result.data.getCopropertyById)
+          map(result => result.data.copropertyById)
       );
   }
+
     getDashboardStats(copropertyId?: string): Observable<DashboardStats> {
       return this.apollo
         .watchQuery<{ dashboardStats: DashboardStats }>({
@@ -200,16 +222,29 @@ export class CopropertyService {
           map(result => result.data.dashboardStats)
         );
     }
+
   createCoproperty(input: CreateCopropertyInput): Observable<Coproperty> {
     return this.apollo
       .mutate<{ createCoproperty: Coproperty }>({
         mutation: CREATE_COPROPERTY,
-        variables: { input },
+        variables: { coproperty: input },
         refetchQueries: [{ query: GET_COPROPERTIES }],
         context: { service: 'copropertyService' }
       })
       .pipe(
         map(result => result.data!.createCoproperty)
+      );
+  }
+
+  updateCoproperty(id: string, input: CreateCopropertyInput): Observable<Coproperty> {
+    return this.apollo
+      .mutate<{ updateCoproperty: Coproperty }>({
+        mutation: UPDATE_COPROPERTY,
+        variables: { id, coproperty: input },
+        context: { service: 'copropertyService' }
+      })
+      .pipe(
+        map(result => result.data!.updateCoproperty)
       );
   }
 
@@ -247,14 +282,14 @@ export class CopropertyService {
 
   getTreasuryEvolution(copropertyId: string, months: number = 12): Observable<TreasuryDataPoint[]> {
     return this.apollo
-      .watchQuery<{ getTreasuryEvolution: TreasuryDataPoint[] }>({
+        .watchQuery<{ treasuryEvolution: TreasuryDataPoint[] }>({
         query: GET_TREASURY_EVOLUTION,
         variables: { copropertyId, months },
         fetchPolicy: 'network-only',
         context: { service: 'copropertyService' }
       })
       .valueChanges.pipe(
-        map(result => result.data.getTreasuryEvolution)
+          map(result => result.data.treasuryEvolution)
       );
   }
 
@@ -271,14 +306,14 @@ export class CopropertyService {
     year: number
   ): Observable<FinancialReport> {
     return this.apollo
-      .watchQuery<{ getFinancialReport: FinancialReport }>({
+        .watchQuery<{ financialReport: FinancialReport }>({
         query: GET_FINANCIAL_REPORT,
         variables: { copropertyId, year },
         fetchPolicy: 'network-only',
         context: { service: 'copropertyService' }
       })
       .valueChanges.pipe(
-        map(result => result.data.getFinancialReport)
+          map(result => result.data.financialReport)
       );
   }
 }

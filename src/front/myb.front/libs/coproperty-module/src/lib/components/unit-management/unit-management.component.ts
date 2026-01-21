@@ -1,20 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { RouterModule } from '@angular/router';
-
-interface Unit {
-  id: string;
-  unitNumber: string;
-  copropertyId: string;
-  floor: number;
-  area: number;
-  shares: number;
-  unitType: string;
-  occupancyStatus: string;
-  owners: any[];
-}
+import { RouterModule, ActivatedRoute } from '@angular/router';
+import { UnitService, UnitExtended } from '../../services/unit.service';
 
 @Component({
   selector: 'myb-unit-management',
@@ -24,115 +13,146 @@ interface Unit {
   styleUrls: ['./unit-management.component.scss'],
 })
 export class UnitManagementComponent implements OnInit {
-  units: Unit[] = [];
-  displayedColumns: string[] = ['unitNumber', 'floor', 'area', 'shares', 'occupancyStatus', 'actions'];
+  private unitService = inject(UnitService);
+  private route = inject(ActivatedRoute);
+  private fb = inject(FormBuilder);
+
+  units = signal<UnitExtended[]>([]);
+  loading = signal(false);
+  displayedColumns: string[] = ['unitNumber', 'floor', 'area', 'shares', 'status', 'owner', 'actions'];
   searchTerm: string = '';
   showAddForm: boolean = false;
   unitForm: FormGroup;
-  editingUnitId: string | null = null;
+  editingUnitId: number | null = null;
+  copropertyId: number = 0;
 
-  unitTypes = ['T1', 'T2', 'T3', 'T4', 'T5'];
-  occupancyStatuses = ['Occupied', 'Vacant', 'Rented'];
+  unitTypes = ['APARTMENT', 'PARKING', 'CAVE', 'COMMERCIAL', 'OTHER'];
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.unitForm = this.fb.group({
       unitNumber: ['', [Validators.required, Validators.minLength(1)]],
       floor: [1, [Validators.required, Validators.min(0)]],
       area: [0, [Validators.required, Validators.min(1)]],
       shares: [0, [Validators.required, Validators.min(1)]],
-      unitType: ['T2', Validators.required],
-      occupancyStatus: ['Occupied', Validators.required],
+      type: ['APARTMENT', Validators.required],
+      ownerName: ['', Validators.required],
+      ownerEmail: ['', Validators.email],
+      ownerPhone: [''],
+      isOccupied: [true, Validators.required],
+      rentedTo: [''],
     });
   }
 
   ngOnInit(): void {
-    this.loadUnits();
+    // Get coproperty ID from route params
+    this.route.params.subscribe(params => {
+      this.copropertyId = +params['id'] || 0;
+      if (this.copropertyId > 0) {
+        this.loadUnits();
+      }
+    });
   }
 
   loadUnits(): void {
-    // TODO: Implement GraphQL query to fetch units
-    // Mock data for now
-    this.units = [
-      {
-        id: '1',
-        unitNumber: 'A101',
-        copropertyId: '1',
-        floor: 1,
-        area: 75.5,
-        shares: 500,
-        unitType: 'T2',
-        occupancyStatus: 'Occupied',
-        owners: [{ firstName: 'Jean', lastName: 'Dupont', ownershipPercentage: 100 }],
+    if (!this.copropertyId || this.copropertyId === 0) {
+      this.units.set([]);
+      this.loading.set(false);
+      return;
+    }
+    this.loading.set(true);
+    this.unitService.getUnitsByCoproperty(this.copropertyId).subscribe({
+      next: (data) => {
+        this.units.set(data);
+        this.loading.set(false);
       },
-      {
-        id: '2',
-        unitNumber: 'A102',
-        copropertyId: '1',
-        floor: 1,
-        area: 65.0,
-        shares: 450,
-        unitType: 'T1',
-        occupancyStatus: 'Vacant',
-        owners: [],
-      },
-      {
-        id: '3',
-        unitNumber: 'B201',
-        copropertyId: '1',
-        floor: 2,
-        area: 100.0,
-        shares: 650,
-        unitType: 'T3',
-        occupancyStatus: 'Occupied',
-        owners: [{ firstName: 'Marie', lastName: 'Martin', ownershipPercentage: 100 }],
-      },
-    ];
+      error: (err) => {
+        console.error('Error loading units:', err);
+        this.loading.set(false);
+      }
+    });
   }
 
-  get filteredUnits(): Unit[] {
+  get filteredUnits(): UnitExtended[] {
+    const allUnits = this.units();
     if (!this.searchTerm) {
-      return this.units;
+      return allUnits;
     }
-    return this.units.filter(
+    return allUnits.filter(
       (unit) =>
         unit.unitNumber.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        unit.unitType.toLowerCase().includes(this.searchTerm.toLowerCase())
+        unit.type.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
   openAddForm(): void {
     this.showAddForm = true;
     this.editingUnitId = null;
-    this.unitForm.reset({ unitType: 'T2', occupancyStatus: 'Occupied', floor: 1 });
+    this.unitForm.reset({ 
+      type: 'APARTMENT', 
+      isOccupied: true, 
+      floor: 1,
+      copropertyId: this.copropertyId 
+    });
   }
 
-  editUnit(unit: Unit): void {
-    this.editingUnitId = unit.id;
+  editUnit(unit: UnitExtended): void {
+    this.editingUnitId = unit.id || null;
     this.showAddForm = true;
     this.unitForm.patchValue({
       unitNumber: unit.unitNumber,
       floor: unit.floor,
       area: unit.area,
       shares: unit.shares,
-      unitType: unit.unitType,
-      occupancyStatus: unit.occupancyStatus,
+      type: unit.type,
+      ownerName: unit.ownerName,
+      ownerEmail: unit.ownerEmail,
+      ownerPhone: unit.ownerPhone,
+      isOccupied: unit.isOccupied,
+      rentedTo: unit.rentedTo,
     });
   }
 
-  deleteUnit(unit: Unit): void {
+  deleteUnit(unit: UnitExtended): void {
     if (confirm(`Are you sure you want to delete unit ${unit.unitNumber}?`)) {
-      // TODO: Implement GraphQL mutation to delete unit
-      this.units = this.units.filter((u) => u.id !== unit.id);
+      this.loading.set(true);
+      this.unitService.deleteUnit(unit.id!).subscribe({
+        next: () => {
+          this.loadUnits();
+        },
+        error: (err) => {
+          console.error('Error deleting unit:', err);
+          this.loading.set(false);
+          alert('Failed to delete unit');
+        }
+      });
     }
   }
 
   saveUnit(): void {
     if (this.unitForm.valid) {
-      const formValue = this.unitForm.value;
-      // TODO: Implement GraphQL mutation to create/update unit
-      alert('Unit saved successfully');
-      this.showAddForm = false;
-      this.unitForm.reset();
+      this.loading.set(true);
+      const unitData: UnitExtended = {
+        ...this.unitForm.value,
+        copropertyId: this.copropertyId,
+        ...(this.editingUnitId && { id: this.editingUnitId })
+      };
+
+      const operation = this.editingUnitId 
+        ? this.unitService.updateUnit(unitData)
+        : this.unitService.createUnit(unitData);
+
+      operation.subscribe({
+        next: () => {
+          this.showAddForm = false;
+          this.unitForm.reset();
+          this.loadUnits();
+        },
+        error: (err) => {
+          console.error('Error saving unit:', err);
+          this.loading.set(false);
+          alert('Failed to save unit');
+        }
+      });
     }
   }
 

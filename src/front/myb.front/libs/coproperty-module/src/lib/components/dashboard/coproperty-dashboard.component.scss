@@ -13,6 +13,81 @@
     font-size: 2rem;
     margin: 0;
   }
+
+  .btn {
+    gap: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+
+    i {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+// Quick Navigation Cards
+.quick-nav-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nav-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:nth-child(1) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  &:nth-child(2) {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  &:nth-child(3) {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  &:nth-child(4) {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  }
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  h6 {
+    margin: 0.5rem 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  small {
+    opacity: 0.9;
+    font-size: 0.85rem;
+  }
 }
 
 .kpi-row {

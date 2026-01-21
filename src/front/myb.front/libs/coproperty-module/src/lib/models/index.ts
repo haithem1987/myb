@@ -9,6 +9,7 @@ export interface CreateFundCallInput {
 }
 
 export interface CreateCopropertyInput {
+  id: string;
   name: string;
   address: string;
   city: string;
@@ -19,6 +20,10 @@ export interface CreateCopropertyInput {
   totalShares: number;
   commonAreas?: string;
   managerId: string;
+  isActive: boolean;
+  units: any[];
+  charges: any[];
+  maintenanceRequests: any[];
 }
 
 export interface FundCall {

@@ -1,0 +1,229 @@
+<div class="charge-management-container">
+  <!-- Message for new coproperty -->
+  <div *ngIf="copropertyId() === 0" class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    {{ 'coproperty.charges.saveFirst' | translate }}
+  </div>
+
+  <div *ngIf="copropertyId() > 0">
+    <div class="management-header">
+      <h2>{{ 'coproperty.charges.title' | translate }}</h2>
+      <button class="btn btn-primary" (click)="showAddForm()" [disabled]="showForm()">
+        <i class="fas fa-plus"></i>
+        {{ 'coproperty.charges.addCharge' | translate }}
+      </button>
+    </div>
+
+  <!-- Add/Edit Form -->
+  <div *ngIf="showForm()" class="card form-card">
+    <div class="card-header">
+      <h5>{{ isEditing() ? ('coproperty.charges.editCharge' | translate) : ('coproperty.charges.addCharge' | translate) }}</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="chargeForm" (ngSubmit)="saveCharge()">
+        <div class="row g-3">
+          <!-- Charge Name -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">{{ 'coproperty.charges.name' | translate }}</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                formControlName="name"
+                [class.is-invalid]="chargeForm.get('name')?.invalid && chargeForm.get('name')?.touched"
+              />
+            </div>
+          </div>
+
+          <!-- Total Amount -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">{{ 'coproperty.charges.totalAmount' | translate }}</label>
+              <div class="input-group">
+                <span class="input-group-text">€</span>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  class="form-control" 
+                  formControlName="totalAmount"
+                  [class.is-invalid]="chargeForm.get('totalAmount')?.invalid && chargeForm.get('totalAmount')?.touched"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Charge Type -->
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label">{{ 'coproperty.charges.type' | translate }}</label>
+              <select class="form-select" formControlName="chargeType">
+                <option value="CLEANING">{{ 'coproperty.charges.types.cleaning' | translate }}</option>
+                <option value="SECURITY">{{ 'coproperty.charges.types.security' | translate }}</option>
+                <option value="MAINTENANCE">{{ 'coproperty.charges.types.maintenance' | translate }}</option>
+                <option value="ELECTRICITY">{{ 'coproperty.charges.types.electricity' | translate }}</option>
+                <option value="WATER">{{ 'coproperty.charges.types.water' | translate }}</option>
+                <option value="INSURANCE">{{ 'coproperty.charges.types.insurance' | translate }}</option>
+                <option value="OTHER">{{ 'coproperty.charges.types.other' | translate }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Frequency -->
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label">{{ 'coproperty.charges.frequency' | translate }}</label>
+              <select class="form-select" formControlName="frequency">
+                <option value="MONTHLY">{{ 'coproperty.charges.frequencies.monthly' | translate }}</option>
+                <option value="QUARTERLY">{{ 'coproperty.charges.frequencies.quarterly' | translate }}</option>
+                <option value="ANNUAL">{{ 'coproperty.charges.frequencies.annual' | translate }}</option>
+                <option value="EXCEPTIONAL">{{ 'coproperty.charges.frequencies.exceptional' | translate }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Distribution Method -->
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label">{{ 'coproperty.charges.distributionMethod' | translate }}</label>
+              <select class="form-select" formControlName="distributionMethod">
+                <option value="BY_SHARES">{{ 'coproperty.charges.distributions.byShares' | translate }}</option>
+                <option value="BY_AREA">{{ 'coproperty.charges.distributions.byArea' | translate }}</option>
+                <option value="EQUAL">{{ 'coproperty.charges.distributions.equal' | translate }}</option>
+                <option value="CUSTOM">{{ 'coproperty.charges.distributions.custom' | translate }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">{{ 'coproperty.charges.startDate' | translate }}</label>
+              <input type="date" class="form-control" formControlName="startDate" />
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">{{ 'coproperty.charges.endDate' | translate }}</label>
+              <input type="date" class="form-control" formControlName="endDate" />
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="col-md-12">
+            <div class="form-group">
+              <label class="form-label">{{ 'coproperty.charges.description' | translate }}</label>
+              <textarea 
+                class="form-control" 
+                formControlName="description"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions mt-4">
+          <button type="submit" class="btn btn-success" [disabled]="!chargeForm.valid">
+            <i class="fas fa-save"></i>
+            {{ 'common.save' | translate }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+            <i class="fas fa-times"></i>
+            {{ 'common.cancel' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Charges Table -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <h5>{{ 'coproperty.charges.title' | translate }} ({{ charges().length }})</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="charges().length === 0" class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        {{ 'common.noData' | translate }}
+      </div>
+
+      <div *ngIf="charges().length > 0" class="row g-3">
+        <div class="col-md-6" *ngFor="let charge of charges()">
+          <div class="charge-card">
+            <div class="card-header-charge">
+              <h6>{{ charge.name }}</h6>
+              <span class="badge" [ngClass]="getChargeTypeBadgeClass(charge.chargeType)">
+                {{ ('coproperty.charges.types.' + getChargeTypeKey(charge.chargeType)) | translate }}
+              </span>
+            </div>
+            <div class="card-body-charge">
+              <div class="charge-info">
+                <span class="label">{{ 'coproperty.charges.totalAmount' | translate }}</span>
+                <span class="amount">{{ charge.totalAmount | currency:'EUR' }}</span>
+              </div>
+              <div class="charge-info">
+                <span class="label">{{ 'coproperty.charges.frequency' | translate }}</span>
+                <span>{{ ('coproperty.charges.frequencies.' + getFrequencyKey(charge.frequency)) | translate }}</span>
+              </div>
+              <div class="charge-info">
+                <span class="label">{{ 'coproperty.charges.distributionMethod' | translate }}</span>
+                <span>{{ ('coproperty.charges.distributions.' + getDistributionKey(charge.distributionMethod)) | translate }}</span>
+              </div>
+              <small class="text-muted d-block mt-2">{{ charge.description }}</small>
+            </div>
+            <div class="card-footer-charge">
+              <button class="btn btn-sm btn-outline-primary" (click)="distributeCharge(charge.id!)">
+                <i class="fas fa-calculator"></i>
+                {{ 'coproperty.charges.calculateDistribution' | translate }}
+              </button>
+              <button class="btn btn-sm btn-outline-warning" (click)="editCharge(charge)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteCharge(charge.id!)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Distribution Preview Modal -->
+  <div class="modal fade" id="distributionModal" tabindex="-1" *ngIf="showDistribution()">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ 'coproperty.charges.distributionPreview' | translate }}</h5>
+          <button type="button" class="btn-close" (click)="closeDistribution()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>{{ 'coproperty.unit.number' | translate }}</th>
+                  <th>{{ 'coproperty.unit.shares' | translate }}</th>
+                  <th>{{ 'coproperty.charges.totalAmount' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let dist of distributions()">
+                  <td>{{ dist.unitNumber }}</td>
+                  <td>{{ dist.shares }}</td>
+                  <td>{{ dist.amount | currency:'EUR' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeDistribution()">
+            {{ 'common.close' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>

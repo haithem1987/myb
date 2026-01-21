@@ -25,7 +25,13 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 export function initializeKeycloak(keycloak: KeycloakService) {
   console.log('Initializing Keycloak...');
-  return () => keycloak.init();
+  return () => {
+    return keycloak.init().catch((err) => {
+      console.warn('Keycloak initialization failed, app will continue:', err);
+      // Don't block app startup if Keycloak fails
+      return false;
+    });
+  };
 }
 export const appConfig: ApplicationConfig = {
   providers: [

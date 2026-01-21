@@ -1,0 +1,93 @@
+import gql from 'graphql-tag';
+
+export const GET_ALL_MAINTENANCE_REQUESTS = gql`
+  query GetAllMaintenanceRequests {
+    allMaintenanceRequests {
+      id
+      copropertyId
+      unitId
+      title
+      description
+      category
+      priority
+      status
+      reportedBy
+      assignedTo
+      estimatedCost
+      actualCost
+      scheduledDate
+      completedDate
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_MAINTENANCE_REQUEST_BY_ID = gql`
+  query GetMaintenanceRequestById($id: Int!) {
+    maintenanceRequestById(id: $id) {
+      id
+      copropertyId
+      unitId
+      title
+      description
+      category
+      priority
+      status
+      reportedBy
+      assignedTo
+      estimatedCost
+      actualCost
+      scheduledDate
+      completedDate
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_MAINTENANCE_BY_COPROPERTY = gql`
+  query GetMaintenanceByCoproperty($copropertyId: Int!) {
+    maintenanceByCoproperty(copropertyId: $copropertyId) {
+      id
+      copropertyId
+      unitId
+      title
+      description
+      category
+      priority
+      status
+      reportedBy
+      assignedTo
+      estimatedCost
+      actualCost
+      scheduledDate
+      completedDate
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_MAINTENANCE_BY_STATUS = gql`
+  query GetMaintenanceByStatus($copropertyId: Int!, $status: String!) {
+    maintenanceByStatus(copropertyId: $copropertyId, status: $status) {
+      id
+      copropertyId
+      unitId
+      title
+      description
+      category
+      priority
+      status
+      reportedBy
+      assignedTo
+      estimatedCost
+      actualCost
+      scheduledDate
+      completedDate
+      createdAt
+      updatedAt
+    }
+  }
+`;

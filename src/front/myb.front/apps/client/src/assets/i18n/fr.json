@@ -182,9 +182,6 @@
       "createAssembly": "Créer une AG",
       "generateReport": "Générer un Rapport"
     },
-    "charges": {
-      "management": "Gestion des Charges"
-    },
     "charge": {
       "title": "Gestion des Charges",
       "details": "Détails de la Charge",
@@ -199,41 +196,10 @@
       "name": "Nom de la Charge",
       "type": "Type de Charge",
       "totalAmount": "Montant Total",
-      "paidAmount": "Montant Payé",
-      "unpaidAmount": "Montant Impayé",
-      "dueDate": "Date d'Échéance",
-      "status": "Statut",
-      "unitStats": "Lots Payés/Total",
       "frequency": "Fréquence",
       "description": "Description",
-      "calculateDistribution": "Calculer la Répartition"
-    },
-    "filters": {
-      "period": "Période",
-      "currentMonth": "Mois en Cours",
-      "currentQuarter": "Trimestre en Cours",
-      "currentYear": "Année en Cours",
-      "customPeriod": "Période Personnalisée",
-      "startDate": "Date de Début",
-      "endDate": "Date de Fin",
-      "status": "Statut",
-      "all": "Tous"
-    },
-    "status": {
-      "paid": "Payé",
-      "partiallyPaid": "Partiellement Payé",
-      "unpaid": "Impayé",
-      "overdue": "En Retard"
-    },
-    "summary": {
-      "totalCharges": "Total des Charges",
-      "totalPaid": "Total Payé",
-      "totalUnpaid": "Total Impayé",
-      "collectionRate": "Taux de Recouvrement"
-    },
-    "actions": {
-      "export": "Exporter",
-      "sendReminders": "Envoyer des Rappels"
+      "calculateDistribution": "Calculer la Répartition",
+      "saveFirst": "Veuillez d'abord enregistrer la copropriété avant de gérer les charges."
     },
     "unit": {
       "management": "Gestion des Lots",
@@ -247,7 +213,8 @@
       "type": "Type",
       "occupancyStatus": "Statut d'Occupation",
       "owners": "Copropriétaires",
-      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce lot ?"
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce lot ?",
+      "saveFirst": "Veuillez d'abord enregistrer la copropriété avant de gérer les lots."
     },
     "owner": {
       "management": "Gestion des Copropriétaires",
@@ -269,7 +236,8 @@
       "description": "Description",
       "category": "Catégorie",
       "priority": "Priorité",
-      "status": "Statut"
+      "status": "Statut",
+      "saveFirst": "Veuillez d'abord enregistrer la copropriété avant de gérer les demandes de maintenance."
     }
   },
   "owner": {

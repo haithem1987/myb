@@ -1,235 +1,114 @@
-import { Injectable } from '@angular/core';
-import { Apollo, gql } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { 
-  Charge, 
-  CreateChargeInput, 
-  UpdateChargeInput, 
-  ChargeDistribution 
-} from '../models';
+import { Injectable, inject } from '@angular/core';
+import { Apollo } from 'apollo-angular';
+import { Observable, map } from 'rxjs';
+import {
+  GET_ALL_CHARGES,
+  GET_CHARGE_BY_ID,
+  GET_CHARGES_BY_COPROPERTY,
+} from '../graphql/queries/charge.query';
+import {
+  CREATE_CHARGE,
+  UPDATE_CHARGE,
+  DELETE_CHARGE,
+  CALCULATE_CHARGE_DISTRIBUTION,
+} from '../graphql/mutations/charge.mutation';
 
-const GET_CHARGES = gql`
-  query GetCharges($copropertyId: UUID!) {
-    charges(copropertyId: $copropertyId) {
-      id
-      copropertyId
-      name
-      description
-      chargeType
-      frequency
-      totalAmount
-      distributionMethod
-      startDate
-      endDate
-      isActive
-      createdAt
-      createdBy
-    }
-  }
-`;
+export interface ChargeExtended {
+  id?: number;
+  copropertyId: number;
+  name: string;
+  description?: string;
+  chargeType: 'CLEANING' | 'SECURITY' | 'MAINTENANCE' | 'ELECTRICITY' | 'WATER' | 'INSURANCE' | 'OTHER';
+  frequency: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL' | 'EXCEPTIONAL';
+  totalAmount: number;
+  distributionMethod: 'BY_SHARES' | 'BY_AREA' | 'EQUAL' | 'CUSTOM';
+  startDate: Date;
+  endDate?: Date;
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
-const GET_CHARGE = gql`
-  query GetCharge($id: UUID!) {
-    charge(id: $id) {
-      id
-      copropertyId
-      name
-      description
-      chargeType
-      frequency
-      totalAmount
-      distributionMethod
-      startDate
-      endDate
-      isActive
-      createdAt
-      createdBy
-    }
-  }
-`;
-
-const GET_ACTIVE_CHARGES = gql`
-  query GetActiveCharges($copropertyId: UUID!) {
-    activeCharges(copropertyId: $copropertyId) {
-      id
-      name
-      chargeType
-      frequency
-      totalAmount
-      distributionMethod
-      startDate
-      isActive
-    }
-  }
-`;
-
-const GET_CHARGE_DISTRIBUTIONS = gql`
-  query GetChargeDistributions($chargeId: UUID!) {
-    chargeDistributions(chargeId: $chargeId) {
-      id
-      chargeId
-      unitId
-      amount
-      calculatedAt
-    }
-  }
-`;
-
-const CREATE_CHARGE = gql`
-  mutation CreateCharge($input: CreateChargeInput!) {
-    createCharge(input: $input) {
-      id
-      copropertyId
-      name
-      description
-      chargeType
-      frequency
-      totalAmount
-      distributionMethod
-      startDate
-      endDate
-      isActive
-      createdAt
-      createdBy
-    }
-  }
-`;
-
-const UPDATE_CHARGE = gql`
-  mutation UpdateCharge($id: UUID!, $input: UpdateChargeInput!) {
-    updateCharge(id: $id, input: $input) {
-      id
-      name
-      description
-      chargeType
-      frequency
-      totalAmount
-      distributionMethod
-      startDate
-      endDate
-      isActive
-    }
-  }
-`;
-
-const DELETE_CHARGE = gql`
-  mutation DeleteCharge($id: UUID!) {
-    deleteCharge(id: $id)
-  }
-`;
-
-const DISTRIBUTE_CHARGE = gql`
-  mutation DistributeCharge($chargeId: UUID!) {
-    distributeCharge(chargeId: $chargeId) {
-      id
-      chargeId
-      unitId
-      amount
-      calculatedAt
-    }
-  }
-`;
+export interface ChargeDistributionExtended {
+  unitId: number;
+  unitNumber: string;
+  amount: number;
+  shares?: number;
+  area?: number;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ChargeService {
-  constructor(private apollo: Apollo) {}
+  private apollo = inject(Apollo);
 
-  getCharges(copropertyId: string): Observable<Charge[]> {
+  getAllCharges(): Observable<ChargeExtended[]> {
     return this.apollo
-      .watchQuery<{ charges: Charge[] }>({
-        query: GET_CHARGES,
-        variables: { copropertyId }
+      .query<{ allCharges: ChargeExtended[] }>({
+        query: GET_ALL_CHARGES,
+        context: { serviceName: 'copropertyService' },
       })
-      .valueChanges.pipe(
-        map(result => result.data.charges)
-      );
+      .pipe(map((result) => result.data.allCharges));
   }
 
-  getCharge(id: string): Observable<Charge> {
+  getChargeById(id: number): Observable<ChargeExtended> {
     return this.apollo
-      .watchQuery<{ charge: Charge }>({
-        query: GET_CHARGE,
-        variables: { id }
+      .query<{ chargeById: ChargeExtended }>({
+        query: GET_CHARGE_BY_ID,
+        variables: { id },
+        context: { serviceName: 'copropertyService' },
       })
-      .valueChanges.pipe(
-        map(result => result.data.charge)
-      );
+      .pipe(map((result) => result.data.chargeById));
   }
 
-  getActiveCharges(copropertyId: string): Observable<Charge[]> {
+  getChargesByCoproperty(copropertyId: number): Observable<ChargeExtended[]> {
     return this.apollo
-      .watchQuery<{ activeCharges: Charge[] }>({
-        query: GET_ACTIVE_CHARGES,
-        variables: { copropertyId }
+      .query<{ chargesByCoproperty: ChargeExtended[] }>({
+        query: GET_CHARGES_BY_COPROPERTY,
+        variables: { copropertyId },
+        context: { serviceName: 'copropertyService' },
       })
-      .valueChanges.pipe(
-        map(result => result.data.activeCharges)
-      );
+      .pipe(map((result) => result.data.chargesByCoproperty));
   }
 
-  getChargeDistributions(chargeId: string): Observable<ChargeDistribution[]> {
+  createCharge(charge: ChargeExtended): Observable<ChargeExtended> {
     return this.apollo
-      .watchQuery<{ chargeDistributions: ChargeDistribution[] }>({
-        query: GET_CHARGE_DISTRIBUTIONS,
-        variables: { chargeId }
-      })
-      .valueChanges.pipe(
-        map(result => result.data.chargeDistributions)
-      );
-  }
-
-  createCharge(input: CreateChargeInput): Observable<Charge> {
-    return this.apollo
-      .mutate<{ createCharge: Charge }>({
+      .mutate<{ createCharge: ChargeExtended }>({
         mutation: CREATE_CHARGE,
-        variables: { input },
-        refetchQueries: [{ 
-          query: GET_CHARGES,
-          variables: { copropertyId: input.copropertyId }
-        }]
+        variables: { item: charge },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.createCharge)
-      );
+      .pipe(map((result) => result.data!.createCharge));
   }
 
-  updateCharge(id: string, input: UpdateChargeInput): Observable<Charge> {
+  updateCharge(charge: ChargeExtended): Observable<ChargeExtended> {
     return this.apollo
-      .mutate<{ updateCharge: Charge }>({
+      .mutate<{ updateCharge: ChargeExtended }>({
         mutation: UPDATE_CHARGE,
-        variables: { id, input }
+        variables: { item: charge },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.updateCharge)
-      );
+      .pipe(map((result) => result.data!.updateCharge));
   }
 
-  deleteCharge(id: string): Observable<boolean> {
+  deleteCharge(id: number): Observable<boolean> {
     return this.apollo
       .mutate<{ deleteCharge: boolean }>({
         mutation: DELETE_CHARGE,
-        variables: { id }
+        variables: { id },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.deleteCharge)
-      );
+      .pipe(map((result) => result.data!.deleteCharge));
   }
 
-  distributeCharge(chargeId: string): Observable<ChargeDistribution[]> {
+  calculateDistribution(chargeId: number): Observable<ChargeDistributionExtended[]> {
     return this.apollo
-      .mutate<{ distributeCharge: ChargeDistribution[] }>({
-        mutation: DISTRIBUTE_CHARGE,
+      .mutate<{ calculateChargeDistribution: ChargeDistributionExtended[] }>({
+        mutation: CALCULATE_CHARGE_DISTRIBUTION,
         variables: { chargeId },
-        refetchQueries: [{ 
-          query: GET_CHARGE_DISTRIBUTIONS,
-          variables: { chargeId }
-        }]
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.distributeCharge)
-      );
+      .pipe(map((result) => result.data!.calculateChargeDistribution));
   }
 }

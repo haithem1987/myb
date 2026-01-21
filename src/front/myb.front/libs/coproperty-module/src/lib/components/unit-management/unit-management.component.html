@@ -1,21 +1,28 @@
 <div class="unit-management-container">
-  <div class="management-header">
-    <h2>{{ 'coproperty.unit.management' | translate }}</h2>
-    <button class="btn btn-primary" (click)="openAddForm()">
-      <i class="fas fa-plus"></i>
-      {{ 'coproperty.unit.addUnit' | translate }}
-    </button>
+  <!-- Message for new coproperty -->
+  <div *ngIf="copropertyId === 0" class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    {{ 'coproperty.unit.saveFirst' | translate }}
   </div>
 
-  <!-- Search Bar -->
-  <div class="search-section">
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Search units..."
-      [(ngModel)]="searchTerm"
-    />
-  </div>
+  <div *ngIf="copropertyId > 0">
+    <div class="management-header">
+      <h2>{{ 'coproperty.unit.management' | translate }}</h2>
+      <button class="btn btn-primary" (click)="openAddForm()">
+        <i class="fas fa-plus"></i>
+        {{ 'coproperty.unit.addUnit' | translate }}
+      </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search units..."
+        [(ngModel)]="searchTerm"
+      />
+    </div>
 
   <!-- Add/Edit Form -->
   <div *ngIf="showAddForm" class="card form-card">
@@ -63,10 +70,12 @@
         </div>
 
         <div class="mb-3">
-          <label for="occupancyStatus" class="form-label">{{ 'coproperty.unit.occupancyStatus' | translate }}</label>
-          <select class="form-select" id="occupancyStatus" formControlName="occupancyStatus">
-            <option *ngFor="let status of occupancyStatuses" [value]="status">{{ status }}</option>
-          </select>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="isOccupied" formControlName="isOccupied" />
+            <label class="form-check-label" for="isOccupied">
+              {{ 'coproperty.unit.occupied' | translate }}
+            </label>
+          </div>
         </div>
 
         <div class="form-actions">
@@ -97,8 +106,8 @@
               <th>{{ 'coproperty.unit.floor' | translate }}</th>
               <th>{{ 'coproperty.unit.area' | translate }}</th>
               <th>{{ 'coproperty.unit.shares' | translate }}</th>
-              <th>{{ 'coproperty.unit.occupancyStatus' | translate }}</th>
-              <th>{{ 'coproperty.unit.owners' | translate }}</th>
+              <th>{{ 'coproperty.unit.status' | translate }}</th>
+              <th>{{ 'coproperty.unit.owner' | translate }}</th>
               <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
@@ -114,22 +123,16 @@
                 <span
                   class="badge"
                   [ngClass]="{
-                    'bg-success': unit.occupancyStatus === 'Occupied',
-                    'bg-warning': unit.occupancyStatus === 'Vacant',
-                    'bg-info': unit.occupancyStatus === 'Rented'
+                    'bg-success': unit.isOccupied,
+                    'bg-warning': !unit.isOccupied
                   }"
                 >
-                  {{ unit.occupancyStatus }}
+                  {{ (unit.isOccupied ? 'coproperty.unit.occupied' : 'coproperty.unit.vacant') | translate }}
                 </span>
               </td>
               <td>
-                <span *ngIf="unit.owners.length > 0">
-                  <span *ngFor="let owner of unit.owners; let last = last">
-                    {{ owner.firstName }} {{ owner.lastName }}
-                    <span *ngIf="!last">, </span>
-                  </span>
-                </span>
-                <span *ngIf="unit.owners.length === 0" class="text-muted">No owners</span>
+                <span *ngIf="unit.ownerName">{{ unit.ownerName }}</span>
+                <span *ngIf="!unit.ownerName" class="text-muted">{{ 'coproperty.unit.noOwner' | translate }}</span>
               </td>
               <td>
                 <button class="btn btn-sm btn-primary" (click)="editUnit(unit)" title="Edit">
@@ -144,5 +147,6 @@
         </table>
       </div>
     </div>
+  </div>
   </div>
 </div>

@@ -69,6 +69,13 @@ export const appRoutes: Route[] = [
             (m) => m.COPROPERTY_ROUTES
           ),
       },
+      {
+        path: 'owner',
+        loadComponent: () =>
+          import('@myb-front/coproperty-module').then(
+            (m) => m.OwnerDashboardComponent
+          ),
+      },
     ],
   },
   {

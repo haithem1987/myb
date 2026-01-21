@@ -1,147 +1,96 @@
-import { Injectable } from '@angular/core';
-import { Apollo, gql } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Unit, CreateUnitInput, UpdateUnitInput } from '../models';
+import { Injectable, inject } from '@angular/core';
+import { Apollo } from 'apollo-angular';
+import { Observable, map } from 'rxjs';
+import {
+  GET_ALL_UNITS,
+  GET_UNIT_BY_ID,
+  GET_UNITS_BY_COPROPERTY,
+} from '../graphql/queries/unit.query';
+import {
+  CREATE_UNIT,
+  UPDATE_UNIT,
+  DELETE_UNIT,
+} from '../graphql/mutations/unit.mutation';
 
-const GET_UNITS = gql`
-  query GetUnits($copropertyId: UUID!) {
-    units(copropertyId: $copropertyId) {
-      id
-      copropertyId
-      unitNumber
-      floor
-      area
-      shares
-      unitType
-      description
-      isOccupied
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const GET_UNIT = gql`
-  query GetUnit($id: UUID!) {
-    unit(id: $id) {
-      id
-      copropertyId
-      unitNumber
-      floor
-      area
-      shares
-      unitType
-      description
-      isOccupied
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const CREATE_UNIT = gql`
-  mutation CreateUnit($input: CreateUnitInput!) {
-    createUnit(input: $input) {
-      id
-      copropertyId
-      unitNumber
-      floor
-      area
-      shares
-      unitType
-      description
-      isOccupied
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const UPDATE_UNIT = gql`
-  mutation UpdateUnit($id: UUID!, $input: UpdateUnitInput!) {
-    updateUnit(id: $id, input: $input) {
-      id
-      unitNumber
-      floor
-      area
-      shares
-      unitType
-      description
-      isOccupied
-      updatedAt
-    }
-  }
-`;
-
-const DELETE_UNIT = gql`
-  mutation DeleteUnit($id: UUID!) {
-    deleteUnit(id: $id)
-  }
-`;
+export interface UnitExtended {
+  id?: number;
+  copropertyId: number;
+  unitNumber: string;
+  floor: number;
+  type: 'APARTMENT' | 'PARKING' | 'CAVE' | 'COMMERCIAL' | 'OTHER';
+  area: number;
+  shares: number;
+  ownerName: string;
+  ownerEmail?: string;
+  ownerPhone?: string;
+  isOccupied: boolean;
+  rentedTo?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UnitService {
-  constructor(private apollo: Apollo) {}
+  private apollo = inject(Apollo);
 
-  getUnits(copropertyId: string): Observable<Unit[]> {
+  getAllUnits(): Observable<UnitExtended[]> {
     return this.apollo
-      .watchQuery<{ units: Unit[] }>({
-        query: GET_UNITS,
-        variables: { copropertyId }
+      .query<{ allUnits: UnitExtended[] }>({
+        query: GET_ALL_UNITS,
+        context: { serviceName: 'copropertyService' },
       })
-      .valueChanges.pipe(
-        map(result => result.data.units)
-      );
+      .pipe(map((result) => result.data.allUnits));
   }
 
-  getUnit(id: string): Observable<Unit> {
+  getUnitById(id: number): Observable<UnitExtended> {
     return this.apollo
-      .watchQuery<{ unit: Unit }>({
-        query: GET_UNIT,
-        variables: { id }
+      .query<{ unitById: UnitExtended }>({
+        query: GET_UNIT_BY_ID,
+        variables: { id },
+        context: { serviceName: 'copropertyService' },
       })
-      .valueChanges.pipe(
-        map(result => result.data.unit)
-      );
+      .pipe(map((result) => result.data.unitById));
   }
 
-  createUnit(input: CreateUnitInput): Observable<Unit> {
+  getUnitsByCoproperty(copropertyId: number): Observable<UnitExtended[]> {
     return this.apollo
-      .mutate<{ createUnit: Unit }>({
+      .query<{ unitsByCoproperty: UnitExtended[] }>({
+        query: GET_UNITS_BY_COPROPERTY,
+        variables: { copropertyId },
+        context: { serviceName: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data.unitsByCoproperty));
+  }
+
+  createUnit(unit: UnitExtended): Observable<UnitExtended> {
+    return this.apollo
+      .mutate<{ createUnit: UnitExtended }>({
         mutation: CREATE_UNIT,
-        variables: { input },
-        refetchQueries: [{ 
-          query: GET_UNITS,
-          variables: { copropertyId: input.copropertyId }
-        }]
+        variables: { item: unit },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.createUnit)
-      );
+      .pipe(map((result) => result.data!.createUnit));
   }
 
-  updateUnit(id: string, input: UpdateUnitInput): Observable<Unit> {
+  updateUnit(unit: UnitExtended): Observable<UnitExtended> {
     return this.apollo
-      .mutate<{ updateUnit: Unit }>({
+      .mutate<{ updateUnit: UnitExtended }>({
         mutation: UPDATE_UNIT,
-        variables: { id, input }
+        variables: { item: unit },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.updateUnit)
-      );
+      .pipe(map((result) => result.data!.updateUnit));
   }
 
-  deleteUnit(id: string): Observable<boolean> {
+  deleteUnit(id: number): Observable<boolean> {
     return this.apollo
       .mutate<{ deleteUnit: boolean }>({
         mutation: DELETE_UNIT,
-        variables: { id }
+        variables: { id },
+        context: { serviceName: 'copropertyService' },
       })
-      .pipe(
-        map(result => result.data!.deleteUnit)
-      );
+      .pipe(map((result) => result.data!.deleteUnit));
   }
 }

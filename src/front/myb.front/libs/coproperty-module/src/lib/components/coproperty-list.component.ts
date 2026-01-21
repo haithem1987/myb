@@ -14,11 +14,12 @@ import { Coproperty } from '../models/coproperty.models';
     <div class="container-fluid mt-4">
       <div class="row mb-4">
         <div class="col-md-8">
-          <h1>{{ 'COPROPERTY_MANAGEMENT' | translate }}</h1>
+          <h1>{{ 'coproperty.list.title' | translate }}</h1>
         </div>
         <div class="col-md-4 text-end">
           <button class="btn btn-primary" (click)="addCoproperty()">
-            {{ 'ADD_COPROPERTY' | translate }}
+            <i class="fas fa-plus"></i>
+            {{ 'coproperty.list.addCoproperty' | translate }}
           </button>
         </div>
       </div>
@@ -28,30 +29,42 @@ import { Coproperty } from '../models/coproperty.models';
           *ngFor="let coproperty of copropertiesList"
           class="col-md-6 col-lg-4 mb-4"
         >
-          <div class="card h-100">
+          <div class="card h-100 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">{{ coproperty.name }}</h5>
-              <p class="card-text text-muted">{{ coproperty.address }}</p>
-              <p class="card-text">
-                <strong>{{ 'UNITS' | translate }}:</strong> {{ coproperty.totalUnits }}
+              <p class="card-text text-muted">
+                <i class="fas fa-map-marker-alt"></i> {{ coproperty.address }}
               </p>
-              <p class="card-text">
-                <strong>{{ 'SHARES' | translate }}:</strong> {{ coproperty.totalShares }}
-              </p>
-              <div class="btn-group w-100" role="group">
+              <div class="row mt-3">
+                <div class="col-6">
+                  <p class="card-text mb-2">
+                    <strong>{{ 'coproperty.list.totalUnits' | translate }}:</strong><br/>
+                    <span class="badge bg-primary">{{ coproperty.totalUnits }}</span>
+                  </p>
+                </div>
+                <div class="col-6">
+                  <p class="card-text mb-2">
+                    <strong>{{ 'coproperty.list.totalShares' | translate }}:</strong><br/>
+                    <span class="badge bg-info">{{ coproperty.totalShares }}</span>
+                  </p>
+                </div>
+              </div>
+              <div class="btn-group w-100 mt-3" role="group">
                 <button
                   type="button"
                   class="btn btn-sm btn-outline-primary"
                   (click)="viewDetails(coproperty.id)"
                 >
-                  {{ 'VIEW' | translate }}
+                  <i class="fas fa-eye"></i>
+                  {{ 'coproperty.list.view' | translate }}
                 </button>
                 <button
                   type="button"
                   class="btn btn-sm btn-outline-warning"
                   (click)="editCoproperty(coproperty.id)"
                 >
-                  {{ 'EDIT' | translate }}
+                  <i class="fas fa-edit"></i>
+                  {{ 'coproperty.list.edit' | translate }}
                 </button>
               </div>
             </div>
@@ -60,8 +73,8 @@ import { Coproperty } from '../models/coproperty.models';
       </div>
 
       <div *ngIf="!(coproperties$ | async)" class="text-center py-5">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">{{ 'LOADING' | translate }}</span>
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{ 'coproperty.list.loading' | translate }}</span>
         </div>
       </div>
     </div>

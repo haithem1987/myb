@@ -1,23 +1,30 @@
 <div class="maintenance-container">
-  <div class="management-header">
-    <h2>{{ 'coproperty.maintenance.title' | translate }}</h2>
-    <button class="btn btn-primary" (click)="openAddForm()">
-      <i class="fas fa-plus"></i>
-      {{ 'coproperty.maintenance.newRequest' | translate }}
-    </button>
+  <!-- Message for new coproperty -->
+  <div *ngIf="copropertyId === 0" class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    {{ 'coproperty.maintenance.saveFirst' | translate }}
   </div>
 
-  <!-- Filters -->
-  <div class="filters-section">
-    <div class="filter-group">
-      <label for="statusFilter">{{ 'coproperty.maintenance.filterStatus' | translate }}</label>
-      <select class="form-select" id="statusFilter" [(ngModel)]="filterStatus">
-        <option value="">All</option>
-        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
-      </select>
+  <div *ngIf="copropertyId > 0">
+    <div class="management-header">
+      <h2>{{ 'coproperty.maintenance.title' | translate }}</h2>
+      <button class="btn btn-primary" (click)="openAddForm()">
+        <i class="fas fa-plus"></i>
+        {{ 'coproperty.maintenance.newRequest' | translate }}
+      </button>
     </div>
-    <div class="filter-group">
-      <label for="priorityFilter">{{ 'coproperty.maintenance.filterPriority' | translate }}</label>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label for="statusFilter">{{ 'coproperty.maintenance.filterStatus' | translate }}</label>
+        <select class="form-select" id="statusFilter" [(ngModel)]="filterStatus">
+          <option value="">All</option>
+          <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="priorityFilter">{{ 'coproperty.maintenance.filterPriority' | translate }}</label>
       <select class="form-select" id="priorityFilter" [(ngModel)]="filterPriority">
         <option value="">All</option>
         <option *ngFor="let priority of priorities" [value]="priority">{{ priority }}</option>
@@ -125,5 +132,6 @@
         </table>
       </div>
     </div>
+  </div>
   </div>
 </div>

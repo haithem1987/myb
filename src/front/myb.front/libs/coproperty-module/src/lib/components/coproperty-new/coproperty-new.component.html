@@ -1,0 +1,252 @@
+<div class="coproperty-new-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1 class="page-title">{{ formTitle | translate }}</h1>
+        <p class="page-subtitle">{{ 'coproperty.form.requiredFields' | translate }}</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline-secondary me-2" (click)="cancel()">
+          <i class="fas fa-times me-2"></i>
+          {{ 'common.cancel' | translate }}
+        </button>
+        <button 
+          class="btn btn-primary" 
+          (click)="saveCoproperty()"
+          [disabled]="saving() || !copropertyForm.valid"
+        >
+          <i class="fas fa-save me-2"></i>
+          <span *ngIf="!saving()">{{ 'common.save' | translate }}</span>
+          <span *ngIf="saving()">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            {{ 'SAVING' | translate }}
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-tabs custom-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button 
+        class="nav-link" 
+        [class.active]="activeTab() === 'info'"
+        (click)="setActiveTab('info')"
+        type="button"
+      >
+        <i class="fas fa-info-circle me-2"></i>
+        {{ 'coproperty.form.basicInfo' | translate }}
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button 
+        class="nav-link" 
+        [class.active]="activeTab() === 'units'"
+        (click)="setActiveTab('units')"
+        type="button"
+      >
+        <i class="fas fa-building me-2"></i>
+        {{ 'UNITS' | translate }}
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button 
+        class="nav-link" 
+        [class.active]="activeTab() === 'charges'"
+        (click)="setActiveTab('charges')"
+        type="button"
+      >
+        <i class="fas fa-receipt me-2"></i>
+        {{ 'coproperty.charges.title' | translate }}
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button 
+        class="nav-link" 
+        [class.active]="activeTab() === 'maintenance'"
+        (click)="setActiveTab('maintenance')"
+        type="button"
+      >
+        <i class="fas fa-tools me-2"></i>
+        {{ 'coproperty.maintenance.title' | translate }}
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Basic Information Tab -->
+    <div *ngIf="activeTab() === 'info'" class="tab-pane-content fade-in">
+      <div class="form-card">
+        <form [formGroup]="copropertyForm">
+          <div class="row g-4">
+            <!-- Name -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.nameLabel' | translate }}
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="name"
+                  [placeholder]="'coproperty.form.namePlaceholder' | translate"
+                  [class.is-invalid]="copropertyForm.get('name')?.invalid && copropertyForm.get('name')?.touched"
+                >
+                <div class="invalid-feedback" *ngIf="copropertyForm.get('name')?.invalid && copropertyForm.get('name')?.touched">
+                  {{ 'NAME_REQUIRED' | translate }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Manager -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.managerLabel' | translate }}
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="managerId"
+                  [placeholder]="'coproperty.form.managerPlaceholder' | translate"
+                >
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.addressLabel' | translate }}
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="address"
+                  [placeholder]="'coproperty.form.addressPlaceholder' | translate"
+                  [class.is-invalid]="copropertyForm.get('address')?.invalid && copropertyForm.get('address')?.touched"
+                >
+                <div class="invalid-feedback" *ngIf="copropertyForm.get('address')?.invalid && copropertyForm.get('address')?.touched">
+                  {{ 'coproperty.form.addressLabel' | translate }} {{ 'NAME_REQUIRED' | translate }}
+                </div>
+              </div>
+            </div>
+
+            <!-- City -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.cityLabel' | translate }}
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="city"
+                  [placeholder]="'coproperty.form.cityPlaceholder' | translate"
+                  [class.is-invalid]="copropertyForm.get('city')?.invalid && copropertyForm.get('city')?.touched"
+                >
+              </div>
+            </div>
+
+            <!-- Postal Code -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.postalCodeLabel' | translate }}
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="postalCode"
+                  [placeholder]="'coproperty.form.postalCodePlaceholder' | translate"
+                  [class.is-invalid]="copropertyForm.get('postalCode')?.invalid && copropertyForm.get('postalCode')?.touched"
+                >
+              </div>
+            </div>
+
+            <!-- Country -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.countryLabel' | translate }}
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="country"
+                  [placeholder]="'coproperty.form.countryPlaceholder' | translate"
+                  [class.is-invalid]="copropertyForm.get('country')?.invalid && copropertyForm.get('country')?.touched"
+                >
+              </div>
+            </div>
+
+            <!-- Total Units -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.totalUnitsLabel' | translate }}
+                </label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  formControlName="totalUnits"
+                  min="1"
+                  [class.is-invalid]="copropertyForm.get('totalUnits')?.invalid && copropertyForm.get('totalUnits')?.touched"
+                >
+              </div>
+            </div>
+
+            <!-- Total Shares -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.totalSharesLabel' | translate }}
+                </label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  formControlName="totalShares"
+                  min="1"
+                  [class.is-invalid]="copropertyForm.get('totalShares')?.invalid && copropertyForm.get('totalShares')?.touched"
+                >
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.descriptionLabel' | translate }}
+                </label>
+                <textarea 
+                  class="form-control" 
+                  formControlName="description"
+                  rows="4"
+                  [placeholder]="'coproperty.form.descriptionPlaceholder' | translate"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Units Tab -->
+    <div *ngIf="activeTab() === 'units'" class="tab-pane-content fade-in">
+      <myb-unit-management></myb-unit-management>
+    </div>
+
+    <!-- Charges Tab -->
+    <div *ngIf="activeTab() === 'charges'" class="tab-pane-content fade-in">
+      <myb-charge-management></myb-charge-management>
+    </div>
+
+    <!-- Maintenance Tab -->
+    <div *ngIf="activeTab() === 'maintenance'" class="tab-pane-content fade-in">
+      <myb-maintenance-requests></myb-maintenance-requests>
+    </div>
+  </div>
+</div>

@@ -25,9 +25,10 @@ export class KeycloakService {
   constructor(private http: HttpClient) {}
 
   async init(): Promise<boolean> {
-    // if (this.initialized) {
-    //   return true;
-    // }
+    // If already initialized, return the authentication status
+    if (this.initialized) {
+      return this.keycloak?.authenticated ?? false;
+    }
 
     return new Promise((resolve, reject) => {
       this.keycloak = new Keycloak({
@@ -38,11 +39,12 @@ export class KeycloakService {
 
       this.keycloak
         .init({
+          // Do not force login on app load; just check existing SSO session
           onLoad: 'check-sso',
           checkLoginIframe: false,
           pkceMethod: 'S256',
           flow: 'standard',
-          redirectUri: window.location.origin,
+          // Let Keycloak use the current URL as redirectUri by default
         })
         .then((authenticated: any) => {
           if (authenticated) {
@@ -57,13 +59,17 @@ export class KeycloakService {
         })
         .catch((err: any) => {
           console.error('Keycloak initialization error:', err);
+          this.initialized = true;
           reject(err);
         });
     });
   }
 
   login(): void {
-    this.keycloak.login();
+    // Preserve the full current URL (including path) after login
+    this.keycloak.login({
+      redirectUri: window.location.href,
+    });
   }
 
   register(): void {

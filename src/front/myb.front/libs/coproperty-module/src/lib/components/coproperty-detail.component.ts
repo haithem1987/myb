@@ -4,11 +4,20 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CopropertyService } from '../services/coproperty.service';
 import { Coproperty } from '../models/coproperty.models';
+import { UnitManagementComponent } from './unit-management/unit-management.component';
+import { ChargeManagementComponent } from './charge-management/charge-management.component';
+import { MaintenanceRequestsComponent } from './maintenance-requests/maintenance-requests.component';
 
 @Component({
   selector: 'myb-coproperty-detail',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    UnitManagementComponent,
+    ChargeManagementComponent,
+    MaintenanceRequestsComponent
+  ],
   template: `
     <div class="container-fluid mt-4">
       <div class="row mb-4">
@@ -106,13 +115,13 @@ import { Coproperty } from '../models/coproperty.models';
           </ul>
           <div class="tab-content mt-3">
             <div id="units" class="tab-pane fade show active">
-              <p>{{ 'UNITS' | translate }} - Coming soon</p>
+              <myb-unit-management></myb-unit-management>
             </div>
             <div id="charges" class="tab-pane fade">
-              <p>{{ 'CHARGES' | translate }} - Coming soon</p>
+              <myb-charge-management></myb-charge-management>
             </div>
             <div id="maintenance" class="tab-pane fade">
-              <p>{{ 'MAINTENANCE' | translate }} - Coming soon</p>
+              <myb-maintenance-requests></myb-maintenance-requests>
             </div>
           </div>
         </div>

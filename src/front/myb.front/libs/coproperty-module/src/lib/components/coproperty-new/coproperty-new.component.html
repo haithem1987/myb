@@ -8,7 +8,7 @@
       </div>
       <div class="header-actions">
         <button class="btn btn-outline-secondary me-2" (click)="cancel()">
-          <i class="fas fa-times me-2"></i>
+          <i class="bi bi-x me-2"></i>
           {{ 'common.cancel' | translate }}
         </button>
         <button 
@@ -16,7 +16,7 @@
           (click)="saveCoproperty()"
           [disabled]="saving() || !copropertyForm.valid"
         >
-          <i class="fas fa-save me-2"></i>
+          <i class="bi bi-save me-2"></i>
           <span *ngIf="!saving()">{{ 'common.save' | translate }}</span>
           <span *ngIf="saving()">
             <span class="spinner-border spinner-border-sm me-2"></span>
@@ -36,7 +36,7 @@
         (click)="setActiveTab('info')"
         type="button"
       >
-        <i class="fas fa-info-circle me-2"></i>
+        <i class="bi bi-info-circle me-2"></i>
         {{ 'coproperty.form.basicInfo' | translate }}
       </button>
     </li>
@@ -47,7 +47,7 @@
         (click)="setActiveTab('units')"
         type="button"
       >
-        <i class="fas fa-building me-2"></i>
+        <i class="bi bi-building me-2"></i>
         {{ 'UNITS' | translate }}
       </button>
     </li>
@@ -58,7 +58,7 @@
         (click)="setActiveTab('charges')"
         type="button"
       >
-        <i class="fas fa-receipt me-2"></i>
+        <i class="bi bi-receipt me-2"></i>
         {{ 'coproperty.charges.title' | translate }}
       </button>
     </li>
@@ -69,7 +69,7 @@
         (click)="setActiveTab('maintenance')"
         type="button"
       >
-        <i class="fas fa-tools me-2"></i>
+        <i class="bi bi-tools me-2"></i>
         {{ 'coproperty.maintenance.title' | translate }}
       </button>
     </li>
@@ -236,17 +236,35 @@
 
     <!-- Units Tab -->
     <div *ngIf="activeTab() === 'units'" class="tab-pane-content fade-in">
-      <myb-unit-management></myb-unit-management>
+      <div *ngIf="!isEditMode() && !copropertyId()" class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        {{ 'coproperty.units.saveFirst' | translate }}
+      </div>
+      <div *ngIf="isEditMode() && copropertyId()">
+        <myb-unit-management [copropertyId]="copropertyId()"></myb-unit-management>
+      </div>
     </div>
 
     <!-- Charges Tab -->
     <div *ngIf="activeTab() === 'charges'" class="tab-pane-content fade-in">
-      <myb-charge-management></myb-charge-management>
+      <div *ngIf="!isEditMode() && !copropertyId()" class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        {{ 'coproperty.charges.saveFirst' | translate }}
+      </div>
+      <div *ngIf="isEditMode() && copropertyId()">
+        <myb-charge-management [copropertyId]="copropertyId()"></myb-charge-management>
+      </div>
     </div>
 
     <!-- Maintenance Tab -->
     <div *ngIf="activeTab() === 'maintenance'" class="tab-pane-content fade-in">
-      <myb-maintenance-requests></myb-maintenance-requests>
+      <div *ngIf="!isEditMode() && !copropertyId()" class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        {{ 'coproperty.maintenance.saveFirst' | translate }}
+      </div>
+      <div *ngIf="isEditMode() && copropertyId()">
+        <myb-maintenance-requests [copropertyId]="copropertyId()"></myb-maintenance-requests>
+      </div>
     </div>
   </div>
 </div>

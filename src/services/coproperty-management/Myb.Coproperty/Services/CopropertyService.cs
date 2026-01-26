@@ -15,7 +15,18 @@ namespace Myb.Coproperty.Services
         public async Task<Models.Coproperty> CreateAsync(Models.Coproperty coproperty)
         {
             var result = await _copropertyRepository.InsertAsync(coproperty);
-            return result.Entity!;
+            
+            if (result.Errors != null && result.Errors.Any())
+            {
+                throw new InvalidOperationException($"Failed to create coproperty: {string.Join(", ", result.Errors)}");
+            }
+            
+            if (result.Entity == null)
+            {
+                throw new InvalidOperationException("Failed to create coproperty: Entity was not returned");
+            }
+            
+            return result.Entity;
         }
 
         public async Task DeleteAsync(Guid id)

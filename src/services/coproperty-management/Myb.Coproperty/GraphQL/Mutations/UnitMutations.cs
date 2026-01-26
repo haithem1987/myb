@@ -11,6 +11,12 @@ namespace Myb.Coproperty.GraphQL.Mutations
         public async Task<Unit> CreateUnit(Unit unit, [Service] IUnitService unitService) =>
             await unitService.CreateAsync(unit);
 
+        public async Task<Unit> UpdateUnit(Unit unit, [Service] IUnitService unitService)
+        {
+            await unitService.UpdateAsync(unit);
+            return unit;
+        }
+
         public async Task<bool> DeleteUnit(Guid id, [Service] IUnitService unitService)
         {
             await unitService.DeleteAsync(id);

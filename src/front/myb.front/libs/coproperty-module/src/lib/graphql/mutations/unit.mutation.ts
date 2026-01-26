@@ -7,14 +7,11 @@ export const CREATE_UNIT = gql`
       copropertyId
       unitNumber
       floor
-      type
+      unitType
+      description
       area
       shares
-      ownerName
-      ownerEmail
-      ownerPhone
       isOccupied
-      rentedTo
       createdAt
       updatedAt
     }
@@ -28,14 +25,11 @@ export const UPDATE_UNIT = gql`
       copropertyId
       unitNumber
       floor
-      type
+      unitType
+      description
       area
       shares
-      ownerName
-      ownerEmail
-      ownerPhone
       isOccupied
-      rentedTo
       createdAt
       updatedAt
     }
@@ -43,7 +37,7 @@ export const UPDATE_UNIT = gql`
 `;
 
 export const DELETE_UNIT = gql`
-  mutation DeleteUnit($id: Int!) {
+  mutation DeleteUnit($id: UUID!) {
     deleteUnit(id: $id)
   }
 `;

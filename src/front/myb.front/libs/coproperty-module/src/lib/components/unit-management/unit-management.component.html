@@ -1,15 +1,15 @@
 <div class="unit-management-container">
   <!-- Message for new coproperty -->
-  <div *ngIf="copropertyId === 0" class="alert alert-info">
-    <i class="fas fa-info-circle me-2"></i>
+  <div *ngIf="!copropertyId" class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
     {{ 'coproperty.unit.saveFirst' | translate }}
   </div>
 
-  <div *ngIf="copropertyId > 0">
+  <div *ngIf="copropertyId">
     <div class="management-header">
       <h2>{{ 'coproperty.unit.management' | translate }}</h2>
       <button class="btn btn-primary" (click)="openAddForm()">
-        <i class="fas fa-plus"></i>
+        <i class="bi bi-plus"></i>
         {{ 'coproperty.unit.addUnit' | translate }}
       </button>
     </div>
@@ -80,11 +80,11 @@
 
         <div class="form-actions">
           <button type="submit" class="btn btn-success" [disabled]="!unitForm.valid">
-            <i class="fas fa-save"></i>
+            <i class="bi bi-save"></i>
             Save
           </button>
           <button type="button" class="btn btn-secondary" (click)="cancelForm()">
-            <i class="fas fa-times"></i>
+            <i class="bi bi-x"></i>
             Cancel
           </button>
         </div>
@@ -107,7 +107,7 @@
               <th>{{ 'coproperty.unit.area' | translate }}</th>
               <th>{{ 'coproperty.unit.shares' | translate }}</th>
               <th>{{ 'coproperty.unit.status' | translate }}</th>
-              <th>{{ 'coproperty.unit.owner' | translate }}</th>
+              <th>{{ 'coproperty.unit.type' | translate }}</th>
               <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
@@ -131,15 +131,15 @@
                 </span>
               </td>
               <td>
-                <span *ngIf="unit.ownerName">{{ unit.ownerName }}</span>
-                <span *ngIf="!unit.ownerName" class="text-muted">{{ 'coproperty.unit.noOwner' | translate }}</span>
+                <span *ngIf="unit.unitType">{{ unit.unitType }}</span>
+                <span *ngIf="!unit.unitType" class="text-muted">-</span>
               </td>
               <td>
                 <button class="btn btn-sm btn-primary" (click)="editUnit(unit)" title="Edit">
-                  <i class="fas fa-edit"></i>
+                  <i class="bi bi-pencil"></i>
                 </button>
                 <button class="btn btn-sm btn-danger" (click)="deleteUnit(unit)" title="Delete">
-                  <i class="fas fa-trash"></i>
+                  <i class="bi bi-trash"></i>
                 </button>
               </td>
             </tr>

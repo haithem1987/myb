@@ -14,6 +14,7 @@ export const GET_ALL_CHARGES = gql`
       startDate
       endDate
       isActive
+      createdBy
       createdAt
       updatedAt
     }
@@ -21,7 +22,7 @@ export const GET_ALL_CHARGES = gql`
 `;
 
 export const GET_CHARGE_BY_ID = gql`
-  query GetChargeById($id: Int!) {
+  query GetChargeById($id: UUID!) {
     chargeById(id: $id) {
       id
       copropertyId
@@ -34,6 +35,7 @@ export const GET_CHARGE_BY_ID = gql`
       startDate
       endDate
       isActive
+      createdBy
       createdAt
       updatedAt
     }
@@ -41,8 +43,8 @@ export const GET_CHARGE_BY_ID = gql`
 `;
 
 export const GET_CHARGES_BY_COPROPERTY = gql`
-  query GetChargesByCoproperty($copropertyId: Int!) {
-    chargesByCoproperty(copropertyId: $copropertyId) {
+  query GetChargesByCoproperty($copropertyId: UUID!) {
+    charges(copropertyId: $copropertyId) {
       id
       copropertyId
       name
@@ -54,6 +56,7 @@ export const GET_CHARGES_BY_COPROPERTY = gql`
       startDate
       endDate
       isActive
+      createdBy
       createdAt
       updatedAt
     }

@@ -14,6 +14,8 @@ namespace Myb.Common.Repositories
         Task<QueryResult<TKey, TEntity>> UpdateAsync(TEntity entity);
         Task<QueryResult<TKey, TEntity>> DeleteAsync(TKey entityId);
         TEntity? GetById(TKey keys);
+        Task<IEnumerable<TEntity>> GetWhereAsync(System.Linq.Expressions.Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity?> GetByIdAsync(TKey id);
        // Task<Folder> GetByIdAsync(int id);
     }
 }

@@ -1,9 +1,10 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { UnitService, UnitExtended } from '../../services/unit.service';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
   selector: 'myb-unit-management',
@@ -12,10 +13,13 @@ import { UnitService, UnitExtended } from '../../services/unit.service';
   templateUrl: './unit-management.component.html',
   styleUrls: ['./unit-management.component.scss'],
 })
-export class UnitManagementComponent implements OnInit {
+export class UnitManagementComponent implements OnInit, OnChanges {
+  @Input() copropertyId: string | null = null;
+  
   private unitService = inject(UnitService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
+  private toastService = inject(ToastService);
 
   units = signal<UnitExtended[]>([]);
   loading = signal(false);
@@ -23,8 +27,8 @@ export class UnitManagementComponent implements OnInit {
   searchTerm: string = '';
   showAddForm: boolean = false;
   unitForm: FormGroup;
-  editingUnitId: number | null = null;
-  copropertyId: number = 0;
+  editingUnitId: string | null = null;
+  resolvedCopropertyId: string | null = null;
 
   unitTypes = ['APARTMENT', 'PARKING', 'CAVE', 'COMMERCIAL', 'OTHER'];
 
@@ -34,39 +38,54 @@ export class UnitManagementComponent implements OnInit {
       floor: [1, [Validators.required, Validators.min(0)]],
       area: [0, [Validators.required, Validators.min(1)]],
       shares: [0, [Validators.required, Validators.min(1)]],
-      type: ['APARTMENT', Validators.required],
-      ownerName: ['', Validators.required],
-      ownerEmail: ['', Validators.email],
-      ownerPhone: [''],
-      isOccupied: [true, Validators.required],
-      rentedTo: [''],
+      unitType: ['APARTMENT', Validators.required],
+      description: [''],
+      isOccupied: [true, Validators.required]
     });
   }
 
   ngOnInit(): void {
-    // Get coproperty ID from route params
-    this.route.params.subscribe(params => {
-      this.copropertyId = +params['id'] || 0;
-      if (this.copropertyId > 0) {
+    // Get coproperty ID from input or parent route params
+    if (this.copropertyId) {
+      this.resolvedCopropertyId = this.copropertyId;
+      this.loadUnits();
+    } else {
+      this.route.parent?.params.subscribe(params => {
+        const idFromRoute = params['id'];
+        if (idFromRoute) {
+          this.resolvedCopropertyId = idFromRoute;
+          this.loadUnits();
+        }
+      });
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['copropertyId'] && !changes['copropertyId'].firstChange) {
+      this.resolvedCopropertyId = this.copropertyId;
+      if (this.copropertyId) {
         this.loadUnits();
       }
-    });
+    }
   }
 
   loadUnits(): void {
-    if (!this.copropertyId || this.copropertyId === 0) {
+    if (!this.resolvedCopropertyId) {
       this.units.set([]);
       this.loading.set(false);
       return;
     }
     this.loading.set(true);
-    this.unitService.getUnitsByCoproperty(this.copropertyId).subscribe({
+    this.unitService.getUnitsByCoproperty(this.resolvedCopropertyId).subscribe({
       next: (data) => {
         this.units.set(data);
         this.loading.set(false);
       },
       error: (err) => {
         console.error('Error loading units:', err);
+        this.toastService.show('Failed to load units. Please try again.', {
+          classname: 'bg-danger text-light',
+        });
         this.loading.set(false);
       }
     });
@@ -80,7 +99,7 @@ export class UnitManagementComponent implements OnInit {
     return allUnits.filter(
       (unit) =>
         unit.unitNumber.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        unit.type.toLowerCase().includes(this.searchTerm.toLowerCase())
+        unit.unitType?.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
@@ -88,10 +107,10 @@ export class UnitManagementComponent implements OnInit {
     this.showAddForm = true;
     this.editingUnitId = null;
     this.unitForm.reset({ 
-      type: 'APARTMENT', 
+      unitType: 'APARTMENT', 
       isOccupied: true, 
       floor: 1,
-      copropertyId: this.copropertyId 
+      copropertyId: this.resolvedCopropertyId
     });
   }
 
@@ -103,12 +122,9 @@ export class UnitManagementComponent implements OnInit {
       floor: unit.floor,
       area: unit.area,
       shares: unit.shares,
-      type: unit.type,
-      ownerName: unit.ownerName,
-      ownerEmail: unit.ownerEmail,
-      ownerPhone: unit.ownerPhone,
-      isOccupied: unit.isOccupied,
-      rentedTo: unit.rentedTo,
+      unitType: unit.unitType,
+      description: unit.description,
+      isOccupied: unit.isOccupied
     });
   }
 
@@ -117,12 +133,17 @@ export class UnitManagementComponent implements OnInit {
       this.loading.set(true);
       this.unitService.deleteUnit(unit.id!).subscribe({
         next: () => {
+          this.toastService.show(`Unit ${unit.unitNumber} deleted successfully!`, {
+            classname: 'bg-success text-light',
+          });
           this.loadUnits();
         },
         error: (err) => {
           console.error('Error deleting unit:', err);
+          this.toastService.show('Failed to delete unit. Please try again.', {
+            classname: 'bg-danger text-light',
+          });
           this.loading.set(false);
-          alert('Failed to delete unit');
         }
       });
     }
@@ -133,8 +154,8 @@ export class UnitManagementComponent implements OnInit {
       this.loading.set(true);
       const unitData: UnitExtended = {
         ...this.unitForm.value,
-        copropertyId: this.copropertyId,
-        ...(this.editingUnitId && { id: this.editingUnitId })
+        copropertyId: this.resolvedCopropertyId,
+        id: this.editingUnitId || '00000000-0000-0000-0000-000000000000'
       };
 
       const operation = this.editingUnitId 
@@ -143,15 +164,38 @@ export class UnitManagementComponent implements OnInit {
 
       operation.subscribe({
         next: () => {
+          const message = this.editingUnitId 
+            ? `Unit ${unitData.unitNumber} updated successfully!`
+            : `Unit ${unitData.unitNumber} created successfully!`;
+          
+          this.toastService.show(message, {
+            classname: 'bg-success text-light',
+          });
+          
           this.showAddForm = false;
           this.unitForm.reset();
           this.loadUnits();
         },
         error: (err) => {
           console.error('Error saving unit:', err);
+          
+          // Check for duplicate unit number error
+          const errorMessage = err?.error?.errors?.[0]?.message || err?.message || '';
+          let displayMessage = 'Failed to save unit. Please try again.';
+          
+          if (errorMessage.includes('duplicate') || errorMessage.includes('already exists')) {
+            displayMessage = `Unit number ${unitData.unitNumber} already exists for this coproperty. Please use a different unit number.`;
+          }
+          
+          this.toastService.show(displayMessage, {
+            classname: 'bg-danger text-light',
+          });
           this.loading.set(false);
-          alert('Failed to save unit');
         }
+      });
+    } else {
+      this.toastService.show('Please fill in all required fields correctly.', {
+        classname: 'bg-warning text-dark',
       });
     }
   }

@@ -25,7 +25,18 @@ namespace Myb.Coproperty.Services
         public async Task<Charge> CreateAsync(Charge charge)
         {
             var result = await _chargeRepository.InsertAsync(charge);
-            return result.Entity!;
+            
+            if (result.Errors != null && result.Errors.Any())
+            {
+                throw new InvalidOperationException($"Failed to create charge: {string.Join(", ", result.Errors)}");
+            }
+            
+            if (result.Entity == null)
+            {
+                throw new InvalidOperationException("Failed to create charge: Entity was not returned");
+            }
+            
+            return result.Entity;
         }
 
         public async Task DeleteAsync(Guid id)
@@ -49,7 +60,8 @@ namespace Myb.Coproperty.Services
                         {
                             ChargeId = chargeId,
                             UnitId = unit.Id,
-                            Amount = (charge.TotalAmount * unit.Shares) / totalShares
+                            Amount = (charge.TotalAmount * unit.Shares) / totalShares,
+                            Unit = unit  // Populate navigation property
                         });
                     }
                     break;
@@ -61,7 +73,8 @@ namespace Myb.Coproperty.Services
                         {
                             ChargeId = chargeId,
                             UnitId = unit.Id,
-                            Amount = (charge.TotalAmount * (unit.Area ?? 0)) / totalArea
+                            Amount = (charge.TotalAmount * (unit.Area ?? 0)) / totalArea,
+                            Unit = unit  // Populate navigation property
                         });
                     }
                     break;
@@ -73,7 +86,8 @@ namespace Myb.Coproperty.Services
                         {
                             ChargeId = chargeId,
                             UnitId = unit.Id,
-                            Amount = amountPerUnit
+                            Amount = amountPerUnit,
+                            Unit = unit  // Populate navigation property
                         });
                     }
                     break;
@@ -97,12 +111,17 @@ namespace Myb.Coproperty.Services
 
         public async Task<Charge> GetByIdAsync(Guid id)
         {
-            return await Task.FromResult(_chargeRepository.GetById(id)!);
+            var charge = await _chargeRepository.GetByIdAsync(id);
+            if (charge == null)
+            {
+                throw new InvalidOperationException($"Charge with ID {id} not found");
+            }
+            return charge;
         }
 
         public async Task<IEnumerable<Charge>> GetChargesByCopropertyIdAsync(Guid copropertyId)
         {
-            return await Task.FromResult(_chargeRepository.GetAll().Where(c => c.CopropertyId == copropertyId).ToList());
+            return await _chargeRepository.GetWhereAsync(c => c.CopropertyId == copropertyId);
         }
 
         public async Task UpdateAsync(Charge charge)

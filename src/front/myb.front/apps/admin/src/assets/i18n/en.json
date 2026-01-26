@@ -198,6 +198,9 @@
       "vacant": "Vacant",
       "owner": "Owner",
       "owners": "Owners",
+      "ownerName": "Owner Name",
+      "ownerEmail": "Owner Email",
+      "ownerPhone": "Owner Phone",
       "noOwner": "No owner",
       "deleteConfirm": "Are you sure you want to delete this unit?",
       "saveFirst": "Please save the coproperty first before managing units."

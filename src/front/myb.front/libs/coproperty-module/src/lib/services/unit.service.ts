@@ -13,18 +13,15 @@ import {
 } from '../graphql/mutations/unit.mutation';
 
 export interface UnitExtended {
-  id?: number;
-  copropertyId: number;
+  id?: string;
+  copropertyId: string;
   unitNumber: string;
-  floor: number;
-  type: 'APARTMENT' | 'PARKING' | 'CAVE' | 'COMMERCIAL' | 'OTHER';
-  area: number;
+  floor?: number;
+  unitType?: string;
+  description?: string;
+  area?: number;
   shares: number;
-  ownerName: string;
-  ownerEmail?: string;
-  ownerPhone?: string;
   isOccupied: boolean;
-  rentedTo?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -39,29 +36,29 @@ export class UnitService {
     return this.apollo
       .query<{ allUnits: UnitExtended[] }>({
         query: GET_ALL_UNITS,
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.allUnits));
   }
 
-  getUnitById(id: number): Observable<UnitExtended> {
+  getUnitById(id: string): Observable<UnitExtended> {
     return this.apollo
       .query<{ unitById: UnitExtended }>({
         query: GET_UNIT_BY_ID,
         variables: { id },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.unitById));
   }
 
-  getUnitsByCoproperty(copropertyId: number): Observable<UnitExtended[]> {
+  getUnitsByCoproperty(copropertyId: string): Observable<UnitExtended[]> {
     return this.apollo
-      .query<{ unitsByCoproperty: UnitExtended[] }>({
+      .query<{ units: UnitExtended[] }>({
         query: GET_UNITS_BY_COPROPERTY,
         variables: { copropertyId },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
-      .pipe(map((result) => result.data.unitsByCoproperty));
+      .pipe(map((result) => result.data.units));
   }
 
   createUnit(unit: UnitExtended): Observable<UnitExtended> {
@@ -69,7 +66,7 @@ export class UnitService {
       .mutate<{ createUnit: UnitExtended }>({
         mutation: CREATE_UNIT,
         variables: { item: unit },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createUnit));
   }
@@ -79,17 +76,17 @@ export class UnitService {
       .mutate<{ updateUnit: UnitExtended }>({
         mutation: UPDATE_UNIT,
         variables: { item: unit },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateUnit));
   }
 
-  deleteUnit(id: number): Observable<boolean> {
+  deleteUnit(id: string): Observable<boolean> {
     return this.apollo
       .mutate<{ deleteUnit: boolean }>({
         mutation: DELETE_UNIT,
         variables: { id },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteUnit));
   }

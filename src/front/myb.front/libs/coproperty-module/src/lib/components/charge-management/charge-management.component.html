@@ -1,15 +1,15 @@
 <div class="charge-management-container">
   <!-- Message for new coproperty -->
-  <div *ngIf="copropertyId() === 0" class="alert alert-info">
-    <i class="fas fa-info-circle me-2"></i>
+  <div *ngIf="!copropertyId" class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
     {{ 'coproperty.charges.saveFirst' | translate }}
   </div>
 
-  <div *ngIf="copropertyId() > 0">
+  <div *ngIf="copropertyId">
     <div class="management-header">
       <h2>{{ 'coproperty.charges.title' | translate }}</h2>
       <button class="btn btn-primary" (click)="showAddForm()" [disabled]="showForm()">
-        <i class="fas fa-plus"></i>
+        <i class="bi bi-plus"></i>
         {{ 'coproperty.charges.addCharge' | translate }}
       </button>
     </div>
@@ -124,11 +124,11 @@
 
         <div class="form-actions mt-4">
           <button type="submit" class="btn btn-success" [disabled]="!chargeForm.valid">
-            <i class="fas fa-save"></i>
+            <i class="bi bi-save"></i>
             {{ 'common.save' | translate }}
           </button>
           <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
-            <i class="fas fa-times"></i>
+            <i class="bi bi-x"></i>
             {{ 'common.cancel' | translate }}
           </button>
         </div>
@@ -143,7 +143,7 @@
     </div>
     <div class="card-body">
       <div *ngIf="charges().length === 0" class="alert alert-info">
-        <i class="fas fa-info-circle me-2"></i>
+        <i class="bi bi-info-circle me-2"></i>
         {{ 'common.noData' | translate }}
       </div>
 
@@ -173,14 +173,14 @@
             </div>
             <div class="card-footer-charge">
               <button class="btn btn-sm btn-outline-primary" (click)="distributeCharge(charge.id!)">
-                <i class="fas fa-calculator"></i>
+                <i class="bi bi-calculator"></i>
                 {{ 'coproperty.charges.calculateDistribution' | translate }}
               </button>
               <button class="btn btn-sm btn-outline-warning" (click)="editCharge(charge)">
-                <i class="fas fa-edit"></i>
+                <i class="bi bi-pencil"></i>
               </button>
               <button class="btn btn-sm btn-outline-danger" (click)="deleteCharge(charge.id!)">
-                <i class="fas fa-trash"></i>
+                <i class="bi bi-trash"></i>
               </button>
             </div>
           </div>

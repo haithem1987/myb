@@ -2,7 +2,7 @@
   <div class="management-header">
     <h2>{{ 'coproperty.owner.management' | translate }}</h2>
     <button class="btn btn-primary" (click)="openAddForm()">
-      <i class="fas fa-plus"></i>
+      <i class="bi bi-plus"></i>
       {{ 'coproperty.owner.addOwner' | translate }}
     </button>
   </div>
@@ -61,11 +61,11 @@
 
         <div class="form-actions">
           <button type="submit" class="btn btn-success" [disabled]="!ownerForm.valid">
-            <i class="fas fa-save"></i>
+            <i class="bi bi-save"></i>
             Save
           </button>
           <button type="button" class="btn btn-secondary" (click)="cancelForm()">
-            <i class="fas fa-times"></i>
+            <i class="bi bi-x"></i>
             Cancel
           </button>
         </div>
@@ -108,10 +108,10 @@
               </td>
               <td>
                 <button class="btn btn-sm btn-primary" (click)="editOwner(owner)" title="Edit">
-                  <i class="fas fa-edit"></i>
+                  <i class="bi bi-pencil"></i>
                 </button>
                 <button class="btn btn-sm btn-danger" (click)="deleteOwner(owner)" title="Delete">
-                  <i class="fas fa-trash"></i>
+                  <i class="bi bi-trash"></i>
                 </button>
               </td>
             </tr>

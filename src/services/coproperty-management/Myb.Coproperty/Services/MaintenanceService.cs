@@ -15,7 +15,18 @@ namespace Myb.Coproperty.Services
         public async Task<MaintenanceRequest> CreateAsync(MaintenanceRequest request)
         {
             var result = await _maintenanceRepository.InsertAsync(request);
-            return result.Entity!;
+            
+            if (result.Errors != null && result.Errors.Any())
+            {
+                throw new InvalidOperationException($"Failed to create maintenance request: {string.Join(", ", result.Errors)}");
+            }
+            
+            if (result.Entity == null)
+            {
+                throw new InvalidOperationException("Failed to create maintenance request: Entity was not returned");
+            }
+            
+            return result.Entity;
         }
 
         public async Task DeleteAsync(Guid id)

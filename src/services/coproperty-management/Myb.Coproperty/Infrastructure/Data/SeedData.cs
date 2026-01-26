@@ -87,7 +87,6 @@ public static class SeedData
                 Area = 50 + (i * 5),
                 Shares = 500,
                 UnitType = i % 3 == 0 ? "T3" : "T2",
-                OccupancyStatus = "Occupied",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -110,7 +109,6 @@ public static class SeedData
                 Area = 60 + (i * 3),
                 Shares = 500,
                 UnitType = i % 2 == 0 ? "T3" : "T2",
-                OccupancyStatus = "Occupied",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };

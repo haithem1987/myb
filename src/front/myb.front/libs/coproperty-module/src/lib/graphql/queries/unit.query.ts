@@ -7,14 +7,11 @@ export const GET_ALL_UNITS = gql`
       copropertyId
       unitNumber
       floor
-      type
+      unitType
+      description
       area
       shares
-      ownerName
-      ownerEmail
-      ownerPhone
       isOccupied
-      rentedTo
       createdAt
       updatedAt
     }
@@ -22,20 +19,17 @@ export const GET_ALL_UNITS = gql`
 `;
 
 export const GET_UNIT_BY_ID = gql`
-  query GetUnitById($id: Int!) {
+  query GetUnitById($id: UUID!) {
     unitById(id: $id) {
       id
       copropertyId
       unitNumber
       floor
-      type
+      unitType
+      description
       area
       shares
-      ownerName
-      ownerEmail
-      ownerPhone
       isOccupied
-      rentedTo
       createdAt
       updatedAt
     }
@@ -43,20 +37,17 @@ export const GET_UNIT_BY_ID = gql`
 `;
 
 export const GET_UNITS_BY_COPROPERTY = gql`
-  query GetUnitsByCoproperty($copropertyId: Int!) {
-    unitsByCoproperty(copropertyId: $copropertyId) {
+  query GetUnitsByCoproperty($copropertyId: UUID!) {
+    units(copropertyId: $copropertyId) {
       id
       copropertyId
       unitNumber
       floor
-      type
+      unitType
+      description
       area
       shares
-      ownerName
-      ownerEmail
-      ownerPhone
       isOccupied
-      rentedTo
       createdAt
       updatedAt
     }

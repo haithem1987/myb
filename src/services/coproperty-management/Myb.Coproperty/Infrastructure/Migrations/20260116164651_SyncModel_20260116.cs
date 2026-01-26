@@ -172,11 +172,18 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                 oldClrType: typeof(DateTime),
                 oldType: "timestamp with time zone");
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "UpdatedAt",
-                table: "Charges",
-                type: "timestamp with time zone",
-                nullable: true);
+            // Use raw SQL to prevent error if column already exists
+            migrationBuilder.Sql(@"
+                DO $$
+                BEGIN
+                    IF NOT EXISTS (
+                        SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'Charges' AND column_name = 'UpdatedAt'
+                    ) THEN
+                        ALTER TABLE ""Charges"" ADD COLUMN ""UpdatedAt"" timestamp with time zone;
+                    END IF;
+                END $$;
+            ");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAt",

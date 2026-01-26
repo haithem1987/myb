@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -12,7 +12,9 @@ import { MaintenanceService, MaintenanceRequestExtended } from '../../services/m
   templateUrl: './maintenance-requests.component.html',
   styleUrls: ['./maintenance-requests.component.scss'],
 })
-export class MaintenanceRequestsComponent implements OnInit {
+export class MaintenanceRequestsComponent implements OnInit, OnChanges {
+  @Input() copropertyId: string | null = null;
+  
   private maintenanceService = inject(MaintenanceService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
@@ -22,10 +24,10 @@ export class MaintenanceRequestsComponent implements OnInit {
   displayedColumns: string[] = ['title', 'unit', 'category', 'priority', 'status', 'createdAt', 'actions'];
   showAddForm: boolean = false;
   requestForm: FormGroup;
-  editingRequestId: number | null = null;
-  copropertyId: number = 0;
+  editingRequestId: string | null = null;
+  resolvedCopropertyId: string | null = null;
 
-  categories = ['PLUMBING', 'ELECTRICAL', 'HEATING', 'ELEVATOR', 'ROOF', 'FACADE', 'OTHER'];
+  categories = ['PLUMBING', 'ELECTRICAL', 'HEATING', 'CLEANING', 'SECURITY', 'STRUCTURAL', 'OTHER'];
   priorities = ['LOW', 'NORMAL', 'HIGH', 'EMERGENCY'];
   statuses = ['PENDING', 'ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
 
@@ -40,31 +42,46 @@ export class MaintenanceRequestsComponent implements OnInit {
       priority: ['NORMAL', Validators.required],
       status: ['PENDING', Validators.required],
       unitId: [null],
-      reportedBy: ['', Validators.required],
-      assignedTo: [''],
+      requestedBy: ['00000000-0000-0000-0000-000000000000'],
+      assignedTo: [null],
       estimatedCost: [0, Validators.min(0)],
       scheduledDate: [null],
     });
   }
 
   ngOnInit(): void {
-    // Get coproperty ID from route params
-    this.route.params.subscribe(params => {
-      this.copropertyId = +params['id'] || 0;
-      if (this.copropertyId > 0) {
+    if (this.copropertyId) {
+      this.resolvedCopropertyId = this.copropertyId;
+      this.loadRequests();
+    } else {
+      // Get coproperty ID from parent route params
+      this.route.parent?.params.subscribe(params => {
+        const idFromRoute = params['id'];
+        if (idFromRoute) {
+          this.resolvedCopropertyId = idFromRoute;
+          this.loadRequests();
+        }
+      });
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['copropertyId'] && !changes['copropertyId'].firstChange) {
+      this.resolvedCopropertyId = this.copropertyId;
+      if (this.copropertyId) {
         this.loadRequests();
       }
-    });
+    }
   }
 
   loadRequests(): void {
-    if (!this.copropertyId || this.copropertyId === 0) {
+    if (!this.resolvedCopropertyId) {
       this.requests.set([]);
       this.loading.set(false);
       return;
     }
     this.loading.set(true);
-    this.maintenanceService.getMaintenanceByCoproperty(this.copropertyId).subscribe({
+    this.maintenanceService.getMaintenanceByCoproperty(this.resolvedCopropertyId).subscribe({
       next: (data) => {
         this.requests.set(data);
         this.loading.set(false);
@@ -92,7 +109,11 @@ export class MaintenanceRequestsComponent implements OnInit {
       category: 'PLUMBING', 
       priority: 'NORMAL',
       status: 'PENDING',
-      copropertyId: this.copropertyId 
+      requestedBy: '00000000-0000-0000-0000-000000000000',
+      estimatedCost: 0,
+      unitId: null,
+      assignedTo: null,
+      scheduledDate: null
     });
   }
 
@@ -106,7 +127,7 @@ export class MaintenanceRequestsComponent implements OnInit {
       priority: request.priority,
       status: request.status,
       unitId: request.unitId,
-      reportedBy: request.reportedBy,
+      requestedBy: request.requestedBy,
       assignedTo: request.assignedTo,
       estimatedCost: request.estimatedCost,
       scheduledDate: request.scheduledDate,
@@ -116,10 +137,14 @@ export class MaintenanceRequestsComponent implements OnInit {
   saveRequest(): void {
     if (this.requestForm.valid) {
       this.loading.set(true);
+      const formValue = this.requestForm.value;
       const requestData: MaintenanceRequestExtended = {
-        ...this.requestForm.value,
-        copropertyId: this.copropertyId,
-        ...(this.editingRequestId && { id: this.editingRequestId })
+        ...formValue,
+        scheduledDate: formValue.scheduledDate ? this.convertToISODateTime(formValue.scheduledDate) : null,
+        copropertyId: this.resolvedCopropertyId,
+        id: this.editingRequestId || '00000000-0000-0000-0000-000000000000',
+        requestedBy: formValue.requestedBy || '00000000-0000-0000-0000-000000000000',
+        assignedTo: formValue.assignedTo || null
       };
 
       const operation = this.editingRequestId 
@@ -211,5 +236,11 @@ export class MaintenanceRequestsComponent implements OnInit {
       default:
         return 'badge-secondary';
     }
+  }
+
+  private convertToISODateTime(dateString: string | null): string | null {
+    if (!dateString) return null;
+    // Convert YYYY-MM-DD to ISO DateTime (YYYY-MM-DDTHH:mm:ss)
+    return `${dateString}T00:00:00`;
   }
 }

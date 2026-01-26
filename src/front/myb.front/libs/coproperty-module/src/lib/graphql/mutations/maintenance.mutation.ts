@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export const CREATE_MAINTENANCE_REQUEST = gql`
-  mutation CreateMaintenanceRequest($item: MaintenanceRequestInput!) {
-    createMaintenanceRequest(maintenanceRequest: $item) {
+  mutation CreateMaintenanceRequest($item: CreateMaintenanceRequestInput!) {
+    createMaintenanceRequestWithDates(requestInput: $item) {
       id
       copropertyId
       unitId
@@ -11,7 +11,7 @@ export const CREATE_MAINTENANCE_REQUEST = gql`
       category
       priority
       status
-      reportedBy
+      requestedBy
       assignedTo
       estimatedCost
       actualCost
@@ -24,8 +24,8 @@ export const CREATE_MAINTENANCE_REQUEST = gql`
 `;
 
 export const UPDATE_MAINTENANCE_REQUEST = gql`
-  mutation UpdateMaintenanceRequest($item: MaintenanceRequestInput!) {
-    updateMaintenanceRequest(maintenanceRequest: $item) {
+  mutation UpdateMaintenanceRequest($item: UpdateMaintenanceRequestInput!) {
+    updateMaintenanceRequestWithDates(requestInput: $item) {
       id
       copropertyId
       unitId
@@ -34,7 +34,7 @@ export const UPDATE_MAINTENANCE_REQUEST = gql`
       category
       priority
       status
-      reportedBy
+      requestedBy
       assignedTo
       estimatedCost
       actualCost
@@ -47,13 +47,13 @@ export const UPDATE_MAINTENANCE_REQUEST = gql`
 `;
 
 export const DELETE_MAINTENANCE_REQUEST = gql`
-  mutation DeleteMaintenanceRequest($id: Int!) {
+  mutation DeleteMaintenanceRequest($id: UUID!) {
     deleteMaintenanceRequest(id: $id)
   }
 `;
 
 export const UPDATE_MAINTENANCE_STATUS = gql`
-  mutation UpdateMaintenanceStatus($id: Int!, $status: String!) {
+  mutation UpdateMaintenanceStatus($id: UUID!, $status: MaintenanceStatus!) {
     updateMaintenanceStatus(id: $id, status: $status) {
       id
       status

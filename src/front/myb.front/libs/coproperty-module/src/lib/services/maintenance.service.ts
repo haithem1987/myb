@@ -15,16 +15,16 @@ import {
 } from '../graphql/mutations/maintenance.mutation';
 
 export interface MaintenanceRequestExtended {
-  id?: number;
-  copropertyId: number;
-  unitId?: number;
+  id?: string;
+  copropertyId: string;
+  unitId?: string;
   unitNumber?: string;
   title: string;
   description: string;
-  category: 'PLUMBING' | 'ELECTRICAL' | 'HEATING' | 'ELEVATOR' | 'ROOF' | 'FACADE' | 'OTHER';
+  category: 'PLUMBING' | 'ELECTRICAL' | 'HEATING' | 'CLEANING' | 'SECURITY' | 'STRUCTURAL' | 'OTHER';
   priority: 'LOW' | 'NORMAL' | 'HIGH' | 'EMERGENCY';
   status: 'PENDING' | 'ASSIGNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  reportedBy: string;
+  requestedBy: string;
   assignedTo?: string;
   estimatedCost?: number;
   actualCost?: number;
@@ -44,37 +44,37 @@ export class MaintenanceService {
     return this.apollo
       .query<{ allMaintenanceRequests: MaintenanceRequestExtended[] }>({
         query: GET_ALL_MAINTENANCE_REQUESTS,
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.allMaintenanceRequests));
   }
 
-  getMaintenanceRequestById(id: number): Observable<MaintenanceRequestExtended> {
+  getMaintenanceRequestById(id: string): Observable<MaintenanceRequestExtended> {
     return this.apollo
       .query<{ maintenanceRequestById: MaintenanceRequestExtended }>({
         query: GET_MAINTENANCE_REQUEST_BY_ID,
         variables: { id },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.maintenanceRequestById));
   }
 
-  getMaintenanceByCoproperty(copropertyId: number): Observable<MaintenanceRequestExtended[]> {
+  getMaintenanceByCoproperty(copropertyId: string): Observable<MaintenanceRequestExtended[]> {
     return this.apollo
-      .query<{ maintenanceByCoproperty: MaintenanceRequestExtended[] }>({
+      .query<{ maintenanceRequests: MaintenanceRequestExtended[] }>({
         query: GET_MAINTENANCE_BY_COPROPERTY,
         variables: { copropertyId },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
-      .pipe(map((result) => result.data.maintenanceByCoproperty));
+      .pipe(map((result) => result.data.maintenanceRequests));
   }
 
-  getMaintenanceByStatus(copropertyId: number, status: string): Observable<MaintenanceRequestExtended[]> {
+  getMaintenanceByStatus(copropertyId: string, status: string): Observable<MaintenanceRequestExtended[]> {
     return this.apollo
       .query<{ maintenanceByStatus: MaintenanceRequestExtended[] }>({
         query: GET_MAINTENANCE_BY_STATUS,
         variables: { copropertyId, status },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.maintenanceByStatus));
   }
@@ -84,7 +84,7 @@ export class MaintenanceService {
       .mutate<{ createMaintenanceRequest: MaintenanceRequestExtended }>({
         mutation: CREATE_MAINTENANCE_REQUEST,
         variables: { item: request },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createMaintenanceRequest));
   }
@@ -94,27 +94,27 @@ export class MaintenanceService {
       .mutate<{ updateMaintenanceRequest: MaintenanceRequestExtended }>({
         mutation: UPDATE_MAINTENANCE_REQUEST,
         variables: { item: request },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateMaintenanceRequest));
   }
 
-  deleteMaintenanceRequest(id: number): Observable<boolean> {
+  deleteMaintenanceRequest(id: string): Observable<boolean> {
     return this.apollo
       .mutate<{ deleteMaintenanceRequest: boolean }>({
         mutation: DELETE_MAINTENANCE_REQUEST,
         variables: { id },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteMaintenanceRequest));
   }
 
-  updateMaintenanceStatus(id: number, status: string): Observable<MaintenanceRequestExtended> {
+  updateMaintenanceStatus(id: string, status: string): Observable<MaintenanceRequestExtended> {
     return this.apollo
       .mutate<{ updateMaintenanceStatus: MaintenanceRequestExtended }>({
         mutation: UPDATE_MAINTENANCE_STATUS,
         variables: { id, status },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateMaintenanceStatus));
   }

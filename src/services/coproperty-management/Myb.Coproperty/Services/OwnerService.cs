@@ -15,7 +15,18 @@ namespace Myb.Coproperty.Services
         public async Task<Owner> CreateAsync(Owner owner)
         {
             var result = await _ownerRepository.InsertAsync(owner);
-            return result.Entity!;
+            
+            if (result.Errors != null && result.Errors.Any())
+            {
+                throw new InvalidOperationException($"Failed to create owner: {string.Join(", ", result.Errors)}");
+            }
+            
+            if (result.Entity == null)
+            {
+                throw new InvalidOperationException("Failed to create owner: Entity was not returned");
+            }
+            
+            return result.Entity;
         }
 
         public async Task DeleteAsync(Guid id)

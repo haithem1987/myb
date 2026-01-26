@@ -139,13 +139,11 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
               .pipe(takeUntil(this.destroy$))
               .subscribe({
                 next: (treasuryData) => {
-                  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                   this.treasuryLabels.set(
-                    treasuryData.map(d => monthNames[d.month - 1])
+                    treasuryData.map(d => d.month)
                   );
                   this.treasuryData.set(
-                    treasuryData.map(d => d.balance)
+                    treasuryData.map(d => d.amount)
                   );
                   this.updateTreasuryChart();
                 },

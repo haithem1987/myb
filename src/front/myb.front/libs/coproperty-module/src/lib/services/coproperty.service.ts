@@ -36,7 +36,7 @@ const GET_COPROPERTIES = gql`
 
 const GET_COPROPERTY = gql`
   query GetCopropertyById($id: UUID!) {
-    getCopropertyById(id: $id) {
+    copropertyById(id: $id) {
       id
       name
       address
@@ -150,12 +150,10 @@ const GET_DASHBOARD_STATS = gql`
 
 const GET_TREASURY_EVOLUTION = gql`
   query GetTreasuryEvolution($copropertyId: UUID!, $months: Int) {
-    getTreasuryEvolution(copropertyId: $copropertyId, months: $months) {
+    treasuryEvolution(copropertyId: $copropertyId, months: $months) {
       month
-      year
-      balance
-      income
-      expenses
+      date
+      amount
     }
   }
 `;
@@ -165,7 +163,7 @@ const GET_TREASURY_EVOLUTION = gql`
 
 const GET_FINANCIAL_REPORT = gql`
   query GetFinancialReport($copropertyId: UUID!, $year: Int!) {
-    getFinancialReport(copropertyId: $copropertyId, year: $year) {
+    financialReport(copropertyId: $copropertyId, year: $year) {
       copropertyId
       period
       totalIncome

@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-between align-items-center">
       <h1>{{ 'coproperty.dashboard.title' | translate }}</h1>
       <button class="btn btn-primary" routerLink="/coproperty/list">
-        <i class="fas fa-building"></i>
+        <i class="bi bi-building"></i>
         {{ 'coproperty.dashboard.viewAllCoproperties' | translate }}
       </button>
     </div>
@@ -13,22 +13,22 @@
   <!-- Quick Navigation Cards -->
   <div class="quick-nav-cards mb-4">
     <div class="nav-card" routerLink="/coproperty/list">
-      <i class="fas fa-list"></i>
+      <i class="bi bi-list-ul"></i>
       <h6>{{ 'coproperty.dashboard.manageAll' | translate }}</h6>
       <small>{{ 'coproperty.dashboard.viewEditList' | translate }}</small>
     </div>
     <div class="nav-card" routerLink="/coproperty/new">
-      <i class="fas fa-plus-circle"></i>
+      <i class="bi bi-plus-circle"></i>
       <h6>{{ 'coproperty.dashboard.addNew' | translate }}</h6>
       <small>{{ 'coproperty.dashboard.createCoproperty' | translate }}</small>
     </div>
     <div class="nav-card" (click)="createFundCall()">
-      <i class="fas fa-money-check-alt"></i>
+      <i class="bi bi-credit-card"></i>
       <h6>{{ 'coproperty.dashboard.fundCall' | translate }}</h6>
       <small>{{ 'coproperty.dashboard.newFundCall' | translate }}</small>
     </div>
     <div class="nav-card" (click)="createAssembly()">
-      <i class="fas fa-users"></i>
+      <i class="bi bi-people"></i>
       <h6>{{ 'coproperty.dashboard.assembly' | translate }}</h6>
       <small>{{ 'coproperty.dashboard.scheduleAssembly' | translate }}</small>
     </div>
@@ -38,7 +38,7 @@
   <div class="kpi-row">
     <div class="kpi-card">
       <div class="kpi-icon treasury">
-        <i class="fas fa-piggy-bank"></i>
+        <i class="bi bi-piggy-bank"></i>
       </div>
       <div class="kpi-content">
         <h3>{{ 'coproperty.dashboard.treasury' | translate }}</h3>
@@ -48,7 +48,7 @@
 
     <div class="kpi-card">
       <div class="kpi-icon charges">
-        <i class="fas fa-chart-line"></i>
+        <i class="bi bi-graph-up"></i>
       </div>
       <div class="kpi-content">
         <h3>{{ 'coproperty.dashboard.charges' | translate }}</h3>
@@ -58,7 +58,7 @@
 
     <div class="kpi-card">
       <div class="kpi-icon units">
-        <i class="fas fa-building"></i>
+        <i class="bi bi-building"></i>
       </div>
       <div class="kpi-content">
         <h3>{{ 'coproperty.dashboard.units' | translate }}</h3>
@@ -68,7 +68,7 @@
 
     <div class="kpi-card">
       <div class="kpi-icon maintenance">
-        <i class="fas fa-wrench"></i>
+        <i class="bi bi-wrench"></i>
       </div>
       <div class="kpi-content">
         <h3>{{ 'coproperty.dashboard.maintenance' | translate }}</h3>
@@ -109,15 +109,15 @@
     </div>
     <div class="card-body">
       <button class="btn btn-primary" (click)="createFundCall()">
-        <i class="fas fa-plus"></i>
+        <i class="bi bi-plus"></i>
         {{ 'coproperty.dashboard.createFundCall' | translate }}
       </button>
       <button class="btn btn-info" (click)="createAssembly()">
-        <i class="fas fa-calendar-alt"></i>
+        <i class="bi bi-calendar-event"></i>
         {{ 'coproperty.dashboard.createAssembly' | translate }}
       </button>
       <button class="btn btn-secondary" (click)="generateReport()">
-        <i class="fas fa-file-pdf"></i>
+        <i class="bi bi-file-pdf"></i>
         {{ 'coproperty.dashboard.generateReport' | translate }}
       </button>
     </div>
@@ -193,7 +193,7 @@
       <div class="timeline">
         <div *ngFor="let activity of recentActivities()" class="timeline-item">
           <div class="timeline-marker" [ngClass]="getActivityClass(activity.type)">
-            <i class="fas fa-circle"></i>
+            <i class="bi bi-circle-fill"></i>
           </div>
           <div class="timeline-content">
             <p class="timeline-description">{{ activity.description }}</p>

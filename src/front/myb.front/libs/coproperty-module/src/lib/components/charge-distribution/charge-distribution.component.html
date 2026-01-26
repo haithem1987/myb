@@ -124,7 +124,7 @@
       </div>
 
       <button class="btn btn-primary mt-3" (click)="calculateDistribution()" [disabled]="!chargeForm.valid">
-        <i class="fas fa-calculator"></i>
+        <i class="bi bi-calculator"></i>
         {{ 'coproperty.charge.calculateDistribution' | translate }}
       </button>
     </div>
@@ -186,11 +186,11 @@
 
       <div class="preview-actions">
         <button class="btn btn-success" (click)="saveDistribution()" [disabled]="!chargeForm.valid">
-          <i class="fas fa-save"></i>
+          <i class="bi bi-save"></i>
           {{ 'common.save' | translate }}
         </button>
         <button class="btn btn-secondary" (click)="reset()">
-          <i class="fas fa-redo"></i>
+          <i class="bi bi-arrow-clockwise"></i>
           {{ 'common.reset' | translate }}
         </button>
       </div>

@@ -181,11 +181,9 @@ export interface DashboardStats {
 }
 
 export interface TreasuryDataPoint {
-  month: number;
-  year: number;
-  balance: number;
-  income: number;
-  expenses: number;
+  month: string;
+  date: Date;
+  amount: number;
 }
 
 export interface ChargeDistributionData {

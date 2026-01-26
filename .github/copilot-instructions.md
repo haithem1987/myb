@@ -26,6 +26,7 @@ Copilot should **immediately create a shell script** for:
    - Code formatting and linting
    - Environment setup/teardown
 
+
 3. **Complex workflows** requiring multiple files
    - Feature scaffolding (component + service + graphql)
    - Service creation (repository + service + dto + graphql)
@@ -567,15 +568,16 @@ Check scripts/README.md for the complete list.
 ## 🎯 Final Guidelines for Copilot
 
 1. **Always check if a script can solve the problem** before providing manual steps
-2. **Generate complete, production-ready scripts** with error handling
-3. **Include usage examples** with each script
-4. **Add comments** explaining complex operations
-5. **Make scripts reusable** with parameters
-6. **Follow shell best practices** (set -e, validation, colors)
-7. **Provide next steps** after script execution
-8. **Save scripts in** `scripts/` directory
-9. **Save documentation in** `docs/` directory
-10. **Keep responses concise** - let scripts do the work
+2. **Always check for code quality issues and compilation errors then fix them** before generating scripts
+3. **Generate complete, production-ready scripts** with error handling
+4. **Include usage examples** with each script
+5. **Add comments** explaining complex operations
+6. **Make scripts reusable** with parameters
+7. **Follow shell best practices** (set -e, validation, colors)
+8. **Provide next steps** after script execution
+9. **Save scripts in** `scripts/` directory
+10. **Save documentation in** `docs/` directory
+11. **Keep responses concise** - let scripts do the work
 
 ---
 

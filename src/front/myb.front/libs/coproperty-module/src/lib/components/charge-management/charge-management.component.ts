@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -12,7 +12,9 @@ import { ChargeService, ChargeExtended, ChargeDistributionExtended } from '../..
   templateUrl: './charge-management.component.html',
   styleUrls: ['./charge-management.component.scss'],
 })
-export class ChargeManagementComponent implements OnInit {
+export class ChargeManagementComponent implements OnInit, OnChanges {
+  @Input() copropertyId: string | null = null;
+  
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private chargeService = inject(ChargeService);
@@ -22,8 +24,8 @@ export class ChargeManagementComponent implements OnInit {
   showForm = signal<boolean>(false);
   showDistribution = signal<boolean>(false);
   isEditing = signal<boolean>(false);
-  currentChargeId = signal<number | null>(null);
-  copropertyId = signal<number>(0);
+  currentChargeId = signal<string | null>(null);
+  resolvedCopropertyId = signal<string | null>(null);
   loading = signal<boolean>(false);
 
   chargeForm: FormGroup;
@@ -43,22 +45,38 @@ export class ChargeManagementComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.parent?.params.subscribe(params => {
-      this.copropertyId.set(+params['id'] || 0);
-      if (this.copropertyId() > 0) {
+    if (this.copropertyId) {
+      this.resolvedCopropertyId.set(this.copropertyId);
+      this.loadCharges();
+    } else {
+      this.route.parent?.params.subscribe(params => {
+        const idFromRoute = params['id'];
+        if (idFromRoute) {
+          this.resolvedCopropertyId.set(idFromRoute);
+          this.loadCharges();
+        }
+      });
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['copropertyId'] && !changes['copropertyId'].firstChange) {
+      this.resolvedCopropertyId.set(this.copropertyId);
+      if (this.copropertyId) {
         this.loadCharges();
       }
-    });
+    }
   }
 
   loadCharges() {
-    if (!this.copropertyId() || this.copropertyId() === 0) {
+    const idStr = this.resolvedCopropertyId();
+    if (!idStr) {
       this.charges.set([]);
       this.loading.set(false);
       return;
     }
     this.loading.set(true);
-    this.chargeService.getChargesByCoproperty(this.copropertyId()).subscribe({
+    this.chargeService.getChargesByCoproperty(idStr).subscribe({
       next: (data: ChargeExtended[]) => {
         this.charges.set(data);
         this.loading.set(false);
@@ -93,10 +111,16 @@ export class ChargeManagementComponent implements OnInit {
   saveCharge() {
     if (this.chargeForm.valid) {
       this.loading.set(true);
+      const copropertyIdStr = this.resolvedCopropertyId();
+      
+      const formValue = this.chargeForm.value;
       const chargeData: ChargeExtended = {
-        ...this.chargeForm.value,
-        copropertyId: this.copropertyId(),
-        ...(this.currentChargeId() && { id: this.currentChargeId()! })
+        ...formValue,
+        startDate: this.convertToISODateTime(formValue.startDate),
+        endDate: formValue.endDate ? this.convertToISODateTime(formValue.endDate) : null,
+        copropertyId: copropertyIdStr,
+        id: this.currentChargeId() || '00000000-0000-0000-0000-000000000000',
+        createdBy: '00000000-0000-0000-0000-000000000000'
       };
 
       const operation = this.isEditing() && this.currentChargeId()
@@ -116,7 +140,7 @@ export class ChargeManagementComponent implements OnInit {
     }
   }
 
-  deleteCharge(chargeId: number) {
+  deleteCharge(chargeId: string) {
     if (confirm('Are you sure you want to delete this charge?')) {
       this.loading.set(true);
       this.chargeService.deleteCharge(chargeId).subscribe({
@@ -129,7 +153,7 @@ export class ChargeManagementComponent implements OnInit {
     }
   }
 
-  distributeCharge(chargeId: number) {
+  distributeCharge(chargeId: string) {
     this.loading.set(true);
     this.chargeService.calculateDistribution(chargeId).subscribe({
       next: (data: ChargeDistributionExtended[]) => {
@@ -192,5 +216,11 @@ export class ChargeManagementComponent implements OnInit {
       'CUSTOM': 'custom'
     };
     return map[method] || 'byShares';
+  }
+
+  private convertToISODateTime(dateString: string | null): string | null {
+    if (!dateString) return null;
+    // Convert YYYY-MM-DD to ISO DateTime (YYYY-MM-DDTHH:mm:ss)
+    return `${dateString}T00:00:00`;
   }
 }

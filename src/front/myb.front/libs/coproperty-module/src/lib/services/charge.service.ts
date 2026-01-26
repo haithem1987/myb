@@ -14,8 +14,8 @@ import {
 } from '../graphql/mutations/charge.mutation';
 
 export interface ChargeExtended {
-  id?: number;
-  copropertyId: number;
+  id?: string;
+  copropertyId: string;
   name: string;
   description?: string;
   chargeType: 'CLEANING' | 'SECURITY' | 'MAINTENANCE' | 'ELECTRICITY' | 'WATER' | 'INSURANCE' | 'OTHER';
@@ -25,12 +25,13 @@ export interface ChargeExtended {
   startDate: Date;
   endDate?: Date;
   isActive: boolean;
+  createdBy: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface ChargeDistributionExtended {
-  unitId: number;
+  unitId: string;
   unitNumber: string;
   amount: number;
   shares?: number;
@@ -47,29 +48,29 @@ export class ChargeService {
     return this.apollo
       .query<{ allCharges: ChargeExtended[] }>({
         query: GET_ALL_CHARGES,
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.allCharges));
   }
 
-  getChargeById(id: number): Observable<ChargeExtended> {
+  getChargeById(id: string): Observable<ChargeExtended> {
     return this.apollo
       .query<{ chargeById: ChargeExtended }>({
         query: GET_CHARGE_BY_ID,
         variables: { id },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.chargeById));
   }
 
-  getChargesByCoproperty(copropertyId: number): Observable<ChargeExtended[]> {
+  getChargesByCoproperty(copropertyId: string): Observable<ChargeExtended[]> {
     return this.apollo
-      .query<{ chargesByCoproperty: ChargeExtended[] }>({
+      .query<{ charges: ChargeExtended[] }>({
         query: GET_CHARGES_BY_COPROPERTY,
         variables: { copropertyId },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
-      .pipe(map((result) => result.data.chargesByCoproperty));
+      .pipe(map((result) => result.data.charges));
   }
 
   createCharge(charge: ChargeExtended): Observable<ChargeExtended> {
@@ -77,7 +78,7 @@ export class ChargeService {
       .mutate<{ createCharge: ChargeExtended }>({
         mutation: CREATE_CHARGE,
         variables: { item: charge },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createCharge));
   }
@@ -87,27 +88,27 @@ export class ChargeService {
       .mutate<{ updateCharge: ChargeExtended }>({
         mutation: UPDATE_CHARGE,
         variables: { item: charge },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateCharge));
   }
 
-  deleteCharge(id: number): Observable<boolean> {
+  deleteCharge(id: string): Observable<boolean> {
     return this.apollo
       .mutate<{ deleteCharge: boolean }>({
         mutation: DELETE_CHARGE,
         variables: { id },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteCharge));
   }
 
-  calculateDistribution(chargeId: number): Observable<ChargeDistributionExtended[]> {
+  calculateDistribution(chargeId: string): Observable<ChargeDistributionExtended[]> {
     return this.apollo
       .mutate<{ calculateChargeDistribution: ChargeDistributionExtended[] }>({
         mutation: CALCULATE_CHARGE_DISTRIBUTION,
         variables: { chargeId },
-        context: { serviceName: 'copropertyService' },
+        context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.calculateChargeDistribution));
   }

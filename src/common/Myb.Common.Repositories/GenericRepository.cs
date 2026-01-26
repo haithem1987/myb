@@ -65,6 +65,16 @@ namespace Myb.Common.Repositories
             return _entities.FirstOrDefault(x => x.Id.Equals(keys));
         }
 
+        public async Task<IEnumerable<TEntity>> GetWhereAsync(System.Linq.Expressions.Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _entities.Where(predicate).ToListAsync();
+        }
+
+        public async Task<TEntity?> GetByIdAsync(TKey id)
+        {
+            return await _entities.FindAsync(id);
+        }
+
         public IEnumerable<string> GetPropertyKeys()
         {
             var entityTypes = _dbContext.Model.GetEntityTypes();
@@ -87,9 +97,16 @@ namespace Myb.Common.Repositories
             try
             {
                 if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+                if (entity.CreatedAt == null)
+                {
+                    entity.CreatedAt = DateTime.UtcNow;
+                }
+                if (entity.UpdatedAt == null)
+                {
+                    entity.UpdatedAt = DateTime.UtcNow;
+                }
                 
-                entity.CreatedAt ??= DateTime.UtcNow;
-                entity.UpdatedAt ??= DateTime.UtcNow;
                 _entities.Add(entity);
                 await _dbContext.SaveChangesAsync();
                 result.Entity = entity;

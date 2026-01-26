@@ -11,7 +11,7 @@ export const GET_ALL_MAINTENANCE_REQUESTS = gql`
       category
       priority
       status
-      reportedBy
+      requestedBy
       assignedTo
       estimatedCost
       actualCost
@@ -24,7 +24,7 @@ export const GET_ALL_MAINTENANCE_REQUESTS = gql`
 `;
 
 export const GET_MAINTENANCE_REQUEST_BY_ID = gql`
-  query GetMaintenanceRequestById($id: Int!) {
+  query GetMaintenanceRequestById($id: UUID!) {
     maintenanceRequestById(id: $id) {
       id
       copropertyId
@@ -34,7 +34,7 @@ export const GET_MAINTENANCE_REQUEST_BY_ID = gql`
       category
       priority
       status
-      reportedBy
+      requestedBy
       assignedTo
       estimatedCost
       actualCost
@@ -47,8 +47,8 @@ export const GET_MAINTENANCE_REQUEST_BY_ID = gql`
 `;
 
 export const GET_MAINTENANCE_BY_COPROPERTY = gql`
-  query GetMaintenanceByCoproperty($copropertyId: Int!) {
-    maintenanceByCoproperty(copropertyId: $copropertyId) {
+  query GetMaintenanceByCoproperty($copropertyId: UUID!) {
+    maintenanceRequests(copropertyId: $copropertyId) {
       id
       copropertyId
       unitId
@@ -57,7 +57,7 @@ export const GET_MAINTENANCE_BY_COPROPERTY = gql`
       category
       priority
       status
-      reportedBy
+      requestedBy
       assignedTo
       estimatedCost
       actualCost
@@ -70,7 +70,7 @@ export const GET_MAINTENANCE_BY_COPROPERTY = gql`
 `;
 
 export const GET_MAINTENANCE_BY_STATUS = gql`
-  query GetMaintenanceByStatus($copropertyId: Int!, $status: String!) {
+  query GetMaintenanceByStatus($copropertyId: UUID!, $status: String!) {
     maintenanceByStatus(copropertyId: $copropertyId, status: $status) {
       id
       copropertyId
@@ -80,7 +80,7 @@ export const GET_MAINTENANCE_BY_STATUS = gql`
       category
       priority
       status
-      reportedBy
+      requestedBy
       assignedTo
       estimatedCost
       actualCost

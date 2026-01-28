@@ -30,6 +30,7 @@ services:
   
   - type: web
     name: myb-keycloak
+    env: docker
     plan: starter
     region: oregon
     dockerfilePath: ./Dockerfile.keycloak
@@ -64,6 +65,7 @@ services:
 
   - type: web
     name: myb-usermanager
+    env: docker
     plan: starter
     region: oregon
     dockerfilePath: ./src/services/user-manager/Myb.UserManager/Dockerfile
@@ -86,6 +88,7 @@ services:
         sync: false
 
   - type: web
+    env: docker
     name: myb-timesheet
     plan: starter
     region: oregon
@@ -109,6 +112,7 @@ services:
         sync: false
 
   - type: web
+    env: docker
     name: myb-docmanager
     plan: starter
     region: oregon
@@ -132,6 +136,7 @@ services:
         sync: false
 
   - type: web
+    env: docker
     name: myb-invoice
     plan: starter
     region: oregon
@@ -154,7 +159,8 @@ services:
       - key: Keycloak__ClientSecret
         sync: false
 
-  - type: web
+  - env: docker
+    type: web
     name: myb-payment
     plan: starter
     region: oregon
@@ -177,7 +183,8 @@ services:
       - key: Stripe__PublishableKey
         sync: false
 
-  - type: web
+  - env: docker
+    type: web
     name: myb-notification
     plan: starter
     region: oregon
@@ -200,7 +207,8 @@ services:
       - key: Email__FromAddress
         value: noreply@myb.com
 
-  - type: web
+  - env: docker
+    type: web
     name: myb-coproperty
     plan: starter
     region: oregon
@@ -225,7 +233,8 @@ services:
 
   # ===== FRONTEND SERVICE =====
 
-  - type: web
+  - env: docker
+    type: web
     name: myb-frontend
     plan: starter
     region: oregon

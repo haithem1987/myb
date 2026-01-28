@@ -1,0 +1,334 @@
+services:
+  # ===== DATABASES =====
+  
+  keycloak-db:
+    type: pserv
+    plan: free
+    name: keycloak-db
+    ipAllowList: []
+    databaseName: keycloak
+    user: keycloak
+    region: oregon
+    previewPlan: free
+
+  timesheet-db:
+    type: pserv
+    plan: free
+    name: timesheet-db
+    ipAllowList: []
+    databaseName: timesheetDB
+    user: postgres
+    region: oregon
+    previewPlan: free
+
+  document-db:
+    type: pserv
+    plan: free
+    name: document-db
+    ipAllowList: []
+    databaseName: documentDB
+    user: postgres
+    region: oregon
+    previewPlan: free
+
+  invoice-db:
+    type: pserv
+    plan: free
+    name: invoice-db
+    ipAllowList: []
+    databaseName: invoiceDB
+    user: postgres
+    region: oregon
+    previewPlan: free
+
+  coproperty-db:
+    type: pserv
+    plan: free
+    name: coproperty-db
+    ipAllowList: []
+    databaseName: copropertyDB
+    user: postgres
+    region: oregon
+    previewPlan: free
+
+  # ===== KEYCLOAK SERVICE =====
+  
+  keycloak:
+    type: web
+    name: myb-keycloak
+    runtime: docker
+    plan: standard
+    region: oregon
+    dockerfilePath: ./Dockerfile.keycloak
+    dockerfile:
+      file: |
+        FROM quay.io/keycloak/keycloak:23.0.4
+
+        ENV KEYCLOAK_ADMIN=$KEYCLOAK_ADMIN_USER
+        ENV KEYCLOAK_ADMIN_PASSWORD=$KEYCLOAK_ADMIN_PASSWORD
+
+        CMD ["start", "--db=postgres"]
+    envVars:
+      - key: KC_BOOTSTRAP_ADMIN_USERNAME
+        value: ${KEYCLOAK_ADMIN_USER}
+      - key: KC_BOOTSTRAP_ADMIN_PASSWORD
+        value: ${KEYCLOAK_ADMIN_PASSWORD}
+      - key: KC_DB
+        value: postgres
+      - key: KC_DB_URL
+        fromDatabase:
+          name: keycloak-db
+          property: connectionString
+      - key: KC_DB_USERNAME
+        value: keycloak
+      - key: KC_DB_PASSWORD
+        fromDatabase:
+          name: keycloak-db
+          property: password
+      - key: KC_HOSTNAME_STRICT
+        value: "false"
+      - key: KC_HTTP_ENABLED
+        value: "true"
+      - key: KC_PROXY
+        value: edge
+      - key: KC_HOSTNAME_STRICT_HTTPS
+        value: "false"
+      - key: KC_HOSTNAME_URL
+        value: ${KEYCLOAK_HOSTNAME_URL}
+    healthCheckPath: /
+    depends_on:
+      - keycloak-db
+
+  # ===== BACKEND SERVICES =====
+
+  user-manager:
+    type: web
+    name: myb-usermanager
+    runtime: docker
+    plan: standard
+    region: oregon
+    buildCommand: ""
+    dockerfilePath: ./src/services/user-manager/Myb.UserManager/Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ConnectionStrings__UserDBConnection
+        fromDatabase:
+          name: timesheet-db
+          property: connectionString
+      - key: Keycloak__BaseUrl
+        value: ${KEYCLOAK_URL}/realms/MYB/protocol/openid-connect
+      - key: Keycloak__Authority
+        value: ${KEYCLOAK_URL}/realms/MYB
+      - key: Keycloak__ClientId
+        value: ${KEYCLOAK_CLIENT_ID}
+      - key: Keycloak__ClientSecret
+        value: ${KEYCLOAK_CLIENT_SECRET}
+    depends_on:
+      - keycloak
+      - timesheet-db
+
+  timesheet:
+    type: web
+    name: myb-timesheet
+    runtime: docker
+    plan: standard
+    region: oregon
+    buildCommand: ""
+    dockerfilePath: ./src/services/time-sheet/Myb.Timesheet/Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ConnectionStrings__TimesheetDBConnection
+        fromDatabase:
+          name: timesheet-db
+          property: connectionString
+      - key: Keycloak__BaseUrl
+        value: ${KEYCLOAK_URL}/realms/MYB/protocol/openid-connect
+      - key: Keycloak__Authority
+        value: ${KEYCLOAK_URL}/realms/MYB
+      - key: Keycloak__ClientId
+        value: ${KEYCLOAK_CLIENT_ID}
+      - key: Keycloak__ClientSecret
+        value: ${KEYCLOAK_CLIENT_SECRET}
+    depends_on:
+      - keycloak
+      - timesheet-db
+
+  document-manager:
+    type: web
+    name: myb-docmanager
+    runtime: docker
+    plan: standard
+    region: oregon
+    buildCommand: ""
+    dockerfilePath: ./src/services/document-management/Myb.Document/Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ConnectionStrings__DocumentDBConnection
+        fromDatabase:
+          name: document-db
+          property: connectionString
+      - key: Keycloak__BaseUrl
+        value: ${KEYCLOAK_URL}/realms/MYB/protocol/openid-connect
+      - key: Keycloak__Authority
+        value: ${KEYCLOAK_URL}/realms/MYB
+      - key: Keycloak__ClientId
+        value: ${KEYCLOAK_CLIENT_ID}
+      - key: Keycloak__ClientSecret
+        value: ${KEYCLOAK_CLIENT_SECRET}
+    depends_on:
+      - keycloak
+      - document-db
+
+  invoice:
+    type: web
+    name: myb-invoice
+    runtime: docker
+    plan: standard
+    region: oregon
+    buildCommand: ""
+    dockerfilePath: ./src/services/invoice-management/Myb.Invoice/Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ConnectionStrings__InvoiceDBConnection
+        fromDatabase:
+          name: invoice-db
+          property: connectionString
+      - key: Keycloak__BaseUrl
+        value: ${KEYCLOAK_URL}/realms/MYB/protocol/openid-connect
+      - key: Keycloak__Authority
+        value: ${KEYCLOAK_URL}/realms/MYB
+      - key: Keycloak__ClientId
+        value: ${KEYCLOAK_CLIENT_ID}
+      - key: Keycloak__ClientSecret
+        value: ${KEYCLOAK_CLIENT_SECRET}
+    depends_on:
+      - keycloak
+      - invoice-db
+
+  payment:
+    type: web
+    name: myb-payment
+    runtime: docker
+    plan: standard
+    region: oregon
+    buildCommand: ""
+    dockerfilePath: ./src/services/payment-service/Myb.Payment/Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: Keycloak__BaseUrl
+        value: ${KEYCLOAK_URL}/realms/MYB/protocol/openid-connect
+      - key: Keycloak__Authority
+        value: ${KEYCLOAK_URL}/realms/MYB
+      - key: Keycloak__ClientId
+        value: ${KEYCLOAK_CLIENT_ID}
+      - key: Keycloak__ClientSecret
+        value: ${KEYCLOAK_CLIENT_SECRET}
+      - key: Stripe__SecretKey
+        value: ${STRIPE_SECRET_KEY}
+      - key: Stripe__PublishableKey
+        value: ${STRIPE_PUBLISHABLE_KEY}
+    depends_on:
+      - keycloak
+
+  notification:
+    type: web
+    name: myb-notification
+    runtime: docker
+    plan: standard
+    region: oregon
+    buildCommand: ""
+    dockerfilePath: ./src/services/notification-service/Myb.Notification/Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: Keycloak__BaseUrl
+        value: ${KEYCLOAK_URL}/realms/MYB/protocol/openid-connect
+      - key: Keycloak__Authority
+        value: ${KEYCLOAK_URL}/realms/MYB
+      - key: Keycloak__ClientId
+        value: ${KEYCLOAK_CLIENT_ID}
+      - key: Keycloak__ClientSecret
+        value: ${KEYCLOAK_CLIENT_SECRET}
+      - key: SendGrid__ApiKey
+        value: ${SENDGRID_API_KEY}
+      - key: Email__FromAddress
+        value: ${EMAIL_FROM_ADDRESS}
+    depends_on:
+      - keycloak
+
+  coproperty:
+    type: web
+    name: myb-coproperty
+    runtime: docker
+    plan: standard
+    region: oregon
+    buildCommand: ""
+    dockerfilePath: ./src/services/coproperty-management/Myb.Coproperty/Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ConnectionStrings__CopropertyDBConnection
+        fromDatabase:
+          name: coproperty-db
+          property: connectionString
+      - key: Keycloak__BaseUrl
+        value: ${KEYCLOAK_URL}/realms/MYB/protocol/openid-connect
+      - key: Keycloak__Authority
+        value: ${KEYCLOAK_URL}/realms/MYB
+      - key: Keycloak__ClientId
+        value: ${KEYCLOAK_CLIENT_ID}
+      - key: Keycloak__ClientSecret
+        value: ${KEYCLOAK_CLIENT_SECRET}
+    depends_on:
+      - keycloak
+      - coproperty-db
+
+  # ===== FRONTEND SERVICE =====
+
+  frontend:
+    type: web
+    name: myb-frontend
+    runtime: docker
+    plan: standard
+    region: oregon
+    buildCommand: ""
+    dockerfilePath: ./src/front/myb.front/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: KEYCLOAK_URL
+        value: ${KEYCLOAK_URL}
+      - key: KEYCLOAK_REALM
+        value: MYB
+      - key: KEYCLOAK_CLIENT_ID
+        value: ${KEYCLOAK_CLIENT_ID}
+      - key: API_BASE_URL
+        value: ${API_BASE_URL}
+    depends_on:
+      - keycloak
+      - user-manager
+      - timesheet
+      - document-manager
+      - invoice
+      - payment
+      - notification
+      - coproperty

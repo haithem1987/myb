@@ -30,7 +30,6 @@ services:
   
   - type: web
     name: myb-keycloak
-    runtime: docker
     plan: starter
     region: oregon
     dockerfilePath: ./Dockerfile.keycloak
@@ -65,7 +64,6 @@ services:
 
   - type: web
     name: myb-usermanager
-    runtime: docker
     plan: starter
     region: oregon
     dockerfilePath: ./src/services/user-manager/Myb.UserManager/Dockerfile
@@ -89,7 +87,6 @@ services:
 
   - type: web
     name: myb-timesheet
-    runtime: docker
     plan: starter
     region: oregon
     dockerfilePath: ./src/services/time-sheet/Myb.Timesheet/Dockerfile
@@ -113,7 +110,6 @@ services:
 
   - type: web
     name: myb-docmanager
-    runtime: docker
     plan: starter
     region: oregon
     dockerfilePath: ./src/services/document-management/Myb.Document/Dockerfile
@@ -137,7 +133,6 @@ services:
 
   - type: web
     name: myb-invoice
-    runtime: docker
     plan: starter
     region: oregon
     dockerfilePath: ./src/services/invoice-management/Myb.Invoice/Dockerfile
@@ -161,7 +156,6 @@ services:
 
   - type: web
     name: myb-payment
-    runtime: docker
     plan: starter
     region: oregon
     dockerfilePath: ./src/services/payment-service/Myb.Payment/Dockerfile
@@ -185,7 +179,6 @@ services:
 
   - type: web
     name: myb-notification
-    runtime: docker
     plan: starter
     region: oregon
     dockerfilePath: ./src/services/notification-service/Myb.Notification/Dockerfile
@@ -209,7 +202,6 @@ services:
 
   - type: web
     name: myb-coproperty
-    runtime: docker
     plan: starter
     region: oregon
     dockerfilePath: ./src/services/coproperty-management/Myb.Coproperty/Dockerfile
@@ -235,7 +227,6 @@ services:
 
   - type: web
     name: myb-frontend
-    runtime: docker
     plan: starter
     region: oregon
     dockerfilePath: ./src/front/myb.front/Dockerfile

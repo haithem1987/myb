@@ -5,12 +5,16 @@ project.lock.json
 *.pyc
 nupkg/
 
-# Ignore all markdown files
-*.md
+# Ignore all markdown files in root
+/*.md
 
-# But keep README
+# But keep README and specific files
 !README.md
 !myb-documentation.md
+
+# Keep documentation in docs/
+!docs/*.md
+!docs/**/*.md
 
 # Visual Studio Code
 .vscode

@@ -4,41 +4,26 @@ services:
   - type: pserv
     name: keycloak-db
     plan: free
-    ipAllowList: []
-    databaseName: keycloak
-    user: keycloak
     region: oregon
 
   - type: pserv
     name: timesheet-db
     plan: free
-    ipAllowList: []
-    databaseName: timesheetDB
-    user: postgres
     region: oregon
 
   - type: pserv
     name: document-db
     plan: free
-    ipAllowList: []
-    databaseName: documentDB
-    user: postgres
     region: oregon
 
   - type: pserv
     name: invoice-db
     plan: free
-    ipAllowList: []
-    databaseName: invoiceDB
-    user: postgres
     region: oregon
 
   - type: pserv
     name: coproperty-db
     plan: free
-    ipAllowList: []
-    databaseName: copropertyDB
-    user: postgres
     region: oregon
 
   # ===== KEYCLOAK SERVICE =====

@@ -1,41 +1,37 @@
-services:
+databases:
   # ===== DATABASES =====
   
-  - type: pserv
-    name: keycloak-db
-    plan: starter
+  - name: keycloak-db
     databaseName: keycloak
-    databaseUser: keycloak
+    user: keycloak
+    plan: starter
     region: oregon
 
-  - type: pserv
-    name: timesheet-db
-    plan: starter
+  - name: timesheet-db
     databaseName: timesheetDB
-    databaseUser: postgres
+    user: postgres
+    plan: starter
     region: oregon
 
-  - type: pserv
-    name: document-db
-    plan: starter
+  - name: document-db
     databaseName: documentDB
-    databaseUser: postgres
+    user: postgres
+    plan: starter
     region: oregon
 
-  - type: pserv
-    name: invoice-db
-    plan: starter
+  - name: invoice-db
     databaseName: invoiceDB
-    databaseUser: postgres
-    region: oregon
-
-  - type: pserv
-    name: coproperty-db
+    user: postgres
     plan: starter
-    databaseName: copropertyDB
-    databaseUser: postgres
     region: oregon
 
+  - name: coproperty-db
+    databaseName: copropertyDB
+    user: postgres
+    plan: starter
+    region: oregon
+
+services:
   # ===== KEYCLOAK SERVICE =====
   
   - type: web

@@ -3,27 +3,37 @@ services:
   
   - type: pserv
     name: keycloak-db
-    plan: free
+    plan: starter
+    databaseName: keycloak
+    databaseUser: keycloak
     region: oregon
 
   - type: pserv
     name: timesheet-db
-    plan: free
+    plan: starter
+    databaseName: timesheetDB
+    databaseUser: postgres
     region: oregon
 
   - type: pserv
     name: document-db
-    plan: free
+    plan: starter
+    databaseName: documentDB
+    databaseUser: postgres
     region: oregon
 
   - type: pserv
     name: invoice-db
-    plan: free
+    plan: starter
+    databaseName: invoiceDB
+    databaseUser: postgres
     region: oregon
 
   - type: pserv
     name: coproperty-db
-    plan: free
+    plan: starter
+    databaseName: copropertyDB
+    databaseUser: postgres
     region: oregon
 
   # ===== KEYCLOAK SERVICE =====

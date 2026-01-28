@@ -8,26 +8,26 @@ databases:
     region: oregon
 
   - name: timesheet-db
-    databaseName: timesheetDB
-    user: postgres
+    databaseName: timesheetdb
+    user: timesheet_user
     plan: starter
     region: oregon
 
   - name: document-db
-    databaseName: documentDB
-    user: postgres
+    databaseName: documentdb
+    user: document_user
     plan: starter
     region: oregon
 
   - name: invoice-db
-    databaseName: invoiceDB
-    user: postgres
+    databaseName: invoicedb
+    user: invoice_user
     plan: starter
     region: oregon
 
   - name: coproperty-db
-    databaseName: copropertyDB
-    user: postgres
+    databaseName: copropertydb
+    user: coproperty_user
     plan: starter
     region: oregon
 

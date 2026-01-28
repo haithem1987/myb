@@ -1,0 +1,7 @@
+FROM quay.io/keycloak/keycloak:23.0.4
+
+# Keycloak will use environment variables from Render
+# No need to set them here as they're injected at runtime
+
+# Start Keycloak in production mode with PostgreSQL
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]

@@ -37,7 +37,7 @@ services:
   - type: web
     name: myb-keycloak
     env: docker
-      plan: free
+    plan: free
     region: oregon
     dockerfilePath: ./Dockerfile.keycloak
     dockerCommand: start --db=postgres
@@ -72,7 +72,7 @@ services:
   - type: web
     name: myb-usermanager
     env: docker
-      plan: free
+    plan: free
     region: oregon
     dockerfilePath: ./src/services/user-manager/Myb.UserManager/Dockerfile
     envVars:
@@ -96,7 +96,7 @@ services:
   - type: web
     env: docker
     name: myb-timesheet
-      plan: free
+    plan: free
     region: oregon
     dockerfilePath: ./src/services/time-sheet/Myb.Timesheet/Dockerfile
     envVars:
@@ -120,7 +120,7 @@ services:
   - type: web
     env: docker
     name: myb-docmanager
-      plan: free
+    plan: free
     region: oregon
     dockerfilePath: ./src/services/document-management/Myb.Document/Dockerfile
     envVars:
@@ -144,7 +144,7 @@ services:
   - type: web
     env: docker
     name: myb-invoice
-      plan: free
+    plan: free
     region: oregon
     dockerfilePath: ./src/services/invoice-management/Myb.Invoice/Dockerfile
     envVars:
@@ -168,7 +168,7 @@ services:
   - env: docker
     type: web
     name: myb-payment
-      plan: free
+    plan: free
     region: oregon
     dockerfilePath: ./src/services/payment-service/Myb.Payment/Dockerfile
     envVars:
@@ -192,7 +192,7 @@ services:
   - env: docker
     type: web
     name: myb-notification
-      plan: free
+    plan: free
     region: oregon
     dockerfilePath: ./src/services/notification-service/Myb.Notification/Dockerfile
     envVars:
@@ -216,7 +216,7 @@ services:
   - env: docker
     type: web
     name: myb-coproperty
-      plan: free
+    plan: free
     region: oregon
     dockerfilePath: ./src/services/coproperty-management/Myb.Coproperty/Dockerfile
     envVars:
@@ -242,7 +242,7 @@ services:
   - env: docker
     type: web
     name: myb-frontend
-      plan: free
+    plan: free
     region: oregon
     dockerfilePath: ./src/front/myb.front/Dockerfile
     envVars:

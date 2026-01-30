@@ -104,7 +104,7 @@ if (app.Environment.IsDevelopment())
     // app.UseSwagger();
     // app.UseSwaggerUI();
 
-    // Seed database with sample data in development (with retry logic)
+    // Migrate database
     using var scope = app.Services.CreateScope();
     var contextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<CopropertyDbContext>>();
     
@@ -117,7 +117,7 @@ if (app.Environment.IsDevelopment())
         {
             using var dbContext = contextFactory.CreateDbContext();
             await dbContext.Database.MigrateAsync();
-            await SeedData.SeedAsync(dbContext);
+            // Seed data is disabled - create real data via frontend instead
             break;
         }
         catch (Exception ex)
@@ -125,11 +125,11 @@ if (app.Environment.IsDevelopment())
             retryCount++;
             if (retryCount >= maxRetries)
             {
-                app.Logger.LogError(ex, "Failed to seed database after {retries} retries", maxRetries);
+                app.Logger.LogError(ex, "Failed to migrate database after {retries} retries", maxRetries);
             }
             else
             {
-                app.Logger.LogWarning(ex, "Failed to seed database, retrying ({attempt}/{max})...", retryCount, maxRetries);
+                app.Logger.LogWarning(ex, "Failed to migrate database, retrying ({attempt}/{max})...", retryCount, maxRetries);
                 await Task.Delay(2000); // Wait 2 seconds before retry
             }
         }

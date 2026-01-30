@@ -9,7 +9,8 @@ export interface Coproperty {
   totalUnits: number;
   totalShares: number;
   commonAreas?: string;
-  managerId: string;
+  managerName?: string;
+  managerId?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -26,11 +27,8 @@ export interface CreateCopropertyInput {
   totalUnits: number;
   totalShares: number;
   commonAreas?: string;
-  managerId: string;
+  managerName?: string;
   isActive: boolean;
-  units: any[];
-  charges: any[];
-  maintenanceRequests: any[];
 }
 
 export interface UpdateCopropertyInput {

@@ -17,12 +17,13 @@ public class Coproperty : IEntity<Guid>
     public int TotalUnits { get; set; }
     public int TotalShares { get; set; }
     public string? CommonAreas { get; set; }
+    public string? ManagerName { get; set; }
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     public bool IsActive { get; set; } = true;
     
-    // Foreign Key
-    public Guid ManagerId { get; set; }
+    // Optional Foreign Key (if manager is tracked in system)
+    public Guid? ManagerId { get; set; }
     
     // Navigation Properties
     public ICollection<Unit> Units { get; set; } = new List<Unit>();

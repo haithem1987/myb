@@ -84,6 +84,7 @@ export class MaintenanceService {
       .mutate<{ createMaintenanceRequest: MaintenanceRequestExtended }>({
         mutation: CREATE_MAINTENANCE_REQUEST,
         variables: { item: request },
+        refetchQueries: [{ query: GET_MAINTENANCE_BY_COPROPERTY, variables: { copropertyId: request.copropertyId } }],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createMaintenanceRequest));
@@ -94,6 +95,7 @@ export class MaintenanceService {
       .mutate<{ updateMaintenanceRequest: MaintenanceRequestExtended }>({
         mutation: UPDATE_MAINTENANCE_REQUEST,
         variables: { item: request },
+        refetchQueries: [{ query: GET_MAINTENANCE_BY_COPROPERTY, variables: { copropertyId: request.copropertyId } }],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateMaintenanceRequest));

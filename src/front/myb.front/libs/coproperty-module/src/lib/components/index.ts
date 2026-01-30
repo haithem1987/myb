@@ -10,4 +10,5 @@ export * from './owner-management/owner-management.component';
 export * from './maintenance-requests/maintenance-requests.component';
 export * from './owner-portal/owner-dashboard.component';
 export * from './owner-portal/invoice-payment-dialog.component';
+export * from './manager-multi-select/manager-multi-select.component';
 export * from './coproperty.routes';

@@ -32,12 +32,26 @@ public class FundCallService : IFundCallService
 
     public async Task<FundCall> CreateAsync(CreateFundCallInput input, string userId)
     {
+        if (!input.CopropertyId.HasValue || input.CopropertyId.Value == Guid.Empty)
+        {
+            throw new ArgumentException("CopropertyId is required to create a fund call");
+        }
+
         using var context = _contextFactory.CreateDbContext();
+        
+        // Verify coproperty exists
+        var copropertyExists = await context.Coproperties
+            .AnyAsync(c => c.Id == input.CopropertyId.Value);
+        
+        if (!copropertyExists)
+        {
+            throw new ArgumentException($"Coproperty with ID {input.CopropertyId.Value} not found");
+        }
         
         var fundCall = new FundCall
         {
             Id = Guid.NewGuid(),
-            CopropertyId = input.CopropertyId ?? Guid.Empty,
+            CopropertyId = input.CopropertyId.Value,
             Amount = input.Amount,
             DueDate = input.DueDate,
             Description = input.Description,

@@ -26,6 +26,7 @@ const GET_COPROPERTIES = gql`
       totalUnits
       totalShares
       commonAreas
+      managerName
       managerId
       isActive
       createdAt
@@ -47,6 +48,7 @@ const GET_COPROPERTY = gql`
       totalUnits
       totalShares
       commonAreas
+      managerName
       managerId
       isActive
       createdAt
@@ -85,6 +87,7 @@ const CREATE_COPROPERTY = gql`
       totalUnits
       totalShares
       commonAreas
+      managerName
       managerId
       isActive
       createdAt
@@ -106,6 +109,7 @@ const UPDATE_COPROPERTY = gql`
       totalUnits
       totalShares
       commonAreas
+      managerName
       managerId
       isActive
       createdAt
@@ -165,14 +169,18 @@ const GET_FINANCIAL_REPORT = gql`
   query GetFinancialReport($copropertyId: UUID!, $year: Int!) {
     financialReport(copropertyId: $copropertyId, year: $year) {
       copropertyId
-      period
-      totalIncome
-      totalExpenses
+      year
+      totalCharges
+      totalCollected
+      totalOverdue
       balance
-      chargesBreakdown {
-        chargeType
-        amount
-        percentage
+      monthlyBalances {
+        month
+        monthName
+        opening
+        receipts
+        expenses
+        closing
       }
     }
   }
@@ -239,6 +247,7 @@ export class CopropertyService {
       .mutate<{ updateCoproperty: Coproperty }>({
         mutation: UPDATE_COPROPERTY,
         variables: { id, coproperty: input },
+        refetchQueries: [{ query: GET_COPROPERTIES }, { query: GET_COPROPERTY, variables: { id } }],
         context: { service: 'copropertyService' }
       })
       .pipe(
@@ -291,12 +300,14 @@ export class CopropertyService {
       );
   }
 
-  // Temporary: Use financial report data to extract charges breakdown
+  // Get charges distribution for a coproperty
   getChargesDistribution(copropertyId: string): Observable<ChargeDistributionData[]> {
-    const currentYear = new Date().getFullYear();
-    return this.getFinancialReport(copropertyId, currentYear).pipe(
-      map(report => report.chargesBreakdown || [])
-    );
+    // Note: Charges are fetched from the charge service
+    // This is a placeholder that returns empty array - charges should be fetched separately
+    return new Observable(observer => {
+      observer.next([]);
+      observer.complete();
+    });
   }
 
   getFinancialReport(

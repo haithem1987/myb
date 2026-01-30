@@ -46,6 +46,9 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
   // Recent activities
   readonly recentActivities = signal<Activity[]>([]);
 
+  // Selected coproperty ID
+  readonly selectedCopropertyId = signal<string | null>(null);
+
   // Action panels
   readonly showCreateAssembly = signal<boolean>(false);
   readonly showCreateFundCall = signal<boolean>(false);
@@ -133,6 +136,7 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
         next: (coproperties) => {
           if (coproperties.length > 0) {
             const firstCopropertyId = coproperties[0].id;
+            this.selectedCopropertyId.set(firstCopropertyId);
             
             // Load treasury evolution
             this.copropertyService.getTreasuryEvolution(firstCopropertyId, 12)
@@ -398,8 +402,14 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
       return;
     }
 
+    if (!this.selectedCopropertyId()) {
+      alert('No coproperty selected');
+      return;
+    }
+
     this.isLoading.set(true);
     const input: CreateFundCallInput = {
+      copropertyId: this.selectedCopropertyId()!,
       amount: this.fundCallAmount(),
       dueDate: new Date(this.fundCallDueDate()),
       description: this.fundCallDescription() || undefined,

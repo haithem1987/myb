@@ -78,6 +78,7 @@ export class ChargeService {
       .mutate<{ createCharge: ChargeExtended }>({
         mutation: CREATE_CHARGE,
         variables: { item: charge },
+        refetchQueries: [{ query: GET_CHARGES_BY_COPROPERTY, variables: { copropertyId: charge.copropertyId } }],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createCharge));
@@ -88,6 +89,7 @@ export class ChargeService {
       .mutate<{ updateCharge: ChargeExtended }>({
         mutation: UPDATE_CHARGE,
         variables: { item: charge },
+        refetchQueries: [{ query: GET_CHARGES_BY_COPROPERTY, variables: { copropertyId: charge.copropertyId } }],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateCharge));

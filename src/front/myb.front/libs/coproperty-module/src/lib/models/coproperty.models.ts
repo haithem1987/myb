@@ -10,6 +10,10 @@ export interface Coproperty {
   totalShares: number;
   commonAreas?: string;
   managerId: string;
+  manager?: {
+    id: string;
+    name: string;
+  };
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -194,9 +198,19 @@ export interface ChargeDistributionData {
 
 export interface FinancialReport {
   copropertyId: string;
-  period: string;
-  totalIncome: number;
-  totalExpenses: number;
+  year: number;
+  totalCharges: number;
+  totalCollected: number;
+  totalOverdue: number;
   balance: number;
-  chargesBreakdown: ChargeDistributionData[];
+  monthlyBalances: MonthlyBalance[];
+}
+
+export interface MonthlyBalance {
+  month: number;
+  monthName: string;
+  opening: number;
+  receipts: number;
+  expenses: number;
+  closing: number;
 }

@@ -8,6 +8,7 @@ import { CreateCopropertyInput, Coproperty } from '../../models/coproperty.model
 import { UnitManagementComponent } from '../unit-management/unit-management.component';
 import { ChargeManagementComponent } from '../charge-management/charge-management.component';
 import { MaintenanceRequestsComponent } from '../maintenance-requests/maintenance-requests.component';
+import { ManagerMultiSelectComponent } from '../manager-multi-select/manager-multi-select.component';
 
 @Component({
   selector: 'myb-coproperty-new',
@@ -19,7 +20,8 @@ import { MaintenanceRequestsComponent } from '../maintenance-requests/maintenanc
     TranslateModule,
     UnitManagementComponent,
     ChargeManagementComponent,
-    MaintenanceRequestsComponent
+    MaintenanceRequestsComponent,
+    ManagerMultiSelectComponent
   ],
   templateUrl: './coproperty-new.component.html',
   styleUrls: ['./coproperty-new.component.scss'],
@@ -73,7 +75,7 @@ export class CopropertyNewComponent implements OnInit {
       totalUnits: [0, [Validators.required, Validators.min(1)]],
       totalShares: [0, [Validators.required, Validators.min(1)]],
       commonAreas: [''],
-      managerId: ['', [Validators.required]]
+      managerName: ['']  // Only manager name field
     });
   }
 
@@ -90,7 +92,7 @@ export class CopropertyNewComponent implements OnInit {
           totalUnits: coproperty.totalUnits,
           totalShares: coproperty.totalShares,
           commonAreas: coproperty.commonAreas,
-          managerId: coproperty.managerId
+          managerName: coproperty.managerName || ''
         });
         this.currentIsActive = coproperty.isActive;
       },
@@ -115,15 +117,6 @@ export class CopropertyNewComponent implements OnInit {
     this.saving.set(true);
 
     const formData = this.copropertyForm.value as Omit<CreateCopropertyInput, 'id'>;
-    
-    // Ensure managerId is a valid UUID, use test UUID as fallback
-    let managerId = formData.managerId?.trim() || '';
-    if (!managerId || !this.isValidUUID(managerId)) {
-      // Use a well-known test manager UUID
-      managerId = '11111111-1111-1111-1111-111111111111';
-      console.warn('Invalid or missing managerId, using test UUID:', managerId);
-    }
-    
     const id = this.isEditMode() && this.copropertyId() ? this.copropertyId()! : this.generateUUID();
 
     const payload: CreateCopropertyInput = {
@@ -137,11 +130,8 @@ export class CopropertyNewComponent implements OnInit {
       totalUnits: formData.totalUnits,
       totalShares: formData.totalShares,
       commonAreas: formData.commonAreas,
-      managerId: managerId,
-      isActive: this.currentIsActive,
-      units: [],
-      charges: [],
-      maintenanceRequests: []
+      managerName: formData.managerName?.trim() || undefined,
+      isActive: this.currentIsActive
     };
 
     const save$ = this.isEditMode() && this.copropertyId()
@@ -160,6 +150,12 @@ export class CopropertyNewComponent implements OnInit {
         console.error('Failed to save coproperty', error);
       }
     });
+  }
+
+  onManagerSelected(selection: { name?: string }): void {
+    if (selection.name !== undefined) {
+      this.copropertyForm.get('managerName')?.setValue(selection.name);
+    }
   }
 
   cancel(): void {

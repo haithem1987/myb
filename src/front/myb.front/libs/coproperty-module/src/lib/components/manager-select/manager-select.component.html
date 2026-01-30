@@ -1,0 +1,27 @@
+<div class="manager-select-wrapper">
+  <div class="form-group mb-3">
+    <label class="form-label">Manager Name</label>
+    <input 
+      type="text" 
+      class="form-control" 
+      [(ngModel)]="tempName" 
+      placeholder="Enter manager name"
+    />
+    <small class="form-text text-muted">Enter the property manager's full name.</small>
+  </div>
+  
+  <div class="manager-actions d-flex gap-2">
+    <button 
+      class="btn btn-sm" 
+      [class.btn-success]="isManagerUsed" 
+      [class.btn-primary]="!isManagerUsed"
+      (click)="applySelection()">
+      <i class="bi me-1" [class.bi-check-lg]="!isManagerUsed" [class.bi-check-circle-fill]="isManagerUsed"></i>
+      {{ isManagerUsed ? 'Used' : 'Use Manager' }}
+    </button>
+    <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()">
+      <i class="bi bi-x-lg me-1"></i>
+      Clear
+    </button>
+  </div>
+</div>

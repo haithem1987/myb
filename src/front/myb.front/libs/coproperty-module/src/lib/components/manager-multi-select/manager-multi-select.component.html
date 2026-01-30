@@ -1,0 +1,72 @@
+<div class="manager-multi-select-wrapper">
+  <div class="form-group mb-3">
+    <label class="form-label">Manager Name</label>
+    
+    <!-- Selected Manager Display -->
+    <div *ngIf="selectedManagerName()" class="selected-manager mb-2">
+      <div class="badge bg-primary d-inline-flex align-items-center gap-2">
+        <i class="bi bi-person-fill"></i>
+        <span>{{ selectedManagerName() }}</span>
+        <button 
+          type="button" 
+          class="btn-close btn-close-white" 
+          aria-label="Remove"
+          (click)="clearSelection()"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="input-group" *ngIf="!selectedManagerName()">
+      <input 
+        type="text" 
+        class="form-control" 
+        [value]="searchTerm()"
+        (input)="onSearchChange($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+        placeholder="Search or add manager..."
+      />
+      <button 
+        class="btn btn-outline-secondary" 
+        type="button"
+        (click)="toggleDropdown()"
+      >
+        <i class="bi" [class.bi-chevron-down]="!isDropdownOpen()" [class.bi-chevron-up]="isDropdownOpen()"></i>
+      </button>
+    </div>
+
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu" [class.show]="isDropdownOpen() && !selectedManagerName()">
+      <div *ngIf="filteredManagers().length === 0" class="dropdown-item text-muted">
+        No managers found
+      </div>
+      <button 
+        *ngFor="let manager of filteredManagers()" 
+        type="button"
+        class="dropdown-item"
+        [class.new-manager-option]="manager.isNew"
+        (click)="selectManager(manager)"
+      >
+        <i class="bi me-2" [class.bi-plus-circle]="manager.isNew" [class.bi-person]="!manager.isNew"></i>
+        {{ manager.label }}
+      </button>
+    </div>
+
+    <small class="form-text text-muted">
+      Search for an existing manager or type a new name to add.
+    </small>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="manager-actions d-flex gap-2 align-items-center" *ngIf="selectedManagerName()">
+    <span class="badge" [class.bg-success]="isManagerUsed()" [class.bg-secondary]="!isManagerUsed()">
+      <i class="bi me-1" [class.bi-check-circle-fill]="isManagerUsed()" [class.bi-clock]="!isManagerUsed()"></i>
+      {{ isManagerUsed() ? 'Applied' : 'Selected' }}
+    </span>
+    <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()">
+      <i class="bi bi-x-lg me-1"></i>
+      Clear
+    </button>
+  </div>
+</div>

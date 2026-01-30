@@ -66,6 +66,7 @@ export class UnitService {
       .mutate<{ createUnit: UnitExtended }>({
         mutation: CREATE_UNIT,
         variables: { item: unit },
+        refetchQueries: [{ query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId: unit.copropertyId } }],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createUnit));
@@ -76,6 +77,7 @@ export class UnitService {
       .mutate<{ updateUnit: UnitExtended }>({
         mutation: UPDATE_UNIT,
         variables: { item: unit },
+        refetchQueries: [{ query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId: unit.copropertyId } }],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateUnit));

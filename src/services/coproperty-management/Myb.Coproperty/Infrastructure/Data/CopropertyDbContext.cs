@@ -69,11 +69,17 @@ public class CopropertyDbContext : DbContext
             entity.Property(e => e.CommonAreas)
                 .HasMaxLength(1000);
             
+            entity.Property(e => e.ManagerName)
+                .HasMaxLength(200);
+            
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
             
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.Property(e => e.ManagerId)
+                .IsRequired(false); // Make ManagerId optional
             
             entity.HasIndex(e => e.IsActive);
             entity.HasIndex(e => e.ManagerId);

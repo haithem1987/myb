@@ -102,18 +102,11 @@
             </div>
 
             <!-- Manager -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">
-                  {{ 'coproperty.form.managerLabel' | translate }}
-                </label>
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  formControlName="managerId"
-                  [placeholder]="'coproperty.form.managerPlaceholder' | translate"
-                >
-              </div>
+            <div class="col-md-12">
+              <myb-manager-multi-select
+                [selectedManager]="copropertyForm.get('managerName')?.value"
+                (managerSelected)="onManagerSelected($event)"
+              ></myb-manager-multi-select>
             </div>
 
             <!-- Address -->

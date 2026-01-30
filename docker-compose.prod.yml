@@ -1,0 +1,275 @@
+version: '3.8'
+
+services:
+  # =============================================================================
+  # PostgreSQL Databases
+  # =============================================================================
+  postgres-user:
+    image: postgres:16.2-alpine
+    container_name: myb-postgres-user
+    environment:
+      POSTGRES_DB: UserDB
+      POSTGRES_USER: ${DB_USER:-myb_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - user-data:/var/lib/postgresql/data
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-myb_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-document:
+    image: postgres:16.2-alpine
+    container_name: myb-postgres-document
+    environment:
+      POSTGRES_DB: DocumentDB
+      POSTGRES_USER: ${DB_USER:-myb_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - document-data:/var/lib/postgresql/data
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-myb_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-invoice:
+    image: postgres:16.2-alpine
+    container_name: myb-postgres-invoice
+    environment:
+      POSTGRES_DB: InvoiceDB
+      POSTGRES_USER: ${DB_USER:-myb_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - invoice-data:/var/lib/postgresql/data
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-myb_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-timesheet:
+    image: postgres:16.2-alpine
+    container_name: myb-postgres-timesheet
+    environment:
+      POSTGRES_DB: TimesheetDB
+      POSTGRES_USER: ${DB_USER:-myb_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - timesheet-data:/var/lib/postgresql/data
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-myb_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================================
+  # Keycloak
+  # =============================================================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    container_name: myb-keycloak
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-user:5432/UserDB
+      KC_DB_USERNAME: ${DB_USER:-myb_admin}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY: edge
+    command:
+      - start
+      - --optimized
+      - --http-port=8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres-user:
+        condition: service_healthy
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # =============================================================================
+  # Backend Services
+  # =============================================================================
+  user-service:
+    build:
+      context: .
+      dockerfile: src/services/UserService/Dockerfile
+    container_name: myb-user-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5001
+      ConnectionStrings__DefaultConnection: Host=postgres-user;Port=5432;Database=UserDB;Username=${DB_USER:-myb_admin};Password=${DB_PASSWORD}
+      Keycloak__Authority: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM:-myb}
+      Keycloak__Audience: ${KEYCLOAK_CLIENT_ID:-myb-client}
+      Cors__AllowedOrigins: ${CORS_ORIGINS}
+    ports:
+      - "5001:5001"
+    depends_on:
+      postgres-user:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  document-service:
+    build:
+      context: .
+      dockerfile: src/services/DocumentService/Dockerfile
+    container_name: myb-document-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5002
+      ConnectionStrings__DefaultConnection: Host=postgres-document;Port=5432;Database=DocumentDB;Username=${DB_USER:-myb_admin};Password=${DB_PASSWORD}
+      Keycloak__Authority: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM:-myb}
+      Keycloak__Audience: ${KEYCLOAK_CLIENT_ID:-myb-client}
+      Cors__AllowedOrigins: ${CORS_ORIGINS}
+    ports:
+      - "5002:5002"
+    depends_on:
+      postgres-document:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5002/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  invoice-service:
+    build:
+      context: .
+      dockerfile: src/services/InvoiceService/Dockerfile
+    container_name: myb-invoice-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5003
+      ConnectionStrings__DefaultConnection: Host=postgres-invoice;Port=5432;Database=InvoiceDB;Username=${DB_USER:-myb_admin};Password=${DB_PASSWORD}
+      Keycloak__Authority: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM:-myb}
+      Keycloak__Audience: ${KEYCLOAK_CLIENT_ID:-myb-client}
+      Cors__AllowedOrigins: ${CORS_ORIGINS}
+    ports:
+      - "5003:5003"
+    depends_on:
+      postgres-invoice:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5003/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  timesheet-service:
+    build:
+      context: .
+      dockerfile: src/services/TimesheetService/Dockerfile
+    container_name: myb-timesheet-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5004
+      ConnectionStrings__DefaultConnection: Host=postgres-timesheet;Port=5432;Database=TimesheetDB;Username=${DB_USER:-myb_admin};Password=${DB_PASSWORD}
+      Keycloak__Authority: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM:-myb}
+      Keycloak__Audience: ${KEYCLOAK_CLIENT_ID:-myb-client}
+      Cors__AllowedOrigins: ${CORS_ORIGINS}
+    ports:
+      - "5004:5004"
+    depends_on:
+      postgres-timesheet:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5004/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # =============================================================================
+  # Frontend (Angular)
+  # =============================================================================
+  frontend:
+    build:
+      context: ./src/front/myb.front
+      dockerfile: Dockerfile.prod
+      args:
+        KEYCLOAK_URL: ${KEYCLOAK_URL}
+        API_URL: ${FRONTEND_URL}
+    container_name: myb-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - user-service
+      - document-service
+      - invoice-service
+      - timesheet-service
+    networks:
+      - myb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  myb-network:
+    driver: bridge
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  user-data:
+    driver: local
+  document-data:
+    driver: local
+  invoice-data:
+    driver: local
+  timesheet-data:
+    driver: local

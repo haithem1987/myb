@@ -19,11 +19,9 @@ export interface CreateCopropertyInput {
   totalUnits: number;
   totalShares: number;
   commonAreas?: string;
-  managerId: string;
+  managerId?: string;
+  managerName?: string;
   isActive: boolean;
-  units: any[];
-  charges: any[];
-  maintenanceRequests: any[];
 }
 
 export interface FundCall {

@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CopropertyInvoice } from '../../models';
 import { OwnerService } from '../../services/owner.service';
-import { KeycloakService } from '@myb/auth';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   selector: 'app-invoice-payment-dialog',
@@ -392,7 +392,7 @@ export class InvoicePaymentDialogComponent implements OnInit {
   }
 
   private getUserId(): string {
-    const token = this.keycloakService.getToken();
+    const token: string | null = this.keycloakService.getToken();
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));

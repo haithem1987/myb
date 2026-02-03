@@ -576,15 +576,14 @@ export class OwnerDashboardComponent implements OnInit {
 
   private loadOwnerData(): void {
     this.loading.set(true);
-Keycloak
+    
     const userId = this.getCurrentUserId();
     
     if (!userId) {
       console.error('User ID not available');
       this.loading.set(false);
       return;
-    } with actual user ID
-    const userId = this.getCurrentUserId();
+    }
 
     // Load my units
     this.ownerService.getMyUnits(userId).subscribe({
@@ -661,7 +660,12 @@ Keycloak
       if (result) {
         // Reload maintenance requests
         this.loadOwnerData();
-      }Navigate to request details or open dialog showing request details
+      }
+    });
+  }
+
+  viewRequestDetails(requestId: string): void {
+    // Navigate to request details or open dialog showing request details
     console.log('View request:', requestId);
     // Future: Implement detailed view dialog or navigation
   }
@@ -679,12 +683,7 @@ Keycloak
         return null;
       }
     }
-    // Fallback for development/testingequestId);
-  }
-
-  private getCurrentUserId(): string {
-    // TODO: Get from AuthService
-    // For now, return placeholder
+    // Fallback for development/testing
     return 'current-user-id';
   }
 }

@@ -6,7 +6,8 @@ import {
   Unit, 
   CopropertyInvoice, 
   MaintenanceRequest, 
-  Payment 
+  Payment,
+  RecordPaymentInput
 } from '../models';
 
 // GraphQL Queries for Owner Portal
@@ -151,14 +152,6 @@ const CREATE_MAINTENANCE_REQUEST = gql`
     }
   }
 `;
-
-export interface RecordPaymentInput {
-  invoiceId: string;
-  amount: number;
-  paymentMethod: string;
-  transactionId?: string;
-  notes?: string;
-}
 
 export interface CreateMaintenanceRequestInput {
   copropertyId: string;

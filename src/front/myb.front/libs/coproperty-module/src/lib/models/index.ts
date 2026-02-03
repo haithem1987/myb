@@ -1,4 +1,11 @@
 export * from './coproperty.models';
+export * from './assembly.model';
+export * from './charge.model';
+export * from './owner.model';
+export * from './unit.model';
+export * from './maintenance.model';
+export * from './invoice.model';
+export * from './fund-call.model';
 
 // Input types for mutations
 export interface CreateFundCallInput {

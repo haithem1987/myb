@@ -8,6 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RouterModule } from '@angular/router';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { OwnerService } from '../../services/owner.service';
 import { Unit, CopropertyInvoice, MaintenanceRequest, InvoiceStatus, MaintenanceStatus } from '../../models';
 import { InvoicePaymentDialogComponent } from './invoice-payment-dialog.component';
@@ -557,6 +558,7 @@ import { OwnerAssembliesComponent } from './owner-assemblies.component';
 export class OwnerDashboardComponent implements OnInit {
   private ownerService = inject(OwnerService);
   private dialog = inject(MatDialog);
+  private keycloakService = inject(KeycloakService);
 
   // Signals for reactive data
   myUnits = signal<Unit[]>([]);
@@ -574,9 +576,14 @@ export class OwnerDashboardComponent implements OnInit {
 
   private loadOwnerData(): void {
     this.loading.set(true);
-
-    // Get current user ID from auth service (you'll need to inject AuthService)
-    // For now, using placeholder - replace with actual user ID
+Keycloak
+    const userId = this.getCurrentUserId();
+    
+    if (!userId) {
+      console.error('User ID not available');
+      this.loading.set(false);
+      return;
+    } with actual user ID
     const userId = this.getCurrentUserId();
 
     // Load my units
@@ -654,13 +661,25 @@ export class OwnerDashboardComponent implements OnInit {
       if (result) {
         // Reload maintenance requests
         this.loadOwnerData();
-      }
-    });
+      }Navigate to request details or open dialog showing request details
+    console.log('View request:', requestId);
+    // Future: Implement detailed view dialog or navigation
   }
 
-  viewRequestDetails(requestId: string): void {
-    // TODO: Navigate to request details or open dialog
-    console.log('View request:', requestId);
+  private getCurrentUserId(): string | null {
+    // Get user ID from Keycloak token
+    const token = this.keycloakService.getToken();
+    if (token) {
+      try {
+        // Decode JWT to get user ID (sub claim)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.sub || null;
+      } catch (error) {
+        console.error('Error parsing token:', error);
+        return null;
+      }
+    }
+    // Fallback for development/testingequestId);
   }
 
   private getCurrentUserId(): string {

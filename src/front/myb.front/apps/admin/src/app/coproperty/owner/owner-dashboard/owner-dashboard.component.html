@@ -1,0 +1,151 @@
+<div class="owner-dashboard">
+  <div class="welcome-section">
+    <h1>Bienvenue dans votre espace copropriétaire</h1>
+    <p class="subtitle">Gérez vos lots et consultez vos documents en toute simplicité</p>
+  </div>
+  
+  <!-- Quick Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <i class="bi bi-building"></i>
+      <div class="stat-value">{{ myUnits().length }}</div>
+      <div class="stat-label">Mes lots</div>
+    </div>
+    
+    <div class="stat-card warning">
+      <i class="bi bi-receipt"></i>
+      <div class="stat-value">{{ pendingInvoices().length }}</div>
+      <div class="stat-label">Factures à payer</div>
+    </div>
+    
+    <div class="stat-card danger">
+      <i class="bi bi-cash"></i>
+      <div class="stat-value">{{ totalDue() }}€</div>
+      <div class="stat-label">Montant dû</div>
+    </div>
+  </div>
+  
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- My Units -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Mes Lots</h2>
+        <a routerLink="/coproperty/owner/my-units" class="btn-link">Voir tout</a>
+      </div>
+      <div class="card-body">
+        <div class="unit-list" *ngIf="!loading(); else loadingTemplate">
+          <div class="unit-item" *ngFor="let unit of myUnits()">
+            <div class="unit-icon">
+              <i class="bi" 
+                 [class.bi-building]="unit.type === 'Appartement'"
+                 [class.bi-p-square]="unit.type === 'Parking'"
+                 [class.bi-archive]="unit.type === 'Cave'"></i>
+            </div>
+            <div class="unit-info">
+              <div class="unit-name">{{ unit.buildingName }}</div>
+              <div class="unit-details">{{ unit.unitNumber }} • {{ unit.surface }}m² • {{ unit.shares }} tantièmes</div>
+            </div>
+            <button class="btn-icon" title="Voir les détails">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Pending Invoices -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Factures en Attente</h2>
+        <a routerLink="/coproperty/owner/invoices" class="btn-link">Voir tout</a>
+      </div>
+      <div class="card-body">
+        <div class="invoice-list" *ngIf="!loading(); else loadingTemplate">
+          <div class="invoice-item" 
+               *ngFor="let invoice of pendingInvoices()"
+               [class.overdue]="isOverdue(invoice.dueDate)">
+            <div class="invoice-header">
+              <div class="invoice-number">{{ invoice.number }}</div>
+              <div class="invoice-amount">{{ invoice.amount }}€</div>
+            </div>
+            <div class="invoice-description">{{ invoice.description }}</div>
+            <div class="invoice-footer">
+              <span class="due-date" [class.overdue]="isOverdue(invoice.dueDate)">
+                <i class="bi bi-calendar"></i>
+                {{ isOverdue(invoice.dueDate) ? 'En retard' : 'Échéance ' + getDaysUntilDue(invoice.dueDate) + 'j' }}
+              </span>
+              <button class="btn-pay">Payer</button>
+            </div>
+          </div>
+          
+          <div class="empty-state" *ngIf="pendingInvoices().length === 0">
+            <i class="bi bi-check-circle"></i>
+            <p>Aucune facture en attente</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Next Assembly -->
+    <div class="card highlight" *ngIf="nextAssembly()">
+      <div class="card-header">
+        <h2>Prochaine Assemblée Générale</h2>
+      </div>
+      <div class="card-body">
+        <div class="assembly-info">
+          <div class="assembly-date">
+            <i class="bi bi-calendar-event"></i>
+            <span>{{ nextAssembly() | date:'EEEE d MMMM yyyy' }}</span>
+          </div>
+          <div class="assembly-time">
+            <i class="bi bi-clock"></i>
+            <span>18h00</span>
+          </div>
+          <div class="assembly-location">
+            <i class="bi bi-geo-alt"></i>
+            <span>Salle polyvalente - Résidence Les Jardins</span>
+          </div>
+          <button class="btn-primary">Voir l'ordre du jour</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Actions Rapides</h2>
+      </div>
+      <div class="card-body">
+        <div class="actions-list">
+          <a routerLink="/coproperty/owner/maintenance/new" class="action-item">
+            <i class="bi bi-plus-circle"></i>
+            <span>Nouvelle demande de travaux</span>
+          </a>
+          
+          <a routerLink="/coproperty/owner/documents" class="action-item">
+            <i class="bi bi-file-text"></i>
+            <span>Consulter mes documents</span>
+          </a>
+          
+          <a routerLink="/coproperty/owner/invoices" class="action-item">
+            <i class="bi bi-receipt"></i>
+            <span>Historique des factures</span>
+          </a>
+          
+          <a href="#" class="action-item">
+            <i class="bi bi-telephone"></i>
+            <span>Contacter le syndic</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <ng-template #loadingTemplate>
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement...</p>
+    </div>
+  </ng-template>
+</div>

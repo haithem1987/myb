@@ -1128,11 +1128,30 @@ export class RoleStateService {
 
 #### Étapes Détaillées
 
-**1. Connexion à la Plateforme**
+**1. Connexion à la Plateforme (Keycloak)**
 ```
-URL: https://myb.app/login
+# Nx Workspace - Admin App
+URL: http://localhost:4201/admin
+
+# Keycloak Authentication
+Redirect to: http://localhost:8080/realms/MYB/protocol/openid-connect/auth
 Utilisateur: marie.dubois@gestion-dubois.fr
-Rôle: coproperty-syndic
+Password: [keycloak-password]
+
+# Keycloak Realm Role
+Role: coproperty-syndic
+Permissions: Full coproperty management
+
+# After authentication
+JWT Token includes:
+  - realm_access.roles: ["coproperty-syndic"]
+  - email: marie.dubois@gestion-dubois.fr
+  - sub: uuid-marie-dubois
+  
+# AuthRoleService automatically:
+  - Maps coproperty-syndic → CopropertyRole.SYNDIC
+  - Grants permissions: coproperty:*, charges:*, invoices:*
+  - Redirects to: /admin/coproperties/syndic/dashboard
 ```
 
 **2. Création de la Copropriété**
@@ -1751,12 +1770,34 @@ mutation CreatePaymentPlan {
 
 #### Étapes Détaillées
 
-**1. Connexion au Portail**
+**1. Connexion au Portail (Keycloak - Client App)**
 
 ```
-URL: https://myb.app/coproperty/owner
+# Nx Workspace - Client App
+URL: http://localhost:4200/coproperty/owner
+
+# Keycloak Authentication
+Redirect to: http://localhost:8080/realms/MYB/protocol/openid-connect/auth
 Utilisateur: jean.martin@email.fr
-Rôle: coproperty-owner
+Password: [keycloak-password]
+
+# Keycloak Realm Role
+Role: coproperty-owner
+Custom Claims:
+  - owned_units: ["unit-uuid-a101", "unit-uuid-p12"]
+  
+# After authentication
+JWT Token includes:
+  - realm_access.roles: ["coproperty-owner"]
+  - email: jean.martin@email.fr
+  - sub: uuid-jean-martin
+  - owned_units: ["unit-uuid-a101"]
+  
+# AuthRoleService automatically:
+  - Maps coproperty-owner → CopropertyRole.OWNER
+  - Grants permissions: invoices:read, maintenance:create, reports:view
+  - Sets ownedUnits from token
+  - Redirects to: /coproperty/owner/dashboard
 ```
 
 **2. Vue du Dashboard Personnel**

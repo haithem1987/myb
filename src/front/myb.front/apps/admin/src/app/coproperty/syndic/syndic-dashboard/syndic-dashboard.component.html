@@ -1,0 +1,128 @@
+<div class="syndic-dashboard">
+  <div class="dashboard-header">
+    <h1>Tableau de Bord Syndic</h1>
+    <p class="subtitle">Vue d'ensemble de vos copropriétés</p>
+  </div>
+  
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card primary">
+      <div class="stat-icon">
+        <i class="bi bi-building"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats().totalCoproperties }}</div>
+        <div class="stat-label">Copropriétés gérées</div>
+      </div>
+    </div>
+    
+    <div class="stat-card success">
+      <div class="stat-icon">
+        <i class="bi bi-house-door"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats().activeUnits }}</div>
+        <div class="stat-label">Lots actifs</div>
+      </div>
+    </div>
+    
+    <div class="stat-card warning">
+      <div class="stat-icon">
+        <i class="bi bi-receipt"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats().pendingInvoices }}</div>
+        <div class="stat-label">Factures en attente</div>
+      </div>
+    </div>
+    
+    <div class="stat-card info">
+      <div class="stat-icon">
+        <i class="bi bi-cash-stack"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats().monthlyRevenue | number:'1.0-0' }}€</div>
+        <div class="stat-label">Recettes du mois</div>
+      </div>
+    </div>
+    
+    <div class="stat-card danger">
+      <div class="stat-icon">
+        <i class="bi bi-exclamation-triangle"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats().urgentMaintenance }}</div>
+        <div class="stat-label">Demandes urgentes</div>
+      </div>
+    </div>
+    
+    <div class="stat-card secondary">
+      <div class="stat-icon">
+        <i class="bi bi-calendar-check"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats().upcomingFundCalls }}</div>
+        <div class="stat-label">Appels de fonds à venir</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <h2>Actions Rapides</h2>
+    <div class="actions-grid">
+      <a routerLink="/coproperty/syndic/invoices/new" class="action-card">
+        <i class="bi bi-plus-circle"></i>
+        <span>Créer une facture</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/fund-calls/new" class="action-card">
+        <i class="bi bi-send"></i>
+        <span>Lancer un appel de fonds</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/maintenance" class="action-card">
+        <i class="bi bi-tools"></i>
+        <span>Gérer les travaux</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/reports" class="action-card">
+        <i class="bi bi-graph-up"></i>
+        <span>Générer un rapport</span>
+      </a>
+    </div>
+  </div>
+  
+  <!-- Recent Activity -->
+  <div class="recent-activity">
+    <h2>Activité Récente</h2>
+    
+    <div class="activity-list" *ngIf="!loading(); else loadingTemplate">
+      <div class="activity-item" *ngFor="let activity of recentActivities()">
+        <div class="activity-icon" [class]="activity.type">
+          <i class="bi" [class]="getActivityIcon(activity.type)"></i>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">{{ activity.title }}</div>
+          <div class="activity-description">{{ activity.description }}</div>
+          <div class="activity-meta">
+            <span class="coproperty">{{ activity.coproperty }}</span>
+            <span class="timestamp">{{ formatTimestamp(activity.timestamp) }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="empty-state" *ngIf="recentActivities().length === 0">
+        <i class="bi bi-inbox"></i>
+        <p>Aucune activité récente</p>
+      </div>
+    </div>
+    
+    <ng-template #loadingTemplate>
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

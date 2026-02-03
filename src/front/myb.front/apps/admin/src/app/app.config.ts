@@ -10,7 +10,18 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 export function initializeKeycloak(keycloak: KeycloakService) {
-  return () => keycloak.init();
+  return async () => {
+    try {
+      console.log('Starting Keycloak initialization...');
+      const authenticated = await keycloak.init();
+      console.log('Keycloak initialized successfully, authenticated:', authenticated);
+      return true; // Always return true to allow app to load
+    } catch (error) {
+      console.error('Keycloak initialization failed:', error);
+      // Don't block app startup even if Keycloak fails
+      return true;
+    }
+  };
 }
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {

@@ -6,18 +6,35 @@ export const authGuard: CanActivateFn = async (route, state) => {
   const keycloakService = inject(KeycloakService);
   const router = inject(Router);
 
+  console.log('Auth guard checking authentication...');
+  
   try {
-    // Wait for Keycloak to initialize
-    const initialized = await keycloakService.init();
-
-    if (!initialized || !keycloakService.isAuthenticated()) {
-      console.log('User not authenticated, redirecting to login');
-      // Redirect to Keycloak login
+    const isAuth = keycloakService.isAuthenticated();
+    console.log('Is authenticated:', isAuth);
+    
+    if (!isAuth) {
+      console.log('Not authenticated, storing URL and redirecting to login');
+      // Store the attempted URL
+      sessionStorage.setItem('redirect_url', state.url);
+      
+      // Don't call login in a loop - check if we just came back from Keycloak
+      const hasKeycloakParams = window.location.search.includes('state=') || 
+                               window.location.search.includes('session_state=') ||
+                               window.location.search.includes('code=');
+      
+      if (hasKeycloakParams) {
+        // We just came back from Keycloak but still not authenticated
+        // This means initialization failed - show error
+        console.error('Returned from Keycloak but not authenticated - check Keycloak configuration');
+        return router.createUrlTree(['/access-denied']);
+      }
+      
+      // First time - redirect to Keycloak
       keycloakService.login();
       return false;
     }
 
-    console.log('User authenticated:', keycloakService.isAuthenticated());
+    console.log('User authenticated, allowing access');
     return true;
   } catch (error) {
     console.error('Auth guard error:', error);

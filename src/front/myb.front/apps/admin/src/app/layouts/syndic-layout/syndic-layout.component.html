@@ -1,0 +1,110 @@
+<div class="syndic-layout" [class.collapsed]="isSidebarCollapsed()">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="assets/logo.svg" alt="MYB" class="logo-image">
+      <span class="role-badge">Syndic</span>
+    </div>
+    
+    <nav class="main-nav">
+      <a routerLink="/coproperty/syndic/dashboard" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-speedometer2"></i>
+        <span class="nav-text">Tableau de bord</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/coproperties" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-building"></i>
+        <span class="nav-text">Copropriétés</span>
+        <span class="badge" *ngIf="managedCoproperties() > 0">
+          {{ managedCoproperties() }}
+        </span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/charges" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-cash-stack"></i>
+        <span class="nav-text">Charges</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/invoices" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-receipt"></i>
+        <span class="nav-text">Factures</span>
+        <span class="badge alert" *ngIf="unpaidInvoices() > 0">
+          {{ unpaidInvoices() }}
+        </span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/maintenance" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-tools"></i>
+        <span class="nav-text">Demandes Travaux</span>
+        <span class="badge urgent" *ngIf="urgentRequests() > 0">
+          {{ urgentRequests() }}
+        </span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/fund-calls" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-calendar-check"></i>
+        <span class="nav-text">Appels de Fonds</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/reports" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-graph-up"></i>
+        <span class="nav-text">Rapports</span>
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <div class="user-info" *ngIf="currentUser()">
+        <div class="user-avatar">
+          {{ currentUser().firstName[0] }}{{ currentUser().lastName[0] }}
+        </div>
+        <div class="user-details">
+          <div class="user-name">{{ currentUser().firstName }} {{ currentUser().lastName }}</div>
+          <div class="user-email">marie.dubois&#64;example.com</div>
+        </div>
+      </div>
+      <button class="btn-logout" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </aside>
+  
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <button class="btn-toggle-sidebar" (click)="toggleSidebar()">
+        <i class="bi" [class.bi-list]="isSidebarCollapsed()" 
+           [class.bi-x]="!isSidebarCollapsed()"></i>
+      </button>
+      
+      <div class="header-actions">
+        <button class="btn-notification">
+          <i class="bi bi-bell"></i>
+          <span class="notification-badge" *ngIf="(unpaidInvoices() + urgentRequests()) > 0">
+            {{ unpaidInvoices() + urgentRequests() }}
+          </span>
+        </button>
+      </div>
+    </header>
+    
+    <!-- Page Content -->
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

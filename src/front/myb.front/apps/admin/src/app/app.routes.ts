@@ -2,6 +2,7 @@ import { Route } from '@angular/router';
 import { Component } from '@angular/core';
 import { HomeComponent } from './home/home.component';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
+import { AdminHomeComponent } from './admin-home/admin-home.component';
 
 @Component({
   standalone: true,
@@ -22,30 +23,25 @@ export class AccessDeniedComponent {
 export const appRoutes: Route[] = [
   {
     path: '',
-    loadComponent: () =>
-      import('@myb-front/shared-ui').then((c) => c.LandingPageComponent),
+    redirectTo: 'home',
+    pathMatch: 'full',
   },
   {
     path: 'home',
-    component: HomeComponent,
+    component: AdminHomeComponent,
+    canActivate: [authGuard],
   },
   {
-    path: 'admin',
+    path: 'coproperty',
     canActivate: [authGuard],
-    children: [
-      {
-        path: '',
-        redirectTo: 'coproperties',
-        pathMatch: 'full',
-      },
-      {
-        path: 'coproperties',
-        loadChildren: () => import('@myb-front/coproperty-module').then(m => m.COPROPERTY_ROUTES),
-      },
-    ],
+    loadChildren: () => import('./coproperty/coproperty.routes').then(m => m.COPROPERTY_ROUTES),
   },
   {
     path: 'access-denied',
     component: AccessDeniedComponent,
+  },
+  {
+    path: '**',
+    redirectTo: 'home',
   },
 ];

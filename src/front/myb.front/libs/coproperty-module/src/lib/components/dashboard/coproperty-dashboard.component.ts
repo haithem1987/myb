@@ -108,6 +108,16 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
   private loadDashboardData(): void {
     this.isLoading.set(true);
 
+    // TEMPORARY: Use mock data until backend is ready
+    // TODO: Uncomment API calls when backend GraphQL is running
+    console.log('Using mock data - backend not connected');
+    this.loadMockData();
+    this.updateTreasuryChart();
+    this.updateChargesChart();
+    this.loadMockActivities();
+    this.isLoading.set(false);
+
+    /* DISABLED - Enable when backend is ready
     // Load dashboard stats
     this.copropertyService.getDashboardStats()
       .pipe(takeUntil(this.destroy$))
@@ -128,6 +138,9 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
         }
       });
 
+    this.isLoading.set(false);
+
+    /* DISABLED - Enable when backend is ready
     // Load treasury evolution - using first coproperty as default
     // In production, this should come from route params or user selection
     this.copropertyService.getCoproperties()
@@ -191,7 +204,8 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
           this.updateChargesChart();
         }
       });
-
+  */
+  
     // Mock recent activities (will be replaced with real API later)
     this.loadMockActivities();
   }

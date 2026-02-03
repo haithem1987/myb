@@ -39,36 +39,46 @@ export class KeycloakService {
 
       this.keycloak
         .init({
-          // Do not force login on app load; just check existing SSO session
           onLoad: 'check-sso',
           checkLoginIframe: false,
           pkceMethod: 'S256',
-          flow: 'standard',
-          // Let Keycloak use the current URL as redirectUri by default
         })
         .then((authenticated: any) => {
+          console.log('Keycloak authenticated:', authenticated);
           if (authenticated) {
-            this.loadUserProfile().then(() => {
-              this.initialized = true;
-              resolve(true);
-            });
+            this.loadUserProfile()
+              .then(() => {
+                this.initialized = true;
+                console.log('User profile loaded successfully');
+                resolve(true);
+              })
+              .catch((err) => {
+                console.error('Failed to load user profile:', err);
+                this.initialized = true;
+                resolve(true); // Still resolve as authenticated
+              });
           } else {
+            console.log('User not authenticated');
             this.initialized = true;
             resolve(false);
           }
         })
         .catch((err: any) => {
           console.error('Keycloak initialization error:', err);
+          console.error('Error details:', JSON.stringify(err, null, 2));
           this.initialized = true;
-          reject(err);
+          // Resolve instead of reject to prevent app crash
+          resolve(false);
         });
     });
   }
 
   login(): void {
-    // Preserve the full current URL (including path) after login
+    // Use the origin + path without query params to avoid redirect loops
+    const redirectUri = window.location.origin + window.location.pathname;
+    console.log('Redirecting to Keycloak login with redirectUri:', redirectUri);
     this.keycloak.login({
-      redirectUri: window.location.href,
+      redirectUri: redirectUri,
     });
   }
 
@@ -112,6 +122,11 @@ export class KeycloakService {
       this.keycloak.tokenParsed.resource_access?.['MYB-client']?.roles || [];
 
     return [...realmRoles, ...clientRoles];
+  }
+
+  // Alias for getUserRoles for convenience
+  getRoles(): string[] {
+    return this.getUserRoles();
   }
 
   hasRole(role: string): boolean {

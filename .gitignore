@@ -11,6 +11,8 @@ nupkg/
 # But keep README and specific files
 !README.md
 !myb-documentation.md
+!QUICK_START_OWNER_PORTAL.md
+!IMPLEMENTATION_COMPLETE.md
 
 # Keep documentation in docs/
 !docs/*.md

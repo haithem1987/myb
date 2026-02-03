@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FileDownloadService, ToastService } from '@myb-front/shared-ui';
 
 interface Document {
   id: string;
@@ -405,11 +406,31 @@ export class OwnerDocumentsComponent {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
-  viewDocument(id: string) {
-    console.log('Viewing document:', id);
+  private fileService = inject(FileDownloadService);
+  private toastService = inject(ToastService);
+
+  viewDocument(id: string): void {
+    const doc = this.documents().find(d => d.id === id);
+    if (!doc) return;
+
+    this.toastService.show(
+      `${doc.name} s'ouvre dans un nouvel onglet`,
+      { classname: 'toast-info' }
+    );
+    
+    setTimeout(() => {
+      this.fileService.openInNewTab('#');
+    }, 500);
   }
 
-  downloadDocument(id: string) {
-    console.log('Downloading document:', id);
+  downloadDocument(id: string): void {
+    const doc = this.documents().find(d => d.id === id);
+    if (!doc) return;
+
+    this.fileService.downloadPDF(doc.name, `Document ${doc.name}`);
+    this.toastService.show(
+      `${doc.name} téléchargé`,
+      { classname: 'toast-success' }
+    );
   }
 }

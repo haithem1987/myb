@@ -63,3 +63,9 @@ export * from './lib/components/payment/payment.component';
 export * from './lib/subscriptions/subscriptions.component';
 
 export * from './lib/components/notification-dropdown/notification-dropdown.component';
+
+export * from './lib/services/modal.service';
+
+export * from './lib/services/file-download.service';
+
+export * from '../../infra/services/toast.service';

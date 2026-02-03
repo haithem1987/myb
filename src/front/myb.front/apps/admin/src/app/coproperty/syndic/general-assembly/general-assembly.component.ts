@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
 
 interface GeneralAssembly {
   id: string;
@@ -511,39 +512,122 @@ export class GeneralAssemblyComponent {
     return `Dans ${days} jours`;
   }
 
-  createAssembly() {
-    console.log('Creating new assembly');
+  private modalService = inject(ModalService);
+  private fileService = inject(FileDownloadService);
+  private toastService = inject(ToastService);
+
+  async createAssembly(): Promise<void> {
+    const confirmed = await this.modalService.confirm({
+      title: 'Nouvelle Assemblée Générale',
+      message: '<p>Formulaire de création en cours de développement.</p>',
+      confirmButtonText: 'OK',
+      showCancelButton: false
+    });
   }
 
-  viewAssembly(id: string) {
-    console.log('Viewing assembly:', id);
+  viewAssembly(id: string): void {
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    this.modalService.open({
+      title: assembly.title,
+      message: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Type:</strong> ${assembly.type === 'ordinary' ? 'Ordinaire' : 'Extraordinaire'}</p>
+          <p><strong>Date:</strong> ${assembly.date.toLocaleDateString('fr-FR')}</p>
+          <p><strong>Lieu:</strong> ${assembly.location}</p>
+          <p><strong>Statut:</strong> ${this.getStatusLabel(assembly.status)}</p>
+          <p><strong>Participants:</strong> ${assembly.attendees}/${assembly.totalUnits}</p>
+          <p><strong>Résolutions:</strong> ${assembly.resolutions}</p>
+        </div>
+      `,
+      size: 'md',
+      showCancelButton: false
+    });
   }
 
-  editAssembly(id: string) {
-    console.log('Editing assembly:', id);
+  async editAssembly(id: string): Promise<void> {
+    await this.modalService.alert('Modification', 'Formulaire de modification en cours de développement');
   }
 
-  deleteAssembly(id: string) {
-    console.log('Deleting assembly:', id);
+  async deleteAssembly(id: string): Promise<void> {
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    const confirmed = await this.modalService.confirm({
+      title: 'Confirmer la suppression',
+      message: `Êtes-vous sûr de vouloir supprimer l'AG "${assembly.title}"?`,
+      confirmButtonText: 'Supprimer',
+      confirmButtonClass: 'btn-danger'
+    });
+
+    if (confirmed) {
+      this.assemblies.set(this.assemblies().filter(a => a.id !== id));
+      this.toastService.show(
+        'L\'assemblée a été supprimée',
+        { classname: 'toast-success' }
+      );
+    }
   }
 
-  sendConvocations(id: string) {
-    console.log('Sending convocations for:', id);
+  async sendConvocations(id: string): Promise<void> {
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    const confirmed = await this.modalService.confirm({
+      title: 'Envoyer les convocations',
+      message: `Envoyer les convocations à tous les copropriétaires pour "${assembly.title}"?`,
+      confirmButtonText: 'Envoyer'
+    });
+
+    if (confirmed) {
+      assembly.status = 'convened';
+      this.assemblies.set([...this.assemblies()]);
+      this.toastService.show(
+        `${assembly.totalUnits} convocations envoyées par email`,
+        { classname: 'toast-success' }
+      );
+    }
   }
 
-  startAssembly(id: string) {
-    console.log('Starting assembly:', id);
+  async startAssembly(id: string): Promise<void> {
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    assembly.status = 'held';
+    this.assemblies.set([...this.assemblies()]);
+    this.toastService.show(
+      'Session de vote ouverte',
+      { classname: 'toast-info' }
+    );
   }
 
-  viewMinutes(id: string) {
-    console.log('Viewing minutes for:', id);
+  viewMinutes(id: string): void {
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    this.fileService.downloadPDF(
+      `PV_${assembly.title.replace(/\s+/g, '_')}.pdf`,
+      `Procès-verbal ${assembly.title}`
+    );
+    this.toastService.show('PV téléchargé', { classname: 'toast-success' });
   }
 
-  downloadDocuments(id: string) {
-    console.log('Downloading documents for:', id);
+  downloadDocuments(id: string): void {
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    this.fileService.downloadPDF(
+      `Documents_${assembly.title.replace(/\s+/g, '_')}.pdf`,
+      `Documents ${assembly.title}`
+    );
+    this.toastService.show(`${assembly.documentsCount} documents téléchargés`, { classname: 'toast-success' });
   }
 
-  manageResolutions(id: string) {
-    console.log('Managing resolutions for:', id);
+  async manageResolutions(id: string): Promise<void> {
+    await this.modalService.alert(
+      'Gestion des résolutions',
+      'Interface de gestion des résolutions en cours de développement'
+    );
   }
 }

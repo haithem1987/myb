@@ -6,10 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatTabsModule } from '@angular/material/tabs';
 import { RouterModule } from '@angular/router';
 import { OwnerService } from '../../services/owner.service';
 import { Unit, CopropertyInvoice, MaintenanceRequest, InvoiceStatus, MaintenanceStatus } from '../../models';
 import { InvoicePaymentDialogComponent } from './invoice-payment-dialog.component';
+import { NewMaintenanceRequestDialogComponent } from './new-maintenance-request-dialog.component';
+import { OwnerAssembliesComponent } from './owner-assemblies.component';
 
 @Component({
   selector: 'app-owner-dashboard',
@@ -22,7 +25,9 @@ import { InvoicePaymentDialogComponent } from './invoice-payment-dialog.componen
     MatIconModule,
     MatTableModule,
     MatChipsModule,
-    MatDialogModule
+    MatDialogModule,
+    MatTabsModule,
+    OwnerAssembliesComponent
   ],
   template: `
     <div class="owner-dashboard">
@@ -245,6 +250,11 @@ import { InvoicePaymentDialogComponent } from './invoice-payment-dialog.componen
               </mat-card>
             }
           </div>
+
+      <!-- Assemblies/Meetings Section -->
+      <section class="assemblies-section">
+        <app-owner-assemblies [copropertyId]="primaryCopropertyId()"></app-owner-assemblies>
+      </section>
         }
       </section>
     </div>
@@ -554,6 +564,7 @@ export class OwnerDashboardComponent implements OnInit {
   paidInvoices = signal<CopropertyInvoice[]>([]);
   myMaintenanceRequests = signal<MaintenanceRequest[]>([]);
   loading = signal(true);
+  primaryCopropertyId = signal<string>('');
 
   displayedColumns: string[] = ['invoiceNumber', 'unit', 'amount', 'dueDate', 'status', 'actions'];
 
@@ -572,6 +583,10 @@ export class OwnerDashboardComponent implements OnInit {
     this.ownerService.getMyUnits(userId).subscribe({
       next: (units) => {
         this.myUnits.set(units);
+        // Set primary coproperty ID from first unit
+        if (units.length > 0) {
+          this.primaryCopropertyId.set(units[0].copropertyId);
+        }
         this.loading.set(false);
       },
       error: (error) => {
@@ -623,8 +638,20 @@ export class OwnerDashboardComponent implements OnInit {
         // Reload data after successful payment
         this.loadOwnerData();
       }
+    const dialogRef = this.dialog.open(NewMaintenanceRequestDialogComponent, {
+      width: '600px',
+      data: {
+        copropertyId: this.primaryCopropertyId(),
+        userId: this.getCurrentUserId()
+      }
     });
-  }
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // Reload maintenance requests
+        this.loadOwnerData();
+      }
+    }
 
   createMaintenanceRequest(): void {
     // TODO: Open dialog to create new maintenance request

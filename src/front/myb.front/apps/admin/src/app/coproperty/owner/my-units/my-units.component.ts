@@ -1,5 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
 import { RouterLink } from '@angular/router';
 
 interface Unit {
@@ -390,11 +391,50 @@ export class OwnerMyUnitsComponent {
     return ((unit.tantiemes / unit.totalTantiemes) * 100).toFixed(2);
   }
 
-  viewChargeDetails(id: string) {
-    console.log('Viewing charge details for unit:', id);
+  private modalService = inject(ModalService);
+  private fileService = inject(FileDownloadService);
+  private toastService = inject(ToastService);
+
+  viewChargeDetails(id: string): void {
+    const unit = this.units().find(u => u.id === id);
+    if (!unit) return;
+
+    this.modalService.open({
+      title: `Détails des charges - ${unit.number}`,
+      message: `
+        <div style="text-align: left; padding: 10px;">
+          <h5>${unit.type === 'apartment' ? 'Appartement' : unit.type === 'parking' ? 'Parking' : 'Cave'} ${unit.number}</h5>
+          <p><strong>Charges trimestrielles:</strong> ${unit.quarterlyCharges.toFixed(2)}€</p>
+          <p><strong>Charges annuelles:</strong> ${(unit.quarterlyCharges * 4).toFixed(2)}€</p>
+          <p><strong>Tantièmes:</strong> ${unit.tantiemes}</p>
+          <p><strong>Pourcentage:</strong> ${((unit.tantiemes / 10000) * 100).toFixed(2)}%</p>
+          <hr/>
+          <p><strong>Décomposition:</strong></p>
+          <ul>
+            <li>Charges courantes: ${(unit.quarterlyCharges * 0.6).toFixed(2)}€</li>
+            <li>Entretien: ${(unit.quarterlyCharges * 0.3).toFixed(2)}€</li>
+            <li>Travaux: ${(unit.quarterlyCharges * 0.1).toFixed(2)}€</li>
+          </ul>
+        </div>
+      `,
+      size: 'md',
+      showCancelButton: false,
+      confirmButtonText: 'Fermer'
+    });
   }
 
-  downloadDocuments(id: string) {
-    console.log('Downloading documents for unit:', id);
+  downloadDocuments(id: string): void {
+    const unit = this.units().find(u => u.id === id);
+    if (!unit) return;
+
+    this.fileService.downloadPDF(
+      `Documents_${unit.number}.pdf`,
+      `Documents lot ${unit.number}`
+    );
+    
+    this.toastService.show(
+      `Documents du lot ${unit.number}`,
+      { classname: 'toast-success' }
+    );
   }
 }

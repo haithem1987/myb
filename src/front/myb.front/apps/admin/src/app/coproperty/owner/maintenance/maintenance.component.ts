@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ModalService } from '@myb-front/shared-ui';
 
 interface MaintenanceRequest {
   id: string;
@@ -517,11 +518,45 @@ export class OwnerMaintenanceComponent {
     return labels[priority] || priority;
   }
 
-  createRequest() {
-    console.log('Creating new maintenance request');
+  private modalService = inject(ModalService);
+
+  async createRequest(): Promise<void> {
+    const confirmed = await this.modalService.confirm({
+      title: 'Nouvelle demande de travaux',
+      message: '<p>Formulaire de création en cours de développement.</p><p>Cette fonctionnalité permettra de soumettre une demande complète avec photos et description détaillée.</p>',
+      confirmButtonText: 'OK',
+      showCancelButton: false
+    });
   }
 
-  viewDetails(id: string) {
-    console.log('Viewing request details:', id);
+  viewDetails(id: string): void {
+    const request = this.requests().find(r => r.id === id);
+    if (!request) return;
+
+    const statusLabel = this.getStatusLabel(request.status);
+    const categoryLabel = this.getCategoryLabel(request.category);
+    const priorityLabel = this.getPriorityLabel(request.priority);
+
+    this.modalService.open({
+      title: request.title,
+      message: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Catégorie:</strong> ${categoryLabel}</p>
+          <p><strong>Priorité:</strong> <span class="badge bg-${request.priority === 'urgent' ? 'danger' : request.priority === 'high' ? 'warning' : 'secondary'}">${priorityLabel}</span></p>
+          <p><strong>Statut:</strong> <span class="badge bg-${request.status === 'completed' ? 'success' : request.status === 'in-progress' ? 'primary' : 'secondary'}">${statusLabel}</span></p>
+          <p><strong>Lot:</strong> ${request.unitNumber}</p>
+          <p><strong>Date de soumission:</strong> ${request.submittedDate.toLocaleDateString('fr-FR')}</p>
+          <hr/>
+          <p><strong>Description:</strong></p>
+          <p>${request.description}</p>
+          ${request.assignedContractor ? `<p><strong>Artisan assigné:</strong> ${request.assignedContractor}</p>` : ''}
+          ${request.estimatedCost ? `<p><strong>Coût estimé:</strong> ${request.estimatedCost.toFixed(2)}€</p>` : ''}
+          ${request.syndicComments ? `<hr/><p><strong>Commentaires du syndic:</strong></p><p>${request.syndicComments}</p>` : ''}
+        </div>
+      `,
+      size: 'lg',
+      showCancelButton: false,
+      confirmButtonText: 'Fermer'
+    });
   }
 }

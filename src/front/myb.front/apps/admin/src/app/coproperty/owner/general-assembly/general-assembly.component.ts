@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FileDownloadService, ToastService } from '@myb-front/shared-ui';
 
 interface Assembly {
   id: string;
@@ -452,15 +453,65 @@ export class OwnerGeneralAssemblyComponent {
     return Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   }
 
-  viewDocuments(id: string) {
-    console.log('Viewing documents for assembly:', id);
+  private fileService = inject(FileDownloadService);
+  private toastService = inject(ToastService);
+
+  viewDocuments(id: string): void {
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    this.fileService.downloadPDF(
+      `Documents_AG_${assembly.date.toISOString().split('T')[0]}.pdf`,
+      `Documents AG ${assembly.title}`
+    );
+    
+    this.toastService.show(
+      'Documents de l\'assemblée générale téléchargés',
+      { classname: 'toast-success' }
+    );
   }
 
-  viewMinutes(id: string) {
-    console.log('Viewing minutes for assembly:', id);
+  viewMinutes(id: string): void {
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    if (!assembly.minutesAvailable) {
+      this.toastService.show(
+        'Le procès-verbal n\'est pas encore disponible',
+        { classname: 'toast-warning' }
+      );
+      return;
+    }
+
+    this.fileService.downloadPDF(
+      `PV_AG_${assembly.date.toISOString().split('T')[0]}.pdf`,
+      `PV ${assembly.title}`
+    );
+    
+    this.toastService.show(
+      'Procès-verbal de l\'AG téléchargé',
+      { classname: 'toast-success' }
+    );
   }
 
-  addToCalendar(id: string) {
-    console.log('Adding assembly to calendar:', id);
+  addToCalendar(id: string): void {
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    const endDate = new Date(assembly.date);
+    endDate.setHours(endDate.getHours() + 2); // 2 hour meeting
+
+    this.fileService.downloadICS({
+      title: assembly.title,
+      start: assembly.date,
+      end: endDate,
+      location: assembly.location,
+      description: `Assemblée Générale - ${assembly.resolutions} résolutions à l'ordre du jour`
+    });
+    
+    this.toastService.show(
+      'L\'AG a été ajoutée à votre calendrier',
+      { classname: 'toast-success' }
+    );
   }
 }

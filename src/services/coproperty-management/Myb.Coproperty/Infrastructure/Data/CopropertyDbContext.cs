@@ -22,6 +22,8 @@ public class CopropertyDbContext : DbContext
     public DbSet<Payment> Payments { get; set; } = null!;
     public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; } = null!;
     public DbSet<FundCall> FundCalls { get; set; } = null!;
+    public DbSet<Assembly> Assemblies { get; set; } = null!;
+    public DbSet<AssemblyAttendance> AssemblyAttendances { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -360,6 +362,59 @@ public class CopropertyDbContext : DbContext
             entity.ToTable(t => t.HasCheckConstraint(
                 "CHK_FundCall_Amount", 
                 "\"Amount\" >= 0"));
+        });
+
+        // Assembly Configuration
+        modelBuilder.Entity<Assembly>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(200);
+            
+            entity.Property(e => e.Location)
+                .HasMaxLength(500);
+            
+            entity.Property(e => e.Agenda)
+                .HasMaxLength(5000);
+            
+            entity.Property(e => e.Minutes)
+                .HasMaxLength(10000);
+            
+            entity.Property(e => e.AssemblyType)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+            
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+            
+            entity.HasOne(e => e.Coproperty)
+                .WithMany()
+                .HasForeignKey(e => e.CopropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(e => e.CopropertyId);
+            entity.HasIndex(e => e.MeetingDate);
+            entity.HasIndex(e => e.Status);
+        });
+
+        // AssemblyAttendance Configuration
+        modelBuilder.Entity<AssemblyAttendance>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.ProxyHolderName)
+                .HasMaxLength(200);
+            
+            entity.HasOne(e => e.Assembly)
+                .WithMany(a => a.Attendances)
+                .HasForeignKey(e => e.AssemblyId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(e => e.AssemblyId);
+            entity.HasIndex(e => e.OwnerId);
         });
     }
 }

@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
 
 interface Invoice {
   id: string;
@@ -311,19 +312,72 @@ export class OwnerInvoicesComponent {
     return labels[status] || status;
   }
 
-  viewInvoice(id: string) {
-    console.log('Viewing invoice:', id);
+  private modalService = inject(ModalService);
+  private fileService = inject(FileDownloadService);
+  private toastService = inject(ToastService);
+
+  viewInvoice(id: string): void {
+    const invoice = this.invoices().find(inv => inv.id === id);
+    if (!invoice) return;
+
+    this.modalService.alert(
+      `Facture #${invoice.number}`,
+      `Période: ${invoice.period}\nMontant: ${invoice.amount.toFixed(2)}€\nStatut: ${this.getStatusLabel(invoice.status)}`
+    );
   }
 
-  downloadInvoice(id: string) {
-    console.log('Downloading invoice:', id);
+  downloadInvoice(id: string): void {
+    const invoice = this.invoices().find(inv => inv.id === id);
+    if (!invoice) return;
+
+    this.fileService.downloadPDF(
+      `Facture_${invoice.number}.pdf`,
+      `Facture ${invoice.number} - ${invoice.period}`
+    );
+    
+    this.toastService.show(
+      `Facture ${invoice.number} téléchargée`,
+      { classname: 'toast-success' }
+    );
   }
 
-  payInvoice(id: string) {
-    console.log('Paying invoice:', id);
+  async payInvoice(id: string): Promise<void> {
+    const invoice = this.invoices().find(inv => inv.id === id);
+    if (!invoice || invoice.status === 'paid') return;
+
+    const confirmed = await this.modalService.confirm({
+      title: 'Confirmation de paiement',
+      message: `Payer ${invoice.amount.toFixed(2)}€ pour ${invoice.period}?`,
+      confirmButtonText: 'Payer',
+      confirmButtonClass: 'btn-success'
+    });
+
+    if (confirmed) {
+      setTimeout(() => {
+        invoice.status = 'paid';
+        invoice.paymentDate = new Date();
+        this.invoices.set([...this.invoices()]);
+        this.toastService.show(
+          `Facture ${invoice.number} payée`,
+          { classname: 'toast-success' }
+        );
+      }, 500);
+    }
   }
 
-  downloadAll() {
-    console.log('Downloading all invoices');
+  downloadAll(): void {
+    const invoices = this.filteredInvoices();
+    if (invoices.length === 0) {
+      this.toastService.show(
+        'Aucune facture à télécharger',
+        { classname: 'toast-warning' }
+      );
+      return;
+    }
+
+    this.toastService.show(
+      `${invoices.length} facture(s) en cours de téléchargement`,
+      { classname: 'toast-success' }
+    );
   }
 }

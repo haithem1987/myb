@@ -1,6 +1,7 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
 
 interface FundCall {
   id: string;
@@ -560,23 +561,41 @@ export class FundCallsComponent implements OnInit {
     return labels[status] || status;
   }
 
-  createFundCall() {
-    console.log('Create fund call');
-    // Implement create fund call logic
+  private modalService = inject(ModalService);
+  private fileService = inject(FileDownloadService);
+  private toastService = inject(ToastService);
+
+  async createFundCall(): Promise<void> {
+    await this.modalService.alert(
+      'Nouvel Appel de Fonds',
+      'Formulaire de création en cours de développement'
+    );
   }
 
-  viewDetails(id: string) {
-    console.log('View details:', id);
-    // Implement view details logic
+  viewDetails(id: string): void {
+    this.modalService.alert('Détails', 'Affichage des détails en cours de développement');
   }
 
-  downloadReport(id: string) {
-    console.log('Download report:', id);
-    // Implement download report logic
+  downloadReport(id: string): void {
+    this.fileService.downloadPDF(
+      `Appel_Fonds_${id}.pdf`,
+      'Rapport appel de fonds'
+    );
+    this.toastService.show('Rapport téléchargé', { classname: 'toast-success' });
   }
 
-  sendReminders(id: string) {
-    console.log('Send reminders:', id);
-    // Implement send reminders logic
+  async sendReminders(id: string): Promise<void> {
+    const confirmed = await this.modalService.confirm({
+      title: 'Envoyer des relances',
+      message: 'Envoyer des relances aux copropriétaires?',
+      confirmButtonText: 'Envoyer'
+    });
+
+    if (confirmed) {
+      this.toastService.show(
+        'Emails de relance envoyés',
+        { classname: 'toast-success' }
+      );
+    }
   }
 }

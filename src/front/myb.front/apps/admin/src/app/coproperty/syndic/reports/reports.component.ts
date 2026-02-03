@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
 
 interface Report {
   id: string;
@@ -500,23 +501,81 @@ export class ReportsComponent {
     // Filter reports based on category
   }
 
-  generateReport() {
-    console.log('Generate new report');
+  private modalService = inject(ModalService);
+  private fileService = inject(FileDownloadService);
+  private toastService = inject(ToastService);
+
+  async generateReport(): Promise<void> {
+    await this.modalService.alert(
+      'Générer un rapport',
+      'Assistant de génération de rapports en cours de développement'
+    );
   }
 
-  generateQuickReport(type: string) {
-    console.log('Generate quick report:', type);
+  generateQuickReport(type: string): void {
+    this.toastService.show(
+      `Rapport ${type} en cours de génération...`,
+      { classname: 'toast-info' }
+    );
+    
+    setTimeout(() => {
+      this.fileService.downloadPDF(
+        `Rapport_${type}_${new Date().toISOString().split('T')[0]}.pdf`,
+        `Rapport ${type}`
+      );
+      this.toastService.show(
+        `Rapport ${type} prêt`,
+        { classname: 'toast-success' }
+      );
+    }, 1000);
   }
 
-  downloadReport(id: string) {
-    console.log('Download report:', id);
+  downloadReport(id: string): void {
+    const report = this.reports().find(r => r.id === id);
+    if (!report) return;
+
+    this.fileService.downloadPDF(
+      `${report.title}.pdf`,
+      `Rapport ${report.title}`
+    );
+    this.toastService.show(report.title, { classname: 'toast-success' });
   }
 
-  viewReport(id: string) {
-    console.log('View report:', id);
+  viewReport(id: string): void {
+    const report = this.reports().find(r => r.id === id);
+    if (!report) return;
+
+    this.modalService.open({
+      title: report.title,
+      message: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Type:</strong> ${report.type}</p>
+          <p><strong>Période:</strong> ${report.period}</p>
+          <p><strong>Taille:</strong> ${report.size}</p>
+          <hr/>
+          <p>Aperçu du rapport disponible prochainement.</p>
+        </div>
+      `,
+      size: 'lg',
+      showCancelButton: false
+    });
   }
 
-  shareReport(id: string) {
-    console.log('Share report:', id);
+  async shareReport(id: string): Promise<void> {
+    const report = this.reports().find(r => r.id === id);
+    if (!report) return;
+
+    const confirmed = await this.modalService.confirm({
+      title: 'Partager le rapport',
+      message: `Partager "${report.title}" avec tous les copropriétaires?`,
+      confirmButtonText: 'Partager'
+    });
+
+    if (confirmed) {
+      this.toastService.show(
+        'Email envoyé aux copropriétaires',
+        { classname: 'toast-success' }
+      );
+    }
   }
 }

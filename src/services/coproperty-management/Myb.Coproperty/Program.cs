@@ -22,6 +22,7 @@ builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IOwnerRepo
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IChargeRepository, Myb.Coproperty.Infrastructure.Repositories.ChargeRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IMaintenanceRepository, Myb.Coproperty.Infrastructure.Repositories.MaintenanceRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IInvoiceRepository, Myb.Coproperty.Infrastructure.Repositories.InvoiceRepository>();
+builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IAssemblyRepository, Myb.Coproperty.Infrastructure.Repositories.AssemblyRepository>();
 // Register ChargeDistribution generic repository
 builder.Services.AddScoped<Myb.Common.Repositories.IGenericRepository<Guid, Myb.Coproperty.Models.ChargeDistribution, CopropertyDbContext>, Myb.Common.Repositories.GenericRepository<Guid, Myb.Coproperty.Models.ChargeDistribution, CopropertyDbContext>>();
 
@@ -33,6 +34,7 @@ builder.Services.AddScoped<Myb.Coproperty.Services.IChargeService, Myb.Copropert
 builder.Services.AddScoped<Myb.Coproperty.Services.IMaintenanceService, Myb.Coproperty.Services.MaintenanceService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IFinanceService, Myb.Coproperty.Services.FinanceService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IFundCallService, Myb.Coproperty.Services.FundCallService>();
+builder.Services.AddScoped<Myb.Coproperty.Services.IAssemblyService, Myb.Coproperty.Services.AssemblyService>();
 builder.Services.AddScoped<Myb.Coproperty.GraphQL.Mutations.IAuthenticationService, Myb.Coproperty.Services.AuthenticationService>();
 
 // Add GraphQL
@@ -46,6 +48,7 @@ builder.Services
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.ChargeQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.MaintenanceQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.InvoiceQueries>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.AssemblyQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.FundCallQueries>()
     .AddMutationType(d => d.Name("Mutation"))
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.CopropertyMutations>()
@@ -55,6 +58,7 @@ builder.Services
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.MaintenanceMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.FinanceMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.FundCallMutations>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.AssemblyMutations>()
     .AddType<Myb.Coproperty.GraphQL.Types.CopropertyType>()
     .AddType<Myb.Coproperty.GraphQL.Types.CopropertyInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.UnitType>()

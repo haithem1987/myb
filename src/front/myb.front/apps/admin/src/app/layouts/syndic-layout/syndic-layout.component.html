@@ -31,6 +31,28 @@
         <span class="nav-text">Charges</span>
       </a>
       
+      <a routerLink="/coproperty/syndic/distribution" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-pie-chart"></i>
+        <span class="nav-text">Répartition</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/units" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-building"></i>
+        <span class="nav-text">Lots</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/owners" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-person-badge"></i>
+        <span class="nav-text">Copropriétaires</span>
+      </a>
+      
+      <!-- Invoice service is separate - commented out
       <a routerLink="/coproperty/syndic/invoices" 
          routerLinkActive="active" 
          class="nav-item">
@@ -40,6 +62,7 @@
           {{ unpaidInvoices() }}
         </span>
       </a>
+      -->
       
       <a routerLink="/coproperty/syndic/maintenance" 
          routerLinkActive="active" 
@@ -56,6 +79,13 @@
          class="nav-item">
         <i class="bi bi-calendar-check"></i>
         <span class="nav-text">Appels de Fonds</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/general-assembly" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-people-fill"></i>
+        <span class="nav-text">Assemblées Générales</span>
       </a>
       
       <a routerLink="/coproperty/syndic/reports" 

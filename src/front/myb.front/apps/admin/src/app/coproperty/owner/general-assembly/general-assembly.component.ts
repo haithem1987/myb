@@ -1,0 +1,466 @@
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+interface Assembly {
+  id: string;
+  title: string;
+  type: 'ordinary' | 'extraordinary';
+  date: Date;
+  status: 'upcoming' | 'past';
+  location: string;
+  resolutions: number;
+  documentsAvailable: boolean;
+  minutesAvailable: boolean;
+  copropertyName: string;
+}
+
+@Component({
+  selector: 'app-owner-general-assembly',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="container-fluid py-4">
+      <!-- Header -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h2 class="mb-1">
+            <i class="bi bi-people-fill me-2"></i>
+            Assemblées Générales
+          </h2>
+          <p class="text-muted">Consultez les AG et accédez aux documents</p>
+        </div>
+      </div>
+
+      <!-- Statistics -->
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-icon bg-primary">
+              <i class="bi bi-calendar-event"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stats().upcoming }}</div>
+              <div class="stat-label">AG à venir</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-icon bg-success">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stats().past }}</div>
+              <div class="stat-label">AG passées</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-icon bg-info">
+              <i class="bi bi-file-text"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stats().documentsAvailable }}</div>
+              <div class="stat-label">Documents disponibles</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Assemblies -->
+      <div class="section" *ngIf="upcomingAssemblies().length > 0">
+        <h4 class="section-title">
+          <i class="bi bi-calendar-event me-2"></i>
+          Prochaines assemblées
+        </h4>
+        <div class="row">
+          <div class="col-12 mb-3" *ngFor="let assembly of upcomingAssemblies()">
+            <div class="assembly-card upcoming">
+              <div class="assembly-header">
+                <div>
+                  <div class="assembly-type-badge" [class.ordinary]="assembly.type === 'ordinary'"
+                       [class.extraordinary]="assembly.type === 'extraordinary'">
+                    {{ assembly.type === 'ordinary' ? 'AG Ordinaire' : 'AG Extraordinaire' }}
+                  </div>
+                  <h5 class="mt-2">{{ assembly.title }}</h5>
+                  <p class="text-muted mb-0">{{ assembly.copropertyName }}</p>
+                </div>
+                <div class="date-badge">
+                  <div class="day">{{ assembly.date | date:'dd' }}</div>
+                  <div class="month">{{ assembly.date | date:'MMM' }}</div>
+                  <div class="year">{{ assembly.date | date:'yyyy' }}</div>
+                </div>
+              </div>
+              <div class="assembly-body">
+                <div class="info-grid">
+                  <div class="info-item">
+                    <i class="bi bi-calendar3"></i>
+                    <div>
+                      <div class="info-label">Date et heure</div>
+                      <div class="info-value">{{ assembly.date | date:'dd/MM/yyyy à HH:mm' }}</div>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-geo-alt"></i>
+                    <div>
+                      <div class="info-label">Lieu</div>
+                      <div class="info-value">{{ assembly.location }}</div>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-list-check"></i>
+                    <div>
+                      <div class="info-label">Résolutions</div>
+                      <div class="info-value">{{ assembly.resolutions }} points à l'ordre du jour</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="countdown-banner" *ngIf="getDaysUntil(assembly.date) > 0">
+                  <i class="bi bi-clock-history me-2"></i>
+                  Dans {{ getDaysUntil(assembly.date) }} jours
+                </div>
+              </div>
+              <div class="assembly-footer">
+                <button class="btn btn-sm btn-outline-primary" 
+                        *ngIf="assembly.documentsAvailable"
+                        (click)="viewDocuments(assembly.id)">
+                  <i class="bi bi-file-text me-1"></i>
+                  Documents
+                </button>
+                <button class="btn btn-sm btn-primary" (click)="addToCalendar(assembly.id)">
+                  <i class="bi bi-calendar-plus me-1"></i>
+                  Ajouter au calendrier
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Past Assemblies -->
+      <div class="section mt-4">
+        <h4 class="section-title">
+          <i class="bi bi-clock-history me-2"></i>
+          Assemblées passées
+        </h4>
+        <div class="row">
+          <div class="col-md-6 mb-3" *ngFor="let assembly of pastAssemblies()">
+            <div class="assembly-card past">
+              <div class="assembly-header">
+                <div>
+                  <div class="assembly-type-badge" [class.ordinary]="assembly.type === 'ordinary'"
+                       [class.extraordinary]="assembly.type === 'extraordinary'">
+                    {{ assembly.type === 'ordinary' ? 'AG Ordinaire' : 'AG Extraordinaire' }}
+                  </div>
+                  <h6 class="mt-2 mb-1">{{ assembly.title }}</h6>
+                  <small class="text-muted">{{ assembly.date | date:'dd MMMM yyyy' }}</small>
+                </div>
+              </div>
+              <div class="assembly-body">
+                <div class="documents-status">
+                  <div class="status-item" [class.available]="assembly.minutesAvailable">
+                    <i class="bi" [class.bi-check-circle]="assembly.minutesAvailable" 
+                       [class.bi-x-circle]="!assembly.minutesAvailable"></i>
+                    <span>Procès-verbal</span>
+                  </div>
+                  <div class="status-item" [class.available]="assembly.documentsAvailable">
+                    <i class="bi" [class.bi-check-circle]="assembly.documentsAvailable" 
+                       [class.bi-x-circle]="!assembly.documentsAvailable"></i>
+                    <span>Documents</span>
+                  </div>
+                </div>
+              </div>
+              <div class="assembly-footer">
+                <button class="btn btn-sm btn-outline-primary" 
+                        *ngIf="assembly.minutesAvailable"
+                        (click)="viewMinutes(assembly.id)">
+                  <i class="bi bi-file-earmark-text me-1"></i>
+                  PV
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" 
+                        *ngIf="assembly.documentsAvailable"
+                        (click)="viewDocuments(assembly.id)">
+                  <i class="bi bi-files me-1"></i>
+                  Documents
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      height: 100%;
+    }
+
+    .stat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .stat-content {
+      flex: 1;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #6c757d;
+    }
+
+    .section-title {
+      margin-bottom: 20px;
+      color: #212529;
+    }
+
+    .assembly-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .assembly-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .assembly-card.upcoming {
+      border-left: 4px solid #0d6efd;
+    }
+
+    .assembly-card.past {
+      opacity: 0.95;
+    }
+
+    .assembly-header {
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: #f8f9fa;
+    }
+
+    .assembly-type-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .assembly-type-badge.ordinary {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .assembly-type-badge.extraordinary {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .date-badge {
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      min-width: 80px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .date-badge .day {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      color: #0d6efd;
+    }
+
+    .date-badge .month {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #495057;
+    }
+
+    .date-badge .year {
+      font-size: 12px;
+      color: #6c757d;
+    }
+
+    .assembly-body {
+      padding: 20px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .info-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .info-item i {
+      font-size: 20px;
+      color: #0d6efd;
+      margin-top: 2px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #6c757d;
+      margin-bottom: 2px;
+    }
+
+    .info-value {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .countdown-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .documents-status {
+      display: flex;
+      gap: 20px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6c757d;
+    }
+
+    .status-item.available {
+      color: #198754;
+    }
+
+    .status-item i {
+      font-size: 18px;
+    }
+
+    .assembly-footer {
+      padding: 16px 20px;
+      background: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      display: flex;
+      gap: 8px;
+    }
+  `]
+})
+export class OwnerGeneralAssemblyComponent {
+  assemblies = signal<Assembly[]>([
+    {
+      id: '1',
+      title: 'Assemblée Générale Ordinaire 2026',
+      type: 'ordinary',
+      date: new Date('2026-06-15T18:30:00'),
+      status: 'upcoming',
+      location: 'Salle polyvalente - Rez-de-chaussée',
+      resolutions: 12,
+      documentsAvailable: true,
+      minutesAvailable: false,
+      copropertyName: 'Résidence Les Jardins du Parc'
+    },
+    {
+      id: '2',
+      title: 'AG Extraordinaire - Ravalement Façade',
+      type: 'extraordinary',
+      date: new Date('2026-03-20T19:00:00'),
+      status: 'upcoming',
+      location: 'Salle polyvalente',
+      resolutions: 3,
+      documentsAvailable: true,
+      minutesAvailable: false,
+      copropertyName: 'Résidence Les Jardins du Parc'
+    },
+    {
+      id: '3',
+      title: 'Assemblée Générale Ordinaire 2025',
+      type: 'ordinary',
+      date: new Date('2025-06-10T18:30:00'),
+      status: 'past',
+      location: 'Salle polyvalente',
+      resolutions: 15,
+      documentsAvailable: true,
+      minutesAvailable: true,
+      copropertyName: 'Résidence Les Jardins du Parc'
+    },
+    {
+      id: '4',
+      title: 'Assemblée Générale Ordinaire 2024',
+      type: 'ordinary',
+      date: new Date('2024-06-12T18:30:00'),
+      status: 'past',
+      location: 'Salle polyvalente',
+      resolutions: 14,
+      documentsAvailable: true,
+      minutesAvailable: true,
+      copropertyName: 'Résidence Les Jardins du Parc'
+    }
+  ]);
+
+  upcomingAssemblies = signal<Assembly[]>(
+    this.assemblies().filter(a => a.status === 'upcoming')
+  );
+
+  pastAssemblies = signal<Assembly[]>(
+    this.assemblies().filter(a => a.status === 'past')
+  );
+
+  stats = signal({
+    upcoming: 2,
+    past: 2,
+    documentsAvailable: 4
+  });
+
+  getDaysUntil(date: Date): number {
+    return Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  }
+
+  viewDocuments(id: string) {
+    console.log('Viewing documents for assembly:', id);
+  }
+
+  viewMinutes(id: string) {
+    console.log('Viewing minutes for assembly:', id);
+  }
+
+  addToCalendar(id: string) {
+    console.log('Adding assembly to calendar:', id);
+  }
+}

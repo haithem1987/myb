@@ -46,8 +46,24 @@ export const COPROPERTY_ROUTES: Routes = [
         loadComponent: () => import('@myb-front/coproperty-module').then(m => m.MaintenanceRequestsComponent),
       },
       {
+        path: 'units',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.UnitManagementComponent),
+      },
+      {
+        path: 'owners',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.OwnerManagementComponent),
+      },
+      {
+        path: 'distribution',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.ChargeDistributionComponent),
+      },
+      {
         path: 'fund-calls',
         loadComponent: () => import('./syndic/fund-calls/fund-calls.component').then(m => m.FundCallsComponent),
+      },
+      {
+        path: 'general-assembly',
+        loadComponent: () => import('./syndic/general-assembly/general-assembly.component').then(m => m.GeneralAssemblyComponent),
       },
       {
         path: 'reports',
@@ -67,6 +83,26 @@ export const COPROPERTY_ROUTES: Routes = [
       {
         path: 'dashboard',
         component: OwnerDashboardComponent,
+      },
+      {
+        path: 'my-units',
+        loadComponent: () => import('./owner/my-units/my-units.component').then(m => m.OwnerMyUnitsComponent),
+      },
+      {
+        path: 'invoices',
+        loadComponent: () => import('./owner/invoices/invoices.component').then(m => m.OwnerInvoicesComponent),
+      },
+      {
+        path: 'maintenance',
+        loadComponent: () => import('./owner/maintenance/maintenance.component').then(m => m.OwnerMaintenanceComponent),
+      },
+      {
+        path: 'documents',
+        loadComponent: () => import('./owner/documents/documents.component').then(m => m.OwnerDocumentsComponent),
+      },
+      {
+        path: 'general-assembly',
+        loadComponent: () => import('./owner/general-assembly/general-assembly.component').then(m => m.OwnerGeneralAssemblyComponent),
       },
     ],
   },

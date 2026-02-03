@@ -392,7 +392,7 @@ export class InvoicePaymentDialogComponent implements OnInit {
   }
 
   private getUserId(): string {
-    const token: string | null = this.keycloakService.getToken();
+    const token = this.keycloakService.getToken();
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));

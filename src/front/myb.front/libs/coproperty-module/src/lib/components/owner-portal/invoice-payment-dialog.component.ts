@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, signal } from '@angular/core';
+import { Component, Inject, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CopropertyInvoice } from '../../models';
 import { OwnerService } from '../../services/owner.service';
+import { KeycloakService } from '@myb/auth';
 
 @Component({
   selector: 'app-invoice-payment-dialog',
@@ -377,6 +378,7 @@ export class InvoicePaymentDialogComponent implements OnInit {
   paymentForm!: FormGroup;
   processing = signal(false);
   error = signal<string | null>(null);
+  private keycloakService = inject(KeycloakService);
 
   constructor(
     private fb: FormBuilder,
@@ -387,6 +389,20 @@ export class InvoicePaymentDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
+  }
+
+  private getUserId(): string {
+    const token = this.keycloakService.getToken();
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.sub || 'unknown-user';
+      } catch (error) {
+        console.error('Error parsing token:', error);
+        return 'unknown-user';
+      }
+    }
+    return 'unknown-user';
   }
 
   private initializeForm(): void {
@@ -472,7 +488,9 @@ export class InvoicePaymentDialogComponent implements OnInit {
       invoiceId: this.data.invoice.id,
       amount: formValue.amount,
       paymentMethod: formValue.paymentMethod,
-      notes: formValue.notes
+      paymentDate: new Date(),
+      notes: formValue.notes,
+      createdBy: this.getUserId()
     };
 
     this.ownerService.recordPayment(paymentInput).subscribe({

@@ -638,6 +638,10 @@ export class OwnerDashboardComponent implements OnInit {
         // Reload data after successful payment
         this.loadOwnerData();
       }
+    });
+  }
+
+  createMaintenanceRequest(): void {
     const dialogRef = this.dialog.open(NewMaintenanceRequestDialogComponent, {
       width: '600px',
       data: {
@@ -651,11 +655,7 @@ export class OwnerDashboardComponent implements OnInit {
         // Reload maintenance requests
         this.loadOwnerData();
       }
-    }
-
-  createMaintenanceRequest(): void {
-    // TODO: Open dialog to create new maintenance request
-    console.log('Create maintenance request');
+    });
   }
 
   viewRequestDetails(requestId: string): void {

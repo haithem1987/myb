@@ -41,7 +41,8 @@ public class AssemblyService : IAssemblyService
     {
         assembly.CreatedAt = DateTime.UtcNow;
         assembly.UpdatedAt = DateTime.UtcNow;
-        return await _assemblyRepository.CreateAsync(assembly);
+        var result = await _assemblyRepository.InsertAsync(assembly);
+        return result.Entity ?? throw new InvalidOperationException("Failed to create assembly");
     }
 
     public async Task UpdateAsync(Assembly assembly)

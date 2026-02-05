@@ -15,10 +15,9 @@ export function initializeKeycloak(keycloak: KeycloakService) {
       console.log('Starting Keycloak initialization...');
       const authenticated = await keycloak.init();
       console.log('Keycloak initialized successfully, authenticated:', authenticated);
-      return true; // Always return true to allow app to load
+      return true;
     } catch (error) {
       console.error('Keycloak initialization failed:', error);
-      // Don't block app startup even if Keycloak fails
       return true;
     }
   };
@@ -36,6 +35,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(
       GraphQLModule,
       TranslateModule.forRoot({
+        defaultLanguage: 'fr',
         loader: {
           provide: TranslateLoader,
           useFactory: HttpLoaderFactory,

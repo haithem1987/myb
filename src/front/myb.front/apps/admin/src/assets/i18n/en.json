@@ -216,16 +216,29 @@
       "units": "Units Owned",
       "deleteConfirm": "Are you sure you want to delete this owner?"
     },
-    "maintenance": {
-      "title": "Maintenance Requests",
-      "requests": "Maintenance Requests",
-      "newRequest": "New Request",
-      "filterStatus": "Filter by Status",
-      "filterPriority": "Filter by Priority",
-      "description": "Description",
-      "category": "Category",
-      "priority": "Priority",
-      "status": "Status"
+    "form": {
+      "newCoproperty": "New Coproperty",
+      "editCoproperty": "Edit Coproperty",
+      "requiredFields": "Fields marked with an asterisk (*) are required",
+      "basicInfo": "Basic Information",
+      "nameLabel": "Coproperty Name",
+      "namePlaceholder": "E.g., Garden Residences",
+      "addressLabel": "Address",
+      "addressPlaceholder": "123 Main Street",
+      "cityLabel": "City",
+      "cityPlaceholder": "New York",
+      "postalCodeLabel": "Postal Code",
+      "postalCodePlaceholder": "10001",
+      "countryLabel": "Country",
+      "countryPlaceholder": "United States",
+      "totalUnitsLabel": "Total Number of Units",
+      "totalSharesLabel": "Total Number of Shares",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Coproperty description...",
+      "managerLabel": "Manager",
+      "managerPlaceholder": "Manager name",
+      "commonAreasLabel": "Common Areas",
+      "commonAreasPlaceholder": "Garden, parking, elevator..."
     }
   },
   "common": {
@@ -257,5 +270,15 @@
     "error": "Error",
     "warning": "Warning",
     "info": "Information"
+  },
+  "validation": {
+    "NAME_REQUIRED": "is required",
+    "SAVING": "Saving...",
+    "UNITS": "Units",
+    "required": "This field is required",
+    "minLength": "Minimum length not met",
+    "min": "Minimum value must be",
+    "email": "Invalid email",
+    "pattern": "Invalid format"
   }
 }

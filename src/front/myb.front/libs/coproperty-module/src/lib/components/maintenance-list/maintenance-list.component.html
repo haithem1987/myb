@@ -1,0 +1,256 @@
+<div class="maintenance-list-container">
+  <div class="page-header">
+    <h1>
+      <i class="bi bi-tools me-2"></i>
+      Demandes de Travaux
+    </h1>
+    <p class="text-muted">Gérez toutes les demandes de travaux de vos copropriétés</p>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Coproperty Filter -->
+        <div class="col-md-3">
+          <label for="copropertyFilter" class="form-label">
+            <i class="bi bi-building me-1"></i>
+            Copropriété
+          </label>
+          <select 
+            id="copropertyFilter" 
+            class="form-select"
+            [value]="selectedCopropertyId() || 'all'"
+            (change)="onCopropertyFilterChange($event)">
+            <option value="all">Toutes les copropriétés</option>
+            <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
+              {{ coproperty.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-md-2">
+          <label for="statusFilter" class="form-label">
+            <i class="bi bi-flag me-1"></i>
+            Statut
+          </label>
+          <select 
+            id="statusFilter" 
+            class="form-select"
+            [value]="filterStatus()"
+            (change)="onStatusFilterChange($event)">
+            <option value="">Tous les statuts</option>
+            <option *ngFor="let status of statuses" [value]="status">
+              {{ getStatusLabel(status) }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Priority Filter -->
+        <div class="col-md-2">
+          <label for="priorityFilter" class="form-label">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            Priorité
+          </label>
+          <select 
+            id="priorityFilter" 
+            class="form-select"
+            [value]="filterPriority()"
+            (change)="onPriorityFilterChange($event)">
+            <option value="">Toutes priorités</option>
+            <option *ngFor="let priority of priorities" [value]="priority">
+              {{ getPriorityLabel(priority) }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="col-md-3">
+          <label for="categoryFilter" class="form-label">
+            <i class="bi bi-tag me-1"></i>
+            Catégorie
+          </label>
+          <select 
+            id="categoryFilter" 
+            class="form-select"
+            [value]="filterCategory()"
+            (change)="onCategoryFilterChange($event)">
+            <option value="">Toutes catégories</option>
+            <option *ngFor="let category of categories" [value]="category">
+              {{ getCategoryLabel(category) }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Search -->
+        <div class="col-md-2">
+          <label for="searchInput" class="form-label">
+            <i class="bi bi-search me-1"></i>
+            Recherche
+          </label>
+          <input 
+            type="text" 
+            id="searchInput"
+            class="form-control"
+            placeholder="Rechercher..."
+            [value]="searchTerm()"
+            (input)="onSearchInput($event)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-primary">
+              <i class="bi bi-list-check"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Total Demandes</h6>
+              <h3 class="mb-0">{{ filteredRequests.length }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-secondary">
+              <i class="bi bi-clock"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">En Attente</h6>
+              <h3 class="mb-0">{{ getPendingCount() }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-info">
+              <i class="bi bi-gear"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">En Cours</h6>
+              <h3 class="mb-0">{{ getInProgressCount() }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-danger">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Urgences</h6>
+              <h3 class="mb-0">{{ getEmergencyCount() }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Requests Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-list-ul me-2"></i>
+        Liste des Demandes ({{ filteredRequests.length }})
+      </h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading() && filteredRequests.length === 0" class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <p class="text-muted mt-3">Aucune demande trouvée</p>
+        <p class="text-muted">Les demandes seront affichées ici une fois créées dans les copropriétés</p>
+      </div>
+
+      <div *ngIf="!loading() && filteredRequests.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Copropriété</th>
+              <th>Titre</th>
+              <th>Catégorie</th>
+              <th>Priorité</th>
+              <th>Statut</th>
+              <th>Lot</th>
+              <th>Coût Estimé</th>
+              <th>Date Création</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of filteredRequests">
+              <td>
+                <strong>{{ getCopropertyName(request) }}</strong>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ request.title }}</div>
+                <small class="text-muted" *ngIf="request.description">
+                  {{ request.description.substring(0, 60) }}{{ request.description.length > 60 ? '...' : '' }}
+                </small>
+              </td>
+              <td>
+                <span class="badge bg-secondary">
+                  {{ getCategoryLabel(request.category) }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getPriorityBadgeClass(request.priority)">
+                  {{ getPriorityLabel(request.priority) }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getStatusBadgeClass(request.status)">
+                  {{ getStatusLabel(request.status) }}
+                </span>
+              </td>
+              <td>
+                <span *ngIf="request.unitNumber">{{ request.unitNumber }}</span>
+                <span *ngIf="!request.unitNumber" class="text-muted">-</span>
+              </td>
+              <td>
+                <span *ngIf="request.estimatedCost">{{ formatCost(request.estimatedCost) }} €</span>
+                <span *ngIf="!request.estimatedCost" class="text-muted">-</span>
+              </td>
+              <td>
+                {{ request.createdAt | date:'dd/MM/yyyy' }}
+              </td>
+              <td>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="viewRequest(request)"
+                  title="Voir les détails">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

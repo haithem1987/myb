@@ -1,11 +1,11 @@
 <div class="maintenance-container">
   <!-- Message for new coproperty -->
-  <div *ngIf="!copropertyId" class="alert alert-info">
+  <div *ngIf="!resolvedCopropertyId" class="alert alert-info">
     <i class="bi bi-info-circle me-2"></i>
     {{ 'coproperty.maintenance.saveFirst' | translate }}
   </div>
 
-  <div *ngIf="copropertyId">
+  <div *ngIf="resolvedCopropertyId">
     <div class="management-header">
       <h2>{{ 'coproperty.maintenance.title' | translate }}</h2>
       <button class="btn btn-primary" (click)="openAddForm()">

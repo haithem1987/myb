@@ -1,4 +1,4 @@
-using Myb.Common.Infrastructure.Repositories;
+using Myb.Common.Repositories;
 using Myb.Coproperty.Infrastructure.Data;
 using Myb.Coproperty.Models;
 

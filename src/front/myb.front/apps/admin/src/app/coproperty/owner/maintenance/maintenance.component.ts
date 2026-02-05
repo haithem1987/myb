@@ -1,13 +1,15 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalService } from '@myb-front/shared-ui';
+import { ModalService, ToastService } from '@myb-front/shared-ui';
+import { OwnerService, MaintenanceRequest as BackendMaintenanceRequest, MaintenanceStatus, MaintenanceCategory, Priority, Unit } from '@myb-front/coproperty-module';
+import { KeycloakService } from '@myb-front/auth';
 
 interface MaintenanceRequest {
   id: string;
   title: string;
-  category: 'plumbing' | 'electricity' | 'heating' | 'common-areas' | 'other';
   description: string;
+  category: 'plumbing' | 'electricity' | 'heating' | 'common-areas' | 'other';
   priority: 'low' | 'normal' | 'high' | 'urgent';
   status: 'submitted' | 'acknowledged' | 'in-progress' | 'completed' | 'rejected';
   unitNumber: string;
@@ -26,15 +28,12 @@ interface MaintenanceRequest {
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
-      <div class="row mb-4">
-        <div class="col-md-8">
-          <h2 class="mb-1">
-            <i class="bi bi-tools me-2"></i>
-            Mes Demandes de Travaux
-          </h2>
-          <p class="text-muted">Signalez un problème ou suivez vos demandes</p>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="mb-1">Demandes de travaux</h2>
+          <p class="text-muted mb-0">Gérez vos demandes d'entretien et de réparation</p>
         </div>
-        <div class="col-md-4 text-end">
+        <div>
           <button class="btn btn-primary" (click)="createRequest()">
             <i class="bi bi-plus-lg me-2"></i>
             Nouvelle demande
@@ -187,10 +186,18 @@ interface MaintenanceRequest {
                 <i class="bi bi-clock-history me-1"></i>
                 Dernière mise à jour: {{ request.lastUpdate | date:'dd/MM/yyyy HH:mm' }}
               </small>
-              <button class="btn btn-sm btn-outline-primary" (click)="viewDetails(request.id)">
-                <i class="bi bi-eye me-1"></i>
-                Détails
-              </button>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-outline-primary" (click)="viewDetails(request.id)">
+                  <i class="bi bi-eye me-1"></i>
+                  Détails
+                </button>
+                <button class="btn btn-sm btn-outline-danger" 
+                        (click)="deleteRequest(request.id, request.title)"
+                        *ngIf="request.status === 'submitted' || request.status === 'acknowledged'"
+                        title="Supprimer la demande">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -419,47 +426,71 @@ interface MaintenanceRequest {
     }
   `]
 })
-export class OwnerMaintenanceComponent {
+export class OwnerMaintenanceComponent implements OnInit {
   selectedStatus = 'all';
   selectedCategory = 'all';
 
-  requests = signal<MaintenanceRequest[]>([
-    {
-      id: '1',
-      title: 'Fuite d\'eau salle de bain',
-      category: 'plumbing',
-      description: 'Fuite importante au niveau du WC. L\'eau s\'infiltre chez le voisin du dessous.',
-      priority: 'urgent',
-      status: 'in-progress',
-      unitNumber: 'A101',
-      submittedDate: new Date('2026-01-29T08:30:00'),
-      lastUpdate: new Date('2026-01-29T14:00:00'),
-      assignedContractor: 'Dupont Plomberie',
-      estimatedCost: 350,
-      syndicComments: 'Intervention programmée pour aujourd\'hui entre 14h et 17h.'
-    },
-    {
-      id: '2',
-      title: 'Ampoule couloir défectueuse',
-      category: 'electricity',
-      description: 'L\'éclairage du couloir du 1er étage ne fonctionne plus.',
-      priority: 'normal',
-      status: 'acknowledged',
-      unitNumber: 'A101',
-      submittedDate: new Date('2026-01-28T16:20:00'),
-      lastUpdate: new Date('2026-01-29T09:00:00'),
-      syndicComments: 'Prise en compte. Intervention prévue dans les 48h.'
-    }
-  ]);
+  requests = signal<MaintenanceRequest[]>([]);
 
   filteredRequests = signal<MaintenanceRequest[]>(this.requests());
 
-  stats = signal({
-    active: 2,
-    completed: 0,
-    avgDays: 3,
-    total: 2
+  stats = computed(() => {
+    const requests = this.requests();
+    const total = requests.length;
+    const completed = requests.filter(r => r.status === 'completed').length;
+    const active = requests.filter(r => r.status !== 'completed' && r.status !== 'rejected').length;
+
+    if (total === 0) {
+      return { active: 0, completed: 0, avgDays: 0, total: 0 };
+    }
+
+    const now = new Date().getTime();
+    const totalDays = requests.reduce((sum, r) => {
+      const start = r.submittedDate.getTime();
+      const end = (r.completionDate ?? new Date()).getTime();
+      const diffDays = Math.max(0, Math.round((end - start) / (1000 * 60 * 60 * 24)));
+      return sum + diffDays;
+    }, 0);
+
+    const avgDays = Math.round(totalDays / total) || 0;
+
+    return { active, completed, avgDays, total };
   });
+
+  private ownerService = inject(OwnerService);
+  private keycloakService = inject(KeycloakService);
+  private unitsById = new Map<string, Unit>();
+
+  ngOnInit(): void {
+    const userId = this.getCurrentUserId();
+
+    if (!userId) {
+      console.error('OwnerMaintenanceComponent: user ID not available');
+      return;
+    }
+
+    // Load units to resolve unit numbers
+    this.ownerService.getMyUnits(userId).subscribe({
+      next: (units) => {
+        units.forEach((unit) => this.unitsById.set(unit.id, unit));
+      },
+      error: (error) => {
+        console.error('Error loading owner units for maintenance:', error);
+      }
+    });
+
+    // Load maintenance requests created by the current owner
+    this.ownerService.getMyMaintenanceRequests(userId).subscribe({
+      next: (backendRequests) => {
+        const mapped = backendRequests.map((req) => this.mapRequest(req));
+        this.requests.set(mapped);
+        this.filteredRequests.set(mapped);
+      },
+      error: (error) => {
+        console.error('Error loading owner maintenance requests:', error);
+      }
+    });
+  }
 
   filterRequests() {
     let filtered = this.requests();
@@ -519,6 +550,90 @@ export class OwnerMaintenanceComponent {
   }
 
   private modalService = inject(ModalService);
+  private toastService = inject(ToastService);
+
+  private getCurrentUserId(): string | null {
+    const token = this.keycloakService.getToken();
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.sub || null;
+      } catch (error) {
+        console.error('Error parsing Keycloak token in OwnerMaintenanceComponent:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private mapRequest(req: BackendMaintenanceRequest): MaintenanceRequest {
+    const unit = req.unitId ? this.unitsById.get(req.unitId) : undefined;
+
+    return {
+      id: req.id,
+      title: req.title,
+      category: this.mapCategory(req.category),
+      description: req.description,
+      priority: this.mapPriority(req.priority),
+      status: this.mapStatus(req.status),
+      unitNumber: unit?.unitNumber ?? '—',
+      submittedDate: new Date(req.createdAt),
+      lastUpdate: new Date(req.updatedAt),
+      assignedContractor: req.assignedTo,
+      estimatedCost: req.estimatedCost,
+      completionDate: req.completedDate ? new Date(req.completedDate) : undefined,
+      syndicComments: undefined
+    };
+  }
+
+  private mapCategory(cat: MaintenanceCategory): 'plumbing' | 'electricity' | 'heating' | 'common-areas' | 'other' {
+    switch (cat) {
+      case MaintenanceCategory.PLUMBING:
+        return 'plumbing';
+      case MaintenanceCategory.ELECTRICAL:
+        return 'electricity';
+      case MaintenanceCategory.HEATING:
+        return 'heating';
+      case MaintenanceCategory.CLEANING:
+      case MaintenanceCategory.SECURITY:
+      case MaintenanceCategory.STRUCTURAL:
+        return 'common-areas';
+      default:
+        return 'other';
+    }
+  }
+
+  private mapPriority(priority: Priority): 'low' | 'normal' | 'high' | 'urgent' {
+    switch (priority) {
+      case Priority.LOW:
+        return 'low';
+      case Priority.NORMAL:
+        return 'normal';
+      case Priority.HIGH:
+        return 'high';
+      case Priority.EMERGENCY:
+        return 'urgent';
+      default:
+        return 'normal';
+    }
+  }
+
+  private mapStatus(status: MaintenanceStatus): 'submitted' | 'acknowledged' | 'in-progress' | 'completed' | 'rejected' {
+    switch (status) {
+      case MaintenanceStatus.PENDING:
+        return 'submitted';
+      case MaintenanceStatus.ASSIGNED:
+        return 'acknowledged';
+      case MaintenanceStatus.IN_PROGRESS:
+        return 'in-progress';
+      case MaintenanceStatus.COMPLETED:
+        return 'completed';
+      case MaintenanceStatus.CANCELLED:
+        return 'rejected';
+      default:
+        return 'submitted';
+    }
+  }
 
   async createRequest(): Promise<void> {
     const confirmed = await this.modalService.confirm({
@@ -558,5 +673,28 @@ export class OwnerMaintenanceComponent {
       showCancelButton: false,
       confirmButtonText: 'Fermer'
     });
+  }
+
+  async deleteRequest(id: string, title: string): Promise<void> {
+    const confirmed = await this.modalService.confirm({
+      title: 'Supprimer la demande',
+      message: `Êtes-vous sûr de vouloir supprimer la demande "${title}" ?<br/><br/>
+                <strong class="text-warning">Cette action est irréversible.</strong>`,
+      confirmButtonText: 'Supprimer',
+      confirmButtonClass: 'btn-danger',
+      cancelButtonText: 'Annuler'
+    });
+
+    if (confirmed) {
+      // Remove from list
+      const updatedRequests = this.requests().filter(r => r.id !== id);
+      this.requests.set(updatedRequests);
+      this.filterRequests();
+
+      this.toastService.show(
+        `La demande "${title}" a été supprimée`,
+        { classname: 'toast-success' }
+      );
+    }
   }
 }

@@ -1,0 +1,230 @@
+<div class="charges-list-container">
+  <div class="page-header">
+    <h1>
+      <i class="bi bi-cash-stack me-2"></i>
+      Gestion des Charges
+    </h1>
+    <p class="text-muted">Gérez toutes les charges de vos copropriétés</p>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Coproperty Filter -->
+        <div class="col-md-4">
+          <label for="copropertyFilter" class="form-label">
+            <i class="bi bi-building me-1"></i>
+            Copropriété
+          </label>
+          <select 
+            id="copropertyFilter" 
+            class="form-select"
+            [value]="selectedCopropertyId() || 'all'"
+            (change)="onCopropertyChange($any($event.target).value)">
+            <option value="all">Toutes les copropriétés</option>
+            <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
+              {{ coproperty.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Type Filter -->
+        <div class="col-md-3">
+          <label for="typeFilter" class="form-label">
+            <i class="bi bi-tag me-1"></i>
+            Type de charge
+          </label>
+          <select 
+            id="typeFilter" 
+            class="form-select"
+            [value]="filterType()"
+            (change)="filterType.set($any($event.target).value)">
+            <option value="">Tous les types</option>
+            <option *ngFor="let type of chargeTypes" [value]="type">
+              {{ type }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Frequency Filter -->
+        <div class="col-md-3">
+          <label for="frequencyFilter" class="form-label">
+            <i class="bi bi-calendar-event me-1"></i>
+            Fréquence
+          </label>
+          <select 
+            id="frequencyFilter" 
+            class="form-select"
+            [value]="filterFrequency()"
+            (change)="filterFrequency.set($any($event.target).value)">
+            <option value="">Toutes les fréquences</option>
+            <option *ngFor="let freq of frequencies" [value]="freq">
+              {{ getFrequencyLabel(freq) }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Search -->
+        <div class="col-md-2">
+          <label for="searchInput" class="form-label">
+            <i class="bi bi-search me-1"></i>
+            Recherche
+          </label>
+          <input 
+            type="text" 
+            id="searchInput"
+            class="form-control"
+            placeholder="Rechercher..."
+            [value]="searchTerm()"
+            (input)="searchTerm.set($any($event.target).value)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-primary">
+              <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Total Charges</h6>
+              <h3 class="mb-0">{{ filteredCharges.length }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-success">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Charges Actives</h6>
+              <h3 class="mb-0">{{ getActiveChargesCount() }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-warning">
+              <i class="bi bi-calendar-event"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Mensuelles</h6>
+              <h3 class="mb-0">{{ getMonthlyChargesCount() }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-info">
+              <i class="bi bi-building"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Copropriétés</h6>
+              <h3 class="mb-0">{{ coproperties().length }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charges Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-list-ul me-2"></i>
+        Liste des Charges ({{ filteredCharges.length }})
+      </h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading() && filteredCharges.length === 0" class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <p class="text-muted mt-3">Aucune charge trouvée</p>
+        <p class="text-muted">Les charges seront affichées ici une fois créées dans les copropriétés</p>
+      </div>
+
+      <div *ngIf="!loading() && filteredCharges.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Copropriété</th>
+              <th>Nom</th>
+              <th>Type</th>
+              <th>Montant</th>
+              <th>Fréquence</th>
+              <th>Début</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let charge of filteredCharges">
+              <td>
+                <strong>{{ getCopropertyName(charge) }}</strong>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ charge.name }}</div>
+                <small class="text-muted" *ngIf="charge.description">
+                  {{ charge.description }}
+                </small>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getChargeTypeBadgeClass(charge.chargeType)">
+                  {{ charge.chargeType }}
+                </span>
+              </td>
+              <td>
+                <strong>{{ formatAmount(charge.totalAmount) }} €</strong>
+              </td>
+              <td>
+                {{ getFrequencyLabel(charge.frequency) }}
+              </td>
+              <td>
+                {{ charge.startDate | date:'dd/MM/yyyy' }}
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getStatusBadgeClass(charge.isActive)">
+                  {{ getStatusLabel(charge.isActive) }}
+                </span>
+              </td>
+              <td>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="viewCharge(charge)"
+                  title="Voir les détails">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

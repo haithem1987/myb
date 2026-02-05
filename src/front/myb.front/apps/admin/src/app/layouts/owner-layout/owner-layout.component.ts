@@ -2,11 +2,12 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
+import { ToastsContainerComponent, ModalContainerComponent } from '@myb-front/shared-ui';
 
 @Component({
   selector: 'app-owner-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent],
   templateUrl: './owner-layout.component.html',
   styleUrls: ['./owner-layout.component.scss']
 })

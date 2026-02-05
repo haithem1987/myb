@@ -1,7 +1,9 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
+import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit } from '@myb-front/coproperty-module';
+import { KeycloakService } from '@myb-front/auth';
 
 interface Invoice {
   id: string;
@@ -242,62 +244,71 @@ interface Invoice {
     }
   `]
 })
-export class OwnerInvoicesComponent {
+export class OwnerInvoicesComponent implements OnInit {
   selectedStatus = 'all';
   selectedYear = '2026';
 
-  invoices = signal<Invoice[]>([
-    {
-      id: '1',
-      number: 'INV-2026-Q1-A101',
-      date: new Date('2026-01-01'),
-      dueDate: new Date('2026-01-31'),
-      amount: 862.50,
-      status: 'pending',
-      period: 'T1 2026',
-      unitNumber: 'A101',
-      copropertyName: 'Résidence Les Jardins du Parc'
-    },
-    {
-      id: '2',
-      number: 'INV-2025-Q4-A101',
-      date: new Date('2025-10-01'),
-      dueDate: new Date('2025-10-31'),
-      amount: 862.50,
-      status: 'paid',
-      period: 'T4 2025',
-      unitNumber: 'A101',
-      copropertyName: 'Résidence Les Jardins du Parc',
-      paymentDate: new Date('2025-10-25')
-    },
-    {
-      id: '3',
-      number: 'INV-2025-Q3-A101',
-      date: new Date('2025-07-01'),
-      dueDate: new Date('2025-07-31'),
-      amount: 862.50,
-      status: 'paid',
-      period: 'T3 2025',
-      unitNumber: 'A101',
-      copropertyName: 'Résidence Les Jardins du Parc',
-      paymentDate: new Date('2025-07-20')
-    }
-  ]);
+  invoices = signal<Invoice[]>([]);
 
   filteredInvoices = signal<Invoice[]>(this.invoices());
 
-  stats = signal({
-    pending: 1,
-    overdue: 0,
-    paid: 2,
-    totalDue: 862.50
+  stats = computed(() => {
+    const invoices = this.filteredInvoices();
+    const pending = invoices.filter(i => i.status === 'pending').length;
+    const overdue = invoices.filter(i => i.status === 'overdue').length;
+    const paid = invoices.filter(i => i.status === 'paid').length;
+    const totalDue = invoices
+      .filter(i => i.status === 'pending' || i.status === 'overdue')
+      .reduce((sum, i) => sum + i.amount, 0);
+
+    return { pending, overdue, paid, totalDue };
   });
+
+  private ownerService = inject(OwnerService);
+  private keycloakService = inject(KeycloakService);
+  private unitsById = new Map<string, Unit>();
+
+  ngOnInit(): void {
+    const userId = this.getCurrentUserId();
+
+    if (!userId) {
+      // If user ID is not available, do not attempt to load data
+      console.error('OwnerInvoicesComponent: user ID not available');
+      return;
+    }
+
+    // Load units to resolve unit numbers for invoices
+    this.ownerService.getMyUnits(userId).subscribe({
+      next: (units) => {
+        units.forEach((unit) => this.unitsById.set(unit.id, unit));
+      },
+      error: (error) => {
+        console.error('Error loading owner units for invoices:', error);
+      }
+    });
+
+    // Load invoices for the current owner
+    this.ownerService.getMyInvoices(userId).subscribe({
+      next: (backendInvoices) => {
+        const mapped = backendInvoices.map((inv) => this.mapInvoice(inv));
+        this.invoices.set(mapped);
+        this.filteredInvoices.set(mapped);
+      },
+      error: (error) => {
+        console.error('Error loading owner invoices:', error);
+      }
+    });
+  }
 
   filterInvoices() {
     let filtered = this.invoices();
 
     if (this.selectedStatus !== 'all') {
       filtered = filtered.filter(i => i.status === this.selectedStatus);
+    }
+
+    if (this.selectedYear) {
+      filtered = filtered.filter(i => i.date.getFullYear().toString() === this.selectedYear);
     }
 
     this.filteredInvoices.set(filtered);
@@ -315,6 +326,60 @@ export class OwnerInvoicesComponent {
   private modalService = inject(ModalService);
   private fileService = inject(FileDownloadService);
   private toastService = inject(ToastService);
+
+  private getCurrentUserId(): string | null {
+    const token = this.keycloakService.getToken();
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.sub || null;
+      } catch (error) {
+        console.error('Error parsing Keycloak token in OwnerInvoicesComponent:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private mapInvoice(inv: CopropertyInvoice): Invoice {
+    const date = new Date(inv.invoiceDate);
+    const dueDate = new Date(inv.dueDate);
+    const unit = this.unitsById.get(inv.unitId);
+
+    return {
+      id: inv.id,
+      number: inv.invoiceNumber,
+      date,
+      dueDate,
+      amount: inv.totalAmount,
+      status: this.mapStatus(inv.status),
+      period: this.getPeriodLabel(date),
+      unitNumber: unit?.unitNumber ?? '—',
+      copropertyName: unit ? `Copropriété ${unit.copropertyId.substring(0, 8)}` : '—',
+      paymentDate: inv.paidDate ? new Date(inv.paidDate) : undefined
+    };
+  }
+
+  private mapStatus(status: InvoiceStatus): 'paid' | 'pending' | 'overdue' {
+    switch (status) {
+      case InvoiceStatus.PAID:
+        return 'paid';
+      case InvoiceStatus.OVERDUE:
+        return 'overdue';
+      case InvoiceStatus.PARTIALLY_PAID:
+      case InvoiceStatus.PENDING:
+      case InvoiceStatus.CANCELLED:
+      default:
+        return 'pending';
+    }
+  }
+
+  private getPeriodLabel(date: Date): string {
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0-based
+    const quarter = Math.floor(month / 3) + 1;
+    return `T${quarter} ${year}`;
+  }
 
   viewInvoice(id: string): void {
     const invoice = this.invoices().find(inv => inv.id === id);

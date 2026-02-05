@@ -1,0 +1,90 @@
+.charges-list-container {
+  padding: 1.5rem;
+  
+  .page-header {
+    margin-bottom: 2rem;
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #212529;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .stats-card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: transform 0.2s;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+    }
+  }
+
+  .table {
+    margin-bottom: 0;
+
+    thead {
+      background-color: #f8f9fa;
+      
+      th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        border-bottom: 2px solid #dee2e6;
+        padding: 0.75rem;
+      }
+    }
+
+    tbody {
+      tr {
+        transition: background-color 0.15s;
+
+        &:hover {
+          background-color: #f8f9fa;
+        }
+
+        td {
+          vertical-align: middle;
+          padding: 0.75rem;
+        }
+      }
+    }
+
+    .badge {
+      font-weight: 500;
+      padding: 0.35em 0.65em;
+    }
+  }
+
+  .card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+    .card-header {
+      background-color: #fff;
+      border-bottom: 1px solid #e9ecef;
+      padding: 1rem 1.25rem;
+      
+      h5 {
+        color: #212529;
+        font-weight: 600;
+      }
+    }
+  }
+}

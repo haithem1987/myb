@@ -1,11 +1,11 @@
 <div class="charge-management-container">
   <!-- Message for new coproperty -->
-  <div *ngIf="!copropertyId" class="alert alert-info">
+  <div *ngIf="!resolvedCopropertyId()" class="alert alert-info">
     <i class="bi bi-info-circle me-2"></i>
     {{ 'coproperty.charges.saveFirst' | translate }}
   </div>
 
-  <div *ngIf="copropertyId">
+  <div *ngIf="resolvedCopropertyId()">
     <div class="management-header">
       <h2>{{ 'coproperty.charges.title' | translate }}</h2>
       <button class="btn btn-primary" (click)="showAddForm()" [disabled]="showForm()">

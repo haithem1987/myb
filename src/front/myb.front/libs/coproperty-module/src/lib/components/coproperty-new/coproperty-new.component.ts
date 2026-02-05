@@ -37,6 +37,7 @@ export class CopropertyNewComponent implements OnInit {
   isEditMode = signal<boolean>(false);
   copropertyId = signal<string | null>(null);
   saving = signal<boolean>(false);
+  saveSuccess = signal<boolean>(false);
   private currentIsActive = true;
 
   private isValidUUID(str: string): boolean {
@@ -141,12 +142,28 @@ export class CopropertyNewComponent implements OnInit {
     save$.subscribe({
       next: (coproperty) => {
         this.saving.set(false);
+        this.saveSuccess.set(true);
+        
+        // Hide success message after 3 seconds
+        setTimeout(() => this.saveSuccess.set(false), 3000);
+        
         const id = coproperty.id;
         this.copropertyId.set(id);
-        this.router.navigate(['/coproperty', id, 'edit']);
+        
+        const wasInEditMode = this.isEditMode();
+        this.isEditMode.set(true);
+        
+        if (wasInEditMode) {
+          // Already in edit mode - just reload the coproperty data
+          this.loadCoproperty(id);
+        } else {
+          // Was creating new - navigate to edit mode so tabs become available
+          this.router.navigate(['/coproperty/syndic/coproperties', id, 'edit']);
+        }
       },
       error: (error) => {
         this.saving.set(false);
+        this.saveSuccess.set(false);
         console.error('Failed to save coproperty', error);
       }
     });
@@ -159,7 +176,7 @@ export class CopropertyNewComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/coproperty']);
+    this.router.navigate(['/coproperty/syndic/coproperties']);
   }
 
   get formTitle(): string {

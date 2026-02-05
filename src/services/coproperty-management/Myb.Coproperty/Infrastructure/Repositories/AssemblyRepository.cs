@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Myb.Common.Infrastructure.Repositories;
+using Myb.Common.Repositories;
 using Myb.Coproperty.Infrastructure.Data;
 using Myb.Coproperty.Models;
 
@@ -7,8 +7,11 @@ namespace Myb.Coproperty.Infrastructure.Repositories;
 
 public class AssemblyRepository : GenericRepository<Guid, Assembly, CopropertyDbContext>, IAssemblyRepository
 {
-    public AssemblyRepository(CopropertyDbContext context) : base(context)
+    private readonly CopropertyDbContext _context;
+
+    public AssemblyRepository(IDbContextFactory<CopropertyDbContext> contextFactory) : base(contextFactory)
     {
+        _context = contextFactory.CreateDbContext();
     }
 
     public async Task<IEnumerable<Assembly>> GetByCopropertyIdAsync(Guid copropertyId)

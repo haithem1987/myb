@@ -20,11 +20,17 @@
           <span *ngIf="!saving()">{{ 'common.save' | translate }}</span>
           <span *ngIf="saving()">
             <span class="spinner-border spinner-border-sm me-2"></span>
-            {{ 'SAVING' | translate }}
+            {{ 'validation.SAVING' | translate }}
           </span>
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- Success Alert -->
+  <div *ngIf="saveSuccess()" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle me-2"></i>
+    <strong>Success!</strong> {{ (isEditMode() ? 'coproperty.messages.updated' : 'coproperty.messages.created') | translate }}
   </div>
 
   <!-- Tabs Navigation -->
@@ -40,7 +46,7 @@
         {{ 'coproperty.form.basicInfo' | translate }}
       </button>
     </li>
-    <li class="nav-item" role="presentation">
+    <li *ngIf="isEditMode()" class="nav-item" role="presentation">
       <button 
         class="nav-link" 
         [class.active]="activeTab() === 'units'"
@@ -48,10 +54,10 @@
         type="button"
       >
         <i class="bi bi-building me-2"></i>
-        {{ 'UNITS' | translate }}
+        {{ 'coproperty.units.title' | translate }}
       </button>
     </li>
-    <li class="nav-item" role="presentation">
+    <li *ngIf="isEditMode()" class="nav-item" role="presentation">
       <button 
         class="nav-link" 
         [class.active]="activeTab() === 'charges'"
@@ -62,7 +68,7 @@
         {{ 'coproperty.charges.title' | translate }}
       </button>
     </li>
-    <li class="nav-item" role="presentation">
+    <li *ngIf="isEditMode()" class="nav-item" role="presentation">
       <button 
         class="nav-link" 
         [class.active]="activeTab() === 'maintenance'"
@@ -74,6 +80,12 @@
       </button>
     </li>
   </ul>
+
+  <!-- Info message for create mode -->
+  <div *ngIf="!isEditMode()" class="alert alert-info mt-3">
+    <i class="bi bi-info-circle me-2"></i>
+    {{ 'coproperty.form.saveFirstMessage' | translate }}
+  </div>
 
   <!-- Tab Content -->
   <div class="tab-content">
@@ -96,7 +108,7 @@
                   [class.is-invalid]="copropertyForm.get('name')?.invalid && copropertyForm.get('name')?.touched"
                 >
                 <div class="invalid-feedback" *ngIf="copropertyForm.get('name')?.invalid && copropertyForm.get('name')?.touched">
-                  {{ 'NAME_REQUIRED' | translate }}
+                  {{ 'validation.required' | translate }}
                 </div>
               </div>
             </div>
@@ -123,7 +135,7 @@
                   [class.is-invalid]="copropertyForm.get('address')?.invalid && copropertyForm.get('address')?.touched"
                 >
                 <div class="invalid-feedback" *ngIf="copropertyForm.get('address')?.invalid && copropertyForm.get('address')?.touched">
-                  {{ 'coproperty.form.addressLabel' | translate }} {{ 'NAME_REQUIRED' | translate }}
+                  {{ 'validation.required' | translate }}
                 </div>
               </div>
             </div>

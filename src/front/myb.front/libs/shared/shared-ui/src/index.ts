@@ -34,6 +34,8 @@ export * from '../../infra/services/timesheet-utils';
 
 export * from './lib/components/toasts-container/toasts-container.component';
 
+export * from './lib/components/modal-container/modal-container.component';
+
 export * from './lib/components/progress-bar/progress-bar.component';
 
 export * from './lib/components/loader/loader.component';

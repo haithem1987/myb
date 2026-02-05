@@ -169,6 +169,9 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<Guid>("ManagerId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ManagerName")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)

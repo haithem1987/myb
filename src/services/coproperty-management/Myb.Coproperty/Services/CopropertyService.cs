@@ -14,11 +14,19 @@ namespace Myb.Coproperty.Services
 
         public async Task<Models.Coproperty> CreateAsync(Models.Coproperty coproperty)
         {
+            if (coproperty == null)
+                throw new ArgumentNullException(nameof(coproperty), "Coproperty cannot be null");
+            
+            // Reset timestamps to null so the database defaults apply
+            coproperty.CreatedAt = null;
+            coproperty.UpdatedAt = null;
+            
             var result = await _copropertyRepository.InsertAsync(coproperty);
             
             if (result.Errors != null && result.Errors.Any())
             {
-                throw new InvalidOperationException($"Failed to create coproperty: {string.Join(", ", result.Errors)}");
+                var errorMessage = string.Join(", ", result.Errors);
+                throw new InvalidOperationException($"Failed to create coproperty: {errorMessage}");
             }
             
             if (result.Entity == null)

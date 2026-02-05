@@ -115,13 +115,13 @@ import { MaintenanceRequestsComponent } from './maintenance-requests/maintenance
           </ul>
           <div class="tab-content mt-3">
             <div id="units" class="tab-pane fade show active">
-              <myb-unit-management></myb-unit-management>
+              <myb-unit-management [copropertyId]="coproperty?.id || null"></myb-unit-management>
             </div>
             <div id="charges" class="tab-pane fade">
-              <myb-charge-management></myb-charge-management>
+              <myb-charge-management [copropertyId]="coproperty?.id || null"></myb-charge-management>
             </div>
             <div id="maintenance" class="tab-pane fade">
-              <myb-maintenance-requests></myb-maintenance-requests>
+              <myb-maintenance-requests [copropertyId]="coproperty?.id || null"></myb-maintenance-requests>
             </div>
           </div>
         </div>
@@ -158,11 +158,11 @@ export class CopropertyDetailComponent implements OnInit {
 
   edit(): void {
     if (this.coproperty) {
-      this.router.navigate(['/coproperty', this.coproperty.id, 'edit']);
+      this.router.navigate(['/coproperty/syndic/coproperties', this.coproperty.id, 'edit']);
     }
   }
 
   goBack(): void {
-    this.router.navigate(['/coproperty']);
+    this.router.navigate(['/coproperty/syndic/coproperties']);
   }
 }

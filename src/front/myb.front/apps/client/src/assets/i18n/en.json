@@ -247,6 +247,8 @@
       "totalSharesLabel": "Total Shares *",
       "managerLabel": "Manager Name",
       "managerPlaceholder": "Property manager name",
+      "commonAreasLabel": "Common Areas",
+      "commonAreasPlaceholder": "Garden, parking, elevator...",
       "validationError": "Please fill in all required fields correctly"
     },
     "charges": {
@@ -514,5 +516,15 @@
     "error": "Error",
     "warning": "Warning",
     "info": "Information"
+  },
+  "validation": {
+    "NAME_REQUIRED": "is required",
+    "SAVING": "Saving...",
+    "UNITS": "Units",
+    "required": "This field is required",
+    "minLength": "Minimum length not reached",
+    "min": "Minimum value must be",
+    "email": "Invalid email",
+    "pattern": "Invalid format"
   }
 }

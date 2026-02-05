@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileDownloadService, ToastService } from '@myb-front/shared-ui';
@@ -353,12 +353,15 @@ export class OwnerDocumentsComponent {
 
   filteredDocuments = signal<Document[]>(this.documents());
 
-  stats = signal({
-    regulation: 1,
-    agMinutes: 2,
-    contracts: 1,
-    financial: 1,
-    total: 6
+  stats = computed(() => {
+    const docs = this.documents();
+    const regulation = docs.filter(d => d.type === 'regulation').length;
+    const agMinutes = docs.filter(d => d.type === 'ag-minutes').length;
+    const contracts = docs.filter(d => d.type === 'contract').length;
+    const financial = docs.filter(d => d.type === 'financial').length;
+    const total = docs.length;
+
+    return { regulation, agMinutes, contracts, financial, total };
   });
 
   filterDocuments() {

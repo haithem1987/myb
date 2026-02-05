@@ -1,0 +1,37 @@
+<!-- Modal Container -->
+<ng-container *ngFor="let modal of modalService.getModals()()">
+  <div class="modal-backdrop show" *ngIf="modal.isOpen"></div>
+  <div class="modal show" *ngIf="modal.isOpen" tabindex="-1" role="dialog">
+    <div class="modal-dialog" [ngClass]="{
+      'modal-sm': modal.config.size === 'sm',
+      'modal-lg': modal.config.size === 'lg',
+      'modal-xl': modal.config.size === 'xl'
+    }" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modal.config.title }}</h5>
+          <button type="button" class="btn-close" (click)="handleCancel(modal)" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" *ngIf="modal.config.message">
+          <div [innerHTML]="modal.config.message"></div>
+        </div>
+        <div class="modal-footer">
+          <button 
+            *ngIf="modal.config.showCancelButton" 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="handleCancel(modal)">
+            {{ modal.config.cancelButtonText }}
+          </button>
+          <button 
+            type="button" 
+            class="btn"
+            [ngClass]="modal.config.confirmButtonClass"
+            (click)="handleConfirm(modal)">
+            {{ modal.config.confirmButtonText }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

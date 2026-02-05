@@ -1,0 +1,230 @@
+<div class="units-list-container">
+  <div class="page-header">
+    <h1>
+      <i class="bi bi-building me-2"></i>
+      Gestion des Lots
+    </h1>
+    <p class="text-muted">Gérez tous les lots de vos copropriétés</p>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Coproperty Filter -->
+        <div class="col-md-4">
+          <label for="copropertyFilter" class="form-label">
+            <i class="bi bi-building me-1"></i>
+            Copropriété
+          </label>
+          <select 
+            id="copropertyFilter" 
+            class="form-select"
+            [value]="selectedCopropertyId() || 'all'"
+            (change)="onCopropertyFilterChange($event)">
+            <option value="all">Toutes les copropriétés</option>
+            <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
+              {{ coproperty.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Type Filter -->
+        <div class="col-md-3">
+          <label for="typeFilter" class="form-label">
+            <i class="bi bi-tag me-1"></i>
+            Type de lot
+          </label>
+          <select 
+            id="typeFilter" 
+            class="form-select"
+            [value]="filterType()"
+            (change)="onTypeFilterChange($event)">
+            <option value="">Tous les types</option>
+            <option *ngFor="let type of unitTypes" [value]="type">
+              {{ getUnitTypeLabel(type) }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Occupancy Filter -->
+        <div class="col-md-3">
+          <label for="occupancyFilter" class="form-label">
+            <i class="bi bi-people me-1"></i>
+            Occupation
+          </label>
+          <select 
+            id="occupancyFilter" 
+            class="form-select"
+            [value]="filterOccupancy()"
+            (change)="onOccupancyFilterChange($event)">
+            <option value="">Tous</option>
+            <option value="occupied">Occupé</option>
+            <option value="vacant">Vacant</option>
+          </select>
+        </div>
+
+        <!-- Search -->
+        <div class="col-md-2">
+          <label for="searchInput" class="form-label">
+            <i class="bi bi-search me-1"></i>
+            Recherche
+          </label>
+          <input 
+            type="text" 
+            id="searchInput"
+            class="form-control"
+            placeholder="Rechercher..."
+            [value]="searchTerm()"
+            (input)="onSearchInput($event)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-primary">
+              <i class="bi bi-building"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Total Lots</h6>
+              <h3 class="mb-0">{{ filteredUnits.length }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-success">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Lots Occupés</h6>
+              <h3 class="mb-0">{{ getOccupiedUnitsCount() }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-warning">
+              <i class="bi bi-x-circle"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Lots Vacants</h6>
+              <h3 class="mb-0">{{ getVacantUnitsCount() }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-info">
+              <i class="bi bi-pie-chart"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Total Tantièmes</h6>
+              <h3 class="mb-0">{{ getTotalShares() }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Units Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-list-ul me-2"></i>
+        Liste des Lots ({{ filteredUnits.length }})
+      </h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading() && filteredUnits.length === 0" class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <p class="text-muted mt-3">Aucun lot trouvé</p>
+        <p class="text-muted">Les lots seront affichés ici une fois créés dans les copropriétés</p>
+      </div>
+
+      <div *ngIf="!loading() && filteredUnits.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Copropriété</th>
+              <th>Numéro</th>
+              <th>Type</th>
+              <th>Étage</th>
+              <th>Superficie</th>
+              <th>Tantièmes</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let unit of filteredUnits">
+              <td>
+                <strong>{{ getCopropertyName(unit) }}</strong>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ unit.unitNumber }}</div>
+                <small class="text-muted" *ngIf="unit.description">
+                  {{ unit.description }}
+                </small>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getUnitTypeBadgeClass(unit.unitType || 'OTHER')">
+                  {{ getUnitTypeLabel(unit.unitType || 'OTHER') }}
+                </span>
+              </td>
+              <td>
+                <span *ngIf="unit.floor !== undefined && unit.floor !== null">{{ unit.floor }}</span>
+                <span *ngIf="unit.floor === undefined || unit.floor === null" class="text-muted">-</span>
+              </td>
+              <td>
+                <strong>{{ formatArea(unit.area) }} m²</strong>
+              </td>
+              <td>
+                <strong>{{ unit.shares }}</strong>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getOccupancyBadgeClass(unit.isOccupied)">
+                  {{ getOccupancyLabel(unit.isOccupied) }}
+                </span>
+              </td>
+              <td>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="viewUnit(unit)"
+                  title="Voir les détails">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

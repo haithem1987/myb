@@ -17,8 +17,8 @@ public class Assembly : IEntity<Guid>
     public AssemblyType AssemblyType { get; set; } = AssemblyType.Ordinary;
     public AssemblyStatus Status { get; set; } = AssemblyStatus.Scheduled;
     public bool IsActive { get; set; } = true;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     
     // Navigation Properties
     public Coproperty Coproperty { get; set; } = null!;
@@ -51,7 +51,8 @@ public class AssemblyAttendance : IEntity<Guid>
     public bool HasProxy { get; set; }
     public string? ProxyHolderName { get; set; }
     public DateTime? CheckInTime { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
     
     // Navigation Properties
     public Assembly Assembly { get; set; } = null!;

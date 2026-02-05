@@ -1,0 +1,201 @@
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { CopropertyService } from '../services/coproperty.service';
+import { Coproperty } from '../models/coproperty.models';
+import { ToastService, ModalService } from '@myb-front/shared-ui';
+
+@Component({
+  selector: 'myb-coproperty-list',
+  standalone: true,
+  imports: [CommonModule, TranslateModule],
+  template: \`
+    <div class="container-fluid mt-4">
+      <div class="row mb-4">
+        <div class="col-md-8">
+          <h1>{{ 'coproperty.list.title' | translate }}</h1>
+        </div>
+        <div class="col-md-4 text-end">
+          <button class="btn btn-primary" (click)="addCoproperty()">
+            <i class="fas fa-plus"></i>
+            {{ 'coproperty.list.addCoproperty' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="coproperties$ | async as copropertiesList" class="row">
+        <div
+          *ngFor="let coproperty of copropertiesList"
+          class="col-md-6 col-lg-4 mb-4"
+        >
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ coproperty.name }}</h5>
+              <p class="card-text text-muted">
+                <i class="fas fa-map-marker-alt"></i> {{ coproperty.address }}
+              </p>
+              <div class="row mt-3">
+                <div class="col-6">
+                  <p class="card-text mb-2">
+                    <strong>{{ 'coproperty.list.totalUnits' | translate }}:</strong><br/>
+                    <span class="badge bg-primary">{{ coproperty.totalUnits }}</span>
+                  </p>
+                </div>
+                <div class="col-6">
+                  <p class="card-text mb-2">
+                    <strong>{{ 'coproperty.list.totalShares' | translate }}:</strong><br/>
+                    <span class="badge bg-info">{{ coproperty.totalShares }}</span>
+                  </p>
+                </div>
+              </div>
+              <div class="d-flex flex-wrap gap-2 mt-3">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary flex-grow-1"
+                  (click)="viewDetails(coproperty.id)"
+                  title="{{ 'coproperty.list.view' | translate }}"
+                >
+                  <i class="fas fa-eye"></i>
+                  {{ 'coproperty.list.view' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-warning flex-grow-1"
+                  (click)="editCoproperty(coproperty.id)"
+                  title="{{ 'coproperty.list.edit' | translate }}"
+                >
+                  <i class="fas fa-edit"></i>
+                  {{ 'coproperty.list.edit' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-info"
+                  (click)="manageTravaux(coproperty.id)"
+                  title="Gérer les travaux"
+                >
+                  <i class="fas fa-wrench"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success"
+                  (click)="createInvoice(coproperty.id)"
+                  title="Créer facture"
+                >
+  
+  private toastService = inject(ToastService);
+  private modalService = inject(ModalService);
+
+  constructor(
+    private copropertyService: CopropertyService,
+    private router: Router
+  ) {
+    this.coproperties$ = this.copropertyService.getCoproperties();
+  }
+
+  viewDetails(id: string): void {
+    this.router.navigate(['/coproperty/syndic/coproperties', id]);
+  }
+
+  editCoproperty(id: string): void {
+    this.router.navigate(['/coproperty/syndic/coproperties', id, 'edit']);
+  }
+
+  addCoproperty(): void {
+    this.router.navigate(['/coproperty/syndic/coproperties/new']);
+  }
+
+  manageTravaux(id: string): void {
+    this.router.navigate(['/coproperty/syndic/coproperties', id], {
+      queryParams: { tab: 'maintenance' }
+    });
+    this.toastService.show(
+      'Accès à la gestion des travaux',
+      { classname: 'toast-info' }
+    );
+  }
+
+  createInvoice(id: string): void {
+    this.router.navigate(['/coproperty/syndic/invoices/new'], {
+      queryParams: { copropertyId: id }
+    });
+    this.toastService.show(
+      'Création de facture pour cette copropriété',
+      { classname: 'toast-info' }
+    );
+  }
+
+  distributeCharges(id: string): void {
+    this.router.navigate(['/coproperty/syndic/distribution'], {
+      queryParams: { copropertyId: id }
+    });
+    this.toastService.show(
+      'Calcul de la distribution des charges',
+      { classname: 'toast-info' }
+    );
+  }
+
+  async deleteCoproperty(id: string, name: string): Promise<void> {
+    const confirmed = await this.modalService.confirm({
+      title: 'Supprimer la copropriété',
+      message: `Êtes-vous sûr de vouloir supprimer la copropriété "${name}" ?<br/><br/>
+                <strong class="text-danger">Cette action est irréversible.</strong><br/>
+                Toutes les données associées (lots, charges, propriétaires) seront supprimées.`,
+      confirmButtonText: 'Supprimer',
+      confirmButtonClass: 'btn-danger',
+      cancelButtonText: 'Annuler'
+    });
+
+    if (confirmed) {
+      try {
+        // await this.copropertyService.deleteCoproperty(id);
+        this.toastService.show(
+          `La copropriété "${name}" a été supprimée avec succès`,
+          { classname: 'toast-success' }
+        );
+        // Refresh the list
+        this.coproperties$ = this.copropertyService.getCoproperties();
+      } catch (error) {
+        this.toastService.show(
+          'Erreur lors de la suppression de la copropriété',
+          { classname: 'toast-danger' }
+        );
+      }
+    }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!(coproperties$ | async)" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{ 'coproperty.list.loading' | translate }}</span>
+        </div>
+      </div>
+    </div>
+  `,
+})
+export class CopropertyListComponent {
+  coproperties$: Observable<Coproperty[]>;
+
+  constructor(
+    private copropertyService: CopropertyService,
+    private router: Router
+  ) {
+    this.coproperties$ = this.copropertyService.getCoproperties();
+  }
+
+  viewDetails(id: string): void {
+    this.router.navigate(['/coproperty/syndic/coproperties', id]);
+  }
+
+  editCoproperty(id: string): void {
+    this.router.navigate(['/coproperty/syndic/coproperties', id, 'edit']);
+  }
+
+  addCoproperty(): void {
+    this.router.navigate(['/coproperty/syndic/coproperties/new']);
+  }
+}

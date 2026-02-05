@@ -2,11 +2,12 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
+import { ToastsContainerComponent, ModalContainerComponent } from '@myb-front/shared-ui';
 
 @Component({
   selector: 'app-syndic-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent],
   templateUrl: './syndic-layout.component.html',
   styleUrls: ['./syndic-layout.component.scss']
 })

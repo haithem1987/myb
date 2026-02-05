@@ -405,9 +405,9 @@ export class OwnerMyUnitsComponent {
         <div style="text-align: left; padding: 10px;">
           <h5>${unit.type === 'apartment' ? 'Appartement' : unit.type === 'parking' ? 'Parking' : 'Cave'} ${unit.number}</h5>
           <p><strong>Charges trimestrielles:</strong> ${unit.quarterlyCharges.toFixed(2)}€</p>
-          <p><strong>Charges annuelles:</strong> ${(unit.quarterlyCharges * 4).toFixed(2)}€</p>
+          <p><strong>Charges annuelles:</strong> ${unit.annualCharges.toFixed(2)}€</p>
           <p><strong>Tantièmes:</strong> ${unit.tantiemes}</p>
-          <p><strong>Pourcentage:</strong> ${((unit.tantiemes / 10000) * 100).toFixed(2)}%</p>
+          <p><strong>Pourcentage:</strong> ${this.getTantiemesPercent(unit)}%</p>
           <hr/>
           <p><strong>Décomposition:</strong></p>
           <ul>

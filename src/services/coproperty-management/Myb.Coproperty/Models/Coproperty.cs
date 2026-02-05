@@ -18,8 +18,8 @@ public class Coproperty : IEntity<Guid>
     public int TotalShares { get; set; }
     public string? CommonAreas { get; set; }
     public string? ManagerName { get; set; }
-    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
     public bool IsActive { get; set; } = true;
     
     // Optional Foreign Key (if manager is tracked in system)

@@ -1,8 +1,10 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FileDownloadService, ToastService } from '@myb-front/shared-ui';
+import { AssemblyService, OwnerService, Assembly as BackendAssembly, Unit } from '@myb-front/coproperty-module';
+import { KeycloakService } from '@myb-front/auth';
 
-interface Assembly {
+interface OwnerAssembly {
   id: string;
   title: string;
   type: 'ordinary' | 'extraordinary';
@@ -383,70 +385,20 @@ interface Assembly {
     }
   `]
 })
-export class OwnerGeneralAssemblyComponent {
-  assemblies = signal<Assembly[]>([
-    {
-      id: '1',
-      title: 'Assemblée Générale Ordinaire 2026',
-      type: 'ordinary',
-      date: new Date('2026-06-15T18:30:00'),
-      status: 'upcoming',
-      location: 'Salle polyvalente - Rez-de-chaussée',
-      resolutions: 12,
-      documentsAvailable: true,
-      minutesAvailable: false,
-      copropertyName: 'Résidence Les Jardins du Parc'
-    },
-    {
-      id: '2',
-      title: 'AG Extraordinaire - Ravalement Façade',
-      type: 'extraordinary',
-      date: new Date('2026-03-20T19:00:00'),
-      status: 'upcoming',
-      location: 'Salle polyvalente',
-      resolutions: 3,
-      documentsAvailable: true,
-      minutesAvailable: false,
-      copropertyName: 'Résidence Les Jardins du Parc'
-    },
-    {
-      id: '3',
-      title: 'Assemblée Générale Ordinaire 2025',
-      type: 'ordinary',
-      date: new Date('2025-06-10T18:30:00'),
-      status: 'past',
-      location: 'Salle polyvalente',
-      resolutions: 15,
-      documentsAvailable: true,
-      minutesAvailable: true,
-      copropertyName: 'Résidence Les Jardins du Parc'
-    },
-    {
-      id: '4',
-      title: 'Assemblée Générale Ordinaire 2024',
-      type: 'ordinary',
-      date: new Date('2024-06-12T18:30:00'),
-      status: 'past',
-      location: 'Salle polyvalente',
-      resolutions: 14,
-      documentsAvailable: true,
-      minutesAvailable: true,
-      copropertyName: 'Résidence Les Jardins du Parc'
-    }
-  ]);
+export class OwnerGeneralAssemblyComponent implements OnInit {
+  assemblies = signal<OwnerAssembly[]>([]);
 
-  upcomingAssemblies = signal<Assembly[]>(
-    this.assemblies().filter(a => a.status === 'upcoming')
-  );
+  upcomingAssemblies = signal<OwnerAssembly[]>([]);
 
-  pastAssemblies = signal<Assembly[]>(
-    this.assemblies().filter(a => a.status === 'past')
-  );
+  pastAssemblies = signal<OwnerAssembly[]>([]);
 
-  stats = signal({
-    upcoming: 2,
-    past: 2,
-    documentsAvailable: 4
+  stats = computed(() => {
+    const assemblies = this.assemblies();
+    const upcoming = assemblies.filter(a => a.status === 'upcoming').length;
+    const past = assemblies.filter(a => a.status === 'past').length;
+    const documentsAvailable = assemblies.filter(a => a.documentsAvailable).length;
+
+    return { upcoming, past, documentsAvailable };
   });
 
   getDaysUntil(date: Date): number {
@@ -455,6 +407,109 @@ export class OwnerGeneralAssemblyComponent {
 
   private fileService = inject(FileDownloadService);
   private toastService = inject(ToastService);
+  private assemblyService = inject(AssemblyService);
+  private ownerService = inject(OwnerService);
+  private keycloakService = inject(KeycloakService);
+  private unitsById = new Map<string, Unit>();
+
+  ngOnInit(): void {
+    this.loadAssembliesForCurrentOwner();
+  }
+
+  private loadAssembliesForCurrentOwner(): void {
+    const userId = this.getCurrentUserId();
+
+    if (!userId) {
+      console.error('OwnerGeneralAssemblyComponent: user ID not available');
+      return;
+    }
+
+    this.ownerService.getMyUnits(userId).subscribe({
+      next: (units) => {
+        if (!units || units.length === 0) {
+          this.assemblies.set([]);
+          this.upcomingAssemblies.set([]);
+          this.pastAssemblies.set([]);
+          return;
+        }
+
+        units.forEach((unit) => this.unitsById.set(unit.id, unit));
+
+        const copropertyIds = Array.from(new Set(units.map(u => u.copropertyId)));
+
+        const observables = copropertyIds.map(id => this.assemblyService.getAssemblies(id));
+
+        // Combine all assemblies across the owner's coproperties
+        Promise.all(observables.map(o => o.toPromise())).then(results => {
+          const allBackendAssemblies: BackendAssembly[] = [];
+          for (const list of results) {
+            if (list && Array.isArray(list)) {
+              allBackendAssemblies.push(...(list as BackendAssembly[]));
+            }
+          }
+
+          const uiAssemblies = allBackendAssemblies.map(a => this.mapAssembly(a));
+
+          this.assemblies.set(uiAssemblies);
+          const now = new Date();
+          this.upcomingAssemblies.set(uiAssemblies.filter(a => a.date > now));
+          this.pastAssemblies.set(uiAssemblies.filter(a => a.date <= now));
+        }).catch(error => {
+          console.error('Error loading assemblies for owner:', error);
+        });
+      },
+      error: (error) => {
+        console.error('Error loading owner units for assemblies:', error);
+      }
+    });
+  }
+
+  private getCurrentUserId(): string | null {
+    const token = this.keycloakService.getToken();
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.sub || null;
+      } catch (error) {
+        console.error('Error parsing Keycloak token in OwnerGeneralAssemblyComponent:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private mapAssembly(assembly: BackendAssembly): OwnerAssembly {
+    const date = new Date(assembly.meetingDate);
+    const now = new Date();
+
+    const status: 'upcoming' | 'past' = date > now ? 'upcoming' : 'past';
+    const type: 'ordinary' | 'extraordinary' = assembly.assemblyType === 'Ordinary' ? 'ordinary' : 'extraordinary';
+
+    const unitExample = this.findAnyUnitForCoproperty(assembly.copropertyId);
+    const copropertyName = unitExample ? `Copropriété ${unitExample.copropertyId.substring(0, 8)}` : 'Copropriété';
+
+    return {
+      id: assembly.id,
+      title: assembly.title,
+      type,
+      date,
+      status,
+      location: assembly.location || 'Lieu à définir',
+      resolutions: 0,
+      documentsAvailable: !!assembly.minutes,
+      minutesAvailable: !!assembly.minutes,
+      copropertyName
+    };
+  }
+
+  private findAnyUnitForCoproperty(copropertyId: string): Unit | undefined {
+    for (const unit of this.unitsById.values()) {
+      if (unit.copropertyId === copropertyId) {
+        return unit;
+      }
+    }
+    return undefined;
+  }
 
   viewDocuments(id: string): void {
     const assembly = this.assemblies().find(a => a.id === id);

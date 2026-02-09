@@ -54,12 +54,11 @@ export class ChargeDistributionComponent implements OnInit {
 
   constructor(private fb: FormBuilder) {
     this.chargeForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
       chargeType: ['General', Validators.required],
-      totalAmount: [0, [Validators.required, Validators.min(0.01)]],
+      totalAmount: ['', [Validators.required, Validators.min(0.01)]],
       frequency: ['Monthly', Validators.required],
-      coproperty: ['', Validators.required],
     });
   }
 
@@ -205,7 +204,11 @@ export class ChargeDistributionComponent implements OnInit {
   }
 
   reset(): void {
-    this.chargeForm.reset({ chargeType: 'General', frequency: 'Monthly' });
+    this.chargeForm.reset({ 
+      chargeType: 'General', 
+      frequency: 'Monthly',
+      totalAmount: ''
+    });
     this.distributionPreview = [];
     this.showPreview = false;
   }

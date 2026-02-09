@@ -191,6 +191,7 @@
       "floor": "Floor",
       "area": "Area",
       "shares": "Shares (Tantièmes)",
+      "percentage": "Percentage",
       "type": "Type",
       "occupancyStatus": "Occupancy Status",
       "status": "Status",

@@ -76,6 +76,10 @@ builder.Services
     .AddType<Myb.Coproperty.GraphQL.Types.MonthlyBalanceType>()
     .AddType<Myb.Coproperty.GraphQL.Types.InvoiceType>()
     .AddType<Myb.Coproperty.GraphQL.Types.PaymentType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.AssemblyType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.AssemblyTypeEnumType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.AssemblyStatusEnumType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.AssemblyAttendanceType>()
     .AddProjections()
     .AddFiltering()
     .AddSorting();

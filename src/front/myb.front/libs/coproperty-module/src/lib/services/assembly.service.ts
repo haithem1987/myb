@@ -16,7 +16,8 @@ export class AssemblyService {
     return this.apollo.query<{ assemblies: Assembly[] }>({
       query: GET_ASSEMBLIES,
       variables: { copropertyId },
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
+      context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data.assemblies)
     );
@@ -26,7 +27,8 @@ export class AssemblyService {
     return this.apollo.query<{ assemblies: Assembly[] }>({
       query: GET_UPCOMING_ASSEMBLIES,
       variables: { copropertyId },
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
+      context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data.assemblies)
     );
@@ -36,7 +38,8 @@ export class AssemblyService {
     return this.apollo.query<{ assembly: Assembly }>({
       query: GET_ASSEMBLY_BY_ID,
       variables: { id },
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
+      context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data.assembly)
     );
@@ -45,7 +48,8 @@ export class AssemblyService {
   createAssembly(input: CreateAssemblyInput): Observable<Assembly> {
     return this.apollo.mutate<{ createAssembly: Assembly }>({
       mutation: CREATE_ASSEMBLY,
-      variables: { assembly: input }
+      variables: { input },
+      context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data!.createAssembly)
     );
@@ -54,7 +58,8 @@ export class AssemblyService {
   updateAssembly(id: string, input: Partial<Assembly>): Observable<Assembly> {
     return this.apollo.mutate<{ updateAssembly: Assembly }>({
       mutation: UPDATE_ASSEMBLY,
-      variables: { id, assembly: input }
+      variables: { id, input },
+      context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data!.updateAssembly)
     );
@@ -63,7 +68,8 @@ export class AssemblyService {
   updateAssemblyStatus(id: string, status: AssemblyStatus): Observable<Assembly> {
     return this.apollo.mutate<{ updateAssemblyStatus: Assembly }>({
       mutation: UPDATE_ASSEMBLY_STATUS,
-      variables: { id, status }
+      variables: { id, status },
+      context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data!.updateAssemblyStatus)
     );
@@ -72,7 +78,8 @@ export class AssemblyService {
   deleteAssembly(id: string): Observable<boolean> {
     return this.apollo.mutate<{ deleteAssembly: boolean }>({
       mutation: DELETE_ASSEMBLY,
-      variables: { id }
+      variables: { id },
+      context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data!.deleteAssembly)
     );

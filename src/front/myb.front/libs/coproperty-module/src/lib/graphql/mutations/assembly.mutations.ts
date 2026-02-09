@@ -1,8 +1,8 @@
 import { gql } from 'apollo-angular';
 
 export const CREATE_ASSEMBLY = gql`
-  mutation CreateAssembly($assembly: AssemblyInput!) {
-    createAssembly(assembly: $assembly) {
+  mutation CreateAssembly($input: CreateAssemblyInput!) {
+    createAssembly(input: $input) {
       id
       copropertyId
       title
@@ -17,8 +17,8 @@ export const CREATE_ASSEMBLY = gql`
 `;
 
 export const UPDATE_ASSEMBLY = gql`
-  mutation UpdateAssembly($id: UUID!, $assembly: AssemblyInput!) {
-    updateAssembly(id: $id, assembly: $assembly) {
+  mutation UpdateAssembly($id: UUID!, $input: UpdateAssemblyInput!) {
+    updateAssembly(id: $id, input: $input) {
       id
       copropertyId
       title

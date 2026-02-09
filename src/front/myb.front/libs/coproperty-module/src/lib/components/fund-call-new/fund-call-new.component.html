@@ -1,0 +1,137 @@
+<div class="fund-call-new-container">
+  <div class="page-header">
+    <button 
+      type="button" 
+      class="btn btn-link text-decoration-none mb-3"
+      (click)="goBack()">
+      <i class="bi bi-arrow-left me-1"></i>
+      Retour
+    </button>
+    <h1>
+      <i class="bi bi-piggy-bank me-2"></i>
+      {{ isEditMode() ? 'Éditer l\'appel de fonds' : 'Créer un appel de fonds' }}
+    </h1>
+  </div>
+
+  <!-- Success Alert -->
+  <div *ngIf="saveSuccess()" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle me-2"></i>
+    {{ isEditMode() ? 'Appel de fonds modifié' : 'Appel de fonds créé' }} avec succès
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="card">
+    <div class="card-body text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="fundCallForm" (ngSubmit)="saveFundCall()" *ngIf="!loading()">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Informations de l'appel de fonds</h5>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="copropertyId" class="form-label">
+              <i class="bi bi-building me-1"></i>
+              Copropriété <span class="text-danger">*</span>
+            </label>
+            <select 
+              id="copropertyId" 
+              class="form-select" 
+              formControlName="copropertyId"
+              [class.is-invalid]="fundCallForm.get('copropertyId')?.invalid && fundCallForm.get('copropertyId')?.touched">
+              <option value="">Sélectionner une copropriété</option>
+              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
+                {{ coproperty.name }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="fundCallForm.get('copropertyId')?.invalid && fundCallForm.get('copropertyId')?.touched">
+              Veuillez sélectionner une copropriété
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="amount" class="form-label">
+              <i class="bi bi-cash-stack me-1"></i>
+              Montant (€) <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="amount" 
+              class="form-control" 
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              formControlName="amount"
+              [class.is-invalid]="fundCallForm.get('amount')?.invalid && fundCallForm.get('amount')?.touched">
+            <div class="invalid-feedback" *ngIf="fundCallForm.get('amount')?.invalid && fundCallForm.get('amount')?.touched">
+              Veuillez entrer un montant valide
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="dueDate" class="form-label">
+              <i class="bi bi-calendar-event me-1"></i>
+              Date limite <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="date" 
+              id="dueDate" 
+              class="form-control" 
+              formControlName="dueDate"
+              [class.is-invalid]="fundCallForm.get('dueDate')?.invalid && fundCallForm.get('dueDate')?.touched">
+            <div class="invalid-feedback" *ngIf="fundCallForm.get('dueDate')?.invalid && fundCallForm.get('dueDate')?.touched">
+              Veuillez sélectionner une date
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="description" class="form-label">
+              <i class="bi bi-pencil-square me-1"></i>
+              Description
+            </label>
+            <input 
+              type="text" 
+              id="description" 
+              class="form-control" 
+              placeholder="Ex: Charges T1 2026"
+              formControlName="description">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-4 d-flex gap-2">
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="saving() || fundCallForm.invalid">
+        <span *ngIf="!saving()">
+          <i class="bi bi-check-circle me-1"></i>
+          {{ isEditMode() ? 'Mettre à jour' : 'Créer' }}
+        </span>
+        <span *ngIf="saving()">
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Sauvegarde en cours...
+        </span>
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="goBack()"
+        [disabled]="saving()">
+        <i class="bi bi-x-circle me-1"></i>
+        Annuler
+      </button>
+    </div>
+  </form>
+</div>

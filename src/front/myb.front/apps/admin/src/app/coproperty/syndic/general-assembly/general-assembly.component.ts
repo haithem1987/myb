@@ -1,8 +1,10 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
+import { AssemblyService, CopropertyService } from '@myb-front/coproperty-module';
+import { Assembly, AssemblyType, AssemblyStatus, CreateAssemblyInput, Coproperty } from '@myb-front/coproperty-module';
 
 interface GeneralAssembly {
   id: string;
@@ -23,7 +25,7 @@ interface GeneralAssembly {
 @Component({
   selector: 'app-general-assembly',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
@@ -36,10 +38,197 @@ interface GeneralAssembly {
           <p class="text-muted">Gestion des AG et convocations</p>
         </div>
         <div class="col-md-4 text-end">
-          <button class="btn btn-primary" (click)="createAssembly()">
+          <button 
+            class="btn btn-primary" 
+            (click)="createAssembly()"
+            [disabled]="!copropertyId">
             <i class="bi bi-plus-lg me-2"></i>
             Nouvelle AG
           </button>
+          <small class="d-block text-danger mt-1" *ngIf="!copropertyId">
+            Veuillez sélectionner une copropriété
+          </small>
+        </div>
+      </div>
+
+      <!-- Coproperty Selector -->
+      <div class="row mb-4" *ngIf="!copropertyId || availableCoproperties().length > 1">
+        <div class="col-12">
+          <div class="alert alert-info">
+            <i class="bi bi-building me-2"></i>
+            <strong>Sélectionnez une copropriété :</strong>
+            <select 
+              class="form-select form-select-sm d-inline-block w-auto ms-3"
+              [(ngModel)]="selectedCopropertyId"
+              (change)="onCopropertyChange()">
+              <option value="">-- Sélectionner --</option>
+              <option *ngFor="let copro of availableCoproperties()" [value]="copro.id">
+                {{ copro.name }} - {{ copro.city }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create/Edit Form -->
+      <div class="row mb-4" *ngIf="showForm()">
+        <div class="col-12">
+          <!-- Warning si pas de coproperty -->
+          <div class="alert alert-danger mb-3" *ngIf="!copropertyId">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Erreur:</strong> Aucune copropriété sélectionnée. Veuillez sélectionner une copropriété d'abord.
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">
+                <i class="bi me-2" [ngClass]="isEditing() ? 'bi-pencil' : 'bi-plus-circle'"></i>
+                {{ isEditing() ? 'Modifier l\'Assemblée Générale' : 'Nouvelle Assemblée Générale' }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <form [formGroup]="assemblyForm" (ngSubmit)="saveAssembly()">
+                <div class="row">
+                  <!-- Title -->
+                  <div class="col-md-8 mb-3">
+                    <label for="title" class="form-label">
+                      Titre de l'AG <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="title"
+                      formControlName="title"
+                      placeholder="Ex: Assemblée Générale Ordinaire 2026"
+                      [class.is-invalid]="assemblyForm.get('title')?.invalid && assemblyForm.get('title')?.touched"
+                    />
+                    <div class="invalid-feedback">
+                      Le titre est requis (minimum 3 caractères)
+                    </div>
+                  </div>
+
+                  <!-- Type -->
+                  <div class="col-md-4 mb-3">
+                    <label for="assemblyType" class="form-label">
+                      Type <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select" id="assemblyType" formControlName="assemblyType">
+                      <option value="Ordinary">AG Ordinaire</option>
+                      <option value="Extraordinary">AG Extraordinaire</option>
+                    </select>
+                  </div>
+
+                  <!-- Date -->
+                  <div class="col-md-4 mb-3">
+                    <label for="meetingDate" class="form-label">
+                      Date <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="meetingDate"
+                      formControlName="meetingDate"
+                      [class.is-invalid]="assemblyForm.get('meetingDate')?.invalid && assemblyForm.get('meetingDate')?.touched"
+                    />
+                    <div class="invalid-feedback">
+                      La date est requise
+                    </div>
+                  </div>
+
+                  <!-- Time -->
+                  <div class="col-md-4 mb-3">
+                    <label for="meetingTime" class="form-label">
+                      Heure <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      id="meetingTime"
+                      formControlName="meetingTime"
+                      [class.is-invalid]="assemblyForm.get('meetingTime')?.invalid && assemblyForm.get('meetingTime')?.touched"
+                    />
+                    <div class="invalid-feedback">
+                      L'heure est requise
+                    </div>
+                  </div>
+
+                  <!-- Location -->
+                  <div class="col-md-4 mb-3">
+                    <label for="location" class="form-label">
+                      Lieu <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="location"
+                      formControlName="location"
+                      placeholder="Ex: Salle polyvalente"
+                      [class.is-invalid]="assemblyForm.get('location')?.invalid && assemblyForm.get('location')?.touched"
+                    />
+                    <div class="invalid-feedback">
+                      Le lieu est requis
+                    </div>
+                  </div>
+
+                  <!-- Agenda -->
+                  <div class="col-12 mb-3">
+                    <label for="agenda" class="form-label">
+                      Ordre du jour
+                    </label>
+                    <textarea
+                      class="form-control"
+                      id="agenda"
+                      formControlName="agenda"
+                      rows="4"
+                      placeholder="Détails de l'ordre du jour..."
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Validation Errors -->
+                <div *ngIf="assemblyForm.invalid && assemblyForm.dirty" class="alert alert-warning mb-3">
+                  <i class="bi bi-exclamation-triangle me-2"></i>
+                  <strong>Veuillez remplir tous les champs requis :</strong>
+                  <ul class="mb-0 mt-2 ms-3">
+                    <li *ngIf="assemblyForm.get('title')?.invalid && assemblyForm.get('title')?.touched">
+                      Titre requis (minimum 3 caractères)
+                    </li>
+                    <li *ngIf="assemblyForm.get('meetingDate')?.invalid && assemblyForm.get('meetingDate')?.touched">
+                      Date requise
+                    </li>
+                    <li *ngIf="assemblyForm.get('meetingTime')?.invalid && assemblyForm.get('meetingTime')?.touched">
+                      Heure requise
+                    </li>
+                    <li *ngIf="assemblyForm.get('location')?.invalid && assemblyForm.get('location')?.touched">
+                      Lieu requis
+                    </li>
+                    <li *ngIf="assemblyForm.get('assemblyType')?.invalid">
+                      Type d'assemblée requis
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2">
+                  <button 
+                    type="submit" 
+                    class="btn btn-success" 
+                    [disabled]="assemblyForm.invalid || loading() || !copropertyId">
+                    <i class="bi bi-{{ loading() ? 'hourglass-split' : 'save' }} me-1"></i>
+                    {{ isEditing() ? 'Modifier' : 'Créer' }}
+                  </button>
+                  <button type="button" class="btn btn-secondary" (click)="cancelForm()" [disabled]="loading()">
+                    <i class="bi bi-x me-1"></i>
+                    Annuler
+                  </button>
+                  <button type="button" class="btn btn-info btn-sm" (click)="debugForm()">
+                    <i class="bi bi-bug me-1"></i>
+                    Debug
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -128,6 +317,29 @@ interface GeneralAssembly {
 
       <!-- Assemblies List -->
       <div class="row">
+        <!-- Empty State -->
+        <div class="col-12" *ngIf="filteredAssemblies().length === 0 && !loading()">
+          <div class="empty-state">
+            <i class="bi bi-calendar-x"></i>
+            <h4>Aucune assemblée générale</h4>
+            <p *ngIf="!copropertyId">Veuillez sélectionner une copropriété</p>
+            <p *ngIf="copropertyId">Créez votre première assemblée générale pour commencer</p>
+            <button class="btn btn-primary" *ngIf="copropertyId" (click)="createAssembly()">
+              <i class="bi bi-plus-lg me-2"></i>
+              Créer une AG
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="col-12 text-center py-5" *ngIf="loading()">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          <p class="mt-3 text-muted">Chargement des assemblées...</p>
+        </div>
+
+        <!-- Assemblies Cards -->
         <div class="col-12" *ngFor="let assembly of filteredAssemblies()">
           <div class="assembly-card mb-3">
             <div class="assembly-header">
@@ -409,68 +621,157 @@ interface GeneralAssembly {
     }
   `]
 })
-export class GeneralAssemblyComponent {
+export class GeneralAssemblyComponent implements OnInit {
+  private modalService = inject(ModalService);
+  private fileService = inject(FileDownloadService);
+  private toastService = inject(ToastService);
+  private assemblyService = inject(AssemblyService);
+  private copropertyService = inject(CopropertyService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+
   selectedStatus = 'all';
   selectedType = 'all';
   selectedYear = '2026';
   searchTerm = '';
+  copropertyId: string | null = null;
+  selectedCopropertyId: string = '';
+  showForm = signal<boolean>(false);
+  isEditing = signal<boolean>(false);
+  currentAssemblyId = signal<string | null>(null);
+  loading = signal<boolean>(false);
+  availableCoproperties = signal<Coproperty[]>([]);
+
+  assemblyForm: FormGroup;
 
   stats = signal({
-    upcoming: 3,
-    held: 8,
-    resolutions: 42,
-    avgAttendance: 78
+    upcoming: 0,
+    held: 0,
+    resolutions: 0,
+    avgAttendance: 0
   });
 
-  assemblies = signal<GeneralAssembly[]>([
-    {
-      id: '1',
-      title: 'Assemblée Générale Ordinaire 2026',
-      type: 'ordinary',
-      date: new Date('2026-06-15T18:30:00'),
-      status: 'convened',
-      copropertyId: 'cp1',
-      copropertyName: 'Résidence Les Jardins du Parc',
-      location: 'Salle polyvalente - Rez-de-chaussée',
-      attendees: 18,
-      totalUnits: 24,
-      resolutions: 12,
-      votesRequired: 13,
-      documentsCount: 8
-    },
-    {
-      id: '2',
-      title: 'AG Extraordinaire - Ravalement Façade',
-      type: 'extraordinary',
-      date: new Date('2026-03-20T19:00:00'),
-      status: 'planned',
-      copropertyId: 'cp1',
-      copropertyName: 'Résidence Les Jardins du Parc',
-      location: 'Salle polyvalente',
-      attendees: 0,
-      totalUnits: 24,
-      resolutions: 3,
-      votesRequired: 17,
-      documentsCount: 5
-    },
-    {
-      id: '3',
-      title: 'Assemblée Générale Ordinaire 2025',
-      type: 'ordinary',
-      date: new Date('2025-06-10T18:30:00'),
-      status: 'held',
-      copropertyId: 'cp1',
-      copropertyName: 'Résidence Les Jardins du Parc',
-      location: 'Salle polyvalente',
-      attendees: 20,
-      totalUnits: 24,
-      resolutions: 15,
-      votesRequired: 13,
-      documentsCount: 12
-    }
-  ]);
+  assemblies = signal<GeneralAssembly[]>([]);
 
-  filteredAssemblies = signal<GeneralAssembly[]>(this.assemblies());
+  filteredAssemblies = signal<GeneralAssembly[]>([]);
+
+  constructor() {
+    this.assemblyForm = this.fb.group({
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      assemblyType: ['Ordinary', Validators.required],
+      meetingDate: ['', Validators.required],
+      meetingTime: ['18:30', Validators.required],
+      location: ['', Validators.required],
+      agenda: ['']
+    });
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.copropertyId = params['copropertyId'] || null;
+      if (this.copropertyId) {
+        this.loadAssemblies();
+      }
+    });
+
+    this.loadCoproperties();
+  }
+
+  loadCoproperties(): void {
+    this.copropertyService.getCoproperties().subscribe({
+      next: (coproperties) => {
+        this.availableCoproperties.set(coproperties);
+        // Auto-select if only one exists and none selected yet
+        if (coproperties.length === 1 && !this.copropertyId) {
+          this.selectedCopropertyId = coproperties[0].id;
+          this.onCopropertyChange();
+        } else if (this.copropertyId) {
+          this.selectedCopropertyId = this.copropertyId;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading coproperties:', error);
+        this.toastService.show('Erreur lors du chargement des copropriétés', { classname: 'toast-danger' });
+      }
+    });
+  }
+
+  onCopropertyChange(): void {
+    if (this.selectedCopropertyId) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { copropertyId: this.selectedCopropertyId },
+        queryParamsHandling: 'merge'
+      });
+    }
+  }
+
+  loadAssemblies(): void {
+    if (!this.copropertyId) return;
+    
+    this.loading.set(true);
+    this.assemblyService.getAssemblies(this.copropertyId).subscribe({
+      next: (assemblies) => {
+        // Transform real data to match the UI format
+        const transformedAssemblies = assemblies.map(a => this.transformAssembly(a));
+        this.assemblies.set(transformedAssemblies);
+        this.filteredAssemblies.set(transformedAssemblies);
+        this.calculateStats(transformedAssemblies);
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading assemblies:', error);
+        this.toastService.show('Erreur lors du chargement des assemblées', { classname: 'toast-danger' });
+        this.loading.set(false);
+      }
+    });
+  }
+
+  transformAssembly(assembly: Assembly): GeneralAssembly {
+    return {
+      id: assembly.id,
+      title: assembly.title,
+      type: assembly.assemblyType === AssemblyType.ORDINARY ? 'ordinary' : 'extraordinary',
+      date: new Date(assembly.meetingDate),
+      status: this.mapStatus(assembly.status),
+      copropertyId: assembly.copropertyId,
+      copropertyName: '', // Will be populated from coproperty data
+      location: assembly.location || 'Non défini',
+      attendees: assembly.attendances?.filter(a => a.isPresent).length || 0,
+      totalUnits: assembly.attendances?.length || 0,
+      resolutions: 0, // Will be added later
+      votesRequired: 0,
+      documentsCount: 0
+    };
+  }
+
+  mapStatus(status: AssemblyStatus): 'planned' | 'convened' | 'held' | 'cancelled' {
+    switch (status) {
+      case AssemblyStatus.SCHEDULED: return 'planned';
+      case AssemblyStatus.IN_PROGRESS: return 'convened';
+      case AssemblyStatus.COMPLETED: return 'held';
+      case AssemblyStatus.CANCELLED: return 'cancelled';
+      default: return 'planned';
+    }
+  }
+
+  calculateStats(assemblies: GeneralAssembly[]): void {
+    const now = new Date();
+    const upcoming = assemblies.filter(a => a.date > now && a.status !== 'cancelled').length;
+    const held = assemblies.filter(a => a.status === 'held').length;
+    const totalResolutions = assemblies.reduce((sum, a) => sum + a.resolutions, 0);
+    const avgAttendance = assemblies.length > 0
+      ? Math.round(assemblies.reduce((sum, a) => sum + (a.attendees / (a.totalUnits || 1) * 100), 0) / assemblies.length)
+      : 0;
+
+    this.stats.set({
+      upcoming,
+      held,
+      resolutions: totalResolutions,
+      avgAttendance
+    });
+  }
 
   filterAssemblies() {
     let filtered = this.assemblies();
@@ -512,17 +813,140 @@ export class GeneralAssemblyComponent {
     return `Dans ${days} jours`;
   }
 
-  private modalService = inject(ModalService);
-  private fileService = inject(FileDownloadService);
-  private toastService = inject(ToastService);
-
-  async createAssembly(): Promise<void> {
-    const confirmed = await this.modalService.confirm({
-      title: 'Nouvelle Assemblée Générale',
-      message: '<p>Formulaire de création en cours de développement.</p>',
-      confirmButtonText: 'OK',
-      showCancelButton: false
+  showAddForm(): void {
+    this.isEditing.set(false);
+    this.currentAssemblyId.set(null);
+    this.assemblyForm.reset({
+      title: '',
+      assemblyType: 'Ordinary',
+      meetingDate: '',
+      meetingTime: '18:30',
+      location: '',
+      agenda: ''
     });
+    this.showForm.set(true);
+  }
+
+  createAssembly(): void {
+    this.showAddForm();
+  }
+
+  cancelForm(): void {
+    this.showForm.set(false);
+    this.assemblyForm.reset();
+  }
+
+  saveAssembly(): void {
+    // Debug: log form status
+    console.log('=== FORM DEBUG ===');
+    console.log('Form valid:', this.assemblyForm.valid);
+    console.log('Form value:', this.assemblyForm.value);
+    console.log('CopropertyId:', this.copropertyId);
+    console.log('Form errors:', this.getFormValidationErrors());
+    console.log('=================');
+    
+    if (this.assemblyForm.invalid) {
+      // Mark all fields as touched to show validation errors
+      Object.keys(this.assemblyForm.controls).forEach(key => {
+        this.assemblyForm.get(key)?.markAsTouched();
+      });
+      this.toastService.show('Formulaire invalide - vérifiez les champs', { classname: 'toast-warning' });
+      return;
+    }
+    
+    if (!this.copropertyId) {
+      this.toastService.show('Copropriété non sélectionnée', { classname: 'toast-danger' });
+      return;
+    }
+
+    const formValue = this.assemblyForm.value;
+    const meetingDateTime = this.combineDateAndTime(formValue.meetingDate, formValue.meetingTime);
+
+    const input: CreateAssemblyInput = {
+      copropertyId: this.copropertyId,
+      title: formValue.title,
+      meetingDate: meetingDateTime,
+      location: formValue.location,
+      agenda: formValue.agenda,
+      assemblyType: formValue.assemblyType === 'Ordinary' ? AssemblyType.ORDINARY : AssemblyType.EXTRAORDINARY
+    };
+
+    this.loading.set(true);
+
+    if (this.isEditing() && this.currentAssemblyId()) {
+      this.assemblyService.updateAssembly(this.currentAssemblyId()!, input).subscribe({
+        next: () => {
+          this.toastService.show('Assemblée générale modifiée avec succès', { classname: 'toast-success' });
+          this.loadAssemblies();
+          this.cancelForm();
+        },
+        error: (error) => {
+          console.error('Error updating assembly:', error);
+          this.toastService.show('Erreur lors de la modification', { classname: 'toast-danger' });
+          this.loading.set(false);
+        }
+      });
+    } else {
+      this.assemblyService.createAssembly(input).subscribe({
+        next: () => {
+          this.toastService.show('Assemblée générale créée avec succès', { classname: 'toast-success' });
+          this.loadAssemblies();
+          this.cancelForm();
+        },
+        error: (error) => {
+          console.error('Error creating assembly:', error);
+          this.toastService.show('Erreur lors de la création', { classname: 'toast-danger' });
+          this.loading.set(false);
+        }
+      });
+    }
+  }
+
+  combineDateAndTime(dateStr: string, timeStr: string): Date {
+    const date = new Date(dateStr);
+    const [hours, minutes] = timeStr.split(':');
+    date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    return date;
+  }
+
+  getFormValidationErrors(): any {
+    const errors: any = {};
+    Object.keys(this.assemblyForm.controls).forEach(key => {
+      const control = this.assemblyForm.get(key);
+      if (control && control.errors) {
+        errors[key] = {
+          errors: control.errors,
+          value: control.value,
+          valid: control.valid,
+          touched: control.touched,
+          dirty: control.dirty
+        };
+      }
+    });
+    return errors;
+  }
+
+  debugForm(): void {
+    console.log('=== FORM DEBUG (Manual) ===');
+    console.log('Form valid:', this.assemblyForm.valid);
+    console.log('Form invalid:', this.assemblyForm.invalid);
+    console.log('Form value:', this.assemblyForm.value);
+    console.log('CopropertyId:', this.copropertyId);
+    console.log('All controls status:');
+    Object.keys(this.assemblyForm.controls).forEach(key => {
+      const control = this.assemblyForm.get(key);
+      console.log(`  ${key}:`, {
+        value: control?.value,
+        valid: control?.valid,
+        errors: control?.errors,
+        touched: control?.touched,
+        dirty: control?.dirty
+      });
+    });
+    console.log('Form errors:', this.getFormValidationErrors());
+    console.log('==========================');
+    
+    alert('Check console for debug info');
   }
 
   viewAssembly(id: string): void {
@@ -547,7 +971,27 @@ export class GeneralAssemblyComponent {
   }
 
   async editAssembly(id: string): Promise<void> {
-    await this.modalService.alert('Modification', 'Formulaire de modification en cours de développement');
+    const assembly = this.assemblies().find(a => a.id === id);
+    if (!assembly) return;
+
+    this.isEditing.set(true);
+    this.currentAssemblyId.set(id);
+
+    // Extract time from date
+    const date = new Date(assembly.date);
+    const dateStr = date.toISOString().split('T')[0];
+    const timeStr = date.toTimeString().slice(0, 5);
+
+    this.assemblyForm.patchValue({
+      title: assembly.title,
+      assemblyType: assembly.type === 'ordinary' ? 'Ordinary' : 'Extraordinary',
+      meetingDate: dateStr,
+      meetingTime: timeStr,
+      location: assembly.location,
+      agenda: '' // Will need to fetch from backend
+    });
+
+    this.showForm.set(true);
   }
 
   async deleteAssembly(id: string): Promise<void> {
@@ -562,11 +1006,18 @@ export class GeneralAssemblyComponent {
     });
 
     if (confirmed) {
-      this.assemblies.set(this.assemblies().filter(a => a.id !== id));
-      this.toastService.show(
-        'L\'assemblée a été supprimée',
-        { classname: 'toast-success' }
-      );
+      this.loading.set(true);
+      this.assemblyService.deleteAssembly(id).subscribe({
+        next: () => {
+          this.toastService.show('L\'assemblée a été supprimée', { classname: 'toast-success' });
+          this.loadAssemblies();
+        },
+        error: (error) => {
+          console.error('Error deleting assembly:', error);
+          this.toastService.show('Erreur lors de la suppression', { classname: 'toast-danger' });
+          this.loading.set(false);
+        }
+      });
     }
   }
 

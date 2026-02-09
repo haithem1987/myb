@@ -384,6 +384,7 @@
       "floor": "Étage",
       "area": "Superficie",
       "shares": "Tantièmes",
+      "percentage": "Pourcentage",
       "type": "Type",
       "occupancyStatus": "Statut d'Occupation",
       "status": "Statut",

@@ -27,16 +27,17 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
   currentChargeId = signal<string | null>(null);
   resolvedCopropertyId = signal<string | null>(null);
   loading = signal<boolean>(false);
+  selectedDistributionMethod = signal<string>('BY_SHARES');
 
   chargeForm: FormGroup;
 
   constructor() {
     this.chargeForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
       chargeType: ['CLEANING', Validators.required],
       frequency: ['MONTHLY', Validators.required],
-      totalAmount: [0, [Validators.required, Validators.min(0)]],
+      totalAmount: ['', [Validators.required, Validators.min(0.01)]],
       distributionMethod: ['BY_SHARES', Validators.required],
       startDate: ['', Validators.required],
       endDate: [''],
@@ -97,7 +98,7 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
       frequency: 'MONTHLY',
       distributionMethod: 'BY_SHARES',
       isActive: true,
-      totalAmount: 0
+      totalAmount: ''
     });
   }
 
@@ -154,6 +155,12 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
   }
 
   distributeCharge(chargeId: string) {
+    // Find the charge to get its distribution method
+    const charge = this.charges().find(c => c.id === chargeId);
+    if (charge) {
+      this.selectedDistributionMethod.set(charge.distributionMethod);
+    }
+    
     this.loading.set(true);
     this.chargeService.calculateDistribution(chargeId).subscribe({
       next: (data: ChargeDistributionExtended[]) => {
@@ -216,6 +223,20 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
       'CUSTOM': 'custom'
     };
     return map[method] || 'byShares';
+  }
+
+  getTotalDistributedAmount(): number {
+    return this.distributions().reduce((sum, dist) => sum + dist.amount, 0);
+  }
+
+  confirmAndSaveDistribution(): void {
+    // This method can be extended to save the distribution if needed
+    // For now, just close the modal and show a success message
+    console.log(`Distribution confirmed for method: ${this.selectedDistributionMethod()}`);
+    console.log(`Total distributed: ${this.getTotalDistributedAmount().toFixed(2)} €`);
+    
+    // Optionally, you can add a success toast notification here
+    this.closeDistribution();
   }
 
   private convertToISODateTime(dateString: string | null): string | null {

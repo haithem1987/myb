@@ -51,6 +51,26 @@
           <label for="description" class="form-label">{{ 'coproperty.charge.description' | translate }}</label>
           <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
         </div>
+
+        <!-- Validation Status -->
+        <div *ngIf="chargeForm.invalid && chargeForm.touched" class="alert alert-warning small mb-0">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          <strong>{{ 'common.validationErrors' | translate }}:</strong>
+          <ul class="mb-0 mt-2 ms-3">
+            <li *ngIf="chargeForm.get('name')?.invalid && chargeForm.get('name')?.touched">
+              Nom requis (min. 2 caractères)
+            </li>
+            <li *ngIf="chargeForm.get('totalAmount')?.invalid && chargeForm.get('totalAmount')?.touched">
+              Montant requis (min. 0.01 €)
+            </li>
+            <li *ngIf="chargeForm.get('chargeType')?.invalid">
+              Type de charge requis
+            </li>
+            <li *ngIf="chargeForm.get('frequency')?.invalid">
+              Fréquence requise
+            </li>
+          </ul>
+        </div>
       </form>
     </div>
   </div>

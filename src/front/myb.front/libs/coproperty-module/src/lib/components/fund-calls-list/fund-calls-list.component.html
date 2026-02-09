@@ -1,0 +1,215 @@
+<div class="fund-calls-list-container">
+  <div class="page-header">
+    <h1>
+      <i class="bi bi-piggy-bank me-2"></i>
+      Appels de Fonds
+    </h1>
+    <p class="text-muted">Gérez les appels de fonds pour vos copropriétés</p>
+  </div>
+
+  <!-- Filter & Create Section -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <!-- Coproperty Filter -->
+        <div class="col-md-4">
+          <label for="copropertyFilter" class="form-label">
+            <i class="bi bi-building me-1"></i>
+            Copropriété
+          </label>
+          <select 
+            id="copropertyFilter" 
+            class="form-select"
+            [value]="selectedCopropertyId() || 'all'"
+            (change)="onCopropertyChange($any($event.target).value)">
+            <option value="all">Toutes les copropriétés</option>
+            <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
+              {{ coproperty.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-md-3">
+          <label for="statusFilter" class="form-label">
+            <i class="bi bi-bookmark me-1"></i>
+            Statut
+          </label>
+          <select 
+            id="statusFilter" 
+            class="form-select"
+            [value]="filterStatus()"
+            (change)="onStatusFilterChange($event)">
+            <option value="">Tous les statuts</option>
+            <option value="active">Actif</option>
+            <option value="inactive">Inactif</option>
+          </select>
+        </div>
+
+        <!-- Search -->
+        <div class="col-md-3">
+          <label for="searchInput" class="form-label">
+            <i class="bi bi-search me-1"></i>
+            Recherche
+          </label>
+          <input 
+            type="text" 
+            id="searchInput"
+            class="form-control"
+            placeholder="Rechercher..."
+            [value]="searchTerm()"
+            (input)="onSearchInput($event)">
+        </div>
+
+        <!-- Create Button -->
+        <div class="col-md-2">
+          <button 
+            type="button" 
+            class="btn btn-primary w-100"
+            (click)="createFundCall()">
+            <i class="bi bi-plus-circle me-1"></i>
+            Nouveau
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-primary">
+              <i class="bi bi-piggy-bank"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Total Appels</h6>
+              <h3 class="mb-0">{{ filteredFundCalls.length }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-success">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Appels Actifs</h6>
+              <h3 class="mb-0">{{ getActiveFundCallsCount() }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-info">
+              <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Montant Total</h6>
+              <h3 class="mb-0">{{ formatAmount(getTotalAmount()) }} €</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fund Calls Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="bi bi-list-ul me-2"></i>
+        Liste des Appels de Fonds ({{ filteredFundCalls.length }})
+      </h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading() && filteredFundCalls.length === 0" class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <p class="text-muted mt-3">Aucun appel de fonds trouvé</p>
+        <p class="text-muted">Les appels de fonds seront affichés ici une fois créés</p>
+      </div>
+
+      <div *ngIf="!loading() && filteredFundCalls.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Copropriété</th>
+              <th>Description</th>
+              <th>Montant</th>
+              <th>Date Limite</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fundCall of filteredFundCalls">
+              <td>
+                <strong>{{ getCopropertyName(fundCall) }}</strong>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ fundCall.description || '-' }}</div>
+              </td>
+              <td>
+                <strong>{{ formatAmount(fundCall.amount) }} €</strong>
+              </td>
+              <td>
+                {{ formatDate(fundCall.dueDate) }}
+              </td>
+              <td>
+                <span class="badge" [ngClass]="fundCall.isActive ? 'bg-success' : 'bg-secondary'">
+                  {{ fundCall.isActive ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="viewFundCall(fundCall)"
+                  title="Voir les détails">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-warning ms-1"
+                  (click)="editFundCall(fundCall)"
+                  title="Éditer">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-success ms-1"
+                  (click)="generateInvoices(fundCall)"
+                  title="Générer les factures">
+                  <i class="bi bi-file-earmark-pdf"></i>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-danger ms-1"
+                  (click)="deleteFundCall(fundCall)"
+                  title="Supprimer">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

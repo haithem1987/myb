@@ -11,6 +11,8 @@ export * from './charges-list/charges-list.component';
 export * from './owner-management/owner-management.component';
 export * from './maintenance-requests/maintenance-requests.component';
 export * from './maintenance-list/maintenance-list.component';
+export * from './fund-calls-list/fund-calls-list.component';
+export * from './fund-call-new/fund-call-new.component';
 export * from './owner-portal/owner-dashboard.component';
 export * from './owner-portal/invoice-payment-dialog.component';
 export * from './manager-multi-select/manager-multi-select.component';

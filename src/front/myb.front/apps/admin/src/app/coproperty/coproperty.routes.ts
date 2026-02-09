@@ -63,7 +63,19 @@ export const COPROPERTY_ROUTES: Routes = [
       },
       {
         path: 'fund-calls',
-        loadComponent: () => import('./syndic/fund-calls/fund-calls.component').then(m => m.FundCallsComponent),
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.FundCallsListComponent),
+      },
+      {
+        path: 'fund-calls/new',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.FundCallNewComponent),
+      },
+      {
+        path: 'fund-calls/:id',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.FundCallNewComponent),
+      },
+      {
+        path: 'fund-calls/:id/edit',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.FundCallNewComponent),
       },
       {
         path: 'general-assembly',

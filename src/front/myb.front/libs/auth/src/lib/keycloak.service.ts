@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import Keycloak, { KeycloakProfile } from 'keycloak-js';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { ENVIRONMENT } from './environment.token';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +23,7 @@ export class KeycloakService {
 
   private initialized = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, @Inject(ENVIRONMENT) private environment: any) {}
 
   async init(): Promise<boolean> {
     // If already initialized, return the authentication status
@@ -32,9 +33,9 @@ export class KeycloakService {
 
     return new Promise((resolve, reject) => {
       this.keycloak = new Keycloak({
-        url: 'http://localhost:8080',
-        realm: 'MYB',
-        clientId: 'MYB-client',
+        url: this.environment.services.keycloak.url,
+        realm: this.environment.services.keycloak.realm,
+        clientId: this.environment.services.keycloak.clientId,
       });
 
       this.keycloak
@@ -180,9 +181,10 @@ export class KeycloakService {
     });
 
     try {
+      const keycloakUrl = this.environment.services.keycloak.url;
       const response: any = await firstValueFrom(
         this.http.post(
-          'http://localhost:8080/realms/master/protocol/openid-connect/token',
+          `${keycloakUrl}/realms/master/protocol/openid-connect/token`,
           body.toString(),
           { headers }
         )
@@ -210,9 +212,10 @@ export class KeycloakService {
     });
 
     try {
+      const keycloakUrl = this.environment.services.keycloak.url;
       const clients: any = await firstValueFrom(
         this.http.get(
-          'http://localhost:8080/admin/realms/MYB/clients?clientId=MYB-client',
+          `${keycloakUrl}/admin/realms/MYB/clients?clientId=MYB-client`,
           { headers }
         )
       );
@@ -253,9 +256,10 @@ export class KeycloakService {
     });
 
     try {
+      const keycloakUrl = this.environment.services.keycloak.url;
       const users: any = await firstValueFrom(
         this.http.get(
-          `http://localhost:8080/admin/realms/MYB/users?email=${partialEmail}`,
+          `${keycloakUrl}/admin/realms/MYB/users?email=${partialEmail}`,
           { headers }
         )
       );
@@ -271,9 +275,10 @@ export class KeycloakService {
           );
 
           try {
+            const keycloakUrl = this.environment.services.keycloak.url;
             const roles: any = await firstValueFrom(
               this.http.get(
-                `http://localhost:8080/admin/realms/MYB/users/${user.id}/role-mappings/clients/${clientId}`,
+                `${keycloakUrl}/admin/realms/MYB/users/${user.id}/role-mappings/clients/${clientId}`,
                 { headers }
               )
             );
@@ -318,10 +323,11 @@ export class KeycloakService {
         'Content-Type': 'application/json',
       });
 
-      const roleUrl = `http://localhost:8080/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
+      const keycloakUrl = this.environment.services.keycloak.url;
+      const roleUrl = `${keycloakUrl}/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
       const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
 
-      const assignRoleUrl = `http://localhost:8080/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
+      const assignRoleUrl = `${keycloakUrl}/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
       await firstValueFrom(this.http.post(assignRoleUrl, [role], { headers }));
 
       console.log(`Successfully assigned role ${roleName} to user ${userId}`);
@@ -346,12 +352,13 @@ export class KeycloakService {
         'Content-Type': 'application/json',
       });
 
+      const keycloakUrl = this.environment.services.keycloak.url;
       // Fetch the role information for the specified role
-      const roleUrl = `http://localhost:8080/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
+      const roleUrl = `${keycloakUrl}/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
       const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
 
       // Unassign the role from the user
-      const unassignRoleUrl = `http://localhost:8080/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
+      const unassignRoleUrl = `${keycloakUrl}/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
       await firstValueFrom(
         this.http.request('delete', unassignRoleUrl, {
           headers,

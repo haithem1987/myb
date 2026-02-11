@@ -1,0 +1,81 @@
+# Railway Configuration for MYB Project - Keycloak Service
+
+[build]
+# Using Docker image instead of building from Dockerfile
+
+[deploy]
+  numReplicas = 1
+  restartPolicyType = "ON_FAILURE"
+  restartPolicyMaxRetries = 10
+  # startCommand removed - each service uses its Dockerfile CMD instead
+
+[[deploy.environmentVariables]]
+  name = "KC_BOOTSTRAP_ADMIN_USERNAME"
+  value = "admin"
+
+[[deploy.environmentVariables]]
+  name = "KC_BOOTSTRAP_ADMIN_PASSWORD"
+  # Set this in Railway dashboard as secret variable
+
+[[deploy.environmentVariables]]
+  name = "KC_DB"
+  value = "postgres"
+
+[[deploy.environmentVariables]]
+  name = "KC_DB_URL"
+  # Format: jdbc:postgresql://${{keycloak-db.RAILWAY_PRIVATE_DOMAIN}}:5432/keycloak
+
+[[deploy.environmentVariables]]
+  name = "KC_DB_USERNAME"
+  value = "keycloak"
+
+[[deploy.environmentVariables]]
+  name = "KC_DB_PASSWORD"
+  # Set this in Railway dashboard as secret variable (same as keycloak-db POSTGRES_PASSWORD)
+
+[[deploy.environmentVariables]]
+  name = "KEYCLOAK_ADMIN"
+  value = "admin"
+
+[[deploy.environmentVariables]]
+  name = "KEYCLOAK_ADMIN_PASSWORD"
+  # Set this in Railway dashboard as secret variable (same as KC_BOOTSTRAP_ADMIN_PASSWORD)
+
+[[deploy.environmentVariables]]
+  name = "KC_HOSTNAME_STRICT"
+  value = "false"
+
+[[deploy.environmentVariables]]
+  name = "KC_HTTP_ENABLED"
+  value = "true"
+
+[[deploy.environmentVariables]]
+  name = "KC_PROXY"
+  value = "edge"
+
+[[deploy.environmentVariables]]
+  name = "KC_HOSTNAME"
+  value = "keycloak-production-2591.up.railway.app"
+
+[[deploy.environmentVariables]]
+  name = "KC_HOSTNAME_PORT"
+  value = "443"
+
+[[deploy.environmentVariables]]
+  name = "KC_SCHEME"
+  value = "https"
+
+[[deploy.environmentVariables]]
+  name = "KC_HOSTNAME_STRICT_HTTPS"
+  value = "false"
+
+[[deploy.healthcheck]]
+  checkType = "TCP"
+  port = 8080
+  interval = 30
+  timeout = 10
+  retries = 10
+
+[service]
+  name = "keycloak"
+  image = "quay.io/keycloak/keycloak:23.0.4"

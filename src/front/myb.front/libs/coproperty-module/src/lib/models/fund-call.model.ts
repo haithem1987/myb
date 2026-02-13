@@ -1,3 +1,5 @@
+import { Currency } from './coproperty.models';
+
 export interface FundCall {
   id: string;
   copropertyId: string;
@@ -7,6 +9,7 @@ export interface FundCall {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  currency: Currency;
 }
 
 export interface CreateFundCallInput {

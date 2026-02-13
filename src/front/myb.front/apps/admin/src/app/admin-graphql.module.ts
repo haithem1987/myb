@@ -1,0 +1,59 @@
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
+import { HttpLink } from 'apollo-angular/http';
+import { InMemoryCache, ApolloLink, from } from '@apollo/client/core';
+import { onError } from '@apollo/client/link/error';
+import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
+
+// Define your microservices' endpoints from environment
+const microserviceLinks = {
+  timesheetService: environment.services?.timesheet?.baseUrl + '/graphql' ?? 'http://localhost:8082/graphql',
+  documentService: environment.services?.document?.graphqlUrl ?? 'http://localhost:8086/graphql',
+  invoiceService: environment.services?.invoice?.graphqlUrl ?? 'http://localhost:8083/graphql',
+  copropertyService: environment.services?.coproperty?.graphqlUrl ?? 'http://localhost:8088/graphql',
+};
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    console.error('GraphQL errors: ', graphQLErrors);
+  } else if (networkError) {
+    console.error('Network error: ', networkError);
+  }
+});
+
+const createServiceLink = (httpLink: HttpLink) => {
+  const serviceLinks = Object.entries(microserviceLinks).reduce(
+    (links, [key, uri]) => {
+      links[key] = httpLink.create({ uri });
+      return links;
+    },
+    {} as { [key: string]: ApolloLink }
+  );
+  return new ApolloLink((operation, forward) => {
+    const targetService = operation?.getContext()['service'] ?? 'copropertyService';
+    const link = serviceLinks[targetService];
+    return link.request(operation, forward);
+  });
+};
+
+@NgModule({
+  imports: [BrowserModule, ApolloModule, HttpClientModule],
+  providers: [
+    {
+      provide: APOLLO_OPTIONS,
+      useFactory: (httpLink: HttpLink, router: Router) => {
+        return {
+          cache: new InMemoryCache({
+            addTypename: false,
+          }),
+          link: from([errorLink, createServiceLink(httpLink)]),
+        };
+      },
+      deps: [HttpLink, Router],
+    },
+  ],
+})
+export class AdminGraphQLModule {}

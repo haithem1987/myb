@@ -1,0 +1,16 @@
+node_modules
+.git
+.env.local
+.env.*.local
+*.log
+dist
+build
+.nx
+.angular
+tmp
+temp
+.DS_Store
+.vscode
+.idea
+*.swp
+coverage

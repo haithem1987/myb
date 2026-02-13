@@ -1,8 +1,10 @@
+// This config is deprecated - use environment configuration instead
+// Kept for backward compatibility
 export const keycloakConfig = {
   realm: 'MYB',
   clientId: 'MYB-client',
   url: 'http://localhost:8080',
   credentials: {
-    secret: 'daqzazd352GGYoZonnhaqXT6e5oI62H2', // Replace with your client secret
+    secret: 'f4umyKKCMYgaipA3f3MndHeTg8ubvyD2',
   },
 };

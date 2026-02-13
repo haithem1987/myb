@@ -3,25 +3,26 @@ using Myb.Common.Models;
 namespace Myb.Coproperty.Models;
 
 /// <summary>
-/// Represents an owner of a unit in a coproperty
+/// Represents an owner in a coproperty who can own multiple units (lots)
 /// </summary>
 public class Owner : IEntity<Guid>
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
-    public Guid UnitId { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string? Phone { get; set; }
-    public decimal OwnershipPercentage { get; set; } = 100.00m;
-    public DateTime StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
-    public bool IsMainOwner { get; set; } = true;
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     
     // Navigation Properties
-    public Unit Unit { get; set; } = null!;
+    public ICollection<OwnerUnit> OwnerUnits { get; set; } = new List<OwnerUnit>();
     public ICollection<CopropertyInvoice> Invoices { get; set; } = new List<CopropertyInvoice>();
+    
+    // Backward compatibility - deprecated, will be removed in future
+    [Obsolete("Use OwnerUnits collection instead")]
+    public Guid UnitId { get; set; }
+    [Obsolete("Use OwnerUnits collection instead")]
+    public Unit Unit { get; set; } = null!;
 }

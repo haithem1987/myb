@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { TranslateModule } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CopropertyService } from '../../services/coproperty.service';
-import { CreateCopropertyInput, Coproperty } from '../../models/coproperty.model';
+import { CreateCopropertyInput, Coproperty, Currency } from '../../models/coproperty.model';
 import { UnitManagementComponent } from '../unit-management/unit-management.component';
 import { ChargeManagementComponent } from '../charge-management/charge-management.component';
 import { MaintenanceRequestsComponent } from '../maintenance-requests/maintenance-requests.component';
@@ -39,6 +39,18 @@ export class CopropertyNewComponent implements OnInit {
   saving = signal<boolean>(false);
   saveSuccess = signal<boolean>(false);
   private currentIsActive = true;
+  
+  // Available currencies
+  currencies = [
+    { value: Currency.USD, label: 'US Dollar (USD)', icon: 'bi-currency-dollar' },
+    { value: Currency.EUR, label: 'Euro (EUR)', icon: 'bi-currency-euro' },
+    { value: Currency.TND, label: 'Tunisian Dinar (TND)', icon: 'bi-cash' },
+    { value: Currency.GBP, label: 'British Pound (GBP)', icon: 'bi-currency-pound' },
+    { value: Currency.CHF, label: 'Swiss Franc (CHF)', icon: 'bi-cash' },
+    { value: Currency.CAD, label: 'Canadian Dollar (CAD)', icon: 'bi-currency-dollar' },
+    { value: Currency.AED, label: 'UAE Dirham (AED)', icon: 'bi-cash' },
+    { value: Currency.MAD, label: 'Moroccan Dirham (MAD)', icon: 'bi-cash' }
+  ];
 
   private isValidUUID(str: string): boolean {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -76,7 +88,8 @@ export class CopropertyNewComponent implements OnInit {
       totalUnits: [0, [Validators.required, Validators.min(1)]],
       totalShares: [0, [Validators.required, Validators.min(1)]],
       commonAreas: [''],
-      managerName: ['']  // Only manager name field
+      currency: [Currency.EUR, [Validators.required]],
+      managerName: ['']
     });
   }
 
@@ -93,6 +106,7 @@ export class CopropertyNewComponent implements OnInit {
           totalUnits: coproperty.totalUnits,
           totalShares: coproperty.totalShares,
           commonAreas: coproperty.commonAreas,
+          currency: coproperty.currency || Currency.EUR,
           managerName: coproperty.managerName || ''
         });
         this.currentIsActive = coproperty.isActive;
@@ -125,6 +139,7 @@ export class CopropertyNewComponent implements OnInit {
       name: formData.name,
       address: formData.address,
       city: formData.city,
+      currency: formData.currency ?? Currency.EUR,
       postalCode: formData.postalCode,
       country: formData.country ?? 'France',
       description: formData.description,

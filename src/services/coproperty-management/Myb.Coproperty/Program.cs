@@ -3,6 +3,13 @@ using Myb.Coproperty.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel to listen on Railway's PORT and bind to 0.0.0.0
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(int.Parse(port));
+});
+
 // Add services to the container.
 
 // Add DbContext
@@ -19,6 +26,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.ICopropertyRepository, Myb.Coproperty.Infrastructure.Repositories.CopropertyRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IUnitRepository, Myb.Coproperty.Infrastructure.Repositories.UnitRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IOwnerRepository, Myb.Coproperty.Infrastructure.Repositories.OwnerRepository>();
+builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IOwnerUnitRepository, Myb.Coproperty.Infrastructure.Repositories.OwnerUnitRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IChargeRepository, Myb.Coproperty.Infrastructure.Repositories.ChargeRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IMaintenanceRepository, Myb.Coproperty.Infrastructure.Repositories.MaintenanceRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IInvoiceRepository, Myb.Coproperty.Infrastructure.Repositories.InvoiceRepository>();
@@ -65,11 +73,17 @@ builder.Services
     .AddType<Myb.Coproperty.GraphQL.Types.UnitInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.OwnerType>()
     .AddType<Myb.Coproperty.GraphQL.Types.OwnerInputType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.OwnerUnitType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.OwnerUnitInputType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.CreateOwnerWithUnitsInputType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.OwnerUnitInputTypeInternal>()
+    .AddType<Myb.Coproperty.GraphQL.Types.CurrencyType>()
     .AddType<Myb.Coproperty.GraphQL.Types.ChargeType>()
     .AddType<Myb.Coproperty.GraphQL.Types.ChargeDistributionType>()
     .AddType<Myb.Coproperty.GraphQL.Types.CreateChargeInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.MaintenanceRequestType>()
     .AddType<Myb.Coproperty.GraphQL.Types.MaintenanceRequestInputType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.FundCallType>()
     .AddType<Myb.Coproperty.GraphQL.Types.DashboardStatsType>()
     .AddType<Myb.Coproperty.GraphQL.Types.TreasuryDataPointType>()
     .AddType<Myb.Coproperty.GraphQL.Types.FinancialReportType>()
@@ -153,6 +167,9 @@ if (!app.Environment.IsDevelopment())
 app.UseCors("AllowAll");
 
 app.UseAuthorization();
+
+// Health check endpoint for Railway
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // GraphQL only - no REST controllers needed
 // app.MapControllers();

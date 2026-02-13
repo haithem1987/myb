@@ -3,11 +3,12 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { appRoutes } from './app.routes';
-import { KeycloakService } from '@myb-front/auth';
-import { GraphQLModule } from 'libs/shared/infra/graphql/graphql.module';
+import { KeycloakService, ENVIRONMENT } from '@myb-front/auth';
+import { AdminGraphQLModule } from './admin-graphql.module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { environment } from '../environments/environment';
 
 export function initializeKeycloak(keycloak: KeycloakService) {
   return async () => {
@@ -29,11 +30,12 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: ENVIRONMENT, useValue: environment },
     provideRouter(appRoutes),
     provideHttpClient(),
     provideAnimations(),
     importProvidersFrom(
-      GraphQLModule,
+      AdminGraphQLModule,
       TranslateModule.forRoot({
         defaultLanguage: 'fr',
         loader: {

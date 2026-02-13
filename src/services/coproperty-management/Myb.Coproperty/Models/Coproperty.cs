@@ -13,6 +13,7 @@ public class Coproperty : IEntity<Guid>
     public string City { get; set; } = string.Empty;
     public string PostalCode { get; set; } = string.Empty;
     public string Country { get; set; } = "France";
+    public Currency Currency { get; set; } = Currency.EUR;
     public string? Description { get; set; }
     public int TotalUnits { get; set; }
     public int TotalShares { get; set; }

@@ -11,6 +11,7 @@ export const GET_ALL_FUND_CALLS = gql`
       isActive
       createdAt
       updatedAt
+      currency
     }
   }
 `;
@@ -26,6 +27,7 @@ export const GET_FUND_CALLS_BY_COPROPERTY = gql`
       isActive
       createdAt
       updatedAt
+      currency
     }
   }
 `;
@@ -41,6 +43,7 @@ export const GET_FUND_CALL_BY_ID = gql`
       isActive
       createdAt
       updatedAt
+      currency
     }
   }
 `;

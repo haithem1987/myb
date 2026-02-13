@@ -14,6 +14,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(m => m.Id).Type<NonNullType<IdType>>();
             descriptor.Field(m => m.Coproperty).ResolveWith<MaintenanceResolvers>(r => r.GetCoproperty(default!, default!));
             descriptor.Field(m => m.Unit).ResolveWith<MaintenanceResolvers>(r => r.GetUnit(default!, default!));
+            descriptor.Field("currency").ResolveWith<MaintenanceResolvers>(r => r.GetCurrency(default!, default!)).Type<NonNullType<CurrencyType>>();
         }
 
         private class MaintenanceResolvers
@@ -26,6 +27,12 @@ namespace Myb.Coproperty.GraphQL.Types
             public Unit GetUnit([Parent] MaintenanceRequest request, [Service] CopropertyDbContext context)
             {
                 return context.Units.FirstOrDefault(u => u.Id == request.UnitId);
+            }
+
+            public Currency GetCurrency([Parent] MaintenanceRequest request, [Service] CopropertyDbContext context)
+            {
+                var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == request.CopropertyId);
+                return coproperty?.Currency ?? Currency.EUR;
             }
         }
     }

@@ -1,0 +1,144 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # FRONTEND - Admin App
+  # ============================================
+  myb-admin:
+    build:
+      context: ./src/front/myb.front
+      dockerfile: ../../Dockerfile.frontend
+      args:
+        APP_NAME: admin
+        APP_PORT: 4201
+    ports:
+      - "4201:80"
+    networks:
+      - my-network
+    depends_on:
+      - myb-coproperty
+      - keycloak
+    environment:
+      - PRODUCTION=true
+      - API_GATEWAY_URL=http://myb-coproperty:8080
+      - KEYCLOAK_URL=http://keycloak:8080
+    restart: on-failure
+
+  # ============================================
+  # KEYCLOAK - Authentication
+  # ============================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.4
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=${KEYCLOAK_ADMIN_USER:-admin}
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/keycloak
+      - KC_DB_USERNAME=${KEYCLOAK_DB_USER:-keycloak}
+      - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD:-keycloak-pwd}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USER:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      - KC_HOSTNAME_STRICT=false
+      - KC_HTTP_ENABLED=true
+      - KC_PROXY=edge
+      - KC_HOSTNAME_URL=${KEYCLOAK_HOSTNAME:-http://localhost:8080}
+      - KC_HOSTNAME_STRICT_HTTPS=false
+    networks:
+      - my-network
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    command: start --db=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    restart: on-failure
+
+  # Keycloak PostgreSQL
+  keycloak-db:
+    image: postgres:16.2
+    container_name: keycloak-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME:-keycloak}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER:-keycloak}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak-pwd}
+      PGDATA: /var/lib/postgresql/keycloak/data
+    ports:
+      - "5450:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_keycloak_data:/var/lib/postgresql/keycloak/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${KEYCLOAK_DB_USER:-keycloak}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ============================================
+  # BACKEND - Coproperty Service
+  # ============================================
+  myb-coproperty:
+    build:
+      context: .
+      dockerfile: ./src/services/coproperty-management/Myb.Coproperty/Dockerfile
+    ports:
+      - "8088:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      copropertyDB:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__CopropertyDBConnection=Host=copropertyDB;Port=5432;Database=${COPROPERTY_DB_NAME:-copropertyDB};Username=${COPROPERTY_DB_USER:-postgres};Password=${COPROPERTY_DB_PASSWORD:-coproperty-pwd}
+      - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+    restart: on-failure
+
+  # Coproperty PostgreSQL
+  copropertyDB:
+    image: postgres:16.2
+    container_name: copropertyDB
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${COPROPERTY_DB_PASSWORD:-coproperty-pwd}
+      POSTGRES_DB: ${COPROPERTY_DB_NAME:-copropertyDB}
+      POSTGRES_USER: ${COPROPERTY_DB_USER:-postgres}
+      PGDATA: /var/lib/postgresql/coproperty/data
+    ports:
+      - "5432:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_coproperty_data:/var/lib/postgresql/coproperty/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${COPROPERTY_DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  keycloak_data:
+  postgres_keycloak_data:
+  postgres_coproperty_data:

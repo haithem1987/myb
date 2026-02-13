@@ -1,4 +1,6 @@
+using HotChocolate;
 using HotChocolate.Types;
+using Myb.Coproperty.Infrastructure.Data;
 using Myb.Coproperty.Models;
 
 namespace Myb.Coproperty.GraphQL.Types;
@@ -29,5 +31,18 @@ public class InvoiceType : ObjectType<CopropertyInvoice>
         descriptor.Field(x => x.CreatedBy).Description("User who created the invoice");
         descriptor.Field(x => x.CreatedAt).Description("Creation date");
         descriptor.Field(x => x.UpdatedAt).Description("Last update date");
+        descriptor.Field("currency").ResolveWith<InvoiceResolvers>(r => r.GetCurrency(default!, default!)).Type<NonNullType<CurrencyType>>().Description("Currency from the associated charge's coproperty");
+    }
+
+    private class InvoiceResolvers
+    {
+        public Currency GetCurrency([Parent] CopropertyInvoice invoice, [Service] CopropertyDbContext context)
+        {
+            var charge = context.Charges.FirstOrDefault(c => c.Id == invoice.ChargeId);
+            if (charge == null) return Currency.EUR;
+            
+            var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == charge.CopropertyId);
+            return coproperty?.Currency ?? Currency.EUR;
+        }
     }
 }

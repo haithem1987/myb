@@ -14,6 +14,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Coproperty).ResolveWith<ChargeResolvers>(r => r.GetCoproperty(default!, default!));
             descriptor.Field(c => c.Distributions).ResolveWith<ChargeResolvers>(r => r.GetDistributions(default!, default!));
+            descriptor.Field("currency").ResolveWith<ChargeResolvers>(r => r.GetCurrency(default!, default!)).Type<NonNullType<CurrencyType>>();
         }
 
         private class ChargeResolvers
@@ -26,6 +27,12 @@ namespace Myb.Coproperty.GraphQL.Types
             public IQueryable<ChargeDistribution> GetDistributions([Parent] Charge charge, [Service] CopropertyDbContext context)
             {
                 return context.ChargeDistributions.Where(d => d.ChargeId == charge.Id);
+            }
+
+            public Currency GetCurrency([Parent] Charge charge, [Service] CopropertyDbContext context)
+            {
+                var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == charge.CopropertyId);
+                return coproperty?.Currency ?? Currency.EUR;
             }
         }
     }

@@ -19,6 +19,7 @@ export const GET_ALL_MAINTENANCE_REQUESTS = gql`
       completedDate
       createdAt
       updatedAt
+      currency
     }
   }
 `;
@@ -42,6 +43,7 @@ export const GET_MAINTENANCE_REQUEST_BY_ID = gql`
       completedDate
       createdAt
       updatedAt
+      currency
     }
   }
 `;
@@ -65,6 +67,7 @@ export const GET_MAINTENANCE_BY_COPROPERTY = gql`
       completedDate
       createdAt
       updatedAt
+      currency
     }
   }
 `;
@@ -88,6 +91,7 @@ export const GET_MAINTENANCE_BY_STATUS = gql`
       completedDate
       createdAt
       updatedAt
+      currency
     }
   }
 `;

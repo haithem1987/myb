@@ -1,5 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types;
+using Myb.Coproperty.Infrastructure.Data;
 using Myb.Coproperty.Models;
 
 namespace Myb.Coproperty.GraphQL.Types
@@ -67,6 +68,24 @@ namespace Myb.Coproperty.GraphQL.Types
                     var distribution = context.Parent<ChargeDistribution>();
                     return distribution.Unit?.Area ?? 0;
                 });
+
+            descriptor
+                .Field("currency")
+                .Type<NonNullType<CurrencyType>>()
+                .Description("The currency from the related Charge's Coproperty")
+                .ResolveWith<ChargeDistributionResolvers>(r => r.GetCurrency(default!, default!));
+        }
+
+        private class ChargeDistributionResolvers
+        {
+            public Currency GetCurrency([Parent] ChargeDistribution distribution, [Service] CopropertyDbContext context)
+            {
+                var charge = context.Charges.FirstOrDefault(c => c.Id == distribution.ChargeId);
+                if (charge == null) return Currency.EUR;
+                
+                var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == charge.CopropertyId);
+                return coproperty?.Currency ?? Currency.EUR;
+            }
         }
     }
 }

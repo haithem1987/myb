@@ -1,3 +1,5 @@
+import { Currency } from './coproperty.models';
+
 export enum ChargeType {
   Cleaning = 'CLEANING',
   Security = 'SECURITY',
@@ -36,6 +38,7 @@ export interface Charge {
   isActive: boolean;
   createdAt: Date;
   createdBy: string;
+  currency: Currency;
 }
 
 export interface CreateChargeInput {
@@ -69,4 +72,5 @@ export interface ChargeDistribution {
   unitId: string;
   amount: number;
   calculatedAt: Date;
+  currency: Currency;
 }

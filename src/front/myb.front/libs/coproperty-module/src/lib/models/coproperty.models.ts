@@ -1,3 +1,14 @@
+export enum Currency {
+  USD = 'USD',
+  EUR = 'EUR',
+  TND = 'TND',
+  GBP = 'GBP',
+  CHF = 'CHF',
+  CAD = 'CAD',
+  AED = 'AED',
+  MAD = 'MAD'
+}
+
 export interface Coproperty {
   id: string;
   name: string;
@@ -5,6 +16,7 @@ export interface Coproperty {
   city: string;
   postalCode: string;
   country: string;
+  currency: Currency;
   description?: string;
   totalUnits: number;
   totalShares: number;

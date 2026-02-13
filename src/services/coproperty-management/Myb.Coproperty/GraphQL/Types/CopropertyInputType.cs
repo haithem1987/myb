@@ -13,6 +13,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(c => c.City).Type<NonNullType<StringType>>();
             descriptor.Field(c => c.PostalCode).Type<NonNullType<StringType>>();
             descriptor.Field(c => c.Country).Type<NonNullType<StringType>>();
+            descriptor.Field(c => c.Currency).Type<CurrencyType>().DefaultValue(Currency.EUR);
             descriptor.Field(c => c.Description).Type<StringType>();
             descriptor.Field(c => c.TotalUnits).Type<NonNullType<IntType>>();
             descriptor.Field(c => c.TotalShares).Type<NonNullType<IntType>>();

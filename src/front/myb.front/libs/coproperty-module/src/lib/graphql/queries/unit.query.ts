@@ -14,6 +14,7 @@ export const GET_ALL_UNITS = gql`
       isOccupied
       createdAt
       updatedAt
+      currency
     }
   }
 `;
@@ -32,6 +33,7 @@ export const GET_UNIT_BY_ID = gql`
       isOccupied
       createdAt
       updatedAt
+      currency
     }
   }
 `;
@@ -50,6 +52,7 @@ export const GET_UNITS_BY_COPROPERTY = gql`
       isOccupied
       createdAt
       updatedAt
+      currency
     }
   }
 `;

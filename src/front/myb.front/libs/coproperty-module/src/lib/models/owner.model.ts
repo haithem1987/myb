@@ -1,12 +1,50 @@
-export interface Owner {
+export interface OwnerUnit {
   id: string;
-  userId: string;
+  ownerId: string;
   unitId: string;
   ownershipPercentage: number;
   startDate: Date;
   endDate?: Date;
   isMainOwner: boolean;
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface Owner {
+  id: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  ownerUnits?: OwnerUnit[];
+  createdAt?: Date;
+  updatedAt?: Date;
+  
+  // Deprecated - for backward compatibility
+  unitId?: string;
+  ownershipPercentage?: number;
+  startDate?: Date;
+  endDate?: Date;
+  isMainOwner?: boolean;
+}
+
+export interface OwnerUnitInput {
+  unitId: string;
+  ownershipPercentage?: number;
+  startDate?: Date;
+  endDate?: Date;
+  isMainOwner?: boolean;
+}
+
+export interface CreateOwnerWithUnitsInput {
+  id?: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  units: OwnerUnitInput[];
 }
 
 export interface AddOwnerInput {

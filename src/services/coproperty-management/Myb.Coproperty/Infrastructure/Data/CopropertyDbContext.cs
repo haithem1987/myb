@@ -16,6 +16,7 @@ public class CopropertyDbContext : DbContext
     public DbSet<Models.Coproperty> Coproperties { get; set; } = null!;
     public DbSet<Unit> Units { get; set; } = null!;
     public DbSet<Owner> Owners { get; set; } = null!;
+    public DbSet<OwnerUnit> OwnerUnits { get; set; } = null!;
     public DbSet<Charge> Charges { get; set; } = null!;
     public DbSet<ChargeDistribution> ChargeDistributions { get; set; } = null!;
     public DbSet<CopropertyInvoice> CopropertyInvoices { get; set; } = null!;
@@ -29,11 +30,8 @@ public class CopropertyDbContext : DbContext
     {
         base.OnConfiguring(optionsBuilder);
         
-        // Suppress PendingModelChangesWarning in Development
-        // This allows the service to start even if migrations are pending,
-        // useful during development iterations
-        optionsBuilder.ConfigureWarnings(w =>
-            w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+        // Note: PendingModelChangesWarning is only available in EF Core 9.0+
+        // For EF Core 8.0, this warning suppression is not needed
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -64,6 +62,11 @@ public class CopropertyDbContext : DbContext
             entity.Property(e => e.Country)
                 .HasMaxLength(100)
                 .HasDefaultValue("France");
+            
+            entity.Property(e => e.Currency)
+                .HasConversion<string>()
+                .HasMaxLength(10)
+                .HasDefaultValue(Currency.EUR);
             
             entity.Property(e => e.Description)
                 .HasMaxLength(2000);
@@ -121,16 +124,52 @@ public class CopropertyDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             
+            entity.Property(e => e.FirstName)
+                .IsRequired()
+                .HasMaxLength(100);
+            
+            entity.Property(e => e.LastName)
+                .IsRequired()
+                .HasMaxLength(100);
+            
+            entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(200);
+            
+            entity.Property(e => e.Phone)
+                .HasMaxLength(50);
+            
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Email);
+            
+            // Ignore deprecated properties
+            entity.Ignore(e => e.UnitId);
+            entity.Ignore(e => e.Unit);
+        });
+        
+        // OwnerUnit Configuration (Many-to-Many relationship)
+        modelBuilder.Entity<OwnerUnit>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
             entity.Property(e => e.OwnershipPercentage)
                 .HasPrecision(5, 2)
                 .HasDefaultValue(100.00m);
             
+            entity.HasOne(e => e.Owner)
+                .WithMany(o => o.OwnerUnits)
+                .HasForeignKey(e => e.OwnerId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
             entity.HasOne(e => e.Unit)
-                .WithMany(u => u.Owners)
+                .WithMany(u => u.OwnerUnits)
                 .HasForeignKey(e => e.UnitId)
                 .OnDelete(DeleteBehavior.Cascade);
             
-            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => new { e.OwnerId, e.UnitId })
+                .IsUnique();
+            
+            entity.HasIndex(e => e.OwnerId);
             entity.HasIndex(e => e.UnitId);
             
             // Check constraint for ownership percentage

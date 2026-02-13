@@ -232,6 +232,8 @@
       "postalCodePlaceholder": "10001",
       "countryLabel": "Country",
       "countryPlaceholder": "United States",
+      "currencyLabel": "Currency",
+      "currencyHelp": "Select the currency for this coproperty",
       "totalUnitsLabel": "Total Number of Units",
       "totalSharesLabel": "Total Number of Shares",
       "descriptionLabel": "Description",

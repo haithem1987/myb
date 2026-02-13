@@ -21,7 +21,11 @@ public class Unit : IEntity<Guid>
     
     // Navigation Properties
     public Coproperty Coproperty { get; set; } = null!;
-    public ICollection<Owner> Owners { get; set; } = new List<Owner>();
+    public ICollection<OwnerUnit> OwnerUnits { get; set; } = new List<OwnerUnit>();
     public ICollection<ChargeDistribution> ChargeDistributions { get; set; } = new List<ChargeDistribution>();
     public ICollection<CopropertyInvoice> Invoices { get; set; } = new List<CopropertyInvoice>();
+    
+    // Backward compatibility - deprecated
+    [Obsolete("Use OwnerUnits collection instead")]
+    public ICollection<Owner> Owners { get; set; } = new List<Owner>();
 }

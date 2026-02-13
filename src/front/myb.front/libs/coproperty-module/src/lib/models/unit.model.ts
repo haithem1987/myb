@@ -1,3 +1,5 @@
+import { Currency } from './coproperty.models';
+
 export interface Unit {
   id: string;
   copropertyId: string;
@@ -10,6 +12,7 @@ export interface Unit {
   isOccupied: boolean;
   createdAt: Date;
   updatedAt: Date;
+  currency: Currency;
 }
 
 export interface CreateUnitInput {

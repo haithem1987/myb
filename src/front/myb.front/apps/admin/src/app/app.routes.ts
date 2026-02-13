@@ -1,8 +1,9 @@
 import { Route } from '@angular/router';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { HomeComponent } from './home/home.component';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
 import { AdminHomeComponent } from './admin-home/admin-home.component';
+import { environment } from '../environments/environment';
 
 @Component({
   standalone: true,
@@ -16,7 +17,10 @@ import { AdminHomeComponent } from './admin-home/admin-home.component';
 })
 export class AccessDeniedComponent {
   login() {
-    window.location.href = 'http://localhost:8080/realms/MYB/protocol/openid-connect/auth?client_id=MYB-client&redirect_uri=' + encodeURIComponent(window.location.origin) + '&response_type=code&scope=openid';
+    const keycloakUrl = environment.services.keycloak.url;
+    const realm = environment.services.keycloak.realm;
+    const clientId = environment.services.keycloak.clientId;
+    window.location.href = `${keycloakUrl}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(window.location.origin)}&response_type=code&scope=openid`;
   }
 }
 

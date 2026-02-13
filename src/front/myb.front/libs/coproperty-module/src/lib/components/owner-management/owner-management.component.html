@@ -52,9 +52,32 @@
               <input type="tel" class="form-control" id="phone" formControlName="phone" />
             </div>
           </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">{{ 'coproperty.owner.units' | translate }} *</label>
+              <div class="unit-multiselect border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                <div *ngFor="let unit of availableUnits" class="form-check">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    [id]="'unit-' + unit.id"
+                    [checked]="isUnitSelected(unit.id)"
+                    (change)="toggleUnitSelection(unit.id)"
+                  />
+                  <label class="form-check-label" [for]="'unit-' + unit.id">
+                    <i class="bi bi-building"></i> {{ unit.unitNumber }}
+                  </label>
+                </div>
+                <div *ngIf="availableUnits.length === 0" class="text-muted small">
+                  <i class="bi bi-info-circle"></i> No units available
+                </div>
+              </div>
+              <small class="text-muted">Select one or more lots for this owner</small>
+            </div>
+          </div>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3" *ngIf="false">
           <label for="address" class="form-label">{{ 'common.address' | translate }}</label>
           <input type="text" class="form-control" id="address" formControlName="address" />
         </div>
@@ -98,13 +121,13 @@
               <td>{{ owner.email }}</td>
               <td>{{ owner.phone }}</td>
               <td>
-                <span *ngIf="owner.units.length > 0">
-                  <span *ngFor="let unit of owner.units; let last = last">
-                    {{ unit.unitNumber }}
-                    <span *ngIf="!last">, </span>
-                  </span>
+                <span class="badge bg-secondary me-1" *ngFor="let ownerUnit of owner.ownerUnits">
+                  <i class="bi bi-building"></i> {{ ownerUnit.unit?.unitNumber || 'Unknown' }}
+                  <small *ngIf="ownerUnit.ownershipPercentage !== 100"> ({{ ownerUnit.ownershipPercentage }}%)</small>
                 </span>
-                <span *ngIf="owner.units.length === 0" class="text-muted">No units</span>
+                <span *ngIf="!owner.ownerUnits || owner.ownerUnits.length === 0" class="text-muted">
+                  <i class="bi bi-exclamation-circle"></i> No units
+                </span>
               </td>
               <td>
                 <button class="btn btn-sm btn-primary" (click)="editOwner(owner)" title="Edit">

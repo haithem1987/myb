@@ -17,6 +17,7 @@ export const GET_ALL_CHARGES = gql`
       createdBy
       createdAt
       updatedAt
+      currency
     }
   }
 `;
@@ -38,6 +39,7 @@ export const GET_CHARGE_BY_ID = gql`
       createdBy
       createdAt
       updatedAt
+      currency
     }
   }
 `;
@@ -59,6 +61,7 @@ export const GET_CHARGES_BY_COPROPERTY = gql`
       createdBy
       createdAt
       updatedAt
+      currency
     }
   }
 `;

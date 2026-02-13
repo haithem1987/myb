@@ -1,0 +1,49 @@
+# Multi-stage build for Client Frontend app
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files from frontend directory
+COPY src/front/myb.front/package.json src/front/myb.front/package-lock.json ./
+
+# Install dependencies
+RUN npm ci --legacy-peer-deps
+
+# Copy NX workspace
+COPY src/front/myb.front/ ./
+
+# Build client app with NX for production
+RUN npx nx build client --configuration=production
+
+# Production stage - Use nginx for better performance
+FROM nginx:alpine
+
+# Copy custom nginx configuration
+RUN echo 'server { \
+    listen 8080; \
+    server_name _; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    gzip on; \
+    gzip_vary on; \
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript; \
+    add_header X-Frame-Options "SAMEORIGIN" always; \
+    add_header X-Content-Type-Options "nosniff" always; \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+    location /health { \
+        access_log off; \
+        return 200 "healthy\\n"; \
+        add_header Content-Type text/plain; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
+
+# Copy built app from builder
+COPY --from=builder /app/dist/apps/client /usr/share/nginx/html
+
+# Expose port (Railway uses PORT env var)
+EXPOSE 8080
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,3 +1,5 @@
+import { Currency } from './coproperty.models';
+
 export enum MaintenanceCategory {
   Plumbing = 'PLUMBING',
   Electrical = 'ELECTRICAL',
@@ -40,6 +42,7 @@ export interface MaintenanceRequest {
   completedDate?: Date;
   createdAt: Date;
   updatedAt: Date;
+  currency: Currency;
 }
 
 export interface CreateMaintenanceInput {

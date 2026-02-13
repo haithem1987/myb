@@ -1,0 +1,61 @@
+# Multi-stage build for Admin Frontend app
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files from frontend directory
+COPY src/front/myb.front/package.json src/front/myb.front/package-lock.json ./
+
+# Install dependencies
+RUN npm ci --legacy-peer-deps
+
+# Copy NX workspace
+COPY src/front/myb.front/ ./
+
+# Build admin app with NX for production
+RUN npx nx build admin --configuration=production
+
+# Production stage - Use nginx for better performance  
+FROM nginx:alpine
+
+# Install gettext for envsubst
+RUN apk add --no-cache gettext
+
+# Create nginx templates directory and template file that uses PORT variable
+RUN mkdir -p /etc/nginx/templates && cat > /etc/nginx/templates/default.conf.template << 'EOF'
+server {
+    listen ${PORT};
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+    
+    gzip on;
+    gzip_vary on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript;
+    
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+    }
+}
+EOF
+
+# Copy built app from builder
+COPY --from=builder /app/dist/apps/admin /usr/share/nginx/html
+
+# Set default PORT if not provided
+ENV PORT=8080
+
+# Expose port
+EXPOSE 8080
+
+# Nginx will automatically process templates and substitute env vars
+CMD ["nginx", "-g", "daemon off;"]

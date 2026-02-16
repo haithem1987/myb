@@ -1,10 +1,18 @@
 <div class="charges-list-container">
   <div class="page-header">
-    <h1>
-      <i class="bi bi-cash-stack me-2"></i>
-      Gestion des Charges
-    </h1>
-    <p class="text-muted">Gérez toutes les charges de vos copropriétés</p>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h1>
+          <i class="bi bi-cash-stack me-2"></i>
+          {{ 'coproperty.charge.title' | translate }}
+        </h1>
+        <p class="text-muted">{{ 'coproperty.charge.subtitle' | translate }}</p>
+      </div>
+      <button class="btn btn-primary btn-violet" routerLink="/coproperty/syndic/budgets/new">
+        <i class="bi bi-plus-circle me-2"></i>
+        {{ 'coproperty.charges.addCharge' | translate }}
+      </button>
+    </div>
   </div>
 
   <!-- Filters Section -->
@@ -15,14 +23,14 @@
         <div class="col-md-4">
           <label for="copropertyFilter" class="form-label">
             <i class="bi bi-building me-1"></i>
-            Copropriété
+            {{ 'coproperty.charge.coproperty' | translate }}
           </label>
           <select 
             id="copropertyFilter" 
             class="form-select"
             [value]="selectedCopropertyId() || 'all'"
             (change)="onCopropertyChange($any($event.target).value)">
-            <option value="all">Toutes les copropriétés</option>
+            <option value="all">{{ 'coproperty.charge.allCoproperties' | translate }}</option>
             <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
               {{ coproperty.name }}
             </option>
@@ -33,14 +41,14 @@
         <div class="col-md-3">
           <label for="typeFilter" class="form-label">
             <i class="bi bi-tag me-1"></i>
-            Type de charge
+            {{ 'coproperty.charge.chargeType' | translate }}
           </label>
           <select 
             id="typeFilter" 
             class="form-select"
             [value]="filterType()"
             (change)="filterType.set($any($event.target).value)">
-            <option value="">Tous les types</option>
+            <option value="">{{ 'coproperty.charge.allTypes' | translate }}</option>
             <option *ngFor="let type of chargeTypes" [value]="type">
               {{ type }}
             </option>
@@ -51,16 +59,16 @@
         <div class="col-md-3">
           <label for="frequencyFilter" class="form-label">
             <i class="bi bi-calendar-event me-1"></i>
-            Fréquence
+            {{ 'coproperty.charges.frequency' | translate }}
           </label>
           <select 
             id="frequencyFilter" 
             class="form-select"
             [value]="filterFrequency()"
             (change)="filterFrequency.set($any($event.target).value)">
-            <option value="">Toutes les fréquences</option>
+            <option value="">{{ 'coproperty.charge.allYears' | translate }}</option>
             <option *ngFor="let freq of frequencies" [value]="freq">
-              {{ getFrequencyLabel(freq) }}
+              {{ freq }}
             </option>
           </select>
         </div>
@@ -69,13 +77,13 @@
         <div class="col-md-2">
           <label for="searchInput" class="form-label">
             <i class="bi bi-search me-1"></i>
-            Recherche
+            {{ 'coproperty.charge.search' | translate }}
           </label>
           <input 
             type="text" 
             id="searchInput"
             class="form-control"
-            placeholder="Rechercher..."
+            [placeholder]="'common.searchPlaceholder' | translate"
             [value]="searchTerm()"
             (input)="searchTerm.set($any($event.target).value)">
         </div>
@@ -93,7 +101,7 @@
               <i class="bi bi-cash-stack"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Total Charges</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.charge.totalBudgets' | translate }}</h6>
               <h3 class="mb-0">{{ filteredCharges.length }}</h3>
             </div>
           </div>
@@ -108,7 +116,7 @@
               <i class="bi bi-check-circle"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Charges Actives</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.charge.activeBudgets' | translate }}</h6>
               <h3 class="mb-0">{{ getActiveChargesCount() }}</h3>
             </div>
           </div>
@@ -123,8 +131,8 @@
               <i class="bi bi-calendar-event"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Mensuelles</h6>
-              <h3 class="mb-0">{{ getMonthlyChargesCount() }}</h3>
+              <h6 class="text-muted mb-0">{{ 'coproperty.charge.currentYear' | translate }}</h6>
+              <h3 class="mb-0">{{ getCurrentYearCount() }}</h3>
             </div>
           </div>
         </div>
@@ -138,7 +146,7 @@
               <i class="bi bi-building"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Copropriétés</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.charge.coproperties' | translate }}</h6>
               <h3 class="mb-0">{{ coproperties().length }}</h3>
             </div>
           </div>
@@ -152,34 +160,34 @@
     <div class="card-header">
       <h5 class="mb-0">
         <i class="bi bi-list-ul me-2"></i>
-        Liste des Charges ({{ filteredCharges.length }})
+        {{ 'coproperty.charge.budgetList' | translate }} ({{ filteredCharges.length }})
       </h5>
     </div>
     <div class="card-body">
       <div *ngIf="loading()" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Chargement...</span>
+          <span class="visually-hidden">{{ 'common.loading' | translate }}</span>
         </div>
       </div>
 
       <div *ngIf="!loading() && filteredCharges.length === 0" class="text-center py-5">
         <i class="bi bi-inbox display-1 text-muted"></i>
-        <p class="text-muted mt-3">Aucune charge trouvée</p>
-        <p class="text-muted">Les charges seront affichées ici une fois créées dans les copropriétés</p>
+        <p class="text-muted mt-3">{{ 'coproperty.charge.noChargesFound' | translate }}</p>
+        <p class="text-muted">{{ 'coproperty.charge.noChargesMessage' | translate }}</p>
       </div>
 
       <div *ngIf="!loading() && filteredCharges.length > 0" class="table-responsive">
         <table class="table table-hover">
           <thead>
             <tr>
-              <th>Copropriété</th>
-              <th>Nom</th>
-              <th>Type</th>
-              <th>Montant</th>
-              <th>Fréquence</th>
-              <th>Début</th>
-              <th>Statut</th>
-              <th>Actions</th>
+              <th>{{ 'coproperty.charge.coproperty' | translate }}</th>
+              <th>{{ 'coproperty.charges.name' | translate }}</th>
+              <th>{{ 'coproperty.charges.type' | translate }}</th>
+              <th>{{ 'coproperty.charges.totalAmount' | translate }}</th>
+              <th>{{ 'coproperty.charges.frequency' | translate }}</th>
+              <th>{{ 'coproperty.charges.startDate' | translate }}</th>
+              <th>{{ 'coproperty.charge.status' | translate }}</th>
+              <th>{{ 'coproperty.charge.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -202,7 +210,7 @@
                 <strong>{{ formatAmount(charge.totalAmount) }} €</strong>
               </td>
               <td>
-                {{ getFrequencyLabel(charge.frequency) }}
+                {{ charge.frequency }}
               </td>
               <td>
                 {{ charge.startDate | date:'dd/MM/yyyy' }}
@@ -215,9 +223,16 @@
               <td>
                 <button 
                   type="button" 
+                  class="btn btn-sm btn-outline-primary me-2"
+                  [routerLink]="['/coproperty/syndic/budgets', charge.id, 'edit']"
+                  [title]="'coproperty.charge.modify' | translate">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button 
+                  type="button" 
                   class="btn btn-sm btn-outline-primary"
                   (click)="viewCharge(charge)"
-                  title="Voir les détails">
+                  [title]="'coproperty.charge.viewDetails' | translate">
                   <i class="bi bi-eye"></i>
                 </button>
               </td>

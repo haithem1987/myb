@@ -81,6 +81,12 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
           ${this.typeOperations.create}
         `,
         variables: { item },
+        refetchQueries: [
+          {
+            query: gql`${this.typeOperations.getAll}`,
+            ...this.getServiceContext()
+          }
+        ],
         ...this.getServiceContext(),
       })
       .pipe(map((result) => this.mapCreateItem(result)));
@@ -94,6 +100,17 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
           ${this.typeOperations.update}
         `,
         variables: { id, item: itemInputWithoutTypename },
+        refetchQueries: [
+          {
+            query: gql`${this.typeOperations.getAll}`,
+            ...this.getServiceContext()
+          },
+          {
+            query: gql`${this.typeOperations.getById}`,
+            variables: { id },
+            ...this.getServiceContext()
+          }
+        ],
         ...this.getServiceContext(),
       })
       .pipe(map((result) => this.mapUpdateItem(result)));
@@ -106,6 +123,13 @@ export class RepositoryService<T extends IIdentity> implements IRepository<T> {
           ${this.typeOperations.delete}
         `,
         variables: { id },
+        refetchQueries: [
+          {
+            query: gql`${this.typeOperations.getAll}`,
+            ...this.getServiceContext()
+          }
+        ],
+        awaitRefetchQueries: true,
         ...this.getServiceContext(),
       })
       .pipe(map((result) => this.mapDeleteResult(result)));

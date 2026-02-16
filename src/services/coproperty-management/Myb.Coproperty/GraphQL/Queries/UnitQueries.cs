@@ -8,6 +8,9 @@ namespace Myb.Coproperty.GraphQL.Queries
     [ExtendObjectType("Query")]
     public class UnitQueries
     {
+        public async Task<IEnumerable<Unit>> GetAllUnits([Service] IUnitService unitService) =>
+            await unitService.GetAllAsync();
+
         public async Task<IEnumerable<Unit>> GetUnits(Guid copropertyId, [Service] IUnitService unitService) =>
             await unitService.GetByCopropertyIdAsync(copropertyId);
 

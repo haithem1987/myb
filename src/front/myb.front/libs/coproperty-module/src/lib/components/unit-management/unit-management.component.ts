@@ -29,6 +29,9 @@ export class UnitManagementComponent implements OnInit, OnChanges {
   unitForm: FormGroup;
   editingUnitId: string | null = null;
   resolvedCopropertyId: string | null = null;
+  
+  // Alert system
+  alert = signal<{type: 'success' | 'danger' | 'warning' | null, message: string}>({type: null, message: ''});
 
   unitTypes = ['APARTMENT', 'PARKING', 'CAVE', 'COMMERCIAL', 'OTHER'];
 
@@ -83,9 +86,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
       },
       error: (err) => {
         console.error('Error loading units:', err);
-        this.toastService.show('Failed to load units. Please try again.', {
-          classname: 'bg-danger text-light',
-        });
+        this.showAlert('danger', 'Échec du chargement des lots. Veuillez réessayer.');
         this.loading.set(false);
       }
     });
@@ -133,16 +134,12 @@ export class UnitManagementComponent implements OnInit, OnChanges {
       this.loading.set(true);
       this.unitService.deleteUnit(unit.id!).subscribe({
         next: () => {
-          this.toastService.show(`Unit ${unit.unitNumber} deleted successfully!`, {
-            classname: 'bg-success text-light',
-          });
+          this.showAlert('success', `Lot ${unit.unitNumber} supprimé avec succès!`);
           this.loadUnits();
         },
         error: (err) => {
           console.error('Error deleting unit:', err);
-          this.toastService.show('Failed to delete unit. Please try again.', {
-            classname: 'bg-danger text-light',
-          });
+          this.showAlert('danger', 'Échec de la suppression du lot. Veuillez réessayer.');
           this.loading.set(false);
         }
       });
@@ -165,12 +162,10 @@ export class UnitManagementComponent implements OnInit, OnChanges {
       operation.subscribe({
         next: () => {
           const message = this.editingUnitId 
-            ? `Unit ${unitData.unitNumber} updated successfully!`
-            : `Unit ${unitData.unitNumber} created successfully!`;
+            ? `Lot ${unitData.unitNumber} mis à jour avec succès!`
+            : `Lot ${unitData.unitNumber} créé avec succès!`;
           
-          this.toastService.show(message, {
-            classname: 'bg-success text-light',
-          });
+          this.showAlert('success', message);
           
           this.showAddForm = false;
           this.unitForm.reset();
@@ -181,22 +176,18 @@ export class UnitManagementComponent implements OnInit, OnChanges {
           
           // Check for duplicate unit number error
           const errorMessage = err?.error?.errors?.[0]?.message || err?.message || '';
-          let displayMessage = 'Failed to save unit. Please try again.';
+          let displayMessage = 'Échec de l\'enregistrement du lot. Veuillez réessayer.';
           
           if (errorMessage.includes('duplicate') || errorMessage.includes('already exists')) {
-            displayMessage = `Unit number ${unitData.unitNumber} already exists for this coproperty. Please use a different unit number.`;
+            displayMessage = `Le numéro de lot ${unitData.unitNumber} existe déjà pour cette copropriété. Veuillez utiliser un numéro différent.`;
           }
           
-          this.toastService.show(displayMessage, {
-            classname: 'bg-danger text-light',
-          });
+          this.showAlert('danger', displayMessage);
           this.loading.set(false);
         }
       });
     } else {
-      this.toastService.show('Please fill in all required fields correctly.', {
-        classname: 'bg-warning text-dark',
-      });
+      this.showAlert('warning', 'Veuillez remplir tous les champs requis correctement.');
     }
   }
 
@@ -204,5 +195,10 @@ export class UnitManagementComponent implements OnInit, OnChanges {
     this.showAddForm = false;
     this.editingUnitId = null;
     this.unitForm.reset();
+  }
+
+  private showAlert(type: 'success' | 'danger' | 'warning', message: string): void {
+    this.alert.set({type, message});
+    setTimeout(() => this.alert.set({type: null, message: ''}), 5000);
   }
 }

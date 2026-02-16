@@ -5,9 +5,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CreateCopropertyInput, Coproperty, Currency } from '../../models/coproperty.model';
-import { UnitManagementComponent } from '../unit-management/unit-management.component';
-import { ChargeManagementComponent } from '../charge-management/charge-management.component';
-import { MaintenanceRequestsComponent } from '../maintenance-requests/maintenance-requests.component';
 import { ManagerMultiSelectComponent } from '../manager-multi-select/manager-multi-select.component';
 
 @Component({
@@ -18,9 +15,6 @@ import { ManagerMultiSelectComponent } from '../manager-multi-select/manager-mul
     FormsModule,
     ReactiveFormsModule,
     TranslateModule,
-    UnitManagementComponent,
-    ChargeManagementComponent,
-    MaintenanceRequestsComponent,
     ManagerMultiSelectComponent
   ],
   templateUrl: './coproperty-new.component.html',

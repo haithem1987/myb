@@ -39,6 +39,11 @@ namespace Myb.Coproperty.Services
             return await Task.FromResult(_unitRepository.GetById(id)!);
         }
 
+        public async Task<IEnumerable<Unit>> GetAllAsync()
+        {
+            return await _unitRepository.GetAllAsync();
+        }
+
         public async Task<IEnumerable<Unit>> GetByCopropertyIdAsync(Guid copropertyId)
         {
             return await _unitRepository.GetByCopropertyIdAsync(copropertyId);

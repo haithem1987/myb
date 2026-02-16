@@ -1,8 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CreateOwnerWithUnitsInput, OwnerUnitInput } from '../../models/owner.model';
+import { UnitService, UnitExtended } from '../../services/unit.service';
+import { CopropertyService } from '../../services/coproperty.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin, of } from 'rxjs';
+import { map, finalize } from 'rxjs/operators';
 
 interface Unit {
   id: string;
@@ -36,20 +41,32 @@ interface Owner {
 export class OwnerManagementComponent implements OnInit {
   @Input() copropertyId?: string;
   
+  private fb = inject(FormBuilder);
+  private unitService = inject(UnitService);
+  private copropertyService = inject(CopropertyService);
+  private destroyRef = inject(DestroyRef);
+  private translateService = inject(TranslateService);
+  
   owners: Owner[] = [];
   availableUnits: Unit[] = [];
+  allUnits: Unit[] = []; // Store all units
+  coproperties = signal<Array<{id: string, name: string}>>([]);
+  selectedCopropertyForFilter = signal<string>('');
   displayedColumns: string[] = ['name', 'email', 'phone', 'units', 'actions'];
   searchTerm: string = '';
   showAddForm: boolean = false;
   ownerForm: FormGroup;
   editingOwnerId: string | null = null;
+  loading = signal<boolean>(false);
+  alert = signal<{type: 'success' | 'danger' | 'warning' | null, message: string}>({type: null, message: ''});
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.ownerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
+      copropertyIdForUnits: ['', Validators.required],
       selectedUnits: [<string[]>[], Validators.required],
     });
   }
@@ -60,14 +77,97 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   loadAvailableUnits(): void {
-    // TODO: Implement GraphQL query to fetch units for the coproperty
-    // Mock data
-    this.availableUnits = [
-      { id: '1', unitNumber: 'A101', copropertyId: this.copropertyId },
-      { id: '2', unitNumber: 'A102', copropertyId: this.copropertyId },
-      { id: '3', unitNumber: 'B201', copropertyId: this.copropertyId },
-      { id: '4', unitNumber: 'B202', copropertyId: this.copropertyId },
-    ];
+    this.loading.set(true);
+    
+    // Load all coproperties first
+    this.copropertyService.getCoproperties()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (coproperties) => {
+          this.coproperties.set(coproperties.map(c => ({ id: c.id, name: c.name })));
+          
+          if (coproperties.length === 0) {
+            this.availableUnits = [];
+            this.allUnits = [];
+            this.loading.set(false);
+            return;
+          }
+
+          // If specific coproperty context, load only its units
+          if (this.copropertyId) {
+            this.loadUnitsForCoproperty(this.copropertyId);
+          } else {
+            // Load all units from all coproperties
+            const unitRequests = coproperties.map(coproperty =>
+              this.unitService.getUnitsByCoproperty(coproperty.id)
+            );
+
+            forkJoin(unitRequests)
+              .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                finalize(() => this.loading.set(false))
+              )
+              .subscribe({
+                next: (results) => {
+                  this.allUnits = results.flat().map(u => ({
+                    id: u.id!,
+                    unitNumber: u.unitNumber,
+                    copropertyId: u.copropertyId
+                  }));
+                  this.availableUnits = [...this.allUnits];
+                },
+                error: (err) => {
+                  console.error('Error loading all units:', err);
+                  this.translateService.get('coproperty.messages.error').subscribe(msg => {
+                    this.showAlert('danger', msg);
+                  });
+                }
+              });
+          }
+        },
+        error: (err) => {
+          console.error('Error loading coproperties:', err);
+          this.loading.set(false);
+        }
+      });
+  }
+
+  loadUnitsForCoproperty(copropertyId: string): void {
+    if (!copropertyId) {
+      this.availableUnits = [...this.allUnits];
+      return;
+    }
+
+    this.loading.set(true);
+    this.unitService.getUnitsByCoproperty(copropertyId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false))
+      )
+      .subscribe({
+        next: (units) => {
+          this.availableUnits = units.map(u => ({
+            id: u.id!,
+            unitNumber: u.unitNumber,
+            copropertyId: u.copropertyId
+          }));
+        },
+        error: (err) => {
+          console.error('Error loading units:', err);
+          this.translateService.get('coproperty.messages.error').subscribe(msg => {
+            this.showAlert('danger', msg);
+          });
+        }
+      });
+  }
+
+  onCopropertyChangeForUnits(copropertyId: string): void {
+    this.selectedCopropertyForFilter.set(copropertyId);
+    this.loadUnitsForCoproperty(copropertyId);
+    // Clear selected units when changing coproperty
+    this.ownerForm.patchValue({ selectedUnits: [] });
   }
 
   loadOwners(): void {
@@ -133,7 +233,13 @@ export class OwnerManagementComponent implements OnInit {
     this.showAddForm = true;
     this.editingOwnerId = null;
     this.ownerForm.reset();
-    this.ownerForm.patchValue({ selectedUnits: [] });
+    this.ownerForm.patchValue({ 
+      selectedUnits: [],
+      copropertyIdForUnits: this.copropertyId || '' 
+    });
+    if (this.copropertyId) {
+      this.selectedCopropertyForFilter.set(this.copropertyId);
+    }
   }
 
   editOwner(owner: Owner): void {
@@ -152,10 +258,15 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   deleteOwner(owner: Owner): void {
-    if (confirm(`Are you sure you want to delete ${owner.firstName} ${owner.lastName}?`)) {
-      // TODO: Implement GraphQL mutation to delete owner
-      this.owners = this.owners.filter((o) => o.id !== owner.id);
-    }
+    this.translateService.get('coproperty.owner.deleteConfirm').subscribe((confirmMsg) => {
+      if (confirm(confirmMsg)) {
+        // TODO: Implement GraphQL mutation to delete owner
+        this.owners = this.owners.filter((o) => o.id !== owner.id);
+        this.translateService.get('coproperty.messages.deleted').subscribe((msg) => {
+          this.showAlert('success', msg);
+        });
+      }
+    });
   }
 
   saveOwner(): void {
@@ -179,9 +290,16 @@ export class OwnerManagementComponent implements OnInit {
       
       // TODO: Implement GraphQL mutation to create/update owner
       console.log('Saving owner with units:', input);
-      alert('Owner saved successfully');
+      const messageKey = this.editingOwnerId ? 'coproperty.messages.updated' : 'coproperty.messages.created';
+      this.translateService.get(messageKey).subscribe((msg) => {
+        this.showAlert('success', msg);
+      });
       this.showAddForm = false;
       this.ownerForm.reset();
+    } else {
+      this.translateService.get('validation.required').subscribe((msg) => {
+        this.showAlert('warning', msg);
+      });
     }
   }
 
@@ -218,5 +336,10 @@ export class OwnerManagementComponent implements OnInit {
     }
     
     this.ownerForm.patchValue({ selectedUnits: [...selectedUnits] });
+  }
+
+  private showAlert(type: 'success' | 'danger' | 'warning', message: string) {
+    this.alert.set({type, message});
+    setTimeout(() => this.alert.set({type: null, message: ''}), 5000);
   }
 }

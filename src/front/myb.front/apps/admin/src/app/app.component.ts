@@ -15,10 +15,33 @@ export class AppComponent implements OnInit {
   private translate = inject(TranslateService);
 
   ngOnInit(): void {
-    // Set default language and add supported languages
-    const browserLang = this.translate.getBrowserLang() || 'fr';
+    // Initialize language with localStorage persistence
+    this.initializeLanguage();
+  }
+
+  private initializeLanguage(): void {
+    // Add supported languages
+    this.translate.addLangs(['fr', 'en']);
+    
+    // Set French as the default language
     this.translate.setDefaultLang('fr');
-    this.translate.use(browserLang);
+    
+    // Check localStorage for saved language preference
+    const savedLang = localStorage.getItem('language');
+    
+    if (savedLang && this.translate.getLangs().includes(savedLang)) {
+      // Use saved language preference
+      this.translate.use(savedLang);
+    } else {
+      // No saved preference, use French as default
+      this.translate.use('fr');
+      localStorage.setItem('language', 'fr');
+    }
+
+    // Subscribe to language changes to save preference
+    this.translate.onLangChange.subscribe((event) => {
+      localStorage.setItem('language', event.lang);
+    });
   }
 }
 

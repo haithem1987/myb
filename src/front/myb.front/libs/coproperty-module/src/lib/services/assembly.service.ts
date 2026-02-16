@@ -49,6 +49,10 @@ export class AssemblyService {
     return this.apollo.mutate<{ createAssembly: Assembly }>({
       mutation: CREATE_ASSEMBLY,
       variables: { input },
+      refetchQueries: [
+        { query: GET_ASSEMBLIES, variables: { copropertyId: input.copropertyId } },
+        { query: GET_UPCOMING_ASSEMBLIES, variables: { copropertyId: input.copropertyId } }
+      ],
       context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data!.createAssembly)
@@ -59,6 +63,9 @@ export class AssemblyService {
     return this.apollo.mutate<{ updateAssembly: Assembly }>({
       mutation: UPDATE_ASSEMBLY,
       variables: { id, input },
+      refetchQueries: [
+        { query: GET_ASSEMBLY_BY_ID, variables: { id } }
+      ],
       context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data!.updateAssembly)
@@ -69,6 +76,9 @@ export class AssemblyService {
     return this.apollo.mutate<{ updateAssemblyStatus: Assembly }>({
       mutation: UPDATE_ASSEMBLY_STATUS,
       variables: { id, status },
+      refetchQueries: [
+        { query: GET_ASSEMBLY_BY_ID, variables: { id } }
+      ],
       context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data!.updateAssemblyStatus)
@@ -79,6 +89,7 @@ export class AssemblyService {
     return this.apollo.mutate<{ deleteAssembly: boolean }>({
       mutation: DELETE_ASSEMBLY,
       variables: { id },
+      awaitRefetchQueries: true,
       context: { service: 'copropertyService' }
     }).pipe(
       map(result => result.data!.deleteAssembly)

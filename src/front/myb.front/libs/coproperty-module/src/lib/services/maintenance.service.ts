@@ -106,6 +106,8 @@ export class MaintenanceService {
       .mutate<{ deleteMaintenanceRequest: boolean }>({
         mutation: DELETE_MAINTENANCE_REQUEST,
         variables: { id },
+        refetchQueries: [{ query: GET_ALL_MAINTENANCE_REQUESTS }],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteMaintenanceRequest));
@@ -116,6 +118,10 @@ export class MaintenanceService {
       .mutate<{ updateMaintenanceStatus: MaintenanceRequestExtended }>({
         mutation: UPDATE_MAINTENANCE_STATUS,
         variables: { id, status },
+        refetchQueries: [
+          { query: GET_ALL_MAINTENANCE_REQUESTS },
+          { query: GET_MAINTENANCE_REQUEST_BY_ID, variables: { id } }
+        ],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateMaintenanceStatus));

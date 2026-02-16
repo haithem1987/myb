@@ -28,7 +28,6 @@ namespace Myb.Coproperty.GraphQL.Types
         {
             // Convert snake_case to PascalCase for enum parsing
             var chargeTypePascal = ConvertToPascalCase(ChargeType);
-            var frequencyPascal = ConvertToPascalCase(Frequency);
             var distributionMethodPascal = ConvertToPascalCase(DistributionMethod);
 
             return new Myb.Coproperty.Models.Charge
@@ -38,7 +37,7 @@ namespace Myb.Coproperty.GraphQL.Types
                 Name = Name,
                 Description = Description,
                 ChargeType = Enum.Parse<Myb.Coproperty.Models.ChargeType>(chargeTypePascal, ignoreCase: true),
-                Frequency = Enum.Parse<Myb.Coproperty.Models.ChargeFrequency>(frequencyPascal, ignoreCase: true),
+                Frequency = Frequency,
                 TotalAmount = TotalAmount,
                 DistributionMethod = Enum.Parse<Myb.Coproperty.Models.DistributionMethod>(distributionMethodPascal, ignoreCase: true),
                 StartDate = DateTime.TryParse(StartDate, out var startDate) 

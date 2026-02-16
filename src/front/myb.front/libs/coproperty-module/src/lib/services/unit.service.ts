@@ -34,10 +34,12 @@ export class UnitService {
 
   getAllUnits(): Observable<UnitExtended[]> {
     return this.apollo
-      .query<{ allUnits: UnitExtended[] }>({
+      .watchQuery<{ allUnits: UnitExtended[] }>({
         query: GET_ALL_UNITS,
+        fetchPolicy: 'cache-and-network',
         context: { service: 'copropertyService' },
       })
+      .valueChanges
       .pipe(map((result) => result.data.allUnits));
   }
 
@@ -53,11 +55,13 @@ export class UnitService {
 
   getUnitsByCoproperty(copropertyId: string): Observable<UnitExtended[]> {
     return this.apollo
-      .query<{ units: UnitExtended[] }>({
+      .watchQuery<{ units: UnitExtended[] }>({
         query: GET_UNITS_BY_COPROPERTY,
         variables: { copropertyId },
+        fetchPolicy: 'cache-and-network',
         context: { service: 'copropertyService' },
       })
+      .valueChanges
       .pipe(map((result) => result.data.units));
   }
 
@@ -66,7 +70,10 @@ export class UnitService {
       .mutate<{ createUnit: UnitExtended }>({
         mutation: CREATE_UNIT,
         variables: { item: unit },
-        refetchQueries: [{ query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId: unit.copropertyId } }],
+        refetchQueries: [
+          { query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId: unit.copropertyId } },
+          { query: GET_ALL_UNITS }
+        ],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createUnit));
@@ -77,7 +84,11 @@ export class UnitService {
       .mutate<{ updateUnit: UnitExtended }>({
         mutation: UPDATE_UNIT,
         variables: { item: unit },
-        refetchQueries: [{ query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId: unit.copropertyId } }],
+        refetchQueries: [
+          { query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId: unit.copropertyId } },
+          { query: GET_ALL_UNITS },
+          { query: GET_UNIT_BY_ID, variables: { id: unit.id } }
+        ],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateUnit));
@@ -88,6 +99,8 @@ export class UnitService {
       .mutate<{ deleteUnit: boolean }>({
         mutation: DELETE_UNIT,
         variables: { id },
+        refetchQueries: [{ query: GET_ALL_UNITS }],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteUnit));

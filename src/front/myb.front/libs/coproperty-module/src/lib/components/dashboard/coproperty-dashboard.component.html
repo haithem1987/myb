@@ -133,7 +133,7 @@
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">Title</label>
-          <input class="form-control" [value]="assemblyTitle()" (input)="assemblyTitle.set($any($event.target).value)" [disabled]="isLoading()" placeholder="Annual General Assembly" />
+          <input class="form-control" [value]="assemblyTitle()" (input)="assemblyTitle.set($any($event.target).value)" [disabled]="isLoading()" [placeholder]="'common.assemblyTitlePlaceholder' | translate" />
         </div>
         <div class="col-md-3">
           <label class="form-label">Date</label>
@@ -141,7 +141,7 @@
         </div>
         <div class="col-12">
           <label class="form-label">Agenda</label>
-          <textarea class="form-control" rows="4" [value]="assemblyAgenda()" (input)="assemblyAgenda.set($any($event.target).value)" [disabled]="isLoading()" placeholder="Agenda items..."></textarea>
+          <textarea class="form-control" rows="4" [value]="assemblyAgenda()" (input)="assemblyAgenda.set($any($event.target).value)" [disabled]="isLoading()" [placeholder]="'common.agendaPlaceholder' | translate"></textarea>
         </div>
       </div>
       <div class="mt-3">
@@ -163,7 +163,7 @@
       <div class="row g-3">
         <div class="col-md-3">
           <label class="form-label">Amount (€)</label>
-          <input type="number" class="form-control" [value]="fundCallAmount()" (input)="fundCallAmount.set(+$any($event.target).value)" [disabled]="isLoading()" placeholder="1000" />
+          <input type="number" class="form-control" [value]="fundCallAmount()" (input)="fundCallAmount.set(+$any($event.target).value)" [disabled]="isLoading()" [placeholder]="'common.amountPlaceholder' | translate" />
         </div>
         <div class="col-md-3">
           <label class="form-label">Due date</label>
@@ -171,7 +171,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">Description</label>
-          <input class="form-control" [value]="fundCallDescription()" (input)="fundCallDescription.set($any($event.target).value)" [disabled]="isLoading()" placeholder="Q1 charges" />
+          <input class="form-control" [value]="fundCallDescription()" (input)="fundCallDescription.set($any($event.target).value)" [disabled]="isLoading()" [placeholder]="'common.fundCallDescPlaceholder' | translate" />
         </div>
       </div>
       <div class="mt-3">

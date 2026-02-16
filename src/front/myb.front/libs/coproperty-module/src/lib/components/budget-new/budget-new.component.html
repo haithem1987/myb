@@ -1,0 +1,262 @@
+<div class="budget-new-container">
+  <div class="page-header">
+    <button 
+      type="button" 
+      class="btn btn-link text-decoration-none mb-3"
+      (click)="goBack()">
+      <i class="bi bi-arrow-left me-1"></i>
+      {{ 'common.back' | translate }}
+    </button>
+    <h1>
+      <i class="bi bi-cash-stack me-2"></i>
+      {{ isEditMode() ? ('coproperty.charges.editCharge' | translate) : ('coproperty.charges.addCharge' | translate) }}
+    </h1>
+  </div>
+
+  <!-- Success Alert -->
+  <div *ngIf="saveSuccess()" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle me-2"></i>
+    {{ isEditMode() ? ('coproperty.charge.budgetUpdated' | translate) : ('coproperty.charge.budgetCreated' | translate) }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="card">
+    <div class="card-body text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ 'common.loading' | translate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="budgetForm" (ngSubmit)="saveBudget()" *ngIf="!loading()">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+          <i class="bi bi-info-circle me-2"></i>
+          {{ 'coproperty.charge.generalInfo' | translate }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <!-- Coproperty -->
+          <div class="col-md-6">
+            <label for="copropertyId" class="form-label">
+              <i class="bi bi-building me-1"></i>
+              {{ 'coproperty.charge.coproperty' | translate }} <span class="text-danger">*</span>
+            </label>
+            <select 
+              id="copropertyId" 
+              class="form-select" 
+              formControlName="copropertyId"
+              [class.is-invalid]="budgetForm.get('copropertyId')?.invalid && budgetForm.get('copropertyId')?.touched">
+              <option value="">{{ 'coproperty.charge.selectCoproperty' | translate }}</option>
+              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
+                {{ coproperty.name }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="budgetForm.get('copropertyId')?.invalid && budgetForm.get('copropertyId')?.touched">
+              {{ 'validation.required' | translate }}
+            </div>
+          </div>
+
+          <!-- Name -->
+          <div class="col-md-6">
+            <label for="name" class="form-label">
+              <i class="bi bi-tag me-1"></i>
+              {{ 'coproperty.charges.name' | translate }} <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="name" 
+              class="form-control" 
+              [placeholder]="'coproperty.charge.namePlaceholder' | translate"
+              formControlName="name"
+              [class.is-invalid]="budgetForm.get('name')?.invalid && budgetForm.get('name')?.touched">
+            <div class="invalid-feedback" *ngIf="budgetForm.get('name')?.invalid && budgetForm.get('name')?.touched">
+              {{ 'validation.required' | translate }}
+            </div>
+          </div>
+
+          <!-- Type -->
+          <div class="col-md-4">
+            <label for="chargeType" class="form-label">
+              <i class="bi bi-bookmark me-1"></i>
+              {{ 'coproperty.charges.type' | translate }} <span class="text-danger">*</span>
+            </label>
+            <select 
+              id="chargeType" 
+              class="form-select" 
+              formControlName="chargeType"
+              [class.is-invalid]="budgetForm.get('chargeType')?.invalid && budgetForm.get('chargeType')?.touched">
+              <option *ngFor="let type of chargeTypes" [value]="type.value">
+                {{ type.label | translate }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Year -->
+          <div class="col-md-4">
+            <label for="frequency" class="form-label">
+              <i class="bi bi-calendar-event me-1"></i>
+              {{ 'coproperty.charges.frequency' | translate }} <span class="text-danger">*</span>
+            </label>
+            <select 
+              id="frequency" 
+              class="form-select" 
+              formControlName="frequency">
+              <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+            </select>
+          </div>
+
+          <!-- Total Amount -->
+          <div class="col-md-4">
+            <label for="totalAmount" class="form-label">
+              <i class="bi bi-cash-stack me-1"></i>
+              {{ 'coproperty.charges.totalAmount' | translate }} <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="totalAmount" 
+              class="form-control" 
+              [placeholder]="'coproperty.charge.amountPlaceholder' | translate"
+              step="0.01"
+              min="0"
+              formControlName="totalAmount"
+              [class.is-invalid]="budgetForm.get('totalAmount')?.invalid && budgetForm.get('totalAmount')?.touched">
+            <div class="invalid-feedback" *ngIf="budgetForm.get('totalAmount')?.invalid && budgetForm.get('totalAmount')?.touched">
+              {{ 'validation.min' | translate }} 0.01
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="col-12">
+            <label for="description" class="form-label">
+              <i class="bi bi-pencil-square me-1"></i>
+              {{ 'coproperty.charges.description' | translate }}
+            </label>
+            <textarea 
+              id="description" 
+              class="form-control" 
+              rows="3"
+              [placeholder]="'coproperty.charge.descriptionPlaceholder' | translate"
+              formControlName="description"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+          <i class="bi bi-pie-chart me-2"></i>
+          {{ 'coproperty.charge.distributionAndDates' | translate }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <!-- Distribution Method -->
+          <div class="col-md-6">
+            <label for="distributionMethod" class="form-label">
+              <i class="bi bi-diagram-3 me-1"></i>
+              {{ 'coproperty.charges.distributionMethod' | translate }} <span class="text-danger">*</span>
+            </label>
+            <select 
+              id="distributionMethod" 
+              class="form-select" 
+              formControlName="distributionMethod">
+              <option *ngFor="let method of distributionMethods" [value]="method.value">
+                {{ method.label | translate }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Start Date -->
+          <div class="col-md-3">
+            <label for="startDate" class="form-label">
+              <i class="bi bi-calendar-check me-1"></i>
+              {{ 'coproperty.charges.startDate' | translate }} <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="date" 
+              id="startDate" 
+              class="form-control" 
+              formControlName="startDate"
+              [class.is-invalid]="budgetForm.get('startDate')?.invalid && budgetForm.get('startDate')?.touched">
+            <div class="invalid-feedback" *ngIf="budgetForm.get('startDate')?.invalid && budgetForm.get('startDate')?.touched">
+              {{ 'validation.required' | translate }}
+            </div>
+          </div>
+
+          <!-- End Date -->
+          <div class="col-md-3">
+            <label for="endDate" class="form-label">
+              <i class="bi bi-calendar-x me-1"></i>
+              {{ 'coproperty.charges.endDate' | translate }}
+            </label>
+            <input 
+              type="date" 
+              id="endDate" 
+              class="form-control" 
+              formControlName="endDate">
+          </div>
+
+          <!-- Active Status -->
+          <div class="col-12">
+            <div class="form-check form-switch">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                id="isActive"
+                formControlName="isActive">
+              <label class="form-check-label" for="isActive">
+                <i class="bi bi-check-circle me-1"></i>
+                {{ 'coproperty.charges.isActive' | translate }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <button 
+              *ngIf="isEditMode()"
+              type="button" 
+              class="btn btn-outline-danger"
+              (click)="deleteBudget()">
+              <i class="bi bi-trash me-2"></i>
+              {{ 'coproperty.charges.deleteCharge' | translate }}
+            </button>
+          </div>
+          <div class="d-flex gap-2">
+            <button 
+              type="button" 
+              class="btn btn-outline-secondary"
+              (click)="goBack()">
+              <i class="bi bi-x me-2"></i>
+              {{ 'coproperty.charges.cancel' | translate }}
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="saving() || budgetForm.invalid">
+              <span *ngIf="!saving()">
+                <i class="bi bi-save me-2"></i>
+                {{ 'coproperty.charges.save' | translate }}
+              </span>
+              <span *ngIf="saving()">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                {{ 'validation.SAVING' | translate }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

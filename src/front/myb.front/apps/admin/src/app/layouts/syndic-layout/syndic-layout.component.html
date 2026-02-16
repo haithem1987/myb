@@ -24,11 +24,14 @@
         </span>
       </a>
       
-      <a routerLink="/coproperty/syndic/charges" 
+      <a routerLink="/coproperty/syndic/budgets" 
          routerLinkActive="active" 
          class="nav-item">
         <i class="bi bi-cash-stack"></i>
-        <span class="nav-text">Charges</span>
+        <span class="nav-text">Budget</span>
+        <span class="badge" *ngIf="totalBudgets() > 0">
+          {{ totalBudgets() }}
+        </span>
       </a>
       
       <a routerLink="/coproperty/syndic/distribution" 
@@ -43,6 +46,9 @@
          class="nav-item">
         <i class="bi bi-building"></i>
         <span class="nav-text">Lots</span>
+        <span class="badge" *ngIf="totalUnits() > 0">
+          {{ totalUnits() }}
+        </span>
       </a>
       
       <a routerLink="/coproperty/syndic/owners" 
@@ -64,6 +70,7 @@
       </a>
       -->
       
+      <!-- Hidden: Demandes Travaux
       <a routerLink="/coproperty/syndic/maintenance" 
          routerLinkActive="active" 
          class="nav-item">
@@ -73,6 +80,7 @@
           {{ urgentRequests() }}
         </span>
       </a>
+      -->
       
       <a routerLink="/coproperty/syndic/fund-calls" 
          routerLinkActive="active" 
@@ -81,19 +89,23 @@
         <span class="nav-text">Appels de Fonds</span>
       </a>
       
+      <!-- Hidden: Assemblées Générales
       <a routerLink="/coproperty/syndic/general-assembly" 
          routerLinkActive="active" 
          class="nav-item">
         <i class="bi bi-people-fill"></i>
         <span class="nav-text">Assemblées Générales</span>
       </a>
+      -->
       
+      <!-- Hidden: Rapports
       <a routerLink="/coproperty/syndic/reports" 
          routerLinkActive="active" 
          class="nav-item">
         <i class="bi bi-graph-up"></i>
         <span class="nav-text">Rapports</span>
       </a>
+      -->
     </nav>
     
     <div class="sidebar-footer">

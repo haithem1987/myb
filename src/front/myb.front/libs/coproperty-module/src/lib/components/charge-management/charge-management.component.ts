@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChargeService, ChargeExtended, ChargeDistributionExtended } from '../../services/charge.service';
 
@@ -18,6 +18,7 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private chargeService = inject(ChargeService);
+  private translateService = inject(TranslateService);
 
   charges = signal<ChargeExtended[]>([]);
   distributions = signal<ChargeDistributionExtended[]>([]);
@@ -28,21 +29,35 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
   resolvedCopropertyId = signal<string | null>(null);
   loading = signal<boolean>(false);
   selectedDistributionMethod = signal<string>('BY_SHARES');
+  alert = signal<{type: 'success' | 'danger' | 'warning' | null, message: string}>({type: null, message: ''});
 
   chargeForm: FormGroup;
+  years: number[] = [];
 
   constructor() {
+    this.years = this.generateYears();
+    const currentYear = new Date().getFullYear().toString();
+    
     this.chargeForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
       chargeType: ['CLEANING', Validators.required],
-      frequency: ['MONTHLY', Validators.required],
+      frequency: [currentYear, Validators.required],
       totalAmount: ['', [Validators.required, Validators.min(0.01)]],
       distributionMethod: ['BY_SHARES', Validators.required],
       startDate: ['', Validators.required],
       endDate: [''],
       isActive: [true]
     });
+  }
+
+  private generateYears(): number[] {
+    const currentYear = new Date().getFullYear();
+    const years: number[] = [];
+    for (let i = currentYear; i <= currentYear + 6; i++) {
+      years.push(i);
+    }
+    return years;
   }
 
   ngOnInit() {
@@ -93,9 +108,10 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
     this.isEditing.set(false);
     this.showForm.set(true);
     this.currentChargeId.set(null);
+    const currentYear = new Date().getFullYear().toString();
     this.chargeForm.reset({
       chargeType: 'CLEANING',
-      frequency: 'MONTHLY',
+      frequency: currentYear,
       distributionMethod: 'BY_SHARES',
       isActive: true,
       totalAmount: ''
@@ -130,11 +146,18 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
 
       operation.subscribe({
         next: () => {
+          const messageKey = this.isEditing() ? 'coproperty.charge.budgetUpdated' : 'coproperty.charge.budgetCreated';
+          this.translateService.get(messageKey).subscribe((message) => {
+            this.showAlert('success', message);
+          });
           this.loadCharges();
           this.cancelEdit();
         },
         error: (error: any) => {
           console.error('Error saving charge:', error);
+          this.translateService.get('coproperty.messages.saveFailed').subscribe((message) => {
+            this.showAlert('danger', message);
+          });
           this.loading.set(false);
         }
       });
@@ -142,16 +165,26 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
   }
 
   deleteCharge(chargeId: string) {
-    if (confirm('Are you sure you want to delete this charge?')) {
-      this.loading.set(true);
-      this.chargeService.deleteCharge(chargeId).subscribe({
-        next: () => this.loadCharges(),
-        error: (error: any) => {
-          console.error('Error deleting charge:', error);
-          this.loading.set(false);
-        }
-      });
-    }
+    this.translateService.get('coproperty.charges.deleteConfirm').subscribe((confirmMessage) => {
+      if (confirm(confirmMessage)) {
+        this.loading.set(true);
+        this.chargeService.deleteCharge(chargeId).subscribe({
+          next: () => {
+            this.translateService.get('coproperty.messages.deleted').subscribe((message) => {
+              this.showAlert('success', message);
+            });
+            this.loadCharges();
+          },
+          error: (error: any) => {
+            console.error('Error deleting charge:', error);
+            this.translateService.get('coproperty.messages.error').subscribe((message) => {
+              this.showAlert('danger', message);
+            });
+            this.loading.set(false);
+          }
+        });
+      }
+    });
   }
 
   distributeCharge(chargeId: string) {
@@ -243,5 +276,10 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
     if (!dateString) return null;
     // Convert YYYY-MM-DD to ISO DateTime (YYYY-MM-DDTHH:mm:ss)
     return `${dateString}T00:00:00`;
+  }
+
+  private showAlert(type: 'success' | 'danger' | 'warning', message: string) {
+    this.alert.set({type, message});
+    setTimeout(() => this.alert.set({type: null, message: ''}), 5000);
   }
 }

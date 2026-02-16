@@ -2,7 +2,7 @@ import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { Coproperty } from '../../models/coproperty.models';
@@ -13,7 +13,7 @@ import { map, finalize, switchMap } from 'rxjs/operators';
 @Component({
   selector: 'myb-charges-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterModule],
   templateUrl: './charges-list.component.html',
   styleUrls: ['./charges-list.component.scss'],
 })
@@ -32,7 +32,7 @@ export class ChargesListComponent implements OnInit {
   filterFrequency = signal<string>('');
 
   chargeTypes = ['CLEANING', 'MAINTENANCE', 'INSURANCE', 'ELEVATOR', 'HEATING', 'WATER', 'ELECTRICITY', 'GARDENING', 'SECURITY', 'OTHER'];
-  frequencies = ['MONTHLY', 'QUARTERLY', 'ANNUALLY', 'ONE_TIME'];
+  frequencies = ['2024', '2025', '2026', '2027', '2028', '2029', '2030'];
 
   ngOnInit(): void {
     this.loadCoproperties();
@@ -153,8 +153,9 @@ export class ChargesListComponent implements OnInit {
     return this.filteredCharges.filter(charge => charge.isActive).length;
   }
 
-  getMonthlyChargesCount(): number {
-    return this.filteredCharges.filter(charge => charge.frequency === 'MONTHLY').length;
+  getCurrentYearCount(): number {
+    const currentYear = new Date().getFullYear().toString();
+    return this.filteredCharges.filter(charge => charge.frequency === currentYear).length;
   }
 
   viewCharge(charge: ChargeExtended): void {

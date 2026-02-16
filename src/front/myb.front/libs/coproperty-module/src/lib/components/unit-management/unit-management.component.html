@@ -1,4 +1,20 @@
 <div class="unit-management-container">
+  <!-- Success/Error Alert -->
+  <div *ngIf="alert().type" class="alert alert-dismissible fade show mb-3" 
+       [ngClass]="{
+         'alert-success': alert().type === 'success',
+         'alert-danger': alert().type === 'danger',
+         'alert-warning': alert().type === 'warning'
+       }" 
+       role="alert">
+    <i class="bi me-2" [ngClass]="{
+      'bi-check-circle': alert().type === 'success',
+      'bi-exclamation-triangle': alert().type === 'danger' || alert().type === 'warning'
+    }"></i>
+    {{ alert().message }}
+    <button type="button" class="btn-close" (click)="alert.set({type: null, message: ''})"></button>
+  </div>
+
   <!-- Message for new coproperty -->
   <div *ngIf="!resolvedCopropertyId" class="alert alert-info">
     <i class="bi bi-info-circle me-2"></i>
@@ -19,7 +35,7 @@
       <input
         type="text"
         class="form-control"
-        placeholder="Search units..."
+        [placeholder]="'common.searchUnits' | translate"
         [(ngModel)]="searchTerm"
       />
     </div>
@@ -81,11 +97,11 @@
         <div class="form-actions">
           <button type="submit" class="btn btn-success" [disabled]="!unitForm.valid">
             <i class="bi bi-save"></i>
-            Save
+            {{ 'common.save' | translate }}
           </button>
           <button type="button" class="btn btn-secondary" (click)="cancelForm()">
             <i class="bi bi-x"></i>
-            Cancel
+            {{ 'common.cancel' | translate }}
           </button>
         </div>
       </form>
@@ -135,10 +151,10 @@
                 <span *ngIf="!unit.unitType" class="text-muted">-</span>
               </td>
               <td>
-                <button class="btn btn-sm btn-primary" (click)="editUnit(unit)" title="Edit">
+                <button class="btn btn-sm btn-primary" (click)="editUnit(unit)" [title]="'common.editAction' | translate">
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteUnit(unit)" title="Delete">
+                <button class="btn btn-sm btn-danger" (click)="deleteUnit(unit)" [title]="'common.deleteAction' | translate">
                   <i class="bi bi-trash"></i>
                 </button>
               </td>

@@ -1,19 +1,20 @@
 import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { UnitService, UnitExtended } from '../../services/unit.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { Coproperty } from '../../models/coproperty.models';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map, finalize, switchMap } from 'rxjs/operators';
+import { map, finalize } from 'rxjs/operators';
+import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
   selector: 'myb-units-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './units-list.component.html',
   styleUrls: ['./units-list.component.scss'],
 })
@@ -22,6 +23,9 @@ export class UnitsListComponent implements OnInit {
   private copropertyService = inject(CopropertyService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
+  private toastService = inject(ToastService);
+  private translateService = inject(TranslateService);
 
   units = signal<UnitExtended[]>([]);
   coproperties = signal<Coproperty[]>([]);
@@ -30,8 +34,27 @@ export class UnitsListComponent implements OnInit {
   searchTerm = signal<string>('');
   filterType = signal<string>('');
   filterOccupancy = signal<string>('');
+  showAddForm = signal<boolean>(false);
+  editingUnitId = signal<string | null>(null);
 
   unitTypes = ['APARTMENT', 'PARKING', 'CAVE', 'COMMERCIAL', 'OTHER'];
+  unitForm: FormGroup;
+  
+  // Alert system
+  alert = signal<{type: 'success' | 'danger' | 'warning' | null, message: string}>({type: null, message: ''});
+
+  constructor() {
+    this.unitForm = this.fb.group({
+      copropertyId: ['', Validators.required],
+      unitNumber: ['', [Validators.required, Validators.minLength(1)]],
+      floor: [1, [Validators.required, Validators.min(0)]],
+      area: [0, [Validators.required, Validators.min(1)]],
+      shares: [0, [Validators.required, Validators.min(1)]],
+      unitType: ['APARTMENT', Validators.required],
+      description: [''],
+      isOccupied: [true, Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.loadCoproperties();
@@ -51,75 +74,40 @@ export class UnitsListComponent implements OnInit {
 
   loadAllUnits(): void {
     this.loading.set(true);
-    this.copropertyService.getCoproperties()
-      .pipe(
-        switchMap((coproperties) => {
-          if (coproperties.length === 0) {
-            this.units.set([]);
-            return of([]);
-          }
-
-          const unitRequests = coproperties.map(coproperty =>
-            this.unitService.getUnitsByCoproperty(coproperty.id).pipe(
-              map(units => ({
-                units,
-                copropertyName: coproperty.name
-              }))
-            )
-          );
-
-          return forkJoin(unitRequests).pipe(
-            map(results => results.flatMap(result =>
-              result.units.map(unit => ({
-                ...unit,
-                copropertyName: result.copropertyName
-              } as any))
-            ))
-          );
-        }),
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.loading.set(false))
-      )
-      .subscribe({
-        next: (allUnits) => {
-          this.units.set(allUnits);
-          this.loading.set(false);
-        },
-        error: (err) => {
-          console.error('Error loading units:', err);
-          this.loading.set(false);
-        }
-      });
+    
+    // Load all units and coproperties in parallel
+    forkJoin({
+      units: this.unitService.getAllUnits(),
+      coproperties: this.copropertyService.getCoproperties()
+    }).pipe(
+      map(({ units, coproperties }) => {
+        // Create a map of coproperty IDs to names for quick lookup
+        const copropertyMap = new Map(
+          coproperties.map(cp => [cp.id, cp.name])
+        );
+        
+        // Add coproperty name to each unit
+        return units.map(unit => ({
+          ...unit,
+          copropertyName: copropertyMap.get(unit.copropertyId) || 'Unknown'
+        } as any));
+      }),
+      finalize(() => this.loading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (allUnits) => {
+        this.units.set(allUnits);
+      },
+      error: (err) => {
+        console.error('Error loading units:', err);
+        this.showAlert('danger', 'Erreur lors du chargement des lots');
+      }
+    });
   }
 
   onCopropertyChange(copropertyId: string): void {
     this.selectedCopropertyId.set(copropertyId);
-    
-    if (!copropertyId || copropertyId === 'all') {
-      this.loadAllUnits();
-    } else {
-      this.loading.set(true);
-      this.unitService.getUnitsByCoproperty(copropertyId)
-        .pipe(
-          takeUntilDestroyed(this.destroyRef),
-          finalize(() => this.loading.set(false))
-        )
-        .subscribe({
-          next: (units) => {
-            const coproperty = this.coproperties().find(c => c.id === copropertyId);
-            const unitsWithCoproperty = units.map(unit => ({
-              ...unit,
-              copropertyName: coproperty?.name || ''
-            } as any));
-            this.units.set(unitsWithCoproperty);
-            this.loading.set(false);
-          },
-          error: (err) => {
-            console.error('Error loading units:', err);
-            this.loading.set(false);
-          }
-        });
-    }
+    // Filter happens automatically through the filteredUnits getter
   }
 
   onCopropertyFilterChange(event: Event): void {
@@ -144,6 +132,12 @@ export class UnitsListComponent implements OnInit {
 
   get filteredUnits(): UnitExtended[] {
     let filtered = this.units();
+
+    // Filter by coproperty
+    const selectedCoproperty = this.selectedCopropertyId();
+    if (selectedCoproperty && selectedCoproperty !== 'all') {
+      filtered = filtered.filter(unit => unit.copropertyId === selectedCoproperty);
+    }
 
     // Filter by search term
     if (this.searchTerm()) {
@@ -204,14 +198,8 @@ export class UnitsListComponent implements OnInit {
   }
 
   getUnitTypeLabel(type: string): string {
-    const labels: { [key: string]: string } = {
-      'APARTMENT': 'Appartement',
-      'PARKING': 'Parking',
-      'CAVE': 'Cave',
-      'COMMERCIAL': 'Commercial',
-      'OTHER': 'Autre'
-    };
-    return labels[type] || type;
+    const typeKey = type.toLowerCase();
+    return this.translateService.instant(`coproperty.unit.types.${typeKey}`);
   }
 
   getOccupancyBadgeClass(isOccupied: boolean): string {
@@ -219,7 +207,8 @@ export class UnitsListComponent implements OnInit {
   }
 
   getOccupancyLabel(isOccupied: boolean): string {
-    return isOccupied ? 'Occupé' : 'Vacant';
+    const key = isOccupied ? 'coproperty.unit.occupied' : 'coproperty.unit.vacant';
+    return this.translateService.instant(key);
   }
 
   getCopropertyName(unit: UnitExtended): string {
@@ -232,5 +221,116 @@ export class UnitsListComponent implements OnInit {
       minimumFractionDigits: 1,
       maximumFractionDigits: 1
     }).format(area);
+  }
+
+  openAddForm(): void {
+    this.showAddForm.set(true);
+    this.editingUnitId.set(null);
+    this.unitForm.reset({ 
+      unitType: 'APARTMENT', 
+      isOccupied: true, 
+      floor: 1,
+      area: 0,
+      shares: 0,
+      copropertyId: this.selectedCopropertyId() || ''
+    });
+  }
+
+  editUnit(unit: UnitExtended): void {
+    this.editingUnitId.set(unit.id || null);
+    this.showAddForm.set(true);
+    this.unitForm.patchValue({
+      copropertyId: unit.copropertyId,
+      unitNumber: unit.unitNumber,
+      floor: unit.floor,
+      area: unit.area,
+      shares: unit.shares,
+      unitType: unit.unitType,
+      description: unit.description,
+      isOccupied: unit.isOccupied
+    });
+  }
+
+  deleteUnit(unit: UnitExtended): void {
+    this.translateService.get('coproperty.unit.deleteConfirm').subscribe((confirmMsg) => {
+      if (confirm(confirmMsg)) {
+        this.loading.set(true);
+        this.unitService.deleteUnit(unit.id!).subscribe({
+          next: () => {
+            this.translateService.get('coproperty.messages.deleted').subscribe((msg) => {
+              this.showAlert('success', msg);
+            });
+            this.loadAllUnits();
+          },
+          error: (err) => {
+            console.error('Error deleting unit:', err);
+            this.translateService.get('coproperty.messages.error').subscribe((msg) => {
+              this.showAlert('danger', msg);
+            });
+            this.loading.set(false);
+          }
+        });
+      }
+    });
+  }
+
+  saveUnit(): void {
+    if (this.unitForm.valid) {
+      this.loading.set(true);
+      const unitData: UnitExtended = {
+        ...this.unitForm.value,
+        id: this.editingUnitId() || '00000000-0000-0000-0000-000000000000'
+      };
+
+      const operation = this.editingUnitId() 
+        ? this.unitService.updateUnit(unitData)
+        : this.unitService.createUnit(unitData);
+
+      operation.subscribe({
+        next: () => {
+          const messageKey = this.editingUnitId() 
+            ? 'coproperty.messages.updated'
+            : 'coproperty.messages.created';
+          
+          this.translateService.get(messageKey).subscribe((msg) => {
+            this.showAlert('success', msg);
+          });
+          
+          this.showAddForm.set(false);
+          this.unitForm.reset();
+          this.loadAllUnits();
+        },
+        error: (err) => {
+          console.error('Error saving unit:', err);
+          
+          const errorMessage = err?.error?.errors?.[0]?.message || err?.message || '';
+          let translationKey = 'coproperty.messages.saveFailed';
+          
+          if (errorMessage.includes('duplicate') || errorMessage.includes('already exists')) {
+            translationKey = 'coproperty.unit.duplicateError';
+          }
+          
+          this.translateService.get(translationKey).subscribe((msg) => {
+            this.showAlert('danger', msg);
+          });
+          this.loading.set(false);
+        }
+      });
+    } else {
+      this.translateService.get('validation.required').subscribe((msg) => {
+        this.showAlert('warning', msg);
+      });
+    }
+  }
+
+  cancelForm(): void {
+    this.showAddForm.set(false);
+    this.editingUnitId.set(null);
+    this.unitForm.reset();
+  }
+
+  private showAlert(type: 'success' | 'danger' | 'warning', message: string): void {
+    this.alert.set({type, message});
+    setTimeout(() => this.alert.set({type: null, message: ''}), 5000);
   }
 }

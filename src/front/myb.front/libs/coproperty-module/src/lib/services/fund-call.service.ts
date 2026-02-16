@@ -58,7 +58,10 @@ export class FundCallService {
       .mutate<{ createFundCall: FundCallExtended }>({
         mutation: CREATE_FUND_CALL,
         variables: { input },
-        refetchQueries: [{ query: GET_ALL_FUND_CALLS }],
+        refetchQueries: [
+          { query: GET_ALL_FUND_CALLS },
+          { query: GET_FUND_CALLS_BY_COPROPERTY, variables: { copropertyId: input.copropertyId } }
+        ],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createFundCall));
@@ -69,7 +72,11 @@ export class FundCallService {
       .mutate<{ updateFundCall: FundCallExtended }>({
         mutation: UPDATE_FUND_CALL,
         variables: { id, input },
-        refetchQueries: [{ query: GET_ALL_FUND_CALLS }],
+        refetchQueries: [
+          { query: GET_ALL_FUND_CALLS },
+          { query: GET_FUND_CALL_BY_ID, variables: { id } },
+          { query: GET_FUND_CALLS_BY_COPROPERTY, variables: { copropertyId: input.copropertyId } }
+        ],
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateFundCall));
@@ -81,6 +88,7 @@ export class FundCallService {
         mutation: DELETE_FUND_CALL,
         variables: { id },
         refetchQueries: [{ query: GET_ALL_FUND_CALLS }],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteFundCall));

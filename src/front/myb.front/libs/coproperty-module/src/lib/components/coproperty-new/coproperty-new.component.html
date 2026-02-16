@@ -7,7 +7,7 @@
         <p class="page-subtitle">{{ 'coproperty.form.requiredFields' | translate }}</p>
       </div>
       <div class="header-actions">
-        <button class="btn btn-outline-secondary me-2" (click)="cancel()">
+        <button class="btn btn-outline-primary me-2" (click)="cancel()">
           <i class="bi bi-x me-2"></i>
           {{ 'common.cancel' | translate }}
         </button>
@@ -30,7 +30,7 @@
   <!-- Success Alert -->
   <div *ngIf="saveSuccess()" class="alert alert-success alert-dismissible fade show" role="alert">
     <i class="bi bi-check-circle me-2"></i>
-    <strong>Success!</strong> {{ (isEditMode() ? 'coproperty.messages.updated' : 'coproperty.messages.created') | translate }}
+    <strong>{{ 'common.success' | translate }}!</strong> {{ (isEditMode() ? 'coproperty.messages.updated' : 'coproperty.messages.created') | translate }}
   </div>
 
   <!-- Tabs Navigation -->
@@ -44,39 +44,6 @@
       >
         <i class="bi bi-info-circle me-2"></i>
         {{ 'coproperty.form.basicInfo' | translate }}
-      </button>
-    </li>
-    <li *ngIf="isEditMode()" class="nav-item" role="presentation">
-      <button 
-        class="nav-link" 
-        [class.active]="activeTab() === 'units'"
-        (click)="setActiveTab('units')"
-        type="button"
-      >
-        <i class="bi bi-building me-2"></i>
-        {{ 'coproperty.units.title' | translate }}
-      </button>
-    </li>
-    <li *ngIf="isEditMode()" class="nav-item" role="presentation">
-      <button 
-        class="nav-link" 
-        [class.active]="activeTab() === 'charges'"
-        (click)="setActiveTab('charges')"
-        type="button"
-      >
-        <i class="bi bi-receipt me-2"></i>
-        {{ 'coproperty.charges.title' | translate }}
-      </button>
-    </li>
-    <li *ngIf="isEditMode()" class="nav-item" role="presentation">
-      <button 
-        class="nav-link" 
-        [class.active]="activeTab() === 'maintenance'"
-        (click)="setActiveTab('maintenance')"
-        type="button"
-      >
-        <i class="bi bi-tools me-2"></i>
-        {{ 'coproperty.maintenance.title' | translate }}
       </button>
     </li>
   </ul>
@@ -261,37 +228,6 @@
       </div>
     </div>
 
-    <!-- Units Tab -->
-    <div *ngIf="activeTab() === 'units'" class="tab-pane-content fade-in">
-      <div *ngIf="!isEditMode() && !copropertyId()" class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>
-        {{ 'coproperty.units.saveFirst' | translate }}
-      </div>
-      <div *ngIf="isEditMode() && copropertyId()">
-        <myb-unit-management [copropertyId]="copropertyId()"></myb-unit-management>
-      </div>
-    </div>
 
-    <!-- Charges Tab -->
-    <div *ngIf="activeTab() === 'charges'" class="tab-pane-content fade-in">
-      <div *ngIf="!isEditMode() && !copropertyId()" class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>
-        {{ 'coproperty.charges.saveFirst' | translate }}
-      </div>
-      <div *ngIf="isEditMode() && copropertyId()">
-        <myb-charge-management [copropertyId]="copropertyId()"></myb-charge-management>
-      </div>
-    </div>
-
-    <!-- Maintenance Tab -->
-    <div *ngIf="activeTab() === 'maintenance'" class="tab-pane-content fade-in">
-      <div *ngIf="!isEditMode() && !copropertyId()" class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>
-        {{ 'coproperty.maintenance.saveFirst' | translate }}
-      </div>
-      <div *ngIf="isEditMode() && copropertyId()">
-        <myb-maintenance-requests [copropertyId]="copropertyId()"></myb-maintenance-requests>
-      </div>
-    </div>
   </div>
 </div>

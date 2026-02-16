@@ -8,10 +8,13 @@
   margin-bottom: 2rem;
 
   h1 {
-    color: #333;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 2rem;
     margin: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .btn {
@@ -53,7 +56,7 @@
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
   }
 
   &:nth-child(1) {
@@ -61,15 +64,15 @@
   }
 
   &:nth-child(2) {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
   }
 
   &:nth-child(3) {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #8b7ee8 0%, #9060c8 100%);
   }
 
   &:nth-child(4) {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: linear-gradient(135deg, #9060c8 0%, #8b7ee8 100%);
   }
 
   i {
@@ -107,16 +110,16 @@
 
 .kpi-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
     transform: translateY(-2px);
   }
 
@@ -129,21 +132,22 @@
     justify-content: center;
     font-size: 1.8rem;
     color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
     &.treasury {
-      background-color: #3f51b5;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
 
     &.charges {
-      background-color: #ff9800;
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
     }
 
     &.units {
-      background-color: #4caf50;
+      background: linear-gradient(135deg, #8b7ee8 0%, #9060c8 100%);
     }
 
     &.maintenance {
-      background-color: #f44336;
+      background: linear-gradient(135deg, #9060c8 0%, #8b7ee8 100%);
     }
   }
 
@@ -152,7 +156,7 @@
 
     h3 {
       font-size: 0.95rem;
-      color: #666;
+      color: #6c757d;
       margin: 0 0 0.5rem 0;
       font-weight: 500;
     }
@@ -161,7 +165,7 @@
     .count {
       font-size: 1.8rem;
       font-weight: 700;
-      color: #333;
+      color: #2c3e50;
       margin: 0;
     }
   }
@@ -180,16 +184,23 @@
 
 .chart-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  }
 
   .card-header {
     padding: 1.5rem;
-    border-bottom: 1px solid #eee;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-bottom: 2px solid #667eea;
+    border-radius: 12px 12px 0 0;
 
     h5 {
       margin: 0;
-      color: #333;
+      color: #2c3e50;
       font-weight: 600;
     }
   }
@@ -213,17 +224,24 @@
 .actions-card,
 .activities-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  }
 
   .card-header {
     padding: 1.5rem;
-    border-bottom: 1px solid #eee;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-bottom: 2px solid #667eea;
+    border-radius: 12px 12px 0 0;
 
     h5 {
       margin: 0;
-      color: #333;
+      color: #2c3e50;
       font-weight: 600;
     }
   }
@@ -243,8 +261,8 @@
       flex: 1;
       min-width: 150px;
       padding: 0.75rem 1.5rem;
-      border-radius: 4px;
-      font-weight: 500;
+      border-radius: 8px;
+      font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -253,7 +271,7 @@
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
       }
 
       i {
@@ -288,21 +306,22 @@
         justify-content: center;
         color: white;
         font-size: 0.6rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
         &.badge-success {
-          background-color: #4caf50;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         &.badge-warning {
-          background-color: #ff9800;
+          background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
         }
 
         &.badge-info {
-          background-color: #3f51b5;
+          background: linear-gradient(135deg, #8b7ee8 0%, #9060c8 100%);
         }
 
         &.badge-secondary {
-          background-color: #999;
+          background: linear-gradient(135deg, #9060c8 0%, #8b7ee8 100%);
         }
       }
 
@@ -312,7 +331,7 @@
 
         .timeline-description {
           margin: 0;
-          color: #333;
+          color: #2c3e50;
           font-weight: 500;
         }
 

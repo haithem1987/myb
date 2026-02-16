@@ -5,6 +5,7 @@ namespace Myb.Coproperty.Infrastructure.Repositories
 {
     public interface IUnitRepository : IGenericRepository<Guid, Unit, Data.CopropertyDbContext>
     {
+        Task<IEnumerable<Unit>> GetAllAsync();
         Task<IEnumerable<Unit>> GetByCopropertyIdAsync(Guid copropertyId);
         Task<IEnumerable<Unit>> GetByOwnerIdAsync(Guid ownerId);
     }

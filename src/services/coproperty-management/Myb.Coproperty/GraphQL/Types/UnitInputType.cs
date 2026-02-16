@@ -20,6 +20,7 @@ namespace Myb.Coproperty.GraphQL.Types
             // Ignore navigation properties
             descriptor.Ignore(u => u.Coproperty);
             descriptor.Ignore(u => u.Owners);
+            descriptor.Ignore(u => u.OwnerUnits);
             descriptor.Ignore(u => u.ChargeDistributions);
             descriptor.Ignore(u => u.Invoices);
         }

@@ -1,10 +1,34 @@
 <div class="units-list-container">
+  <!-- Success/Error Alert -->
+  <div *ngIf="alert().type" class="alert alert-dismissible fade show mb-3" 
+       [ngClass]="{
+         'alert-success': alert().type === 'success',
+         'alert-danger': alert().type === 'danger',
+         'alert-warning': alert().type === 'warning'
+       }" 
+       role="alert">
+    <i class="bi me-2" [ngClass]="{
+      'bi-check-circle': alert().type === 'success',
+      'bi-exclamation-triangle': alert().type === 'danger' || alert().type === 'warning'
+    }"></i>
+    {{ alert().message }}
+    <button type="button" class="btn-close" (click)="alert.set({type: null, message: ''})"></button>
+  </div>
+
   <div class="page-header">
-    <h1>
-      <i class="bi bi-building me-2"></i>
-      Gestion des Lots
-    </h1>
-    <p class="text-muted">Gérez tous les lots de vos copropriétés</p>
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1>
+          <i class="bi bi-building me-2"></i>
+          {{ 'coproperty.unit.management' | translate }}
+        </h1>
+        <p class="text-muted">{{ 'coproperty.unit.manageAllUnits' | translate }}</p>
+      </div>
+      <button class="btn btn-primary btn-add" (click)="openAddForm()">
+        <i class="bi bi-plus-circle me-2"></i>
+        {{ 'coproperty.unit.addUnit' | translate }}
+      </button>
+    </div>
   </div>
 
   <!-- Filters Section -->
@@ -15,14 +39,14 @@
         <div class="col-md-4">
           <label for="copropertyFilter" class="form-label">
             <i class="bi bi-building me-1"></i>
-            Copropriété
+            {{ 'coproperty.charge.coproperty' | translate }}
           </label>
           <select 
             id="copropertyFilter" 
             class="form-select"
             [value]="selectedCopropertyId() || 'all'"
             (change)="onCopropertyFilterChange($event)">
-            <option value="all">Toutes les copropriétés</option>
+            <option value="all">{{ 'coproperty.charge.allCoproperties' | translate }}</option>
             <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
               {{ coproperty.name }}
             </option>
@@ -33,14 +57,14 @@
         <div class="col-md-3">
           <label for="typeFilter" class="form-label">
             <i class="bi bi-tag me-1"></i>
-            Type de lot
+            {{ 'coproperty.unit.type' | translate }}
           </label>
           <select 
             id="typeFilter" 
             class="form-select"
             [value]="filterType()"
             (change)="onTypeFilterChange($event)">
-            <option value="">Tous les types</option>
+            <option value="">{{ 'coproperty.unit.allTypes' | translate }}</option>
             <option *ngFor="let type of unitTypes" [value]="type">
               {{ getUnitTypeLabel(type) }}
             </option>
@@ -51,16 +75,16 @@
         <div class="col-md-3">
           <label for="occupancyFilter" class="form-label">
             <i class="bi bi-people me-1"></i>
-            Occupation
+            {{ 'coproperty.unit.occupancyStatus' | translate }}
           </label>
           <select 
             id="occupancyFilter" 
             class="form-select"
             [value]="filterOccupancy()"
             (change)="onOccupancyFilterChange($event)">
-            <option value="">Tous</option>
-            <option value="occupied">Occupé</option>
-            <option value="vacant">Vacant</option>
+            <option value="">{{ 'common.all' | translate }}</option>
+            <option value="occupied">{{ 'coproperty.unit.occupied' | translate }}</option>
+            <option value="vacant">{{ 'coproperty.unit.vacant' | translate }}</option>
           </select>
         </div>
 
@@ -68,17 +92,195 @@
         <div class="col-md-2">
           <label for="searchInput" class="form-label">
             <i class="bi bi-search me-1"></i>
-            Recherche
+            {{ 'coproperty.charge.search' | translate }}
           </label>
           <input 
             type="text" 
             id="searchInput"
             class="form-control"
-            placeholder="Rechercher..."
+            [placeholder]="'common.searchPlaceholder' | translate"
             [value]="searchTerm()"
             (input)="onSearchInput($event)">
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Unit Form -->
+  <div *ngIf="showAddForm()" class="card mb-4 form-card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          <i class="bi bi-plus-circle me-2"></i>
+          {{ editingUnitId() ? ('coproperty.unit.editUnit' | translate) : ('coproperty.unit.addUnit' | translate) }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cancelForm()"></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="unitForm" (ngSubmit)="saveUnit()">
+        <div class="row">
+          <!-- Coproperty Selection -->
+          <div class="col-md-6 mb-3">
+            <label for="formCopropertyId" class="form-label">
+              <i class="bi bi-building me-1"></i>
+              {{ 'coproperty.charge.coproperty' | translate }} *
+            </label>
+            <select 
+              class="form-select" 
+              id="formCopropertyId" 
+              formControlName="copropertyId"
+              [class.is-invalid]="unitForm.get('copropertyId')?.touched && unitForm.get('copropertyId')?.invalid">
+              <option value="">{{ 'coproperty.charge.selectCoproperty' | translate }}</option>
+              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
+                {{ coproperty.name }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="unitForm.get('copropertyId')?.touched && unitForm.get('copropertyId')?.invalid">
+              {{ 'coproperty.charge.coproperty' | translate }} {{ 'validation.required' | translate }}
+            </div>
+          </div>
+
+          <!-- Unit Number -->
+          <div class="col-md-6 mb-3">
+            <label for="formUnitNumber" class="form-label">
+              <i class="bi bi-hash me-1"></i>
+              {{ 'coproperty.unit.number' | translate }} *
+            </label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="formUnitNumber" 
+              formControlName="unitNumber"
+              [placeholder]="'coproperty.unit.numberPlaceholder' | translate"
+              [class.is-invalid]="unitForm.get('unitNumber')?.touched && unitForm.get('unitNumber')?.invalid" />
+            <div class="invalid-feedback" *ngIf="unitForm.get('unitNumber')?.touched && unitForm.get('unitNumber')?.invalid">
+              {{ 'coproperty.unit.number' | translate }} {{ 'validation.required' | translate }}
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Unit Type -->
+          <div class="col-md-4 mb-3">
+            <label for="formUnitType" class="form-label">
+              <i class="bi bi-tag me-1"></i>
+              {{ 'coproperty.unit.type' | translate }} *
+            </label>
+            <select class="form-select" id="formUnitType" formControlName="unitType">
+              <option value="APARTMENT">{{ 'coproperty.unit.types.apartment' | translate }}</option>
+              <option value="PARKING">{{ 'coproperty.unit.types.parking' | translate }}</option>
+              <option value="CAVE">{{ 'coproperty.unit.types.cave' | translate }}</option>
+              <option value="COMMERCIAL">{{ 'coproperty.unit.types.commercial' | translate }}</option>
+              <option value="OTHER">{{ 'coproperty.unit.types.other' | translate }}</option>
+            </select>
+          </div>
+
+          <!-- Floor -->
+          <div class="col-md-4 mb-3">
+            <label for="formFloor" class="form-label">
+              <i class="bi bi-layers me-1"></i>
+              {{ 'coproperty.unit.floor' | translate }} *
+            </label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="formFloor" 
+              formControlName="floor"
+              min="0"
+              [class.is-invalid]="unitForm.get('floor')?.touched && unitForm.get('floor')?.invalid" />
+            <div class="invalid-feedback" *ngIf="unitForm.get('floor')?.touched && unitForm.get('floor')?.invalid">
+              {{ 'coproperty.unit.floorMin' | translate }}
+            </div>
+          </div>
+
+          <!-- Is Occupied -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label d-block">
+              <i class="bi bi-people me-1"></i>
+              {{ 'coproperty.unit.status' | translate }}
+            </label>
+            <div class="form-check form-switch mt-2">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                id="formIsOccupied" 
+                formControlName="isOccupied" />
+              <label class="form-check-label" for="formIsOccupied">
+                {{ 'coproperty.unit.occupied' | translate }}
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Area -->
+          <div class="col-md-6 mb-3">
+            <label for="formArea" class="form-label">
+              <i class="bi bi-rulers me-1"></i>
+              {{ 'coproperty.unit.area' | translate }} (m²) *
+            </label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="formArea" 
+              formControlName="area"
+              step="0.1"
+              min="1"
+              [placeholder]="'coproperty.unit.areaPlaceholder' | translate"
+              [class.is-invalid]="unitForm.get('area')?.touched && unitForm.get('area')?.invalid" />
+            <div class="invalid-feedback" *ngIf="unitForm.get('area')?.touched && unitForm.get('area')?.invalid">
+              {{ 'coproperty.unit.areaMin' | translate }}
+            </div>
+          </div>
+
+          <!-- Shares -->
+          <div class="col-md-6 mb-3">
+            <label for="formShares" class="form-label">
+              <i class="bi bi-pie-chart me-1"></i>
+              {{ 'coproperty.unit.shares' | translate }} *
+            </label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="formShares" 
+              formControlName="shares"
+              min="1"
+              [placeholder]="'coproperty.unit.sharesPlaceholder' | translate"
+              [class.is-invalid]="unitForm.get('shares')?.touched && unitForm.get('shares')?.invalid" />
+            <div class="invalid-feedback" *ngIf="unitForm.get('shares')?.touched && unitForm.get('shares')?.invalid">
+              {{ 'coproperty.unit.sharesMin' | translate }}
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Description -->
+          <div class="col-12 mb-3">
+            <label for="formDescription" class="form-label">
+              <i class="bi bi-file-text me-1"></i>
+              {{ 'coproperty.charges.description' | translate }} ({{ 'coproperty.unit.optional' | translate }})
+            </label>
+            <textarea 
+              class="form-control" 
+              id="formDescription" 
+              formControlName="description"
+              rows="2"
+              [placeholder]="'coproperty.unit.descriptionPlaceholder' | translate"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" [disabled]="!unitForm.valid || loading()">
+            <i class="bi bi-save me-2"></i>
+            {{ editingUnitId() ? ('common.update' | translate) : ('common.save' | translate) }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()" [disabled]="loading()">
+            <i class="bi bi-x me-2"></i>
+            {{ 'common.cancel' | translate }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -92,7 +294,7 @@
               <i class="bi bi-building"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Total Lots</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.unit.totalUnits' | translate }}</h6>
               <h3 class="mb-0">{{ filteredUnits.length }}</h3>
             </div>
           </div>
@@ -107,7 +309,7 @@
               <i class="bi bi-check-circle"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Lots Occupés</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.unit.occupiedUnits' | translate }}</h6>
               <h3 class="mb-0">{{ getOccupiedUnitsCount() }}</h3>
             </div>
           </div>
@@ -122,7 +324,7 @@
               <i class="bi bi-x-circle"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Lots Vacants</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.unit.vacantUnits' | translate }}</h6>
               <h3 class="mb-0">{{ getVacantUnitsCount() }}</h3>
             </div>
           </div>
@@ -137,7 +339,7 @@
               <i class="bi bi-pie-chart"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Total Tantièmes</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.unit.totalShares' | translate }}</h6>
               <h3 class="mb-0">{{ getTotalShares() }}</h3>
             </div>
           </div>
@@ -151,34 +353,34 @@
     <div class="card-header">
       <h5 class="mb-0">
         <i class="bi bi-list-ul me-2"></i>
-        Liste des Lots ({{ filteredUnits.length }})
+        {{ 'coproperty.unit.list' | translate }} ({{ filteredUnits.length }})
       </h5>
     </div>
     <div class="card-body">
       <div *ngIf="loading()" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Chargement...</span>
+          <span class="visually-hidden">{{ 'common.loading' | translate }}</span>
         </div>
       </div>
 
       <div *ngIf="!loading() && filteredUnits.length === 0" class="text-center py-5">
         <i class="bi bi-inbox display-1 text-muted"></i>
-        <p class="text-muted mt-3">Aucun lot trouvé</p>
-        <p class="text-muted">Les lots seront affichés ici une fois créés dans les copropriétés</p>
+        <p class="text-muted mt-3">{{ 'coproperty.unit.noUnitsFound' | translate }}</p>
+        <p class="text-muted">{{ 'coproperty.unit.noUnitsMessage' | translate }}</p>
       </div>
 
       <div *ngIf="!loading() && filteredUnits.length > 0" class="table-responsive">
         <table class="table table-hover">
           <thead>
             <tr>
-              <th>Copropriété</th>
-              <th>Numéro</th>
-              <th>Type</th>
-              <th>Étage</th>
-              <th>Superficie</th>
-              <th>Tantièmes</th>
-              <th>Statut</th>
-              <th>Actions</th>
+              <th>{{ 'coproperty.charge.coproperty' | translate }}</th>
+              <th>{{ 'coproperty.unit.number' | translate }}</th>
+              <th>{{ 'coproperty.unit.type' | translate }}</th>
+              <th>{{ 'coproperty.unit.floor' | translate }}</th>
+              <th>{{ 'coproperty.unit.area' | translate }}</th>
+              <th>{{ 'coproperty.unit.shares' | translate }}</th>
+              <th>{{ 'coproperty.unit.status' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -213,13 +415,29 @@
                 </span>
               </td>
               <td>
-                <button 
-                  type="button" 
-                  class="btn btn-sm btn-outline-primary"
-                  (click)="viewUnit(unit)"
-                  title="Voir les détails">
-                  <i class="bi bi-eye"></i>
-                </button>
+                <div class="btn-group" role="group">
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="viewUnit(unit)"
+                    [title]="'coproperty.charge.viewDetails' | translate">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-outline-warning"
+                    (click)="editUnit(unit)"
+                    [title]="'common.editAction' | translate">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="deleteUnit(unit)"
+                    [title]="'common.deleteAction' | translate">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>

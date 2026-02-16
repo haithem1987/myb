@@ -12,7 +12,7 @@ public class Charge : IEntity<Guid>
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public ChargeType ChargeType { get; set; }
-    public ChargeFrequency Frequency { get; set; }
+    public string Frequency { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
     public DistributionMethod DistributionMethod { get; set; }
     public DateTime StartDate { get; set; }

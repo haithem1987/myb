@@ -100,6 +100,8 @@ export class ChargeService {
       .mutate<{ deleteCharge: boolean }>({
         mutation: DELETE_CHARGE,
         variables: { id },
+        refetchQueries: [{ query: GET_ALL_CHARGES }],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteCharge));

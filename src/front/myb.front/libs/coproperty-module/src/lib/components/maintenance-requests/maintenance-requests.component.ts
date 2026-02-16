@@ -26,6 +26,7 @@ export class MaintenanceRequestsComponent implements OnInit, OnChanges {
   requestForm: FormGroup;
   editingRequestId: string | null = null;
   resolvedCopropertyId: string | null = null;
+  alert = signal<{type: 'success' | 'danger' | 'warning' | null, message: string}>({type: null, message: ''});
 
   categories = ['PLUMBING', 'ELECTRICAL', 'HEATING', 'CLEANING', 'SECURITY', 'STRUCTURAL', 'OTHER'];
   priorities = ['LOW', 'NORMAL', 'HIGH', 'EMERGENCY'];
@@ -153,14 +154,15 @@ export class MaintenanceRequestsComponent implements OnInit, OnChanges {
 
       operation.subscribe({
         next: () => {
+          this.showAlert('success', this.editingRequestId ? 'Demande de maintenance modifiée avec succès' : 'Demande de maintenance créée avec succès');
           this.showAddForm = false;
           this.requestForm.reset();
           this.loadRequests();
         },
         error: (err) => {
           console.error('Error saving maintenance request:', err);
+          this.showAlert('danger', 'Erreur lors de l\'enregistrement de la demande');
           this.loading.set(false);
-          alert('Failed to save maintenance request');
         }
       });
     }
@@ -177,16 +179,17 @@ export class MaintenanceRequestsComponent implements OnInit, OnChanges {
   }
 
   deleteRequest(request: MaintenanceRequestExtended): void {
-    if (confirm(`Are you sure you want to delete this request?`)) {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer cette demande ?`)) {
       this.loading.set(true);
       this.maintenanceService.deleteMaintenanceRequest(request.id!).subscribe({
         next: () => {
+          this.showAlert('success', 'Demande de maintenance supprimée avec succès');
           this.loadRequests();
         },
         error: (err) => {
           console.error('Error deleting maintenance request:', err);
+          this.showAlert('danger', 'Erreur lors de la suppression de la demande');
           this.loading.set(false);
-          alert('Failed to delete maintenance request');
         }
       });
     }
@@ -196,12 +199,13 @@ export class MaintenanceRequestsComponent implements OnInit, OnChanges {
     this.loading.set(true);
     this.maintenanceService.updateMaintenanceStatus(request.id!, newStatus).subscribe({
       next: () => {
+        this.showAlert('success', 'Statut mis à jour avec succès');
         this.loadRequests();
       },
       error: (err) => {
         console.error('Error updating status:', err);
+        this.showAlert('danger', 'Erreur lors de la mise à jour du statut');
         this.loading.set(false);
-        alert('Failed to update status');
       }
     });
   }
@@ -242,5 +246,10 @@ export class MaintenanceRequestsComponent implements OnInit, OnChanges {
     if (!dateString) return null;
     // Convert YYYY-MM-DD to ISO DateTime (YYYY-MM-DDTHH:mm:ss)
     return `${dateString}T00:00:00`;
+  }
+
+  private showAlert(type: 'success' | 'danger' | 'warning', message: string) {
+    this.alert.set({type, message});
+    setTimeout(() => this.alert.set({type: null, message: ''}), 5000);
   }
 }

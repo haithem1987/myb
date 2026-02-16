@@ -1,4 +1,18 @@
 <div class="maintenance-container">
+  <!-- Alert Section -->
+  <div *ngIf="alert().type" class="alert" [ngClass]="{
+    'alert-success': alert().type === 'success',
+    'alert-danger': alert().type === 'danger',
+    'alert-warning': alert().type === 'warning'
+  }" role="alert">
+    <i class="bi" [ngClass]="{
+      'bi-check-circle': alert().type === 'success',
+      'bi-exclamation-triangle': alert().type === 'danger' || alert().type === 'warning'
+    }"></i>
+    <span>{{ alert().message }}</span>
+    <button type="button" class="btn-close" (click)="alert.set({type: null, message: ''})"></button>
+  </div>
+
   <!-- Message for new coproperty -->
   <div *ngIf="!resolvedCopropertyId" class="alert alert-info">
     <i class="bi bi-info-circle me-2"></i>
@@ -120,10 +134,10 @@
               </td>
               <td>{{ request.createdAt | date: 'short' }}</td>
               <td>
-                <button class="btn btn-sm btn-info" (click)="viewRequest(request)" title="View">
+                <button class="btn btn-sm btn-info" (click)="viewRequest(request)" [title]="'common.viewAction' | translate">
                   <i class="bi bi-eye"></i>
                 </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteRequest(request)" title="Delete">
+                <button class="btn btn-sm btn-danger" (click)="deleteRequest(request)" [title]="'common.deleteAction' | translate">
                   <i class="bi bi-trash"></i>
                 </button>
               </td>

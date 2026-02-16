@@ -1,7 +1,21 @@
 <div class="owner-management-container">
+  <!-- Alert Section -->
+  <div *ngIf="alert().type" class="alert" [ngClass]="{
+    'alert-success': alert().type === 'success',
+    'alert-danger': alert().type === 'danger',
+    'alert-warning': alert().type === 'warning'
+  }" role="alert">
+    <i class="bi" [ngClass]="{
+      'bi-check-circle': alert().type === 'success',
+      'bi-exclamation-triangle': alert().type === 'danger' || alert().type === 'warning'
+    }"></i>
+    <span>{{ alert().message }}</span>
+    <button type="button" class="btn-close" (click)="alert.set({type: null, message: ''})"></button>
+  </div>
+
   <div class="management-header">
     <h2>{{ 'coproperty.owner.management' | translate }}</h2>
-    <button class="btn btn-primary" (click)="openAddForm()">
+    <button class="btn btn-primary btn-violet" (click)="openAddForm()">
       <i class="bi bi-plus"></i>
       {{ 'coproperty.owner.addOwner' | translate }}
     </button>
@@ -12,7 +26,7 @@
     <input
       type="text"
       class="form-control"
-      placeholder="Search owners..."
+      [placeholder]="'common.searchOwners' | translate"
       [(ngModel)]="searchTerm"
     />
   </div>
@@ -52,27 +66,59 @@
               <input type="tel" class="form-control" id="phone" formControlName="phone" />
             </div>
           </div>
-          <div class="col-md-6">
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="mb-3">
+              <label class="form-label">{{ 'coproperty.charge.coproperty' | translate }} *</label>
+              <select 
+                class="form-select" 
+                formControlName="copropertyIdForUnits"
+                (change)="onCopropertyChangeForUnits($any($event.target).value)"
+                [class.is-invalid]="ownerForm.get('copropertyIdForUnits')?.touched && ownerForm.get('copropertyIdForUnits')?.invalid">
+                <option value="">{{ 'coproperty.charge.selectCoproperty' | translate }}</option>
+                <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
+                  {{ coproperty.name }}
+                </option>
+              </select>
+              <small class="text-muted">{{ 'coproperty.owner.selectCopropertyHelp' | translate }}</small>
+              <div class="invalid-feedback" *ngIf="ownerForm.get('copropertyIdForUnits')?.touched && ownerForm.get('copropertyIdForUnits')?.invalid">
+                {{ 'validation.required' | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
             <div class="mb-3">
               <label class="form-label">{{ 'coproperty.owner.units' | translate }} *</label>
               <div class="unit-multiselect border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-                <div *ngFor="let unit of availableUnits" class="form-check">
-                  <input 
-                    class="form-check-input" 
-                    type="checkbox" 
-                    [id]="'unit-' + unit.id"
-                    [checked]="isUnitSelected(unit.id)"
-                    (change)="toggleUnitSelection(unit.id)"
-                  />
-                  <label class="form-check-label" [for]="'unit-' + unit.id">
-                    <i class="bi bi-building"></i> {{ unit.unitNumber }}
-                  </label>
+                <div *ngIf="loading()" class="text-center py-3">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">{{ 'common.loading' | translate }}</span>
+                  </div>
                 </div>
-                <div *ngIf="availableUnits.length === 0" class="text-muted small">
-                  <i class="bi bi-info-circle"></i> No units available
+                <div *ngIf="!loading()">
+                  <div *ngFor="let unit of availableUnits" class="form-check">
+                    <input 
+                      class="form-check-input" 
+                      type="checkbox" 
+                      [id]="'unit-' + unit.id"
+                      [checked]="isUnitSelected(unit.id)"
+                      (change)="toggleUnitSelection(unit.id)"
+                    />
+                    <label class="form-check-label" [for]="'unit-' + unit.id">
+                      <i class="bi bi-building"></i> {{ unit.unitNumber }}
+                    </label>
+                  </div>
+                  <div *ngIf="availableUnits.length === 0 && !loading()" class="text-muted small">
+                    <i class="bi bi-info-circle"></i> {{ 'coproperty.unit.noUnitsAvailable' | translate }}
+                  </div>
                 </div>
               </div>
-              <small class="text-muted">Select one or more lots for this owner</small>
+              <small class="text-muted">{{ 'coproperty.unit.selectUnitsHelp' | translate }}</small>
             </div>
           </div>
         </div>
@@ -85,11 +131,11 @@
         <div class="form-actions">
           <button type="submit" class="btn btn-success" [disabled]="!ownerForm.valid">
             <i class="bi bi-save"></i>
-            Save
+            {{ 'common.save' | translate }}
           </button>
           <button type="button" class="btn btn-secondary" (click)="cancelForm()">
             <i class="bi bi-x"></i>
-            Cancel
+            {{ 'common.cancel' | translate }}
           </button>
         </div>
       </form>
@@ -126,14 +172,14 @@
                   <small *ngIf="ownerUnit.ownershipPercentage !== 100"> ({{ ownerUnit.ownershipPercentage }}%)</small>
                 </span>
                 <span *ngIf="!owner.ownerUnits || owner.ownerUnits.length === 0" class="text-muted">
-                  <i class="bi bi-exclamation-circle"></i> No units
+                  <i class="bi bi-exclamation-circle"></i> {{ 'coproperty.unit.noOwner' | translate }}
                 </span>
               </td>
               <td>
-                <button class="btn btn-sm btn-primary" (click)="editOwner(owner)" title="Edit">
+                <button class="btn btn-sm btn-primary" (click)="editOwner(owner)" [title]="'common.editAction' | translate">
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteOwner(owner)" title="Delete">
+                <button class="btn btn-sm btn-danger" (click)="deleteOwner(owner)" [title]="'common.deleteAction' | translate">
                   <i class="bi bi-trash"></i>
                 </button>
               </td>

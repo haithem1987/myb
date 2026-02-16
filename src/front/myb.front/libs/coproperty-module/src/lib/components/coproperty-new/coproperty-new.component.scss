@@ -211,6 +211,18 @@
     }
   }
 
+  &.btn-outline-primary {
+    border: 2px solid #667eea;
+    color: #667eea;
+    background: transparent;
+
+    &:hover {
+      background: #667eea;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+  }
+
   &.btn-outline-secondary {
     border: 2px solid #6c757d;
     color: #6c757d;

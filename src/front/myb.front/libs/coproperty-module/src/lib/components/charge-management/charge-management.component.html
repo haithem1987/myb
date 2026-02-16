@@ -1,4 +1,18 @@
 <div class="charge-management-container">
+  <!-- Alert Section -->
+  <div *ngIf="alert().type" class="alert" [ngClass]="{
+    'alert-success': alert().type === 'success',
+    'alert-danger': alert().type === 'danger',
+    'alert-warning': alert().type === 'warning'
+  }" role="alert">
+    <i class="bi" [ngClass]="{
+      'bi-check-circle': alert().type === 'success',
+      'bi-exclamation-triangle': alert().type === 'danger' || alert().type === 'warning'
+    }"></i>
+    <span>{{ alert().message }}</span>
+    <button type="button" class="btn-close" (click)="alert.set({type: null, message: ''})"></button>
+  </div>
+
   <!-- Message for new coproperty -->
   <div *ngIf="!resolvedCopropertyId()" class="alert alert-info">
     <i class="bi bi-info-circle me-2"></i>
@@ -68,15 +82,12 @@
             </div>
           </div>
 
-          <!-- Frequency -->
+          <!-- Year -->
           <div class="col-md-4">
             <div class="form-group">
               <label class="form-label">{{ 'coproperty.charges.frequency' | translate }}</label>
               <select class="form-select" formControlName="frequency">
-                <option value="MONTHLY">{{ 'coproperty.charges.frequencies.monthly' | translate }}</option>
-                <option value="QUARTERLY">{{ 'coproperty.charges.frequencies.quarterly' | translate }}</option>
-                <option value="ANNUAL">{{ 'coproperty.charges.frequencies.annual' | translate }}</option>
-                <option value="EXCEPTIONAL">{{ 'coproperty.charges.frequencies.exceptional' | translate }}</option>
+                <option *ngFor="let year of years" [value]="year">{{ year }}</option>
               </select>
             </div>
           </div>
@@ -139,22 +150,22 @@
           <strong>{{ 'common.validationErrors' | translate }}:</strong>
           <ul class="mb-0 mt-2 ms-3">
             <li *ngIf="chargeForm.get('name')?.invalid && chargeForm.get('name')?.touched">
-              Nom requis
+              {{ 'coproperty.charges.name' | translate }} {{ 'validation.required' | translate }}
             </li>
             <li *ngIf="chargeForm.get('totalAmount')?.invalid && chargeForm.get('totalAmount')?.touched">
-              Montant requis (min. 0.01 €)
+              {{ 'coproperty.charges.totalAmount' | translate }} {{ 'validation.required' | translate }} ({{ 'validation.min' | translate }} 0.01 €)
             </li>
             <li *ngIf="chargeForm.get('startDate')?.invalid && chargeForm.get('startDate')?.touched">
-              Date de début requise
+              {{ 'coproperty.charges.startDate' | translate }} {{ 'validation.required' | translate }}
             </li>
             <li *ngIf="chargeForm.get('chargeType')?.invalid">
-              Type de charge requis
+              {{ 'coproperty.charges.type' | translate }} {{ 'validation.required' | translate }}
             </li>
             <li *ngIf="chargeForm.get('frequency')?.invalid">
-              Fréquence requise
+              {{ 'coproperty.charges.frequency' | translate }} {{ 'validation.required' | translate }}
             </li>
             <li *ngIf="chargeForm.get('distributionMethod')?.invalid">
-              Méthode de distribution requise
+              {{ 'coproperty.charges.distributionMethod' | translate }} {{ 'validation.required' | translate }}
             </li>
           </ul>
         </div>
@@ -189,7 +200,7 @@
               </div>
               <div class="charge-info">
                 <span class="label">{{ 'coproperty.charges.frequency' | translate }}</span>
-                <span>{{ ('coproperty.charges.frequencies.' + getFrequencyKey(charge.frequency)) | translate }}</span>
+                <span>{{ charge.frequency }}</span>
               </div>
               <div class="charge-info">
                 <span class="label">{{ 'coproperty.charges.distributionMethod' | translate }}</span>

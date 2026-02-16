@@ -65,7 +65,7 @@
               type="number" 
               id="amount" 
               class="form-control" 
-              placeholder="0.00"
+              [placeholder]="'common.amountPlaceholder' | translate"
               step="0.01"
               min="0"
               formControlName="amount"
@@ -102,7 +102,7 @@
               type="text" 
               id="description" 
               class="form-control" 
-              placeholder="Ex: Charges T1 2026"
+              [placeholder]="'common.fundCallDescPlaceholder' | translate"
               formControlName="description">
           </div>
         </div>

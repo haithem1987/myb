@@ -44,6 +44,11 @@ namespace Myb.Coproperty.Services
             await _chargeRepository.DeleteAsync(id);
         }
 
+        public async Task<IEnumerable<Charge>> GetAllAsync()
+        {
+            return await _chargeRepository.GetAllAsync();
+        }
+
         public async Task<IEnumerable<ChargeDistribution>> DistributeChargeAsync(Guid chargeId)
         {
             var charge = _chargeRepository.GetById(chargeId)!;

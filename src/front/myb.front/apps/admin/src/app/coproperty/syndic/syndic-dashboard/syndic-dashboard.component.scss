@@ -195,6 +195,8 @@
       &.maintenance { background: #f59e0b; }
       &.payment { background: #10b981; }
       &.document { background: #8b5cf6; }
+      &.budget { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+      &.fundcall { background: #06b6d4; }
     }
     
     .activity-content {

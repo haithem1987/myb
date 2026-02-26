@@ -71,28 +71,6 @@
         <div class="row">
           <div class="col-md-12">
             <div class="mb-3">
-              <label class="form-label">{{ 'coproperty.charge.coproperty' | translate }} *</label>
-              <select 
-                class="form-select" 
-                formControlName="copropertyIdForUnits"
-                (change)="onCopropertyChangeForUnits($any($event.target).value)"
-                [class.is-invalid]="ownerForm.get('copropertyIdForUnits')?.touched && ownerForm.get('copropertyIdForUnits')?.invalid">
-                <option value="">{{ 'coproperty.charge.selectCoproperty' | translate }}</option>
-                <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
-                  {{ coproperty.name }}
-                </option>
-              </select>
-              <small class="text-muted">{{ 'coproperty.owner.selectCopropertyHelp' | translate }}</small>
-              <div class="invalid-feedback" *ngIf="ownerForm.get('copropertyIdForUnits')?.touched && ownerForm.get('copropertyIdForUnits')?.invalid">
-                {{ 'validation.required' | translate }}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-12">
-            <div class="mb-3">
               <label class="form-label">{{ 'coproperty.owner.units' | translate }} *</label>
               <div class="unit-multiselect border rounded p-2" style="max-height: 200px; overflow-y: auto;">
                 <div *ngIf="loading()" class="text-center py-3">
@@ -111,6 +89,7 @@
                     />
                     <label class="form-check-label" [for]="'unit-' + unit.id">
                       <i class="bi bi-building"></i> {{ unit.unitNumber }}
+                      <span class="text-muted small" *ngIf="unit.copropertyName"> - {{ unit.copropertyName }}</span>
                     </label>
                   </div>
                   <div *ngIf="availableUnits.length === 0 && !loading()" class="text-muted small">

@@ -13,12 +13,15 @@ namespace Myb.Coproperty.Infrastructure.Repositories
 
         public async Task<IEnumerable<Unit>> GetAllAsync()
         {
-            return await GetAll().ToListAsync();
+            return await GetAll()
+                .Include(u => u.Coproperty)
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<Unit>> GetByCopropertyIdAsync(Guid copropertyId)
         {
             return await GetAll()
+                .Include(u => u.Coproperty)
                 .Where(u => u.CopropertyId == copropertyId)
                 .ToListAsync();
         }

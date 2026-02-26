@@ -15,6 +15,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(u => u.Coproperty).ResolveWith<UnitResolvers>(r => r.GetCoproperty(default!, default!));
             descriptor.Field(u => u.OwnerUnits).ResolveWith<UnitResolvers>(r => r.GetOwnerUnits(default!, default!));
             descriptor.Field("currency").ResolveWith<UnitResolvers>(r => r.GetCurrency(default!, default!)).Type<NonNullType<CurrencyType>>();
+            descriptor.Field("copropertyName").ResolveWith<UnitResolvers>(r => r.GetCopropertyName(default!, default!)).Type<StringType>();
         }
 
         private class UnitResolvers
@@ -33,6 +34,19 @@ namespace Myb.Coproperty.GraphQL.Types
             {
                 var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == unit.CopropertyId);
                 return coproperty?.Currency ?? Currency.EUR;
+            }
+
+            public string? GetCopropertyName([Parent] Unit unit, [Service] CopropertyDbContext context)
+            {
+                // Use the already loaded Coproperty navigation property if available
+                if (unit.Coproperty != null)
+                {
+                    return unit.Coproperty.Name;
+                }
+                
+                // Otherwise query the database
+                var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == unit.CopropertyId);
+                return coproperty?.Name;
             }
         }
     }

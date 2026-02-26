@@ -4,6 +4,7 @@ namespace Myb.Coproperty.Services
 {
     public interface IChargeService
     {
+        Task<IEnumerable<Charge>> GetAllAsync();
         Task<IEnumerable<Charge>> GetChargesByCopropertyIdAsync(Guid copropertyId);
         Task<Charge> GetByIdAsync(Guid id);
         Task<Charge> CreateAsync(Charge charge);

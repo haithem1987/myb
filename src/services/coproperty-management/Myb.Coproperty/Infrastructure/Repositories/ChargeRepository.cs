@@ -11,6 +11,11 @@ namespace Myb.Coproperty.Infrastructure.Repositories
         {
         }
 
+        public async Task<IEnumerable<Charge>> GetAllAsync()
+        {
+            return await GetAll().ToListAsync();
+        }
+
         public async Task<IEnumerable<Charge>> GetActiveChargesAsync(Guid copropertyId)
         {
             return await GetAll()

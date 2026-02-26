@@ -5,6 +5,7 @@ export const GET_ALL_UNITS = gql`
     allUnits {
       id
       copropertyId
+      copropertyName
       unitNumber
       floor
       unitType
@@ -24,6 +25,7 @@ export const GET_UNIT_BY_ID = gql`
     unitById(id: $id) {
       id
       copropertyId
+      copropertyName
       unitNumber
       floor
       unitType
@@ -43,6 +45,7 @@ export const GET_UNITS_BY_COPROPERTY = gql`
     units(copropertyId: $copropertyId) {
       id
       copropertyId
+      copropertyName
       unitNumber
       floor
       unitType

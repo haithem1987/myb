@@ -15,6 +15,7 @@ import {
 export interface UnitExtended {
   id?: string;
   copropertyId: string;
+  copropertyName?: string;
   unitNumber: string;
   floor?: number;
   unitType?: string;
@@ -36,7 +37,7 @@ export class UnitService {
     return this.apollo
       .watchQuery<{ allUnits: UnitExtended[] }>({
         query: GET_ALL_UNITS,
-        fetchPolicy: 'cache-and-network',
+        fetchPolicy: 'network-only',
         context: { service: 'copropertyService' },
       })
       .valueChanges

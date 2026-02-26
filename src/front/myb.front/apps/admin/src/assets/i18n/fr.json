@@ -25,6 +25,7 @@
     },
     "list": {
       "title": "Gestion des Copropriétés",
+      "subtitle": "Gérez toutes vos copropriétés en un seul endroit",
       "addCoproperty": "Ajouter une Copropriété",
       "name": "Nom",
       "address": "Adresse",

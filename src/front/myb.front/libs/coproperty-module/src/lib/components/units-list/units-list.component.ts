@@ -57,17 +57,21 @@ export class UnitsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Load coproperties first, then units
     this.loadCoproperties();
-    this.loadAllUnits();
   }
 
   loadCoproperties(): void {
     this.copropertyService.getCoproperties().subscribe({
       next: (data) => {
         this.coproperties.set(data);
+        // Load units after coproperties are loaded
+        this.loadAllUnits();
       },
       error: (err) => {
         console.error('Error loading coproperties:', err);
+        // Still try to load units even if coproperties fail
+        this.loadAllUnits();
       }
     });
   }
@@ -75,32 +79,19 @@ export class UnitsListComponent implements OnInit {
   loadAllUnits(): void {
     this.loading.set(true);
     
-    // Load all units and coproperties in parallel
-    forkJoin({
-      units: this.unitService.getAllUnits(),
-      coproperties: this.copropertyService.getCoproperties()
-    }).pipe(
-      map(({ units, coproperties }) => {
-        // Create a map of coproperty IDs to names for quick lookup
-        const copropertyMap = new Map(
-          coproperties.map(cp => [cp.id, cp.name])
-        );
-        
-        // Add coproperty name to each unit
-        return units.map(unit => ({
-          ...unit,
-          copropertyName: copropertyMap.get(unit.copropertyId) || 'Unknown'
-        } as any));
-      }),
+    // Load all units - copropertyName now comes from GraphQL backend
+    this.unitService.getAllUnits().pipe(
       finalize(() => this.loading.set(false)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (allUnits) => {
-        this.units.set(allUnits);
+        this.units.set(allUnits as any);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error('Error loading units:', err);
         this.showAlert('danger', 'Erreur lors du chargement des lots');
+         this.loading.set(false);
       }
     });
   }

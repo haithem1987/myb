@@ -19,6 +19,9 @@ public class Unit : IEntity<Guid>
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     
+    // Computed Properties
+    public string? CopropertyName => Coproperty?.Name;
+    
     // Navigation Properties
     public Coproperty Coproperty { get; set; } = null!;
     public ICollection<OwnerUnit> OwnerUnits { get; set; } = new List<OwnerUnit>();

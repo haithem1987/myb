@@ -15,11 +15,15 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
     <div class="container-fluid mt-4">
       <div class="row mb-4">
         <div class="col-md-8">
-          <h1>{{ 'coproperty.list.title' | translate }}</h1>
+          <h1>
+            <i class="bi bi-buildings me-2"></i>
+            {{ 'coproperty.list.title' | translate }}
+          </h1>
+          <p class="text-muted">{{ 'coproperty.list.subtitle' | translate }}</p>
         </div>
         <div class="col-md-4 text-end">
-          <button class="btn btn-primary" (click)="addCoproperty()">
-            <i class="bi bi-plus-lg"></i>
+          <button class="btn btn-primary btn-violet" (click)="addCoproperty()">
+            <i class="bi bi-plus-circle me-2"></i>
             {{ 'coproperty.list.addCoproperty' | translate }}
           </button>
         </div>
@@ -27,42 +31,41 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
 
       <div *ngIf="coproperties$ | async as copropertiesList" class="row">
         <div *ngFor="let coproperty of copropertiesList" class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm">
+          <div class="card h-100 shadow-sm coproperty-card">
             <div class="card-body">
-              <h5 class="card-title">{{ coproperty.name }}</h5>
-              <p class="card-text text-muted">
-                <i class="bi bi-geo-alt-fill"></i> {{ coproperty.address }}
+              <h5 class="card-title text-primary fw-bold">
+                <i class="bi bi-building me-2"></i>
+                {{ coproperty.name }}
+              </h5>
+              <p class="card-text text-muted mb-3">
+                <i class="bi bi-geo-alt-fill me-1"></i> {{ coproperty.address }}
               </p>
-              <div class="row mt-3">
+              <div class="row mt-3 mb-3">
                 <div class="col-6">
-                  <p class="card-text mb-2">
-                    <strong>{{ 'coproperty.list.totalUnits' | translate }}:</strong><br/>
-                    <span class="badge bg-primary">{{ coproperty.totalUnits }}</span>
-                  </p>
+                  <div class="stat-box">
+                    <div class="stat-label">{{ 'coproperty.list.totalUnits' | translate }}</div>
+                    <div class="stat-value text-primary">
+                      <i class="bi bi-building"></i> {{ coproperty.totalUnits }}
+                    </div>
+                  </div>
                 </div>
                 <div class="col-6">
-                  <p class="card-text mb-2">
-                    <strong>{{ 'coproperty.list.totalShares' | translate }}:</strong><br/>
-                    <span class="badge bg-info">{{ coproperty.totalShares }}</span>
-                  </p>
+                  <div class="stat-box">
+                    <div class="stat-label">{{ 'coproperty.list.totalShares' | translate }}</div>
+                    <div class="stat-value text-info">
+                      <i class="bi bi-pie-chart"></i> {{ coproperty.totalShares }}
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="d-flex flex-wrap gap-2 mt-3">
                 <button type="button" class="btn btn-sm btn-outline-primary flex-grow-1" 
                   (click)="viewDetails(coproperty.id)" title="{{ 'coproperty.list.view' | translate }}">
-                  <i class="bi bi-eye"></i> {{ 'coproperty.list.view' | translate }}
+                  <i class="bi bi-eye"></i>
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-warning flex-grow-1" 
+                <button type="button" class="btn btn-sm btn-violet flex-grow-1" 
                   (click)="editCoproperty(coproperty.id)" title="{{ 'coproperty.list.edit' | translate }}">
-                  <i class="bi bi-pencil-square"></i> {{ 'coproperty.list.edit' | translate }}
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-info"  
-                  (click)="manageTravaux(coproperty.id)" title="Gérer les travaux">
-                  <i class="bi bi-tools"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-success" 
-                  (click)="createInvoice(coproperty.id)" title="Créer facture">
-                  <i class="bi bi-receipt"></i>
+                  <i class="bi bi-pencil-square"></i>
                 </button>
                 <button type="button" class="btn btn-sm btn-outline-secondary" 
                   (click)="distributeCharges(coproperty.id)" title="Calculer distribution">
@@ -85,6 +88,49 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
       </div>
     </div>
   `,
+  styles: [`
+    .coproperty-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .coproperty-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2) !important;
+    }
+    
+    .stat-box {
+      text-align: center;
+      padding: 10px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border-radius: 8px;
+    }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: #6c757d;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .card-title {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    h1 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  `]
 })
 export class CopropertyListComponent {
   coproperties$: Observable<Coproperty[]>;

@@ -153,22 +153,11 @@ export class CopropertyNewComponent implements OnInit {
         this.saving.set(false);
         this.saveSuccess.set(true);
         
-        // Hide success message after 3 seconds
-        setTimeout(() => this.saveSuccess.set(false), 3000);
-        
-        const id = coproperty.id;
-        this.copropertyId.set(id);
-        
-        const wasInEditMode = this.isEditMode();
-        this.isEditMode.set(true);
-        
-        if (wasInEditMode) {
-          // Already in edit mode - just reload the coproperty data
-          this.loadCoproperty(id);
-        } else {
-          // Was creating new - navigate to edit mode so tabs become available
-          this.router.navigate(['/coproperty/syndic/coproperties', id, 'edit']);
-        }
+        // Show success message then navigate to list after 2 seconds
+        setTimeout(() => {
+          this.saveSuccess.set(false);
+          this.router.navigate(['/coproperty/syndic/coproperties']);
+        }, 2000);
       },
       error: (error) => {
         this.saving.set(false);

@@ -196,6 +196,7 @@ export class CopropertyService {
     return this.apollo
       .watchQuery<{ coproperties: Coproperty[] }>({
         query: GET_COPROPERTIES,
+        fetchPolicy: 'network-only',
         context: { service: 'copropertyService' }
       })
       .valueChanges.pipe(

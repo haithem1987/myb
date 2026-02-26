@@ -34,3 +34,25 @@ $gray-900: #275556;
 .btn {
   font-weight: bold;
 }
+
+// Violet button style - matches units and charges gradient
+.btn-violet {
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  
+  &:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+    color: white;
+  }
+  
+  &:active, &:focus {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4391 100%);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    color: white;
+  }
+}

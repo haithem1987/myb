@@ -48,6 +48,7 @@ export class ChargeService {
     return this.apollo
       .query<{ allCharges: ChargeExtended[] }>({
         query: GET_ALL_CHARGES,
+        fetchPolicy: 'network-only',
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.allCharges));

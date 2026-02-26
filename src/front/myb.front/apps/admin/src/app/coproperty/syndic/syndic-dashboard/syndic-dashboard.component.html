@@ -26,43 +26,23 @@
       </div>
     </div>
     
-    <div class="stat-card warning">
-      <div class="stat-icon">
-        <i class="bi bi-receipt"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ stats().pendingInvoices }}</div>
-        <div class="stat-label">Factures en attente</div>
-      </div>
-    </div>
-    
     <div class="stat-card info">
       <div class="stat-icon">
         <i class="bi bi-cash-stack"></i>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ stats().monthlyRevenue | number:'1.0-0' }}€</div>
-        <div class="stat-label">Recettes du mois</div>
-      </div>
-    </div>
-    
-    <div class="stat-card danger">
-      <div class="stat-icon">
-        <i class="bi bi-exclamation-triangle"></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ stats().urgentMaintenance }}</div>
-        <div class="stat-label">Demandes urgentes</div>
+        <div class="stat-value">{{ stats().totalBudget | number:'1.0-0' }}€</div>
+        <div class="stat-label">Budget total</div>
       </div>
     </div>
     
     <div class="stat-card secondary">
       <div class="stat-icon">
-        <i class="bi bi-calendar-check"></i>
+        <i class="bi bi-people"></i>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ stats().upcomingFundCalls }}</div>
-        <div class="stat-label">Appels de fonds à venir</div>
+        <div class="stat-value">{{ stats().totalOwners }}</div>
+        <div class="stat-label">Nombre de copropriétaires</div>
       </div>
     </div>
   </div>
@@ -71,24 +51,24 @@
   <div class="quick-actions">
     <h2>Actions Rapides</h2>
     <div class="actions-grid">
-      <a routerLink="/coproperty/syndic/invoices/new" class="action-card">
+      <a routerLink="/coproperty/syndic/coproperties/new" class="action-card">
+        <i class="bi bi-building"></i>
+        <span>Ajouter une copropriété</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/units/new" class="action-card">
+        <i class="bi bi-house-door"></i>
+        <span>Ajouter un lot</span>
+      </a>
+      
+      <a routerLink="/coproperty/syndic/charges/new" class="action-card">
         <i class="bi bi-plus-circle"></i>
-        <span>Créer une facture</span>
+        <span>Ajouter un budget</span>
       </a>
       
-      <a routerLink="/coproperty/syndic/fund-calls/new" class="action-card">
-        <i class="bi bi-send"></i>
-        <span>Lancer un appel de fonds</span>
-      </a>
-      
-      <a routerLink="/coproperty/syndic/maintenance" class="action-card">
-        <i class="bi bi-tools"></i>
-        <span>Gérer les travaux</span>
-      </a>
-      
-      <a routerLink="/coproperty/syndic/reports" class="action-card">
-        <i class="bi bi-graph-up"></i>
-        <span>Générer un rapport</span>
+      <a routerLink="/coproperty/syndic/owners" class="action-card">
+        <i class="bi bi-person-plus"></i>
+        <span>Ajouter un copropriétaire</span>
       </a>
     </div>
   </div>

@@ -6,13 +6,14 @@ import { CreateOwnerWithUnitsInput, OwnerUnitInput } from '../../models/owner.mo
 import { UnitService, UnitExtended } from '../../services/unit.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of } from 'rxjs';
+import { of } from 'rxjs';
 import { map, finalize } from 'rxjs/operators';
 
 interface Unit {
   id: string;
   unitNumber: string;
   copropertyId?: string;
+  copropertyName?: string;
 }
 
 interface Owner {
@@ -66,7 +67,6 @@ export class OwnerManagementComponent implements OnInit {
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
-      copropertyIdForUnits: ['', Validators.required],
       selectedUnits: [<string[]>[], Validators.required],
     });
   }
@@ -78,96 +78,36 @@ export class OwnerManagementComponent implements OnInit {
 
   loadAvailableUnits(): void {
     this.loading.set(true);
+    console.log('[Owner Management] Loading units started');
     
-    // Load all coproperties first
-    this.copropertyService.getCoproperties()
-      .pipe(
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (coproperties) => {
-          this.coproperties.set(coproperties.map(c => ({ id: c.id, name: c.name })));
-          
-          if (coproperties.length === 0) {
-            this.availableUnits = [];
-            this.allUnits = [];
-            this.loading.set(false);
-            return;
-          }
-
-          // If specific coproperty context, load only its units
-          if (this.copropertyId) {
-            this.loadUnitsForCoproperty(this.copropertyId);
-          } else {
-            // Load all units from all coproperties
-            const unitRequests = coproperties.map(coproperty =>
-              this.unitService.getUnitsByCoproperty(coproperty.id)
-            );
-
-            forkJoin(unitRequests)
-              .pipe(
-                takeUntilDestroyed(this.destroyRef),
-                finalize(() => this.loading.set(false))
-              )
-              .subscribe({
-                next: (results) => {
-                  this.allUnits = results.flat().map(u => ({
-                    id: u.id!,
-                    unitNumber: u.unitNumber,
-                    copropertyId: u.copropertyId
-                  }));
-                  this.availableUnits = [...this.allUnits];
-                },
-                error: (err) => {
-                  console.error('Error loading all units:', err);
-                  this.translateService.get('coproperty.messages.error').subscribe(msg => {
-                    this.showAlert('danger', msg);
-                  });
-                }
-              });
-          }
-        },
-        error: (err) => {
-          console.error('Error loading coproperties:', err);
-          this.loading.set(false);
-        }
-      });
-  }
-
-  loadUnitsForCoproperty(copropertyId: string): void {
-    if (!copropertyId) {
-      this.availableUnits = [...this.allUnits];
-      return;
-    }
-
-    this.loading.set(true);
-    this.unitService.getUnitsByCoproperty(copropertyId)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.loading.set(false))
-      )
-      .subscribe({
-        next: (units) => {
-          this.availableUnits = units.map(u => ({
-            id: u.id!,
-            unitNumber: u.unitNumber,
-            copropertyId: u.copropertyId
-          }));
-        },
-        error: (err) => {
-          console.error('Error loading units:', err);
-          this.translateService.get('coproperty.messages.error').subscribe(msg => {
-            this.showAlert('danger', msg);
-          });
-        }
-      });
-  }
-
-  onCopropertyChangeForUnits(copropertyId: string): void {
-    this.selectedCopropertyForFilter.set(copropertyId);
-    this.loadUnitsForCoproperty(copropertyId);
-    // Clear selected units when changing coproperty
-    this.ownerForm.patchValue({ selectedUnits: [] });
+    // Load all units at once using the new getAllUnits query
+    this.unitService.getAllUnits().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => {
+        console.log('[Owner Management] Loading units finalized');
+        this.loading.set(false);
+      })
+    ).subscribe({
+      next: (units) => {
+        console.log('[Owner Management] Units loaded:', units.length);
+        // Transform units for display
+        this.allUnits = units.map(u => ({
+          id: u.id!,
+          unitNumber: u.unitNumber,
+          copropertyId: u.copropertyId,
+          copropertyName: u.copropertyName || 'Unknown'
+        }));
+        this.availableUnits = [...this.allUnits];
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('[Owner Management] Error loading units:', err);
+        this.translateService.get('coproperty.messages.error').subscribe(msg => {
+          this.showAlert('danger', msg);
+        });
+        this.loading.set(false);
+      }
+    });
   }
 
   loadOwners(): void {
@@ -234,12 +174,8 @@ export class OwnerManagementComponent implements OnInit {
     this.editingOwnerId = null;
     this.ownerForm.reset();
     this.ownerForm.patchValue({ 
-      selectedUnits: [],
-      copropertyIdForUnits: this.copropertyId || '' 
+      selectedUnits: []
     });
-    if (this.copropertyId) {
-      this.selectedCopropertyForFilter.set(this.copropertyId);
-    }
   }
 
   editOwner(owner: Owner): void {

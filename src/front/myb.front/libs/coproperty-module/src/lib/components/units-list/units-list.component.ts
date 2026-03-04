@@ -65,7 +65,7 @@ export class UnitsListComponent implements OnInit {
     this.copropertyService.getCoproperties().subscribe({
       next: (data) => {
         this.coproperties.set(data);
-        // Load units after coproperties are loaded
+        // Load all units regardless of coproperties
         this.loadAllUnits();
       },
       error: (err) => {

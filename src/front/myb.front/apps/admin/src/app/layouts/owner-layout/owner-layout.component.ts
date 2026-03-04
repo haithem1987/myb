@@ -17,13 +17,31 @@ export class OwnerLayoutComponent implements OnInit {
   // State signals
   pendingInvoices = signal(2);
   activeRequests = signal(1);
-  currentUser = signal({ name: 'Jean Martin', firstName: 'Jean', lastName: 'Martin', role: 'Owner' });
+  currentUser = signal<{ name: string; firstName: string; lastName: string; role: string }>({ name: 'Utilisateur', firstName: 'U', lastName: ' ', role: 'Copropriétaire' });
   
   // Sidebar state
   isMobileMenuOpen = signal(false);
   
   ngOnInit(): void {
+    this.loadUserFromKeycloak();
     this.loadOwnerData();
+  }
+  
+  private loadUserFromKeycloak(): void {
+    try {
+      const profile = this.keycloakService.getProfile();
+      const keycloak = (this.keycloakService as any).keycloak;
+      const token = keycloak?.tokenParsed;
+
+      const firstName = profile?.firstName || token?.given_name || '';
+      const lastName = profile?.lastName || token?.family_name || '';
+      const name = `${firstName} ${lastName}`.trim() || token?.preferred_username || 'Utilisateur';
+
+      this.currentUser.set({ name, firstName: firstName || 'U', lastName: lastName || '', role: 'Copropriétaire' });
+    } catch (e) {
+      console.error('Error loading user from Keycloak', e);
+      this.currentUser.set({ name: 'Utilisateur', firstName: 'U', lastName: ' ', role: 'Copropriétaire' });
+    }
   }
   
   private loadOwnerData(): void {

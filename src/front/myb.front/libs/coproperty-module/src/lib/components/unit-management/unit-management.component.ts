@@ -132,7 +132,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
   deleteUnit(unit: UnitExtended): void {
     if (confirm(`Are you sure you want to delete unit ${unit.unitNumber}?`)) {
       this.loading.set(true);
-      this.unitService.deleteUnit(unit.id!).subscribe({
+      this.unitService.deleteUnit(unit.id!, unit.copropertyId || this.resolvedCopropertyId || undefined).subscribe({
         next: () => {
           this.showAlert('success', `Lot ${unit.unitNumber} supprimé avec succès!`);
           this.loadUnits();

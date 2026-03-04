@@ -29,14 +29,32 @@ export class SyndicLayoutComponent implements OnInit {
   totalBudgets = signal(0);
   totalUnits = signal(0);
   totalOwners = signal(0);
-  currentUser = signal({ name: 'Marie Dubois', firstName: 'Marie', lastName: 'Dubois', role: 'Syndic' });
+  currentUser = signal<{ name: string; firstName: string; lastName: string; role: string }>({ name: '', firstName: '', lastName: '', role: 'Syndic' });
   
   // Sidebar state
   isSidebarCollapsed = signal(false);
   
   ngOnInit(): void {
+    this.loadUserFromKeycloak();
     // Load dashboard statistics
     this.loadStatistics();
+  }
+  
+  private loadUserFromKeycloak(): void {
+    try {
+      const profile = this.keycloakService.getProfile();
+      const keycloak = (this.keycloakService as any).keycloak;
+      const token = keycloak?.tokenParsed;
+
+      const firstName = profile?.firstName || token?.given_name || '';
+      const lastName = profile?.lastName || token?.family_name || '';
+      const name = `${firstName} ${lastName}`.trim() || token?.preferred_username || 'Utilisateur';
+
+      this.currentUser.set({ name, firstName: firstName || 'U', lastName: lastName || '', role: 'Syndic' });
+    } catch (e) {
+      console.error('Error loading user from Keycloak', e);
+      this.currentUser.set({ name: 'Utilisateur', firstName: 'U', lastName: '', role: 'Syndic' });
+    }
   }
   
   private loadStatistics(): void {

@@ -5,7 +5,7 @@ export const environment = {
   // Service endpoints (all with CORS enabled)
   services: {
     coproperty: 'http://localhost:8088/graphql',
-    invoice: 'http://localhost:8083/graphql',
+    invoice: 'http://localhost:8083/invoice/graphql',
     timesheet: 'http://localhost:8082/graphql',
     document: 'http://localhost:8086/graphql',
     payment: 'http://localhost:8084',

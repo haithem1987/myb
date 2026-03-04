@@ -90,18 +90,26 @@ export class ChargeService {
       .mutate<{ updateCharge: ChargeExtended }>({
         mutation: UPDATE_CHARGE,
         variables: { item: charge },
-        refetchQueries: [{ query: GET_CHARGES_BY_COPROPERTY, variables: { copropertyId: charge.copropertyId } }],
+        refetchQueries: [
+          { query: GET_CHARGES_BY_COPROPERTY, variables: { copropertyId: charge.copropertyId } },
+          { query: GET_ALL_CHARGES }
+        ],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateCharge));
   }
 
-  deleteCharge(id: string): Observable<boolean> {
+  deleteCharge(id: string, copropertyId?: string): Observable<boolean> {
+    const refetchQueries: any[] = [{ query: GET_ALL_CHARGES }];
+    if (copropertyId) {
+      refetchQueries.push({ query: GET_CHARGES_BY_COPROPERTY, variables: { copropertyId } });
+    }
     return this.apollo
       .mutate<{ deleteCharge: boolean }>({
         mutation: DELETE_CHARGE,
         variables: { id },
-        refetchQueries: [{ query: GET_ALL_CHARGES }],
+        refetchQueries,
         awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })

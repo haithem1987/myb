@@ -1,49 +1,58 @@
 import gql from 'graphql-tag';
 
-export const GET_ALL_FUND_CALLS = gql`
-  query GetAllFundCalls {
-    allFundCalls {
+export const FUND_CALL_FRAGMENT = gql`
+  fragment FundCallFields on FundCall {
+    id
+    copropertyId
+    ownerId
+    owner {
       id
-      copropertyId
+      firstName
+      lastName
+      email
+    }
+    amount
+    dueDate
+    description
+    status
+    isActive
+    createdAt
+    updatedAt
+    currency
+    payments {
+      id
+      fundCallId
       amount
-      dueDate
-      description
-      isActive
+      paymentDate
+      justificatif
       createdAt
-      updatedAt
-      currency
     }
   }
 `;
 
 export const GET_FUND_CALLS_BY_COPROPERTY = gql`
-  query GetFundCallsByCoproperty($copropertyId: UUID!) {
-    fundCallsByCoproperty(copropertyId: $copropertyId) {
-      id
-      copropertyId
-      amount
-      dueDate
-      description
-      isActive
-      createdAt
-      updatedAt
-      currency
+  query GetFundCallsByCoproperty($copropertyId: UUID!, $ownerId: UUID, $year: Int) {
+    fundCallsByCoproperty(copropertyId: $copropertyId, ownerId: $ownerId, year: $year) {
+      ...FundCallFields
     }
   }
+  ${FUND_CALL_FRAGMENT}
+`;
+
+export const GET_ALL_FUND_CALLS = gql`
+  query GetAllFundCalls {
+    allFundCalls {
+      ...FundCallFields
+    }
+  }
+  ${FUND_CALL_FRAGMENT}
 `;
 
 export const GET_FUND_CALL_BY_ID = gql`
   query GetFundCallById($id: UUID!) {
     fundCall(id: $id) {
-      id
-      copropertyId
-      amount
-      dueDate
-      description
-      isActive
-      createdAt
-      updatedAt
-      currency
+      ...FundCallFields
     }
   }
+  ${FUND_CALL_FRAGMENT}
 `;

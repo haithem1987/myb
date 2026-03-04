@@ -34,6 +34,17 @@ export const authGuard: CanActivateFn = async (route, state) => {
       return false;
     }
 
+    // Check required roles if specified in route data
+    const requiredRoles = route.data?.['roles'] as string[] | undefined;
+    if (requiredRoles && requiredRoles.length > 0) {
+      const userRoles = keycloakService.getUserRoles();
+      const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
+      if (!hasRequiredRole) {
+        console.warn('User does not have required roles:', requiredRoles, 'User roles:', userRoles);
+        return router.createUrlTree(['/coproperty']);
+      }
+    }
+
     console.log('User authenticated, allowing access');
     return true;
   } catch (error) {

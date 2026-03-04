@@ -12,7 +12,7 @@ namespace Myb.Coproperty.GraphQL.Types
         protected override void Configure(IObjectTypeDescriptor<Models.Coproperty> descriptor)
         {
             // Expose all scalar fields automatically
-            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Id).Type<NonNullType<UuidType>>();
             descriptor.Field(c => c.Name).Type<NonNullType<StringType>>();
             descriptor.Field(c => c.Address).Type<NonNullType<StringType>>();
             descriptor.Field(c => c.City).Type<NonNullType<StringType>>();
@@ -24,7 +24,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(c => c.TotalShares).Type<NonNullType<IntType>>();
             descriptor.Field(c => c.CommonAreas).Type<StringType>();
             descriptor.Field(c => c.ManagerName).Type<StringType>();
-            descriptor.Field(c => c.ManagerId).Type<IdType>();
+            descriptor.Field(c => c.ManagerId).Type<UuidType>();
             descriptor.Field(c => c.IsActive).Type<NonNullType<BooleanType>>();
             descriptor.Field(c => c.CreatedAt).Type<DateTimeType>();
             descriptor.Field(c => c.UpdatedAt).Type<DateTimeType>();

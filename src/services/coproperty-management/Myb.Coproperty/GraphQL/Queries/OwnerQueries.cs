@@ -14,6 +14,9 @@ namespace Myb.Coproperty.GraphQL.Queries
         public async Task<Owner> GetOwnerById(Guid id, [Service] IOwnerService ownerService) =>
             await ownerService.GetByIdAsync(id);
 
+        public async Task<Owner?> GetOwnerByUserId(Guid userId, [Service] IOwnerService ownerService) =>
+            await ownerService.GetByUserIdAsync(userId);
+
         public async Task<IEnumerable<Owner>> GetOwnersByUnit(Guid unitId, [Service] IOwnerService ownerService) =>
             await ownerService.GetByUnitIdAsync(unitId);
     }

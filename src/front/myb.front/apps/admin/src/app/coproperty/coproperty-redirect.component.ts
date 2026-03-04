@@ -8,8 +8,11 @@ import { KeycloakService } from '@myb-front/auth';
   template: `
     <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
       <div style="text-align: center;">
-        <h2>Redirection...</h2>
-        <p>Chargement de votre espace...</p>
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+        <h4>Redirection...</h4>
+        <p class="text-muted">Chargement de votre espace en fonction de votre rôle...</p>
       </div>
     </div>
   `
@@ -23,11 +26,11 @@ export class CopropertyRedirectComponent implements OnInit {
   }
 
   private redirectBasedOnRole() {
-    const roles = this.keycloakService.getRoles();
-    console.log('User roles:', roles);
+    const roles = this.keycloakService.getUserRoles();
+    console.log('CopropertyRedirect — User roles from Keycloak:', roles);
 
-    // Priority-based routing
-    if (roles.includes('coproperty-syndic')) {
+    // Priority-based routing using client roles
+    if (roles.includes('coproperty-syndic') || roles.includes('coproperty-admin')) {
       console.log('Redirecting to syndic dashboard');
       this.router.navigate(['/coproperty/syndic/dashboard']);
     } else if (roles.includes('coproperty-council')) {
@@ -40,10 +43,10 @@ export class CopropertyRedirectComponent implements OnInit {
       console.log('Redirecting to owner dashboard');
       this.router.navigate(['/coproperty/owner/dashboard']);
     } else if (roles.includes('system-admin')) {
-      console.log('Redirecting to admin dashboard');
-      this.router.navigate(['/coproperty/admin/dashboard']);
+      console.log('Redirecting to syndic dashboard (admin fallback)');
+      this.router.navigate(['/coproperty/syndic/dashboard']);
     } else {
-      console.log('No valid role found, redirecting to access denied');
+      console.warn('No valid coproperty role found. User roles:', roles);
       this.router.navigate(['/access-denied']);
     }
   }

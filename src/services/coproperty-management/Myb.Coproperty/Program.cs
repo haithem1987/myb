@@ -84,6 +84,7 @@ builder.Services
     .AddType<Myb.Coproperty.GraphQL.Types.MaintenanceRequestType>()
     .AddType<Myb.Coproperty.GraphQL.Types.MaintenanceRequestInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.FundCallType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.FundCallPaymentType>()
     .AddType<Myb.Coproperty.GraphQL.Types.DashboardStatsType>()
     .AddType<Myb.Coproperty.GraphQL.Types.TreasuryDataPointType>()
     .AddType<Myb.Coproperty.GraphQL.Types.FinancialReportType>()
@@ -96,7 +97,13 @@ builder.Services
     .AddType<Myb.Coproperty.GraphQL.Types.AssemblyAttendanceType>()
     .AddProjections()
     .AddFiltering()
-    .AddSorting();
+    .AddSorting()
+    .AddErrorFilter(error =>
+    {
+        if (error.Exception is InvalidOperationException or ArgumentException)
+            return error.WithMessage(error.Exception.Message).RemoveExtensions();
+        return error;
+    });
 
 
 builder.Services.AddControllers();

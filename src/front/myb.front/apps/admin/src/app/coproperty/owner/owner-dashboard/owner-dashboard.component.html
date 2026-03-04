@@ -35,6 +35,10 @@
       </div>
       <div class="card-body">
         <div class="unit-list" *ngIf="!loading(); else loadingTemplate">
+          <div *ngIf="myUnits().length === 0" class="empty-state">
+            <i class="bi bi-building"></i>
+            <p>Aucun lot associé</p>
+          </div>
           <div class="unit-item" *ngFor="let unit of myUnits()">
             <div class="unit-icon">
               <i class="bi" 

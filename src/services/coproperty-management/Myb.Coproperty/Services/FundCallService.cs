@@ -12,9 +12,12 @@ public interface IFundCallService
 {
     Task<FundCall> CreateAsync(CreateFundCallInput input, string userId);
     Task<FundCall> UpdateAsync(Guid id, CreateFundCallInput input, string userId);
+    Task<FundCall> UpdateStatusAsync(Guid id, UpdateFundCallInput input, string userId);
     Task DeleteAsync(Guid id);
     Task<FundCall?> GetByIdAsync(Guid id);
-    Task<List<FundCall>> GetByCopropertyIdAsync(Guid copropertyId);
+    Task<List<FundCall>> GetByCopropertyIdAsync(Guid copropertyId, Guid? ownerId = null, int? year = null);
+    Task<List<FundCall>> GetAllAsync();
+    Task<FundCallPayment> AddPaymentAsync(Guid fundCallId, AddFundCallPaymentInput input, string userId);
     Task<List<CopropertyInvoice>> GenerateInvoicesFromFundCallAsync(Guid fundCallId, string userId);
 }
 
@@ -33,28 +36,38 @@ public class FundCallService : IFundCallService
     public async Task<FundCall> CreateAsync(CreateFundCallInput input, string userId)
     {
         if (!input.CopropertyId.HasValue || input.CopropertyId.Value == Guid.Empty)
-        {
             throw new ArgumentException("CopropertyId is required to create a fund call");
-        }
 
         using var context = _contextFactory.CreateDbContext();
-        
+
         // Verify coproperty exists
         var copropertyExists = await context.Coproperties
             .AnyAsync(c => c.Id == input.CopropertyId.Value);
-        
+
         if (!copropertyExists)
-        {
             throw new ArgumentException($"Coproperty with ID {input.CopropertyId.Value} not found");
-        }
-        
+
+        // Duplicate check: same coproperty + same calendar day (UTC) + same OwnerId
+        // Use a date range to avoid date_trunc type-mismatch with timestamptz columns
+        var dueDayUtc = DateTime.SpecifyKind(input.DueDate.Date, DateTimeKind.Utc);
+        var nextDayUtc = dueDayUtc.AddDays(1);
+        var duplicate = await context.FundCalls.AnyAsync(f =>
+            f.CopropertyId == input.CopropertyId.Value &&
+            f.OwnerId == input.OwnerId &&
+            f.DueDate >= dueDayUtc && f.DueDate < nextDayUtc);
+
+        if (duplicate)
+            throw new InvalidOperationException("Fund call already exists for this date");
+
         var fundCall = new FundCall
         {
             Id = Guid.NewGuid(),
             CopropertyId = input.CopropertyId.Value,
+            OwnerId = input.OwnerId,
             Amount = input.Amount,
             DueDate = input.DueDate,
             Description = input.Description,
+            Status = input.Status ?? FundCallStatus.ToPay,
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = Guid.TryParse(userId, out var userGuid) ? userGuid : Guid.Empty,
@@ -70,7 +83,7 @@ public class FundCallService : IFundCallService
     public async Task<FundCall> UpdateAsync(Guid id, CreateFundCallInput input, string userId)
     {
         using var context = _contextFactory.CreateDbContext();
-        
+
         var fundCall = await context.FundCalls.FindAsync(id);
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {id} not found");
@@ -78,6 +91,24 @@ public class FundCallService : IFundCallService
         fundCall.Amount = input.Amount;
         fundCall.DueDate = input.DueDate;
         fundCall.Description = input.Description;
+        fundCall.OwnerId = input.OwnerId;
+        fundCall.Status = input.Status ?? fundCall.Status;
+        fundCall.UpdatedAt = DateTime.UtcNow;
+
+        await context.SaveChangesAsync();
+
+        return fundCall;
+    }
+
+    public async Task<FundCall> UpdateStatusAsync(Guid id, UpdateFundCallInput input, string userId)
+    {
+        using var context = _contextFactory.CreateDbContext();
+
+        var fundCall = await context.FundCalls.FindAsync(id);
+        if (fundCall == null)
+            throw new InvalidOperationException($"FundCall with ID {id} not found");
+
+        fundCall.Status = input.Status;
         fundCall.UpdatedAt = DateTime.UtcNow;
 
         await context.SaveChangesAsync();
@@ -88,7 +119,7 @@ public class FundCallService : IFundCallService
     public async Task DeleteAsync(Guid id)
     {
         using var context = _contextFactory.CreateDbContext();
-        
+
         var fundCall = await context.FundCalls.FindAsync(id);
         if (fundCall != null)
         {
@@ -100,32 +131,93 @@ public class FundCallService : IFundCallService
     public async Task<FundCall?> GetByIdAsync(Guid id)
     {
         using var context = _contextFactory.CreateDbContext();
-        
+
         return await context.FundCalls
             .Include(f => f.Coproperty)
+            .Include(f => f.Owner)
             .Include(f => f.Invoices)
+            .Include(f => f.Payments)
             .FirstOrDefaultAsync(f => f.Id == id);
     }
 
-    public async Task<List<FundCall>> GetByCopropertyIdAsync(Guid copropertyId)
+    public async Task<List<FundCall>> GetByCopropertyIdAsync(Guid copropertyId, Guid? ownerId = null, int? year = null)
     {
         using var context = _contextFactory.CreateDbContext();
-        
-        return await context.FundCalls
+
+        var query = context.FundCalls
             .Where(f => f.CopropertyId == copropertyId)
+            .AsQueryable();
+
+        if (ownerId.HasValue)
+            query = query.Where(f => f.OwnerId == ownerId.Value);
+
+        if (year.HasValue)
+            query = query.Where(f => f.DueDate.Year == year.Value);
+
+        return await query
+            .Include(f => f.Owner)
             .Include(f => f.Invoices)
-            .OrderByDescending(f => f.CreatedAt)
+            .Include(f => f.Payments)
+            .OrderByDescending(f => f.DueDate)
             .ToListAsync();
+    }
+
+    public async Task<List<FundCall>> GetAllAsync()
+    {
+        using var context = _contextFactory.CreateDbContext();
+
+        return await context.FundCalls
+            .Include(f => f.Owner)
+            .Include(f => f.Invoices)
+            .Include(f => f.Payments)
+            .OrderByDescending(f => f.DueDate)
+            .ToListAsync();
+    }
+
+    public async Task<FundCallPayment> AddPaymentAsync(Guid fundCallId, AddFundCallPaymentInput input, string userId)
+    {
+        using var context = _contextFactory.CreateDbContext();
+
+        var fundCall = await context.FundCalls.FindAsync(fundCallId);
+        if (fundCall == null)
+            throw new InvalidOperationException($"FundCall with ID {fundCallId} not found");
+
+        var payment = new FundCallPayment
+        {
+            Id = Guid.NewGuid(),
+            FundCallId = fundCallId,
+            Amount = input.Amount,
+            PaymentDate = input.PaymentDate,
+            Justificatif = input.Justificatif,
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = Guid.TryParse(userId, out var userGuid) ? userGuid : Guid.Empty
+        };
+
+        context.FundCallPayments.Add(payment);
+
+        // Auto-transition status to Paid if the total payments cover the fund call amount
+        var existingTotal = await context.FundCallPayments
+            .Where(p => p.FundCallId == fundCallId)
+            .SumAsync(p => p.Amount);
+
+        if (existingTotal + input.Amount >= fundCall.Amount)
+            fundCall.Status = FundCallStatus.Paid;
+
+        fundCall.UpdatedAt = DateTime.UtcNow;
+
+        await context.SaveChangesAsync();
+
+        return payment;
     }
 
     public async Task<List<CopropertyInvoice>> GenerateInvoicesFromFundCallAsync(Guid fundCallId, string userId)
     {
         using var context = _contextFactory.CreateDbContext();
-        
+
         var fundCall = await context.FundCalls
             .Include(f => f.Coproperty)
             .FirstOrDefaultAsync(f => f.Id == fundCallId);
-        
+
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {fundCallId} not found");
 

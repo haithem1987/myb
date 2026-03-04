@@ -11,7 +11,7 @@ import { KeycloakService } from '@myb-front/auth';
     <div class="council-layout">
       <aside class="sidebar">
         <div class="logo">
-          <img src="assets/logo.svg" alt="MYB">
+          <img src="assets/MYB-LOGO-dark.png" alt="MYB">
           <span class="role-badge">Conseil Syndical</span>
         </div>
         
@@ -72,6 +72,12 @@ import { KeycloakService } from '@myb-front/auth';
       align-items: center;
       gap: 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      img {
+        height: 36px;
+        width: auto;
+        object-fit: contain;
+      }
     }
     
     .role-badge {

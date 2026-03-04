@@ -12,7 +12,7 @@ import { environment } from '../environments/environment';
 const microserviceLinks = {
   timesheetService: environment.services?.timesheet?.baseUrl + '/graphql' ?? 'http://localhost:8082/graphql',
   documentService: environment.services?.document?.graphqlUrl ?? 'http://localhost:8086/graphql',
-  invoiceService: environment.services?.invoice?.graphqlUrl ?? 'http://localhost:8083/graphql',
+  invoiceService: environment.services?.invoice?.graphqlUrl ?? 'http://localhost:8083/invoice/graphql',
   copropertyService: environment.services?.coproperty?.graphqlUrl ?? 'http://localhost:8088/graphql',
 };
 

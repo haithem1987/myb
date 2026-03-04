@@ -6,6 +6,7 @@ import { CouncilLayoutComponent } from '../layouts/council-layout/council-layout
 import { AccountantLayoutComponent } from '../layouts/accountant-layout/accountant-layout.component';
 import { SyndicDashboardComponent } from './syndic/syndic-dashboard/syndic-dashboard.component';
 import { OwnerDashboardComponent } from './owner/owner-dashboard/owner-dashboard.component';
+import { authGuard } from 'libs/auth/src/lib/auth.guard';
 
 export const COPROPERTY_ROUTES: Routes = [
   {
@@ -15,6 +16,8 @@ export const COPROPERTY_ROUTES: Routes = [
   {
     path: 'syndic',
     component: SyndicLayoutComponent,
+    canActivate: [authGuard],
+    data: { roles: ['coproperty-syndic', 'coproperty-admin', 'system-admin'] },
     children: [
       {
         path: '',
@@ -107,6 +110,8 @@ export const COPROPERTY_ROUTES: Routes = [
   {
     path: 'owner',
     component: OwnerLayoutComponent,
+    canActivate: [authGuard],
+    data: { roles: ['coproperty-owner', 'coproperty-syndic', 'coproperty-admin', 'system-admin'] },
     children: [
       {
         path: '',
@@ -142,6 +147,8 @@ export const COPROPERTY_ROUTES: Routes = [
   {
     path: 'council',
     component: CouncilLayoutComponent,
+    canActivate: [authGuard],
+    data: { roles: ['coproperty-council', 'coproperty-syndic', 'coproperty-admin', 'system-admin'] },
     children: [
       {
         path: '',
@@ -157,6 +164,8 @@ export const COPROPERTY_ROUTES: Routes = [
   {
     path: 'accountant',
     component: AccountantLayoutComponent,
+    canActivate: [authGuard],
+    data: { roles: ['coproperty-accountant', 'coproperty-syndic', 'coproperty-admin', 'system-admin'] },
     children: [
       {
         path: '',

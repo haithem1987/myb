@@ -23,7 +23,7 @@ export const environment = {
       baseUrl: 'https://document-production.up.railway.app',
     },
     invoice: {
-      graphqlUrl: 'https://invoice-production.up.railway.app/graphql',
+      graphqlUrl: 'https://invoice-production.up.railway.app/invoice/graphql',
       baseUrl: 'https://invoice-production.up.railway.app',
     },
     timesheet: {

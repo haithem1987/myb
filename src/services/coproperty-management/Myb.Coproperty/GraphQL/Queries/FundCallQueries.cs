@@ -11,19 +11,26 @@ namespace Myb.Coproperty.GraphQL.Queries;
 [ExtendObjectType("Query")]
 public class FundCallQueries
 {
-    /// <summary>
-    /// Get a fund call by ID
-    /// </summary>
+    /// <summary>Get a fund call by ID</summary>
     public async Task<FundCall?> GetFundCall(
         Guid id,
         [Service] IFundCallService fundCallService) =>
         await fundCallService.GetByIdAsync(id);
 
     /// <summary>
-    /// Get all fund calls for a coproperty
+    /// Get all fund calls for a coproperty, optionally filtered by owner and/or year.
     /// </summary>
     public async Task<List<FundCall>> GetFundCallsByCoproperty(
         Guid copropertyId,
+        Guid? ownerId,
+        int? year,
         [Service] IFundCallService fundCallService) =>
-        await fundCallService.GetByCopropertyIdAsync(copropertyId);
+        await fundCallService.GetByCopropertyIdAsync(copropertyId, ownerId, year);
+
+    /// <summary>
+    /// Get all fund calls across all coproperties (unfiltered; filtering handled client-side).
+    /// </summary>
+    public async Task<List<FundCall>> GetAllFundCalls(
+        [Service] IFundCallService fundCallService) =>
+        await fundCallService.GetAllAsync();
 }

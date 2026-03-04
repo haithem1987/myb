@@ -3,12 +3,12 @@
     "http": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "graphql",
+      "launchUrl": "invoice/graphql",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5145"
+      "applicationUrl": "http://localhost:8083"
     },
     "IIS Express": {
       "commandName": "IISExpress",

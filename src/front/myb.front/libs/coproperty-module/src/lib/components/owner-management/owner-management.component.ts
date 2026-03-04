@@ -2,12 +2,14 @@ import { Component, OnInit, Input, signal, inject, DestroyRef } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { CreateOwnerWithUnitsInput, OwnerUnitInput } from '../../models/owner.model';
+import { CreateOwnerWithUnitsInput, OwnerUnitInput, OwnerWithUnits } from '../../models/owner.model';
 import { UnitService, UnitExtended } from '../../services/unit.service';
 import { CopropertyService } from '../../services/coproperty.service';
+import { OwnerService } from '../../services/owner.service';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { of } from 'rxjs';
-import { map, finalize } from 'rxjs/operators';
+import { of, from } from 'rxjs';
+import { map, finalize, switchMap } from 'rxjs/operators';
 
 interface Unit {
   id: string;
@@ -18,6 +20,7 @@ interface Unit {
 
 interface Owner {
   id: string;
+  userId?: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -45,6 +48,8 @@ export class OwnerManagementComponent implements OnInit {
   private fb = inject(FormBuilder);
   private unitService = inject(UnitService);
   private copropertyService = inject(CopropertyService);
+  private ownerService = inject(OwnerService);
+  private keycloakService = inject(KeycloakService);
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
   
@@ -55,6 +60,7 @@ export class OwnerManagementComponent implements OnInit {
   selectedCopropertyForFilter = signal<string>('');
   displayedColumns: string[] = ['name', 'email', 'phone', 'units', 'actions'];
   searchTerm: string = '';
+  unitSearchTerm: string = '';
   showAddForm: boolean = false;
   ownerForm: FormGroup;
   editingOwnerId: string | null = null;
@@ -72,7 +78,22 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadOwners();
+    // Load coproperty first if copropertyId is provided, otherwise load all owners
+    if (this.copropertyId) {
+      this.loadOwners();
+    } else {
+      // Try to get first coproperty from the list
+      this.copropertyService.getCoproperties()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (coproperties) => {
+            if (coproperties.length > 0) {
+              this.copropertyId = coproperties[0].id;
+              this.loadOwners();
+            }
+          }
+        });
+    }
     this.loadAvailableUnits();
   }
 
@@ -98,6 +119,7 @@ export class OwnerManagementComponent implements OnInit {
           copropertyName: u.copropertyName || 'Unknown'
         }));
         this.availableUnits = [...this.allUnits];
+        this.unitSearchTerm = '';
         this.loading.set(false);
       },
       error: (err) => {
@@ -110,50 +132,49 @@ export class OwnerManagementComponent implements OnInit {
     });
   }
 
+  get filteredAvailableUnits(): Unit[] {
+    if (!this.unitSearchTerm.trim()) return this.availableUnits;
+    const term = this.unitSearchTerm.toLowerCase();
+    return this.availableUnits.filter(u =>
+      u.unitNumber.toLowerCase().includes(term) ||
+      (u.copropertyName || '').toLowerCase().includes(term)
+    );
+  }
+
   loadOwners(): void {
-    // TODO: Implement GraphQL query to fetch owners
-    // Mock data
-    this.owners = [
-      {
-        id: '1',
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        email: 'jean.dupont@example.com',
-        phone: '+33123456789',
-        ownerUnits: [
-          { 
-            id: '1', 
-            unitId: '1', 
-            ownershipPercentage: 100, 
-            isMainOwner: true,
-            unit: { id: '1', unitNumber: 'A101' }
-          }
-        ],
-      },
-      {
-        id: '2',
-        firstName: 'Marie',
-        lastName: 'Martin',
-        email: 'marie.martin@example.com',
-        phone: '+33987654321',
-        ownerUnits: [
-          { 
-            id: '2', 
-            unitId: '3', 
-            ownershipPercentage: 50, 
-            isMainOwner: true,
-            unit: { id: '3', unitNumber: 'B201' }
-          },
-          { 
-            id: '3', 
-            unitId: '4', 
-            ownershipPercentage: 100, 
-            isMainOwner: false,
-            unit: { id: '4', unitNumber: 'B202' }
-          }
-        ],
-      },
-    ];
+    if (!this.copropertyId) {
+      console.warn('[Owner Management] No coproperty ID available');
+      return;
+    }
+
+    this.loading.set(true);
+    console.log('[Owner Management] Loading owners for coproperty:', this.copropertyId);
+    
+    this.ownerService.getAllOwners(this.copropertyId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false))
+      )
+      .subscribe({
+        next: (owners) => {
+          console.log('[Owner Management] Owners loaded:', owners.length);
+          this.owners = owners.map(o => ({
+            id: o.id,
+            userId: o.userId,
+            firstName: o.firstName,
+            lastName: o.lastName,
+            email: o.email,
+            phone: o.phone || '',
+            ownerUnits: o.ownerUnits || []
+          }));
+        },
+        error: (err) => {
+          console.error('[Owner Management] Error loading owners:', err);
+          this.translateService.get('coproperty.messages.error').subscribe(msg => {
+            this.showAlert('danger', msg);
+          });
+        }
+      });
   }
 
   get filteredOwners(): Owner[] {
@@ -196,11 +217,29 @@ export class OwnerManagementComponent implements OnInit {
   deleteOwner(owner: Owner): void {
     this.translateService.get('coproperty.owner.deleteConfirm').subscribe((confirmMsg) => {
       if (confirm(confirmMsg)) {
-        // TODO: Implement GraphQL mutation to delete owner
-        this.owners = this.owners.filter((o) => o.id !== owner.id);
-        this.translateService.get('coproperty.messages.deleted').subscribe((msg) => {
-          this.showAlert('success', msg);
-        });
+        this.loading.set(true);
+        this.ownerService.deleteOwner(owner.id, this.copropertyId)
+          .pipe(
+            takeUntilDestroyed(this.destroyRef),
+            finalize(() => this.loading.set(false))
+          )
+          .subscribe({
+            next: (success) => {
+              if (success) {
+                // Remove from local list immediately for better UX
+                this.owners = this.owners.filter((o) => o.id !== owner.id);
+                this.translateService.get('coproperty.messages.deleted').subscribe((msg) => {
+                  this.showAlert('success', msg);
+                });
+              }
+            },
+            error: (err) => {
+              console.error('[Owner Management] Error deleting owner:', err);
+              this.translateService.get('coproperty.messages.error').subscribe((msg) => {
+                this.showAlert('danger', msg);
+              });
+            }
+          });
       }
     });
   }
@@ -210,33 +249,102 @@ export class OwnerManagementComponent implements OnInit {
       const formValue = this.ownerForm.value;
       const selectedUnitIds: string[] = formValue.selectedUnits || [];
       
-      // Create the input for the GraphQL mutation
-      const input: CreateOwnerWithUnitsInput = {
-        userId: 'current-user-id', // TODO: Get from auth service
-        firstName: formValue.firstName,
-        lastName: formValue.lastName,
-        email: formValue.email,
-        phone: formValue.phone,
-        units: selectedUnitIds.map(unitId => ({
-          unitId: unitId,
-          ownershipPercentage: 100, // Default value
-          isMainOwner: true, // Default value
-        }))
-      };
+      // Validate that at least one unit is selected
+      if (selectedUnitIds.length === 0) {
+        this.translateService.get('coproperty.owner.unitRequired').subscribe((msg) => {
+          this.showAlert('warning', msg || 'Veuillez sélectionner au moins une unité');
+        });
+        return;
+      }
       
-      // TODO: Implement GraphQL mutation to create/update owner
-      console.log('Saving owner with units:', input);
-      const messageKey = this.editingOwnerId ? 'coproperty.messages.updated' : 'coproperty.messages.created';
-      this.translateService.get(messageKey).subscribe((msg) => {
-        this.showAlert('success', msg);
+      this.loading.set(true);
+
+      // Step 1: Create or find the Keycloak user, then create the owner
+      const keycloakUser$ = from(this.resolveKeycloakUserId(formValue));
+      
+      keycloakUser$.pipe(
+        switchMap((keycloakUserId: string) => {
+          // Step 2: Create the owner with the real Keycloak user ID
+          const input: CreateOwnerWithUnitsInput = {
+            userId: keycloakUserId,
+            firstName: formValue.firstName,
+            lastName: formValue.lastName,
+            email: formValue.email,
+            phone: formValue.phone || '',
+            units: selectedUnitIds.map(unitId => ({
+              unitId: unitId,
+              ownershipPercentage: 100,
+              isMainOwner: true,
+              startDate: new Date().toISOString(),
+              endDate: null
+            }))
+          };
+          
+          return this.editingOwnerId 
+            ? this.ownerService.updateOwner(this.editingOwnerId, input, this.copropertyId)
+            : this.ownerService.createOwner(input, this.copropertyId);
+        }),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false))
+      ).subscribe({
+        next: (owner) => {
+          console.log('[Owner Management] Owner saved:', owner);
+          const messageKey = this.editingOwnerId ? 'coproperty.messages.updated' : 'coproperty.messages.created';
+          this.translateService.get(messageKey).subscribe((msg) => {
+            this.showAlert('success', msg);
+          });
+          
+          // Reload the owners list to get fresh data
+          this.loadOwners();
+          
+          // Reset form
+          this.showAddForm = false;
+          this.editingOwnerId = null;
+          this.ownerForm.reset();
+        },
+        error: (err) => {
+          console.error('[Owner Management] Error saving owner:', err);
+          this.translateService.get('coproperty.messages.error').subscribe((msg) => {
+            this.showAlert('danger', msg);
+          });
+        }
       });
-      this.showAddForm = false;
-      this.ownerForm.reset();
     } else {
       this.translateService.get('validation.required').subscribe((msg) => {
         this.showAlert('warning', msg);
       });
     }
+  }
+
+  /**
+   * Find existing Keycloak user by email, or create a new one.
+   * Returns the Keycloak user ID (UUID).
+   */
+  private async resolveKeycloakUserId(formValue: any): Promise<string> {
+    const email = formValue.email;
+    
+    // Check if user already exists in Keycloak
+    const existingUserId = await this.keycloakService.findUserByEmail(email);
+    if (existingUserId) {
+      console.log('[Owner Management] Keycloak user already exists:', existingUserId);
+      // Ensure the coproperty-owner role is assigned
+      await this.keycloakService.assignRoleToUser(existingUserId, 'coproperty-owner');
+      return existingUserId;
+    }
+
+    // Create a new Keycloak user with a temporary password
+    const defaultPassword = 'Changeme123!';
+    const newUserId = await this.keycloakService.createUser({
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      email: email,
+      password: defaultPassword,
+      role: 'coproperty-owner',
+      enabled: true,
+    });
+
+    console.log('[Owner Management] Created new Keycloak user:', newUserId);
+    return newUserId;
   }
 
   cancelForm(): void {

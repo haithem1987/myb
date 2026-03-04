@@ -307,6 +307,123 @@ export class KeycloakService {
     }
   }
 
+  /**
+   * Create a new user in Keycloak and return the created user's ID.
+   * Optionally sets a temporary password and assigns a client role.
+   */
+  async createUser(options: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password?: string;
+    role?: string;
+    enabled?: boolean;
+  }): Promise<string> {
+    if (!this.adminToken) {
+      await this.getAdminToken();
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.adminToken}`,
+      'Content-Type': 'application/json',
+    });
+
+    const keycloakUrl = this.environment.services.keycloak.url;
+
+    // Build the user representation
+    const userPayload: any = {
+      username: options.email,
+      email: options.email,
+      firstName: options.firstName,
+      lastName: options.lastName,
+      enabled: options.enabled !== false,
+      emailVerified: true,
+    };
+
+    // If a password is provided, set it as a temporary credential
+    if (options.password) {
+      userPayload.credentials = [
+        {
+          type: 'password',
+          value: options.password,
+          temporary: true,
+        },
+      ];
+    }
+
+    // Create the user (returns 201 with Location header)
+    const response = await firstValueFrom(
+      this.http.post(
+        `${keycloakUrl}/admin/realms/MYB/users`,
+        userPayload,
+        { headers, observe: 'response' }
+      )
+    );
+
+    // Extract the user ID from the Location header
+    const location = response.headers.get('Location') || '';
+    const userId = location.substring(location.lastIndexOf('/') + 1);
+
+    if (!userId) {
+      // Fallback: query by email to get the ID
+      const users: any[] = await firstValueFrom(
+        this.http.get<any[]>(
+          `${keycloakUrl}/admin/realms/MYB/users?email=${encodeURIComponent(options.email)}&exact=true`,
+          { headers }
+        )
+      );
+      if (users && users.length > 0) {
+        const createdUserId = users[0].id;
+        if (options.role) {
+          await this.assignRoleToUser(createdUserId, options.role);
+        }
+        return createdUserId;
+      }
+      throw new Error('Failed to retrieve created Keycloak user ID');
+    }
+
+    // Assign role if requested
+    if (options.role) {
+      await this.assignRoleToUser(userId, options.role);
+    }
+
+    console.log(`Keycloak user created: ${userId} (${options.email})`);
+    return userId;
+  }
+
+  /**
+   * Check if a user with the given email already exists in Keycloak.
+   * Returns the user ID if found, null otherwise.
+   */
+  async findUserByEmail(email: string): Promise<string | null> {
+    if (!this.adminToken) {
+      await this.getAdminToken();
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.adminToken}`,
+      'Content-Type': 'application/json',
+    });
+
+    const keycloakUrl = this.environment.services.keycloak.url;
+
+    try {
+      const users: any[] = await firstValueFrom(
+        this.http.get<any[]>(
+          `${keycloakUrl}/admin/realms/MYB/users?email=${encodeURIComponent(email)}&exact=true`,
+          { headers }
+        )
+      );
+      if (users && users.length > 0) {
+        return users[0].id;
+      }
+      return null;
+    } catch (err) {
+      console.error('Error finding Keycloak user by email:', err);
+      return null;
+    }
+  }
+
   async assignRoleToUser(userId: string, roleName: string): Promise<void> {
     try {
       if (!this.adminToken) {

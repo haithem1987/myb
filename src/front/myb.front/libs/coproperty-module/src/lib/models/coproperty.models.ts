@@ -45,16 +45,7 @@ export interface Unit {
   updatedAt: Date;
 }
 
-export interface Owner {
-  id: string;
-  userId: string;
-  unitId: string;
-  ownershipPercentage: number;
-  startDate: Date;
-  endDate?: Date;
-  isMainOwner: boolean;
-  createdAt: Date;
-}
+// Owner interface moved to owner.model.ts to support multiple units per owner
 
 export interface Charge {
   id: string;

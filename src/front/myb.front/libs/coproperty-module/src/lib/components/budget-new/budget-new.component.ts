@@ -26,11 +26,13 @@ export class BudgetNewComponent implements OnInit {
 
   budgetForm!: FormGroup;
   coproperties = signal<Coproperty[]>([]);
+  selectedCoproperty = signal<Coproperty | null>(null);
   loading = signal<boolean>(false);
   saving = signal<boolean>(false);
   saveSuccess = signal<boolean>(false);
   budgetId: string | null = null;
   isEditMode = signal<boolean>(false);
+  copropertyIdFromUrl: string | null = null;
 
   chargeTypes = [
     { value: 'CLEANING', label: 'coproperty.charges.types.cleaning', icon: 'bi-broom' },
@@ -46,15 +48,13 @@ export class BudgetNewComponent implements OnInit {
 
   distributionMethods = [
     { value: 'BY_SHARES', label: 'coproperty.charges.distributions.byShares', icon: 'bi-percent' },
-    { value: 'BY_AREA', label: 'coproperty.charges.distributions.byArea', icon: 'bi-rulers' },
-    { value: 'EQUAL', label: 'coproperty.charges.distributions.equal', icon: 'bi-distribute-vertical' },
-    { value: 'CUSTOM', label: 'coproperty.charges.distributions.custom', icon: 'bi-gear' }
   ];
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadCoproperties();
     this.checkEditMode();
+    this.checkCopropertyFromUrl();
   }
 
   private generateYears(): number[] {
@@ -75,7 +75,7 @@ export class BudgetNewComponent implements OnInit {
       chargeType: ['CLEANING', Validators.required],
       frequency: [currentYear.toString(), Validators.required],
       totalAmount: ['', [Validators.required, Validators.min(0.01)]],
-      distributionMethod: ['BY_SHARES', Validators.required],
+      distributionMethod: ['BY_SHARES'],
       startDate: ['', Validators.required],
       endDate: [''],
       isActive: [true]
@@ -88,11 +88,56 @@ export class BudgetNewComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.coproperties.set(data);
+          // If we have a coproperty ID from URL, find and set it
+          if (this.copropertyIdFromUrl) {
+            const coproperty = data.find(c => c.id === this.copropertyIdFromUrl);
+            if (coproperty) {
+              this.selectedCoproperty.set(coproperty);
+              this.budgetForm.patchValue({ copropertyId: coproperty.id });
+            }
+          } else if (data.length > 0 && !this.budgetForm.get('copropertyId')?.value) {
+            // Auto-select first coproperty by default
+            this.selectedCoproperty.set(data[0]);
+            this.budgetForm.patchValue({ copropertyId: data[0].id });
+          }
         },
         error: (err) => {
           console.error('Error loading coproperties:', err);
         }
       });
+  }
+
+  private checkCopropertyFromUrl(): void {
+    this.activatedRoute.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const copropertyId = params.get('copropertyId');
+        if (copropertyId) {
+          this.copropertyIdFromUrl = copropertyId;
+          this.loadCopropertyDetails(copropertyId);
+        }
+      });
+  }
+
+  private loadCopropertyDetails(id: string): void {
+    this.copropertyService.getCoproperty(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (coproperty) => {
+          this.selectedCoproperty.set(coproperty);
+          this.budgetForm.patchValue({ copropertyId: coproperty.id });
+        },
+        error: (err) => {
+          console.error('Error loading coproperty:', err);
+        }
+      });
+  }
+
+  onCopropertyChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const copropertyId = select.value;
+    const coproperty = this.coproperties().find(c => c.id === copropertyId);
+    this.selectedCoproperty.set(coproperty || null);
   }
 
   private checkEditMode(): void {
@@ -167,23 +212,27 @@ export class BudgetNewComponent implements OnInit {
       ? this.chargeService.updateCharge(budgetData)
       : this.chargeService.createCharge(budgetData);
 
-    operation.subscribe({
-      next: (result) => {
-        this.saving.set(false);
-        this.saveSuccess.set(true);
-        setTimeout(() => this.saveSuccess.set(false), 3000);
-        
-        if (!this.isEditMode()) {
-          this.budgetId = result.id || null;
-          this.isEditMode.set(true);
-          this.router.navigate(['/coproperty/syndic/budgets', result.id, 'edit'], { replaceUrl: true });
+    operation
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.saving.set(false);
+          this.saveSuccess.set(true);
+          
+          // Navigate back to list after showing success message
+          // The refetchQueries in the service ensures the list will have fresh data
+          setTimeout(() => {
+            this.saveSuccess.set(false);
+            this.router.navigate(['/coproperty/syndic/budgets'], {
+              queryParams: { refresh: Date.now() } // Force component reload
+            });
+          }, 1500);
+        },
+        error: (error) => {
+          console.error('Error saving budget:', error);
+          this.saving.set(false);
         }
-      },
-      error: (error) => {
-        console.error('Error saving budget:', error);
-        this.saving.set(false);
-      }
-    });
+      });
   }
 
   deleteBudget(): void {
@@ -204,7 +253,40 @@ export class BudgetNewComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/coproperty/syndic/budgets']);
+    if (this.copropertyIdFromUrl) {
+      this.router.navigate(['/coproperty/syndic/budgets'], {
+        queryParams: { copropertyId: this.copropertyIdFromUrl }
+      });
+    } else {
+      this.router.navigate(['/coproperty/syndic/budgets']);
+    }
+  }
+
+  calculateDistribution(): void {
+    const copropertyId = this.budgetForm.get('copropertyId')?.value;
+    const totalAmount = this.budgetForm.get('totalAmount')?.value;
+    const distributionMethod = this.budgetForm.get('distributionMethod')?.value;
+
+    if (!copropertyId || !totalAmount || !distributionMethod) {
+      return;
+    }
+
+    // Navigate to distribution calculation page or show distribution modal
+    // This would typically show a breakdown of how charges are distributed among units
+    console.log('Calculate distribution:', {
+      copropertyId,
+      totalAmount,
+      distributionMethod
+    });
+    
+    // You can implement a modal or navigate to a distribution details page
+    this.router.navigate(['/coproperty/syndic/distribution'], {
+      queryParams: {
+        copropertyId,
+        totalAmount,
+        distributionMethod
+      }
+    });
   }
 
   private convertToISODateTime(dateString: string | null): string | null {

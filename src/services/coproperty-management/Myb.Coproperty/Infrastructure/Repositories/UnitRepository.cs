@@ -29,7 +29,8 @@ namespace Myb.Coproperty.Infrastructure.Repositories
         public async Task<IEnumerable<Unit>> GetByOwnerIdAsync(Guid ownerId)
         {
             return await GetAll()
-                .Where(u => u.Owners.Any(o => o.UserId == ownerId))
+                .Where(u => u.OwnerUnits.Any(ou => ou.Owner.UserId == ownerId))
+                .Include(u => u.Coproperty)
                 .ToListAsync();
         }
     }

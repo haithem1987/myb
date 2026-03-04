@@ -236,6 +236,7 @@ export class CopropertyService {
         mutation: CREATE_COPROPERTY,
         variables: { coproperty: input },
         refetchQueries: [{ query: GET_COPROPERTIES }],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' }
       })
       .pipe(
@@ -249,6 +250,7 @@ export class CopropertyService {
         mutation: UPDATE_COPROPERTY,
         variables: { id, coproperty: input },
         refetchQueries: [{ query: GET_COPROPERTIES }, { query: GET_COPROPERTY, variables: { id } }],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' }
       })
       .pipe(
@@ -264,6 +266,7 @@ export class CopropertyService {
         mutation: DELETE_COPROPERTY,
         variables: { id },
         refetchQueries: [{ query: GET_COPROPERTIES }],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' }
       })
       .pipe(

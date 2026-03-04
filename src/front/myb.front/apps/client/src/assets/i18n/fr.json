@@ -283,10 +283,27 @@
       },
       "distributions": {
         "byShares": "Par Tantièmes",
+        "bySharesDesc": "Basé sur les parts de copropriété (tantièmes)",
         "byArea": "Par Surface",
-        "equal": "Égalitaire",
-        "custom": "Personnalisée"
+        "byAreaDesc": "Basé sur la surface des lots (m²)",
+        "equal": "Répartition Égalitaire",
+        "equalDesc": "Distribution égale entre toutes les unités",
+        "custom": "Répartition Personnalisée",
+        "customDesc": "Saisie manuelle du montant par unité"
       }
+    },
+    "distribution": {
+      "title": "Gestion de Répartition",
+      "subtitle": "Répartissez les charges entre les copropriétaires",
+      "details": "Détail de Répartition",
+      "totalAmount": "Montant Total",
+      "totalAmountHelp": "Calculé automatiquement à partir des budgets de l'année sélectionnée",
+      "budgetBreakdown": "Détail des budgets",
+      "noChargesForYear": "Aucun budget trouvé pour cette copropriété et cette année",
+      "method": "Méthode de Répartition",
+      "selectMethod": "Choisir une méthode",
+      "calculate": "Calculer la Répartition",
+      "fundCallCreated": "Répartition enregistrée et appel de fonds créé avec succès"
     },
     "maintenance": {
       "title": "Demandes de Maintenance",
@@ -408,6 +425,7 @@
       "firstName": "Prénom",
       "lastName": "Nom de famille",
       "units": "Lots Possédés",
+      "unitRequired": "Veuillez sélectionner au moins un lot",
       "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce copropriétaire ?"
     }
   },

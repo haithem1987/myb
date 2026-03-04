@@ -413,6 +413,36 @@ export class AdminHomeComponent implements OnInit {
   ngOnInit() {
     this.loadUserInfo();
     this.checkServiceAccess();
+    this.autoRedirectByRole();
+  }
+
+  /**
+   * Auto-redirect users to their dashboard based on Keycloak role.
+   * If a user has exactly one coproperty role, go straight there.
+   * If multiple roles → show the service selection screen.
+   */
+  private autoRedirectByRole() {
+    const roles = this.userRoles();
+    const copropertyRoles = roles.filter(r =>
+      ['coproperty-syndic', 'coproperty-owner', 'coproperty-council', 'coproperty-accountant'].includes(r)
+    );
+
+    if (copropertyRoles.length === 1) {
+      const roleRouteMap: Record<string, string> = {
+        'coproperty-syndic': '/coproperty/syndic/dashboard',
+        'coproperty-owner': '/coproperty/owner/dashboard',
+        'coproperty-council': '/coproperty/council/dashboard',
+        'coproperty-accountant': '/coproperty/accountant/dashboard',
+      };
+      const target = roleRouteMap[copropertyRoles[0]];
+      if (target) {
+        this.router.navigate([target]);
+        return;
+      }
+    }
+
+    // system-admin with no coproperty role → stay on home
+    // multiple roles → stay on home (service selection)
   }
 
   private loadUserInfo() {

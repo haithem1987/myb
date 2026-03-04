@@ -44,6 +44,10 @@ export class MaintenanceListComponent implements OnInit {
     this.copropertyService.getCoproperties().subscribe({
       next: (data) => {
         this.coproperties.set(data);
+        // Auto-select first coproperty by default
+        if (data.length > 0 && !this.selectedCopropertyId()) {
+          this.onCopropertyChange(data[0].id);
+        }
       },
       error: (err) => {
         console.error('Error loading coproperties:', err);

@@ -19,6 +19,7 @@ public interface IInvoiceRepository
     Task DeleteAsync(Guid id);
     Task<List<CopropertyInvoice>> GetByChargeIdAsync(Guid chargeId);
     Task<List<CopropertyInvoice>> GetByStatusAsync(InvoiceStatus status);
+    Task<List<CopropertyInvoice>> GetByOwnerUserIdAsync(Guid ownerUserId);
 }
 
 /// <summary>
@@ -163,6 +164,21 @@ public class InvoiceRepository : IInvoiceRepository
     {
         return await _context.CopropertyInvoices
             .Where(i => i.Status == status)
+            .Include(i => i.Unit)
+            .Include(i => i.Owner)
+            .Include(i => i.Charge)
+            .Include(i => i.Payments)
+            .OrderByDescending(i => i.InvoiceDate)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Get all invoices for an owner identified by their Keycloak user ID
+    /// </summary>
+    public async Task<List<CopropertyInvoice>> GetByOwnerUserIdAsync(Guid ownerUserId)
+    {
+        return await _context.CopropertyInvoices
+            .Where(i => i.Owner.UserId == ownerUserId)
             .Include(i => i.Unit)
             .Include(i => i.Owner)
             .Include(i => i.Charge)

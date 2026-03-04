@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Myb.Common.Authentification.Extensions;
 using Myb.Invoice.EntityFrameWork.Infra;
+using Myb.Invoice.Infra.Extensions;
 using Myb.Invoice.Infra.GraphQl.Mutations;
 using Myb.Invoice.Infra.GraphQl.Querys;
 using Myb.Common.GraphQL.Infra;
@@ -25,7 +26,8 @@ public static class Configuration
         });
 
         builder.AddKeycloakSettings();
-        builder.Services.AddServices();              // your domain services
+        builder.AddKeycloakAuthorization();
+        builder.Services.RegisterServices();         // register IInvoiceService, IClientService, etc.
         builder.Services.RegisterGraphQl<InvoiceContext, InvoiceQuery, InvoiceMutations>("invoice");
     }
 

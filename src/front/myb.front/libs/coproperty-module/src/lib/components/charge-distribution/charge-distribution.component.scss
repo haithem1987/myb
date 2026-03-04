@@ -1,290 +1,515 @@
+// ─── Violet palette ─────────────────────────────────────────────────────────
+$violet-start: #667eea;
+$violet-end: #764ba2;
+$violet-gradient: linear-gradient(135deg, $violet-start 0%, $violet-end 100%);
+$violet-light: rgba(102, 126, 234, 0.08);
+$violet-border: rgba(102, 126, 234, 0.22);
+$violet-shadow: 0 8px 24px rgba(102, 126, 234, 0.22);
+
 .charge-distribution-container {
   padding: 2rem;
 
+  // ─── Header ────────────────────────────────────────────────────────────────
   .distribution-header {
     margin-bottom: 2rem;
 
     h2 {
       margin: 0;
       font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-size: 2rem;
+      background: $violet-gradient;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
+    p { margin-top: 0.25rem; }
   }
 
+  // ─── Shared card styling ────────────────────────────────────────────────────
   .form-card,
   .method-card,
   .distribution-preview {
     margin-bottom: 2rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
+    border: none;
+    border-radius: 14px;
     overflow: hidden;
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
 
     &:hover {
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+      box-shadow: $violet-shadow;
+      transform: translateY(-2px);
     }
 
     .card-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: $violet-gradient;
       border-bottom: none;
-      padding: 1.5rem;
+      padding: 1.25rem 1.5rem;
 
       h5 {
         margin: 0;
         color: white;
         font-weight: 600;
+        font-size: 1.05rem;
       }
     }
 
     .card-body {
-      padding: 1.5rem;
+      padding: 1.75rem;
+      background: #fafbff;
     }
   }
 
+  // ─── Method badge ───────────────────────────────────────────────────────────
+  .method-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(4px);
+  }
+
+  // ─── Form card inputs ───────────────────────────────────────────────────────
   .form-card {
-    form {
-      .mb-3 {
-        margin-bottom: 1rem;
-
-        label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 600;
-          color: #2c3e50;
-        }
-
-        input,
-        select,
-        textarea {
-          width: 100%;
-          padding: 0.75rem;
-          border: 2px solid #e9ecef;
-          border-radius: 8px;
-          font-size: 0.95rem;
-          transition: all 0.3s ease;
-
-          &:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
-            outline: none;
-          }
-        }
-
-        .input-group {
-          display: flex;
-
-          input {
-            flex: 1;
-            border-radius: 4px 0 0 4px;
-          }
-
-          .input-group-text {
-            padding: 0.75rem 1rem;
-            background-color: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-left: none;
-            border-radius: 0 8px 8px 0;
-            color: #667eea;
-            font-weight: 600;
-          }
-        }
-      }
-    }
-  }
-
-  .method-card {
-    .method-options {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-
-      .form-check {
-        padding: 1rem;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-
-        &:hover {
-          border-color: #667eea;
-          background-color: rgba(102, 126, 234, 0.05);
-        }
-
-        .form-check-input {
-          margin-top: 0.3rem;
-        }
-
-        .form-check-label {
-          margin-left: 0.5rem;
-          font-weight: 500;
-          color: #333;
-          cursor: pointer;
-        }
-
-        small {
-          margin-left: 1.5rem;
-          margin-top: 0.5rem;
-        }
-      }
-    }
-
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      border: none;
+    .form-label {
       font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      color: $violet-start;
+      font-size: 0.875rem;
+      margin-bottom: 0.4rem;
 
-      &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+      i { color: $violet-end; }
+    }
+
+    .form-control,
+    .form-select {
+      border: 2px solid #e0e7ff;
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: white;
+
+      &:focus {
+        border-color: $violet-start;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        background: white;
       }
 
       &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+        background: #f3f4ff;
+        color: $violet-end;
+        font-weight: 700;
+        border-color: $violet-border;
+      }
+    }
+
+    .input-group-text {
+      background: $violet-light;
+      border: 2px solid #e0e7ff;
+      border-left: none;
+      color: $violet-end;
+      font-weight: 700;
+      border-radius: 0 8px 8px 0;
+    }
+  }
+
+  // ─── Budget breakdown table ─────────────────────────────────────────────────
+  .budget-breakdown-header {
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    color: $violet-start;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+
+    i { color: $violet-end; }
+  }
+
+  .budget-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
+
+    thead tr th {
+      background: $violet-gradient;
+      color: white;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 0.85rem 1rem;
+      border: none;
+
+      i { opacity: 0.85; }
+    }
+
+    tbody tr {
+      transition: background 0.15s ease;
+
+      &:hover { background: $violet-light; }
+
+      td {
+        padding: 0.85rem 1rem;
+        border-color: #eef0fc;
+        vertical-align: middle;
+        font-size: 0.92rem;
+      }
+    }
+
+    tfoot .total-row {
+      background: linear-gradient(90deg, #f0f2ff 0%, #f5f0ff 100%);
+
+      td {
+        padding: 0.9rem 1rem;
+        border-top: 2px solid $violet-border;
+        font-size: 0.95rem;
+      }
+
+      .total-amount {
+        font-size: 1.05rem;
+        background: $violet-gradient;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+
+    .charge-type-badge {
+      display: inline-block;
+      padding: 0.28rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: $violet-light;
+      color: $violet-end;
+      border: 1px solid $violet-border;
+    }
+
+    .amount-cell {
+      font-weight: 600;
+      color: $violet-end;
+    }
+  }
+
+  // ─── Method selection cards ─────────────────────────────────────────────────
+  .method-radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .method-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+  }
+
+  .method-option-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.2rem;
+    border: 2px solid #e0e7ff;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: white;
+    position: relative;
+
+    &:hover {
+      border-color: $violet-start;
+      background: $violet-light;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .method-icon-wrap {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #e0e7ff 0%, #ede9f6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.25s ease;
+
+      i {
+        font-size: 1.3rem;
+        color: $violet-start;
+        transition: color 0.25s ease;
+      }
+    }
+
+    .method-content {
+      flex: 1;
+      min-width: 0;
+
+      .method-title {
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #2d3748;
+        line-height: 1.3;
+      }
+
+      .method-desc {
+        display: block;
+        font-size: 0.75rem;
+        color: #718096;
+        margin-top: 0.2rem;
+        line-height: 1.3;
+      }
+    }
+
+    .method-check {
+      font-size: 1.15rem;
+      color: #cbd5e0;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    &.active {
+      border-color: $violet-start;
+      background: $violet-gradient;
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+      transform: translateY(-3px);
+
+      .method-icon-wrap {
+        background: rgba(255, 255, 255, 0.25);
+        i { color: white; }
+      }
+
+      .method-title { color: white; }
+      .method-desc { color: rgba(255, 255, 255, 0.8); }
+      .method-check { color: rgba(255, 255, 255, 0.9); }
+    }
+  }
+
+  // ─── Buttons ────────────────────────────────────────────────────────────────
+  .btn-violet {
+    background: $violet-gradient;
+    border: none;
+    color: white;
+    padding: 0.7rem 1.6rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.28);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.45);
+      color: white;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-outline-violet {
+    background: transparent;
+    border: 2px solid $violet-start;
+    color: $violet-start;
+    padding: 0.7rem 1.6rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+
+    &:hover:not(:disabled) {
+      background: $violet-light;
+      transform: translateY(-2px);
+      color: $violet-end;
+    }
+
+    &:disabled { opacity: 0.55; }
+  }
+
+  // ─── Distribution preview table ─────────────────────────────────────────────
+  .preview-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
+
+    thead tr th {
+      background: $violet-gradient;
+      color: white;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 0.85rem 1rem;
+      border: none;
+
+      i { opacity: 0.85; }
+    }
+
+    tbody tr {
+      transition: background 0.15s ease;
+
+      &:hover { background: $violet-light; }
+
+      td {
+        padding: 0.8rem 1rem;
+        border-color: #eef0fc;
+        vertical-align: middle;
+        font-size: 0.92rem;
+      }
+    }
+
+    .unit-number-badge {
+      display: inline-block;
+      padding: 0.22rem 0.65rem;
+      background: $violet-light;
+      color: $violet-end;
+      border: 1px solid $violet-border;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .shares-badge {
+      display: inline-block;
+      padding: 0.22rem 0.65rem;
+      background: linear-gradient(135deg, #f0f2ff 0%, #ede9f6 100%);
+      color: $violet-start;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .amount-cell {
+      font-weight: 700;
+      color: $violet-end;
+    }
+
+    .percentage-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: $violet-start;
+
+      .percentage-bar {
+        height: 6px;
+        min-width: 4px;
+        max-width: 80px;
+        border-radius: 3px;
+        background: $violet-gradient;
+        transition: width 0.4s ease;
+      }
+    }
+
+    .custom-amount-input {
+      border: 2px solid #e0e7ff;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      width: 110px;
+
+      &:focus {
+        border-color: $violet-start;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
       }
     }
   }
 
-  .distribution-preview {
-    .table-responsive {
-      margin-bottom: 1.5rem;
+  // ─── Preview summary ────────────────────────────────────────────────────────
+  .preview-summary {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.06), rgba(118, 75, 162, 0.06));
+    border: 2px solid $violet-border;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.25rem 0;
 
-      table {
-        margin-bottom: 0;
-
-        thead {
-          th {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            font-weight: 600;
-            color: #667eea;
-            border-color: #667eea;
-            border-bottom-width: 2px;
-            padding: 1rem;
-          }
-        }
-
-        tbody {
-          tr {
-            transition: all 0.15s ease;
-
-            &:hover {
-              background-color: rgba(102, 126, 234, 0.05);
-            }
-
-            td {
-              padding: 1rem;
-              vertical-align: middle;
-              border-color: #dee2e6;
-
-              input {
-                padding: 0.5rem;
-                border: 2px solid #e9ecef;
-                border-radius: 8px;
-                font-size: 0.9rem;
-                transition: all 0.3s ease;
-
-                &:focus {
-                  border-color: #667eea;
-                  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
-                  outline: none;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    .preview-summary {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-      padding: 1.5rem;
-      border: 2px solid rgba(102, 126, 234, 0.2);
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
-
-      .summary-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-        font-size: 1.1rem;
-        color: #2c3e50;
-
-        strong {
-          font-weight: 700;
-        }
-      }
-
-      .summary-note {
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid #ddd;
-
-        small {
-          color: #ff9800;
-        }
-      }
-    }
-
-    .preview-actions {
+    .summary-row {
       display: flex;
-      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+      color: #4a5568;
 
-      button {
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
+      .total-amount {
+        font-size: 1.15rem;
+        font-weight: 800;
+        background: $violet-gradient;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
     }
+
+    .summary-note {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid $violet-border;
+      color: #d97706;
+      font-size: 0.85rem;
+
+      i { color: #f59e0b; }
+    }
+  }
+
+  // ─── Preview actions ────────────────────────────────────────────────────────
+  .preview-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  // ─── Alert overrides ────────────────────────────────────────────────────────
+  .alert-success {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-color: $violet-start;
+    color: $violet-end;
+    border-radius: 10px;
+  }
+
+  .alert-info {
+    background: $violet-light;
+    border-color: $violet-border;
+    color: $violet-end;
+    border-radius: 10px;
   }
 }
 
+// ─── Responsive ─────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .charge-distribution-container {
     padding: 1rem;
 
-    .method-card .method-options {
+    .method-options {
       grid-template-columns: 1fr;
-    }
-
-    .distribution-preview .table-responsive {
-      overflow-x: auto;
-
-      table {
-        font-size: 0.85rem;
-
-        thead th,
-        tbody td {
-          padding: 0.75rem;
-        }
-      }
     }
 
     .preview-actions {
       flex-direction: column;
 
-      button {
+      .btn-violet,
+      .btn-outline-violet {
         width: 100%;
+        text-align: center;
       }
+    }
+
+    .preview-table thead tr th,
+    .budget-table thead tr th {
+      font-size: 0.72rem;
+      padding: 0.65rem 0.6rem;
     }
   }
 }

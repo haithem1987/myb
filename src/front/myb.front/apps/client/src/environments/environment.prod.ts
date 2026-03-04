@@ -19,7 +19,7 @@ export const environment = {
       baseUrl: `${window.location.origin.replace(/:\d+/, ':8086')}`,
     },
     invoice: {
-      graphqlUrl: `${window.location.origin.replace(/:\d+/, ':8083')}/graphql`,
+      graphqlUrl: `${window.location.origin.replace(/:\d+/, ':8083')}/invoice/graphql`,
       baseUrl: `${window.location.origin.replace(/:\d+/, ':8083')}`,
     },
     timesheet: {

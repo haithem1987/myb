@@ -36,7 +36,17 @@ namespace Myb.Coproperty.Services
 
         public async Task<Owner> GetByIdAsync(Guid id)
         {
-            return await Task.FromResult(_ownerRepository.GetById(id)!);
+            var owner = await _ownerRepository.GetByIdWithUnitsAsync(id);
+            if (owner == null)
+            {
+                throw new InvalidOperationException($"Owner with ID {id} not found");
+            }
+            return owner;
+        }
+
+        public async Task<Owner?> GetByUserIdAsync(Guid userId)
+        {
+            return await _ownerRepository.GetByUserIdAsync(userId);
         }
 
         public async Task<IEnumerable<Owner>> GetByCopropertyIdAsync(Guid copropertyId)

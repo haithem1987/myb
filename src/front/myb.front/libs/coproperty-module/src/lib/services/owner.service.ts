@@ -9,6 +9,92 @@ import {
   Payment,
   RecordPaymentInput
 } from '../models';
+import { CreateOwnerWithUnitsInput, Owner, OwnerWithUnits } from '../models/owner.model';
+
+// GraphQL Queries for Owner Management
+const GET_ALL_OWNERS = gql`
+  query GetOwners($copropertyId: UUID!) {
+    owners(copropertyId: $copropertyId) {
+      id
+      userId
+      firstName
+      lastName
+      email
+      phone
+      createdAt
+      updatedAt
+      ownerUnits {
+        id
+        unitId
+        ownershipPercentage
+        isMainOwner
+        startDate
+        endDate
+        unit {
+          id
+          unitNumber
+          copropertyId
+        }
+      }
+    }
+  }
+`;
+
+const GET_OWNER_BY_ID = gql`
+  query GetOwnerById($id: UUID!) {
+    ownerById(id: $id) {
+      id
+      userId
+      firstName
+      lastName
+      email
+      phone
+      createdAt
+      updatedAt
+      ownerUnits {
+        id
+        unitId
+        ownershipPercentage
+        isMainOwner
+        startDate
+        endDate
+        unit {
+          id
+          unitNumber
+          copropertyId
+        }
+      }
+    }
+  }
+`;
+
+const GET_OWNER_BY_USER_ID = gql`
+  query GetOwnerByUserId($userId: UUID!) {
+    ownerByUserId(userId: $userId) {
+      id
+      userId
+      firstName
+      lastName
+      email
+      phone
+      createdAt
+      updatedAt
+      ownerUnits {
+        id
+        unitId
+        ownershipPercentage
+        isMainOwner
+        startDate
+        endDate
+        unit {
+          id
+          unitNumber
+          copropertyId
+        }
+      }
+    }
+  }
+`;
 
 // GraphQL Queries for Owner Portal
 const GET_MY_UNITS = gql`
@@ -150,6 +236,43 @@ const CREATE_MAINTENANCE_REQUEST = gql`
       status
       createdAt
     }
+  }
+`;
+
+// Owner Management Mutations
+const CREATE_OWNER_WITH_UNITS = gql`
+  mutation CreateOwnerWithUnits($input: CreateOwnerWithUnitsInput!) {
+    createOwnerWithUnits(input: $input) {
+      id
+      userId
+      firstName
+      lastName
+      email
+      phone
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const UPDATE_OWNER_WITH_UNITS = gql`
+  mutation UpdateOwnerWithUnits($id: UUID!, $input: CreateOwnerWithUnitsInput!) {
+    updateOwnerWithUnits(id: $id, input: $input) {
+      id
+      userId
+      firstName
+      lastName
+      email
+      phone
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const DELETE_OWNER = gql`
+  mutation RemoveOwner($id: UUID!) {
+    removeOwner(id: $id)
   }
 `;
 
@@ -324,5 +447,117 @@ export class OwnerService {
       .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
     return pendingInvoices.length > 0 ? new Date(pendingInvoices[0].dueDate) : null;
+  }
+
+  /**
+   * Get all owners for a coproperty
+   */
+  getAllOwners(copropertyId: string): Observable<OwnerWithUnits[]> {
+    return this.apollo
+      .watchQuery<{ owners: OwnerWithUnits[] }>({
+        query: GET_ALL_OWNERS,
+        variables: { copropertyId },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' }
+      })
+      .valueChanges.pipe(
+        map(result => result.data.owners)
+      );
+  }
+
+  /**
+   * Get owner by ID
+   */
+  getOwnerById(id: string): Observable<OwnerWithUnits> {
+    return this.apollo
+      .watchQuery<{ ownerById: OwnerWithUnits }>({
+        query: GET_OWNER_BY_ID,
+        variables: { id },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' }
+      })
+      .valueChanges.pipe(
+        map(result => result.data.ownerById)
+      );
+  }
+
+  /**
+   * Get owner by Keycloak user ID
+   */
+  getOwnerByUserId(userId: string): Observable<OwnerWithUnits | null> {
+    return this.apollo
+      .watchQuery<{ ownerByUserId: OwnerWithUnits | null }>({
+        query: GET_OWNER_BY_USER_ID,
+        variables: { userId },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' }
+      })
+      .valueChanges.pipe(
+        map(result => result.data.ownerByUserId)
+      );
+  }
+
+  /**
+   * Create a new owner with units
+   */
+  createOwner(input: CreateOwnerWithUnitsInput, copropertyId?: string): Observable<Owner> {
+    const refetchQueries: any[] = [];
+    if (copropertyId) {
+      refetchQueries.push({ query: GET_ALL_OWNERS, variables: { copropertyId } });
+    }
+    return this.apollo
+      .mutate<{ createOwnerWithUnits: Owner }>({
+        mutation: CREATE_OWNER_WITH_UNITS,
+        variables: { input },
+        context: { service: 'copropertyService' },
+        refetchQueries,
+        awaitRefetchQueries: true
+      })
+      .pipe(
+        map(result => result.data!.createOwnerWithUnits)
+      );
+  }
+
+  /**
+   * Update an existing owner with units
+   */
+  updateOwner(id: string, input: CreateOwnerWithUnitsInput, copropertyId?: string): Observable<Owner> {
+    const refetchQueries: any[] = [];
+    if (copropertyId) {
+      refetchQueries.push({ query: GET_ALL_OWNERS, variables: { copropertyId } });
+      refetchQueries.push({ query: GET_OWNER_BY_ID, variables: { id } });
+    }
+    return this.apollo
+      .mutate<{ updateOwnerWithUnits: Owner }>({
+        mutation: UPDATE_OWNER_WITH_UNITS,
+        variables: { id, input },
+        context: { service: 'copropertyService' },
+        refetchQueries,
+        awaitRefetchQueries: true
+      })
+      .pipe(
+        map(result => result.data!.updateOwnerWithUnits)
+      );
+  }
+
+  /**
+   * Delete an owner
+   */
+  deleteOwner(id: string, copropertyId?: string): Observable<boolean> {
+    const refetchQueries: any[] = [];
+    if (copropertyId) {
+      refetchQueries.push({ query: GET_ALL_OWNERS, variables: { copropertyId } });
+    }
+    return this.apollo
+      .mutate<{ removeOwner: boolean }>({
+        mutation: DELETE_OWNER,
+        variables: { id },
+        context: { service: 'copropertyService' },
+        refetchQueries,
+        awaitRefetchQueries: true
+      })
+      .pipe(
+        map(result => result.data!.removeOwner)
+      );
   }
 }

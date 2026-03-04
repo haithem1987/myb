@@ -58,4 +58,12 @@ public class InvoiceQueries
         Guid chargeId,
         [Service] IInvoiceRepository invoiceRepository) =>
         await invoiceRepository.GetByChargeIdAsync(chargeId);
+
+    /// <summary>
+    /// Get all invoices for an owner (identified by Keycloak user ID)
+    /// </summary>
+    public async Task<List<CopropertyInvoice>> GetInvoicesByOwner(
+        Guid ownerId,
+        [Service] IInvoiceRepository invoiceRepository) =>
+        await invoiceRepository.GetByOwnerUserIdAsync(ownerId);
 }

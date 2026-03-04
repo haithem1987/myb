@@ -102,7 +102,7 @@
             </div>
             <div class="ms-3">
               <h6 class="text-muted mb-0">{{ 'coproperty.charge.totalBudgets' | translate }}</h6>
-              <h3 class="mb-0">{{ filteredCharges.length }}</h3>
+              <h3 class="mb-0">{{ formatAmount(getTotalBudgetAmount()) }} €</h3>
             </div>
           </div>
         </div>
@@ -223,17 +223,24 @@
               <td>
                 <button 
                   type="button" 
-                  class="btn btn-sm btn-outline-primary me-2"
+                  class="btn btn-sm btn-outline-violet me-1"
+                  (click)="viewCharge(charge)"
+                  [title]="'coproperty.charge.viewDetails' | translate">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-violet me-1"
                   [routerLink]="['/coproperty/syndic/budgets', charge.id, 'edit']"
                   [title]="'coproperty.charge.modify' | translate">
                   <i class="bi bi-pencil"></i>
                 </button>
                 <button 
                   type="button" 
-                  class="btn btn-sm btn-outline-primary"
-                  (click)="viewCharge(charge)"
-                  [title]="'coproperty.charge.viewDetails' | translate">
-                  <i class="bi bi-eye"></i>
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteCharge(charge)"
+                  [title]="'common.deleteAction' | translate">
+                  <i class="bi bi-trash"></i>
                 </button>
               </td>
             </tr>

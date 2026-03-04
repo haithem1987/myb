@@ -23,6 +23,7 @@ public class CopropertyDbContext : DbContext
     public DbSet<Payment> Payments { get; set; } = null!;
     public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; } = null!;
     public DbSet<FundCall> FundCalls { get; set; } = null!;
+    public DbSet<FundCallPayment> FundCallPayments { get; set; } = null!;
     public DbSet<Assembly> Assemblies { get; set; } = null!;
     public DbSet<AssemblyAttendance> AssemblyAttendances { get; set; } = null!;
 
@@ -117,6 +118,9 @@ public class CopropertyDbContext : DbContext
                 .IsUnique();
             
             entity.HasIndex(e => e.CopropertyId);
+            
+            // Ignore deprecated properties
+            entity.Ignore(e => e.Owners);
         });
 
         // Owner Configuration
@@ -382,6 +386,11 @@ public class CopropertyDbContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(2000)
                 .IsRequired();
+
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .HasDefaultValue(FundCallStatus.ToPay);
             
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -393,14 +402,49 @@ public class CopropertyDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.CopropertyId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Owner)
+                .WithMany()
+                .HasForeignKey(e => e.OwnerId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .IsRequired(false);
             
             entity.HasIndex(e => e.CopropertyId);
             entity.HasIndex(e => e.IsActive);
+            entity.HasIndex(e => e.Status);
+
+            // Prevent duplicate fund calls for the same coproperty + dueDate + owner
+            entity.HasIndex(e => new { e.CopropertyId, e.DueDate, e.OwnerId })
+                .IsUnique()
+                .HasFilter(null);
             
             // Check constraint for amount
             entity.ToTable(t => t.HasCheckConstraint(
                 "CHK_FundCall_Amount", 
                 "\"Amount\" >= 0"));
+        });
+
+        // FundCallPayment Configuration
+        modelBuilder.Entity<FundCallPayment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Amount)
+                .HasPrecision(10, 2)
+                .IsRequired();
+
+            entity.Property(e => e.Justificatif)
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.HasOne(e => e.FundCall)
+                .WithMany(f => f.Payments)
+                .HasForeignKey(e => e.FundCallId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.FundCallId);
         });
 
         // Assembly Configuration

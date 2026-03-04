@@ -1,6 +1,7 @@
 export * from './coproperty.models';
 export * from './assembly.model';
 export * from './fund-call.model';
+export * from './owner.model';
 
 // Export specific types from invoice.model to avoid conflicts
 export type { RecordPaymentInput } from './invoice.model';

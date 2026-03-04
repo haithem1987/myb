@@ -4,7 +4,6 @@ using Myb.Common.Authentification.Dtos;
 using Myb.Common.Authentification.Exceptions;
 using Myb.Common.Authentification.Interfaces;
 using Myb.Common.Authentification.Settings;
-using Myb.UserManager.Models;
 using Newtonsoft.Json;
 
 namespace Myb.Common.Authentification.Services

@@ -29,11 +29,21 @@ export interface Owner {
   isMainOwner?: boolean;
 }
 
+export interface OwnerWithUnits extends Owner {
+  ownerUnits: Array<OwnerUnit & {
+    unit?: {
+      id: string;
+      unitNumber: string;
+      copropertyId?: string;
+    };
+  }>;
+}
+
 export interface OwnerUnitInput {
   unitId: string;
   ownershipPercentage?: number;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: string | Date;
+  endDate?: string | Date | null;
   isMainOwner?: boolean;
 }
 

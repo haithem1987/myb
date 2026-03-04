@@ -75,6 +75,7 @@ export class UnitService {
           { query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId: unit.copropertyId } },
           { query: GET_ALL_UNITS }
         ],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createUnit));
@@ -90,17 +91,22 @@ export class UnitService {
           { query: GET_ALL_UNITS },
           { query: GET_UNIT_BY_ID, variables: { id: unit.id } }
         ],
+        awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateUnit));
   }
 
-  deleteUnit(id: string): Observable<boolean> {
+  deleteUnit(id: string, copropertyId?: string): Observable<boolean> {
+    const refetchQueries: any[] = [{ query: GET_ALL_UNITS }];
+    if (copropertyId) {
+      refetchQueries.push({ query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId } });
+    }
     return this.apollo
       .mutate<{ deleteUnit: boolean }>({
         mutation: DELETE_UNIT,
         variables: { id },
-        refetchQueries: [{ query: GET_ALL_UNITS }],
+        refetchQueries,
         awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })

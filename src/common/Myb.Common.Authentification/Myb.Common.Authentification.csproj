@@ -16,7 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\services\user-manager\Myb.UserManager.Models\Myb.UserManager.Models.csproj" />
     </ItemGroup>
 
 </Project>

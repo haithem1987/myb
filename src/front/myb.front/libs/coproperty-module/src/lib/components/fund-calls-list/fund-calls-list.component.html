@@ -11,14 +11,15 @@
   <div class="card mb-4">
     <div class="card-body">
       <div class="row g-3 align-items-end">
+
         <!-- Coproperty Filter -->
-        <div class="col-md-4">
+        <div class="col-md-3">
           <label for="copropertyFilter" class="form-label">
             <i class="bi bi-building me-1"></i>
             Copropriété
           </label>
-          <select 
-            id="copropertyFilter" 
+          <select
+            id="copropertyFilter"
             class="form-select"
             [value]="selectedCopropertyId() || 'all'"
             (change)="onCopropertyChange($any($event.target).value)">
@@ -29,20 +30,55 @@
           </select>
         </div>
 
-        <!-- Status Filter -->
-        <div class="col-md-3">
+        <!-- Owner Filter (derived from loaded fund calls) -->
+        <div class="col-md-2">
+          <label for="ownerFilter" class="form-label">
+            <i class="bi bi-person me-1"></i>
+            Copropriétaire
+          </label>
+          <select
+            id="ownerFilter"
+            class="form-select"
+            [value]="filterOwnerId()"
+            (change)="onOwnerFilterChange($event)">
+            <option value="">Tous</option>
+            <option *ngFor="let owner of uniqueOwnersForFilter" [value]="owner.id">
+              {{ owner.firstName }} {{ owner.lastName }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Year Filter (server-side) -->
+        <div class="col-md-2">
+          <label for="yearFilter" class="form-label">
+            <i class="bi bi-calendar me-1"></i>
+            Année
+          </label>
+          <select
+            id="yearFilter"
+            class="form-select"
+            [value]="filterYear() ?? ''"
+            (change)="onYearFilterChange($event)">
+            <option value="">Toutes</option>
+            <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+
+        <!-- Status Filter (client-side) -->
+        <div class="col-md-2">
           <label for="statusFilter" class="form-label">
             <i class="bi bi-bookmark me-1"></i>
             Statut
           </label>
-          <select 
-            id="statusFilter" 
+          <select
+            id="statusFilter"
             class="form-select"
             [value]="filterStatus()"
             (change)="onStatusFilterChange($event)">
             <option value="">Tous les statuts</option>
-            <option value="active">Actif</option>
-            <option value="inactive">Inactif</option>
+            <option value="TO_PAY">À payer</option>
+            <option value="PAID">Réglé</option>
+            <option value="VALIDATED">Validé</option>
           </select>
         </div>
 
@@ -52,8 +88,8 @@
             <i class="bi bi-search me-1"></i>
             Recherche
           </label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             id="searchInput"
             class="form-control"
             [placeholder]="'common.searchPlaceholder' | translate"
@@ -61,38 +97,31 @@
             (input)="onSearchInput($event)">
         </div>
 
-        <!-- Create Button -->
-        <div class="col-md-2">
-          <button 
-            type="button" 
-            class="btn btn-primary w-100"
-            (click)="createFundCall()">
-            <i class="bi bi-plus-circle me-1"></i>
-            Nouveau
-          </button>
-        </div>
       </div>
     </div>
   </div>
 
   <!-- Stats Cards -->
   <div class="row mb-4">
-    <div class="col-md-4">
+    <!-- Montant Total Appelé -->
+    <div class="col-md-3">
       <div class="card stats-card">
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class="stat-icon bg-primary">
-              <i class="bi bi-piggy-bank"></i>
+              <i class="bi bi-cash-stack"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Total Appels</h6>
-              <h3 class="mb-0">{{ filteredFundCalls.length }}</h3>
+              <h6 class="text-muted mb-0">Montant Appelé</h6>
+              <h3 class="mb-0">{{ formatAmount(getTotalAmount()) }} €</h3>
+              <small class="text-muted">{{ filteredFundCalls.length }} appel(s)</small>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
+    <!-- Montant Encaissé -->
+    <div class="col-md-3">
       <div class="card stats-card">
         <div class="card-body">
           <div class="d-flex align-items-center">
@@ -100,23 +129,49 @@
               <i class="bi bi-check-circle"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Appels Actifs</h6>
-              <h3 class="mb-0">{{ getActiveFundCallsCount() }}</h3>
+              <h6 class="text-muted mb-0">Encaissé</h6>
+              <h3 class="mb-0">{{ formatAmount(getTotalPaidAmount()) }} €</h3>
+              <small class="text-muted">{{ getPaidCount() }} réglé(s)</small>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
+    <!-- Reste à percevoir -->
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-warning">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Reste à percevoir</h6>
+              <h3 class="mb-0">{{ formatAmount(getTotalRemainingAmount()) }} €</h3>
+              <small class="text-muted">{{ getToPayCount() }} en attente</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Taux de recouvrement -->
+    <div class="col-md-3">
       <div class="card stats-card">
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class="stat-icon bg-info">
-              <i class="bi bi-cash-stack"></i>
+              <i class="bi bi-pie-chart"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Montant Total</h6>
-              <h3 class="mb-0">{{ formatAmount(getTotalAmount()) }} €</h3>
+              <h6 class="text-muted mb-0">Recouvrement</h6>
+              <h3 class="mb-0">
+                {{ getTotalAmount() > 0 ? ((getTotalPaidAmount() / getTotalAmount()) * 100 | number:'1.0-0') : 0 }}%
+              </h3>
+              <div class="progress mt-1" style="height:4px;width:80px">
+                <div class="progress-bar bg-info"
+                  [style.width.%]="getTotalAmount() > 0 ? (getTotalPaidAmount() / getTotalAmount() * 100) : 0">
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -126,13 +181,14 @@
 
   <!-- Fund Calls Table -->
   <div class="card">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">
         <i class="bi bi-list-ul me-2"></i>
         Liste des Appels de Fonds ({{ filteredFundCalls.length }})
       </h5>
     </div>
     <div class="card-body">
+
       <div *ngIf="loading()" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Chargement...</span>
@@ -145,22 +201,65 @@
         <p class="text-muted">Les appels de fonds seront affichés ici une fois créés</p>
       </div>
 
+      <!-- Bulk action bar -->
+      <div *ngIf="hasSelection" class="bulk-action-bar d-flex align-items-center gap-2 mb-3 px-3 py-2 rounded-3 border border-primary bg-primary bg-opacity-10">
+        <span class="badge bg-primary rounded-pill">{{ selectedCount }}</span>
+        <span class="small text-primary fw-semibold">sélectionné(s)</span>
+        <div class="vr mx-1"></div>
+        <button class="btn btn-sm btn-success" (click)="bulkChangeStatus('PAID')" title="Marquer comme Réglé">
+          <i class="bi bi-check-circle-fill me-1"></i>Réglé
+        </button>
+        <button class="btn btn-sm btn-info text-white" (click)="bulkChangeStatus('VALIDATED')" title="Marquer comme Validé">
+          <i class="bi bi-patch-check-fill me-1"></i>Validé
+        </button>
+        <button class="btn btn-sm btn-warning" (click)="bulkChangeStatus('TO_PAY')" title="Remettre en À payer">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>À payer
+        </button>
+        <div class="ms-auto">
+          <button class="btn btn-sm btn-outline-danger" (click)="bulkDelete()" title="Supprimer la sélection">
+            <i class="bi bi-trash me-1"></i>Supprimer
+          </button>
+        </div>
+      </div>
+
       <div *ngIf="!loading() && filteredFundCalls.length > 0" class="table-responsive">
-        <table class="table table-hover">
-          <thead>
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
             <tr>
+              <th style="width:44px" class="text-center">
+                <input type="checkbox" class="form-check-input"
+                  [checked]="isAllSelected"
+                  (change)="toggleSelectAll()"
+                  title="Sélectionner tout">
+              </th>
               <th>Copropriété</th>
+              <th>Copropriétaire</th>
               <th>Description</th>
               <th>Montant</th>
               <th>Date Limite</th>
               <th>Statut</th>
-              <th>Actions</th>
+              <th>Versements</th>
+              <th class="text-end">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let fundCall of filteredFundCalls">
+            <tr *ngFor="let fundCall of filteredFundCalls"
+                [class.table-active]="isSelected(fundCall.id)"
+                [class.selected-row]="isSelected(fundCall.id)">
+              <td class="text-center">
+                <input type="checkbox" class="form-check-input"
+                  [checked]="isSelected(fundCall.id)"
+                  (change)="toggleSelect(fundCall.id)">
+              </td>
               <td>
                 <strong>{{ getCopropertyName(fundCall) }}</strong>
+              </td>
+              <td>
+                <span *ngIf="fundCall.owner">
+                  <i class="bi bi-person-fill me-1 text-muted"></i>
+                  {{ getOwnerName(fundCall) }}
+                </span>
+                <span *ngIf="!fundCall.owner" class="text-muted">—</span>
               </td>
               <td>
                 <div class="fw-semibold">{{ fundCall.description || '-' }}</div>
@@ -168,48 +267,446 @@
               <td>
                 <strong>{{ formatAmount(fundCall.amount) }} €</strong>
               </td>
+              <td>{{ formatDate(fundCall.dueDate) }}</td>
               <td>
-                {{ formatDate(fundCall.dueDate) }}
-              </td>
-              <td>
-                <span class="badge" [ngClass]="fundCall.isActive ? 'bg-success' : 'bg-secondary'">
-                  {{ fundCall.isActive ? 'Actif' : 'Inactif' }}
+                <span class="badge" [ngClass]="getStatusBadge(fundCall.status)">
+                  {{ getStatusLabel(fundCall.status) }}
                 </span>
               </td>
-              <td>
-                <button 
-                  type="button" 
-                  class="btn btn-sm btn-outline-primary"
-                  (click)="viewFundCall(fundCall)"
-                  [title]="'coproperty.charge.viewDetails' | translate">
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button 
-                  type="button" 
-                  class="btn btn-sm btn-outline-warning ms-1"
-                  (click)="editFundCall(fundCall)"
-                  [title]="'common.editAction' | translate">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button 
-                  type="button" 
-                  class="btn btn-sm btn-outline-success ms-1"
-                  (click)="generateInvoices(fundCall)"
-                  [title]="'common.generateInvoices' | translate">
-                  <i class="bi bi-file-earmark-pdf"></i>
-                </button>
-                <button 
-                  type="button" 
-                  class="btn btn-sm btn-outline-danger ms-1"
-                  (click)="deleteFundCall(fundCall)"
-                  [title]="'common.deleteAction' | translate">
-                  <i class="bi bi-trash"></i>
-                </button>
+              <td style="min-width:120px">
+                <ng-container *ngIf="getPaymentProgress(fundCall) as prog">
+                  <div *ngIf="prog.total > 0">
+                    <div class="d-flex justify-content-between small mb-1">
+                      <span class="fw-semibold"
+                        [class.text-success]="prog.percent >= 100"
+                        [class.text-warning]="prog.percent > 0 && prog.percent < 100"
+                        [class.text-danger]="prog.percent === 0">
+                        {{ formatAmount(prog.paid) }}
+                      </span>
+                      <span class="text-muted"> / {{ formatAmount(prog.total) }} €</span>
+                    </div>
+                    <div class="progress" style="height:5px">
+                      <div class="progress-bar"
+                        [class.bg-success]="prog.percent >= 100"
+                        [class.bg-warning]="prog.percent > 0 && prog.percent < 100"
+                        [class.bg-danger]="prog.percent === 0"
+                        [style.width.%]="prog.percent">
+                      </div>
+                    </div>
+                  </div>
+                  <span *ngIf="prog.total === 0" class="text-muted small">—</span>
+                </ng-container>
+              </td>
+              <td class="text-end">
+                <div class="d-flex gap-1 justify-content-end flex-nowrap">
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    title="Modifier / Ajouter un paiement"
+                    (click)="editFundCall(fundCall)">
+                    <i class="bi bi-pencil-fill"></i>
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-secondary"
+                    title="Prévisualiser / Générer la facture"
+                    (click)="previewInvoice(fundCall)">
+                    <i class="bi bi-file-earmark-text"></i>
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    title="Supprimer"
+                    (click)="deleteFundCall(fundCall)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ── Inline Edit Panel (offcanvas-style) ─────────────────────────────────────────── -->
+<div *ngIf="showEditPanel()" class="edit-panel-backdrop" (click)="closeEditPanel()">
+</div>
+
+<div class="edit-panel" [class.edit-panel--open]="showEditPanel()">
+  <div class="edit-panel-header">
+    <h5 class="mb-0">
+      <i class="bi bi-pencil-square me-2"></i>
+      Modifier l'appel de fonds
+    </h5>
+    <button type="button" class="btn-close" (click)="closeEditPanel()"></button>
+  </div>
+
+  <div class="edit-panel-body" *ngIf="editingFundCall()">
+
+    <!-- ── Status + Versements at a glance (TOP) ─────────────────── -->
+    <div class="status-versement-card mb-3 p-3 rounded-3 border">
+      <div class="row g-3">
+        <!-- Status badge -->
+        <div class="col-6">
+          <div class="small text-muted mb-1">
+            <i class="bi bi-bookmark me-1"></i>Statut
+          </div>
+          <span class="badge fs-6 px-3 py-2" [ngClass]="getStatusBadge(editingFundCall()!.status)">
+            {{ getStatusLabel(editingFundCall()!.status) }}
+          </span>
+        </div>
+        <!-- Payment progress -->
+        <div class="col-6">
+          <div class="small text-muted mb-1">
+            <i class="bi bi-cash-coin me-1"></i>Versements
+          </div>
+          <div class="d-flex justify-content-between small fw-semibold mb-1">
+            <span [class.text-success]="getRemainingAmount(editingFundCall()!) === 0"
+                  [class.text-warning]="getRemainingAmount(editingFundCall()!) > 0">
+              {{ formatAmount(getTotalPayments(editingFundCall()!)) }} €
+            </span>
+            <span class="text-muted">/ {{ formatAmount(editingFundCall()!.amount) }} €</span>
+          </div>
+          <div class="progress" style="height:6px">
+            <div class="progress-bar"
+              [class.bg-success]="getRemainingAmount(editingFundCall()!) === 0"
+              [class.bg-warning]="getRemainingAmount(editingFundCall()!) > 0 && getTotalPayments(editingFundCall()!) > 0"
+              [class.bg-danger]="getTotalPayments(editingFundCall()!) === 0"
+              [style.width.%]="editingFundCall()!.amount ? (getTotalPayments(editingFundCall()!) / editingFundCall()!.amount * 100) : 0">
+            </div>
+          </div>
+          <div class="small mt-1"
+            [class.text-danger]="getRemainingAmount(editingFundCall()!) > 0"
+            [class.text-success]="getRemainingAmount(editingFundCall()!) === 0">
+            <ng-container *ngIf="getRemainingAmount(editingFundCall()!) > 0">
+              Reste : {{ formatAmount(getRemainingAmount(editingFundCall()!)) }} €
+            </ng-container>
+            <ng-container *ngIf="getRemainingAmount(editingFundCall()!) === 0">
+              <i class="bi bi-check-circle-fill me-1"></i>Soldé
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Versements section ─────────────────────────────────────── -->
+    <div class="payments-section mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0">
+          <i class="bi bi-cash-coin me-1"></i>Historique des versements
+        </h6>
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="togglePaymentForm()">
+          <i class="bi" [ngClass]="showPaymentForm() ? 'bi-x-lg' : 'bi-plus-lg'"></i>
+          {{ showPaymentForm() ? 'Annuler' : 'Ajouter' }}
+        </button>
+      </div>
+
+      <!-- Existing payments list -->
+      <div *ngIf="editingFundCall()!.payments && editingFundCall()!.payments!.length > 0" class="payment-list mb-2">
+        <div *ngFor="let payment of editingFundCall()!.payments" class="payment-item">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-semibold">{{ formatAmount(payment.amount) }} €</div>
+              <div class="small text-muted">
+                <i class="bi bi-calendar2 me-1"></i>{{ formatDate(payment.paymentDate) }}
+              </div>
+              <div *ngIf="payment.justificatif" class="small text-muted text-truncate" style="max-width:160px" [title]="payment.justificatif">
+                <i class="bi bi-file-earmark me-1"></i>{{ payment.justificatif }}
+              </div>
+            </div>
+            <span class="badge bg-success-subtle text-success">
+              <i class="bi bi-check2"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!editingFundCall()!.payments || editingFundCall()!.payments!.length === 0"
+           class="text-center text-muted small py-2 mb-2">
+        <i class="bi bi-inbox me-1"></i>Aucun versement enregistré
+      </div>
+
+      <!-- Add payment form -->
+      <div *ngIf="showPaymentForm()" class="add-payment-form">
+        <form [formGroup]="paymentForm" (ngSubmit)="addPayment()">
+          <div class="mb-2">
+            <label class="form-label small">
+              <i class="bi bi-cash me-1"></i>Montant <span class="text-danger">*</span>
+            </label>
+            <input type="number" class="form-control form-control-sm" step="0.01" min="0.01"
+              formControlName="amount"
+              [placeholder]="'Montant du versement'"
+              [class.is-invalid]="paymentForm.get('amount')?.invalid && paymentForm.get('amount')?.touched">
+            <div class="invalid-feedback">Montant invalide</div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">
+              <i class="bi bi-calendar-event me-1"></i>Date <span class="text-danger">*</span>
+            </label>
+            <input type="date" class="form-control form-control-sm"
+              formControlName="paymentDate"
+              [class.is-invalid]="paymentForm.get('paymentDate')?.invalid && paymentForm.get('paymentDate')?.touched">
+            <div class="invalid-feedback">Date requise</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">
+              <i class="bi bi-paperclip me-1"></i>Justificatif
+            </label>
+            <!-- Hidden real file input -->
+            <input type="file"
+              id="justificatifFileInput"
+              class="d-none"
+              accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx"
+              (change)="onJustificatifFileChange($event)">
+            <!-- Styled trigger button + file name preview -->
+            <div class="input-group input-group-sm">
+              <label for="justificatifFileInput" class="btn btn-outline-secondary mb-0" style="cursor:pointer">
+                <i class="bi bi-upload me-1"></i>Choisir un fichier
+              </label>
+              <span class="form-control text-truncate"
+                [class.text-muted]="!selectedJustificatifFile()"
+                [title]="selectedJustificatifFile()?.name || ''">
+                {{ selectedJustificatifFile()?.name || 'Aucun fichier sélectionné' }}
+              </span>
+              <button *ngIf="selectedJustificatifFile()" type="button"
+                class="btn btn-outline-danger btn-sm"
+                title="Supprimer"
+                (click)="selectedJustificatifFile.set(null); paymentForm.patchValue({justificatif:''})">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+            <div class="form-text">PDF, image, Word ou Excel (facultatif)</div>
+          </div>
+          <button type="submit" class="btn btn-sm btn-success w-100"
+            [disabled]="paymentForm.invalid || addingPayment()">
+            <span *ngIf="!addingPayment()">
+              <i class="bi bi-plus-circle me-1"></i>Enregistrer le versement
+            </span>
+            <span *ngIf="addingPayment()">
+              <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+              Ajout...
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <hr class="my-3">
+
+    <!-- ── Edit form ─────────────────────────────────────────────── -->
+    <form [formGroup]="editForm" (ngSubmit)="saveEdit()">
+
+      <!-- Status -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">
+          <i class="bi bi-bookmark-fill me-1"></i>Statut
+        </label>
+        <select class="form-select" formControlName="status">
+          <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+
+      <!-- Coproperty (read-only in edit) -->
+      <div class="mb-3">
+        <label class="form-label">
+          <i class="bi bi-building me-1"></i>Copropriété
+        </label>
+        <input type="text" class="form-control" readonly
+          [value]="getCopropertyName(editingFundCall()!)">
+      </div>
+
+      <!-- Owner -->
+      <div class="mb-3">
+        <label class="form-label">
+          <i class="bi bi-person me-1"></i>Copropriétaire
+        </label>
+        <select class="form-select" formControlName="ownerId">
+          <option value="">Tous les copropriétaires</option>
+          <option *ngFor="let owner of editOwners()" [value]="owner.id">
+            {{ owner.firstName }} {{ owner.lastName }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Amount -->
+      <div class="mb-3">
+        <label class="form-label">
+          <i class="bi bi-cash-stack me-1"></i>Montant <span class="text-danger">*</span>
+        </label>
+        <input type="number" class="form-control" step="0.01" min="0.01"
+          formControlName="amount"
+          [class.is-invalid]="editForm.get('amount')?.invalid && editForm.get('amount')?.touched">
+        <div class="invalid-feedback">Montant invalide</div>
+      </div>
+
+      <!-- Due Date -->
+      <div class="mb-3">
+        <label class="form-label">
+          <i class="bi bi-calendar-event me-1"></i>Date limite <span class="text-danger">*</span>
+        </label>
+        <input type="date" class="form-control"
+          formControlName="dueDate"
+          [class.is-invalid]="editForm.get('dueDate')?.invalid && editForm.get('dueDate')?.touched">
+        <div class="invalid-feedback">Date requise</div>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-4">
+        <label class="form-label">
+          <i class="bi bi-pencil me-1"></i>Description
+        </label>
+        <input type="text" class="form-control" placeholder="Description"
+          formControlName="description">
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill"
+          [disabled]="editForm.invalid || savingEdit()">
+          <span *ngIf="!savingEdit()">
+            <i class="bi bi-check-circle me-1"></i>Enregistrer
+          </span>
+          <span *ngIf="savingEdit()">
+            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+            Sauvegarde...
+          </span>
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="closeEditPanel()" [disabled]="savingEdit()">
+          <i class="bi bi-x-circle me-1"></i>Annuler
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<!-- ── Invoice Preview Modal ──────────────────────────────────────────────────────── -->
+<div *ngIf="showInvoiceModal()" class="invoice-modal-backdrop" (click)="closeInvoiceModal()">
+</div>
+
+<div class="invoice-modal" [class.invoice-modal--open]="showInvoiceModal()" id="invoice-print-area">
+  <div class="invoice-modal-header no-print">
+    <h5 class="mb-0">
+      <i class="bi bi-file-earmark-text me-2"></i>
+      Prévisualisation de la facture
+    </h5>
+    <button type="button" class="btn-close" (click)="closeInvoiceModal()"></button>
+  </div>
+
+  <div class="invoice-modal-body" *ngIf="pendingInvoice()">
+
+    <!-- ── Invoice Document ── -->
+    <div class="invoice-document">
+
+      <!-- Header -->
+      <div class="inv-header">
+        <div class="inv-brand">
+          <div class="inv-logo">
+            <i class="bi bi-buildings"></i>
+          </div>
+          <div>
+            <div class="inv-company">MYB Syndic</div>
+            <div class="inv-tagline text-muted small">Gestion de copropriété</div>
+          </div>
+        </div>
+        <div class="inv-meta">
+          <h4 class="inv-title">FACTURE</h4>
+          <div class="inv-num"># {{ pendingInvoice()!.invoiceNum }}</div>
+          <span class="badge" [ngClass]="createdInvoice() ? 'bg-success' : 'bg-warning text-dark'">
+            {{ createdInvoice() ? 'Générée' : 'Brouillon' }}
+          </span>
+        </div>
+      </div>
+
+      <hr class="inv-divider">
+
+      <!-- Dates row -->
+      <div class="inv-dates">
+        <div class="inv-date-item">
+          <span class="inv-date-label">Date de facture</span>
+          <span class="inv-date-value">{{ formatDate(pendingInvoice()!.invoiceDate ?? undefined) }}</span>
+        </div>
+        <div class="inv-date-item" *ngIf="pendingInvoice()!.dueDate">
+          <span class="inv-date-label">Date d'échéance</span>
+          <span class="inv-date-value">{{ formatDate(pendingInvoice()!.dueDate ?? undefined) }}</span>
+        </div>
+        <div class="inv-date-item" *ngIf="pendingFundCall()">
+          <span class="inv-date-label">Copropriété</span>
+          <span class="inv-date-value">{{ getCopropertyName(pendingFundCall()!) }}</span>
+        </div>
+        <div class="inv-date-item" *ngIf="pendingFundCall()?.owner">
+          <span class="inv-date-label">Copropriétaire</span>
+          <span class="inv-date-value">{{ getOwnerName(pendingFundCall()!) }}</span>
+        </div>
+      </div>
+
+      <hr class="inv-divider">
+
+      <!-- Line items table -->
+      <table class="inv-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th class="text-center">Qté</th>
+            <th class="text-end">Prix unit.</th>
+            <th class="text-end">Total HT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let line of pendingInvoice()!.invoiceDetails">
+            <td>{{ line.description }}</td>
+            <td class="text-center">{{ line.quantity }}</td>
+            <td class="text-end">{{ formatAmount(line.unitPriceHT) }} €</td>
+            <td class="text-end">
+              <strong>{{ formatAmount((line.quantity ?? 1) * (line.unitPriceHT ?? 0)) }} €</strong>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="inv-subtotal">
+            <td colspan="3" class="text-end">Sous-total HT</td>
+            <td class="text-end">{{ formatAmount(pendingInvoice()!.subTotal) }} €</td>
+          </tr>
+          <tr class="inv-total">
+            <td colspan="3" class="text-end"><strong>TOTAL TTC</strong></td>
+            <td class="text-end"><strong>{{ formatAmount(pendingInvoice()!.totalAmount) }} €</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Footer note -->
+      <div class="inv-footer-note">
+        <i class="bi bi-info-circle me-1"></i>
+        Appel de fonds généré par MYB Syndic • Payable à réception
+      </div>
+    </div>
+
+  </div><!-- /invoice-modal-body -->
+
+  <!-- Action bar -->
+  <div class="invoice-modal-footer no-print" *ngIf="pendingInvoice()">
+    <button type="button" class="btn btn-secondary" (click)="closeInvoiceModal()">
+      <i class="bi bi-x-circle me-1"></i>Fermer
+    </button>
+
+    <ng-container *ngIf="!createdInvoice()">
+      <button type="button" class="btn btn-primary"
+        [disabled]="generatingInvoice()"
+        (click)="confirmAndCreateInvoice()">
+        <span *ngIf="!generatingInvoice()">
+          <i class="bi bi-check-circle me-1"></i>Confirmer &amp; Générer
+        </span>
+        <span *ngIf="generatingInvoice()">
+          <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+          Génération...
+        </span>
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="createdInvoice()">
+      <button type="button" class="btn btn-success" (click)="downloadInvoice()">
+        <i class="bi bi-download me-1"></i>Télécharger PDF
+      </button>
+    </ng-container>
   </div>
 </div>

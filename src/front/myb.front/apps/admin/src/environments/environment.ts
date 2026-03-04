@@ -23,7 +23,7 @@ export const environment = {
       baseUrl: 'http://localhost:8086',
     },
     invoice: {
-      graphqlUrl: 'http://localhost:5083/graphql',
+      graphqlUrl: 'http://localhost:8083/invoice/graphql',
       baseUrl: 'http://localhost:8083',
     },
     timesheet: {

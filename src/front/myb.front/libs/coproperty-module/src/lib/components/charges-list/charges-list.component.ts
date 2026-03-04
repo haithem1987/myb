@@ -2,7 +2,7 @@ import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { Coproperty } from '../../models/coproperty.models';
@@ -21,6 +21,7 @@ export class ChargesListComponent implements OnInit {
   private chargeService = inject(ChargeService);
   private copropertyService = inject(CopropertyService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
 
   charges = signal<ChargeExtended[]>([]);
@@ -37,12 +38,31 @@ export class ChargesListComponent implements OnInit {
   ngOnInit(): void {
     this.loadCoproperties();
     this.loadAllCharges();
+    
+    // Listen for navigation with refresh param to reload data
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        if (params['refresh']) {
+          this.loadAllCharges();
+          // Clean up the URL by removing the refresh param
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true
+          });
+        }
+      });
   }
 
   loadCoproperties(): void {
     this.copropertyService.getCoproperties().subscribe({
       next: (data) => {
         this.coproperties.set(data);
+        // Auto-select first coproperty by default
+        if (data.length > 0 && !this.selectedCopropertyId()) {
+          this.onCopropertyChange(data[0].id);
+        }
       },
       error: (err) => {
         console.error('Error loading coproperties:', err);
@@ -149,6 +169,10 @@ export class ChargesListComponent implements OnInit {
     return filtered;
   }
 
+  getTotalBudgetAmount(): number {
+    return this.filteredCharges.reduce((sum, charge) => sum + (charge.totalAmount || 0), 0);
+  }
+
   getActiveChargesCount(): number {
     return this.filteredCharges.filter(charge => charge.isActive).length;
   }
@@ -208,5 +232,28 @@ export class ChargesListComponent implements OnInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount);
+  }
+
+  deleteCharge(charge: ChargeExtended): void {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer la charge "${charge.name}" ?
+
+Cette action est irréversible.`)) {
+      if (charge.id) {
+        this.loading.set(true);
+        this.chargeService.deleteCharge(charge.id, charge.copropertyId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.loading.set(false);
+              this.loadAllCharges();
+            },
+            error: (err) => {
+              console.error('Error deleting charge:', err);
+              this.loading.set(false);
+              alert('Erreur lors de la suppression de la charge');
+            }
+          });
+      }
+    }
   }
 }

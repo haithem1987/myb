@@ -1,6 +1,8 @@
 using Myb.Coproperty.Infrastructure.Data;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Models.Dtos;
+using Myb.Common.Messaging;
+using Myb.Common.Messaging.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Myb.Coproperty.Services;
@@ -27,10 +29,12 @@ public interface IFundCallService
 public class FundCallService : IFundCallService
 {
     private readonly IDbContextFactory<CopropertyDbContext> _contextFactory;
+    private readonly IEmailPublisher _emailPublisher;
 
-    public FundCallService(IDbContextFactory<CopropertyDbContext> contextFactory)
+    public FundCallService(IDbContextFactory<CopropertyDbContext> contextFactory, IEmailPublisher emailPublisher)
     {
         _contextFactory = contextFactory;
+        _emailPublisher = emailPublisher;
     }
 
     public async Task<FundCall> CreateAsync(CreateFundCallInput input, string userId)
@@ -76,6 +80,31 @@ public class FundCallService : IFundCallService
 
         context.FundCalls.Add(fundCall);
         await context.SaveChangesAsync();
+
+        // Send email notification to the owner if fund call targets a specific owner
+        if (input.OwnerId.HasValue)
+        {
+            var owner = await context.Owners.FindAsync(input.OwnerId.Value);
+            if (owner != null && !string.IsNullOrEmpty(owner.Email))
+            {
+                await _emailPublisher.PublishAsync(new EmailMessage
+                {
+                    To = owner.Email,
+                    Subject = $"Appel de fonds - {fundCall.Description}",
+                    HtmlBody = $@"<h1>Nouvel appel de fonds</h1>
+                        <p>Bonjour {owner.FirstName} {owner.LastName},</p>
+                        <p>Un nouvel appel de fonds a été créé pour votre copropriété.</p>
+                        <table style='border-collapse:collapse;'>
+                            <tr><td><strong>Description :</strong></td><td>{fundCall.Description}</td></tr>
+                            <tr><td><strong>Montant :</strong></td><td>{fundCall.Amount:N2} €</td></tr>
+                            <tr><td><strong>Date d'échéance :</strong></td><td>{fundCall.DueDate:dd/MM/yyyy}</td></tr>
+                        </table>
+                        <br/>
+                        <p>Cordialement,<br/>L'équipe MYB</p>",
+                    Source = "coproperty-service"
+                });
+            }
+        }
 
         return fundCall;
     }

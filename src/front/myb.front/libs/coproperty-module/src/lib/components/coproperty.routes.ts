@@ -7,6 +7,7 @@ import { OwnerDashboardComponent } from './owner-portal/owner-dashboard.componen
 import { CopropertyNewComponent } from './coproperty-new/coproperty-new.component';
 import { FundCallsListComponent } from './fund-calls-list/fund-calls-list.component';
 import { FundCallNewComponent } from './fund-call-new/fund-call-new.component';
+import { profileGuard } from '../guards/profile.guard';
 
 export const COPROPERTY_ROUTES: Routes = [
   {
@@ -50,9 +51,10 @@ export const COPROPERTY_ROUTES: Routes = [
         path: 'fund-calls/:id/edit',
         component: FundCallNewComponent,
       },
-      // Owner Portal Routes
+      // Owner Portal Routes — protected: requires completed owner profile
       {
         path: 'owner',
+        canActivate: [profileGuard],
         component: OwnerDashboardComponent,
       },
     ],

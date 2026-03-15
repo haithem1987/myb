@@ -498,7 +498,8 @@
     "success": "Succès",
     "error": "Erreur",
     "warning": "Avertissement",
-    "info": "Information"
+    "info": "Information",
+    "or": "ou"
   },
   "validation": {
     "NAME_REQUIRED": "est requis",
@@ -508,6 +509,27 @@
     "minLength": "Longueur minimale non atteinte",
     "min": "La valeur minimale doit être de",
     "email": "Email invalide",
-    "pattern": "Format invalide"
+    "pattern": "Format invalide",
+    "phoneInvalid": "Format de numéro de téléphone invalide"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "error": {
+      "notAuthenticated": "Vous devez être connecté pour continuer."
+    },
+    "register": {
+      "title": "Rejoignez MYB",
+      "subtitle": "Créez votre compte copropriétaire pour gérer vos biens.",
+      "withGoogle": "Continuer avec Google",
+      "withEmail": "S'inscrire par e-mail",
+      "alreadyAccount": "Vous avez déjà un compte ?",
+      "completeProfile": "Complétez votre profil",
+      "completeProfileSubtitle": "Presque fini ! Ajoutez votre numéro de téléphone pour finaliser votre inscription.",
+      "emailFromKeycloak": "L'email est géré par votre fournisseur d'authentification.",
+      "unitsAssignedLater": "Vos lots seront attribués par l'administrateur après validation.",
+      "saveProfile": "Finaliser l'inscription",
+      "profileSaved": "Votre profil a été enregistré avec succès. Redirection...",
+      "profileError": "Une erreur est survenue lors de l'enregistrement de votre profil. Veuillez réessayer."
+    }
   }
 }

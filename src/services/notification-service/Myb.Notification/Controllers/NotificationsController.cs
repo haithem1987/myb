@@ -34,5 +34,13 @@ public class NotificationsController : ControllerBase
         return Ok(notifications);
     }
 
+    [HttpPost("email")]
+    public async Task<IActionResult> SendEmail([FromBody] EmailNotificationRequest req)
+    {
+        await _notificationService.SendEmailNotificationAsync(req.ToEmail, req.Subject, req.HtmlBody);
+        return Ok(new { message = "Email queued successfully" });
+    }
+
     public record NotificationRequest(string SenderId,string ReceiverId, string Message);
+    public record EmailNotificationRequest(string ToEmail, string Subject, string HtmlBody);
 }

@@ -17,4 +17,6 @@ export * from './budget-new/budget-new.component';
 export * from './owner-portal/owner-dashboard.component';
 export * from './owner-portal/invoice-payment-dialog.component';
 export * from './manager-multi-select/manager-multi-select.component';
+export * from './owner-registration/owner-registration.component';
+export * from './owner-profile-completion/owner-profile-completion.component';
 export * from './coproperty.routes';

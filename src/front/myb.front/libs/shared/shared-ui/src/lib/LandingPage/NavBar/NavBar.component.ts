@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { KeycloakService } from '../../../../../../auth/src/lib/keycloak.service';
 import { CounterService } from '../FeaturesSection/CounterService';
 import { Subscription, filter } from 'rxjs';
@@ -12,6 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     UserDropdownComponent,
     LanguageSwitcherComponent,
     TranslateModule,
@@ -26,17 +28,21 @@ export class NavBarComponent {
 
   constructor(
     public keycloakService: KeycloakService,
-    public counterService: CounterService
+    public counterService: CounterService,
+    private router: Router,
   ) {}
 
   incrementCount() {
     this.counterService.increment();
   }
+
   onLogin(): void {
     this.keycloakService.login();
   }
+
+  /** Navigate to the Angular registration page (Email / Google choice) */
   onRegister(): void {
-    this.keycloakService.register();
+    this.router.navigate(['/register']);
   }
 
   onLogout(): void {

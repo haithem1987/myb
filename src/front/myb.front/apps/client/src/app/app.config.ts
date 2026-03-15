@@ -6,6 +6,7 @@ import {
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { ENVIRONMENT } from 'libs/auth/src/lib/environment.token';
 import { TYPE_KEY_TOKEN } from 'libs/shared/infra/tokens/apolloToken';
 import { GraphQLModule } from 'libs/shared/infra/graphql/graphql.module';
 import { appRoutes } from './app.routes';
@@ -14,11 +15,10 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import {
   TranslateModule,
   TranslateLoader,
-  TranslateService,
 } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { NgxStripeModule } from 'ngx-stripe';
-import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { environment } from '../environments/environment';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
@@ -35,6 +35,7 @@ export function initializeKeycloak(keycloak: KeycloakService) {
 }
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: ENVIRONMENT, useValue: environment },
     provideRouter(appRoutes),
     provideAnimations(),
     importProvidersFrom(

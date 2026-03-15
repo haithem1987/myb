@@ -29,8 +29,8 @@ export const authGuard: CanActivateFn = async (route, state) => {
         return router.createUrlTree(['/access-denied']);
       }
       
-      // First time - redirect to Keycloak
-      keycloakService.login();
+      // First time - redirect to Keycloak, using the INTENDED URL as redirect URI
+      keycloakService.login(window.location.origin + state.url);
       return false;
     }
 

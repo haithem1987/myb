@@ -1,6 +1,6 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
 import { ToastsContainerComponent, ModalContainerComponent } from '@myb-front/shared-ui';
 
@@ -13,11 +13,15 @@ import { ToastsContainerComponent, ModalContainerComponent } from '@myb-front/sh
 })
 export class OwnerLayoutComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
+  private router = inject(Router);
   
   // State signals
   pendingInvoices = signal(2);
   activeRequests = signal(1);
   currentUser = signal<{ name: string; firstName: string; lastName: string; role: string }>({ name: 'Utilisateur', firstName: 'U', lastName: ' ', role: 'Copropriétaire' });
+
+  // Dual-role flag: coproprietaire who is also syndic
+  isSyndic = signal(false);
   
   // Sidebar state
   isMobileMenuOpen = signal(false);
@@ -38,6 +42,9 @@ export class OwnerLayoutComponent implements OnInit {
       const name = `${firstName} ${lastName}`.trim() || token?.preferred_username || 'Utilisateur';
 
       this.currentUser.set({ name, firstName: firstName || 'U', lastName: lastName || '', role: 'Copropriétaire' });
+      // Check if this coproprietaire is also a syndic
+      const roles = this.keycloakService.getUserRoles();
+      this.isSyndic.set(roles.includes('coproperty-syndic') || roles.includes('coproperty-admin') || roles.includes('system-admin'));
     } catch (e) {
       console.error('Error loading user from Keycloak', e);
       this.currentUser.set({ name: 'Utilisateur', firstName: 'U', lastName: ' ', role: 'Copropriétaire' });
@@ -52,6 +59,10 @@ export class OwnerLayoutComponent implements OnInit {
   
   toggleMobileMenu(): void {
     this.isMobileMenuOpen.update(value => !value);
+  }
+
+  switchToSyndicSpace(): void {
+    this.router.navigate(['/coproperty/syndic/dashboard']);
   }
   
   logout(): void {

@@ -7,6 +7,8 @@ export const environment = {
   services: {
     keycloak: {
       url: 'https://keycloak-production-2591.up.railway.app',
+      // In production, admin calls go directly to Keycloak (same origin or properly CORS-configured)
+      adminUrl: 'https://keycloak-production-2591.up.railway.app',
       realm: 'MYB',
       clientId: 'MYB-client',
     },

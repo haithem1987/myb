@@ -127,6 +127,26 @@
       }
     }
     
+    .btn-switch-role {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: opacity 0.2s ease;
+
+      &:hover { opacity: 0.85; }
+
+      i { font-size: 16px; }
+    }
+
     .btn-logout {
       width: 36px;
       height: 36px;

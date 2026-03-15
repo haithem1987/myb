@@ -31,6 +31,9 @@ export class SyndicLayoutComponent implements OnInit {
   totalOwners = signal(0);
   currentUser = signal<{ name: string; firstName: string; lastName: string; role: string }>({ name: '', firstName: '', lastName: '', role: 'Syndic' });
   
+  // Dual-role flag: syndic who is also a coproprietaire
+  isCoproprietaire = signal(false);
+
   // Sidebar state
   isSidebarCollapsed = signal(false);
   
@@ -51,6 +54,9 @@ export class SyndicLayoutComponent implements OnInit {
       const name = `${firstName} ${lastName}`.trim() || token?.preferred_username || 'Utilisateur';
 
       this.currentUser.set({ name, firstName: firstName || 'U', lastName: lastName || '', role: 'Syndic' });
+      // Check if this syndic is also a coproprietaire
+      const roles = this.keycloakService.getUserRoles();
+      this.isCoproprietaire.set(roles.includes('coproperty-owner'));
     } catch (e) {
       console.error('Error loading user from Keycloak', e);
       this.currentUser.set({ name: 'Utilisateur', firstName: 'U', lastName: '', role: 'Syndic' });
@@ -96,6 +102,10 @@ export class SyndicLayoutComponent implements OnInit {
   
   toggleSidebar(): void {
     this.isSidebarCollapsed.update(value => !value);
+  }
+
+  switchToOwnerSpace(): void {
+    this.router.navigate(['/coproperty/owner/dashboard']);
   }
   
   logout(): void {

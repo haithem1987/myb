@@ -3,11 +3,13 @@
   <div *ngIf="alert().type" class="alert" [ngClass]="{
     'alert-success': alert().type === 'success',
     'alert-danger': alert().type === 'danger',
-    'alert-warning': alert().type === 'warning'
+    'alert-warning': alert().type === 'warning',
+    'alert-info': alert().type === 'info'
   }" role="alert">
     <i class="bi" [ngClass]="{
       'bi-check-circle': alert().type === 'success',
-      'bi-exclamation-triangle': alert().type === 'danger' || alert().type === 'warning'
+      'bi-exclamation-triangle': alert().type === 'danger' || alert().type === 'warning',
+      'bi-info-circle': alert().type === 'info'
     }"></i>
     <span>{{ alert().message }}</span>
     <button type="button" class="btn-close" (click)="alert.set({type: null, message: ''})"></button>
@@ -37,18 +39,103 @@
       <h5>{{ editingOwnerId ? ('coproperty.owner.editOwner' | translate) : ('coproperty.owner.addOwner' | translate) }}</h5>
     </div>
     <div class="card-body">
-      <form [formGroup]="ownerForm" (ngSubmit)="saveOwner()">
+
+      <!-- Step 1: Search Keycloak user (only for new owners) -->
+      <div *ngIf="!editingOwnerId" class="mb-4">
+        <label class="form-label fw-bold">
+          <i class="bi bi-search me-1"></i>
+          {{ 'coproperty.owner.searchUserByEmail' | translate }}
+        </label>
+        <p class="text-muted small mb-2">
+          <i class="bi bi-info-circle me-1"></i>
+          {{ 'coproperty.owner.userNotRegistered' | translate }}
+        </p>
+
+        <!-- Selected user badge -->
+        <div *ngIf="selectedKeycloakUser()" class="selected-user-badge mb-3">
+          <div class="d-flex align-items-center justify-content-between p-3 border rounded bg-light">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-person-check-fill text-success fs-4"></i>
+              <div>
+                <strong>{{ selectedKeycloakUser()!.firstName }} {{ selectedKeycloakUser()!.lastName }}</strong>
+                <br>
+                <small class="text-muted">{{ selectedKeycloakUser()!.email }}</small>
+                <span *ngIf="userHasOwnerRole(selectedKeycloakUser()!)" class="badge bg-success ms-2">
+                  <i class="bi bi-shield-check me-1"></i>{{ 'coproperty.owner.hasOwnerRole' | translate }}
+                </span>
+                <span *ngIf="!userHasOwnerRole(selectedKeycloakUser()!)" class="badge bg-warning text-dark ms-2">
+                  <i class="bi bi-shield-exclamation me-1"></i>{{ 'coproperty.owner.noOwnerRole' | translate }}
+                </span>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-outline-danger" (click)="clearSelectedUser()" type="button">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search input -->
+        <div *ngIf="!selectedKeycloakUser()" class="position-relative">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="keycloakSearchTerm"
+              [ngModelOptions]="{standalone: true}"
+              (input)="onKeycloakSearchInput()"
+              [placeholder]="'common.searchKeycloakUsers' | translate"
+            />
+            <span *ngIf="keycloakSearchLoading()" class="input-group-text">
+              <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+            </span>
+          </div>
+
+          <!-- Search results dropdown -->
+          <div *ngIf="keycloakSearchResults().length > 0" class="keycloak-search-results border rounded mt-1 shadow-sm">
+            <div
+              *ngFor="let user of keycloakSearchResults()"
+              class="search-result-item p-2 d-flex align-items-center gap-2 cursor-pointer"
+              (click)="selectKeycloakUser(user)"
+            >
+              <i class="bi bi-person-circle text-primary"></i>
+              <div class="flex-grow-1">
+                <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+                <br>
+                <small class="text-muted">{{ user.email }}</small>
+              </div>
+              <span *ngIf="userHasOwnerRole(user)" class="badge bg-success">
+                <i class="bi bi-shield-check"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- No results -->
+          <div *ngIf="keycloakSearchTerm.length >= 2 && !keycloakSearchLoading() && keycloakSearchResults().length === 0" class="text-muted small mt-2">
+            <i class="bi bi-exclamation-circle me-1"></i>{{ 'common.userNotFound' | translate }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Owner form (shown when user is selected or editing) -->
+      <form *ngIf="selectedKeycloakUser() || editingOwnerId" [formGroup]="ownerForm" (ngSubmit)="saveOwner()">
         <div class="row">
           <div class="col-md-6">
             <div class="mb-3">
               <label for="firstName" class="form-label">{{ 'coproperty.owner.firstName' | translate }}</label>
-              <input type="text" class="form-control" id="firstName" formControlName="firstName" />
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" id="firstName" formControlName="firstName" readonly />
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="mb-3">
               <label for="lastName" class="form-label">{{ 'coproperty.owner.lastName' | translate }}</label>
-              <input type="text" class="form-control" id="lastName" formControlName="lastName" />
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" id="lastName" formControlName="lastName" readonly />
+              </div>
             </div>
           </div>
         </div>
@@ -57,13 +144,19 @@
           <div class="col-md-6">
             <div class="mb-3">
               <label for="email" class="form-label">{{ 'common.email' | translate }}</label>
-              <input type="email" class="form-control" id="email" formControlName="email" />
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" id="email" formControlName="email" readonly />
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="mb-3">
               <label for="phone" class="form-label">{{ 'common.phone' | translate }}</label>
-              <input type="tel" class="form-control" id="phone" formControlName="phone" />
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                <input type="tel" class="form-control" id="phone" formControlName="phone" />
+              </div>
             </div>
           </div>
         </div>
@@ -84,7 +177,7 @@
                   <i class="bi bi-x"></i>
                 </button>
               </div>
-              <div class="unit-multiselect border rounded p-2" style="max-height: 200px;   ">
+              <div class="unit-multiselect border rounded p-2" style="max-height: 200px;">
                 <div *ngIf="loading()" class="text-center py-3">
                   <div class="spinner-border spinner-border-sm text-primary" role="status">
                     <span class="visually-hidden">{{ 'common.loading' | translate }}</span>
@@ -117,14 +210,10 @@
           </div>
         </div>
 
-        <div class="mb-3" *ngIf="false">
-          <label for="address" class="form-label">{{ 'common.address' | translate }}</label>
-          <input type="text" class="form-control" id="address" formControlName="address" />
-        </div>
-
         <div class="form-actions">
-          <button type="submit" class="btn btn-success" [disabled]="!ownerForm.valid">
-            <i class="bi bi-save"></i>
+          <button type="submit" class="btn btn-success" [disabled]="loading()">
+            <span *ngIf="loading()" class="spinner-border spinner-border-sm me-1" role="status"></span>
+            <i *ngIf="!loading()" class="bi bi-save me-1"></i>
             {{ 'common.save' | translate }}
           </button>
           <button type="button" class="btn btn-secondary" (click)="cancelForm()">
@@ -150,6 +239,7 @@
               <th>{{ 'common.email' | translate }}</th>
               <th>{{ 'common.phone' | translate }}</th>
               <th>{{ 'coproperty.owner.units' | translate }}</th>
+              <th>{{ 'coproperty.owner.roleStatus' | translate }}</th>
               <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
@@ -170,12 +260,43 @@
                 </span>
               </td>
               <td>
-                <button class="btn btn-sm btn-primary" (click)="editOwner(owner)" [title]="'common.editAction' | translate">
+                <!-- Role status with toggle -->
+                <button
+                  *ngIf="owner.hasOwnerRole"
+                  class="btn btn-sm btn-outline-success"
+                  (click)="toggleOwnerRole(owner)"
+                  [disabled]="assigningRole() === owner.userId"
+                  [title]="'coproperty.owner.removeOwnerRole' | translate"
+                >
+                  <span *ngIf="assigningRole() === owner.userId" class="spinner-border spinner-border-sm" role="status"></span>
+                  <i *ngIf="assigningRole() !== owner.userId" class="bi bi-shield-fill-check"></i>
+                  <span class="ms-1 d-none d-md-inline">{{ 'coproperty.owner.hasOwnerRole' | translate }}</span>
+                </button>
+                <button
+                  *ngIf="!owner.hasOwnerRole"
+                  class="btn btn-sm btn-outline-warning"
+                  (click)="toggleOwnerRole(owner)"
+                  [disabled]="assigningRole() === owner.userId"
+                  [title]="'coproperty.owner.assignOwnerRole' | translate"
+                >
+                  <span *ngIf="assigningRole() === owner.userId" class="spinner-border spinner-border-sm" role="status"></span>
+                  <i *ngIf="assigningRole() !== owner.userId" class="bi bi-shield-exclamation"></i>
+                  <span class="ms-1 d-none d-md-inline">{{ 'coproperty.owner.noOwnerRole' | translate }}</span>
+                </button>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-primary me-1" (click)="editOwner(owner)" [title]="'common.editAction' | translate">
                   <i class="bi bi-pencil"></i>
                 </button>
                 <button class="btn btn-sm btn-danger" (click)="deleteOwner(owner)" [title]="'common.deleteAction' | translate">
                   <i class="bi bi-trash"></i>
                 </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredOwners.length === 0">
+              <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-people fs-3 d-block mb-2"></i>
+                {{ 'common.noData' | translate }}
               </td>
             </tr>
           </tbody>

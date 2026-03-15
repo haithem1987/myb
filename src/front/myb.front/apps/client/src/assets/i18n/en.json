@@ -516,7 +516,8 @@
     "success": "Success",
     "error": "Error",
     "warning": "Warning",
-    "info": "Information"
+    "info": "Information",
+    "or": "or"
   },
   "validation": {
     "NAME_REQUIRED": "is required",
@@ -526,6 +527,27 @@
     "minLength": "Minimum length not reached",
     "min": "Minimum value must be",
     "email": "Invalid email",
-    "pattern": "Invalid format"
+    "pattern": "Invalid format",
+    "phoneInvalid": "Invalid phone number format"
+  },
+  "auth": {
+    "login": "Log in",
+    "error": {
+      "notAuthenticated": "You must be logged in to continue."
+    },
+    "register": {
+      "title": "Join MYB",
+      "subtitle": "Create your owner account to manage your properties.",
+      "withGoogle": "Continue with Google",
+      "withEmail": "Register with Email",
+      "alreadyAccount": "Already have an account?",
+      "completeProfile": "Complete Your Profile",
+      "completeProfileSubtitle": "Almost there! Add your phone number to finish your registration.",
+      "emailFromKeycloak": "Email is managed by your authentication provider.",
+      "unitsAssignedLater": "Your property units will be assigned by the administrator after validation.",
+      "saveProfile": "Complete Registration",
+      "profileSaved": "Your profile has been saved successfully. Redirecting...",
+      "profileError": "An error occurred while saving your profile. Please try again."
+    }
   }
 }

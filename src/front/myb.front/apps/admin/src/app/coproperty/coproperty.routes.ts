@@ -7,6 +7,7 @@ import { AccountantLayoutComponent } from '../layouts/accountant-layout/accounta
 import { SyndicDashboardComponent } from './syndic/syndic-dashboard/syndic-dashboard.component';
 import { OwnerDashboardComponent } from './owner/owner-dashboard/owner-dashboard.component';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
+import { profileGuard } from '@myb-front/coproperty-module';
 
 export const COPROPERTY_ROUTES: Routes = [
   {
@@ -110,7 +111,7 @@ export const COPROPERTY_ROUTES: Routes = [
   {
     path: 'owner',
     component: OwnerLayoutComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, profileGuard],
     data: { roles: ['coproperty-owner', 'coproperty-syndic', 'coproperty-admin', 'system-admin'] },
     children: [
       {

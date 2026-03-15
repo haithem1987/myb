@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Myb.UserManager.Models\Myb.UserManager.Models.csproj" />
     <ProjectReference Include="..\Myb.UserManager.Sevices\Myb.UserManager.Sevices.csproj" />
+    <ProjectReference Include="..\..\..\common\Myb.Common.Messaging\Myb.Common.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

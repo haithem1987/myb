@@ -45,6 +45,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\common\Myb.Common.Authentification\Myb.Common.Authentification.csproj" />
+      <ProjectReference Include="..\..\..\common\Myb.Common.Messaging\Myb.Common.Messaging.csproj" />
       <ProjectReference Include="..\Myb.Payment.EntityFrameWork.Infra\Myb.Payment.EntityFrameWork.Infra.csproj" />
     </ItemGroup>
 

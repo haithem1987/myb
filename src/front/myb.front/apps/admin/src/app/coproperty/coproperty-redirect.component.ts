@@ -29,8 +29,18 @@ export class CopropertyRedirectComponent implements OnInit {
     const roles = this.keycloakService.getUserRoles();
     console.log('CopropertyRedirect — User roles from Keycloak:', roles);
 
+    const hasSyndic = roles.includes('coproperty-syndic') || roles.includes('coproperty-admin');
+    const hasOwner = roles.includes('coproperty-owner');
+
+    // If user has BOTH syndic and owner roles, send them to home to choose
+    if (hasSyndic && hasOwner) {
+      console.log('Dual-role user (syndic + owner): redirecting to home for selection');
+      this.router.navigate(['/home']);
+      return;
+    }
+
     // Priority-based routing using client roles
-    if (roles.includes('coproperty-syndic') || roles.includes('coproperty-admin')) {
+    if (hasSyndic) {
       console.log('Redirecting to syndic dashboard');
       this.router.navigate(['/coproperty/syndic/dashboard']);
     } else if (roles.includes('coproperty-council')) {

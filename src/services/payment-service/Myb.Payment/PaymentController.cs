@@ -1,5 +1,7 @@
 ﻿using Myb.Payment.EntityFrameWork.Infra;
 using Myb.Payment.Models;
+using Myb.Common.Messaging;
+using Myb.Common.Messaging.Models;
 
 namespace Myb.Payment;
 
@@ -12,11 +14,13 @@ public class PaymentController : ControllerBase
 {
     private readonly IPaymentService _paymentService;
     private readonly PaymentContext _context;
+    private readonly IEmailPublisher _emailPublisher;
 
-    public PaymentController(IPaymentService paymentService, PaymentContext context)
+    public PaymentController(IPaymentService paymentService, PaymentContext context, IEmailPublisher emailPublisher)
     {
         _paymentService = paymentService;
         _context = context;
+        _emailPublisher = emailPublisher;
     }
 
     [HttpPost("create-payment-intent")]
@@ -45,6 +49,27 @@ public class PaymentController : ControllerBase
 
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
+
+            // Send payment confirmation email
+            if (!string.IsNullOrEmpty(request.ReceiptEmail))
+            {
+                await _emailPublisher.PublishAsync(new EmailMessage
+                {
+                    To = request.ReceiptEmail,
+                    Subject = "Confirmation de paiement - MYB",
+                    HtmlBody = $@"<h1>Paiement confirmé</h1>
+                        <p>Votre paiement a été traité avec succès.</p>
+                        <table style='border-collapse:collapse;'>
+                            <tr><td><strong>Service :</strong></td><td>{payment.ServiceName}</td></tr>
+                            <tr><td><strong>Montant :</strong></td><td>{request.Amount} {request.Currency.ToUpper()}</td></tr>
+                            <tr><td><strong>Date :</strong></td><td>{payment.PaymentDate:dd/MM/yyyy}</td></tr>
+                            <tr><td><strong>Référence :</strong></td><td>#{payment.Id}</td></tr>
+                        </table>
+                        <br/>
+                        <p>Cordialement,<br/>L'équipe MYB</p>",
+                    Source = "payment-service"
+                });
+            }
 
             return Ok(new { clientSecret, PaymentId = payment.Id });
         }

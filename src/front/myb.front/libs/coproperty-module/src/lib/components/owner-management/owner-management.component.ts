@@ -8,8 +8,8 @@ import { CopropertyService } from '../../services/coproperty.service';
 import { OwnerService } from '../../services/owner.service';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { of, from } from 'rxjs';
-import { map, finalize, switchMap } from 'rxjs/operators';
+import { of, from, Subject } from 'rxjs';
+import { map, finalize, switchMap, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 
 interface Unit {
   id: string;
@@ -25,6 +25,7 @@ interface Owner {
   lastName: string;
   email: string;
   phone: string;
+  hasOwnerRole?: boolean;
   ownerUnits?: Array<{
     id: string;
     unitId: string;
@@ -33,6 +34,16 @@ interface Owner {
     unit?: Unit;
   }>;
   units?: Unit[]; // For backward compatibility
+}
+
+interface KeycloakUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  enabled: boolean;
+  emailVerified: boolean;
+  roles: string[];
 }
 
 @Component({
@@ -55,25 +66,45 @@ export class OwnerManagementComponent implements OnInit {
   
   owners: Owner[] = [];
   availableUnits: Unit[] = [];
-  allUnits: Unit[] = []; // Store all units
+  allUnits: Unit[] = [];
   coproperties = signal<Array<{id: string, name: string}>>([]);
   selectedCopropertyForFilter = signal<string>('');
-  displayedColumns: string[] = ['name', 'email', 'phone', 'units', 'actions'];
+  displayedColumns: string[] = ['name', 'email', 'phone', 'units', 'role', 'actions'];
   searchTerm: string = '';
   unitSearchTerm: string = '';
   showAddForm: boolean = false;
   ownerForm: FormGroup;
   editingOwnerId: string | null = null;
   loading = signal<boolean>(false);
-  alert = signal<{type: 'success' | 'danger' | 'warning' | null, message: string}>({type: null, message: ''});
+  alert = signal<{type: 'success' | 'danger' | 'warning' | 'info' | null, message: string}>({type: null, message: ''});
+
+  // ── Keycloak user search ──
+  keycloakSearchTerm: string = '';
+  keycloakSearchResults = signal<KeycloakUser[]>([]);
+  keycloakSearchLoading = signal<boolean>(false);
+  selectedKeycloakUser = signal<KeycloakUser | null>(null);
+  private keycloakSearch$ = new Subject<string>();
+
+  // ── Role assignment state ──
+  assigningRole = signal<string | null>(null); // userId being assigned
 
   constructor() {
     this.ownerForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
+      firstName: [{ value: '', disabled: true }],
+      lastName: [{ value: '', disabled: true }],
+      email: [{ value: '', disabled: true }],
+      phone: [''],
       selectedUnits: [<string[]>[], Validators.required],
+    });
+
+    // Debounced Keycloak user search
+    this.keycloakSearch$.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      filter(term => term.length >= 2),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(term => {
+      this.searchKeycloakUsers(term);
     });
   }
 
@@ -156,7 +187,7 @@ export class OwnerManagementComponent implements OnInit {
         finalize(() => this.loading.set(false))
       )
       .subscribe({
-        next: (owners) => {
+        next: async (owners) => {
           console.log('[Owner Management] Owners loaded:', owners.length);
           this.owners = owners.map(o => ({
             id: o.id,
@@ -165,8 +196,21 @@ export class OwnerManagementComponent implements OnInit {
             lastName: o.lastName,
             email: o.email,
             phone: o.phone || '',
+            hasOwnerRole: false,
             ownerUnits: o.ownerUnits || []
           }));
+
+          // Enrich owners with Keycloak role status
+          for (const owner of this.owners) {
+            if (owner.userId) {
+              try {
+                const roles = await this.keycloakService.getUserClientRoles(owner.userId);
+                owner.hasOwnerRole = roles.includes('coproperty-owner');
+              } catch {
+                owner.hasOwnerRole = false;
+              }
+            }
+          }
         },
         error: (err) => {
           console.error('[Owner Management] Error loading owners:', err);
@@ -197,6 +241,10 @@ export class OwnerManagementComponent implements OnInit {
     this.ownerForm.patchValue({ 
       selectedUnits: []
     });
+    // Reset Keycloak search state
+    this.keycloakSearchTerm = '';
+    this.keycloakSearchResults.set([]);
+    this.selectedKeycloakUser.set(null);
   }
 
   editOwner(owner: Owner): void {
@@ -204,6 +252,17 @@ export class OwnerManagementComponent implements OnInit {
     this.showAddForm = true;
     
     const selectedUnitIds = owner.ownerUnits?.map(ou => ou.unitId) || [];
+    
+    // Set selected Keycloak user from owner data
+    this.selectedKeycloakUser.set({
+      id: owner.userId || '',
+      email: owner.email,
+      firstName: owner.firstName,
+      lastName: owner.lastName,
+      enabled: true,
+      emailVerified: true,
+      roles: owner.hasOwnerRole ? ['coproperty-owner'] : [],
+    });
     
     this.ownerForm.patchValue({
       firstName: owner.firstName,
@@ -245,112 +304,187 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   saveOwner(): void {
-    if (this.ownerForm.valid) {
-      const formValue = this.ownerForm.value;
-      const selectedUnitIds: string[] = formValue.selectedUnits || [];
-      
-      // Validate that at least one unit is selected
-      if (selectedUnitIds.length === 0) {
-        this.translateService.get('coproperty.owner.unitRequired').subscribe((msg) => {
-          this.showAlert('warning', msg || 'Veuillez sélectionner au moins une unité');
-        });
-        return;
-      }
-      
-      this.loading.set(true);
+    const formValue = this.ownerForm.getRawValue(); // getRawValue to include disabled fields
+    const selectedUnitIds: string[] = formValue.selectedUnits || [];
+    
+    // Validate that at least one unit is selected
+    if (selectedUnitIds.length === 0) {
+      this.translateService.get('coproperty.owner.unitRequired').subscribe((msg) => {
+        this.showAlert('warning', msg || 'Veuillez sélectionner au moins une unité');
+      });
+      return;
+    }
 
-      // Step 1: Create or find the Keycloak user, then create the owner
-      const keycloakUser$ = from(this.resolveKeycloakUserId(formValue));
-      
-      keycloakUser$.pipe(
-        switchMap((keycloakUserId: string) => {
-          // Step 2: Create the owner with the real Keycloak user ID
-          const input: CreateOwnerWithUnitsInput = {
-            userId: keycloakUserId,
-            firstName: formValue.firstName,
-            lastName: formValue.lastName,
-            email: formValue.email,
-            phone: formValue.phone || '',
-            units: selectedUnitIds.map(unitId => ({
-              unitId: unitId,
-              ownershipPercentage: 100,
-              isMainOwner: true,
-              startDate: new Date().toISOString(),
-              endDate: null
-            }))
-          };
-          
-          return this.editingOwnerId 
-            ? this.ownerService.updateOwner(this.editingOwnerId, input, this.copropertyId)
-            : this.ownerService.createOwner(input, this.copropertyId);
-        }),
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.loading.set(false))
-      ).subscribe({
-        next: (owner) => {
-          console.log('[Owner Management] Owner saved:', owner);
-          const messageKey = this.editingOwnerId ? 'coproperty.messages.updated' : 'coproperty.messages.created';
-          this.translateService.get(messageKey).subscribe((msg) => {
-            this.showAlert('success', msg);
-          });
-          
-          // Reload the owners list to get fresh data
-          this.loadOwners();
-          
-          // Reset form
-          this.showAddForm = false;
-          this.editingOwnerId = null;
-          this.ownerForm.reset();
-        },
-        error: (err) => {
-          console.error('[Owner Management] Error saving owner:', err);
-          this.translateService.get('coproperty.messages.error').subscribe((msg) => {
-            this.showAlert('danger', msg);
-          });
-        }
-      });
-    } else {
-      this.translateService.get('validation.required').subscribe((msg) => {
-        this.showAlert('warning', msg);
-      });
+    // For new owners, a Keycloak user must be selected
+    if (!this.editingOwnerId && !this.selectedKeycloakUser()) {
+      this.showAlert('warning', 'Veuillez sélectionner un utilisateur inscrit');
+      return;
+    }
+    
+    this.loading.set(true);
+
+    const keycloakUser = this.selectedKeycloakUser();
+    const keycloakUserId = this.editingOwnerId 
+      ? (this.owners.find(o => o.id === this.editingOwnerId)?.userId || keycloakUser?.id || '')
+      : keycloakUser!.id;
+
+    // Step 1: Assign coproperty-owner role in Keycloak (if not already assigned)
+    const assignRole$ = from(
+      this.keycloakService.assignRoleToUser(keycloakUserId, 'coproperty-owner')
+        .then(() => console.log('[Owner Management] coproperty-owner role assigned'))
+        .catch(err => console.warn('[Owner Management] Could not assign role:', err))
+    );
+
+    assignRole$.pipe(
+      switchMap(() => {
+        // Step 2: Create/update the owner entity with unit links
+        const input: CreateOwnerWithUnitsInput = {
+          userId: keycloakUserId,
+          firstName: formValue.firstName || keycloakUser?.firstName || '',
+          lastName: formValue.lastName || keycloakUser?.lastName || '',
+          email: formValue.email || keycloakUser?.email || '',
+          phone: formValue.phone || '',
+          units: selectedUnitIds.map(unitId => ({
+            unitId: unitId,
+            ownershipPercentage: 100,
+            isMainOwner: true,
+            startDate: new Date().toISOString(),
+            endDate: null
+          }))
+        };
+        
+        return this.editingOwnerId 
+          ? this.ownerService.updateOwner(this.editingOwnerId, input, this.copropertyId)
+          : this.ownerService.createOwner(input, this.copropertyId);
+      }),
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.loading.set(false))
+    ).subscribe({
+      next: (owner) => {
+        console.log('[Owner Management] Owner saved:', owner);
+        const messageKey = this.editingOwnerId ? 'coproperty.messages.updated' : 'coproperty.messages.created';
+        this.translateService.get(messageKey).subscribe((msg) => {
+          this.showAlert('success', msg);
+        });
+        
+        // Reload the owners list to get fresh data
+        this.loadOwners();
+        
+        // Reset form
+        this.showAddForm = false;
+        this.editingOwnerId = null;
+        this.ownerForm.reset();
+        this.selectedKeycloakUser.set(null);
+        this.keycloakSearchResults.set([]);
+        this.keycloakSearchTerm = '';
+      },
+      error: (err) => {
+        console.error('[Owner Management] Error saving owner:', err);
+        this.translateService.get('coproperty.messages.error').subscribe((msg) => {
+          this.showAlert('danger', msg);
+        });
+      }
+    });
+  }
+
+  /**
+   * Search Keycloak for registered users by email.
+   * Only shows users who are not already owners in this coproperty.
+   */
+  private async searchKeycloakUsers(email: string): Promise<void> {
+    this.keycloakSearchLoading.set(true);
+    try {
+      const users = await this.keycloakService.searchKeycloakUsers(email);
+      // Filter out users who are already owners
+      const existingOwnerUserIds = new Set(this.owners.map(o => o.userId).filter(Boolean));
+      const filtered = users.filter(u => !existingOwnerUserIds.has(u.id));
+      this.keycloakSearchResults.set(filtered);
+    } catch (err) {
+      console.error('[Owner Management] Keycloak search error:', err);
+      this.keycloakSearchResults.set([]);
+    } finally {
+      this.keycloakSearchLoading.set(false);
     }
   }
 
   /**
-   * Find existing Keycloak user by email, or create a new one.
-   * Returns the Keycloak user ID (UUID).
+   * Triggered when the syndic types in the Keycloak user search box
    */
-  private async resolveKeycloakUserId(formValue: any): Promise<string> {
-    const email = formValue.email;
-    
-    // Check if user already exists in Keycloak
-    const existingUserId = await this.keycloakService.findUserByEmail(email);
-    if (existingUserId) {
-      console.log('[Owner Management] Keycloak user already exists:', existingUserId);
-      // Ensure the coproperty-owner role is assigned
-      await this.keycloakService.assignRoleToUser(existingUserId, 'coproperty-owner');
-      return existingUserId;
+  onKeycloakSearchInput(): void {
+    this.keycloakSearch$.next(this.keycloakSearchTerm);
+    if (this.keycloakSearchTerm.length < 2) {
+      this.keycloakSearchResults.set([]);
     }
+  }
 
-    // Create a new Keycloak user with a temporary password
-    const defaultPassword = 'Changeme123!';
-    const newUserId = await this.keycloakService.createUser({
-      firstName: formValue.firstName,
-      lastName: formValue.lastName,
-      email: email,
-      password: defaultPassword,
-      role: 'coproperty-owner',
-      enabled: true,
+  /**
+   * Select a Keycloak user to create as owner
+   */
+  selectKeycloakUser(user: KeycloakUser): void {
+    this.selectedKeycloakUser.set(user);
+    this.keycloakSearchResults.set([]);
+    this.keycloakSearchTerm = '';
+    
+    // Pre-fill form with Keycloak user data (read-only)
+    this.ownerForm.patchValue({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
     });
+  }
 
-    console.log('[Owner Management] Created new Keycloak user:', newUserId);
-    return newUserId;
+  /**
+   * Clear the selected Keycloak user
+   */
+  clearSelectedUser(): void {
+    this.selectedKeycloakUser.set(null);
+    this.ownerForm.patchValue({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+    });
+  }
+
+  /**
+   * Toggle coproperty-owner role on/off for an existing owner in the table
+   */
+  async toggleOwnerRole(owner: Owner): Promise<void> {
+    if (!owner.userId) return;
+    
+    this.assigningRole.set(owner.userId);
+    try {
+      if (owner.hasOwnerRole) {
+        await this.keycloakService.unassignRoleFromUser(owner.userId, 'coproperty-owner');
+        owner.hasOwnerRole = false;
+        this.translateService.get('common.roleUnassigned').subscribe(msg => this.showAlert('info', msg));
+      } else {
+        await this.keycloakService.assignRoleToUser(owner.userId, 'coproperty-owner');
+        owner.hasOwnerRole = true;
+        this.translateService.get('common.roleAssigned').subscribe(msg => this.showAlert('success', msg));
+      }
+    } catch (err) {
+      console.error('[Owner Management] Role toggle error:', err);
+      this.translateService.get('coproperty.messages.error').subscribe(msg => this.showAlert('danger', msg));
+    } finally {
+      this.assigningRole.set(null);
+    }
+  }
+
+  /**
+   * Check if a Keycloak user has the coproperty-owner role
+   */
+  userHasOwnerRole(user: KeycloakUser): boolean {
+    return user.roles.includes('coproperty-owner');
   }
 
   cancelForm(): void {
     this.showAddForm = false;
     this.editingOwnerId = null;
     this.ownerForm.reset();
+    this.selectedKeycloakUser.set(null);
+    this.keycloakSearchResults.set([]);
+    this.keycloakSearchTerm = '';
   }
 
   getOwnerFullName(owner: Owner): string {
@@ -382,7 +516,7 @@ export class OwnerManagementComponent implements OnInit {
     this.ownerForm.patchValue({ selectedUnits: [...selectedUnits] });
   }
 
-  private showAlert(type: 'success' | 'danger' | 'warning', message: string) {
+  private showAlert(type: 'success' | 'danger' | 'warning' | 'info', message: string) {
     this.alert.set({type, message});
     setTimeout(() => this.alert.set({type: null, message: ''}), 5000);
   }

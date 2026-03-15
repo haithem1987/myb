@@ -7,6 +7,7 @@ export const environment = {
   services: {
     keycloak: {
       url: 'http://localhost:8080',
+      adminUrl: 'http://localhost:8080',
       realm: 'MYB',
       clientId: 'MYB-client',
     },

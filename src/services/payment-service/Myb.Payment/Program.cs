@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Myb.Common.Authentification.Extensions;
+using Myb.Common.Messaging;
 using Myb.Payment;
 using Myb.Payment.EntityFrameWork.Infra;
 
@@ -33,6 +34,7 @@ builder.Services.AddDbContext<PaymentContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PaymentDBConnection")));
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddEmailPublisher();
 builder.AddKeycloakSettings();
 builder.Services.AddServices();
 builder.Services.AddEndpointsApiExplorer();

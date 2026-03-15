@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
+import { noProfileGuard, completeProfileGuard } from 'libs/coproperty-module/src/lib/guards/profile.guard';
 export const appRoutes: Route[] = [
   // {
   //   path: 'home',
@@ -11,6 +12,30 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('@myb-front/shared-ui').then((c) => c.LandingPageComponent),
   },
+
+  // ─── Owner Self-Registration Flow ───────────────────────────────────────────
+  {
+    path: 'register',
+    children: [
+      {
+        path: '',
+        canActivate: [noProfileGuard],
+        loadComponent: () =>
+          import('@myb-front/coproperty-module').then(
+            (m) => m.OwnerRegistrationComponent
+          ),
+      },
+      {
+        path: 'complete-profile',
+        canActivate: [completeProfileGuard],
+        loadComponent: () =>
+          import('@myb-front/coproperty-module').then(
+            (m) => m.OwnerProfileCompletionComponent
+          ),
+      },
+    ],
+  },
+  // ────────────────────────────────────────────────────────────────────────────
 
   {
     path: 'users',

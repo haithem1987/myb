@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Myb.Common.Messaging;
 using Myb.Common.Repositories;
 using Myb.Notification.Hubs;
 using Myb.Notification.Providers;
@@ -30,6 +31,7 @@ public static class Configuration
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<IUserIdProvider, KeycloakUserIdProvider>();
         builder.Services.AddScoped<INotificationService, NotificationService>();
+        builder.Services.AddEmailPublisher();
         builder.Services.AddControllers();
     }
 

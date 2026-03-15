@@ -4,6 +4,8 @@ using HotChocolate.Authorization;
 using Myb.Common.Authentification.Dtos;
 using Myb.Common.Authentification.Exceptions;
 using Myb.Common.Authentification.Interfaces;
+using Myb.Common.Messaging;
+using Myb.Common.Messaging.Models;
 using Myb.Common.Repositories;
 using Myb.UserManager.EntityFrameWork.Infra;
 using Myb.UserManager.Models;
@@ -13,12 +15,14 @@ namespace Myb.UserManager.Sevices
     public class UserService : IUserService 
     {
         private readonly IGenericRepository<int?,User, UserContext> _genericRepo;
-        private readonly IKeycloakTokenService _keycloakTokenService; 
+        private readonly IKeycloakTokenService _keycloakTokenService;
+        private readonly IEmailPublisher _emailPublisher;
 
-        public UserService(IGenericRepository<int?, User, UserContext> genericRepository ,IKeycloakTokenService keycloakTokenService)
+        public UserService(IGenericRepository<int?, User, UserContext> genericRepository, IKeycloakTokenService keycloakTokenService, IEmailPublisher emailPublisher)
         {
             _genericRepo = genericRepository;
             _keycloakTokenService = keycloakTokenService;
+            _emailPublisher = emailPublisher;
         }
 
         public User? GetById(int? id)
@@ -37,6 +41,22 @@ namespace Myb.UserManager.Sevices
         public async Task<User?> Add(User user)
         {
             var result = await _genericRepo.InsertAsync(user);
+
+            if (result.Entity != null)
+            {
+                await _emailPublisher.PublishAsync(new EmailMessage
+                {
+                    To = result.Entity.Username,
+                    Subject = "Bienvenue sur MYB Platform",
+                    HtmlBody = $@"<h1>Bienvenue {result.Entity.Name} !</h1>
+                        <p>Votre compte a été créé avec succès sur la plateforme MYB.</p>
+                        <p>Vous pouvez maintenant vous connecter et accéder à tous nos services.</p>
+                        <br/>
+                        <p>Cordialement,<br/>L'équipe MYB</p>",
+                    Source = "user-manager"
+                });
+            }
+
             return result.Entity;
         }
         public async Task<User?> Update(User user) 

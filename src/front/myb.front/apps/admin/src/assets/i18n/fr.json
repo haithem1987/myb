@@ -318,7 +318,20 @@
       "units": "Lots Possédés",
       "unitRequired": "Veuillez sélectionner au moins un lot",
       "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce copropriétaire ?",
-      "selectCopropertyHelp": "Sélectionnez d'abord la copropriété pour afficher les lots disponibles"
+    "selectCopropertyHelp": "Sélectionnez d'abord la copropriété pour afficher les lots disponibles",
+    "linkExistingUser": "Lier un utilisateur existant",
+    "searchUserByEmail": "Rechercher un utilisateur inscrit par email",
+    "userFound": "Utilisateur trouvé",
+    "userNotRegistered": "Cet utilisateur n'est pas encore inscrit. Il doit d'abord créer un compte.",
+    "roleStatus": "Statut du rôle",
+    "hasOwnerRole": "Rôle copropriétaire actif",
+    "noOwnerRole": "Rôle copropriétaire non attribué",
+    "assignOwnerRole": "Attribuer le rôle copropriétaire",
+    "removeOwnerRole": "Retirer le rôle copropriétaire",
+    "createFromUser": "Créer le copropriétaire à partir de l'utilisateur",
+    "noRegisteredUsers": "Aucun utilisateur inscrit sans profil copropriétaire",
+    "pendingUsers": "Utilisateurs en attente d'attribution",
+    "pendingUsersHelp": "Ces utilisateurs se sont inscrits mais n'ont pas encore été assignés comme copropriétaires"
     },
     "messages": {
       "created": "La copropriété a été créée avec succès",
@@ -382,6 +395,57 @@
     "minLength": "Longueur minimale non atteinte",
     "min": "La valeur minimale doit être de",
     "email": "Email invalide",
-    "pattern": "Format invalide"
+    "pattern": "Format invalide",
+    "phoneInvalid": "Format de numéro de téléphone invalide"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "error": {
+      "notAuthenticated": "Vous devez être connecté pour continuer."
+    },
+    "register": {
+      "title": "Rejoignez MYB",
+      "subtitle": "Créez votre compte copropriétaire pour gérer vos biens.",
+      "withGoogle": "Continuer avec Google",
+      "withEmail": "S'inscrire par e-mail",
+      "alreadyAccount": "Vous avez déjà un compte ?",
+      "completeProfile": "Complétez votre profil",
+      "completeProfileSubtitle": "Presque fini ! Ajoutez votre numéro de téléphone pour finaliser votre inscription.",
+      "emailFromKeycloak": "L'email est géré par votre fournisseur d'authentification.",
+      "unitsAssignedLater": "Vos lots seront attribués par l'administrateur après validation.",
+      "saveProfile": "Finaliser l'inscription",
+      "profileSaved": "Votre profil a été enregistré avec succès. Redirection...",
+      "profileError": "Une erreur est survenue lors de l'enregistrement de votre profil. Veuillez réessayer."
+    }
+  },
+  "common": {
+    "or": "ou",
+    "email": "Email",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "actions": "Actions",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée trouvée",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "editAction": "Modifier",
+    "deleteAction": "Supprimer",
+    "searchOwners": "Rechercher des copropriétaires...",
+    "searchUnits": "Rechercher des lots...",
+    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par email...",
+    "status": "Statut",
+    "role": "Rôle",
+    "assignRole": "Attribuer le rôle",
+    "unassignRole": "Retirer le rôle",
+    "roleAssigned": "Rôle attribué avec succès",
+    "roleUnassigned": "Rôle retiré avec succès",
+    "userNotFound": "Aucun utilisateur trouvé avec cet email",
+    "keycloakUser": "Utilisateur Keycloak",
+    "registeredUsers": "Utilisateurs inscrits"
   }
 }

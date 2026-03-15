@@ -58,6 +58,12 @@
       </nav>
       
       <div class="user-section">
+        <!-- Switch to syndic space if user has dual role -->
+        <button class="btn-switch-role" *ngIf="isSyndic()" (click)="switchToSyndicSpace()" title="Espace Syndic">
+          <i class="bi bi-shield-check"></i>
+          <span>Espace Syndic</span>
+        </button>
+
         <div class="user-info" *ngIf="currentUser()">
           <div class="user-avatar">
             {{ currentUser().firstName[0] }}{{ currentUser().lastName[0] }}

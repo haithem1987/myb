@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\common\Myb.Common.Authentification\Myb.Common.Authentification.csproj" />
     <ProjectReference Include="..\..\..\common\Myb.Common.Repositories\Myb.Common.Repositories.csproj" />
+    <ProjectReference Include="..\..\..\common\Myb.Common.Messaging\Myb.Common.Messaging.csproj" />
     <ProjectReference Include="..\Myb.UserManager.EntityFrameWork.Infra\Myb.UserManager.EntityFrameWork.Infra.csproj" />
     <ProjectReference Include="..\Myb.UserManager.Models\Myb.UserManager.Models.csproj" />
   </ItemGroup>

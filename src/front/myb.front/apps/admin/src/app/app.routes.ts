@@ -7,6 +7,8 @@ import { AdminHomeComponent } from './admin-home/admin-home.component';
 import { environment } from '../environments/environment';
 import { KeycloakService } from '@myb-front/auth';
 
+import { noProfileGuard, completeProfileGuard } from '@myb-front/coproperty-module';
+
 @Component({
   standalone: true,
   imports: [CommonModule],
@@ -74,6 +76,29 @@ export const appRoutes: Route[] = [
     component: AdminHomeComponent,
     canActivate: [authGuard],
   },
+  // ─── Owner Self-Registration Flow (works on admin app too) ──────────────────
+  {
+    path: 'register',
+    children: [
+      {
+        path: '',
+        canActivate: [noProfileGuard],
+        loadComponent: () =>
+          import('@myb-front/coproperty-module').then(
+            (m) => m.OwnerRegistrationComponent
+          ),
+      },
+      {
+        path: 'complete-profile',
+        canActivate: [completeProfileGuard],
+        loadComponent: () =>
+          import('@myb-front/coproperty-module').then(
+            (m) => m.OwnerProfileCompletionComponent
+          ),
+      },
+    ],
+  },
+  // ────────────────────────────────────────────────────────────────────────────
   {
     path: 'coproperty',
     canActivate: [authGuard],

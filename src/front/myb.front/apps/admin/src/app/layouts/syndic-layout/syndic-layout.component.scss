@@ -6,7 +6,7 @@
   &.collapsed .sidebar {
     width: 80px;
     
-    .nav-text, .role-badge, .user-details, .btn-logout span {
+    .nav-text, .role-badge, .user-details, .btn-logout span, .btn-switch-role span {
       display: none;
     }
     
@@ -159,6 +159,30 @@
       }
     }
     
+    .btn-switch-role {
+      width: 100%;
+      padding: 10px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.875rem;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: rgba(16, 185, 129, 0.3);
+        color: white;
+      }
+
+      i { font-size: 16px; flex-shrink: 0; }
+    }
+
     .btn-logout {
       width: 100%;
       padding: 10px;

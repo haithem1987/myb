@@ -14,7 +14,7 @@ export class KeycloakService {
   public profile$: Observable<KeycloakProfile | null> =
     this.profileSubject.asObservable();
 
-  private adminToken: string | null = null;
+  private get currentUserToken(): string { return this.keycloak?.token ?? ''; }
   private clientIdCache: string | null = null; // Cache clientId here
   private userIdSubject: BehaviorSubject<string | null> = new BehaviorSubject<
     string | null
@@ -24,6 +24,30 @@ export class KeycloakService {
   private initialized = false;
 
   constructor(private http: HttpClient, @Inject(ENVIRONMENT) private environment: any) {}
+
+  /**
+   * URL for Keycloak Admin REST API calls.
+   * In development this points to the Angular dev proxy (/keycloak-admin) to avoid
+   * CORS errors when calling Keycloak's admin endpoints from the browser.
+   * In production this points directly to the Keycloak server.
+   */
+  private get keycloakAdminUrl(): string {
+    return this.environment.services.keycloak.adminUrl
+      ?? this.environment.services.keycloak.url;
+  }
+
+  /**
+   * Normalizes a Keycloak user ID to the standard UUID format (with hyphens).
+   * Some backends store UUIDs without hyphens (32 hex chars); Keycloak Admin API
+   * requires the hyphenated form: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   */
+  private normalizeUuid(id: string): string {
+    const clean = id.replace(/-/g, '');
+    if (clean.length === 32) {
+      return `${clean.slice(0,8)}-${clean.slice(8,12)}-${clean.slice(12,16)}-${clean.slice(16,20)}-${clean.slice(20)}`;
+    }
+    return id;
+  }
 
   async init(): Promise<boolean> {
     // If already initialized, return the authentication status
@@ -74,17 +98,48 @@ export class KeycloakService {
     });
   }
 
-  login(): void {
-    // Use the origin + path without query params to avoid redirect loops
-    const redirectUri = window.location.origin + window.location.pathname;
-    console.log('Redirecting to Keycloak login with redirectUri:', redirectUri);
-    this.keycloak.login({
-      redirectUri: redirectUri,
+  /**
+   * Redirect to Keycloak login.
+   * @param redirectUri Where Keycloak should redirect after login.
+   *                    Defaults to current origin + pathname if omitted.
+   */
+  login(redirectUri?: string): void {
+    const uri = redirectUri ?? (window.location.origin + window.location.pathname);
+    console.log('Redirecting to Keycloak login with redirectUri:', uri);
+    this.keycloak.login({ redirectUri: uri });
+  }
+
+  /**
+   * Redirect to Keycloak registration page.
+   * After successful registration + email verification, Keycloak redirects to `redirectUri`.
+   */
+  registerWithRedirect(redirectUri?: string): void {
+    this.keycloak.register({
+      redirectUri: redirectUri ?? (window.location.origin + '/register/complete-profile'),
     });
   }
 
+  /**
+   * Trigger Keycloak login with Google identity provider hint.
+   * Keycloak must have a "google" social IDP configured in the realm.
+   */
+  loginWithGoogle(redirectUri?: string): void {
+    this.keycloak.login({
+      idpHint: 'google',
+      redirectUri: redirectUri ?? (window.location.origin + '/register/complete-profile'),
+    });
+  }
+
+  /** @deprecated Use registerWithRedirect instead */
   register(): void {
     this.keycloak.register();
+  }
+
+  /**
+   * Returns the Keycloak user ID (sub) of the currently authenticated user.
+   */
+  getUserId(): string | null {
+    return this.userIdSubject.value;
   }
 
   logout(): void {
@@ -168,51 +223,18 @@ export class KeycloakService {
     });
   }
 
-  private async getAdminToken(): Promise<void> {
-    const body = new URLSearchParams();
-    body.set('client_id', 'admin-cli');
-    //body.set('client_secret', 'RvzjCKDdaxuhPB6bkHYSbR2Sx9f8lNMm');
-    body.set('username', 'admin');
-    body.set('password', 'admin');
-    body.set('grant_type', 'password');
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/x-www-form-urlencoded',
-    });
-
-    try {
-      const keycloakUrl = this.environment.services.keycloak.url;
-      const response: any = await firstValueFrom(
-        this.http.post(
-          `${keycloakUrl}/realms/master/protocol/openid-connect/token`,
-          body.toString(),
-          { headers }
-        )
-      );
-      this.adminToken = response.access_token;
-    } catch (err) {
-      console.error('Error obtaining admin token:', err);
-      this.adminToken = null;
-      throw err;
-    }
-  }
-
   private async getClientId(): Promise<string | null> {
     if (this.clientIdCache) {
       return this.clientIdCache;
     }
 
-    if (!this.adminToken) {
-      await this.getAdminToken();
-    }
-
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.adminToken}`,
+      Authorization: `Bearer ${this.currentUserToken}`,
       'Content-Type': 'application/json',
     });
 
     try {
-      const keycloakUrl = this.environment.services.keycloak.url;
+      const keycloakUrl = this.keycloakAdminUrl;
       const clients: any = await firstValueFrom(
         this.http.get(
           `${keycloakUrl}/admin/realms/MYB/clients?clientId=MYB-client`,
@@ -233,30 +255,18 @@ export class KeycloakService {
   }
 
   async getUsersByEmailForClient(partialEmail: string): Promise<any> {
-    try {
-      if (!this.adminToken) {
-        await this.getAdminToken();
-      }
-      return this.queryUsersByPartialEmailForClient(partialEmail);
-    } catch (err) {
-      console.error('Error fetching admin token:', err);
-      throw err;
-    }
+    return this.queryUsersByPartialEmailForClient(partialEmail);
   }
 
   private async queryUsersByPartialEmailForClient(
     partialEmail: string
   ): Promise<any> {
-    if (!this.adminToken) {
-      throw new Error('Admin token is not available');
-    }
-
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.adminToken}`,
+      Authorization: `Bearer ${this.currentUserToken}`,
     });
 
     try {
-      const keycloakUrl = this.environment.services.keycloak.url;
+      const keycloakUrl = this.keycloakAdminUrl;
       const users: any = await firstValueFrom(
         this.http.get(
           `${keycloakUrl}/admin/realms/MYB/users?email=${partialEmail}`,
@@ -275,7 +285,7 @@ export class KeycloakService {
           );
 
           try {
-            const keycloakUrl = this.environment.services.keycloak.url;
+            const keycloakUrl = this.keycloakAdminUrl;
             const roles: any = await firstValueFrom(
               this.http.get(
                 `${keycloakUrl}/admin/realms/MYB/users/${user.id}/role-mappings/clients/${clientId}`,
@@ -319,16 +329,12 @@ export class KeycloakService {
     role?: string;
     enabled?: boolean;
   }): Promise<string> {
-    if (!this.adminToken) {
-      await this.getAdminToken();
-    }
-
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.adminToken}`,
+      Authorization: `Bearer ${this.currentUserToken}`,
       'Content-Type': 'application/json',
     });
 
-    const keycloakUrl = this.environment.services.keycloak.url;
+    const keycloakUrl = this.keycloakAdminUrl;
 
     // Build the user representation
     const userPayload: any = {
@@ -396,16 +402,13 @@ export class KeycloakService {
    * Returns the user ID if found, null otherwise.
    */
   async findUserByEmail(email: string): Promise<string | null> {
-    if (!this.adminToken) {
-      await this.getAdminToken();
-    }
-
+    // Note: this returns a normalized UUID
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.adminToken}`,
+      Authorization: `Bearer ${this.currentUserToken}`,
       'Content-Type': 'application/json',
     });
 
-    const keycloakUrl = this.environment.services.keycloak.url;
+    const keycloakUrl = this.keycloakAdminUrl;
 
     try {
       const users: any[] = await firstValueFrom(
@@ -425,22 +428,19 @@ export class KeycloakService {
   }
 
   async assignRoleToUser(userId: string, roleName: string): Promise<void> {
+    userId = this.normalizeUuid(userId);
     try {
-      if (!this.adminToken) {
-        await this.getAdminToken();
-      }
-
       const clientId = await this.getClientId();
       if (!clientId) {
         throw new Error('Client ID could not be retrieved');
       }
 
       const headers = new HttpHeaders({
-        Authorization: `Bearer ${this.adminToken}`,
+        Authorization: `Bearer ${this.currentUserToken}`,
         'Content-Type': 'application/json',
       });
 
-      const keycloakUrl = this.environment.services.keycloak.url;
+      const keycloakUrl = this.keycloakAdminUrl;
       const roleUrl = `${keycloakUrl}/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
       const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
 
@@ -454,22 +454,19 @@ export class KeycloakService {
   }
 
   async unassignRoleFromUser(userId: string, roleName: string): Promise<void> {
+    userId = this.normalizeUuid(userId);
     try {
-      if (!this.adminToken) {
-        await this.getAdminToken();
-      }
-
       const clientId = await this.getClientId();
       if (!clientId) {
         throw new Error('Client ID could not be retrieved');
       }
 
       const headers = new HttpHeaders({
-        Authorization: `Bearer ${this.adminToken}`,
+        Authorization: `Bearer ${this.currentUserToken}`,
         'Content-Type': 'application/json',
       });
 
-      const keycloakUrl = this.environment.services.keycloak.url;
+      const keycloakUrl = this.keycloakAdminUrl;
       // Fetch the role information for the specified role
       const roleUrl = `${keycloakUrl}/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
       const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
@@ -491,6 +488,91 @@ export class KeycloakService {
         `Error unassigning role ${roleName} from user ${userId}:`,
         err
       );
+    }
+  }
+
+  /**
+   * Search Keycloak users by email (partial match).
+   * Returns array of { id, email, firstName, lastName, enabled, emailVerified, roles }.
+   */
+  async searchKeycloakUsers(emailSearch: string): Promise<any[]> {
+    try {
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${this.currentUserToken}`,
+        'Content-Type': 'application/json',
+      });
+
+      const keycloakUrl = this.keycloakAdminUrl;
+      const users: any[] = await firstValueFrom(
+        this.http.get<any[]>(
+          `${keycloakUrl}/admin/realms/MYB/users?email=${encodeURIComponent(emailSearch)}&max=20`,
+          { headers }
+        )
+      );
+
+      // Enrich with client roles
+      const clientId = await this.getClientId();
+      const enrichedUsers = await Promise.all(
+        users.map(async (user: any) => {
+          let roles: string[] = [];
+          if (clientId) {
+            try {
+              const userRoles: any[] = await firstValueFrom(
+                this.http.get<any[]>(
+                  `${keycloakUrl}/admin/realms/MYB/users/${user.id}/role-mappings/clients/${clientId}`,
+                  { headers }
+                )
+              );
+              roles = userRoles.map((r: any) => r.name);
+            } catch {
+              // User may have no client role mappings
+            }
+          }
+          return {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            enabled: user.enabled,
+            emailVerified: user.emailVerified,
+            roles,
+          };
+        })
+      );
+
+      return enrichedUsers;
+    } catch (err) {
+      console.error('Error searching Keycloak users:', err);
+      return [];
+    }
+  }
+
+  /**
+   * Get the client roles assigned to a specific Keycloak user.
+   */
+  async getUserClientRoles(userId: string): Promise<string[]> {
+    userId = this.normalizeUuid(userId);
+    try {
+      const clientId = await this.getClientId();
+      if (!clientId) return [];
+
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${this.currentUserToken}`,
+        'Content-Type': 'application/json',
+      });
+
+      const keycloakUrl = this.keycloakAdminUrl;
+      const roles: any[] = await firstValueFrom(
+        this.http.get<any[]>(
+          `${keycloakUrl}/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`,
+          { headers }
+        )
+      );
+
+      return roles.map((r: any) => r.name);
+    } catch (err) {
+      console.error('Error fetching user client roles:', err);
+      return [];
     }
   }
 }

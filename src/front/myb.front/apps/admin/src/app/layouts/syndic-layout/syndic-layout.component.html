@@ -109,18 +109,24 @@
     </nav>
     
     <div class="sidebar-footer">
+      <!-- Switch to coproprietaire space if user has dual role -->
+      <button class="btn-switch-role" *ngIf="isCoproprietaire()" (click)="switchToOwnerSpace()" title="Mon espace Copropriétaire">
+        <i class="bi bi-person-badge"></i>
+        <span class="nav-text">Espace Copropriétaire</span>
+      </button>
+
       <div class="user-info" *ngIf="currentUser()">
         <div class="user-avatar">
           {{ currentUser().firstName[0] }}{{ currentUser().lastName[0] }}
         </div>
         <div class="user-details">
           <div class="user-name">{{ currentUser().firstName }} {{ currentUser().lastName }}</div>
-          <div class="user-email">marie.dubois&#64;example.com</div>
+          <div class="user-role">Syndic</div>
         </div>
       </div>
       <button class="btn-logout" (click)="logout()">
         <i class="bi bi-box-arrow-right"></i>
-        <span>Déconnexion</span>
+        <span class="nav-text">Déconnexion</span>
       </button>
     </div>
   </aside>

@@ -341,13 +341,23 @@ export class AdminHomeComponent implements OnInit {
   // Define all available services with their required roles
   private allServices: ServiceCard[] = [
     {
-      id: 'coproperty',
-      title: 'Coproperty Management',
-      description: 'Manage condominiums, units, charges, invoices, and fund calls.',
-      icon: 'bi bi-building',
-      route: '/coproperty',
-      requiredRoles: ['coproperty-syndic', 'coproperty-owner', 'coproperty-council', 'coproperty-accountant'],
-      color: '#3b82f6',
+      id: 'coproperty-syndic',
+      title: 'Espace Syndic',
+      description: 'Gérez les copropriétés, lots, budgets, appels de fonds et copropriétaires.',
+      icon: 'bi bi-building-gear',
+      route: '/coproperty/syndic/dashboard',
+      requiredRoles: ['coproperty-syndic', 'coproperty-admin', 'system-admin'],
+      color: '#1e40af',
+      available: false
+    },
+    {
+      id: 'coproperty-owner',
+      title: 'Espace Copropriétaire',
+      description: 'Consultez vos lots, factures, demandes de travaux et assemblées générales.',
+      icon: 'bi bi-person-badge',
+      route: '/coproperty/owner/dashboard',
+      requiredRoles: ['coproperty-owner'],
+      color: '#0891b2',
       available: false
     },
     {
@@ -399,6 +409,16 @@ export class AdminHomeComponent implements OnInit {
       requiredRoles: ['system-admin'],
       color: '#6366f1',
       available: false
+    },
+    {
+      id: 'register',
+      title: 'Inscription Copropriétaire',
+      description: 'Compléter votre profil et rejoindre une copropriété en tant que copropriétaire.',
+      icon: 'bi bi-person-plus',
+      route: '/register',
+      requiredRoles: ['*'],
+      color: '#059669',
+      available: false
     }
   ];
 
@@ -423,9 +443,15 @@ export class AdminHomeComponent implements OnInit {
    */
   private autoRedirectByRole() {
     const roles = this.userRoles();
+    const syndicRoles = ['coproperty-syndic', 'coproperty-admin'];
     const copropertyRoles = roles.filter(r =>
       ['coproperty-syndic', 'coproperty-owner', 'coproperty-council', 'coproperty-accountant'].includes(r)
     );
+    const hasSyndic = roles.some(r => syndicRoles.includes(r));
+    const hasOwner = roles.includes('coproperty-owner');
+
+    // If user has BOTH syndic and owner roles, stay on home to let them choose
+    if (hasSyndic && hasOwner) return;
 
     if (copropertyRoles.length === 1) {
       const roleRouteMap: Record<string, string> = {
@@ -466,10 +492,15 @@ export class AdminHomeComponent implements OnInit {
     const userRoles = this.userRoles();
     
     this.allServices.forEach(service => {
-      // Check if user has at least one of the required roles
-      service.available = service.requiredRoles.some(requiredRole => 
-        userRoles.includes(requiredRole)
-      );
+      if (service.requiredRoles.includes('*')) {
+        // Registration card: show only if the user has no coproperty-owner role yet
+        service.available = !userRoles.includes('coproperty-owner');
+      } else {
+        // Check if user has at least one of the required roles
+        service.available = service.requiredRoles.some(requiredRole => 
+          userRoles.includes(requiredRole)
+        );
+      }
     });
   }
 

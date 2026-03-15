@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Myb.Common.Messaging;
 using Myb.Coproperty.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +45,7 @@ builder.Services.AddScoped<Myb.Coproperty.Services.IFinanceService, Myb.Coproper
 builder.Services.AddScoped<Myb.Coproperty.Services.IFundCallService, Myb.Coproperty.Services.FundCallService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IAssemblyService, Myb.Coproperty.Services.AssemblyService>();
 builder.Services.AddScoped<Myb.Coproperty.GraphQL.Mutations.IAuthenticationService, Myb.Coproperty.Services.AuthenticationService>();
+builder.Services.AddEmailPublisher();
 
 // Add GraphQL
 builder.Services

@@ -18,6 +18,15 @@ services:
       - KC_PROXY=edge
       - KC_HOSTNAME_URL=http://localhost:8080
       - KC_HOSTNAME_STRICT_HTTPS=false
+      # SMTP settings used by the configure-keycloak-smtp.sh init script
+      - SMTP_HOST=${SMTP_HOST:-mailhog}
+      - SMTP_PORT=${SMTP_PORT:-1025}
+      - SMTP_FROM=${EMAIL_FROM_ADDRESS:-noreply@myb.com}
+      - SMTP_FROM_DISPLAY_NAME=${EMAIL_FROM_NAME:-MYB Platform}
+      - SMTP_SSL=${SMTP_SSL:-false}
+      - SMTP_STARTTLS=${SMTP_STARTTLS:-false}
+      - SMTP_AUTH=${SMTP_AUTH:-false}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM:-myb}
     networks:
       - my-network
     volumes:
@@ -32,6 +41,8 @@ services:
     depends_on:
       keycloak-db:
         condition: service_healthy
+      mailhog:
+        condition: service_started
 
   # Keycloak PostgreSQL Database
   keycloak-db:
@@ -151,6 +162,8 @@ services:
         condition: service_healthy
       timesheetDB:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -160,6 +173,7 @@ services:
       - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
       - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
       - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+      - RabbitMq__Host=rabbitmq
     restart: on-failure
 
   # votre service Timesheet
@@ -265,6 +279,8 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -275,7 +291,35 @@ services:
       - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
       - Stripe__SecretKey=${STRIPE_SECRET_KEY:-sk_test_dummy_key}
       - Stripe__PublishableKey=${STRIPE_PUBLISHABLE_KEY:-pk_test_dummy_key}
+      - RabbitMq__Host=rabbitmq
     restart: on-failure
+
+  # Message Broker
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - my-network
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Dev mail catcher (replace with real SMTP in prod)
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - my-network
 
   # votre service Notification
   myb-notification:
@@ -287,6 +331,8 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -295,8 +341,31 @@ services:
       - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
       - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
       - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
-      - SendGrid__ApiKey=${SENDGRID_API_KEY:-sg_test_dummy_key}
-      - Email__FromAddress=${EMAIL_FROM_ADDRESS:-noreply@myb.com}
+      - RabbitMq__Host=rabbitmq
+    restart: on-failure
+
+  # Service dédié envoi de mails (consomme la queue RabbitMQ)
+  myb-mailer:
+    build:
+      context: .
+      dockerfile: ./src/services/mailer-service/Myb.Mailer/Dockerfile
+    ports:
+      - "8089:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - my-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - RabbitMq__Host=rabbitmq
+      - Smtp__Host=${SMTP_HOST:-mailhog}
+      - Smtp__Port=${SMTP_PORT:-1025}
+      - Smtp__FromAddress=${EMAIL_FROM_ADDRESS:-noreply@myb.com}
+      - Smtp__FromName=${SMTP_FROM_NAME:-MYB Platform}
+      - Smtp__EnableSsl=${SMTP_ENABLE_SSL:-false}
+      - Smtp__Username=${SMTP_USERNAME:-}
+      - Smtp__Password=${SMTP_PASSWORD:-}
     restart: on-failure
 
   # votre service Coproperty Management
@@ -311,6 +380,8 @@ services:
         condition: service_healthy
       copropertyDB:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -320,6 +391,7 @@ services:
       - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
       - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
       - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+      - RabbitMq__Host=rabbitmq
     restart: on-failure
 
 networks:
@@ -333,3 +405,4 @@ volumes:
   postgres_document_data:
   postgres_invoice_data:
   postgres_coproperty_data:
+  rabbitmq_data:

@@ -32,6 +32,7 @@
 
     <ItemGroup>
       <ProjectReference Include="../../../common/Myb.Common.Repositories/Myb.Common.Repositories.csproj" />
+      <ProjectReference Include="../../../common/Myb.Common.Messaging/Myb.Common.Messaging.csproj" />
     </ItemGroup>
 
 </Project>

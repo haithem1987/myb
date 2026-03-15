@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Myb.Common.Messaging;
+using Myb.Common.Messaging.Models;
 using Myb.Common.Repositories;
 using Myb.Notification.Hubs;
 
@@ -10,15 +12,18 @@ public class NotificationService : INotificationService
     private readonly IDbContextFactory<NotificationContext> _contextFactory;
     private readonly IGenericRepository<string?, Models.Notification, NotificationContext> _notificationRepository;
     private readonly IHubContext<NotificationHub> _hubContext;
+    private readonly IEmailPublisher _emailPublisher;
 
     public NotificationService(
         IGenericRepository<string?, Models.Notification, NotificationContext> notificationRepository,
         IDbContextFactory<NotificationContext> contextFactory,
-        IHubContext<NotificationHub> hubContext)
+        IHubContext<NotificationHub> hubContext,
+        IEmailPublisher emailPublisher)
     {
         _notificationRepository = notificationRepository;
         _contextFactory = contextFactory;
         _hubContext = hubContext;
+        _emailPublisher = emailPublisher;
     }
 
     public async Task SendNotificationAsync(string senderId, string receiverId, string message)
@@ -59,5 +64,16 @@ public class NotificationService : INotificationService
             Console.WriteLine(e);
             throw new InvalidOperationException("Failed to send notification.");
         }
+    }
+
+    public async Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody)
+    {
+        await _emailPublisher.PublishAsync(new EmailMessage
+        {
+            To = receiverEmail,
+            Subject = subject,
+            HtmlBody = htmlBody,
+            Source = "notification-service"
+        });
     }
 }

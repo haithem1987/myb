@@ -25,14 +25,17 @@
         (input)="onSearchChange($event)"
         (focus)="onFocus()"
         (blur)="onBlur()"
-        placeholder="Search or add manager..."
+        [placeholder]="isLoading() ? 'Loading managers...' : 'Search or add manager...'"
+        [disabled]="isLoading()"
       />
       <button 
         class="btn btn-outline-secondary" 
         type="button"
         (click)="toggleDropdown()"
+        [disabled]="isLoading()"
       >
-        <i class="bi" [class.bi-chevron-down]="!isDropdownOpen()" [class.bi-chevron-up]="isDropdownOpen()"></i>
+        <span *ngIf="isLoading()" class="spinner-border spinner-border-sm" role="status"></span>
+        <i *ngIf="!isLoading()" class="bi" [class.bi-chevron-down]="!isDropdownOpen()" [class.bi-chevron-up]="isDropdownOpen()"></i>
       </button>
     </div>
 

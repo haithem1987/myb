@@ -1,4 +1,5 @@
 using MailKit.Net.Smtp;
+using MailKit.Security;
 using MimeKit;
 using Myb.Common.Messaging.Models;
 
@@ -34,10 +35,23 @@ public class SmtpEmailSender : ISmtpEmailSender
         message.Body = new TextPart("html") { Text = email.HtmlBody };
 
         using var client = new SmtpClient();
-        var useSsl = bool.Parse(smtp["EnableSsl"] ?? "false");
         var port = int.Parse(smtp["Port"] ?? "1025");
+        var enableSsl = bool.Parse(smtp["EnableSsl"] ?? "false");
+        var startTls = bool.Parse(smtp["StartTls"] ?? "false");
 
-        await client.ConnectAsync(smtp["Host"] ?? "mailhog", port, useSsl);
+        // Determine connection security:
+        // - StartTls=true  → STARTTLS on port 587 (Gmail, SendGrid, etc.)
+        // - EnableSsl=true → implicit SSL on port 465
+        // - Neither        → no encryption (Mailhog dev)
+        SecureSocketOptions socketOptions;
+        if (startTls)
+            socketOptions = SecureSocketOptions.StartTls;
+        else if (enableSsl)
+            socketOptions = SecureSocketOptions.SslOnConnect;
+        else
+            socketOptions = SecureSocketOptions.None;
+
+        await client.ConnectAsync(smtp["Host"] ?? "mailhog", port, socketOptions);
 
         if (!string.IsNullOrEmpty(smtp["Username"]))
             await client.AuthenticateAsync(smtp["Username"], smtp["Password"]);

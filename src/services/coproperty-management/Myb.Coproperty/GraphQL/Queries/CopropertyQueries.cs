@@ -3,6 +3,7 @@ using HotChocolate.Types;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Models.Dtos;
 using Myb.Coproperty.Services;
+using System.Collections.Generic;
 
 namespace Myb.Coproperty.GraphQL.Queries
 {
@@ -43,5 +44,13 @@ namespace Myb.Coproperty.GraphQL.Queries
             int year,
             [Service] IFinanceService financeService) =>
             await financeService.GenerateFinancialReportAsync(copropertyId, year);
+
+        /// <summary>
+        /// Get Keycloak users that hold the manager/syndic role.
+        /// The role is created automatically if it does not yet exist.
+        /// </summary>
+        public async Task<IEnumerable<ManagerDto>> GetManagers(
+            [Service] IKeycloakAdminService keycloakAdminService) =>
+            await keycloakAdminService.GetManagersByRoleAsync();
     }
 }

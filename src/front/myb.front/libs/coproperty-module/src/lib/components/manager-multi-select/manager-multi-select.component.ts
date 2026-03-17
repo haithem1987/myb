@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CopropertyService } from '../../services/coproperty.service';
 
 interface ManagerOption {
   value: string;
@@ -19,23 +20,19 @@ export class ManagerMultiSelectComponent implements OnInit, OnChanges {
   @Input() selectedManager: string | null = null;
   @Output() managerSelected = new EventEmitter<{ name: string }>();
 
+  private copropertyService = inject(CopropertyService);
+
   searchTerm = signal<string>('');
   isDropdownOpen = signal<boolean>(false);
   selectedManagerName = signal<string>('');
   isManagerUsed = signal<boolean>(false);
+  isLoading = signal<boolean>(false);
 
-  // Mock data - in production, this would come from a service
-  availableManagers = signal<ManagerOption[]>([
-    { value: 'Jean Dupont', label: 'Jean Dupont' },
-    { value: 'Marie Martin', label: 'Marie Martin' },
-    { value: 'Pierre Durand', label: 'Pierre Durand' },
-    { value: 'Sophie Bernard', label: 'Sophie Bernard' },
-    { value: 'Thomas Petit', label: 'Thomas Petit' }
-  ]);
-
+  availableManagers = signal<ManagerOption[]>([]);
   filteredManagers = signal<ManagerOption[]>([]);
 
   ngOnInit() {
+    this.loadManagers();
     this.updateSelection();
   }
 
@@ -43,6 +40,25 @@ export class ManagerMultiSelectComponent implements OnInit, OnChanges {
     if (changes['selectedManager']) {
       this.updateSelection();
     }
+  }
+
+  private loadManagers() {
+    this.isLoading.set(true);
+    this.copropertyService.getManagers().subscribe({
+      next: (managers) => {
+        const options: ManagerOption[] = managers.map(m => ({
+          value: m.fullName,
+          label: m.fullName
+        }));
+        this.availableManagers.set(options);
+        this.filteredManagers.set(options);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load managers from Keycloak:', err);
+        this.isLoading.set(false);
+      }
+    });
   }
 
   private updateSelection() {
@@ -105,7 +121,7 @@ export class ManagerMultiSelectComponent implements OnInit, OnChanges {
     this.searchTerm.set('');
     this.isDropdownOpen.set(false);
     
-    // If it's a new manager, add it to the available list
+    // If it's a new manager, add it to the available list temporarily
     if (manager.isNew) {
       this.availableManagers.update(managers => [
         ...managers,
@@ -154,3 +170,4 @@ export class ManagerMultiSelectComponent implements OnInit, OnChanges {
     }, 200);
   }
 }
+

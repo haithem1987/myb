@@ -6,6 +6,12 @@ export * from './owner.model';
 // Export specific types from invoice.model to avoid conflicts
 export type { RecordPaymentInput } from './invoice.model';
 
+export interface ManagerUser {
+  id: string;
+  fullName: string;
+  email: string;
+}
+
 // Input types for mutations
 export interface CreateFundCallInput {
   copropertyId?: string;

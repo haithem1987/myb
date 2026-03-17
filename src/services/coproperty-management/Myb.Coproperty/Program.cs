@@ -47,6 +47,12 @@ builder.Services.AddScoped<Myb.Coproperty.Services.IAssemblyService, Myb.Coprope
 builder.Services.AddScoped<Myb.Coproperty.GraphQL.Mutations.IAuthenticationService, Myb.Coproperty.Services.AuthenticationService>();
 builder.Services.AddEmailPublisher();
 
+// Keycloak Admin API — used for manager role lookup
+builder.Services.Configure<Myb.Coproperty.Services.KeycloakOptions>(
+    builder.Configuration.GetSection(Myb.Coproperty.Services.KeycloakOptions.SectionName));
+builder.Services.AddHttpClient("keycloak-admin");
+builder.Services.AddScoped<Myb.Coproperty.Services.IKeycloakAdminService, Myb.Coproperty.Services.KeycloakAdminService>();
+
 // Add GraphQL
 builder.Services
     .AddGraphQLServer()

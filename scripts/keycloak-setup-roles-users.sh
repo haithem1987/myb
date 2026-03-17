@@ -48,9 +48,12 @@ if [ "$REALM_EXISTS" = "404" ]; then
     -d "{
       \"realm\": \"$REALM\",
       \"enabled\": true,
-      \"registrationAllowed\": false,
+      \"registrationAllowed\": true,
+      \"registrationEmailAsUsername\": true,
+      \"verifyEmail\": true,
       \"loginWithEmailAllowed\": true,
-      \"duplicateEmailsAllowed\": false
+      \"duplicateEmailsAllowed\": false,
+      \"resetPasswordAllowed\": true
     }"
   echo "  ✅ Realm created"
 else

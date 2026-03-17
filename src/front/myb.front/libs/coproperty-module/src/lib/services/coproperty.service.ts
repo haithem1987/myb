@@ -10,7 +10,8 @@ import {
   DashboardStats,
   TreasuryDataPoint,
   ChargeDistributionData,
-  FinancialReport
+  FinancialReport,
+  ManagerUser
 } from '../models';
 
 const GET_COPROPERTIES = gql`
@@ -186,6 +187,16 @@ const GET_FINANCIAL_REPORT = gql`
   }
 `;
 
+const GET_MANAGERS = gql`
+  query GetManagers {
+    managers {
+      id
+      fullName
+      email
+    }
+  }
+`;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -327,6 +338,18 @@ export class CopropertyService {
       })
       .valueChanges.pipe(
           map(result => result.data.financialReport)
+      );
+  }
+
+  getManagers(): Observable<ManagerUser[]> {
+    return this.apollo
+      .watchQuery<{ managers: ManagerUser[] }>({
+        query: GET_MANAGERS,
+        fetchPolicy: 'cache-first',
+        context: { service: 'copropertyService' }
+      })
+      .valueChanges.pipe(
+        map(result => result.data.managers)
       );
   }
 }

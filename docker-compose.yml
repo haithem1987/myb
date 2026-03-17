@@ -15,8 +15,6 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
       - KC_HOSTNAME_STRICT=false
       - KC_HTTP_ENABLED=true
-      - KC_PROXY=edge
-      - KC_HOSTNAME_URL=http://localhost:8080
       - KC_HOSTNAME_STRICT_HTTPS=false
       # SMTP settings used by the configure-keycloak-smtp.sh init script
       - SMTP_HOST=${SMTP_HOST:-mailhog}
@@ -26,7 +24,7 @@ services:
       - SMTP_SSL=${SMTP_SSL:-false}
       - SMTP_STARTTLS=${SMTP_STARTTLS:-false}
       - SMTP_AUTH=${SMTP_AUTH:-false}
-      - KEYCLOAK_REALM=${KEYCLOAK_REALM:-myb}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM:-MYB}
     networks:
       - my-network
     volumes:
@@ -364,6 +362,7 @@ services:
       - Smtp__FromAddress=${EMAIL_FROM_ADDRESS:-noreply@myb.com}
       - Smtp__FromName=${SMTP_FROM_NAME:-MYB Platform}
       - Smtp__EnableSsl=${SMTP_ENABLE_SSL:-false}
+      - Smtp__StartTls=${SMTP_STARTTLS:-false}
       - Smtp__Username=${SMTP_USERNAME:-}
       - Smtp__Password=${SMTP_PASSWORD:-}
     restart: on-failure
@@ -391,6 +390,9 @@ services:
       - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
       - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
       - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
+      - Keycloak__ServiceClientId=${KEYCLOAK_SERVICE_CLIENT_ID:-myb-backend}
+      - Keycloak__ServiceClientSecret=${KEYCLOAK_SERVICE_CLIENT_SECRET:-Iae91CtN9N1a3voLVYW4yFsaA7woSTDD}
+      - Keycloak__ManagerRole=${KEYCLOAK_MANAGER_ROLE:-coproperty-syndic}
       - RabbitMq__Host=rabbitmq
     restart: on-failure
 

@@ -1,0 +1,240 @@
+<div class="charge-payments-container">
+  <div class="page-header">
+    <h1>
+      <i class="bi bi-credit-card-2-front me-2"></i>
+      Suivi des Paiements de Charges
+    </h1>
+    <p class="text-muted">Consultez l'état des paiements de charges par les copropriétaires</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label for="copropertyFilter" class="form-label">
+            <i class="bi bi-building me-1"></i> Copropriété
+          </label>
+          <select
+            id="copropertyFilter"
+            class="form-select"
+            [value]="selectedCopropertyId()"
+            (change)="onCopropertyChange($any($event.target).value)">
+            <option value="">Sélectionner une copropriété</option>
+            <option *ngFor="let c of coproperties()" [value]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="statusFilter" class="form-label">
+            <i class="bi bi-funnel me-1"></i> Statut
+          </label>
+          <select
+            id="statusFilter"
+            class="form-select"
+            [value]="filterStatus()"
+            (change)="onStatusFilterChange($event)">
+            <option value="">Tous les statuts</option>
+            <option value="PAID">Payé</option>
+            <option value="PARTIALLY_PAID">Partiellement payé</option>
+            <option value="UNPAID">Non payé</option>
+            <option value="PENDING">En attente</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="search" class="form-label">
+            <i class="bi bi-search me-1"></i> Recherche
+          </label>
+          <input
+            id="search"
+            type="text"
+            class="form-control"
+            placeholder="Charge, lot, référence..."
+            [value]="searchTerm()"
+            (input)="onSearchInput($event)" />
+        </div>
+
+        <div class="col-md-2">
+          <button class="btn btn-outline-primary w-100" (click)="refreshData()">
+            <i class="bi bi-arrow-clockwise me-1"></i> Actualiser
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-primary">
+              <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Total des Charges</h6>
+              <h3 class="mb-0">{{ formatAmount(totalAmount) }}</h3>
+              <small class="text-muted">{{ filteredDistributions.length }} distribution(s)</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-success">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Montant Encaissé</h6>
+              <h3 class="mb-0">{{ formatAmount(totalPaid) }}</h3>
+              <small class="text-muted">{{ paidCount }} payé(s)</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-danger">
+              <i class="bi bi-exclamation-circle"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Reste à Percevoir</h6>
+              <h3 class="mb-0">{{ formatAmount(totalRemaining) }}</h3>
+              <small class="text-muted">{{ unpaidCount }} en attente</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon bg-info">
+              <i class="bi bi-pie-chart"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="text-muted mb-0">Taux de Recouvrement</h6>
+              <h3 class="mb-0">{{ collectionRate | number:'1.0-0' }}%</h3>
+              <div class="progress mt-1" style="height:4px;width:80px">
+                <div class="progress-bar bg-info" [style.width.%]="collectionRate"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payments Table -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <i class="bi bi-table me-2"></i>
+        Détail des Paiements ({{ filteredDistributions.length }})
+      </h5>
+    </div>
+    <div class="card-body">
+
+      <div *ngIf="loading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading() && filteredDistributions.length === 0" class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <p class="text-muted mt-3">Aucune distribution trouvée</p>
+      </div>
+
+      <div *ngIf="!loading() && filteredDistributions.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Charge</th>
+              <th>Copropriétaire</th>
+              <th>Lot</th>
+              <th>Type</th>
+              <th>Montant</th>
+              <th>Payé</th>
+              <th>Reste</th>
+              <th>Date Paiement</th>
+              <th>Méthode</th>
+              <th>Référence</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of filteredDistributions"
+                [class.table-success]="d.paymentStatus === 'PAID'"
+                [class.table-warning]="d.paymentStatus === 'PARTIALLY_PAID'">
+              <td>
+                <div class="d-flex align-items-center">
+                  <i class="bi me-2" [ngClass]="getChargeTypeIcon(d.chargeType)"></i>
+                  <div>
+                    <strong>{{ d.chargeName }}</strong>
+                    <div class="text-muted small">{{ d.chargeDescription }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-person-fill me-1 text-muted"></i>
+                  <span class="fw-semibold">{{ d.ownerName }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ d.unitNumber }}</span>
+              </td>
+              <td class="text-muted small">{{ d.chargeType }}</td>
+              <td><strong>{{ formatAmount(d.amount) }}</strong></td>
+              <td>
+                <span [class.text-success]="d.paidAmount >= d.amount"
+                      [class.text-warning]="d.paidAmount > 0 && d.paidAmount < d.amount"
+                      [class.text-muted]="!d.paidAmount || d.paidAmount === 0"
+                      class="fw-semibold">
+                  {{ formatAmount(d.paidAmount || 0) }}
+                </span>
+              </td>
+              <td>
+                <span [class.text-danger]="(d.amount - (d.paidAmount || 0)) > 0"
+                      [class.text-success]="(d.amount - (d.paidAmount || 0)) <= 0">
+                  {{ formatAmount(d.amount - (d.paidAmount || 0)) }}
+                </span>
+              </td>
+              <td>{{ formatDate(d.paidAt) }}</td>
+              <td>
+                <span *ngIf="d.paymentMethod" class="badge bg-light text-dark border">
+                  <i class="bi bi-credit-card me-1"></i>{{ d.paymentMethod }}
+                </span>
+                <span *ngIf="!d.paymentMethod" class="text-muted">—</span>
+              </td>
+              <td>
+                <span *ngIf="d.paymentTransactionId" class="text-muted small font-monospace">
+                  {{ d.paymentTransactionId }}
+                </span>
+                <span *ngIf="!d.paymentTransactionId" class="text-muted">—</span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getStatusBadgeClass(d.paymentStatus)">
+                  {{ getStatusLabel(d.paymentStatus) }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

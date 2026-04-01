@@ -430,70 +430,55 @@ export class KeycloakService {
   async assignRoleToUser(userId: string, roleName: string): Promise<void> {
     userId = this.normalizeUuid(userId);
     try {
-      const clientId = await this.getClientId();
-      if (!clientId) {
-        throw new Error('Client ID could not be retrieved');
-      }
-
+      const graphqlUrl = this.getGraphqlUrl();
       const headers = new HttpHeaders({
         Authorization: `Bearer ${this.currentUserToken}`,
         'Content-Type': 'application/json',
       });
-
-      const keycloakUrl = this.keycloakAdminUrl;
-      const roleUrl = `${keycloakUrl}/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
-      const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
-
-      const assignRoleUrl = `${keycloakUrl}/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
-      await firstValueFrom(this.http.post(assignRoleUrl, [role], { headers }));
-
+      const body = {
+        query: `mutation AssignRole($userId: String!, $roleName: String!) {
+          assignUserClientRole(userId: $userId, roleName: $roleName)
+        }`,
+        variables: { userId, roleName }
+      };
+      const response: any = await firstValueFrom(this.http.post(graphqlUrl, body, { headers }));
+      if (response?.errors?.length) throw new Error(response.errors[0].message);
+      if (response?.data?.assignUserClientRole === false) throw new Error('Role assignment failed');
       console.log(`Successfully assigned role ${roleName} to user ${userId}`);
     } catch (err) {
       console.error(`Error assigning role ${roleName} to user ${userId}:`, err);
+      throw err;
     }
   }
 
   async unassignRoleFromUser(userId: string, roleName: string): Promise<void> {
     userId = this.normalizeUuid(userId);
     try {
-      const clientId = await this.getClientId();
-      if (!clientId) {
-        throw new Error('Client ID could not be retrieved');
-      }
-
+      const graphqlUrl = this.getGraphqlUrl();
       const headers = new HttpHeaders({
         Authorization: `Bearer ${this.currentUserToken}`,
         'Content-Type': 'application/json',
       });
-
-      const keycloakUrl = this.keycloakAdminUrl;
-      // Fetch the role information for the specified role
-      const roleUrl = `${keycloakUrl}/admin/realms/MYB/clients/${clientId}/roles/${roleName}`;
-      const role = await firstValueFrom(this.http.get(roleUrl, { headers }));
-
-      // Unassign the role from the user
-      const unassignRoleUrl = `${keycloakUrl}/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`;
-      await firstValueFrom(
-        this.http.request('delete', unassignRoleUrl, {
-          headers,
-          body: [role], // Pass the role object in the body to remove
-        })
-      );
-
-      console.log(
-        `Successfully unassigned role ${roleName} from user ${userId}`
-      );
+      const body = {
+        query: `mutation UnassignRole($userId: String!, $roleName: String!) {
+          unassignUserClientRole(userId: $userId, roleName: $roleName)
+        }`,
+        variables: { userId, roleName }
+      };
+      const response: any = await firstValueFrom(this.http.post(graphqlUrl, body, { headers }));
+      if (response?.errors?.length) throw new Error(response.errors[0].message);
+      if (response?.data?.unassignUserClientRole === false) throw new Error('Role unassignment failed');
+      console.log(`Successfully unassigned role ${roleName} from user ${userId}`);
     } catch (err) {
-      console.error(
-        `Error unassigning role ${roleName} from user ${userId}:`,
-        err
-      );
+      console.error(`Error unassigning role ${roleName} from user ${userId}:`, err);
+      throw err;
     }
   }
 
   /**
    * Search Keycloak users by email (partial match).
-   * Returns array of { id, email, firstName, lastName, enabled, emailVerified, roles }.
+   * Routes through the coproperty backend GraphQL service account to avoid
+   * Keycloak admin API 403 errors with regular user tokens.
    */
   async searchKeycloakUsers(emailSearch: string): Promise<any[]> {
     try {
@@ -502,45 +487,28 @@ export class KeycloakService {
         'Content-Type': 'application/json',
       });
 
-      const keycloakUrl = this.keycloakAdminUrl;
-      const users: any[] = await firstValueFrom(
-        this.http.get<any[]>(
-          `${keycloakUrl}/admin/realms/MYB/users?email=${encodeURIComponent(emailSearch)}&max=20`,
-          { headers }
-        )
-      );
+      const graphqlUrl = this.getGraphqlUrl();
 
-      // Enrich with client roles
-      const clientId = await this.getClientId();
-      const enrichedUsers = await Promise.all(
-        users.map(async (user: any) => {
-          let roles: string[] = [];
-          if (clientId) {
-            try {
-              const userRoles: any[] = await firstValueFrom(
-                this.http.get<any[]>(
-                  `${keycloakUrl}/admin/realms/MYB/users/${user.id}/role-mappings/clients/${clientId}`,
-                  { headers }
-                )
-              );
-              roles = userRoles.map((r: any) => r.name);
-            } catch {
-              // User may have no client role mappings
-            }
+      const body = {
+        query: `query SearchKeycloakUsers($email: String!, $max: Int) {
+          searchKeycloakUsers(email: $email, max: $max) {
+            id
+            email
+            firstName
+            lastName
+            enabled
+            emailVerified
+            roles
           }
-          return {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName || '',
-            lastName: user.lastName || '',
-            enabled: user.enabled,
-            emailVerified: user.emailVerified,
-            roles,
-          };
-        })
+        }`,
+        variables: { email: emailSearch, max: 20 }
+      };
+
+      const response: any = await firstValueFrom(
+        this.http.post(graphqlUrl, body, { headers })
       );
 
-      return enrichedUsers;
+      return response?.data?.searchKeycloakUsers ?? [];
     } catch (err) {
       console.error('Error searching Keycloak users:', err);
       return [];
@@ -549,30 +517,33 @@ export class KeycloakService {
 
   /**
    * Get the client roles assigned to a specific Keycloak user.
+   * Routes through the coproperty backend to avoid 403 with regular user tokens.
    */
   async getUserClientRoles(userId: string): Promise<string[]> {
     userId = this.normalizeUuid(userId);
     try {
-      const clientId = await this.getClientId();
-      if (!clientId) return [];
-
+      const graphqlUrl = this.getGraphqlUrl();
       const headers = new HttpHeaders({
         Authorization: `Bearer ${this.currentUserToken}`,
         'Content-Type': 'application/json',
       });
-
-      const keycloakUrl = this.keycloakAdminUrl;
-      const roles: any[] = await firstValueFrom(
-        this.http.get<any[]>(
-          `${keycloakUrl}/admin/realms/MYB/users/${userId}/role-mappings/clients/${clientId}`,
-          { headers }
-        )
-      );
-
-      return roles.map((r: any) => r.name);
+      const body = {
+        query: `query GetUserClientRoles($userId: String!) {
+          userClientRoles(userId: $userId)
+        }`,
+        variables: { userId }
+      };
+      const response: any = await firstValueFrom(this.http.post(graphqlUrl, body, { headers }));
+      return response?.data?.userClientRoles ?? [];
     } catch (err) {
       console.error('Error fetching user client roles:', err);
       return [];
     }
+  }
+
+  private getGraphqlUrl(): string {
+    return this.environment.services?.coproperty?.graphqlUrl
+      ?? (this.environment.services?.coproperty?.baseUrl + '/graphql')
+      ?? 'http://localhost:8088/graphql';
   }
 }

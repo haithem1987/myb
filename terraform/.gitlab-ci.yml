@@ -1,0 +1,190 @@
+# ==============================================================================
+# MYB Platform - GitLab CI/CD Pipeline
+# Builds Docker images, pushes to ECR, deploys to ECS
+# ==============================================================================
+
+stages:
+  - validate
+  - build
+  - deploy-dev
+  - deploy-staging
+  - deploy-prod
+
+variables:
+  AWS_REGION: eu-west-3
+  PROJECT_NAME: myb
+  DOCKER_BUILDKIT: "1"
+
+# --- Templates ---
+
+.docker-build: &docker-build
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  before_script:
+    - apk add --no-cache aws-cli bash
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+.terraform: &terraform
+  image:
+    name: hashicorp/terraform:1.7
+    entrypoint: [""]
+  before_script:
+    - cd terraform/environments/$ENVIRONMENT
+
+# --- Validate ---
+
+terraform-validate:
+  <<: *terraform
+  stage: validate
+  variables:
+    ENVIRONMENT: dev
+  script:
+    - terraform init -backend=false
+    - terraform validate
+    - terraform fmt -check -recursive ../../
+  only:
+    changes:
+      - terraform/**/*
+
+# --- Build (all services in parallel) ---
+
+.build-service:
+  <<: *docker-build
+  stage: build
+  script:
+    - |
+      ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PROJECT_NAME/$SERVICE_NAME"
+      docker build -t $ECR_URI:$CI_COMMIT_SHORT_SHA -t $ECR_URI:$CI_COMMIT_REF_SLUG -f $DOCKERFILE $CONTEXT
+      docker push $ECR_URI:$CI_COMMIT_SHORT_SHA
+      docker push $ECR_URI:$CI_COMMIT_REF_SLUG
+  only:
+    - main
+    - develop
+    - tags
+
+build-user-manager:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: user-manager
+    DOCKERFILE: src/services/user-manager/Myb.UserManager/Dockerfile
+    CONTEXT: "."
+
+build-timesheet:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: timesheet
+    DOCKERFILE: src/services/time-sheet/Myb.Timesheet/Dockerfile
+    CONTEXT: "."
+
+build-invoice:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: invoice
+    DOCKERFILE: src/services/invoice-management/Myb.Invoice/Dockerfile
+    CONTEXT: "."
+
+build-document:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: document
+    DOCKERFILE: src/services/document-management/Myb.Document/Dockerfile
+    CONTEXT: "."
+
+build-payment:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: payment
+    DOCKERFILE: src/services/payment-service/Myb.Payment/Dockerfile
+    CONTEXT: "."
+
+build-notification:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: notification
+    DOCKERFILE: src/services/notification-service/Myb.Notification/Dockerfile
+    CONTEXT: "."
+
+build-mailer:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: mailer
+    DOCKERFILE: src/services/mailer-service/Myb.Mailer/Dockerfile
+    CONTEXT: "."
+
+build-coproperty:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: coproperty
+    DOCKERFILE: src/services/coproperty-management/Myb.Coproperty/Dockerfile
+    CONTEXT: "."
+
+build-keycloak:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: keycloak
+    DOCKERFILE: Dockerfile.keycloak
+    CONTEXT: "."
+
+build-frontend:
+  extends: .build-service
+  variables:
+    SERVICE_NAME: frontend
+    DOCKERFILE: src/front/myb.front/Dockerfile
+    CONTEXT: src/front/myb.front
+
+# --- Deploy Dev (auto on develop branch) ---
+
+deploy-dev:
+  <<: *terraform
+  stage: deploy-dev
+  variables:
+    ENVIRONMENT: dev
+    TF_VAR_image_tag: $CI_COMMIT_SHORT_SHA
+  script:
+    - terraform init
+    - terraform plan -out=plan.tfplan
+    - terraform apply -auto-approve plan.tfplan
+  environment:
+    name: dev
+    url: http://$ALB_DNS_NAME
+  only:
+    - develop
+
+# --- Deploy Staging (manual trigger) ---
+
+deploy-staging:
+  <<: *terraform
+  stage: deploy-staging
+  variables:
+    ENVIRONMENT: staging
+    TF_VAR_image_tag: $CI_COMMIT_SHORT_SHA
+  script:
+    - terraform init
+    - terraform plan -out=plan.tfplan
+    - terraform apply -auto-approve plan.tfplan
+  environment:
+    name: staging
+    url: https://staging.myb.com
+  when: manual
+  only:
+    - main
+
+# --- Deploy Production (manual with approval) ---
+
+deploy-prod:
+  <<: *terraform
+  stage: deploy-prod
+  variables:
+    ENVIRONMENT: prod
+    TF_VAR_image_tag: $CI_COMMIT_SHORT_SHA
+  script:
+    - terraform init
+    - terraform plan -out=plan.tfplan
+    - terraform apply -auto-approve plan.tfplan
+  environment:
+    name: production
+    url: https://myb.com
+  when: manual
+  only:
+    - tags

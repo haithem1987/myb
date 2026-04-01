@@ -24,5 +24,19 @@ namespace Myb.Coproperty.GraphQL.Mutations
             await copropertyService.DeleteAsync(id);
             return true;
         }
+
+        /// <summary>Assign a Keycloak client role to a user (uses backend service account).</summary>
+        public async Task<bool> AssignUserClientRole(
+            string userId,
+            string roleName,
+            [Service] IKeycloakAdminService keycloakAdminService) =>
+            await keycloakAdminService.AssignClientRoleAsync(userId, roleName);
+
+        /// <summary>Remove a Keycloak client role from a user (uses backend service account).</summary>
+        public async Task<bool> UnassignUserClientRole(
+            string userId,
+            string roleName,
+            [Service] IKeycloakAdminService keycloakAdminService) =>
+            await keycloakAdminService.UnassignClientRoleAsync(userId, roleName);
     }
 }

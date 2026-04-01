@@ -22,11 +22,49 @@ public static class Configuration
         {
             options.AddPolicy("AllowAll", policy =>
             {
-                policy.AllowAnyOrigin()
+                policy.WithOrigins("http://localhost:4200", "http://localhost:4201")
                     .AllowAnyHeader()
-                    .AllowAnyMethod();
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             });
         });
+
+        // JWT Bearer authentication for Keycloak
+        var keycloakSection = builder.Configuration.GetSection("Keycloak");
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = keycloakSection["Authority"];
+                options.Audience = keycloakSection["ClientId"];
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuers = new[]
+                    {
+                        keycloakSection["Authority"],
+                        "http://localhost:8080/realms/MYB"
+                    },
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                };
+                // SignalR sends access token via query string for WebSocket connections
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            path.StartsWithSegments("/notificationhub"))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+        builder.Services.AddAuthorization();
 
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<IUserIdProvider, KeycloakUserIdProvider>();
@@ -37,6 +75,14 @@ public static class Configuration
 
     public static void ConfigureNotificationModuleApp(this WebApplication app)
     {
+        // Auto-create/migrate database
+        using (var scope = app.Services.CreateScope())
+        {
+            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<NotificationContext>>();
+            using var context = factory.CreateDbContext();
+            context.Database.EnsureCreated();
+        }
+
         app.UseCors("AllowAll");
         app.UseAuthentication();
         app.UseAuthorization();

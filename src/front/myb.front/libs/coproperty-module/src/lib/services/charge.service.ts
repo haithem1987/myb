@@ -5,6 +5,7 @@ import {
   GET_ALL_CHARGES,
   GET_CHARGE_BY_ID,
   GET_CHARGES_BY_COPROPERTY,
+  GET_COPROPERTY_CHARGE_DISTRIBUTIONS,
 } from '../graphql/queries/charge.query';
 import {
   CREATE_CHARGE,
@@ -36,6 +37,30 @@ export interface ChargeDistributionExtended {
   amount: number;
   shares?: number;
   area?: number;
+}
+
+export interface ChargeDistributionPayment {
+  id: string;
+  chargeId: string;
+  unitId: string;
+  amount: number;
+  percentage: number;
+  calculatedAt: string;
+  paymentStatus: string;
+  paidAmount: number;
+  paidAt: string | null;
+  paymentTransactionId: string | null;
+  paymentMethod: string | null;
+  unitNumber: string;
+  shares: number;
+  area: number;
+  chargeName: string;
+  chargeDescription: string;
+  chargeType: string;
+  chargeFrequency: string;
+  currency: string;
+  ownerName: string;
+  ownerEmail: string;
 }
 
 @Injectable({
@@ -118,11 +143,22 @@ export class ChargeService {
 
   calculateDistribution(chargeId: string): Observable<ChargeDistributionExtended[]> {
     return this.apollo
-      .mutate<{ calculateChargeDistribution: ChargeDistributionExtended[] }>({
+      .mutate<{ distributeCharge: ChargeDistributionExtended[] }>({
         mutation: CALCULATE_CHARGE_DISTRIBUTION,
         variables: { chargeId },
         context: { service: 'copropertyService' },
       })
-      .pipe(map((result) => result.data!.calculateChargeDistribution));
+      .pipe(map((result) => result.data!.distributeCharge));
+  }
+
+  getCopropertyChargeDistributions(copropertyId: string): Observable<ChargeDistributionPayment[]> {
+    return this.apollo
+      .query<{ copropertyChargeDistributions: ChargeDistributionPayment[] }>({
+        query: GET_COPROPERTY_CHARGE_DISTRIBUTIONS,
+        variables: { copropertyId },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data.copropertyChargeDistributions));
   }
 }

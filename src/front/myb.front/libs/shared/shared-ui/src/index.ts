@@ -58,6 +58,8 @@ export * from './lib/components/access-denied-page/access-denied-page.component'
 
 export * from './lib/components/breadcrumb/breadcrumb.component';
 
+export * from './lib/components/notification-dropdown/notification-dropdown.component';
+
 export * from './lib/components/date-cell/date-cell.component';
 
 export * from './lib/components/payment/payment.component';

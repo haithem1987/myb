@@ -1,0 +1,47 @@
+# ==============================================================================
+# Dev Environment - Terraform Variables
+# Copy this file to terraform.tfvars and fill in actual values
+# NEVER commit terraform.tfvars to version control
+# ==============================================================================
+
+# --- Project ---
+project_name = "myb"
+environment  = "dev"
+aws_region   = "eu-west-3"
+
+# --- Networking ---
+vpc_cidr        = "10.0.0.0/16"
+cors_origins    = ["*"]
+certificate_arn = "" # Leave empty for HTTP-only dev, set ACM ARN for HTTPS
+
+# --- Database ---
+rds_instance_class    = "db.t3.micro"   # ~$15/month (free tier eligible)
+rds_allocated_storage = 20              # GB
+db_master_username    = "myb_admin"
+db_master_password    = "CHANGE_ME_strong_password_here"
+
+# --- Keycloak ---
+keycloak_admin_user            = "admin"
+keycloak_admin_password        = "CHANGE_ME_keycloak_admin"
+keycloak_realm                 = "MYB"
+keycloak_client_id             = "MYB-client"
+keycloak_client_secret         = "CHANGE_ME_client_secret"
+keycloak_service_client_id     = "myb-backend"
+keycloak_service_client_secret = "CHANGE_ME_service_client_secret"
+keycloak_manager_role          = "coproperty-syndic"
+
+# --- RabbitMQ ---
+mq_instance_type  = "mq.t3.micro"   # ~$27/month
+rabbitmq_username = "myb_mq_admin"
+rabbitmq_password = "CHANGE_ME_mq_password_12chars"
+
+# --- Stripe ---
+stripe_secret_key      = "sk_test_your_key_here"
+stripe_publishable_key = "pk_test_your_key_here"
+
+# --- SMTP ---
+smtp_from_address = "noreply@myb.com"
+smtp_from_name    = "MYB Platform"
+
+# --- Deployment ---
+image_tag = "latest"

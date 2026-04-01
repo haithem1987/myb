@@ -40,6 +40,7 @@ export interface CreateCopropertyInput {
   totalUnits: number;
   totalShares: number;
   commonAreas?: string;
+  managerId?: string;
   managerName?: string;
   isActive: boolean;
 }

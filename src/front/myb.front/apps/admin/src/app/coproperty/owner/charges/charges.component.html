@@ -1,0 +1,186 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2 class="mb-1">
+        <i class="bi bi-cash-stack me-2"></i>
+        Mes Charges
+      </h2>
+      <p class="text-muted">Consultez et payez vos charges de copropriété</p>
+    </div>
+    <div class="col-md-4 text-end" *ngIf="unpaidDistributions.length > 0">
+      <button class="btn btn-primary" (click)="payAllCharges()" [disabled]="paying()">
+        <i class="bi bi-credit-card me-2"></i>
+        Tout payer ({{ formatAmount(totalDue) }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-icon bg-primary">
+          <i class="bi bi-calculator"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatAmount(totalCharges) }}</div>
+          <div class="stat-label">Total des charges</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-icon bg-success">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatAmount(totalPaid) }}</div>
+          <div class="stat-label">Montant payé</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-icon" [class.bg-danger]="totalDue > 0" [class.bg-success]="totalDue === 0">
+          <i class="bi" [class.bi-exclamation-circle]="totalDue > 0" [class.bi-check-circle]="totalDue === 0"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatAmount(totalDue) }}</div>
+          <div class="stat-label">Reste à payer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="text-muted mt-3">Chargement de vos charges...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading() && distributions().length === 0" class="empty-state text-center py-5">
+    <i class="bi bi-inbox display-1 text-muted"></i>
+    <h4 class="mt-3">Aucune charge</h4>
+    <p class="text-muted">Aucune charge n'a été distribuée à vos lots pour le moment.</p>
+  </div>
+
+  <!-- Unpaid Charges -->
+  <div *ngIf="!loading() && unpaidDistributions.length > 0" class="mb-4">
+    <h4 class="section-title">
+      <i class="bi bi-clock-history text-warning me-2"></i>
+      Charges à payer ({{ unpaidDistributions.length }})
+    </h4>
+    <div class="charges-grid">
+      <div class="charge-card unpaid" *ngFor="let dist of unpaidDistributions">
+        <div class="charge-header">
+          <div class="charge-type">
+            <i class="bi" [ngClass]="getChargeTypeIcon(dist.chargeType || '')"></i>
+            <span class="type-label">{{ dist.chargeType || 'Charge' }}</span>
+          </div>
+          <span class="status-badge" [ngClass]="getStatusClass(dist.paymentStatus || '')">
+            {{ getStatusLabel(dist.paymentStatus || '') }}
+          </span>
+        </div>
+
+        <div class="charge-body">
+          <h5 class="charge-name">{{ dist.chargeName || 'Charge de copropriété' }}</h5>
+          <p class="charge-desc" *ngIf="dist.chargeDescription">{{ dist.chargeDescription }}</p>
+
+          <div class="charge-details">
+            <div class="detail-row">
+              <span class="detail-label">
+                <i class="bi bi-house-door me-1"></i> Lot
+              </span>
+              <span class="detail-value">{{ dist.unitNumber || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">
+                <i class="bi bi-pie-chart me-1"></i> Tantièmes
+              </span>
+              <span class="detail-value">{{ dist.shares || 0 }}</span>
+            </div>
+            <div class="detail-row" *ngIf="dist.chargeFrequency">
+              <span class="detail-label">
+                <i class="bi bi-calendar me-1"></i> Période
+              </span>
+              <span class="detail-value">{{ dist.chargeFrequency }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="charge-footer">
+          <div class="amount-section">
+            <div class="amount-label">Montant à payer</div>
+            <div class="amount-value">{{ formatAmount(dist.amount - (dist.paidAmount || 0)) }}</div>
+            <div class="amount-total" *ngIf="(dist.paidAmount ?? 0) > 0">
+              sur {{ formatAmount(dist.amount) }}
+            </div>
+          </div>
+          <button
+            class="btn btn-success btn-pay"
+            (click)="payCharge(dist)"
+            [disabled]="paying() !== null">
+            <span *ngIf="paying() === dist.id" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="paying() !== dist.id" class="bi bi-credit-card me-1"></i>
+            {{ paying() === dist.id ? 'Paiement...' : 'Payer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paid Charges -->
+  <div *ngIf="!loading() && paidDistributions.length > 0">
+    <h4 class="section-title">
+      <i class="bi bi-check-circle text-success me-2"></i>
+      Charges payées ({{ paidDistributions.length }})
+    </h4>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Charge</th>
+            <th>Lot</th>
+            <th>Type</th>
+            <th>Période</th>
+            <th class="text-end">Montant</th>
+            <th>Payé le</th>
+            <th>Méthode</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dist of paidDistributions">
+            <td>
+              <strong>{{ dist.chargeName || 'Charge' }}</strong>
+            </td>
+            <td>{{ dist.unitNumber || 'N/A' }}</td>
+            <td>
+              <i class="bi me-1" [ngClass]="getChargeTypeIcon(dist.chargeType || '')"></i>
+              {{ dist.chargeType || '-' }}
+            </td>
+            <td>{{ dist.chargeFrequency || '-' }}</td>
+            <td class="text-end">{{ formatAmount(dist.amount) }}</td>
+            <td>{{ dist.paidAt ? (dist.paidAt | date:'dd/MM/yyyy') : '-' }}</td>
+            <td>{{ dist.paymentMethod || '-' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(dist.paymentStatus || '')">
+                {{ getStatusLabel(dist.paymentStatus || '') }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- All Paid State -->
+  <div *ngIf="!loading() && distributions().length > 0 && unpaidDistributions.length === 0" class="all-paid-banner">
+    <i class="bi bi-check-circle-fill"></i>
+    <span>Toutes vos charges sont payées!</span>
+  </div>
+</div>

@@ -74,6 +74,93 @@ namespace Myb.Coproperty.GraphQL.Types
                 .Type<NonNullType<CurrencyType>>()
                 .Description("The currency from the related Charge's Coproperty")
                 .ResolveWith<ChargeDistributionResolvers>(r => r.GetCurrency(default!, default!));
+
+            // Payment tracking fields
+            descriptor
+                .Field(d => d.PaymentStatus)
+                .Description("Payment status: Unpaid, Pending, Paid, PartiallyPaid, Failed");
+
+            descriptor
+                .Field(d => d.PaidAmount)
+                .Description("Total amount paid so far");
+
+            descriptor
+                .Field(d => d.PaidAt)
+                .Description("Date when the payment was made");
+
+            descriptor
+                .Field(d => d.PaymentTransactionId)
+                .Description("Transaction ID from the payment service");
+
+            descriptor
+                .Field(d => d.PaymentMethod)
+                .Description("Payment method used (Card, BankTransfer, etc.)");
+
+            // Charge details for owner display
+            descriptor
+                .Field("chargeName")
+                .Type<StringType>()
+                .Description("The name of the charge")
+                .Resolve(context =>
+                {
+                    var distribution = context.Parent<ChargeDistribution>();
+                    return distribution.Charge?.Name ?? "";
+                });
+
+            descriptor
+                .Field("chargeDescription")
+                .Type<StringType>()
+                .Description("The description of the charge")
+                .Resolve(context =>
+                {
+                    var distribution = context.Parent<ChargeDistribution>();
+                    return distribution.Charge?.Description ?? "";
+                });
+
+            descriptor
+                .Field("chargeType")
+                .Type<StringType>()
+                .Description("The type of charge (CLEANING, MAINTENANCE, etc.)")
+                .Resolve(context =>
+                {
+                    var distribution = context.Parent<ChargeDistribution>();
+                    return distribution.Charge?.ChargeType.ToString() ?? "";
+                });
+
+            descriptor
+                .Field("chargeFrequency")
+                .Type<StringType>()
+                .Description("The frequency/year of the charge")
+                .Resolve(context =>
+                {
+                    var distribution = context.Parent<ChargeDistribution>();
+                    return distribution.Charge?.Frequency ?? "";
+                });
+
+            // Owner name for syndic view
+            descriptor
+                .Field("ownerName")
+                .Type<StringType>()
+                .Description("Name of the owner of this unit")
+                .Resolve(context =>
+                {
+                    var distribution = context.Parent<ChargeDistribution>();
+                    var owner = distribution.Unit?.OwnerUnits?.FirstOrDefault()?.Owner;
+                    if (owner != null)
+                        return $"{owner.FirstName} {owner.LastName}";
+                    return "Non assigné";
+                });
+
+            descriptor
+                .Field("ownerEmail")
+                .Type<StringType>()
+                .Description("Email of the owner of this unit")
+                .Resolve(context =>
+                {
+                    var distribution = context.Parent<ChargeDistribution>();
+                    var owner = distribution.Unit?.OwnerUnits?.FirstOrDefault()?.Owner;
+                    return owner?.Email ?? "";
+                });
         }
 
         private class ChargeDistributionResolvers

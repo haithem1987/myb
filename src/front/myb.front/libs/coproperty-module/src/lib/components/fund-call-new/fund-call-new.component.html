@@ -79,7 +79,7 @@
           <div class="col-md-6">
             <label for="amount" class="form-label">
               <i class="bi bi-cash-stack me-1"></i>
-              Montant (€) <span class="text-danger">*</span>
+              Montant ({{ currencySymbol }}) <span class="text-danger">*</span>
             </label>
             <input
               type="number"
@@ -198,7 +198,7 @@
               <div class="col-md-4">
                 <label class="form-label">
                   <i class="bi bi-cash-stack me-1"></i>
-                  Montant (€) <span class="text-danger">*</span>
+                  Montant ({{ currencySymbol }}) <span class="text-danger">*</span>
                 </label>
                 <input
                   type="number"
@@ -263,7 +263,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let payment of currentFundCall()!.payments">
-                <td><strong>{{ formatAmount(payment.amount) }} €</strong></td>
+                <td><strong>{{ formatAmount(payment.amount) }}</strong></td>
                 <td>{{ formatDate(payment.paymentDate) }}</td>
                 <td>{{ payment.justificatif || '—' }}</td>
               </tr>

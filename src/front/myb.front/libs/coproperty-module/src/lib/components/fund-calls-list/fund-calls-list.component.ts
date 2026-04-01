@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { FundCallService, FundCallExtended } from '../../services/fund-call.service';
 import { CopropertyService } from '../../services/coproperty.service';
+import { CurrencyService } from '../../services/currency.service';
 import { OwnerService } from '../../services/owner.service';
 import { Coproperty } from '../../models/coproperty.models';
 import { OwnerWithUnits } from '../../models/owner.model';
@@ -33,6 +34,7 @@ import { InvoiceDetails } from 'libs/invoice-module/src/lib/models/invoiceDetail
 export class FundCallsListComponent implements OnInit {
   private fundCallService = inject(FundCallService);
   private copropertyService = inject(CopropertyService);
+  private currencyService = inject(CurrencyService);
   private ownerService = inject(OwnerService);
   private invoiceService = inject(InvoiceService);
   private router = inject(Router);
@@ -480,8 +482,8 @@ export class FundCallsListComponent implements OnInit {
       <tr>
         <td>${line.description ?? ''}</td>
         <td class="center">${line.quantity ?? 1}</td>
-        <td class="right">${fmt(line.unitPriceHT)} €</td>
-        <td class="right"><strong>${fmt((line.quantity ?? 1) * (line.unitPriceHT ?? 0))} €</strong></td>
+        <td class="right">${fmt(line.unitPriceHT)}</td>
+        <td class="right"><strong>${fmt((line.quantity ?? 1) * (line.unitPriceHT ?? 0))}</strong></td>
       </tr>`).join('');
 
     const statusBadge = this.createdInvoice()
@@ -580,11 +582,11 @@ export class FundCallsListComponent implements OnInit {
     <tfoot>
       <tr class="subtotal">
         <td colspan="3" class="right">Sous-total HT</td>
-        <td class="right">${fmt(inv.subTotal)} €</td>
+        <td class="right">${fmt(inv.subTotal)}</td>
       </tr>
       <tr class="total">
         <td colspan="3" class="right"><strong>TOTAL TTC</strong></td>
-        <td class="right"><strong>${fmt(inv.totalAmount)} €</strong></td>
+        <td class="right"><strong>${fmt(inv.totalAmount)}</strong></td>
       </tr>
     </tfoot>
   </table>
@@ -687,12 +689,7 @@ export class FundCallsListComponent implements OnInit {
   }
 
   formatAmount(amount: number | string | undefined | null): string {
-    const n = typeof amount === 'string' ? parseFloat(amount) : (amount ?? NaN);
-    if (isNaN(n)) return '0,00';
-    return new Intl.NumberFormat('fr-FR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(n);
+    return this.currencyService.formatAmount(amount);
   }
 
   formatDate(date: Date | string | undefined): string {

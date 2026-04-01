@@ -1,0 +1,40 @@
+# ==============================================================================
+# MYB Platform - LocalStack (AWS Emulation) for Local Development
+# Usage: docker compose -f docker-compose.localstack.yml up -d
+# ==============================================================================
+# Emulates: ECR, ECS (partial), RDS-like (via local PG), S3, SSM, SQS,
+#           CloudWatch Logs, IAM, STS, Route53, ELBv2
+# ==============================================================================
+
+services:
+  localstack:
+    image: localstack/localstack:4.3
+    container_name: localstack
+    ports:
+      - "4566:4566"            # LocalStack Gateway (all AWS services)
+      - "4510-4559:4510-4559"  # External service ports
+    environment:
+      - SERVICES=s3,ssm,ecr,iam,sts,cloudwatch,logs,sqs,secretsmanager
+      - DEBUG=0
+      - PERSISTENCE=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=eu-west-3
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./terraform/scripts/localstack-init:/etc/localstack/init/ready.d
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  localstack_data:
+
+networks:
+  my-network:
+    driver: bridge

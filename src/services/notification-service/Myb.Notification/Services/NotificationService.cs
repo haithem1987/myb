@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Myb.Common.Messaging;
 using Myb.Common.Messaging.Models;
-using Myb.Common.Repositories;
 using Myb.Notification.Hubs;
 
 namespace Myb.Notification.Services;
@@ -10,17 +9,14 @@ namespace Myb.Notification.Services;
 public class NotificationService : INotificationService
 {
     private readonly IDbContextFactory<NotificationContext> _contextFactory;
-    private readonly IGenericRepository<string?, Models.Notification, NotificationContext> _notificationRepository;
     private readonly IHubContext<NotificationHub> _hubContext;
     private readonly IEmailPublisher _emailPublisher;
 
     public NotificationService(
-        IGenericRepository<string?, Models.Notification, NotificationContext> notificationRepository,
         IDbContextFactory<NotificationContext> contextFactory,
         IHubContext<NotificationHub> hubContext,
         IEmailPublisher emailPublisher)
     {
-        _notificationRepository = notificationRepository;
         _contextFactory = contextFactory;
         _hubContext = hubContext;
         _emailPublisher = emailPublisher;
@@ -33,11 +29,14 @@ public class NotificationService : INotificationService
             SenderId = senderId,
             ReceiverId = receiverId,
             Message = message,
-            IsRead = false
+            IsRead = false,
+            CreatedAt = DateTime.UtcNow
         };
         try
         {
-            await _notificationRepository.InsertAsync(notification);
+            using var context = _contextFactory.CreateDbContext();
+            context.Set<Models.Notification>().Add(notification);
+            await context.SaveChangesAsync();
             await _hubContext.Clients.User(receiverId).SendAsync("ReceiveNotification", message);
         }
         catch (Exception e)
@@ -45,25 +44,15 @@ public class NotificationService : INotificationService
             Console.WriteLine(e);
             throw new InvalidOperationException("Failed to send notification.");
         }
-       
     }
 
     public async Task<List<Models.Notification>> GetNotificationsAsync(string userId)
     {
-        try {
-            var notifications = _notificationRepository
-            .GetAll()
+        using var context = _contextFactory.CreateDbContext();
+        return await context.Set<Models.Notification>()
             .Where(n => n.ReceiverId == userId)
             .OrderByDescending(n => n.CreatedAt)
-            .ToList();
-
-            return await Task.FromResult(notifications);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw new InvalidOperationException("Failed to send notification.");
-        }
+            .ToListAsync();
     }
 
     public async Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody)
@@ -75,5 +64,31 @@ public class NotificationService : INotificationService
             HtmlBody = htmlBody,
             Source = "notification-service"
         });
+    }
+
+    public async Task MarkAsReadAsync(string notificationId)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        var notification = await context.Set<Models.Notification>().FindAsync(notificationId);
+        if (notification != null)
+        {
+            notification.IsRead = true;
+            notification.UpdatedAt = DateTime.UtcNow;
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public async Task MarkAllAsReadAsync(string userId)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        var unread = await context.Set<Models.Notification>()
+            .Where(n => n.ReceiverId == userId && !n.IsRead)
+            .ToListAsync();
+        foreach (var n in unread)
+        {
+            n.IsRead = true;
+            n.UpdatedAt = DateTime.UtcNow;
+        }
+        await context.SaveChangesAsync();
     }
 }

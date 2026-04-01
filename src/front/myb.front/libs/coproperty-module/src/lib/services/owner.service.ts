@@ -7,7 +7,8 @@ import {
   CopropertyInvoice, 
   MaintenanceRequest, 
   Payment,
-  RecordPaymentInput
+  RecordPaymentInput,
+  ChargeDistribution
 } from '../models';
 import { CreateOwnerWithUnitsInput, Owner, OwnerWithUnits } from '../models/owner.model';
 
@@ -131,6 +132,7 @@ const GET_MY_INVOICES = gql`
       status
       paidDate
       paymentMethod
+      description
       notes
       createdAt
     }
@@ -273,6 +275,55 @@ const UPDATE_OWNER_WITH_UNITS = gql`
 const DELETE_OWNER = gql`
   mutation RemoveOwner($id: UUID!) {
     removeOwner(id: $id)
+  }
+`;
+
+const GET_OWNER_CHARGE_DISTRIBUTIONS = gql`
+  query GetOwnerChargeDistributions($ownerId: UUID!) {
+    ownerChargeDistributions(ownerId: $ownerId) {
+      id
+      chargeId
+      unitId
+      amount
+      percentage
+      calculatedAt
+      paymentStatus
+      paidAmount
+      paidAt
+      paymentTransactionId
+      paymentMethod
+      unitNumber
+      shares
+      area
+      chargeName
+      chargeDescription
+      chargeType
+      chargeFrequency
+      currency
+    }
+  }
+`;
+
+const MARK_CHARGE_DISTRIBUTION_PAID = gql`
+  mutation MarkChargeDistributionPaid(
+    $distributionId: UUID!
+    $transactionId: String!
+    $paymentMethod: String!
+    $paidAmount: Decimal!
+  ) {
+    markChargeDistributionPaid(
+      distributionId: $distributionId
+      transactionId: $transactionId
+      paymentMethod: $paymentMethod
+      paidAmount: $paidAmount
+    ) {
+      id
+      paymentStatus
+      paidAmount
+      paidAt
+      paymentTransactionId
+      paymentMethod
+    }
   }
 `;
 
@@ -558,6 +609,42 @@ export class OwnerService {
       })
       .pipe(
         map(result => result.data!.removeOwner)
+      );
+  }
+
+  /**
+   * Get all charge distributions for an owner (their share of coproperty charges)
+   */
+  getOwnerChargeDistributions(ownerId: string): Observable<ChargeDistribution[]> {
+    return this.apollo
+      .watchQuery<{ ownerChargeDistributions: ChargeDistribution[] }>({
+        query: GET_OWNER_CHARGE_DISTRIBUTIONS,
+        variables: { ownerId },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' }
+      })
+      .valueChanges.pipe(
+        map(result => result.data.ownerChargeDistributions)
+      );
+  }
+
+  /**
+   * Mark a charge distribution as paid after payment service confirms payment
+   */
+  markChargeDistributionPaid(
+    distributionId: string,
+    transactionId: string,
+    paymentMethod: string,
+    paidAmount: number
+  ): Observable<ChargeDistribution> {
+    return this.apollo
+      .mutate<{ markChargeDistributionPaid: ChargeDistribution }>({
+        mutation: MARK_CHARGE_DISTRIBUTION_PAID,
+        variables: { distributionId, transactionId, paymentMethod, paidAmount },
+        context: { service: 'copropertyService' }
+      })
+      .pipe(
+        map(result => result.data!.markChargeDistributionPaid)
       );
   }
 }

@@ -5,3 +5,5 @@ export * from './maintenance.service';
 export * from './fund-call.service';
 export * from './owner.service';
 export * from './assembly.service';
+export * from './payment-api.service';
+export * from './currency.service';

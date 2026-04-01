@@ -2,16 +2,17 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
-import { ToastsContainerComponent, ModalContainerComponent } from '@myb-front/shared-ui';
-import { CopropertyService } from '@myb-front/coproperty-module';
+import { ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, NotificationService } from '@myb-front/shared-ui';
+import { CopropertyService, CurrencyService, Currency } from '@myb-front/coproperty-module';
 import { ChargeService } from '@myb-front/coproperty-module';
 import { UnitService } from '@myb-front/coproperty-module';
+import { Notification } from 'libs/shared/infra/models/notification.model';
 import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-syndic-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent],
+  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent],
   templateUrl: './syndic-layout.component.html',
   styleUrls: ['./syndic-layout.component.scss']
 })
@@ -21,6 +22,8 @@ export class SyndicLayoutComponent implements OnInit {
   private copropertyService = inject(CopropertyService);
   private chargeService = inject(ChargeService);
   private unitService = inject(UnitService);
+  private notificationService = inject(NotificationService);
+  private currencyService = inject(CurrencyService);
   
   // State signals
   unpaidInvoices = signal(0);
@@ -30,6 +33,10 @@ export class SyndicLayoutComponent implements OnInit {
   totalUnits = signal(0);
   totalOwners = signal(0);
   currentUser = signal<{ name: string; firstName: string; lastName: string; role: string }>({ name: '', firstName: '', lastName: '', role: 'Syndic' });
+  
+  // Notification state
+  notifications = signal<Notification[]>([]);
+  unreadCount = signal(0);
   
   // Dual-role flag: syndic who is also a coproprietaire
   isCoproprietaire = signal(false);
@@ -41,6 +48,33 @@ export class SyndicLayoutComponent implements OnInit {
     this.loadUserFromKeycloak();
     // Load dashboard statistics
     this.loadStatistics();
+    // Start real-time notifications
+    this.initNotifications();
+  }
+  
+  private async initNotifications(): Promise<void> {
+    await this.notificationService.startConnection();
+    const userId = this.keycloakService.getProfile()?.id || '';
+    if (userId) {
+      this.notificationService.getNotificationsByUserId(userId);
+    }
+    this.notificationService.notifications$.subscribe(notifications => {
+      this.notifications.set(notifications);
+    });
+    this.notificationService.unreadCount$.subscribe(count => {
+      this.unreadCount.set(count);
+    });
+  }
+
+  onMarkAsRead(notificationId: string): void {
+    this.notificationService.markAsRead(notificationId);
+  }
+
+  onMarkAllAsRead(): void {
+    const userId = this.keycloakService.getProfile()?.id || '';
+    if (userId) {
+      this.notificationService.markAllAsRead(userId);
+    }
   }
   
   private loadUserFromKeycloak(): void {
@@ -72,6 +106,11 @@ export class SyndicLayoutComponent implements OnInit {
       next: (results) => {
         // Set coproperty count
         this.managedCoproperties.set(results.coproperties.length);
+
+        // Initialize currency from first coproperty
+        if (results.coproperties.length > 0 && results.coproperties[0].currency) {
+          this.currencyService.setCurrency(results.coproperties[0].currency as Currency);
+        }
         
         // Set budgets count
         this.totalBudgets.set(results.charges.length);
@@ -95,9 +134,6 @@ export class SyndicLayoutComponent implements OnInit {
     });
     
     // TODO: Load owners count when service is available
-    // For now, using mock data
-    this.unpaidInvoices.set(5);
-    this.urgentRequests.set(3);
   }
   
   toggleSidebar(): void {

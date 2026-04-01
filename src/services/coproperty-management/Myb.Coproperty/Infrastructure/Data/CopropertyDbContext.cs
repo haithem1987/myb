@@ -232,6 +232,21 @@ public class CopropertyDbContext : DbContext
             entity.Property(e => e.Amount)
                 .HasPrecision(10, 2)
                 .IsRequired();
+
+            entity.Property(e => e.PaidAmount)
+                .HasPrecision(10, 2)
+                .HasDefaultValue(0);
+
+            entity.Property(e => e.PaymentStatus)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .HasDefaultValue(ChargePaymentStatus.Unpaid);
+
+            entity.Property(e => e.PaymentTransactionId)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50);
             
             entity.HasOne(e => e.Charge)
                 .WithMany(c => c.Distributions)
@@ -245,6 +260,8 @@ public class CopropertyDbContext : DbContext
             
             entity.HasIndex(e => new { e.ChargeId, e.UnitId })
                 .IsUnique();
+
+            entity.HasIndex(e => e.PaymentStatus);
         });
 
         // CopropertyInvoice Configuration
@@ -428,6 +445,9 @@ public class CopropertyDbContext : DbContext
         modelBuilder.Entity<FundCallPayment>(entity =>
         {
             entity.HasKey(e => e.Id);
+
+            // UpdatedAt is required by IEntity but was never added to the DB table
+            entity.Ignore(e => e.UpdatedAt);
 
             entity.Property(e => e.Amount)
                 .HasPrecision(10, 2)

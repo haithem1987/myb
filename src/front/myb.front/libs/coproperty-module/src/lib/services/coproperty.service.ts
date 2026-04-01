@@ -3,7 +3,8 @@ import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { 
-  Coproperty, 
+  Coproperty,
+  Currency,
   CreateCopropertyInput,
   FundCall,
   CreateFundCallInput,
@@ -23,6 +24,7 @@ const GET_COPROPERTIES = gql`
       city
       postalCode
       country
+      currency
       description
       totalUnits
       totalShares
@@ -45,6 +47,7 @@ const GET_COPROPERTY = gql`
       city
       postalCode
       country
+      currency
       description
       totalUnits
       totalShares
@@ -84,6 +87,7 @@ const CREATE_COPROPERTY = gql`
       city
       postalCode
       country
+      currency
       description
       totalUnits
       totalShares
@@ -106,6 +110,7 @@ const UPDATE_COPROPERTY = gql`
       city
       postalCode
       country
+      currency
       description
       totalUnits
       totalShares

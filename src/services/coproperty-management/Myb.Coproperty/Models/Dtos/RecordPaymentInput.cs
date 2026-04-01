@@ -10,5 +10,7 @@ public class RecordPaymentInput
     public DateTime PaymentDate { get; set; }
     public string PaymentMethod { get; set; } = string.Empty;
     public string? Reference { get; set; }
+    public string? TransactionId { get; set; }
     public string? Notes { get; set; }
+    public string? CreatedBy { get; set; }
 }

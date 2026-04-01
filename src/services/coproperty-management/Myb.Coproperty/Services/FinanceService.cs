@@ -150,9 +150,9 @@ public class FinanceService : IFinanceService
             Amount = input.Amount,
             PaymentDate = input.PaymentDate,
             PaymentMethod = input.PaymentMethod,
-            TransactionId = input.Reference,
+            TransactionId = input.TransactionId ?? input.Reference,
             Notes = input.Notes,
-            CreatedBy = Guid.TryParse(createdBy, out var userGuid) ? userGuid : Guid.Empty,
+            CreatedBy = Guid.TryParse(input.CreatedBy ?? createdBy, out var userGuid) ? userGuid : Guid.Empty,
             CreatedAt = DateTime.UtcNow
         };
 

@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
+import { CurrencyService } from '../../services/currency.service';
 import { FundCallService } from '../../services/fund-call.service';
 import { OwnerService } from '../../services/owner.service';
 import { UnitService } from '../../services/unit.service';
@@ -55,6 +56,7 @@ enum DistributionMethod {
 export class ChargeDistributionComponent implements OnInit {
   private chargeService = inject(ChargeService);
   private copropertyService = inject(CopropertyService);
+  private currencyService = inject(CurrencyService);
   private fundCallService = inject(FundCallService);
   private ownerService = inject(OwnerService);
   private unitService = inject(UnitService);
@@ -227,11 +229,12 @@ export class ChargeDistributionComponent implements OnInit {
     return this.charges().filter(c => c.frequency === year);
   }
 
+  get currencySymbol(): string {
+    return this.currencyService.symbol;
+  }
+
   formatAmount(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+    return this.currencyService.formatAmount(amount);
   }
 
   // Distribution calculation logic
@@ -370,7 +373,26 @@ export class ChargeDistributionComponent implements OnInit {
     const baseDescription = this.repartitionForm.get('description')?.value || `Appel de fonds - Répartition ${year}`;
     const dueDate = new Date(`${year}-12-31T00:00:00`) as any;
 
-    // One fund call per unit/owner entry (each row = one fund call)
+    // Step 1: Persist ChargeDistributions for each selected charge
+    const filteredCharges = this.getFilteredCharges().filter((c) => !!c.id);
+    const distributeRequests = filteredCharges.map((charge) =>
+      this.chargeService.calculateDistribution(charge.id!).pipe(
+        catchError((err) => {
+          console.error(`Error distributing charge ${charge.name}:`, err);
+          return of([]);
+        })
+      )
+    );
+
+    // Step 2: After ChargeDistributions are persisted, create FundCalls
+    forkJoin(distributeRequests.length > 0 ? distributeRequests : [of([])])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.createFundCallsAfterDistribution(copropertyId, baseDescription, dueDate);
+      });
+  }
+
+  private createFundCallsAfterDistribution(copropertyId: string, baseDescription: string, dueDate: any): void {
     const fundCallEntries: { input: CreateFundCallInput; preview: DistributionPreview }[] =
       this.distributionPreview.map((p) => ({
         input: {

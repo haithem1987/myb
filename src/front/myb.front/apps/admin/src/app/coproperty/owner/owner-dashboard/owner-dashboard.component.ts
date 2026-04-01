@@ -1,10 +1,10 @@
 import { Component, signal, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { OwnerService, Unit, CopropertyInvoice, InvoiceStatus, CopropertyService, Coproperty } from '@myb-front/coproperty-module';
+import { OwnerService, Unit, CopropertyInvoice, InvoiceStatus, CopropertyService, Coproperty, ChargeDistribution, CurrencyService } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
-import { catchError, take } from 'rxjs/operators';
+import { catchError, take, switchMap } from 'rxjs/operators';
 
 interface OwnerUnit {
   id: string;
@@ -24,6 +24,16 @@ interface PendingInvoice {
   description: string;
 }
 
+interface RecentInvoice {
+  id: string;
+  number: string;
+  description: string;
+  date: Date;
+  amount: number;
+  status: string;
+  paymentMethod: string;
+}
+
 @Component({
   selector: 'app-owner-dashboard',
   standalone: true,
@@ -35,11 +45,12 @@ export class OwnerDashboardComponent implements OnInit {
   private ownerService = inject(OwnerService);
   private copropertyService = inject(CopropertyService);
   private keycloakService = inject(KeycloakService);
+  private currencyService = inject(CurrencyService);
 
   myUnits = signal<OwnerUnit[]>([]);
   pendingInvoices = signal<PendingInvoice[]>([]);
+  recentInvoices = signal<RecentInvoice[]>([]);
   totalDue = signal(0);
-  nextAssembly = signal<Date | null>(null);
   loading = signal(true);
   
   ngOnInit(): void {
@@ -69,13 +80,23 @@ export class OwnerDashboardComponent implements OnInit {
 
     this.loading.set(true);
 
-    // Load units, invoices and coproperties in parallel
-    forkJoin({
-      units: this.ownerService.getMyUnits(userId).pipe(take(1), catchError(() => of([] as Unit[]))),
-      invoices: this.ownerService.getMyInvoices(userId).pipe(take(1), catchError(() => of([] as CopropertyInvoice[]))),
-      coproperties: this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([] as Coproperty[]))),
-    }).subscribe({
-      next: ({ units, invoices, coproperties }) => {
+    // First get the owner entity, then load everything in parallel
+    this.ownerService.getOwnerByUserId(userId).pipe(
+      take(1),
+      catchError(() => of(null)),
+      switchMap((owner) => {
+        const ownerId = owner?.id;
+        return forkJoin({
+          units: this.ownerService.getMyUnits(userId).pipe(take(1), catchError(() => of([] as Unit[]))),
+          invoices: this.ownerService.getMyInvoices(userId).pipe(take(1), catchError(() => of([] as CopropertyInvoice[]))),
+          coproperties: this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([] as Coproperty[]))),
+          distributions: ownerId
+            ? this.ownerService.getOwnerChargeDistributions(ownerId).pipe(take(1), catchError(() => of([] as ChargeDistribution[])))
+            : of([] as ChargeDistribution[]),
+        });
+      })
+    ).subscribe({
+      next: ({ units, invoices, coproperties, distributions }) => {
         const copropertyMap = new Map<string, string>(
           coproperties.map((c) => [c.id, c.name])
         );
@@ -113,8 +134,29 @@ export class OwnerDashboardComponent implements OnInit {
           description: inv.notes || `Facture ${inv.invoiceNumber}`,
         })));
 
-        // Calculate total due
-        this.totalDue.set(pending.reduce((sum, inv) => sum + inv.totalAmount, 0));
+        // Map all invoices (latest 5) for the recent invoices list
+        const sorted = [...invoices].sort((a, b) =>
+          new Date(b.invoiceDate).getTime() - new Date(a.invoiceDate).getTime()
+        ).slice(0, 5);
+        this.recentInvoices.set(sorted.map(inv => ({
+          id: inv.id,
+          number: inv.invoiceNumber,
+          description: inv.description || inv.notes || `Facture ${inv.invoiceNumber}`,
+          date: new Date(inv.invoiceDate),
+          amount: inv.totalAmount,
+          status: inv.status === InvoiceStatus.PAID ? 'paid' : inv.status === InvoiceStatus.OVERDUE ? 'overdue' : 'pending',
+          paymentMethod: inv.paymentMethod ?? '',
+        })));
+
+        // Calculate total due from charge distributions (unpaid)
+        const chargeDue = distributions
+          .filter(d => d.paymentStatus !== 'PAID' && d.paymentStatus !== 'Paid')
+          .reduce((sum, d) => sum + d.amount - (d.paidAmount || 0), 0);
+
+        // Also add unpaid invoices
+        const invoiceDue = pending.reduce((sum, inv) => sum + inv.totalAmount, 0);
+
+        this.totalDue.set(Math.max(chargeDue, invoiceDue));
 
         this.loading.set(false);
       },

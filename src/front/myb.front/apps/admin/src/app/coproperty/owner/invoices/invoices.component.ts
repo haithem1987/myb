@@ -2,20 +2,20 @@ import { Component, signal, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
-import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit } from '@myb-front/coproperty-module';
+import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
 
 interface Invoice {
   id: string;
   number: string;
+  description: string;
   date: Date;
-  dueDate: Date;
   amount: number;
-  status: 'paid' | 'pending' | 'overdue';
   period: string;
   unitNumber: string;
-  copropertyName: string;
   paymentDate?: Date;
+  paymentMethod: string;
+  status: string;
 }
 
 @Component({
@@ -31,7 +31,7 @@ interface Invoice {
             <i class="bi bi-receipt me-2"></i>
             Mes Factures
           </h2>
-          <p class="text-muted">Consultez et payez vos factures de charges</p>
+          <p class="text-muted">Historique de vos paiements et reçus de charges</p>
         </div>
         <div class="col-md-4 text-end">
           <button class="btn btn-outline-primary" (click)="downloadAll()">
@@ -43,47 +43,36 @@ interface Invoice {
 
       <!-- Statistics -->
       <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon bg-danger">
-              <i class="bi bi-exclamation-circle"></i>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value">{{ stats().pending }}</div>
-              <div class="stat-label">À payer</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon bg-warning">
-              <i class="bi bi-clock-history"></i>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value">{{ stats().overdue }}</div>
-              <div class="stat-label">En retard</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           <div class="stat-card">
             <div class="stat-icon bg-success">
-              <i class="bi bi-check-circle"></i>
+              <i class="bi bi-receipt-cutoff"></i>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ stats().paid }}</div>
-              <div class="stat-label">Payées</div>
+              <div class="stat-value">{{ stats().total }}</div>
+              <div class="stat-label">Total factures</div>
             </div>
           </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           <div class="stat-card">
             <div class="stat-icon bg-primary">
               <i class="bi bi-cash-stack"></i>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ stats().totalDue }} €</div>
-              <div class="stat-label">Montant dû</div>
+              <div class="stat-value">{{ formatAmount(stats().totalPaid) }}</div>
+              <div class="stat-label">Total payé</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-icon bg-secondary">
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stats().lastPaymentDate }}</div>
+              <div class="stat-label">Dernier paiement</div>
             </div>
           </div>
         </div>
@@ -91,14 +80,6 @@ interface Invoice {
 
       <!-- Filters -->
       <div class="row mb-4">
-        <div class="col-md-3">
-          <select class="form-select" [(ngModel)]="selectedStatus" (change)="filterInvoices()">
-            <option value="all">Tous les statuts</option>
-            <option value="pending">À payer</option>
-            <option value="overdue">En retard</option>
-            <option value="paid">Payées</option>
-          </select>
-        </div>
         <div class="col-md-3">
           <select class="form-select" [(ngModel)]="selectedYear" (change)="filterInvoices()">
             <option value="2026">2026</option>
@@ -116,35 +97,31 @@ interface Invoice {
               <thead>
                 <tr>
                   <th>Facture</th>
-                  <th>Période</th>
+                  <th>Description</th>
                   <th>Lot</th>
                   <th>Date</th>
-                  <th>Échéance</th>
                   <th>Montant</th>
-                  <th>Statut</th>
+                  <th>Méthode</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let invoice of filteredInvoices()" 
-                    [class.table-warning]="invoice.status === 'overdue'"
-                    [class.table-success]="invoice.status === 'paid'">
+                <tr *ngFor="let invoice of filteredInvoices()">
                   <td>
                     <strong>{{ invoice.number }}</strong>
-                    <br>
-                    <small class="text-muted">{{ invoice.copropertyName }}</small>
                   </td>
-                  <td>{{ invoice.period }}</td>
-                  <td><span class="badge bg-secondary">{{ invoice.unitNumber }}</span></td>
-                  <td>{{ invoice.date | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ invoice.dueDate | date:'dd/MM/yyyy' }}</td>
-                  <td class="fw-bold">{{ invoice.amount }} €</td>
                   <td>
-                    <span class="badge" 
-                          [class.bg-danger]="invoice.status === 'pending'"
-                          [class.bg-warning]="invoice.status === 'overdue'"
-                          [class.bg-success]="invoice.status === 'paid'">
-                      {{ getStatusLabel(invoice.status) }}
+                    <span>{{ invoice.description }}</span>
+                    <br>
+                    <small class="text-muted">{{ invoice.period }}</small>
+                  </td>
+                  <td><span class="badge bg-secondary">{{ invoice.unitNumber }}</span></td>
+                  <td>{{ invoice.paymentDate | date:'dd/MM/yyyy' }}</td>
+                  <td class="fw-bold">{{ formatAmount(invoice.amount) }}</td>
+                  <td>
+                    <span class="badge bg-light text-dark">
+                      <i class="bi" [class.bi-credit-card]="invoice.paymentMethod === 'Card'" [class.bi-bank]="invoice.paymentMethod === 'BankTransfer'" [class.bi-cash]="invoice.paymentMethod !== 'Card' && invoice.paymentMethod !== 'BankTransfer'"></i>
+                      {{ getPaymentMethodLabel(invoice.paymentMethod) }}
                     </span>
                   </td>
                   <td>
@@ -152,20 +129,9 @@ interface Invoice {
                       <button class="btn btn-sm btn-outline-primary me-1" (click)="viewInvoice(invoice.id)" title="Voir">
                         <i class="bi bi-eye"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-secondary me-1" (click)="downloadInvoice(invoice.id)" title="Télécharger">
+                      <button class="btn btn-sm btn-outline-secondary" (click)="downloadInvoice(invoice.id)" title="Télécharger">
                         <i class="bi bi-download"></i>
                       </button>
-                      <button *ngIf="invoice.status !== 'paid'" 
-                              class="btn btn-sm btn-success" 
-                              (click)="payInvoice(invoice.id)"
-                              title="Payer">
-                        <i class="bi bi-credit-card me-1"></i>
-                        Payer
-                      </button>
-                      <span *ngIf="invoice.status === 'paid'" class="text-muted">
-                        <i class="bi bi-check-circle text-success"></i>
-                        {{ invoice.paymentDate | date:'dd/MM/yy' }}
-                      </span>
                     </div>
                   </td>
                 </tr>
@@ -173,6 +139,128 @@ interface Invoice {
             </table>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ── Invoice Preview Modal ── -->
+    <div *ngIf="showInvoiceModal()" class="invoice-modal-backdrop" (click)="closeInvoiceModal()"></div>
+
+    <div class="invoice-modal" [class.invoice-modal--open]="showInvoiceModal()">
+      <div class="invoice-modal-header">
+        <h5 class="mb-0">
+          <i class="bi bi-file-earmark-text me-2"></i>
+          Détail de la facture
+        </h5>
+        <button type="button" class="btn-close" (click)="closeInvoiceModal()"></button>
+      </div>
+
+      <div class="invoice-modal-body" *ngIf="selectedInvoice()">
+        <div class="invoice-document">
+
+          <!-- Header -->
+          <div class="inv-header">
+            <div class="inv-brand">
+              <div class="inv-logo">
+                <i class="bi bi-buildings"></i>
+              </div>
+              <div>
+                <div class="inv-company">MYB Syndic</div>
+                <div class="text-muted small">Gestion de copropriété</div>
+              </div>
+            </div>
+            <div class="inv-meta">
+              <h4 class="inv-title">FACTURE</h4>
+              <div class="inv-num"># {{ selectedInvoice()!.number }}</div>
+              <span class="badge" [ngClass]="selectedInvoice()!.status === 'paid' ? 'bg-success' : 'bg-warning text-dark'">
+                {{ selectedInvoice()!.status === 'paid' ? 'Payée' : 'En attente' }}
+              </span>
+            </div>
+          </div>
+
+          <hr class="inv-divider">
+
+          <!-- Dates row -->
+          <div class="inv-dates">
+            <div class="inv-date-item">
+              <span class="inv-date-label">Date de facture</span>
+              <span class="inv-date-value">{{ selectedInvoice()!.date | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="inv-date-item" *ngIf="selectedInvoice()!.paymentDate">
+              <span class="inv-date-label">Date de paiement</span>
+              <span class="inv-date-value">{{ selectedInvoice()!.paymentDate | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="inv-date-item">
+              <span class="inv-date-label">Lot</span>
+              <span class="inv-date-value">{{ selectedInvoice()!.unitNumber }}</span>
+            </div>
+            <div class="inv-date-item">
+              <span class="inv-date-label">Période</span>
+              <span class="inv-date-value">{{ selectedInvoice()!.period }}</span>
+            </div>
+          </div>
+
+          <hr class="inv-divider">
+
+          <!-- Copropriétaire -->
+          <div class="inv-dates" style="margin-bottom: 0.5rem;">
+            <div class="inv-date-item">
+              <span class="inv-date-label">Copropriétaire</span>
+              <span class="inv-date-value">{{ ownerName() }}</span>
+            </div>
+            <div class="inv-date-item" *ngIf="selectedInvoice()!.paymentMethod">
+              <span class="inv-date-label">Méthode de paiement</span>
+              <span class="inv-date-value">{{ getPaymentMethodLabel(selectedInvoice()!.paymentMethod) }}</span>
+            </div>
+          </div>
+
+          <hr class="inv-divider">
+
+          <!-- Line items table -->
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th class="text-center">Qté</th>
+                <th class="text-end">Prix unit.</th>
+                <th class="text-end">Total HT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ selectedInvoice()!.description }}</td>
+                <td class="text-center">1</td>
+                <td class="text-end">{{ formatAmount(selectedInvoice()!.amount) }}</td>
+                <td class="text-end"><strong>{{ formatAmount(selectedInvoice()!.amount) }}</strong></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="inv-subtotal">
+                <td colspan="3" class="text-end">Sous-total HT</td>
+                <td class="text-end">{{ formatAmount(selectedInvoice()!.amount) }}</td>
+              </tr>
+              <tr class="inv-total">
+                <td colspan="3" class="text-end"><strong>TOTAL TTC</strong></td>
+                <td class="text-end"><strong>{{ formatAmount(selectedInvoice()!.amount) }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <!-- Footer note -->
+          <div class="inv-footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Reçu de paiement généré par MYB Syndic
+          </div>
+        </div>
+      </div>
+
+      <!-- Action bar -->
+      <div class="invoice-modal-footer" *ngIf="selectedInvoice()">
+        <button type="button" class="btn btn-secondary" (click)="closeInvoiceModal()">
+          <i class="bi bi-x-circle me-1"></i>Fermer
+        </button>
+        <button type="button" class="btn btn-primary" (click)="downloadInvoice(selectedInvoice()!.id)">
+          <i class="bi bi-download me-1"></i>Télécharger PDF
+        </button>
       </div>
     </div>
   `,
@@ -242,34 +330,237 @@ interface Invoice {
       align-items: center;
       gap: 4px;
     }
+
+    /* ── Invoice Preview Modal ── */
+    .invoice-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1050;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .invoice-modal {
+      position: fixed;
+      top: 0;
+      right: -680px;
+      width: 660px;
+      max-width: 100vw;
+      height: 100vh;
+      background: #fff;
+      z-index: 1051;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -6px 0 30px rgba(0, 0, 0, 0.18);
+      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .invoice-modal--open {
+      right: 0;
+    }
+
+    .invoice-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+      flex-shrink: 0;
+    }
+
+    .invoice-modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .invoice-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+      flex-shrink: 0;
+    }
+
+    /* ── Invoice Document Layout ── */
+    .invoice-document {
+      font-size: 0.9rem;
+      color: #1f2937;
+    }
+
+    .inv-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+
+    .inv-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .inv-logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #fff;
+    }
+
+    .inv-company {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+
+    .inv-meta {
+      text-align: right;
+    }
+
+    .inv-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: #1e3a8a;
+      margin: 0 0 0.25rem;
+    }
+
+    .inv-num {
+      font-size: 1rem;
+      color: #6b7280;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .inv-divider {
+      border-color: #e5e7eb;
+      margin: 0.75rem 0;
+    }
+
+    .inv-dates {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .inv-date-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .inv-date-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      font-weight: 600;
+    }
+
+    .inv-date-value {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.75rem;
+    }
+
+    .inv-table th {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #6b7280;
+      border-bottom: 2px solid #e5e7eb;
+      padding: 0.5rem 0.75rem;
+      font-weight: 600;
+    }
+
+    .inv-table td {
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: top;
+    }
+
+    .inv-subtotal td {
+      border-top: 2px solid #e5e7eb;
+      border-bottom: none;
+      color: #6b7280;
+      padding-top: 0.75rem;
+    }
+
+    .inv-total td {
+      font-size: 1rem;
+      border-top: 2px solid #1e3a8a;
+      border-bottom: none;
+      color: #1e3a8a;
+      padding-top: 0.75rem;
+    }
+
+    .inv-footer-note {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1rem;
+      background: #eff6ff;
+      border-left: 3px solid #3b82f6;
+      border-radius: 0 0.375rem 0.375rem 0;
+      font-size: 0.82rem;
+      color: #4b5563;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
   `]
 })
 export class OwnerInvoicesComponent implements OnInit {
-  selectedStatus = 'all';
   selectedYear = '2026';
 
   invoices = signal<Invoice[]>([]);
-
   filteredInvoices = signal<Invoice[]>(this.invoices());
+  showInvoiceModal = signal(false);
+  selectedInvoice = signal<Invoice | null>(null);
+  ownerName = signal<string>('');
 
   stats = computed(() => {
     const invoices = this.filteredInvoices();
-    const pending = invoices.filter(i => i.status === 'pending').length;
-    const overdue = invoices.filter(i => i.status === 'overdue').length;
-    const paid = invoices.filter(i => i.status === 'paid').length;
-    const totalDue = invoices
-      .filter(i => i.status === 'pending' || i.status === 'overdue')
-      .reduce((sum, i) => sum + i.amount, 0);
+    const total = invoices.length;
+    const totalPaid = invoices.reduce((sum, i) => sum + i.amount, 0);
+    const lastPayment = invoices
+      .filter(i => i.paymentDate)
+      .sort((a, b) => (b.paymentDate?.getTime() ?? 0) - (a.paymentDate?.getTime() ?? 0))[0];
+    const lastPaymentDate = lastPayment?.paymentDate
+      ? lastPayment.paymentDate.toLocaleDateString('fr-FR') : '—';
 
-    return { pending, overdue, paid, totalDue };
+    return { total, totalPaid, lastPaymentDate };
   });
 
   private ownerService = inject(OwnerService);
   private keycloakService = inject(KeycloakService);
+  private currencyService = inject(CurrencyService);
   private unitsById = new Map<string, Unit>();
 
   ngOnInit(): void {
     const userId = this.getCurrentUserId();
+
+    // Get owner name from Keycloak profile
+    const profile = this.keycloakService.getProfile();
+    if (profile) {
+      this.ownerName.set(`${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim());
+    }
 
     if (!userId) {
       // If user ID is not available, do not attempt to load data
@@ -303,24 +594,28 @@ export class OwnerInvoicesComponent implements OnInit {
   filterInvoices() {
     let filtered = this.invoices();
 
-    if (this.selectedStatus !== 'all') {
-      filtered = filtered.filter(i => i.status === this.selectedStatus);
-    }
-
     if (this.selectedYear) {
-      filtered = filtered.filter(i => i.date.getFullYear().toString() === this.selectedYear);
+      filtered = filtered.filter(i => {
+        const d = i.paymentDate ?? i.date;
+        return d.getFullYear().toString() === this.selectedYear;
+      });
     }
 
     this.filteredInvoices.set(filtered);
   }
 
-  getStatusLabel(status: string): string {
+  getPaymentMethodLabel(method: string): string {
     const labels: Record<string, string> = {
-      pending: 'À payer',
-      overdue: 'En retard',
-      paid: 'Payée'
+      Card: 'Carte',
+      BankTransfer: 'Virement',
+      Cash: 'Espèces',
+      Check: 'Chèque'
     };
-    return labels[status] || status;
+    return labels[method] || method || '—';
+  }
+
+  formatAmount(amount: number | string | undefined | null): string {
+    return this.currencyService.formatAmount(amount);
   }
 
   private modalService = inject(ModalService);
@@ -343,20 +638,19 @@ export class OwnerInvoicesComponent implements OnInit {
 
   private mapInvoice(inv: CopropertyInvoice): Invoice {
     const date = new Date(inv.invoiceDate);
-    const dueDate = new Date(inv.dueDate);
     const unit = this.unitsById.get(inv.unitId);
 
     return {
       id: inv.id,
       number: inv.invoiceNumber,
+      description: inv.description ?? '',
       date,
-      dueDate,
       amount: inv.totalAmount,
-      status: this.mapStatus(inv.status),
       period: this.getPeriodLabel(date),
       unitNumber: unit?.unitNumber ?? '—',
-      copropertyName: unit ? `Copropriété ${unit.copropertyId.substring(0, 8)}` : '—',
-      paymentDate: inv.paidDate ? new Date(inv.paidDate) : undefined
+      paymentDate: inv.paidDate ? new Date(inv.paidDate) : undefined,
+      paymentMethod: inv.paymentMethod ?? '',
+      status: inv.status === InvoiceStatus.PAID ? 'paid' : 'pending'
     };
   }
 
@@ -384,50 +678,142 @@ export class OwnerInvoicesComponent implements OnInit {
   viewInvoice(id: string): void {
     const invoice = this.invoices().find(inv => inv.id === id);
     if (!invoice) return;
+    this.selectedInvoice.set(invoice);
+    this.showInvoiceModal.set(true);
+  }
 
-    this.modalService.alert(
-      `Facture #${invoice.number}`,
-      `Période: ${invoice.period}\nMontant: ${invoice.amount.toFixed(2)}€\nStatut: ${this.getStatusLabel(invoice.status)}`
-    );
+  closeInvoiceModal(): void {
+    this.showInvoiceModal.set(false);
+    this.selectedInvoice.set(null);
   }
 
   downloadInvoice(id: string): void {
     const invoice = this.invoices().find(inv => inv.id === id);
     if (!invoice) return;
 
-    this.fileService.downloadPDF(
-      `Facture_${invoice.number}.pdf`,
-      `Facture ${invoice.number} - ${invoice.period}`
-    );
-    
-    this.toastService.show(
-      `Facture ${invoice.number} téléchargée`,
-      { classname: 'toast-success' }
-    );
-  }
+    const fmt = (v: number) => this.currencyService.formatAmount(v);
+    const fmtD = (d: Date | undefined) => d ? d.toLocaleDateString('fr-FR') : '-';
+    const owner = this.ownerName() || '—';
 
-  async payInvoice(id: string): Promise<void> {
-    const invoice = this.invoices().find(inv => inv.id === id);
-    if (!invoice || invoice.status === 'paid') return;
+    const statusBadge = invoice.status === 'paid'
+      ? '<span class="badge badge-success">Payée</span>'
+      : '<span class="badge badge-draft">En attente</span>';
 
-    const confirmed = await this.modalService.confirm({
-      title: 'Confirmation de paiement',
-      message: `Payer ${invoice.amount.toFixed(2)}€ pour ${invoice.period}?`,
-      confirmButtonText: 'Payer',
-      confirmButtonClass: 'btn-success'
-    });
+    const metaRows = [
+      { label: 'Date de facture', value: fmtD(invoice.date) },
+      invoice.paymentDate ? { label: 'Date de paiement', value: fmtD(invoice.paymentDate) } : null,
+      { label: 'Lot', value: invoice.unitNumber },
+      { label: 'Période', value: invoice.period },
+      { label: 'Copropriétaire', value: owner },
+      invoice.paymentMethod ? { label: 'Méthode de paiement', value: this.getPaymentMethodLabel(invoice.paymentMethod) } : null,
+    ].filter(Boolean).map(m => `
+      <div class="meta-item">
+        <span class="meta-label">${m!.label}</span>
+        <span class="meta-value">${m!.value}</span>
+      </div>`).join('');
 
-    if (confirmed) {
-      setTimeout(() => {
-        invoice.status = 'paid';
-        invoice.paymentDate = new Date();
-        this.invoices.set([...this.invoices()]);
-        this.toastService.show(
-          `Facture ${invoice.number} payée`,
-          { classname: 'toast-success' }
-        );
-      }, 500);
-    }
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture ${invoice.number}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1f2937; background: #fff; padding: 40px 48px; }
+    .inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .inv-brand  { display: flex; align-items: center; gap: 14px; }
+    .inv-logo   { width: 52px; height: 52px; background: linear-gradient(135deg,#3b82f6,#1d4ed8); border-radius: 10px;
+                  display: flex; align-items: center; justify-content: center; }
+    .inv-logo svg { width: 28px; height: 28px; fill: #fff; }
+    .inv-company { font-size: 16px; font-weight: 700; color: #1e3a8a; }
+    .inv-tagline { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    .inv-meta   { text-align: right; }
+    .inv-title  { font-size: 28px; font-weight: 800; letter-spacing: .05em; color: #1e3a8a; line-height: 1; }
+    .inv-num    { font-size: 13px; color: #6b7280; font-weight: 600; margin: 6px 0; }
+    .badge      { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-draft   { background: #fef9c3; color: #854d0e; }
+    hr { border: none; border-top: 1px solid #e5e7eb; margin: 16px 0; }
+    .meta-grid { display: flex; flex-wrap: wrap; gap: 20px 32px; margin-bottom: 8px; }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: #9ca3af; font-weight: 600; }
+    .meta-value { font-size: 13px; font-weight: 600; color: #111827; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    thead tr th { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280;
+                  border-bottom: 2px solid #e5e7eb; padding: 8px 10px; font-weight: 600; }
+    tbody tr td { padding: 10px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+    tfoot .subtotal td { border-top: 2px solid #e5e7eb; color: #6b7280; padding: 10px 10px; }
+    tfoot .total   td { border-top: 2px solid #1e3a8a; color: #1e3a8a; font-size: 15px; padding: 10px 10px; }
+    .right  { text-align: right; }
+    .center { text-align: center; }
+    .inv-note { margin-top: 28px; padding: 10px 14px; background: #eff6ff;
+                border-left: 3px solid #3b82f6; border-radius: 0 6px 6px 0; font-size: 11.5px; color: #4b5563; }
+    @page { margin: 10mm 12mm; }
+  </style>
+</head>
+<body>
+  <div class="inv-header">
+    <div class="inv-brand">
+      <div class="inv-logo">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div>
+        <div class="inv-company">MYB Syndic</div>
+        <div class="inv-tagline">Gestion de copropriété</div>
+      </div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-title">FACTURE</div>
+      <div class="inv-num"># ${invoice.number}</div>
+      ${statusBadge}
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="meta-grid">${metaRows}</div>
+
+  <hr>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th class="center">Qté</th>
+        <th class="right">Prix unit.</th>
+        <th class="right">Total HT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>${invoice.description}</td>
+        <td class="center">1</td>
+        <td class="right">${fmt(invoice.amount)}</td>
+        <td class="right"><strong>${fmt(invoice.amount)}</strong></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr class="subtotal">
+        <td colspan="3" class="right">Sous-total HT</td>
+        <td class="right">${fmt(invoice.amount)}</td>
+      </tr>
+      <tr class="total">
+        <td colspan="3" class="right"><strong>TOTAL TTC</strong></td>
+        <td class="right"><strong>${fmt(invoice.amount)}</strong></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="inv-note">ⓘ Reçu de paiement généré par MYB Syndic</div>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=800,height=900');
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 400);
   }
 
   downloadAll(): void {

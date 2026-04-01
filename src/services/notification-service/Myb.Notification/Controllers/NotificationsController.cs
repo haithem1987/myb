@@ -41,6 +41,20 @@ public class NotificationsController : ControllerBase
         return Ok(new { message = "Email queued successfully" });
     }
 
+    [HttpPut("{notificationId}/read")]
+    public async Task<IActionResult> MarkAsRead(string notificationId)
+    {
+        await _notificationService.MarkAsReadAsync(notificationId);
+        return Ok();
+    }
+
+    [HttpPut("read-all/{userId}")]
+    public async Task<IActionResult> MarkAllAsRead(string userId)
+    {
+        await _notificationService.MarkAllAsReadAsync(userId);
+        return Ok();
+    }
+
     public record NotificationRequest(string SenderId,string ReceiverId, string Message);
     public record EmailNotificationRequest(string ToEmail, string Subject, string HtmlBody);
 }

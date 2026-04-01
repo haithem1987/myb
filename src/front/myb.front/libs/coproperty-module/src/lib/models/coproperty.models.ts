@@ -69,6 +69,21 @@ export interface ChargeDistribution {
   unitId: string;
   amount: number;
   calculatedAt: Date;
+  currency?: Currency;
+  // Payment tracking
+  paymentStatus?: string;
+  paidAmount?: number;
+  paidAt?: Date;
+  paymentTransactionId?: string;
+  paymentMethod?: string;
+  // Charge details (from GraphQL resolver)
+  unitNumber?: string;
+  shares?: number;
+  area?: number;
+  chargeName?: string;
+  chargeDescription?: string;
+  chargeType?: string;
+  chargeFrequency?: string;
 }
 
 export interface CopropertyInvoice {
@@ -85,6 +100,7 @@ export interface CopropertyInvoice {
   status: InvoiceStatus;
   paidDate?: Date;
   paymentMethod?: string;
+  description?: string;
   notes?: string;
   createdAt: Date;
 }

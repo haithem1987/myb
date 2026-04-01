@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
 using Myb.Common.Messaging.Models;
@@ -15,6 +16,11 @@ public class EmailConsumerWorker : BackgroundService
     private IConnection? _connection;
     private IChannel? _channel;
     private const string QueueName = "email-queue";
+    private const int MaxRetries = 5;
+    private static readonly int[] RetryDelaysSeconds = [2, 5, 15, 30, 60];
+
+    // Track retry counts by message body hash (cleared on success or discard)
+    private readonly ConcurrentDictionary<string, int> _retryCounts = new();
 
     public EmailConsumerWorker(IServiceProvider services, IConfiguration config,
         ILogger<EmailConsumerWorker> logger)
@@ -66,9 +72,12 @@ public class EmailConsumerWorker : BackgroundService
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += async (_, ea) =>
         {
+            var json = Encoding.UTF8.GetString(ea.Body.ToArray());
+            var messageKey = Convert.ToBase64String(
+                System.Security.Cryptography.SHA256.HashData(ea.Body.Span)[..16]);
+
             try
             {
-                var json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 var email = JsonSerializer.Deserialize<EmailMessage>(json);
 
                 if (email != null)
@@ -79,11 +88,31 @@ public class EmailConsumerWorker : BackgroundService
                 }
 
                 await _channel.BasicAckAsync(ea.DeliveryTag, false);
+                _retryCounts.TryRemove(messageKey, out var _removed);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to process email message");
-                await _channel.BasicNackAsync(ea.DeliveryTag, false, true);
+                var retryCount = _retryCounts.AddOrUpdate(messageKey, 1, (_, count) => count + 1);
+
+                if (retryCount > MaxRetries)
+                {
+                    _logger.LogError(ex,
+                        "Email message failed after {MaxRetries} retries, discarding. Subject may be in: {Json}",
+                        MaxRetries, json[..Math.Min(json.Length, 200)]);
+                    await _channel.BasicAckAsync(ea.DeliveryTag, false); // discard
+                    _retryCounts.TryRemove(messageKey, out var _discarded);
+                }
+                else
+                {
+                    var delaySec = RetryDelaysSeconds[Math.Min(retryCount - 1, RetryDelaysSeconds.Length - 1)];
+                    _logger.LogWarning(ex,
+                        "Failed to send email (attempt {Attempt}/{Max}), retrying in {Delay}s...",
+                        retryCount, MaxRetries, delaySec);
+
+                    // Wait before requeuing to avoid hammering the SMTP server
+                    await Task.Delay(TimeSpan.FromSeconds(delaySec), stoppingToken);
+                    await _channel.BasicNackAsync(ea.DeliveryTag, false, true);
+                }
             }
         };
 

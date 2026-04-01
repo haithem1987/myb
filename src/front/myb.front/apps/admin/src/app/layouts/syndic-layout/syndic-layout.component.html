@@ -88,6 +88,20 @@
         <i class="bi bi-calendar-check"></i>
         <span class="nav-text">Appels de Fonds</span>
       </a>
+
+      <a routerLink="/coproperty/syndic/charge-payments" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-credit-card-2-front"></i>
+        <span class="nav-text">Paiements Charges</span>
+      </a>
+
+      <a routerLink="/coproperty/syndic/settings" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-gear"></i>
+        <span class="nav-text">Paramètres</span>
+      </a>
       
       <!-- Hidden: Assemblées Générales
       <a routerLink="/coproperty/syndic/general-assembly" 
@@ -141,12 +155,12 @@
       </button>
       
       <div class="header-actions">
-        <button class="btn-notification">
-          <i class="bi bi-bell"></i>
-          <span class="notification-badge" *ngIf="(unpaidInvoices() + urgentRequests()) > 0">
-            {{ unpaidInvoices() + urgentRequests() }}
-          </span>
-        </button>
+        <myb-front-notification-dropdown
+          [notifications]="notifications()"
+          [unreadCount]="unreadCount()"
+          (markAsRead)="onMarkAsRead($event)"
+          (markAllAsRead)="onMarkAllAsRead()">
+        </myb-front-notification-dropdown>
       </div>
     </header>
     

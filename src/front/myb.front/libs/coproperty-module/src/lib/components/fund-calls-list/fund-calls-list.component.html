@@ -113,7 +113,7 @@
             </div>
             <div class="ms-3">
               <h6 class="text-muted mb-0">Montant Appelé</h6>
-              <h3 class="mb-0">{{ formatAmount(getTotalAmount()) }} €</h3>
+              <h3 class="mb-0">{{ formatAmount(getTotalAmount()) }}</h3>
               <small class="text-muted">{{ filteredFundCalls.length }} appel(s)</small>
             </div>
           </div>
@@ -130,7 +130,7 @@
             </div>
             <div class="ms-3">
               <h6 class="text-muted mb-0">Encaissé</h6>
-              <h3 class="mb-0">{{ formatAmount(getTotalPaidAmount()) }} €</h3>
+              <h3 class="mb-0">{{ formatAmount(getTotalPaidAmount()) }}</h3>
               <small class="text-muted">{{ getPaidCount() }} réglé(s)</small>
             </div>
           </div>
@@ -147,7 +147,7 @@
             </div>
             <div class="ms-3">
               <h6 class="text-muted mb-0">Reste à percevoir</h6>
-              <h3 class="mb-0">{{ formatAmount(getTotalRemainingAmount()) }} €</h3>
+              <h3 class="mb-0">{{ formatAmount(getTotalRemainingAmount()) }}</h3>
               <small class="text-muted">{{ getToPayCount() }} en attente</small>
             </div>
           </div>
@@ -265,7 +265,7 @@
                 <div class="fw-semibold">{{ fundCall.description || '-' }}</div>
               </td>
               <td>
-                <strong>{{ formatAmount(fundCall.amount) }} €</strong>
+                <strong>{{ formatAmount(fundCall.amount) }}</strong>
               </td>
               <td>{{ formatDate(fundCall.dueDate) }}</td>
               <td>
@@ -362,9 +362,9 @@
           <div class="d-flex justify-content-between small fw-semibold mb-1">
             <span [class.text-success]="getRemainingAmount(editingFundCall()!) === 0"
                   [class.text-warning]="getRemainingAmount(editingFundCall()!) > 0">
-              {{ formatAmount(getTotalPayments(editingFundCall()!)) }} €
+              {{ formatAmount(getTotalPayments(editingFundCall()!)) }}
             </span>
-            <span class="text-muted">/ {{ formatAmount(editingFundCall()!.amount) }} €</span>
+            <span class="text-muted">/ {{ formatAmount(editingFundCall()!.amount) }}</span>
           </div>
           <div class="progress" style="height:6px">
             <div class="progress-bar"
@@ -378,7 +378,7 @@
             [class.text-danger]="getRemainingAmount(editingFundCall()!) > 0"
             [class.text-success]="getRemainingAmount(editingFundCall()!) === 0">
             <ng-container *ngIf="getRemainingAmount(editingFundCall()!) > 0">
-              Reste : {{ formatAmount(getRemainingAmount(editingFundCall()!)) }} €
+              Reste : {{ formatAmount(getRemainingAmount(editingFundCall()!)) }}
             </ng-container>
             <ng-container *ngIf="getRemainingAmount(editingFundCall()!) === 0">
               <i class="bi bi-check-circle-fill me-1"></i>Soldé
@@ -405,7 +405,7 @@
         <div *ngFor="let payment of editingFundCall()!.payments" class="payment-item">
           <div class="d-flex justify-content-between align-items-start">
             <div>
-              <div class="fw-semibold">{{ formatAmount(payment.amount) }} €</div>
+              <div class="fw-semibold">{{ formatAmount(payment.amount) }}</div>
               <div class="small text-muted">
                 <i class="bi bi-calendar2 me-1"></i>{{ formatDate(payment.paymentDate) }}
               </div>
@@ -656,20 +656,20 @@
           <tr *ngFor="let line of pendingInvoice()!.invoiceDetails">
             <td>{{ line.description }}</td>
             <td class="text-center">{{ line.quantity }}</td>
-            <td class="text-end">{{ formatAmount(line.unitPriceHT) }} €</td>
+            <td class="text-end">{{ formatAmount(line.unitPriceHT) }}</td>
             <td class="text-end">
-              <strong>{{ formatAmount((line.quantity ?? 1) * (line.unitPriceHT ?? 0)) }} €</strong>
+              <strong>{{ formatAmount((line.quantity ?? 1) * (line.unitPriceHT ?? 0)) }}</strong>
             </td>
           </tr>
         </tbody>
         <tfoot>
           <tr class="inv-subtotal">
             <td colspan="3" class="text-end">Sous-total HT</td>
-            <td class="text-end">{{ formatAmount(pendingInvoice()!.subTotal) }} €</td>
+            <td class="text-end">{{ formatAmount(pendingInvoice()!.subTotal) }}</td>
           </tr>
           <tr class="inv-total">
             <td colspan="3" class="text-end"><strong>TOTAL TTC</strong></td>
-            <td class="text-end"><strong>{{ formatAmount(pendingInvoice()!.totalAmount) }} €</strong></td>
+            <td class="text-end"><strong>{{ formatAmount(pendingInvoice()!.totalAmount) }}</strong></td>
           </tr>
         </tfoot>
       </table>

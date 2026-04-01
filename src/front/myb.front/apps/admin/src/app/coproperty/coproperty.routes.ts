@@ -99,12 +99,20 @@ export const COPROPERTY_ROUTES: Routes = [
         loadComponent: () => import('@myb-front/coproperty-module').then(m => m.FundCallNewComponent),
       },
       {
+        path: 'charge-payments',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.ChargePaymentsComponent),
+      },
+      {
         path: 'general-assembly',
         loadComponent: () => import('./syndic/general-assembly/general-assembly.component').then(m => m.GeneralAssemblyComponent),
       },
       {
         path: 'reports',
         loadComponent: () => import('./syndic/reports/reports.component').then(m => m.ReportsComponent),
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./syndic/settings/settings.component').then(m => m.SyndicSettingsComponent),
       },
     ],
   },
@@ -130,6 +138,10 @@ export const COPROPERTY_ROUTES: Routes = [
       {
         path: 'invoices',
         loadComponent: () => import('./owner/invoices/invoices.component').then(m => m.OwnerInvoicesComponent),
+      },
+      {
+        path: 'charges',
+        loadComponent: () => import('./owner/charges/charges.component').then(m => m.OwnerChargesComponent),
       },
       {
         path: 'maintenance',

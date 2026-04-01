@@ -51,6 +51,11 @@ builder.Services.AddEmailPublisher();
 builder.Services.Configure<Myb.Coproperty.Services.KeycloakOptions>(
     builder.Configuration.GetSection(Myb.Coproperty.Services.KeycloakOptions.SectionName));
 builder.Services.AddHttpClient("keycloak-admin");
+builder.Services.AddHttpClient("NotificationService", client =>
+{
+    var notifUrl = builder.Configuration["Services:NotificationUrl"] ?? "http://myb-notification:8080";
+    client.BaseAddress = new Uri(notifUrl);
+});
 builder.Services.AddScoped<Myb.Coproperty.Services.IKeycloakAdminService, Myb.Coproperty.Services.KeycloakAdminService>();
 
 // Add GraphQL

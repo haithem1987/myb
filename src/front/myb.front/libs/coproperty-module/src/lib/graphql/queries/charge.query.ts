@@ -65,3 +65,31 @@ export const GET_CHARGES_BY_COPROPERTY = gql`
     }
   }
 `;
+
+export const GET_COPROPERTY_CHARGE_DISTRIBUTIONS = gql`
+  query GetCopropertyChargeDistributions($copropertyId: UUID!) {
+    copropertyChargeDistributions(copropertyId: $copropertyId) {
+      id
+      chargeId
+      unitId
+      amount
+      percentage
+      calculatedAt
+      paymentStatus
+      paidAmount
+      paidAt
+      paymentTransactionId
+      paymentMethod
+      unitNumber
+      shares
+      area
+      chargeName
+      chargeDescription
+      chargeType
+      chargeFrequency
+      currency
+      ownerName
+      ownerEmail
+    }
+  }
+`;

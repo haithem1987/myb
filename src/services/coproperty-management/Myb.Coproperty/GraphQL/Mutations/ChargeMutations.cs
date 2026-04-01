@@ -83,5 +83,16 @@ namespace Myb.Coproperty.GraphQL.Mutations
 
         public async Task<IEnumerable<ChargeDistribution>> DistributeCharge(Guid chargeId, [Service] IChargeService chargeService) =>
             await chargeService.DistributeChargeAsync(chargeId);
+
+        /// <summary>
+        /// Mark a charge distribution as paid after successful payment through the payment service.
+        /// </summary>
+        public async Task<ChargeDistribution?> MarkChargeDistributionPaid(
+            Guid distributionId,
+            string transactionId,
+            string paymentMethod,
+            decimal paidAmount,
+            [Service] IChargeService chargeService) =>
+            await chargeService.MarkDistributionPaidAsync(distributionId, transactionId, paymentMethod, paidAmount);
     }
 }

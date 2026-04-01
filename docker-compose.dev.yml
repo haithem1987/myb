@@ -241,6 +241,8 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
+      copropertyDB:
+        condition: service_healthy
     networks:
       - my-network
     environment:
@@ -251,6 +253,8 @@ services:
       - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
       - Stripe__SecretKey=${STRIPE_SECRET_KEY:-sk_test_dummy_key}
       - Stripe__PublishableKey=${STRIPE_PUBLISHABLE_KEY:-pk_test_dummy_key}
+      - ConnectionStrings__PaymentDBConnection=Host=copropertyDB;Port=5432;Database=paymentDB;Username=${COPROPERTY_DB_USER:-postgres};Password=${COPROPERTY_DB_PASSWORD:-coproperty-pwd}
+      - RabbitMq__Host=rabbitmq
     restart: on-failure
 
   # Notification service

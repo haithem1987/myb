@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CreateCopropertyInput, Coproperty, Currency } from '../../models/coproperty.model';
 import { ManagerMultiSelectComponent } from '../manager-multi-select/manager-multi-select.component';
+import { KeycloakService } from '@myb-front/auth';
 
 @Component({
   selector: 'myb-coproperty-new',
@@ -25,6 +26,7 @@ export class CopropertyNewComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private copropertyService = inject(CopropertyService);
+  private keycloakService = inject(KeycloakService);
 
   activeTab = signal<string>('info');
   copropertyForm!: FormGroup;
@@ -140,6 +142,7 @@ export class CopropertyNewComponent implements OnInit {
       totalUnits: formData.totalUnits,
       totalShares: formData.totalShares,
       commonAreas: formData.commonAreas,
+      managerId: this.keycloakService.getProfile()?.id || undefined,
       managerName: formData.managerName?.trim() || undefined,
       isActive: this.currentIsActive
     };

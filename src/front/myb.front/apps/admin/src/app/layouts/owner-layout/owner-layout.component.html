@@ -31,29 +31,12 @@
             {{ pendingInvoices() }}
           </span>
         </a>
-        
-        <a routerLink="/coproperty/owner/maintenance" 
+
+        <a routerLink="/coproperty/owner/charges" 
            routerLinkActive="active" 
            class="nav-link">
-          <i class="bi bi-tools"></i>
-          <span>Demandes</span>
-          <span class="badge info" *ngIf="activeRequests() > 0">
-            {{ activeRequests() }}
-          </span>
-        </a>
-        
-        <a routerLink="/coproperty/owner/documents" 
-           routerLinkActive="active" 
-           class="nav-link">
-          <i class="bi bi-file-text"></i>
-          <span>Documents</span>
-        </a>
-        
-        <a routerLink="/coproperty/owner/general-assembly" 
-           routerLinkActive="active" 
-           class="nav-link">
-          <i class="bi bi-people"></i>
-          <span>AG</span>
+          <i class="bi bi-cash-stack"></i>
+          <span>Charges</span>
         </a>
       </nav>
       
@@ -113,32 +96,13 @@
         {{ pendingInvoices() }}
       </span>
     </a>
-    
-    <a routerLink="/coproperty/owner/maintenance" 
+
+    <a routerLink="/coproperty/owner/charges" 
        routerLinkActive="active" 
        class="nav-link"
        (click)="toggleMobileMenu()">
-      <i class="bi bi-tools"></i>
-      <span>Demandes</span>
-      <span class="badge info" *ngIf="activeRequests() > 0">
-        {{ activeRequests() }}
-      </span>
-    </a>
-    
-    <a routerLink="/coproperty/owner/documents" 
-       routerLinkActive="active" 
-       class="nav-link"
-       (click)="toggleMobileMenu()">
-      <i class="bi bi-file-text"></i>
-      <span>Documents</span>
-    </a>
-    
-    <a routerLink="/coproperty/owner/general-assembly" 
-       routerLinkActive="active" 
-       class="nav-link"
-       (click)="toggleMobileMenu()">
-      <i class="bi bi-people"></i>
-      <span>Assemblée Générale</span>
+      <i class="bi bi-cash-stack"></i>
+      <span>Charges</span>
     </a>
   </nav>
   

@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
+import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -20,6 +21,7 @@ import { map, finalize, switchMap } from 'rxjs/operators';
 export class ChargesListComponent implements OnInit {
   private chargeService = inject(ChargeService);
   private copropertyService = inject(CopropertyService);
+  private currencyService = inject(CurrencyService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
@@ -228,10 +230,7 @@ export class ChargesListComponent implements OnInit {
   }
 
   formatAmount(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+    return this.currencyService.formatAmount(amount);
   }
 
   deleteCharge(charge: ChargeExtended): void {

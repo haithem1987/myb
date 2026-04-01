@@ -55,13 +55,21 @@ public class FundCallService : IFundCallService
         // Use a date range to avoid date_trunc type-mismatch with timestamptz columns
         var dueDayUtc = DateTime.SpecifyKind(input.DueDate.Date, DateTimeKind.Utc);
         var nextDayUtc = dueDayUtc.AddDays(1);
-        var duplicate = await context.FundCalls.AnyAsync(f =>
+        var existingFundCall = await context.FundCalls.FirstOrDefaultAsync(f =>
             f.CopropertyId == input.CopropertyId.Value &&
             f.OwnerId == input.OwnerId &&
             f.DueDate >= dueDayUtc && f.DueDate < nextDayUtc);
 
-        if (duplicate)
-            throw new InvalidOperationException("Fund call already exists for this date");
+        // If a fund call already exists, update its amount and description instead of rejecting
+        if (existingFundCall != null)
+        {
+            existingFundCall.Amount = input.Amount;
+            existingFundCall.Description = input.Description;
+            existingFundCall.Status = input.Status ?? existingFundCall.Status;
+            existingFundCall.UpdatedAt = DateTime.UtcNow;
+            await context.SaveChangesAsync();
+            return existingFundCall;
+        }
 
         var fundCall = new FundCall
         {
@@ -234,6 +242,57 @@ public class FundCallService : IFundCallService
 
         fundCall.UpdatedAt = DateTime.UtcNow;
 
+        // Sync payment to charge distributions for this owner/coproperty
+        // This ensures coherence between fund call payments and charge payment statuses
+        if (fundCall.OwnerId.HasValue)
+        {
+            // Get all unit IDs owned by this owner in this coproperty
+            var ownerUnitIds = await context.OwnerUnits
+                .Where(ou => ou.OwnerId == fundCall.OwnerId.Value)
+                .Join(context.Units,
+                    ou => ou.UnitId,
+                    u => u.Id,
+                    (ou, u) => new { ou.UnitId, u.CopropertyId })
+                .Where(x => x.CopropertyId == fundCall.CopropertyId)
+                .Select(x => x.UnitId)
+                .ToListAsync();
+
+            if (ownerUnitIds.Count > 0)
+            {
+                // Get unpaid charge distributions for these units, ordered by oldest first (FIFO)
+                var unpaidDistributions = await context.ChargeDistributions
+                    .Include(cd => cd.Charge)
+                    .Where(cd => ownerUnitIds.Contains(cd.UnitId)
+                        && cd.Charge.CopropertyId == fundCall.CopropertyId
+                        && cd.PaymentStatus != ChargePaymentStatus.Paid)
+                    .OrderBy(cd => cd.CalculatedAt)
+                    .ToListAsync();
+
+                // Distribute payment across unpaid distributions (FIFO)
+                var remainingPayment = input.Amount;
+                foreach (var dist in unpaidDistributions)
+                {
+                    if (remainingPayment <= 0) break;
+
+                    var amountDue = dist.Amount - dist.PaidAmount;
+                    var payAmount = Math.Min(remainingPayment, amountDue);
+
+                    dist.PaidAmount += payAmount;
+                    dist.PaidAt = input.PaymentDate;
+                    dist.PaymentMethod = "BankTransfer";
+                    dist.PaymentTransactionId = input.Justificatif ?? $"FC-{fundCallId}";
+                    dist.UpdatedAt = DateTime.UtcNow;
+
+                    if (dist.PaidAmount >= dist.Amount)
+                        dist.PaymentStatus = ChargePaymentStatus.Paid;
+                    else if (dist.PaidAmount > 0)
+                        dist.PaymentStatus = ChargePaymentStatus.PartiallyPaid;
+
+                    remainingPayment -= payAmount;
+                }
+            }
+        }
+
         await context.SaveChangesAsync();
 
         return payment;
@@ -269,6 +328,15 @@ public class FundCallService : IFundCallService
                 var unitAmount = fundCall.Amount * sharePercentage;
 
                 var owner = unit.Owners.First();
+
+                // Skip if a pending invoice already exists for this unit + owner + coproperty
+                var existingInvoice = await context.CopropertyInvoices
+                    .AnyAsync(i =>
+                        i.CopropertyId == fundCall.CopropertyId &&
+                        i.UnitId == unit.Id &&
+                        i.OwnerId == owner.Id &&
+                        i.Status != InvoiceStatus.Paid);
+                if (existingInvoice) continue;
 
                 var invoice = new CopropertyInvoice
                 {

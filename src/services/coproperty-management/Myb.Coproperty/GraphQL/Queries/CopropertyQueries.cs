@@ -52,5 +52,22 @@ namespace Myb.Coproperty.GraphQL.Queries
         public async Task<IEnumerable<ManagerDto>> GetManagers(
             [Service] IKeycloakAdminService keycloakAdminService) =>
             await keycloakAdminService.GetManagersByRoleAsync();
+
+        /// <summary>
+        /// Search Keycloak users by partial email match (uses backend service account).
+        /// </summary>
+        public async Task<IEnumerable<KeycloakUserSearchDto>> SearchKeycloakUsers(
+            string email,
+            int? max,
+            [Service] IKeycloakAdminService keycloakAdminService) =>
+            await keycloakAdminService.SearchUsersByEmailAsync(email, max ?? 20);
+
+        /// <summary>
+        /// Get client roles assigned to a Keycloak user (uses backend service account).
+        /// </summary>
+        public async Task<IEnumerable<string>> GetUserClientRoles(
+            string userId,
+            [Service] IKeycloakAdminService keycloakAdminService) =>
+            await keycloakAdminService.GetUserClientRolesAsync(userId);
     }
 }

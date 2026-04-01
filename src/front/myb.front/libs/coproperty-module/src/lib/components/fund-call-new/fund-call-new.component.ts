@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FundCallService, FundCallExtended } from '../../services/fund-call.service';
 import { CopropertyService } from '../../services/coproperty.service';
+import { CurrencyService } from '../../services/currency.service';
 import { OwnerService } from '../../services/owner.service';
 import { Coproperty } from '../../models/coproperty.models';
 import { OwnerWithUnits } from '../../models/owner.model';
@@ -27,6 +28,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
 export class FundCallNewComponent implements OnInit {
   private fundCallService = inject(FundCallService);
   private copropertyService = inject(CopropertyService);
+  private currencyService = inject(CurrencyService);
   private ownerService = inject(OwnerService);
   private formBuilder = inject(FormBuilder);
   private router = inject(Router);
@@ -271,10 +273,12 @@ export class FundCallNewComponent implements OnInit {
     return new Date(date).toLocaleDateString('fr-FR');
   }
 
+  get currencySymbol(): string {
+    return this.currencyService.symbol;
+  }
+
   formatAmount(amount: number | string | undefined | null): string {
-    const n = typeof amount === 'string' ? parseFloat(amount) : (amount ?? NaN);
-    if (isNaN(n)) return '0,00';
-    return new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+    return this.currencyService.formatAmount(amount);
   }
 
   goBack(): void {

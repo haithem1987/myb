@@ -15,8 +15,24 @@ public class ChargeDistribution : IEntity<Guid>
     public DateTime CalculatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    // Payment tracking
+    public ChargePaymentStatus PaymentStatus { get; set; } = ChargePaymentStatus.Unpaid;
+    public decimal PaidAmount { get; set; }
+    public DateTime? PaidAt { get; set; }
+    public string? PaymentTransactionId { get; set; }
+    public string? PaymentMethod { get; set; }
     
     // Navigation Properties
     public Charge Charge { get; set; } = null!;
     public Unit Unit { get; set; } = null!;
+}
+
+public enum ChargePaymentStatus
+{
+    Unpaid,
+    Pending,
+    Paid,
+    PartiallyPaid,
+    Failed
 }

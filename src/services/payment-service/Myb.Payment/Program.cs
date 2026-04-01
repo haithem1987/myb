@@ -8,7 +8,6 @@ using Myb.Payment;
 using Myb.Payment.EntityFrameWork.Infra;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 // Add CORS policy for all origins (backend to backend communication)
 builder.Services.AddCors(options =>
@@ -38,15 +37,26 @@ builder.Services.AddEmailPublisher();
 builder.AddKeycloakSettings();
 builder.Services.AddServices();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 app.UseCors("AllowAll");
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+app.MapOpenApi();
+
+// Auto-migrate payment database
+using (var scope = app.Services.CreateScope())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Payment API V1");
-});
+    var db = scope.ServiceProvider.GetRequiredService<PaymentContext>();
+    try
+    {
+        await db.Database.MigrateAsync();
+    }
+    catch
+    {
+        // If no migrations exist, ensure the DB is created
+        await db.Database.EnsureCreatedAsync();
+    }
+}
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

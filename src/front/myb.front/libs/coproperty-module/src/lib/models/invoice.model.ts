@@ -20,6 +20,7 @@ export interface CopropertyInvoice {
   status: InvoiceStatus;
   paidDate?: Date;
   paymentMethod?: string;
+  description?: string;
   notes?: string;
   createdAt: Date;
 }

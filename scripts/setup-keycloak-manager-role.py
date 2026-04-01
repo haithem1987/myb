@@ -75,7 +75,7 @@ rm_resp, _ = api(token, 'GET', '/admin/realms/MYB/clients?clientId=realm-managem
 rm_uuid = rm_resp[0]['id']
 
 # Get needed roles from realm-management
-needed_roles = ['view-users', 'query-users', 'manage-realm', 'create-client', 'manage-clients']
+needed_roles = ['view-users', 'query-users', 'manage-users', 'manage-realm', 'create-client', 'manage-clients']
 rm_roles, _ = api(token, 'GET', f'/admin/realms/MYB/clients/{rm_uuid}/roles')
 roles_to_assign = [r for r in rm_roles if r['name'] in needed_roles]
 print(f"Assigning {len(roles_to_assign)} realm-management roles to service account")

@@ -147,7 +147,26 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+  # Service PostgreSQL pour Notification
+  notificationDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${NOTIFICATION_DB_PASSWORD:-notification-pwd}
+      POSTGRES_DB: ${NOTIFICATION_DB_NAME:-notificationDB}
+      POSTGRES_USER: ${NOTIFICATION_DB_USER:-postgres}
+      PGDATA: /var/lib/postgresql/notification/data
+    ports:
+      - "5436:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_notification_data:/var/lib/postgresql/notification/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${NOTIFICATION_DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   # your UserManager service (optionnel si vous l'utilisez)
   myb-usermanager:
     build:
@@ -331,10 +350,13 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      notificationDB:
+        condition: service_healthy
     networks:
       - my-network
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__NotificationDBConnection=Host=notificationDB;Port=5432;Database=${NOTIFICATION_DB_NAME:-notificationDB};Username=${NOTIFICATION_DB_USER:-postgres};Password=${NOTIFICATION_DB_PASSWORD:-notification-pwd}
       - Keycloak__BaseUrl=${KEYCLOAK_BASE_URL:-http://keycloak:8080/realms/MYB/protocol/openid-connect}
       - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/MYB}
       - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
@@ -407,4 +429,5 @@ volumes:
   postgres_document_data:
   postgres_invoice_data:
   postgres_coproperty_data:
+  postgres_notification_data:
   rabbitmq_data:

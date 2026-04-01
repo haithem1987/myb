@@ -2,16 +2,21 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { ToastService } from './toast.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 import { Notification } from '../models/notification.model';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private hubConnection: signalR.HubConnection | null = null;
+  private readonly apiUrl = 'http://localhost:8085';
 
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
+  public unreadCount$ = this.notifications$.pipe(
+    map(notifications => notifications.filter(n => !n.isRead).length)
+  );
+
   constructor(
     private http: HttpClient,
     private keycloakService: KeycloakService,
@@ -22,7 +27,7 @@ export class NotificationService {
     const token = (await this.keycloakService.getToken()) || '';
     console.log('startConnection', this.keycloakService);
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5040/notificationhub', {
+      .withUrl(`${this.apiUrl}/notificationhub`, {
         accessTokenFactory: () => token,
         withCredentials: false,
       })
@@ -47,9 +52,8 @@ export class NotificationService {
   }
 
   public sendToUser({ senderId, receiverId, message }: any): void {
-    console.log('Notification envoyée au user >>>>>>> ', message);
     this.http
-      .post('http://localhost:5040/api/Notifications', {
+      .post(`${this.apiUrl}/api/Notifications`, {
         senderId,
         receiverId,
         message,
@@ -62,10 +66,36 @@ export class NotificationService {
 
   public getNotificationsByUserId(userId: string): void {
     this.http
-      .get<Notification[]>(`http://localhost:5040/api/Notifications/${userId}`)
+      .get<Notification[]>(`${this.apiUrl}/api/Notifications/${userId}`)
       .subscribe({
         next: (notifications) => this.notificationsSubject.next(notifications),
         error: (err) => console.error('Failed to fetch notifications', err),
+      });
+  }
+
+  public markAsRead(notificationId: string): void {
+    this.http
+      .put(`${this.apiUrl}/api/Notifications/${notificationId}/read`, {})
+      .subscribe({
+        next: () => {
+          const updated = this.notificationsSubject.value.map(n =>
+            n.id === notificationId ? { ...n, isRead: true } : n
+          );
+          this.notificationsSubject.next(updated);
+        },
+        error: (err) => console.error('Failed to mark notification as read', err),
+      });
+  }
+
+  public markAllAsRead(userId: string): void {
+    this.http
+      .put(`${this.apiUrl}/api/Notifications/read-all/${userId}`, {})
+      .subscribe({
+        next: () => {
+          const updated = this.notificationsSubject.value.map(n => ({ ...n, isRead: true }));
+          this.notificationsSubject.next(updated);
+        },
+        error: (err) => console.error('Failed to mark all as read', err),
       });
   }
 }

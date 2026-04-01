@@ -75,7 +75,7 @@
                   [value]="formatAmount(calculatedTotal())"
                   readonly
                   disabled />
-                <span class="input-group-text">€</span>
+                <span class="input-group-text">{{ currencySymbol }}</span>
               </div>
               <small class="text-muted">
                 <i class="bi bi-info-circle me-1"></i>
@@ -127,7 +127,7 @@
               <tr *ngFor="let charge of getFilteredCharges()">
                 <td class="fw-semibold">{{ charge.name }}</td>
                 <td><span class="charge-type-badge">{{ charge.chargeType }}</span></td>
-                <td class="text-end amount-cell">{{ formatAmount(charge.totalAmount) }} €</td>
+                <td class="text-end amount-cell">{{ formatAmount(charge.totalAmount) }}</td>
               </tr>
             </tbody>
             <tfoot>
@@ -135,7 +135,7 @@
                 <td colspan="2" class="fw-bold">
                   <i class="bi bi-calculator me-1"></i>{{ 'common.total' | translate }}
                 </td>
-                <td class="text-end fw-bold total-amount">{{ formatAmount(calculatedTotal()) }} €</td>
+                <td class="text-end fw-bold total-amount">{{ formatAmount(calculatedTotal()) }}</td>
               </tr>
             </tfoot>
           </table>

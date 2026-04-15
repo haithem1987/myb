@@ -333,25 +333,28 @@
 }
 
 // Responsive adjustments
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .budget-new-container {
-    padding: 1rem;
+    padding: 1.25rem;
+  }
+}
 
-    .page-header h1 {
-      font-size: 1.5rem;
-    }
+@media (max-width: 576px) {
+  .budget-new-container {
+    padding: 0.75rem;
 
-    .card-body {
-      padding: 1rem;
-    }
+    .page-header h1 { font-size: 1.3rem; }
+
+    .card .card-body { padding: 1rem; }
+
+    .distribution-card { min-height: 120px; }
 
     .d-flex.gap-2 {
       flex-direction: column;
       width: 100%;
-      
-      .btn {
-        width: 100%;
-      }
+      .btn { width: 100%; }
     }
+
+    .btn { padding: 0.5rem 1rem; font-size: 0.9rem; }
   }
 }

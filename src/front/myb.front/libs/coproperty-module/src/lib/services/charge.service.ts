@@ -12,6 +12,7 @@ import {
   UPDATE_CHARGE,
   DELETE_CHARGE,
   CALCULATE_CHARGE_DISTRIBUTION,
+  MARK_CHARGE_DISTRIBUTION_PAID,
 } from '../graphql/mutations/charge.mutation';
 
 export interface ChargeExtended {
@@ -26,6 +27,7 @@ export interface ChargeExtended {
   startDate: Date;
   endDate?: Date;
   isActive: boolean;
+  isContribution: boolean;
   createdBy: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -160,5 +162,20 @@ export class ChargeService {
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.copropertyChargeDistributions));
+  }
+
+  markChargeDistributionPaid(
+    distributionId: string,
+    transactionId: string,
+    paymentMethod: string,
+    paidAmount: number
+  ): Observable<ChargeDistributionPayment> {
+    return this.apollo
+      .mutate<{ markChargeDistributionPaid: ChargeDistributionPayment }>({
+        mutation: MARK_CHARGE_DISTRIBUTION_PAID,
+        variables: { distributionId, transactionId, paymentMethod, paidAmount },
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data!.markChargeDistributionPaid));
   }
 }

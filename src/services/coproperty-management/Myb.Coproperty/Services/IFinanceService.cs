@@ -37,4 +37,19 @@ public interface IFinanceService
     /// Get dashboard statistics
     /// </summary>
     Task<DashboardStats> GetDashboardStatsAsync(Guid? copropertyId = null);
+
+    /// <summary>
+    /// Get full treasury dashboard (real + accounting treasury)
+    /// </summary>
+    Task<TreasuryDashboard> GetTreasuryDashboardAsync(Guid copropertyId, int months = 12);
+
+    /// <summary>
+    /// Get unpaid/late payment summary for a coproperty
+    /// </summary>
+    Task<UnpaidPaymentsSummary> GetUnpaidPaymentsSummaryAsync(Guid copropertyId);
+
+    /// <summary>
+    /// Get payment summary for a specific owner
+    /// </summary>
+    Task<OwnerPaymentSummary> GetOwnerPaymentSummaryAsync(Guid ownerId, Guid? copropertyId = null);
 }

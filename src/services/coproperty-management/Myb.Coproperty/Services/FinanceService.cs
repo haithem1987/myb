@@ -254,9 +254,13 @@ public class FinanceService : IFinanceService
             copropertiesQuery = copropertiesQuery.Where(c => c.Id == copropertyId);
 
         var totalCoproperties = await copropertiesQuery.CountAsync();
-        var totalUnits = await context.Units
-            .Where(u => !copropertyId.HasValue || u.CopropertyId == copropertyId)
-            .CountAsync();
+
+        var unitsQuery = context.Units
+            .Where(u => !copropertyId.HasValue || u.CopropertyId == copropertyId);
+
+        var totalUnits = await unitsQuery.CountAsync();
+        var occupiedUnits = await unitsQuery.Where(u => u.IsOccupied).CountAsync();
+        var totalArea = await unitsQuery.SumAsync(u => u.Area ?? 0m);
 
         var invoicesQuery = context.CopropertyInvoices.AsQueryable();
         if (copropertyId.HasValue)
@@ -279,14 +283,32 @@ public class FinanceService : IFinanceService
             .ToListAsync()
             .ContinueWith(task => (decimal)task.Result.Sum(i => i.TotalAmount - (i.Payments?.Sum(p => p.Amount) ?? 0)));
 
+        var totalOwners = await context.OwnerUnits
+            .Where(ou => !copropertyId.HasValue || ou.Unit.CopropertyId == copropertyId)
+            .Select(ou => ou.OwnerId)
+            .Distinct()
+            .CountAsync();
+
+        var activeCharges = await context.Charges
+            .Where(c => !copropertyId.HasValue || c.CopropertyId == copropertyId)
+            .Where(c => c.IsActive)
+            .CountAsync();
+
+        var occupancyRate = totalUnits > 0 ? (decimal)occupiedUnits / totalUnits * 100 : 0;
+
         return new DashboardStats
         {
             TotalCoproperties = totalCoproperties,
             TotalUnits = totalUnits,
+            OccupiedUnits = occupiedUnits,
             TotalCharges = totalCharges,
             TotalBalance = totalBalance.Result,
             PendingMaintenance = pendingMaintenance,
-            OverdueInvoices = overdueInvoices
+            OverdueInvoices = overdueInvoices,
+            TotalOwners = totalOwners,
+            ActiveCharges = activeCharges,
+            TotalArea = totalArea,
+            OccupancyRate = Math.Round(occupancyRate, 1)
         };
     }
 
@@ -316,5 +338,300 @@ public class FinanceService : IFinanceService
         }
 
         return monthlyBalances;
+    }
+
+    /// <summary>
+    /// Get full treasury dashboard with real vs accounting treasury
+    /// </summary>
+    public async Task<TreasuryDashboard> GetTreasuryDashboardAsync(Guid copropertyId, int months = 12)
+    {
+        using var context = _contextFactory.CreateDbContext();
+
+        var coproperty = await context.Coproperties.FirstOrDefaultAsync(c => c.Id == copropertyId);
+        if (coproperty == null)
+            throw new InvalidOperationException($"Coproperty {copropertyId} not found");
+
+        var now = DateTime.UtcNow;
+        var startOfYear = new DateTime(now.Year, 1, 1);
+
+        // --- REAL TREASURY (actual cash movements) ---
+        // Payments received from owners (encaissements)
+        var allPayments = await context.Payments
+            .Include(p => p.Invoice)
+            .Where(p => p.Invoice.CopropertyId == copropertyId)
+            .ToListAsync();
+
+        var paymentsThisYear = allPayments.Where(p => p.PaymentDate >= startOfYear).ToList();
+        var totalEncaissements = paymentsThisYear.Sum(p => p.Amount);
+
+        // For decaissements, we use charges that have been actually paid/processed
+        // In a real system this would connect to supplier payments
+        // Here we approximate with charge amounts for charges marked active within the period
+        var chargesThisYear = await context.Charges
+            .Where(c => c.CopropertyId == copropertyId && c.IsActive)
+            .Where(c => c.CreatedAt.HasValue && c.CreatedAt.Value >= startOfYear)
+            .ToListAsync();
+        var totalDecaissements = chargesThisYear.Sum(c => c.TotalAmount);
+
+        // Opening balance: sum of all payments before this year minus all charges before this year
+        var paymentsBefore = allPayments.Where(p => p.PaymentDate < startOfYear).Sum(p => p.Amount);
+        var chargesBefore = await context.Charges
+            .Where(c => c.CopropertyId == copropertyId)
+            .Where(c => c.CreatedAt.HasValue && c.CreatedAt.Value < startOfYear)
+            .SumAsync(c => c.TotalAmount);
+        var openingBalance = paymentsBefore - chargesBefore;
+
+        var realTreasury = new RealTreasury
+        {
+            OpeningBalance = openingBalance,
+            TotalEncaissements = totalEncaissements,
+            TotalDecaissements = totalDecaissements,
+            CurrentBalance = openingBalance + totalEncaissements - totalDecaissements
+        };
+
+        // --- ACCOUNTING TREASURY (obligations) ---
+        var allInvoices = await context.CopropertyInvoices
+            .Include(i => i.Payments)
+            .Include(i => i.Charge)
+            .Where(i => i.CopropertyId == copropertyId)
+            .ToListAsync();
+
+        var totalChargesEngaged = await context.Charges
+            .Where(c => c.CopropertyId == copropertyId && c.IsActive)
+            .SumAsync(c => c.TotalAmount);
+
+        var totalInvoiced = allInvoices.Sum(i => i.TotalAmount);
+        var totalCollected = allInvoices.Sum(i => i.Payments.Sum(p => p.Amount));
+        var totalOutstanding = allInvoices
+            .Where(i => i.Status != InvoiceStatus.Paid && i.Status != InvoiceStatus.Cancelled)
+            .Sum(i => i.TotalAmount - i.Payments.Sum(p => p.Amount));
+        var totalOverdue = allInvoices
+            .Where(i => (i.Status == InvoiceStatus.Pending || i.Status == InvoiceStatus.PartiallyPaid || i.Status == InvoiceStatus.Overdue)
+                        && i.DueDate < now)
+            .Sum(i => i.TotalAmount - i.Payments.Sum(p => p.Amount));
+
+        var accountingTreasury = new AccountingTreasury
+        {
+            TotalChargesEngaged = totalChargesEngaged,
+            TotalInvoiced = totalInvoiced,
+            TotalCollected = totalCollected,
+            TotalOutstanding = totalOutstanding,
+            TotalOverdue = totalOverdue,
+            AccountingBalance = totalCollected - totalChargesEngaged
+        };
+
+        // Collection rate
+        var collectionRate = totalInvoiced > 0 ? (totalCollected / totalInvoiced) * 100 : 0;
+
+        // Treasury evolution
+        var evolution = await GetTreasuryEvolutionAsync(copropertyId, months);
+
+        // Expense breakdown by charge type
+        var chargesByType = await context.Charges
+            .Where(c => c.CopropertyId == copropertyId && c.IsActive)
+            .GroupBy(c => c.ChargeType)
+            .Select(g => new { Type = g.Key, Amount = g.Sum(c => c.TotalAmount) })
+            .ToListAsync();
+
+        var totalChargeAmount = chargesByType.Sum(c => c.Amount);
+        var expensesByType = chargesByType.Select(c => new ExpenseBreakdown
+        {
+            Category = c.Type.ToString(),
+            Amount = c.Amount,
+            Percentage = totalChargeAmount > 0 ? (c.Amount / totalChargeAmount) * 100 : 0
+        }).ToList();
+
+        return new TreasuryDashboard
+        {
+            CopropertyId = copropertyId,
+            CopropertyName = coproperty.Name,
+            RealTreasury = realTreasury,
+            AccountingTreasury = accountingTreasury,
+            WorkingCapitalGap = realTreasury.CurrentBalance - accountingTreasury.AccountingBalance,
+            CollectionRate = collectionRate,
+            Evolution = evolution,
+            ExpensesByType = expensesByType
+        };
+    }
+
+    /// <summary>
+    /// Get unpaid/late payment summary across all owners for a coproperty
+    /// </summary>
+    public async Task<UnpaidPaymentsSummary> GetUnpaidPaymentsSummaryAsync(Guid copropertyId)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        var now = DateTime.UtcNow;
+
+        var invoices = await context.CopropertyInvoices
+            .Include(i => i.Payments)
+            .Include(i => i.Unit)
+            .Include(i => i.Owner)
+            .Include(i => i.Charge)
+            .Where(i => i.CopropertyId == copropertyId)
+            .Where(i => i.Status != InvoiceStatus.Paid && i.Status != InvoiceStatus.Cancelled)
+            .ToListAsync();
+
+        var grouped = invoices.GroupBy(i => i.OwnerId);
+        var ownerSummaries = new List<OwnerPaymentSummary>();
+
+        foreach (var group in grouped)
+        {
+            var owner = group.First().Owner;
+            var ownerInvoices = group.ToList();
+
+            var totalDue = ownerInvoices.Sum(i => i.TotalAmount);
+            var totalPaid = ownerInvoices.Sum(i => i.Payments.Sum(p => p.Amount));
+            var totalOutstanding = totalDue - totalPaid;
+
+            var overdueInvoices = ownerInvoices.Where(i => i.DueDate < now).ToList();
+            var totalOverdue = overdueInvoices.Sum(i => i.TotalAmount - i.Payments.Sum(p => p.Amount));
+            var oldestOverdue = overdueInvoices.OrderBy(i => i.DueDate).FirstOrDefault()?.DueDate;
+            var daysOverdue = oldestOverdue.HasValue ? (int)(now - oldestOverdue.Value).TotalDays : 0;
+
+            var healthStatus = GetHealthStatus(daysOverdue, overdueInvoices.Count);
+
+            var unitNumbers = ownerInvoices.Select(i => i.Unit?.UnitNumber ?? "N/A").Distinct().ToList();
+
+            var invoiceDetails = ownerInvoices.Select(i => new OwnerInvoiceDetail
+            {
+                InvoiceId = i.Id,
+                InvoiceNumber = i.InvoiceNumber,
+                UnitNumber = i.Unit?.UnitNumber ?? "N/A",
+                ChargeName = i.Charge?.Name ?? "N/A",
+                Amount = i.TotalAmount,
+                PaidAmount = i.Payments.Sum(p => p.Amount),
+                RemainingAmount = i.TotalAmount - i.Payments.Sum(p => p.Amount),
+                DueDate = i.DueDate,
+                DaysLate = i.DueDate < now ? (int)(now - i.DueDate).TotalDays : 0,
+                Status = i.Status,
+                ReminderLevel = GetReminderLevel(i.DueDate, now)
+            }).OrderByDescending(d => d.DaysLate).ToList();
+
+            ownerSummaries.Add(new OwnerPaymentSummary
+            {
+                OwnerId = owner?.Id ?? group.Key,
+                OwnerName = owner != null ? $"{owner.FirstName} {owner.LastName}" : "Unknown",
+                Email = owner?.Email ?? "",
+                Phone = owner?.Phone,
+                UnitNumbers = unitNumbers,
+                TotalDue = totalDue,
+                TotalPaid = totalPaid,
+                TotalOutstanding = totalOutstanding,
+                TotalOverdue = totalOverdue,
+                OverdueInvoiceCount = overdueInvoices.Count,
+                PendingInvoiceCount = ownerInvoices.Count - overdueInvoices.Count,
+                OldestOverdueDate = oldestOverdue,
+                DaysOverdue = daysOverdue,
+                HealthStatus = healthStatus,
+                Invoices = invoiceDetails
+            });
+        }
+
+        // Sort by severity (worst first)
+        ownerSummaries = ownerSummaries
+            .OrderByDescending(o => o.HealthStatus)
+            .ThenByDescending(o => o.TotalOverdue)
+            .ToList();
+
+        var allOverdue = invoices.Where(i => i.DueDate < now).ToList();
+        var avgDaysOverdue = allOverdue.Any()
+            ? (int)allOverdue.Average(i => (now - i.DueDate).TotalDays)
+            : 0;
+
+        return new UnpaidPaymentsSummary
+        {
+            CopropertyId = copropertyId,
+            TotalOwners = ownerSummaries.Count,
+            OwnersWithOverdue = ownerSummaries.Count(o => o.OverdueInvoiceCount > 0),
+            TotalOverdueInvoices = allOverdue.Count,
+            TotalOverdueAmount = allOverdue.Sum(i => i.TotalAmount - i.Payments.Sum(p => p.Amount)),
+            TotalPendingAmount = invoices.Where(i => i.DueDate >= now).Sum(i => i.TotalAmount - i.Payments.Sum(p => p.Amount)),
+            AverageDaysOverdue = avgDaysOverdue,
+            OwnerSummaries = ownerSummaries
+        };
+    }
+
+    /// <summary>
+    /// Get payment summary for a specific owner
+    /// </summary>
+    public async Task<OwnerPaymentSummary> GetOwnerPaymentSummaryAsync(Guid ownerId, Guid? copropertyId = null)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        var now = DateTime.UtcNow;
+
+        var query = context.CopropertyInvoices
+            .Include(i => i.Payments)
+            .Include(i => i.Unit)
+            .Include(i => i.Owner)
+            .Include(i => i.Charge)
+            .Where(i => i.OwnerId == ownerId);
+
+        if (copropertyId.HasValue)
+            query = query.Where(i => i.CopropertyId == copropertyId.Value);
+
+        var invoices = await query.ToListAsync();
+        var owner = invoices.FirstOrDefault()?.Owner;
+
+        var unpaidInvoices = invoices.Where(i => i.Status != InvoiceStatus.Paid && i.Status != InvoiceStatus.Cancelled).ToList();
+        var overdueInvoices = unpaidInvoices.Where(i => i.DueDate < now).ToList();
+
+        var totalDue = invoices.Sum(i => i.TotalAmount);
+        var totalPaid = invoices.Sum(i => i.Payments.Sum(p => p.Amount));
+        var totalOutstanding = unpaidInvoices.Sum(i => i.TotalAmount - i.Payments.Sum(p => p.Amount));
+        var totalOverdue = overdueInvoices.Sum(i => i.TotalAmount - i.Payments.Sum(p => p.Amount));
+        var oldestOverdue = overdueInvoices.OrderBy(i => i.DueDate).FirstOrDefault()?.DueDate;
+        var daysOverdue = oldestOverdue.HasValue ? (int)(now - oldestOverdue.Value).TotalDays : 0;
+
+        var invoiceDetails = unpaidInvoices.Select(i => new OwnerInvoiceDetail
+        {
+            InvoiceId = i.Id,
+            InvoiceNumber = i.InvoiceNumber,
+            UnitNumber = i.Unit?.UnitNumber ?? "N/A",
+            ChargeName = i.Charge?.Name ?? "N/A",
+            Amount = i.TotalAmount,
+            PaidAmount = i.Payments.Sum(p => p.Amount),
+            RemainingAmount = i.TotalAmount - i.Payments.Sum(p => p.Amount),
+            DueDate = i.DueDate,
+            DaysLate = i.DueDate < now ? (int)(now - i.DueDate).TotalDays : 0,
+            Status = i.Status,
+            ReminderLevel = GetReminderLevel(i.DueDate, now)
+        }).OrderByDescending(d => d.DaysLate).ToList();
+
+        return new OwnerPaymentSummary
+        {
+            OwnerId = ownerId,
+            OwnerName = owner != null ? $"{owner.FirstName} {owner.LastName}" : "Unknown",
+            Email = owner?.Email ?? "",
+            Phone = owner?.Phone,
+            UnitNumbers = invoices.Select(i => i.Unit?.UnitNumber ?? "N/A").Distinct().ToList(),
+            TotalDue = totalDue,
+            TotalPaid = totalPaid,
+            TotalOutstanding = totalOutstanding,
+            TotalOverdue = totalOverdue,
+            OverdueInvoiceCount = overdueInvoices.Count,
+            PendingInvoiceCount = unpaidInvoices.Count - overdueInvoices.Count,
+            OldestOverdueDate = oldestOverdue,
+            DaysOverdue = daysOverdue,
+            HealthStatus = GetHealthStatus(daysOverdue, overdueInvoices.Count),
+            Invoices = invoiceDetails
+        };
+    }
+
+    private static PaymentHealthStatus GetHealthStatus(int daysOverdue, int overdueCount)
+    {
+        if (overdueCount == 0) return PaymentHealthStatus.Pending;
+        if (daysOverdue > 90) return PaymentHealthStatus.Delinquent;
+        if (daysOverdue > 30) return PaymentHealthStatus.Critical;
+        return PaymentHealthStatus.Late;
+    }
+
+    private static int GetReminderLevel(DateTime dueDate, DateTime now)
+    {
+        if (dueDate >= now) return 0;
+        var daysLate = (int)(now - dueDate).TotalDays;
+        if (daysLate > 30) return 3;
+        if (daysLate > 15) return 2;
+        if (daysLate > 5) return 1;
+        return 0;
     }
 }

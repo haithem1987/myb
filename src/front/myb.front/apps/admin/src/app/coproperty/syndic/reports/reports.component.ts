@@ -438,6 +438,56 @@ interface Report {
       background: #3b82f6;
       color: white;
     }
+
+    @media (max-width: 992px) {
+      .reports-container { padding: 1.25rem; }
+      .quick-reports-grid { grid-template-columns: repeat(2, 1fr); }
+      .templates-grid { grid-template-columns: repeat(2, 1fr); }
+      .report-meta { gap: 0.75rem; }
+    }
+
+    @media (max-width: 576px) {
+      .reports-container { padding: 0.75rem; }
+
+      .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+      .page-header h1 { font-size: 1.5rem; }
+      .page-header .btn { width: 100%; justify-content: center; }
+
+      .report-categories { gap: 0.5rem; }
+      .category-btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+
+      .quick-reports-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      .quick-report-card { padding: 1.25rem; }
+      .quick-report-card i { font-size: 1.75rem; margin-bottom: 0.5rem; }
+
+      .report-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .report-icon { width: 48px; height: 48px; }
+      .report-icon i { font-size: 1.4rem; }
+      .report-content h3 { font-size: 1rem; }
+      .report-meta { gap: 0.5rem; }
+      .meta-item { font-size: 0.8rem; }
+      .report-actions { width: 100%; justify-content: flex-end; }
+
+      .templates-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+      .template-card { padding: 1.25rem; }
+      .template-card i { font-size: 2rem; margin-bottom: 0.75rem; }
+      .template-card h3 { font-size: 1rem; }
+    }
   `]
 })
 export class ReportsComponent {

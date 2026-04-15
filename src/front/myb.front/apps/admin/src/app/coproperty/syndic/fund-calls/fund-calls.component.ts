@@ -2,6 +2,7 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
+import { CurrencyService } from '@myb-front/coproperty-module';
 
 interface FundCall {
   id: string;
@@ -51,7 +52,7 @@ interface FundCall {
         <div class="stat-card">
           <i class="bi bi-currency-euro icon"></i>
           <div class="stat-content">
-            <div class="stat-value">{{ totalAmount() | number:'1.0-0' }}€</div>
+            <div class="stat-value">{{ formatAmount(totalAmount()) }}</div>
             <div class="stat-label">Montant total</div>
           </div>
         </div>
@@ -111,7 +112,7 @@ interface FundCall {
             <div class="stat">
               <i class="bi bi-currency-euro"></i>
               <div>
-                <strong>{{ fundCall.totalAmount | number:'1.0-0' }}€</strong>
+                <strong>{{ formatAmount(fundCall.totalAmount) }}</strong>
                 <small>Montant total</small>
               </div>
             </div>
@@ -482,6 +483,66 @@ interface FundCall {
       color: #6b7280;
       margin: 0 0 1.5rem 0;
     }
+
+    @media (max-width: 992px) {
+      .fund-calls-container { padding: 1.25rem; }
+      .stats-cards { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .fund-call-stats { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .filters { gap: 1rem; }
+      .filter-group { min-width: 150px; }
+    }
+
+    @media (max-width: 576px) {
+      .fund-calls-container { padding: 0.75rem; }
+
+      .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+      .page-header h1 { font-size: 1.5rem; }
+      .page-header .btn { width: 100%; justify-content: center; }
+
+      .stats-cards {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+      .stat-card {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      .stat-card .icon { font-size: 1.75rem; }
+      .stat-value { font-size: 1.35rem; }
+      .stat-label { font-size: 0.8rem; }
+
+      .filters {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+      }
+      .filter-group { min-width: 100%; }
+
+      .fund-call-header h3 { font-size: 1.1rem; }
+
+      .fund-call-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+      .fund-call-stats .stat i { font-size: 1.2rem; }
+      .fund-call-stats .stat strong { font-size: 1rem; }
+
+      .fund-call-card { padding: 1rem; }
+
+      .fund-call-actions {
+        flex-direction: column;
+      }
+      .fund-call-actions .btn { width: 100%; justify-content: center; }
+
+      .empty-state { padding: 2rem 1rem; }
+      .empty-state i { font-size: 3rem; }
+    }
   `]
 })
 export class FundCallsComponent implements OnInit {
@@ -564,6 +625,11 @@ export class FundCallsComponent implements OnInit {
   private modalService = inject(ModalService);
   private fileService = inject(FileDownloadService);
   private toastService = inject(ToastService);
+  private currencyService = inject(CurrencyService);
+
+  formatAmount(amount: number): string {
+    return this.currencyService.formatAmount(amount);
+  }
 
   async createFundCall(): Promise<void> {
     await this.modalService.alert(

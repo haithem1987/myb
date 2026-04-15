@@ -1,10 +1,10 @@
 <div class="charge-payments-container">
   <div class="page-header">
     <h1>
-      <i class="bi bi-credit-card-2-front me-2"></i>
-      Suivi des Paiements de Charges
+      <i class="bi bi-receipt me-2"></i>
+      Règlement des Charges Fournisseurs
     </h1>
-    <p class="text-muted">Consultez l'état des paiements de charges par les copropriétaires</p>
+    <p class="text-muted">Enregistrez les paiements effectués par le syndic aux fournisseurs (eau, électricité, entretien, etc.)</p>
   </div>
 
   <!-- Filters -->
@@ -38,7 +38,6 @@
             <option value="PAID">Payé</option>
             <option value="PARTIALLY_PAID">Partiellement payé</option>
             <option value="UNPAID">Non payé</option>
-            <option value="PENDING">En attente</option>
           </select>
         </div>
 
@@ -50,7 +49,7 @@
             id="search"
             type="text"
             class="form-control"
-            placeholder="Charge, lot, référence..."
+            placeholder="Nom de charge, type, référence..."
             [value]="searchTerm()"
             (input)="onSearchInput($event)" />
         </div>
@@ -76,7 +75,7 @@
             <div class="ms-3">
               <h6 class="text-muted mb-0">Total des Charges</h6>
               <h3 class="mb-0">{{ formatAmount(totalAmount) }}</h3>
-              <small class="text-muted">{{ filteredDistributions.length }} distribution(s)</small>
+              <small class="text-muted">{{ filteredSummaries.length }} charge(s)</small>
             </div>
           </div>
         </div>
@@ -91,9 +90,9 @@
               <i class="bi bi-check-circle"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Montant Encaissé</h6>
+              <h6 class="text-muted mb-0">Payé aux Fournisseurs</h6>
               <h3 class="mb-0">{{ formatAmount(totalPaid) }}</h3>
-              <small class="text-muted">{{ paidCount }} payé(s)</small>
+              <small class="text-muted">{{ paidCount }} réglé(s)</small>
             </div>
           </div>
         </div>
@@ -108,7 +107,7 @@
               <i class="bi bi-exclamation-circle"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Reste à Percevoir</h6>
+              <h6 class="text-muted mb-0">Reste à Régler</h6>
               <h3 class="mb-0">{{ formatAmount(totalRemaining) }}</h3>
               <small class="text-muted">{{ unpaidCount }} en attente</small>
             </div>
@@ -125,7 +124,7 @@
               <i class="bi bi-pie-chart"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Taux de Recouvrement</h6>
+              <h6 class="text-muted mb-0">Taux de Règlement</h6>
               <h3 class="mb-0">{{ collectionRate | number:'1.0-0' }}%</h3>
               <div class="progress mt-1" style="height:4px;width:80px">
                 <div class="progress-bar bg-info" [style.width.%]="collectionRate"></div>
@@ -137,12 +136,12 @@
     </div>
   </div>
 
-  <!-- Payments Table -->
+  <!-- Charges Table (grouped by budget) -->
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">
         <i class="bi bi-table me-2"></i>
-        Détail des Paiements ({{ filteredDistributions.length }})
+        Détail des Charges ({{ filteredSummaries.length }})
       </h5>
     </div>
     <div class="card-body">
@@ -153,87 +152,194 @@
         </div>
       </div>
 
-      <div *ngIf="!loading() && filteredDistributions.length === 0" class="text-center py-5">
+      <div *ngIf="!loading() && filteredSummaries.length === 0" class="text-center py-5">
         <i class="bi bi-inbox display-1 text-muted"></i>
-        <p class="text-muted mt-3">Aucune distribution trouvée</p>
+        <p class="text-muted mt-3">Aucune charge distribuée trouvée</p>
       </div>
 
-      <div *ngIf="!loading() && filteredDistributions.length > 0" class="table-responsive">
+      <div *ngIf="!loading() && filteredSummaries.length > 0" class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-light">
             <tr>
               <th>Charge</th>
-              <th>Copropriétaire</th>
-              <th>Lot</th>
               <th>Type</th>
-              <th>Montant</th>
-              <th>Payé</th>
-              <th>Reste</th>
-              <th>Date Paiement</th>
+              <th class="text-end">Montant Total</th>
+              <th class="text-end">Payé</th>
+              <th class="text-end">Reste</th>
+              <th>Date Règlement</th>
               <th>Méthode</th>
               <th>Référence</th>
               <th>Statut</th>
+              <th class="text-center">Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let d of filteredDistributions"
-                [class.table-success]="d.paymentStatus === 'PAID'"
-                [class.table-warning]="d.paymentStatus === 'PARTIALLY_PAID'">
+            <tr *ngFor="let s of filteredSummaries"
+                [class.table-success]="s.paymentStatus === 'PAID'"
+                [class.table-warning]="s.paymentStatus === 'PARTIALLY_PAID'">
               <td>
                 <div class="d-flex align-items-center">
-                  <i class="bi me-2" [ngClass]="getChargeTypeIcon(d.chargeType)"></i>
+                  <i class="bi me-2 fs-5" [ngClass]="getChargeTypeIcon(s.chargeType)"></i>
                   <div>
-                    <strong>{{ d.chargeName }}</strong>
-                    <div class="text-muted small">{{ d.chargeDescription }}</div>
+                    <strong>{{ s.chargeName }}</strong>
+                    <div *ngIf="s.chargeDescription" class="text-muted small">{{ s.chargeDescription }}</div>
                   </div>
                 </div>
               </td>
               <td>
-                <div class="d-flex align-items-center">
-                  <i class="bi bi-person-fill me-1 text-muted"></i>
-                  <span class="fw-semibold">{{ d.ownerName }}</span>
-                </div>
+                <span class="badge bg-light text-dark border">
+                  {{ getChargeTypeLabel(s.chargeType) }}
+                </span>
               </td>
-              <td>
-                <span class="badge bg-light text-dark border">{{ d.unitNumber }}</span>
-              </td>
-              <td class="text-muted small">{{ d.chargeType }}</td>
-              <td><strong>{{ formatAmount(d.amount) }}</strong></td>
-              <td>
-                <span [class.text-success]="d.paidAmount >= d.amount"
-                      [class.text-warning]="d.paidAmount > 0 && d.paidAmount < d.amount"
-                      [class.text-muted]="!d.paidAmount || d.paidAmount === 0"
+              <td class="text-end"><strong>{{ formatAmount(s.totalAmount) }}</strong></td>
+              <td class="text-end">
+                <span [class.text-success]="s.paidAmount >= s.totalAmount"
+                      [class.text-warning]="s.paidAmount > 0 && s.paidAmount < s.totalAmount"
+                      [class.text-muted]="!s.paidAmount || s.paidAmount === 0"
                       class="fw-semibold">
-                  {{ formatAmount(d.paidAmount || 0) }}
+                  {{ formatAmount(s.paidAmount) }}
                 </span>
               </td>
-              <td>
-                <span [class.text-danger]="(d.amount - (d.paidAmount || 0)) > 0"
-                      [class.text-success]="(d.amount - (d.paidAmount || 0)) <= 0">
-                  {{ formatAmount(d.amount - (d.paidAmount || 0)) }}
+              <td class="text-end">
+                <span [class.text-danger]="s.remaining > 0"
+                      [class.text-success]="s.remaining <= 0">
+                  {{ formatAmount(s.remaining) }}
                 </span>
               </td>
-              <td>{{ formatDate(d.paidAt) }}</td>
+              <td>{{ formatDate(s.paidAt) }}</td>
               <td>
-                <span *ngIf="d.paymentMethod" class="badge bg-light text-dark border">
-                  <i class="bi bi-credit-card me-1"></i>{{ d.paymentMethod }}
+                <span *ngIf="s.paymentMethod" class="badge bg-light text-dark border">
+                  <i class="bi bi-credit-card me-1"></i>{{ s.paymentMethod }}
                 </span>
-                <span *ngIf="!d.paymentMethod" class="text-muted">—</span>
+                <span *ngIf="!s.paymentMethod" class="text-muted">—</span>
               </td>
               <td>
-                <span *ngIf="d.paymentTransactionId" class="text-muted small font-monospace">
-                  {{ d.paymentTransactionId }}
+                <span *ngIf="s.paymentTransactionId" class="text-muted small font-monospace">
+                  {{ s.paymentTransactionId }}
                 </span>
-                <span *ngIf="!d.paymentTransactionId" class="text-muted">—</span>
+                <span *ngIf="!s.paymentTransactionId" class="text-muted">—</span>
               </td>
               <td>
-                <span class="badge" [ngClass]="getStatusBadgeClass(d.paymentStatus)">
-                  {{ getStatusLabel(d.paymentStatus) }}
+                <span class="badge" [ngClass]="getStatusBadgeClass(s.paymentStatus)">
+                  {{ getStatusLabel(s.paymentStatus) }}
+                </span>
+              </td>
+              <td class="text-center">
+                <button *ngIf="s.paymentStatus !== 'PAID'"
+                        class="btn btn-sm btn-outline-success"
+                        [disabled]="paying() === s.chargeId"
+                        (click)="openPaymentModal(s)">
+                  <i class="bi bi-wallet2 me-1"></i>
+                  <span *ngIf="paying() !== s.chargeId">Régler</span>
+                  <span *ngIf="paying() === s.chargeId">
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                  </span>
+                </button>
+                <span *ngIf="s.paymentStatus === 'PAID'" class="text-success">
+                  <i class="bi bi-check-circle-fill"></i>
                 </span>
               </td>
             </tr>
           </tbody>
+          <tfoot>
+            <tr class="fw-bold">
+              <td colspan="2">Total</td>
+              <td class="text-end">{{ formatAmount(totalAmount) }}</td>
+              <td class="text-end text-success">{{ formatAmount(totalPaid) }}</td>
+              <td class="text-end text-danger">{{ formatAmount(totalRemaining) }}</td>
+              <td colspan="5"></td>
+            </tr>
+          </tfoot>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div *ngIf="showPaymentModal()" class="modal-backdrop fade show"></div>
+  <div *ngIf="showPaymentModal()" class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">
+            <i class="bi bi-wallet2 me-2"></i>
+            Enregistrer un Paiement Fournisseur
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closePaymentModal()"></button>
+        </div>
+        <div class="modal-body" *ngIf="selectedCharge() as charge">
+          <div class="alert alert-light border mb-3">
+            <div class="d-flex align-items-center">
+              <i class="bi me-2 fs-4" [ngClass]="getChargeTypeIcon(charge.chargeType)"></i>
+              <div>
+                <strong>{{ charge.chargeName }}</strong>
+                <div class="text-muted small">{{ getChargeTypeLabel(charge.chargeType) }}</div>
+              </div>
+            </div>
+            <hr class="my-2">
+            <div class="d-flex justify-content-between">
+              <span>Montant total :</span>
+              <strong>{{ formatAmount(charge.totalAmount) }}</strong>
+            </div>
+            <div class="d-flex justify-content-between text-danger">
+              <span>Reste à régler :</span>
+              <strong>{{ formatAmount(charge.remaining) }}</strong>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="paymentAmount" class="form-label fw-semibold">
+              <i class="bi bi-cash me-1"></i> Montant du paiement
+            </label>
+            <div class="input-group">
+              <input
+                id="paymentAmount"
+                type="number"
+                class="form-control"
+                [(ngModel)]="paymentForm.amount"
+                [max]="charge.remaining"
+                min="0.01"
+                step="0.01" />
+              <span class="input-group-text">{{ charge.currency }}</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="paymentMethod" class="form-label fw-semibold">
+              <i class="bi bi-credit-card me-1"></i> Méthode de paiement
+            </label>
+            <select id="paymentMethod" class="form-select" [(ngModel)]="paymentForm.paymentMethod">
+              <option value="Virement">Virement bancaire</option>
+              <option value="Chèque">Chèque</option>
+              <option value="Espèces">Espèces</option>
+              <option value="Carte">Carte bancaire</option>
+              <option value="Prélèvement">Prélèvement</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="transactionId" class="form-label fw-semibold">
+              <i class="bi bi-hash me-1"></i> Référence de paiement
+            </label>
+            <input
+              id="transactionId"
+              type="text"
+              class="form-control"
+              [(ngModel)]="paymentForm.transactionId"
+              placeholder="N° de virement, chèque, etc." />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closePaymentModal()">
+            Annuler
+          </button>
+          <button type="button" class="btn btn-success"
+                  [disabled]="paying() !== null || paymentForm.amount <= 0"
+                  (click)="confirmPayment()">
+            <i class="bi bi-check-circle me-1"></i>
+            Confirmer le Paiement
+          </button>
+        </div>
       </div>
     </div>
   </div>

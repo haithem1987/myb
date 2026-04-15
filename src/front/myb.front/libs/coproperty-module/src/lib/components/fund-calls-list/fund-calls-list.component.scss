@@ -477,3 +477,48 @@
     letter-spacing: 0.03em;
   }
 }
+
+// ── Responsive ──────────────────────────────────────────────────────────────
+@media (max-width: 992px) {
+  .fund-calls-list-container { padding: 1.25rem 0; }
+  .edit-panel { width: 380px; }
+  .invoice-modal { width: 500px; }
+}
+
+@media (max-width: 576px) {
+  .fund-calls-list-container {
+    padding: 0.75rem 0;
+
+    .page-header h1 { font-size: 1.3rem; }
+
+    .stats-card .card-body { padding: 1rem; }
+    .stat-icon { width: 40px; height: 40px; font-size: 1.1rem; }
+
+    .card .card-body { padding: 1rem; }
+    .card .card-header { padding: 0.75rem 1rem; }
+
+    .table thead th { padding: 0.5rem; font-size: 0.65rem; }
+    .table tbody td { padding: 0.5rem 0.625rem; font-size: 0.85rem; }
+  }
+
+  .edit-panel { width: 100%; max-width: 100vw; }
+  .edit-panel-body { padding: 1rem; }
+
+  .invoice-modal { width: 100vw; }
+  .invoice-modal-body { padding: 1rem; }
+  .inv-header { flex-direction: column; gap: 0.75rem; }
+  .inv-meta { text-align: left; }
+  .inv-title { font-size: 1.2rem; }
+  .inv-dates { grid-template-columns: 1fr 1fr; }
+}
+
+// ── Overdue row styling ──────────────────────────────────────────────
+.overdue-row {
+  border-left: 3px solid #dc3545 !important;
+  animation: pulse-overdue 2s ease-in-out 1;
+}
+
+@keyframes pulse-overdue {
+  0%, 100% { background-color: inherit; }
+  50% { background-color: rgba(220, 53, 69, 0.05); }
+}

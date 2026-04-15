@@ -154,6 +154,19 @@ interface Document {
       }
     }
 
+    @media (max-width: 576px) {
+      .col-md-2-4 { width: 50%; margin-bottom: 0.5rem; }
+      .stat-card { padding: 12px; gap: 10px; }
+      .stat-icon { width: 40px; height: 40px; font-size: 18px; }
+      .stat-value { font-size: 20px; }
+      .stat-label { font-size: 11px; }
+
+      .document-card { padding: 16px; }
+      .document-icon { width: 48px; height: 48px; font-size: 22px; margin-bottom: 12px; }
+      .document-name { font-size: 14px; min-height: 36px; }
+      .document-actions { padding-top: 12px; }
+    }
+
     .stat-card {
       background: white;
       border-radius: 12px;

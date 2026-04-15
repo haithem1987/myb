@@ -4,9 +4,9 @@
     <p class="subtitle">Vue d'ensemble de vos copropriétés</p>
   </div>
   
-  <!-- Statistics Cards -->
+  <!-- Primary Statistics Cards -->
   <div class="stats-grid">
-    <div class="stat-card primary">
+    <a routerLink="/coproperty/syndic/coproperties" class="stat-card primary clickable">
       <div class="stat-icon">
         <i class="bi bi-building"></i>
       </div>
@@ -14,37 +14,69 @@
         <div class="stat-value">{{ stats().totalCoproperties }}</div>
         <div class="stat-label">Copropriétés gérées</div>
       </div>
-    </div>
+      <span class="card-arrow"><i class="bi bi-arrow-right-circle"></i></span>
+    </a>
     
-    <div class="stat-card success">
+    <a routerLink="/coproperty/syndic/units" class="stat-card success clickable">
       <div class="stat-icon">
         <i class="bi bi-house-door"></i>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ stats().activeUnits }}</div>
-        <div class="stat-label">Lots actifs</div>
+        <div class="stat-value">{{ stats().activeUnits }}<span class="stat-sub">/{{ stats().totalUnits }}</span></div>
+        <div class="stat-label">Lots occupés / total</div>
       </div>
-    </div>
+      <span class="card-arrow"><i class="bi bi-arrow-right-circle"></i></span>
+    </a>
     
-    <div class="stat-card info">
+    <a routerLink="/coproperty/syndic/treasury" class="stat-card info clickable">
       <div class="stat-icon">
         <i class="bi bi-cash-stack"></i>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ stats().totalBudget | number:'1.0-0' }}€</div>
+        <div class="stat-value">{{ formatAmount(stats().totalBudget) }}</div>
         <div class="stat-label">Budget total</div>
       </div>
-    </div>
+      <span class="card-arrow"><i class="bi bi-arrow-right-circle"></i></span>
+    </a>
     
-    <div class="stat-card secondary">
+    <a routerLink="/coproperty/syndic/owners" class="stat-card secondary clickable">
       <div class="stat-icon">
         <i class="bi bi-people"></i>
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ stats().totalOwners }}</div>
-        <div class="stat-label">Nombre de copropriétaires</div>
+        <div class="stat-label">Copropriétaires</div>
       </div>
-    </div>
+      <span class="card-arrow"><i class="bi bi-arrow-right-circle"></i></span>
+    </a>
+  </div>
+
+  <!-- Secondary Indicators -->
+  <div class="indicators-row">
+    <a routerLink="/coproperty/syndic/units" class="indicator clickable">
+      <i class="bi bi-graph-up"></i>
+      <div class="indicator-info">
+        <span class="indicator-value">{{ stats().occupancyRate }}%</span>
+        <span class="indicator-label">Taux d'occupation</span>
+      </div>
+      <div class="indicator-bar">
+        <div class="indicator-fill" [style.width.%]="stats().occupancyRate"></div>
+      </div>
+    </a>
+    <a routerLink="/coproperty/syndic/budgets" class="indicator clickable">
+      <i class="bi bi-clipboard-check"></i>
+      <div class="indicator-info">
+        <span class="indicator-value">{{ stats().activeCharges }}</span>
+        <span class="indicator-label">Charges actives</span>
+      </div>
+    </a>
+    <a routerLink="/coproperty/syndic/units" class="indicator clickable">
+      <i class="bi bi-rulers"></i>
+      <div class="indicator-info">
+        <span class="indicator-value">{{ stats().totalSurface | number:'1.0-0' }} m²</span>
+        <span class="indicator-label">Surface totale gérée</span>
+      </div>
+    </a>
   </div>
   
   <!-- Quick Actions -->

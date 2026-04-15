@@ -181,6 +181,32 @@
 
   <!-- Fund Calls Table -->
   <div class="card">
+
+    <!-- Overdue Alert Banner -->
+    <div *ngIf="getOverdueCount() > 0" class="alert alert-danger border-0 rounded-0 rounded-top mb-0 d-flex align-items-center justify-content-between" role="alert">
+      <div class="d-flex align-items-center">
+        <div class="me-3" style="font-size: 2rem;">
+          <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+        </div>
+        <div>
+          <h6 class="alert-heading mb-1">
+            <i class="bi bi-bell-fill me-1"></i>
+            Relance requise &mdash; Impayés détectés
+          </h6>
+          <p class="mb-0 small">
+            <strong>{{ getOverdueCount() }}</strong> appel(s) de fonds en retard de paiement pour un montant total impayé de
+            <strong class="text-danger">{{ formatAmount(getTotalOverdueAmount()) }}</strong>.
+            Veuillez relancer les copropriétaires concernés.
+          </p>
+        </div>
+      </div>
+      <div class="d-flex gap-2 flex-shrink-0 ms-3">
+        <span class="badge bg-danger rounded-pill fs-6 px-3 py-2">
+          {{ getOverdueCount() }} impayé(s)
+        </span>
+      </div>
+    </div>
+
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">
         <i class="bi bi-list-ul me-2"></i>
@@ -245,7 +271,9 @@
           <tbody>
             <tr *ngFor="let fundCall of filteredFundCalls"
                 [class.table-active]="isSelected(fundCall.id)"
-                [class.selected-row]="isSelected(fundCall.id)">
+                [class.selected-row]="isSelected(fundCall.id)"
+                [class.table-danger]="isOverdue(fundCall) && !isSelected(fundCall.id)"
+                [class.overdue-row]="isOverdue(fundCall)">
               <td class="text-center">
                 <input type="checkbox" class="form-check-input"
                   [checked]="isSelected(fundCall.id)"
@@ -267,10 +295,17 @@
               <td>
                 <strong>{{ formatAmount(fundCall.amount) }}</strong>
               </td>
-              <td>{{ formatDate(fundCall.dueDate) }}</td>
+              <td>{{ formatDate(fundCall.dueDate) }}
+                <span *ngIf="isOverdue(fundCall)" class="badge ms-1" [ngClass]="getOverdueBadgeClass(fundCall)">
+                  <i class="bi bi-clock-history me-1"></i>{{ getOverdueLabel(fundCall) }}
+                </span>
+              </td>
               <td>
                 <span class="badge" [ngClass]="getStatusBadge(fundCall.status)">
                   {{ getStatusLabel(fundCall.status) }}
+                </span>
+                <span *ngIf="isOverdue(fundCall)" class="badge bg-danger ms-1" title="Relance nécessaire">
+                  <i class="bi bi-bell-fill me-1"></i>Relance
                 </span>
               </td>
               <td style="min-width:120px">
@@ -283,7 +318,7 @@
                         [class.text-danger]="prog.percent === 0">
                         {{ formatAmount(prog.paid) }}
                       </span>
-                      <span class="text-muted"> / {{ formatAmount(prog.total) }} €</span>
+                      <span class="text-muted"> / {{ formatAmount(prog.total) }}</span>
                     </div>
                     <div class="progress" style="height:5px">
                       <div class="progress-bar"

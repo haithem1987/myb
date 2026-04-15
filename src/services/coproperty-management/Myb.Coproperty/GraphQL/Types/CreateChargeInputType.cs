@@ -22,6 +22,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(c => c.StartDate).Type<NonNullType<StringType>>();
             descriptor.Field(c => c.EndDate).Type<StringType>();
             descriptor.Field(c => c.IsActive).Type<BooleanType>().DefaultValue(true);
+            descriptor.Field(c => c.IsContribution).Type<BooleanType>().DefaultValue(false);
             descriptor.Field(c => c.CreatedBy).Type<NonNullType<IdType>>();
         }
     }

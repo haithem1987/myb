@@ -130,6 +130,21 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
+    @media (max-width: 992px) {
+      .col-lg-4 { flex: 0 0 50%; max-width: 50%; }
+    }
+
+    @media (max-width: 576px) {
+      .container-fluid { padding: 0.75rem; }
+      h1 { font-size: 1.4rem; }
+      .col-md-4.text-end { text-align: start !important; margin-top: 0.5rem; }
+      .btn-violet { width: 100%; }
+      .col-md-6, .col-lg-4 { flex: 0 0 100%; max-width: 100%; }
+      .stat-value { font-size: 1.2rem; }
+      .stat-label { font-size: 0.65rem; }
+      .card-title { font-size: 1rem; }
+    }
   `]
 })
 export class CopropertyListComponent {

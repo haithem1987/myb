@@ -51,10 +51,20 @@ export class OwnerDashboardComponent implements OnInit {
   pendingInvoices = signal<PendingInvoice[]>([]);
   recentInvoices = signal<RecentInvoice[]>([]);
   totalDue = signal(0);
+  totalPaid = signal(0);
+  overdueCount = signal(0);
+  totalCharges = signal(0);
   loading = signal(true);
+
+  totalShares = computed(() => this.myUnits().reduce((sum, u) => sum + u.shares, 0));
+  totalSurface = computed(() => this.myUnits().reduce((sum, u) => sum + u.surface, 0));
   
   ngOnInit(): void {
     this.loadOwnerData();
+  }
+
+  formatAmount(amount: number): string {
+    return this.currencyService.formatAmount(amount);
   }
 
   private getCurrentUserId(): string | null {
@@ -80,7 +90,6 @@ export class OwnerDashboardComponent implements OnInit {
 
     this.loading.set(true);
 
-    // First get the owner entity, then load everything in parallel
     this.ownerService.getOwnerByUserId(userId).pipe(
       take(1),
       catchError(() => of(null)),
@@ -125,6 +134,9 @@ export class OwnerDashboardComponent implements OnInit {
           inv.status === InvoiceStatus.OVERDUE ||
           inv.status === InvoiceStatus.PARTIALLY_PAID
         );
+        const overdue = invoices.filter(inv => inv.status === InvoiceStatus.OVERDUE);
+        this.overdueCount.set(overdue.length);
+
         this.pendingInvoices.set(pending.map(inv => ({
           id: inv.id,
           number: inv.invoiceNumber,
@@ -133,6 +145,10 @@ export class OwnerDashboardComponent implements OnInit {
           dueDate: new Date(inv.dueDate),
           description: inv.notes || `Facture ${inv.invoiceNumber}`,
         })));
+
+        // Paid invoices total
+        const paid = invoices.filter(inv => inv.status === InvoiceStatus.PAID);
+        this.totalPaid.set(paid.reduce((sum, inv) => sum + inv.totalAmount, 0));
 
         // Map all invoices (latest 5) for the recent invoices list
         const sorted = [...invoices].sort((a, b) =>
@@ -148,12 +164,14 @@ export class OwnerDashboardComponent implements OnInit {
           paymentMethod: inv.paymentMethod ?? '',
         })));
 
+        // Total charges from distributions
+        this.totalCharges.set(distributions.reduce((sum, d) => sum + d.amount, 0));
+
         // Calculate total due from charge distributions (unpaid)
         const chargeDue = distributions
           .filter(d => d.paymentStatus !== 'PAID' && d.paymentStatus !== 'Paid')
           .reduce((sum, d) => sum + d.amount - (d.paidAmount || 0), 0);
 
-        // Also add unpaid invoices
         const invoiceDue = pending.reduce((sum, inv) => sum + inv.totalAmount, 0);
 
         this.totalDue.set(Math.max(chargeDue, invoiceDue));
@@ -175,5 +193,14 @@ export class OwnerDashboardComponent implements OnInit {
     const now = new Date();
     const diff = new Date(dueDate).getTime() - now.getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'paid': return 'Payée';
+      case 'overdue': return 'En retard';
+      case 'pending': return 'En attente';
+      default: return status;
+    }
   }
 }

@@ -46,6 +46,32 @@ namespace Myb.Coproperty.GraphQL.Queries
             await financeService.GenerateFinancialReportAsync(copropertyId, year);
 
         /// <summary>
+        /// Get full treasury dashboard (real + accounting treasury)
+        /// </summary>
+        public async Task<TreasuryDashboard> GetTreasuryDashboard(
+            Guid copropertyId,
+            [Service] IFinanceService financeService,
+            int months = 12) =>
+            await financeService.GetTreasuryDashboardAsync(copropertyId, months);
+
+        /// <summary>
+        /// Get unpaid/late payment summary for a coproperty
+        /// </summary>
+        public async Task<UnpaidPaymentsSummary> GetUnpaidPaymentsSummary(
+            Guid copropertyId,
+            [Service] IFinanceService financeService) =>
+            await financeService.GetUnpaidPaymentsSummaryAsync(copropertyId);
+
+        /// <summary>
+        /// Get payment summary for a specific owner
+        /// </summary>
+        public async Task<OwnerPaymentSummary> GetOwnerPaymentSummary(
+            Guid ownerId,
+            [Service] IFinanceService financeService,
+            Guid? copropertyId = null) =>
+            await financeService.GetOwnerPaymentSummaryAsync(ownerId, copropertyId);
+
+        /// <summary>
         /// Get Keycloak users that hold the manager/syndic role.
         /// The role is created automatically if it does not yet exist.
         /// </summary>

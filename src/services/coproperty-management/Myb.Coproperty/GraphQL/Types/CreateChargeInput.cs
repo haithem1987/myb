@@ -19,6 +19,7 @@ namespace Myb.Coproperty.GraphQL.Types
         public required string StartDate { get; set; }  // String instead of DateTime
         public string? EndDate { get; set; }  // String instead of DateTime
         public bool IsActive { get; set; } = true;
+        public bool IsContribution { get; set; } = false;
         public required Guid CreatedBy { get; set; }
 
         /// <summary>
@@ -47,6 +48,7 @@ namespace Myb.Coproperty.GraphQL.Types
                     ? DateTime.SpecifyKind(endDate, DateTimeKind.Utc) 
                     : null,
                 IsActive = IsActive,
+                IsContribution = IsContribution,
                 CreatedBy = CreatedBy,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow

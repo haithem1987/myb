@@ -4,15 +4,20 @@ import { RouterModule } from '@angular/router';
 import { CopropertyService } from 'libs/coproperty-module/src/lib/services/coproperty.service';
 import { UnitService } from 'libs/coproperty-module/src/lib/services/unit.service';
 import { ChargeService } from 'libs/coproperty-module/src/lib/services/charge.service';
+import { CurrencyService } from 'libs/coproperty-module/src/lib/services/currency.service';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { take, timeout, catchError } from 'rxjs/operators';
 
 interface DashboardStats {
   totalCoproperties: number;
+  totalUnits: number;
   activeUnits: number;
   totalBudget: number;
   totalOwners: number;
+  activeCharges: number;
+  occupancyRate: number;
+  totalSurface: number;
 }
 
 interface RecentActivity {
@@ -35,13 +40,18 @@ export class SyndicDashboardComponent implements OnInit {
   private copropertyService = inject(CopropertyService);
   private unitService = inject(UnitService);
   private chargeService = inject(ChargeService);
+  private currencyService = inject(CurrencyService);
   private destroyRef = inject(DestroyRef);
   
   stats = signal<DashboardStats>({
     totalCoproperties: 0,
+    totalUnits: 0,
     activeUnits: 0,
     totalBudget: 0,
-    totalOwners: 0
+    totalOwners: 0,
+    activeCharges: 0,
+    occupancyRate: 0,
+    totalSurface: 0
   });
   
   recentActivities = signal<RecentActivity[]>([]);
@@ -50,17 +60,14 @@ export class SyndicDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.loadDashboardData();
   }
+
+  formatAmount(amount: number): string {
+    return this.currencyService.formatAmount(amount);
+  }
   
   private loadDashboardData(): void {
     this.loading.set(true);
-    console.log('[Dashboard] Loading dashboard data...');
-    console.log('[Dashboard] Services:', {
-      coproperty: !!this.copropertyService,
-      unit: !!this.unitService,
-      charge: !!this.chargeService
-    });
     
-    // Load real data from GraphQL with timeout and error handling
     const coproperties$ = this.copropertyService.getCoproperties().pipe(
       take(1),
       timeout(10000),
@@ -88,8 +95,6 @@ export class SyndicDashboardComponent implements OnInit {
       })
     );
     
-    console.log('[Dashboard] Starting forkJoin...');
-    
     forkJoin({
       coproperties: coproperties$,
       units: units$,
@@ -98,35 +103,27 @@ export class SyndicDashboardComponent implements OnInit {
     .pipe(takeUntilDestroyed(this.destroyRef))
     .subscribe({
       next: ({ coproperties, units, charges }) => {
-        console.log('[Dashboard] Data received:', {
-          coproperties: coproperties.length,
-          units: units.length,
-          charges: charges.length
-        });
-        
-        // Calculate total budget from all active charges
-        const totalBudget = charges
-          .filter(c => c.isActive)
-          .reduce((sum, charge) => sum + (charge.totalAmount || 0), 0);
-        
-        console.log('[Dashboard] Total budget:', totalBudget);
-        
-        // Count unique owners from units (simplified - using number of occupied units as proxy)
+        const activeCharges = charges.filter(c => c.isActive);
+        const totalBudget = activeCharges.reduce((sum, charge) => sum + (charge.totalAmount || 0), 0);
         const totalOwners = units.filter(u => u.isOccupied).length;
+        const totalUnits = units.length;
+        const activeUnits = units.filter(u => u.isOccupied).length;
+        const occupancyRate = totalUnits > 0 ? Math.round((activeUnits / totalUnits) * 100) : 0;
+        const totalSurface = units.reduce((sum, u) => sum + (u.area || 0), 0);
         
         this.stats.set({
           totalCoproperties: coproperties.length,
-          activeUnits: units.filter(u => u.isOccupied).length,
-          totalBudget: totalBudget,
-          totalOwners: totalOwners
+          totalUnits,
+          activeUnits,
+          totalBudget,
+          totalOwners,
+          activeCharges: activeCharges.length,
+          occupancyRate,
+          totalSurface
         });
-        
-        console.log('[Dashboard] Stats updated:', this.stats());
         
         // Create recent activities from latest charges
         const activities: RecentActivity[] = [];
-        
-        // Get latest charges sorted by date
         const sortedCharges = [...charges]
           .sort((a, b) => {
             const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -143,17 +140,14 @@ export class SyndicDashboardComponent implements OnInit {
             id: charge.id || '',
             type: 'budget',
             title: 'Nouveau budget créé',
-            description: `${charge.name} - ${charge.totalAmount}€`,
+            description: `${charge.name} - ${this.formatAmount(charge.totalAmount)}`,
             timestamp: charge.createdAt ? new Date(charge.createdAt) : new Date(),
             coproperty: copropertyName
           });
         });
         
         this.recentActivities.set(activities);
-        console.log('[Dashboard] Activities set:', activities.length);
-        
         this.loading.set(false);
-        console.log('[Dashboard] Loading complete');
       },
       error: (err) => {
         console.error('[Dashboard] Error loading dashboard data:', err);

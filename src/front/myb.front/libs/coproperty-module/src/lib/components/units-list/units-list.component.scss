@@ -423,3 +423,30 @@
     }
   }
 }
+
+@media (max-width: 992px) {
+  .units-list-container { padding: 1.25rem; }
+}
+
+@media (max-width: 576px) {
+  .units-list-container {
+    padding: 0.75rem;
+
+    .page-header {
+      h1 { font-size: 1.4rem; }
+      .btn-add { width: 100%; justify-content: center; padding: 0.625rem 1rem; }
+    }
+
+    .stats-card {
+      .stat-icon { width: 2.5rem; height: 2.5rem; i { font-size: 1.25rem; } }
+      h3 { font-size: 1.5rem; }
+      h6 { font-size: 0.65rem; }
+    }
+
+    .form-card .card-body { padding: 1rem; }
+    .form-card .form-actions { flex-direction: column; }
+
+    .table thead th { padding: 0.5rem; font-size: 0.65rem; }
+    .table tbody td { padding: 0.5rem; font-size: 0.85rem; }
+  }
+}

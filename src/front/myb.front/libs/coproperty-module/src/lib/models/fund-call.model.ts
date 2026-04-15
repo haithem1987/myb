@@ -32,6 +32,7 @@ export interface FundCallPayment {
   amount: number;
   paymentDate: Date;
   justificatif?: string;
+  paymentMethod?: string;
   createdAt: Date;
 }
 
@@ -39,6 +40,7 @@ export interface FundCallPayment {
 export interface FundCall {
   id: string;
   copropertyId: string;
+  copropertyName?: string;
   ownerId?: string;
   owner?: FundCallOwner;
   amount: number;
@@ -70,5 +72,6 @@ export interface AddFundCallPaymentInput {
   amount: number;
   paymentDate: Date;
   justificatif?: string;
+  paymentMethod?: string;
 }
 

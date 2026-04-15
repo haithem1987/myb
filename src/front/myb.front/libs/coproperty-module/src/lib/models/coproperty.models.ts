@@ -197,10 +197,15 @@ export enum MaintenanceStatus {
 export interface DashboardStats {
   totalCoproperties: number;
   totalUnits: number;
+  occupiedUnits: number;
   totalBalance: number;
   totalCharges: number;
   pendingMaintenance: number;
   overdueInvoices: number;
+  totalOwners: number;
+  activeCharges: number;
+  totalArea: number;
+  occupancyRate: number;
 }
 
 export interface TreasuryDataPoint {

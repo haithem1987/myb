@@ -47,6 +47,9 @@ builder.Services.AddScoped<Myb.Coproperty.Services.IAssemblyService, Myb.Coprope
 builder.Services.AddScoped<Myb.Coproperty.GraphQL.Mutations.IAuthenticationService, Myb.Coproperty.Services.AuthenticationService>();
 builder.Services.AddEmailPublisher();
 
+// Monthly fund call payment reminders
+builder.Services.AddHostedService<Myb.Coproperty.Services.FundCallReminderService>();
+
 // Keycloak Admin API — used for manager role lookup
 builder.Services.Configure<Myb.Coproperty.Services.KeycloakOptions>(
     builder.Configuration.GetSection(Myb.Coproperty.Services.KeycloakOptions.SectionName));

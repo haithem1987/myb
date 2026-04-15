@@ -5,6 +5,8 @@ import {
   GET_FUND_CALLS_BY_COPROPERTY,
   GET_ALL_FUND_CALLS,
   GET_FUND_CALL_BY_ID,
+  GET_FUND_CALLS_BY_OWNER,
+  GET_EXISTING_FUND_CALL_TOTALS,
 } from '../graphql/queries/fund-call.query';
 import {
   CREATE_FUND_CALL,
@@ -74,6 +76,20 @@ export class FundCallService {
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.fundCall));
+  }
+
+  getFundCallsByOwner(ownerId: string): Observable<FundCallExtended[]> {
+    return this.apollo
+      .query<{ fundCallsByOwner: (FundCallExtended & { coproperty?: { id: string; name: string } })[] }>({
+        query: GET_FUND_CALLS_BY_OWNER,
+        variables: { ownerId },
+        fetchPolicy: 'no-cache',
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data.fundCallsByOwner.map(fc => ({
+        ...fc,
+        copropertyName: fc.coproperty?.name || fc.copropertyName
+      }))));
   }
 
   createFundCall(input: CreateFundCallInput): Observable<FundCallExtended> {
@@ -147,6 +163,17 @@ export class FundCallService {
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteFundCall));
+  }
+
+  getExistingFundCallTotals(copropertyId: string): Observable<{ ownerId: string; remainingAmount: number }[]> {
+    return this.apollo
+      .query<{ existingFundCallTotals: { ownerId: string; remainingAmount: number }[] }>({
+        query: GET_EXISTING_FUND_CALL_TOTALS,
+        variables: { copropertyId },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data.existingFundCallTotals));
   }
 
   generateInvoicesFromFundCall(fundCallId: string): Observable<any[]> {

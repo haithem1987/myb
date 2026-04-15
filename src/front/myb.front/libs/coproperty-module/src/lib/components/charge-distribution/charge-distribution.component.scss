@@ -488,13 +488,31 @@ $violet-shadow: 0 8px 24px rgba(102, 126, 234, 0.22);
 }
 
 // ─── Responsive ─────────────────────────────────────────────────────────────
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .charge-distribution-container {
-    padding: 1rem;
+    padding: 1.25rem;
+
+    .method-options {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .charge-distribution-container {
+    padding: 0.75rem;
+
+    .distribution-header h2 { font-size: 1.4rem; }
+
+    .form-card .card-body,
+    .method-card .card-body,
+    .distribution-preview .card-body { padding: 1rem; }
 
     .method-options {
       grid-template-columns: 1fr;
     }
+
+    .method-option-card { padding: 0.75rem; }
 
     .preview-actions {
       flex-direction: column;
@@ -508,8 +526,14 @@ $violet-shadow: 0 8px 24px rgba(102, 126, 234, 0.22);
 
     .preview-table thead tr th,
     .budget-table thead tr th {
-      font-size: 0.72rem;
-      padding: 0.65rem 0.6rem;
+      font-size: 0.65rem;
+      padding: 0.5rem;
+    }
+
+    .preview-table tbody td,
+    .budget-table tbody td {
+      padding: 0.5rem;
+      font-size: 0.82rem;
     }
   }
 }

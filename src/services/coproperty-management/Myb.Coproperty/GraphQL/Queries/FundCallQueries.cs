@@ -1,6 +1,7 @@
 using HotChocolate;
 using HotChocolate.Types;
 using Myb.Coproperty.Models;
+using Myb.Coproperty.Models.Dtos;
 using Myb.Coproperty.Services;
 
 namespace Myb.Coproperty.GraphQL.Queries;
@@ -33,4 +34,29 @@ public class FundCallQueries
     public async Task<List<FundCall>> GetAllFundCalls(
         [Service] IFundCallService fundCallService) =>
         await fundCallService.GetAllAsync();
+
+    /// <summary>
+    /// Get all fund calls for a specific owner (across all coproperties).
+    /// Used by the owner portal.
+    /// </summary>
+    public async Task<List<FundCall>> GetFundCallsByOwner(
+        Guid ownerId,
+        [Service] IFundCallService fundCallService) =>
+        await fundCallService.GetByOwnerIdAsync(ownerId);
+
+    /// <summary>
+    /// Get remaining fund call totals per owner for a coproperty.
+    /// Used during repartition to avoid double-charging owners who already have fund calls.
+    /// </summary>
+    public async Task<List<OwnerFundCallTotal>> GetExistingFundCallTotals(
+        Guid copropertyId,
+        [Service] IFundCallService fundCallService)
+    {
+        var totals = await fundCallService.GetExistingFundCallTotalsByOwnerAsync(copropertyId);
+        return totals.Select(kvp => new OwnerFundCallTotal
+        {
+            OwnerId = kvp.Key,
+            RemainingAmount = kvp.Value
+        }).ToList();
+    }
 }

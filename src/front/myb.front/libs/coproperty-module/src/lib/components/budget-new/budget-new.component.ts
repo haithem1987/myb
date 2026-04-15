@@ -5,6 +5,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
+import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -23,6 +24,11 @@ export class BudgetNewComponent implements OnInit {
   private activatedRoute = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
+  private currencyService = inject(CurrencyService);
+
+  get currencySymbol(): string {
+    return this.currencyService.symbol;
+  }
 
   budgetForm!: FormGroup;
   coproperties = signal<Coproperty[]>([]);
@@ -78,7 +84,8 @@ export class BudgetNewComponent implements OnInit {
       distributionMethod: ['BY_SHARES'],
       startDate: ['', Validators.required],
       endDate: [''],
-      isActive: [true]
+      isActive: [true],
+      isContribution: [false]
     });
   }
 
@@ -171,7 +178,8 @@ export class BudgetNewComponent implements OnInit {
             totalAmount: budget.totalAmount,
             distributionMethod: budget.distributionMethod,
             startDate: isoStartDate,
-            isActive: budget.isActive
+            isActive: budget.isActive,
+            isContribution: budget.isContribution ?? false
           };
 
           if (budget.endDate) {

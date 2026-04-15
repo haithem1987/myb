@@ -66,6 +66,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(p => p.Amount).Type<NonNullType<FloatType>>();
             descriptor.Field(p => p.PaymentDate).Type<NonNullType<DateTimeType>>();
             descriptor.Field(p => p.Justificatif).Type<StringType>();
+            descriptor.Field(p => p.PaymentMethod).Type<StringType>();
             descriptor.Field(p => p.CreatedAt).Type<NonNullType<DateTimeType>>();
         }
     }

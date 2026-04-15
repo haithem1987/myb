@@ -1,0 +1,211 @@
+<div class="unpaid-payments-container">
+  <!-- Header -->
+  <div class="page-header">
+    <a routerLink="/admin/coproperties" class="back-link">
+      <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+    </a>
+    <h1><i class="bi bi-exclamation-triangle"></i> Impayés & Retards de Paiement</h1>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading()" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <div *ngIf="!isLoading() && summary()">
+    <!-- Alert KPI Cards -->
+    <div class="alert-kpi-row">
+      <div class="alert-kpi danger">
+        <div class="alert-kpi-icon"><i class="bi bi-exclamation-octagon"></i></div>
+        <div class="alert-kpi-body">
+          <span class="label">Impayés en retard</span>
+          <span class="value">{{ formatAmount(summary()!.totalOverdueAmount) }}</span>
+          <span class="sub">{{ summary()!.totalOverdueInvoices }} factures</span>
+        </div>
+      </div>
+      <div class="alert-kpi warning">
+        <div class="alert-kpi-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="alert-kpi-body">
+          <span class="label">En attente</span>
+          <span class="value">{{ formatAmount(summary()!.totalPendingAmount) }}</span>
+          <span class="sub">Non encore échu</span>
+        </div>
+      </div>
+      <div class="alert-kpi info">
+        <div class="alert-kpi-icon"><i class="bi bi-people"></i></div>
+        <div class="alert-kpi-body">
+          <span class="label">Propriétaires concernés</span>
+          <span class="value">{{ summary()!.ownersWithOverdue }} / {{ summary()!.totalOwners }}</span>
+          <span class="sub">avec retard de paiement</span>
+        </div>
+      </div>
+      <div class="alert-kpi dark">
+        <div class="alert-kpi-icon"><i class="bi bi-calendar-x"></i></div>
+        <div class="alert-kpi-body">
+          <span class="label">Retard moyen</span>
+          <span class="value">{{ summary()!.averageDaysOverdue }} jours</span>
+          <span class="sub">tous propriétaires confondus</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="filters-bar">
+      <div class="filter-tabs">
+        <button class="filter-btn" [class.active]="selectedFilter() === 'all'" (click)="selectedFilter.set('all')">
+          <i class="bi bi-list"></i> Tous ({{ summary()!.ownerSummaries.length }})
+        </button>
+        <button class="filter-btn overdue" [class.active]="selectedFilter() === 'overdue'" (click)="selectedFilter.set('overdue')">
+          <i class="bi bi-exclamation-triangle"></i> En retard ({{ summary()!.ownersWithOverdue }})
+        </button>
+        <button class="filter-btn pending" [class.active]="selectedFilter() === 'pending'" (click)="selectedFilter.set('pending')">
+          <i class="bi bi-clock"></i> En attente
+        </button>
+      </div>
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Rechercher par nom, email ou unité..."
+          [value]="searchTerm()"
+          (input)="searchTerm.set($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <!-- Owner Cards List -->
+    <div class="owners-list">
+      <div *ngIf="filteredOwners.length === 0" class="empty-state">
+        <i class="bi bi-check-circle"></i>
+        <p>Aucun impayé trouvé</p>
+      </div>
+
+      <div *ngFor="let owner of filteredOwners" class="owner-card" [class.expanded]="expandedOwner() === owner.ownerId">
+        <!-- Owner Header (clickable) -->
+        <div class="owner-header" (click)="toggleOwnerExpand(owner.ownerId)">
+          <div class="owner-info">
+            <div class="owner-avatar" [class]="'health-' + owner.healthStatus.toLowerCase()">
+              {{ owner.ownerName.charAt(0) }}
+            </div>
+            <div class="owner-details">
+              <h5 class="owner-name">{{ owner.ownerName }}</h5>
+              <div class="owner-meta">
+                <span><i class="bi bi-envelope"></i> {{ owner.email }}</span>
+                <span *ngIf="owner.phone"><i class="bi bi-telephone"></i> {{ owner.phone }}</span>
+                <span><i class="bi bi-building"></i> {{ owner.unitNumbers.join(', ') }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="owner-amounts">
+            <div class="amount-block" *ngIf="owner.totalOverdue > 0">
+              <span class="amount-label">En retard</span>
+              <span class="amount-value text-danger">{{ formatAmount(owner.totalOverdue) }}</span>
+            </div>
+            <div class="amount-block">
+              <span class="amount-label">Restant dû</span>
+              <span class="amount-value">{{ formatAmount(owner.totalOutstanding) }}</span>
+            </div>
+            <div class="health-badge">
+              <span class="badge" [class]="getHealthConfig(owner.healthStatus).badge">
+                <i [class]="getHealthConfig(owner.healthStatus).icon"></i>
+                {{ getHealthConfig(owner.healthStatus).label }}
+              </span>
+              <span class="days-info" *ngIf="owner.daysOverdue > 0">{{ owner.daysOverdue }}j de retard</span>
+            </div>
+            <div class="expand-icon">
+              <i class="bi" [class.bi-chevron-down]="expandedOwner() !== owner.ownerId" [class.bi-chevron-up]="expandedOwner() === owner.ownerId"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Owner Detail (expandable) -->
+        <div class="owner-detail" *ngIf="expandedOwner() === owner.ownerId">
+          <!-- Progress bar -->
+          <div class="payment-progress">
+            <div class="progress-info">
+              <span>Payé: {{ formatAmount(owner.totalPaid) }}</span>
+              <span>Total: {{ formatAmount(owner.totalDue) }}</span>
+            </div>
+            <div class="progress">
+              <div class="progress-bar bg-success" [style.width.%]="(owner.totalPaid / owner.totalDue) * 100"></div>
+              <div class="progress-bar bg-warning" [style.width.%]="((owner.totalOutstanding - owner.totalOverdue) / owner.totalDue) * 100"></div>
+              <div class="progress-bar bg-danger" [style.width.%]="(owner.totalOverdue / owner.totalDue) * 100"></div>
+            </div>
+            <div class="progress-legend">
+              <span class="legend-item"><span class="dot bg-success"></span> Payé</span>
+              <span class="legend-item"><span class="dot bg-warning"></span> En attente</span>
+              <span class="legend-item"><span class="dot bg-danger"></span> En retard</span>
+            </div>
+          </div>
+
+          <!-- Invoices Table -->
+          <div class="invoices-table-wrapper">
+            <table class="table invoices-table">
+              <thead>
+                <tr>
+                  <th>Facture</th>
+                  <th>Unité</th>
+                  <th>Charge</th>
+                  <th>Montant</th>
+                  <th>Payé</th>
+                  <th>Restant</th>
+                  <th>Échéance</th>
+                  <th>Retard</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let inv of owner.invoices" [class.overdue-row]="inv.daysLate > 0">
+                  <td class="fw-bold">{{ inv.invoiceNumber }}</td>
+                  <td><span class="badge bg-light text-dark">{{ inv.unitNumber }}</span></td>
+                  <td>{{ inv.chargeName }}</td>
+                  <td>{{ formatAmount(inv.amount) }}</td>
+                  <td class="text-success">{{ formatAmount(inv.paidAmount) }}</td>
+                  <td class="fw-bold" [class.text-danger]="inv.daysLate > 0">{{ formatAmount(inv.remainingAmount) }}</td>
+                  <td>
+                    <span [class.text-danger]="inv.daysLate > 0" [class.fw-bold]="inv.daysLate > 0">
+                      {{ inv.dueDate | date:'dd/MM/yyyy' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span *ngIf="inv.daysLate > 0" class="days-late">
+                      <i class="bi bi-exclamation-triangle text-danger"></i>
+                      {{ inv.daysLate }}j
+                    </span>
+                    <span *ngIf="inv.daysLate === 0" class="text-muted">—</span>
+                  </td>
+                  <td>
+                    <span class="badge" [class.bg-danger]="inv.status === 'Overdue'" [class.bg-warning]="inv.status === 'Pending'" [class.bg-info]="inv.status === 'PartiallyPaid'">
+                      {{ inv.status }}
+                    </span>
+                    <span *ngIf="inv.reminderLevel > 0" class="badge ms-1" [class]="getReminderLevelBadge(inv.reminderLevel)">
+                      {{ getReminderLevelLabel(inv.reminderLevel) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-btns">
+                      <button *ngIf="inv.daysLate > 0 && inv.reminderLevel < 3"
+                        class="btn btn-sm btn-outline-warning"
+                        title="Envoyer relance"
+                        (click)="sendReminder(inv.invoiceId, inv.reminderLevel + 1); $event.stopPropagation()">
+                        <i class="bi bi-send"></i>
+                      </button>
+                      <button *ngIf="inv.reminderLevel >= 3"
+                        class="btn btn-sm btn-outline-danger"
+                        title="Mise en demeure envoyée"
+                        disabled>
+                        <i class="bi bi-envelope-exclamation"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

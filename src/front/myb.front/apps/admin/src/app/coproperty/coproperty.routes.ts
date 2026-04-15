@@ -103,6 +103,14 @@ export const COPROPERTY_ROUTES: Routes = [
         loadComponent: () => import('@myb-front/coproperty-module').then(m => m.ChargePaymentsComponent),
       },
       {
+        path: 'treasury',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.TreasuryDetailComponent),
+      },
+      {
+        path: 'unpaid-payments',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.UnpaidPaymentsComponent),
+      },
+      {
         path: 'general-assembly',
         loadComponent: () => import('./syndic/general-assembly/general-assembly.component').then(m => m.GeneralAssemblyComponent),
       },

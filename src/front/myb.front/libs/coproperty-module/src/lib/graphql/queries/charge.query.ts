@@ -14,6 +14,7 @@ export const GET_ALL_CHARGES = gql`
       startDate
       endDate
       isActive
+      isContribution
       createdBy
       createdAt
       updatedAt
@@ -36,6 +37,7 @@ export const GET_CHARGE_BY_ID = gql`
       startDate
       endDate
       isActive
+      isContribution
       createdBy
       createdAt
       updatedAt
@@ -58,6 +60,7 @@ export const GET_CHARGES_BY_COPROPERTY = gql`
       startDate
       endDate
       isActive
+      isContribution
       createdBy
       createdAt
       updatedAt

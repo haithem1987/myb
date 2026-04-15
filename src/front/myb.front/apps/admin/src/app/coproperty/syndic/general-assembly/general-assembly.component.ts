@@ -619,6 +619,34 @@ interface GeneralAssembly {
       color: #6c757d;
       margin-bottom: 24px;
     }
+
+    @media (max-width: 992px) {
+      .stat-card { padding: 16px; }
+      .stat-icon { width: 44px; height: 44px; font-size: 20px; }
+      .stat-value { font-size: 22px; }
+    }
+
+    @media (max-width: 576px) {
+      .stat-card { padding: 14px; gap: 12px; }
+      .stat-icon { width: 40px; height: 40px; font-size: 18px; }
+      .stat-value { font-size: 20px; }
+      .stat-label { font-size: 12px; }
+
+      .assembly-header { padding: 14px; flex-direction: column; gap: 10px; }
+      .assembly-body { padding: 14px; }
+
+      .assembly-footer {
+        padding: 12px 14px;
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+      }
+      .action-buttons { width: 100%; }
+      .action-buttons .btn { flex: 1; }
+
+      .empty-state { padding: 40px 16px; }
+      .empty-state i { font-size: 48px; }
+    }
   `]
 })
 export class GeneralAssemblyComponent implements OnInit {

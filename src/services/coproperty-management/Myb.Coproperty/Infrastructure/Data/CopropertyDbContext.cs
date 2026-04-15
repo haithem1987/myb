@@ -217,6 +217,9 @@ public class CopropertyDbContext : DbContext
             
             entity.HasIndex(e => e.CopropertyId);
             entity.HasIndex(e => e.IsActive);
+
+            entity.Property(e => e.IsContribution)
+                .HasDefaultValue(false);
             
             // Check constraint for amount
             entity.ToTable(t => t.HasCheckConstraint(
@@ -455,6 +458,9 @@ public class CopropertyDbContext : DbContext
 
             entity.Property(e => e.Justificatif)
                 .HasMaxLength(1000);
+
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(100);
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");

@@ -6,7 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CopropertyService } from '../../services/coproperty.service';
-import { CreateFundCallInput } from '../../models';
+import { CurrencyService } from '../../services/currency.service';
+import { CreateFundCallInput, TreasuryDashboard } from '../../models';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
 // Register Chart.js components
@@ -29,9 +30,16 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
   // KPIs - using signals for reactivity
   readonly totalCoproperties = signal<number>(0);
   readonly totalUnits = signal<number>(0);
+  readonly occupiedUnits = signal<number>(0);
   readonly totalBalance = signal<number>(0);
   readonly totalCharges = signal<number>(0);
   readonly pendingMaintenance = signal<number>(0);
+  readonly overdueCount = signal<number>(0);
+  readonly totalOwners = signal<number>(0);
+  readonly activeCharges = signal<number>(0);
+  readonly totalArea = signal<number>(0);
+  readonly occupancyRate = signal<number>(0);
+  readonly treasuryDashboardData = signal<TreasuryDashboard | null>(null);
 
   // Charts data
   readonly treasuryData = signal<number[]>([]);
@@ -71,7 +79,8 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private copropertyService: CopropertyService
+    private copropertyService: CopropertyService,
+    private currencyService: CurrencyService
   ) {}
 
   ngOnInit(): void {
@@ -125,9 +134,15 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
         next: (stats) => {
           this.totalCoproperties.set(stats.totalCoproperties);
           this.totalUnits.set(stats.totalUnits);
+          this.occupiedUnits.set(stats.occupiedUnits);
           this.totalBalance.set(stats.totalBalance);
           this.totalCharges.set(stats.totalCharges);
           this.pendingMaintenance.set(stats.pendingMaintenance);
+          this.overdueCount.set(stats.overdueInvoices);
+          this.totalOwners.set(stats.totalOwners);
+          this.activeCharges.set(stats.activeCharges);
+          this.totalArea.set(stats.totalArea);
+          this.occupancyRate.set(stats.occupancyRate);
           this.isLoading.set(false);
         },
         error: (err) => {
@@ -252,7 +267,7 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
           y: {
             beginAtZero: false,
             ticks: {
-              callback: (value: number | string) => '€' + Number(value).toLocaleString()
+              callback: (value: number | string) => this.currencyService.symbol + Number(value).toLocaleString()
             }
           }
         }
@@ -305,7 +320,7 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
               label: (context: any) => {
                 const label = context.label || '';
                 const value = context.parsed || 0;
-                return `${label}: €${value.toLocaleString()}`;
+                return `${label}: ${this.currencyService.symbol}${value.toLocaleString()}`;
               }
             }
           }
@@ -314,6 +329,14 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
     };
 
     this.chargesChart = new Chart(canvas, config);
+  }
+
+  formatAmount(amount: number): string {
+    return this.currencyService.formatAmount(amount);
+  }
+
+  get currencySymbol(): string {
+    return this.currencyService.symbol;
   }
 
   private updateTreasuryChart(): void {
@@ -333,13 +356,20 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
   }
 
   private loadMockData(): void {
-    this.totalCoproperties.set(12);
-    this.totalUnits.set(156);
-    this.totalBalance.set(45230.50);
+    this.totalCoproperties.set(1);
+    this.totalUnits.set(3);
+    this.occupiedUnits.set(3);
+    this.totalBalance.set(11405.00);
     this.totalCharges.set(12500.00);
-    this.pendingMaintenance.set(8);
+    this.pendingMaintenance.set(0);
+    this.overdueCount.set(0);
+    this.totalOwners.set(3);
+    this.activeCharges.set(9);
+    this.totalArea.set(1652);
+    this.occupancyRate.set(100);
     this.loadMockTreasuryData();
     this.loadMockChargesData();
+    this.loadMockTreasuryDashboard();
   }
 
   private loadMockTreasuryData(): void {
@@ -370,6 +400,36 @@ export class CopropertyDashboardComponent implements OnInit, OnDestroy, AfterVie
         date: new Date(Date.now() - 24 * 60 * 60 * 1000) 
       },
     ]);
+  }
+
+  private loadMockTreasuryDashboard(): void {
+    this.treasuryDashboardData.set({
+      copropertyId: 'mock-id',
+      copropertyName: 'Résidence Les Jardins',
+      realTreasury: {
+        openingBalance: 38000,
+        totalEncaissements: 15200,
+        totalDecaissements: 7970,
+        currentBalance: 45230.50,
+      },
+      accountingTreasury: {
+        totalChargesEngaged: 12500,
+        totalInvoiced: 18500,
+        totalCollected: 15200,
+        totalOutstanding: 3300,
+        totalOverdue: 1850,
+        accountingBalance: 2700,
+      },
+      workingCapitalGap: 42530.50,
+      collectionRate: 82.2,
+      evolution: [],
+      expensesByType: [
+        { category: 'Maintenance', amount: 4500, percentage: 36 },
+        { category: 'Cleaning', amount: 3200, percentage: 25.6 },
+        { category: 'Insurance', amount: 2800, percentage: 22.4 },
+        { category: 'Electricity', amount: 2000, percentage: 16 },
+      ],
+    });
   }
 
   createFundCall(): void {

@@ -12,7 +12,10 @@ import {
   TreasuryDataPoint,
   ChargeDistributionData,
   FinancialReport,
-  ManagerUser
+  ManagerUser,
+  TreasuryDashboard,
+  UnpaidPaymentsSummary,
+  OwnerPaymentSummary
 } from '../models';
 
 const GET_COPROPERTIES = gql`
@@ -150,10 +153,15 @@ const GET_DASHBOARD_STATS = gql`
     dashboardStats(copropertyId: $copropertyId) {
       totalCoproperties
       totalUnits
+      occupiedUnits
       totalBalance
       totalCharges
       pendingMaintenance
       overdueInvoices
+      totalOwners
+      activeCharges
+      totalArea
+      occupancyRate
     }
   }
 `;
@@ -198,6 +206,116 @@ const GET_MANAGERS = gql`
       id
       fullName
       email
+    }
+  }
+`;
+
+const GET_TREASURY_DASHBOARD = gql`
+  query GetTreasuryDashboard($copropertyId: UUID!, $months: Int) {
+    treasuryDashboard(copropertyId: $copropertyId, months: $months) {
+      copropertyId
+      copropertyName
+      realTreasury {
+        openingBalance
+        totalEncaissements
+        totalDecaissements
+        currentBalance
+      }
+      accountingTreasury {
+        totalChargesEngaged
+        totalInvoiced
+        totalCollected
+        totalOutstanding
+        totalOverdue
+        accountingBalance
+      }
+      workingCapitalGap
+      collectionRate
+      evolution {
+        month
+        date
+        amount
+      }
+      expensesByType {
+        category
+        amount
+        percentage
+      }
+    }
+  }
+`;
+
+const GET_UNPAID_PAYMENTS_SUMMARY = gql`
+  query GetUnpaidPaymentsSummary($copropertyId: UUID!) {
+    unpaidPaymentsSummary(copropertyId: $copropertyId) {
+      copropertyId
+      totalOwners
+      ownersWithOverdue
+      totalOverdueInvoices
+      totalOverdueAmount
+      totalPendingAmount
+      averageDaysOverdue
+      ownerSummaries {
+        ownerId
+        ownerName
+        email
+        phone
+        unitNumbers
+        totalDue
+        totalPaid
+        totalOutstanding
+        totalOverdue
+        overdueInvoiceCount
+        pendingInvoiceCount
+        oldestOverdueDate
+        daysOverdue
+        healthStatus
+        invoices {
+          invoiceId
+          invoiceNumber
+          unitNumber
+          chargeName
+          amount
+          paidAmount
+          remainingAmount
+          dueDate
+          daysLate
+          status
+          reminderLevel
+        }
+      }
+    }
+  }
+`;
+
+const GET_OWNER_PAYMENT_SUMMARY = gql`
+  query GetOwnerPaymentSummary($ownerId: UUID!, $copropertyId: UUID) {
+    ownerPaymentSummary(ownerId: $ownerId, copropertyId: $copropertyId) {
+      ownerId
+      ownerName
+      email
+      unitNumbers
+      totalDue
+      totalPaid
+      totalOutstanding
+      totalOverdue
+      overdueInvoiceCount
+      pendingInvoiceCount
+      daysOverdue
+      healthStatus
+      invoices {
+        invoiceId
+        invoiceNumber
+        unitNumber
+        chargeName
+        amount
+        paidAmount
+        remainingAmount
+        dueDate
+        daysLate
+        status
+        reminderLevel
+      }
     }
   }
 `;
@@ -355,6 +473,45 @@ export class CopropertyService {
       })
       .valueChanges.pipe(
         map(result => result.data.managers)
+      );
+  }
+
+  getTreasuryDashboard(copropertyId: string, months: number = 12): Observable<TreasuryDashboard> {
+    return this.apollo
+      .watchQuery<{ treasuryDashboard: TreasuryDashboard }>({
+        query: GET_TREASURY_DASHBOARD,
+        variables: { copropertyId, months },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' }
+      })
+      .valueChanges.pipe(
+        map(result => result.data.treasuryDashboard)
+      );
+  }
+
+  getUnpaidPaymentsSummary(copropertyId: string): Observable<UnpaidPaymentsSummary> {
+    return this.apollo
+      .watchQuery<{ unpaidPaymentsSummary: UnpaidPaymentsSummary }>({
+        query: GET_UNPAID_PAYMENTS_SUMMARY,
+        variables: { copropertyId },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' }
+      })
+      .valueChanges.pipe(
+        map(result => result.data.unpaidPaymentsSummary)
+      );
+  }
+
+  getOwnerPaymentSummary(ownerId: string, copropertyId?: string): Observable<OwnerPaymentSummary> {
+    return this.apollo
+      .watchQuery<{ ownerPaymentSummary: OwnerPaymentSummary }>({
+        query: GET_OWNER_PAYMENT_SUMMARY,
+        variables: { ownerId, copropertyId },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' }
+      })
+      .valueChanges.pipe(
+        map(result => result.data.ownerPaymentSummary)
       );
   }
 }

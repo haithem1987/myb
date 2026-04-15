@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { MaintenanceService, MaintenanceRequestExtended } from '../../services/maintenance.service';
 import { CopropertyService } from '../../services/coproperty.service';
+import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -261,11 +262,10 @@ export class MaintenanceListComponent implements OnInit {
     return (request as any).copropertyName || '';
   }
 
+  private currencyService = inject(CurrencyService);
+
   formatCost(cost: number | undefined): string {
-    if (!cost) return '-';
-    return new Intl.NumberFormat('fr-FR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(cost);
+    if (cost == null || cost === 0) return '-';
+    return this.currencyService.formatAmount(cost);
   }
 }

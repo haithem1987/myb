@@ -53,6 +53,7 @@ export const ADD_FUND_CALL_PAYMENT = gql`
       amount
       paymentDate
       justificatif
+      paymentMethod
       createdAt
     }
   }

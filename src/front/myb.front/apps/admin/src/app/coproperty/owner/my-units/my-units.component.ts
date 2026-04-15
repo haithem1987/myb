@@ -343,6 +343,31 @@ interface UnitView {
     .unit-footer button {
       flex: 1;
     }
+
+    @media (max-width: 992px) {
+      .stat-card { padding: 16px; }
+      .stat-icon { width: 44px; height: 44px; font-size: 20px; }
+      .stat-value { font-size: 22px; }
+    }
+
+    @media (max-width: 576px) {
+      .stat-card { padding: 14px; gap: 12px; }
+      .stat-icon { width: 40px; height: 40px; font-size: 18px; }
+      .stat-value { font-size: 20px; }
+      .stat-label { font-size: 12px; }
+
+      .unit-header { padding: 16px; }
+      .unit-number { font-size: 20px; }
+      .unit-type-badge { font-size: 11px; padding: 3px 10px; }
+
+      .unit-body { padding: 16px; }
+      .info-row { gap: 10px; margin-bottom: 12px; }
+      .info-row i { font-size: 18px; }
+      .info-value { font-size: 13px; }
+
+      .unit-footer { padding: 12px 16px; }
+      .unit-footer button { font-size: 13px; }
+    }
   `]
 })
 export class OwnerMyUnitsComponent implements OnInit {

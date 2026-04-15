@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CopropertyInvoice } from '../../models';
 import { OwnerService } from '../../services/owner.service';
+import { CurrencyService } from '../../services/currency.service';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
@@ -43,7 +44,7 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
         </div>
         <div class="detail-row">
           <span class="label">Total Amount:</span>
-          <span class="value amount">{{ data.invoice.totalAmount | currency:'EUR' }}</span>
+          <span class="value amount">{{ formatAmount(data.invoice.totalAmount) }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Due Date:</span>
@@ -54,11 +55,11 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
         @if (data.invoice.status === 'PartiallyPaid') {
           <div class="detail-row">
             <span class="label">Amount Paid:</span>
-            <span class="value">{{ getAmountPaid() | currency:'EUR' }}</span>
+            <span class="value">{{ formatAmount(getAmountPaid()) }}</span>
           </div>
           <div class="detail-row">
             <span class="label">Remaining:</span>
-            <span class="value amount">{{ getRemainingAmount() | currency:'EUR' }}</span>
+            <span class="value amount">{{ formatAmount(getRemainingAmount()) }}</span>
           </div>
         }
       </div>
@@ -93,7 +94,7 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
             min="0.01"
             [max]="data.invoice.totalAmount"
           >
-          <span matPrefix>€&nbsp;</span>
+          <span matPrefix>{{ currencySymbol }}&nbsp;</span>
           @if (paymentForm.get('amount')?.hasError('required')) {
             <mat-error>Amount is required</mat-error>
           }
@@ -379,6 +380,15 @@ export class InvoicePaymentDialogComponent implements OnInit {
   processing = signal(false);
   error = signal<string | null>(null);
   private keycloakService = inject(KeycloakService);
+  private currencyService = inject(CurrencyService);
+
+  formatAmount(amount: number | undefined | null): string {
+    return this.currencyService.formatAmount(amount ?? 0);
+  }
+
+  get currencySymbol(): string {
+    return this.currencyService.symbol;
+  }
 
   constructor(
     private fb: FormBuilder,

@@ -7,6 +7,8 @@ import { OwnerDashboardComponent } from './owner-portal/owner-dashboard.componen
 import { CopropertyNewComponent } from './coproperty-new/coproperty-new.component';
 import { FundCallsListComponent } from './fund-calls-list/fund-calls-list.component';
 import { FundCallNewComponent } from './fund-call-new/fund-call-new.component';
+import { TreasuryDetailComponent } from './treasury-detail/treasury-detail.component';
+import { UnpaidPaymentsComponent } from './unpaid-payments/unpaid-payments.component';
 import { profileGuard } from '../guards/profile.guard';
 
 export const COPROPERTY_ROUTES: Routes = [
@@ -26,6 +28,14 @@ export const COPROPERTY_ROUTES: Routes = [
       {
         path: 'new',
         component: CopropertyNewComponent,
+      },
+      {
+        path: 'treasury',
+        component: TreasuryDetailComponent,
+      },
+      {
+        path: 'unpaid-payments',
+        component: UnpaidPaymentsComponent,
       },
       {
         path: ':id',

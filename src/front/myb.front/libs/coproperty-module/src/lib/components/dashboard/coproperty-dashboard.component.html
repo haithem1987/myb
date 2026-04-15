@@ -2,8 +2,11 @@
   <!-- Header -->
   <div class="dashboard-header">
     <div class="d-flex justify-content-between align-items-center">
-      <h1>{{ 'coproperty.dashboard.title' | translate }}</h1>
-      <button class="btn btn-primary" routerLink="/coproperty/list">
+      <div>
+        <h1>{{ 'coproperty.dashboard.title' | translate }}</h1>
+        <p class="subtitle">{{ 'coproperty.dashboard.subtitle' | translate }}</p>
+      </div>
+      <button class="btn btn-primary" routerLink="/admin/coproperties/list">
         <i class="bi bi-building"></i>
         {{ 'coproperty.dashboard.viewAllCoproperties' | translate }}
       </button>
@@ -12,12 +15,12 @@
 
   <!-- Quick Navigation Cards -->
   <div class="quick-nav-cards mb-4">
-    <div class="nav-card" routerLink="/coproperty/list">
+    <div class="nav-card" routerLink="/admin/coproperties/list">
       <i class="bi bi-list-ul"></i>
       <h6>{{ 'coproperty.dashboard.manageAll' | translate }}</h6>
       <small>{{ 'coproperty.dashboard.viewEditList' | translate }}</small>
     </div>
-    <div class="nav-card" routerLink="/coproperty/new">
+    <div class="nav-card" routerLink="/admin/coproperties/new">
       <i class="bi bi-plus-circle"></i>
       <h6>{{ 'coproperty.dashboard.addNew' | translate }}</h6>
       <small>{{ 'coproperty.dashboard.createCoproperty' | translate }}</small>
@@ -34,45 +37,164 @@
     </div>
   </div>
 
-  <!-- KPI Cards -->
+  <!-- KPI Cards Row 1 - All Clickable with navigation -->
   <div class="kpi-row">
-    <div class="kpi-card">
-      <div class="kpi-icon treasury">
-        <i class="bi bi-piggy-bank"></i>
+    <div class="kpi-card clickable" routerLink="/admin/coproperties/list">
+      <div class="kpi-icon coproperties">
+        <i class="bi bi-building-fill"></i>
       </div>
       <div class="kpi-content">
-        <h3>{{ 'coproperty.dashboard.treasury' | translate }}</h3>
-        <p class="amount">{{ totalBalance() | currency: 'EUR' }}</p>
+        <p class="count">{{ totalCoproperties() }}</p>
+        <h3>{{ 'coproperty.dashboard.copropertiesManaged' | translate }}</h3>
+        <small class="kpi-hint"><i class="bi bi-arrow-right-circle"></i> {{ 'coproperty.dashboard.viewAll' | translate }}</small>
       </div>
     </div>
 
-    <div class="kpi-card">
-      <div class="kpi-icon charges">
-        <i class="bi bi-graph-up"></i>
+    <div class="kpi-card clickable" routerLink="/admin/coproperties/list">
+      <div class="kpi-icon lots">
+        <i class="bi bi-house-door-fill"></i>
       </div>
       <div class="kpi-content">
-        <h3>{{ 'coproperty.dashboard.charges' | translate }}</h3>
-        <p class="amount">{{ totalCharges() | currency: 'EUR' }}</p>
+        <p class="count">{{ occupiedUnits() }}<span class="count-sub">/{{ totalUnits() }}</span></p>
+        <h3>{{ 'coproperty.dashboard.occupiedLots' | translate }}</h3>
+        <small class="kpi-hint"><i class="bi bi-arrow-right-circle"></i> {{ 'coproperty.dashboard.viewUnits' | translate }}</small>
       </div>
     </div>
 
-    <div class="kpi-card">
-      <div class="kpi-icon units">
-        <i class="bi bi-building"></i>
+    <div class="kpi-card clickable" routerLink="/admin/coproperties/treasury">
+      <div class="kpi-icon budget">
+        <i class="bi bi-cash-stack"></i>
       </div>
       <div class="kpi-content">
-        <h3>{{ 'coproperty.dashboard.units' | translate }}</h3>
-        <p class="count">{{ totalUnits() }}</p>
+        <p class="amount">{{ formatAmount(totalBalance()) }}</p>
+        <h3>{{ 'coproperty.dashboard.totalBudget' | translate }}</h3>
+        <small class="kpi-hint"><i class="bi bi-arrow-right-circle"></i> {{ 'coproperty.dashboard.viewTreasury' | translate }}</small>
       </div>
     </div>
 
-    <div class="kpi-card">
-      <div class="kpi-icon maintenance">
-        <i class="bi bi-wrench"></i>
+    <div class="kpi-card clickable" routerLink="/admin/coproperties/list">
+      <div class="kpi-icon owners">
+        <i class="bi bi-people-fill"></i>
       </div>
       <div class="kpi-content">
-        <h3>{{ 'coproperty.dashboard.maintenance' | translate }}</h3>
-        <p class="count">{{ pendingMaintenance() }}</p>
+        <p class="count">{{ totalOwners() }}</p>
+        <h3>{{ 'coproperty.dashboard.coOwners' | translate }}</h3>
+        <small class="kpi-hint"><i class="bi bi-arrow-right-circle"></i> {{ 'coproperty.dashboard.viewOwners' | translate }}</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards Row 2 -->
+  <div class="kpi-row">
+    <div class="kpi-card clickable" routerLink="/admin/coproperties/list">
+      <div class="kpi-icon-sm occupancy">
+        <i class="bi bi-graph-up-arrow"></i>
+      </div>
+      <div class="kpi-content">
+        <p class="count">{{ occupancyRate() }}%</p>
+        <h3>{{ 'coproperty.dashboard.occupancyRate' | translate }}</h3>
+        <div class="progress-bar-sm">
+          <div class="progress-fill" [style.width.%]="occupancyRate()"></div>
+        </div>
+        <small class="kpi-hint"><i class="bi bi-arrow-right-circle"></i> {{ 'coproperty.dashboard.viewDetails' | translate }}</small>
+      </div>
+    </div>
+
+    <div class="kpi-card clickable" routerLink="/admin/coproperties/unpaid-payments">
+      <div class="kpi-icon-sm charges-active">
+        <i class="bi bi-clipboard-check"></i>
+      </div>
+      <div class="kpi-content">
+        <p class="count">{{ activeCharges() }}</p>
+        <h3>{{ 'coproperty.dashboard.activeCharges' | translate }}</h3>
+        <small class="kpi-hint"><i class="bi bi-arrow-right-circle"></i> {{ 'coproperty.dashboard.viewCharges' | translate }}</small>
+      </div>
+    </div>
+
+    <div class="kpi-card clickable" routerLink="/admin/coproperties/list">
+      <div class="kpi-icon-sm area">
+        <i class="bi bi-bounding-box-circles"></i>
+      </div>
+      <div class="kpi-content">
+        <p class="count">{{ totalArea() | number:'1.0-0' }} m²</p>
+        <h3>{{ 'coproperty.dashboard.totalArea' | translate }}</h3>
+        <small class="kpi-hint"><i class="bi bi-arrow-right-circle"></i> {{ 'coproperty.dashboard.viewDetails' | translate }}</small>
+      </div>
+    </div>
+
+    <div class="kpi-card clickable warning" routerLink="/admin/coproperties/unpaid-payments" [queryParams]="{ filter: 'overdue' }" *ngIf="overdueCount() > 0">
+      <div class="kpi-icon-sm overdue">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+      </div>
+      <div class="kpi-content">
+        <p class="count text-danger">{{ overdueCount() }}</p>
+        <h3 class="text-danger">{{ 'coproperty.dashboard.overduePayments' | translate }}</h3>
+        <small class="kpi-hint text-danger"><i class="bi bi-arrow-right-circle"></i> {{ 'coproperty.dashboard.viewOverdue' | translate }}</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Treasury Summary Cards (Real vs Accounting) -->
+  <div class="treasury-summary-row" *ngIf="treasuryDashboardData()">
+    <div class="card treasury-card real" routerLink="/admin/coproperties/treasury" [queryParams]="{ copropertyId: selectedCopropertyId(), tab: 'real' }">
+      <div class="card-header">
+        <h5><i class="bi bi-bank"></i> {{ 'coproperty.dashboard.realTreasury' | translate }}</h5>
+        <span class="badge bg-primary">{{ 'coproperty.dashboard.cashBased' | translate }}</span>
+      </div>
+      <div class="card-body">
+        <div class="treasury-metrics">
+          <div class="metric">
+            <span class="label">{{ 'coproperty.dashboard.openingBalance' | translate }}</span>
+            <span class="value">{{ formatAmount(treasuryDashboardData()!.realTreasury.openingBalance) }}</span>
+          </div>
+          <div class="metric positive">
+            <span class="label"><i class="bi bi-arrow-down-circle"></i> {{ 'coproperty.dashboard.encaissements' | translate }}</span>
+            <span class="value text-success">+{{ formatAmount(treasuryDashboardData()!.realTreasury.totalEncaissements) }}</span>
+          </div>
+          <div class="metric negative">
+            <span class="label"><i class="bi bi-arrow-up-circle"></i> {{ 'coproperty.dashboard.decaissements' | translate }}</span>
+            <span class="value text-danger">-{{ formatAmount(treasuryDashboardData()!.realTreasury.totalDecaissements) }}</span>
+          </div>
+          <hr>
+          <div class="metric total">
+            <span class="label">{{ 'coproperty.dashboard.currentBalance' | translate }}</span>
+            <span class="value" [class.text-success]="treasuryDashboardData()!.realTreasury.currentBalance >= 0" [class.text-danger]="treasuryDashboardData()!.realTreasury.currentBalance < 0">
+              {{ formatAmount(treasuryDashboardData()!.realTreasury.currentBalance) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card treasury-card accounting" routerLink="/admin/coproperties/treasury" [queryParams]="{ copropertyId: selectedCopropertyId(), tab: 'accounting' }">
+      <div class="card-header">
+        <h5><i class="bi bi-calculator"></i> {{ 'coproperty.dashboard.accountingTreasury' | translate }}</h5>
+        <span class="badge bg-info">{{ 'coproperty.dashboard.engagementBased' | translate }}</span>
+      </div>
+      <div class="card-body">
+        <div class="treasury-metrics">
+          <div class="metric">
+            <span class="label">{{ 'coproperty.dashboard.totalInvoiced' | translate }}</span>
+            <span class="value">{{ formatAmount(treasuryDashboardData()!.accountingTreasury.totalInvoiced) }}</span>
+          </div>
+          <div class="metric positive">
+            <span class="label"><i class="bi bi-check-circle"></i> {{ 'coproperty.dashboard.totalCollected' | translate }}</span>
+            <span class="value text-success">{{ formatAmount(treasuryDashboardData()!.accountingTreasury.totalCollected) }}</span>
+          </div>
+          <div class="metric" *ngIf="treasuryDashboardData()!.accountingTreasury.totalOverdue > 0">
+            <span class="label"><i class="bi bi-exclamation-circle text-danger"></i> {{ 'coproperty.dashboard.totalOverdue' | translate }}</span>
+            <span class="value text-danger">{{ formatAmount(treasuryDashboardData()!.accountingTreasury.totalOverdue) }}</span>
+          </div>
+          <hr>
+          <div class="metric total">
+            <span class="label">{{ 'coproperty.dashboard.collectionRate' | translate }}</span>
+            <span class="value">
+              <span class="badge" [class.bg-success]="treasuryDashboardData()!.collectionRate >= 80" [class.bg-warning]="treasuryDashboardData()!.collectionRate >= 50 && treasuryDashboardData()!.collectionRate < 80" [class.bg-danger]="treasuryDashboardData()!.collectionRate < 50">
+                {{ treasuryDashboardData()!.collectionRate | number:'1.1-1' }}%
+              </span>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -162,7 +284,7 @@
     <div class="card-body">
       <div class="row g-3">
         <div class="col-md-3">
-          <label class="form-label">Amount (€)</label>
+          <label class="form-label">Amount ({{ currencySymbol }})</label>
           <input type="number" class="form-control" [value]="fundCallAmount()" (input)="fundCallAmount.set(+$any($event.target).value)" [disabled]="isLoading()" [placeholder]="'common.amountPlaceholder' | translate" />
         </div>
         <div class="col-md-3">

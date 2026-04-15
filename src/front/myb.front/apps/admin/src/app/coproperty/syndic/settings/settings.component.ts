@@ -174,6 +174,16 @@ import { take } from 'rxjs/operators';
     .info-list li:last-child {
       border-bottom: none;
     }
+
+    @media (max-width: 576px) {
+      .settings-card-header {
+        padding: 1rem;
+        gap: 0.75rem;
+      }
+      .settings-icon { width: 38px; height: 38px; font-size: 1.1rem; }
+      .settings-card-body { padding: 1rem; }
+      .info-list li { font-size: 0.85rem; padding: 0.4rem 0; }
+    }
   `]
 })
 export class SyndicSettingsComponent implements OnInit {

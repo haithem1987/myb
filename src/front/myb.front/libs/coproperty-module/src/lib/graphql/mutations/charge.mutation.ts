@@ -14,6 +14,7 @@ export const CREATE_CHARGE = gql`
       startDate
       endDate
       isActive
+      isContribution
       createdBy
       createdAt
       updatedAt
@@ -35,6 +36,7 @@ export const UPDATE_CHARGE = gql`
       startDate
       endDate
       isActive
+      isContribution
       createdAt
       updatedAt
     }
@@ -55,6 +57,29 @@ export const CALCULATE_CHARGE_DISTRIBUTION = gql`
       amount
       shares
       area
+    }
+  }
+`;
+
+export const MARK_CHARGE_DISTRIBUTION_PAID = gql`
+  mutation MarkChargeDistributionPaid(
+    $distributionId: UUID!
+    $transactionId: String!
+    $paymentMethod: String!
+    $paidAmount: Decimal!
+  ) {
+    markChargeDistributionPaid(
+      distributionId: $distributionId
+      transactionId: $transactionId
+      paymentMethod: $paymentMethod
+      paidAmount: $paidAmount
+    ) {
+      id
+      paymentStatus
+      paidAmount
+      paidAt
+      paymentTransactionId
+      paymentMethod
     }
   }
 `;

@@ -58,3 +58,29 @@
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 0.8rem;
 }
+
+.modal-backdrop {
+  z-index: 1040;
+}
+
+.modal {
+  z-index: 1050;
+}
+
+@media (max-width: 992px) {
+  .charge-payments-container { padding: 1rem; }
+}
+
+@media (max-width: 576px) {
+  .charge-payments-container { padding: 0.75rem; }
+
+  .page-header h1 { font-size: 1.3rem; }
+
+  .stats-card .card-body { padding: 0.875rem; }
+  .stat-icon { width: 40px; height: 40px; font-size: 1rem; }
+
+  .table {
+    th { padding: 0.5rem; font-size: 0.65rem; }
+    td { padding: 0.5rem; font-size: 0.8rem; }
+  }
+}

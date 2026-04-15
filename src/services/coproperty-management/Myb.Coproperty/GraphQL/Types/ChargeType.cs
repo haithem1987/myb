@@ -12,6 +12,7 @@ namespace Myb.Coproperty.GraphQL.Types
         protected override void Configure(IObjectTypeDescriptor<Charge> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.IsContribution).Type<NonNullType<BooleanType>>();
             descriptor.Field(c => c.Coproperty).ResolveWith<ChargeResolvers>(r => r.GetCoproperty(default!, default!));
             descriptor.Field(c => c.Distributions).ResolveWith<ChargeResolvers>(r => r.GetDistributions(default!, default!));
             descriptor.Field("currency").ResolveWith<ChargeResolvers>(r => r.GetCurrency(default!, default!)).Type<NonNullType<CurrencyType>>();

@@ -1,0 +1,297 @@
+<div class="treasury-detail-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <a routerLink="/admin/coproperties" class="back-link">
+          <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+        </a>
+        <h1><i class="bi bi-piggy-bank"></i> Trésorerie</h1>
+        <p class="subtitle" *ngIf="treasury()">{{ treasury()!.copropertyName }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading()" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2 text-muted">Chargement des données...</p>
+  </div>
+
+  <div *ngIf="!isLoading() && treasury()">
+    <!-- Tab Navigation -->
+    <ul class="nav nav-pills treasury-tabs mb-4">
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab() === 'overview'" (click)="switchTab('overview')">
+          <i class="bi bi-grid"></i> Vue d'ensemble
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab() === 'real'" (click)="switchTab('real')">
+          <i class="bi bi-bank"></i> Trésorerie Réelle
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab() === 'accounting'" (click)="switchTab('accounting')">
+          <i class="bi bi-calculator"></i> Trésorerie Comptable
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab() === 'evolution'" (click)="switchTab('evolution')">
+          <i class="bi bi-graph-up"></i> Évolution
+        </button>
+      </li>
+    </ul>
+
+    <!-- OVERVIEW TAB -->
+    <div *ngIf="activeTab() === 'overview'">
+      <!-- Top KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card real-balance">
+          <div class="kpi-icon"><i class="bi bi-bank"></i></div>
+          <div class="kpi-body">
+            <span class="kpi-label">Solde Réel (Banque)</span>
+            <span class="kpi-value" [class.positive]="treasury()!.realTreasury.currentBalance >= 0" [class.negative]="treasury()!.realTreasury.currentBalance < 0">
+              {{ formatAmount(treasury()!.realTreasury.currentBalance) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="kpi-card accounting-balance">
+          <div class="kpi-icon"><i class="bi bi-calculator"></i></div>
+          <div class="kpi-body">
+            <span class="kpi-label">Solde Comptable</span>
+            <span class="kpi-value" [class.positive]="treasury()!.accountingTreasury.accountingBalance >= 0" [class.negative]="treasury()!.accountingTreasury.accountingBalance < 0">
+              {{ formatAmount(treasury()!.accountingTreasury.accountingBalance) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="kpi-card collection-rate">
+          <div class="kpi-icon"><i class="bi bi-percent"></i></div>
+          <div class="kpi-body">
+            <span class="kpi-label">Taux de Recouvrement</span>
+            <span class="kpi-value">
+              <span class="badge rate-badge" [class.bg-success]="treasury()!.collectionRate >= 80" [class.bg-warning]="treasury()!.collectionRate >= 50 && treasury()!.collectionRate < 80" [class.bg-danger]="treasury()!.collectionRate < 50">
+                {{ treasury()!.collectionRate | number:'1.1-1' }}%
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="kpi-card overdue-amount" *ngIf="treasury()!.accountingTreasury.totalOverdue > 0">
+          <div class="kpi-icon danger"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="kpi-body">
+            <span class="kpi-label">Montant en Retard</span>
+            <span class="kpi-value text-danger">{{ formatAmount(treasury()!.accountingTreasury.totalOverdue) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-grid">
+        <div class="card chart-card">
+          <div class="card-header"><h5>Évolution de la Trésorerie</h5></div>
+          <div class="card-body">
+            <div class="chart-wrapper"><canvas id="treasuryEvolutionChart"></canvas></div>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <div class="card-header"><h5>Répartition des Dépenses</h5></div>
+          <div class="card-body">
+            <div class="chart-wrapper"><canvas id="expensesBreakdownChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison: Real vs Accounting -->
+      <div class="card comparison-card">
+        <div class="card-header"><h5><i class="bi bi-arrow-left-right"></i> Comparaison Réelle vs Comptable</h5></div>
+        <div class="card-body">
+          <div class="comparison-table">
+            <div class="comparison-row header">
+              <span class="label"></span>
+              <span class="col-real"><i class="bi bi-bank"></i> Réelle</span>
+              <span class="col-accounting"><i class="bi bi-calculator"></i> Comptable</span>
+              <span class="col-diff">Écart</span>
+            </div>
+            <div class="comparison-row">
+              <span class="label">Solde</span>
+              <span class="col-real">{{ formatAmount(treasury()!.realTreasury.currentBalance) }}</span>
+              <span class="col-accounting">{{ formatAmount(treasury()!.accountingTreasury.accountingBalance) }}</span>
+              <span class="col-diff" [class.text-success]="treasury()!.workingCapitalGap >= 0" [class.text-danger]="treasury()!.workingCapitalGap < 0">
+                {{ formatAmount(treasury()!.workingCapitalGap) }}
+              </span>
+            </div>
+            <div class="comparison-row">
+              <span class="label">Entrées / Facturé</span>
+              <span class="col-real text-success">+{{ formatAmount(treasury()!.realTreasury.totalEncaissements) }}</span>
+              <span class="col-accounting">{{ formatAmount(treasury()!.accountingTreasury.totalInvoiced) }}</span>
+              <span class="col-diff">{{ formatAmount(treasury()!.accountingTreasury.totalInvoiced - treasury()!.realTreasury.totalEncaissements) }}</span>
+            </div>
+            <div class="comparison-row">
+              <span class="label">Sorties / Charges</span>
+              <span class="col-real text-danger">-{{ formatAmount(treasury()!.realTreasury.totalDecaissements) }}</span>
+              <span class="col-accounting">{{ formatAmount(treasury()!.accountingTreasury.totalChargesEngaged) }}</span>
+              <span class="col-diff">{{ formatAmount(treasury()!.accountingTreasury.totalChargesEngaged - treasury()!.realTreasury.totalDecaissements) }}</span>
+            </div>
+          </div>
+          <div class="comparison-explanation mt-3">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              <strong>Écart de trésorerie:</strong> La différence de {{ formatAmount(treasury()!.workingCapitalGap) }} représente le 
+              {{ treasury()!.workingCapitalGap >= 0 ? 'surplus' : 'besoin' }} en fonds de roulement, 
+              lié au décalage entre les engagements comptables et les mouvements réels de trésorerie.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REAL TREASURY TAB -->
+    <div *ngIf="activeTab() === 'real'">
+      <div class="card detail-card">
+        <div class="card-header">
+          <h5><i class="bi bi-bank"></i> Trésorerie Réelle</h5>
+          <span class="badge bg-primary">Basée sur les mouvements de trésorerie</span>
+        </div>
+        <div class="card-body">
+          <div class="formula-box">
+            <div class="formula">
+              <span class="formula-label">Solde Initial</span>
+              <span class="formula-value">{{ formatAmount(treasury()!.realTreasury.openingBalance) }}</span>
+            </div>
+            <div class="formula-operator">+</div>
+            <div class="formula">
+              <span class="formula-label">Encaissements</span>
+              <span class="formula-value text-success">{{ formatAmount(treasury()!.realTreasury.totalEncaissements) }}</span>
+            </div>
+            <div class="formula-operator">−</div>
+            <div class="formula">
+              <span class="formula-label">Décaissements</span>
+              <span class="formula-value text-danger">{{ formatAmount(treasury()!.realTreasury.totalDecaissements) }}</span>
+            </div>
+            <div class="formula-operator">=</div>
+            <div class="formula result">
+              <span class="formula-label">Solde Actuel</span>
+              <span class="formula-value" [class.text-success]="treasury()!.realTreasury.currentBalance >= 0">
+                {{ formatAmount(treasury()!.realTreasury.currentBalance) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="info-box mt-4">
+            <h6><i class="bi bi-info-circle"></i> Qu'est-ce que la trésorerie réelle ?</h6>
+            <p>La trésorerie réelle représente l'argent qui <strong>entre et sort effectivement</strong> du compte bancaire de la copropriété. 
+               Elle reflète les mouvements de cash réels : paiements reçus des propriétaires et dépenses effectivement payées.</p>
+            <ul>
+              <li><strong>Encaissements:</strong> Paiements reçus des propriétaires (virements, chèques encaissés)</li>
+              <li><strong>Décaissements:</strong> Factures fournisseurs payées, frais réglés</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCOUNTING TREASURY TAB -->
+    <div *ngIf="activeTab() === 'accounting'">
+      <div class="card detail-card">
+        <div class="card-header">
+          <h5><i class="bi bi-calculator"></i> Trésorerie Comptable</h5>
+          <span class="badge bg-info">Basée sur les engagements</span>
+        </div>
+        <div class="card-body">
+          <div class="accounting-metrics">
+            <div class="metric-row">
+              <div class="metric-card">
+                <span class="metric-label">Charges Engagées</span>
+                <span class="metric-value">{{ formatAmount(treasury()!.accountingTreasury.totalChargesEngaged) }}</span>
+                <small class="text-muted">Total des obligations</small>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Total Facturé</span>
+                <span class="metric-value">{{ formatAmount(treasury()!.accountingTreasury.totalInvoiced) }}</span>
+                <small class="text-muted">Factures émises</small>
+              </div>
+            </div>
+            <div class="metric-row">
+              <div class="metric-card success">
+                <span class="metric-label">Encaissé</span>
+                <span class="metric-value text-success">{{ formatAmount(treasury()!.accountingTreasury.totalCollected) }}</span>
+                <small class="text-muted">Paiements reçus</small>
+              </div>
+              <div class="metric-card warning">
+                <span class="metric-label">Restant Dû</span>
+                <span class="metric-value text-warning">{{ formatAmount(treasury()!.accountingTreasury.totalOutstanding) }}</span>
+                <small class="text-muted">En attente de paiement</small>
+              </div>
+            </div>
+            <div class="metric-row" *ngIf="treasury()!.accountingTreasury.totalOverdue > 0">
+              <div class="metric-card danger full-width">
+                <span class="metric-label"><i class="bi bi-exclamation-triangle"></i> Impayés en Retard</span>
+                <span class="metric-value text-danger">{{ formatAmount(treasury()!.accountingTreasury.totalOverdue) }}</span>
+                <small class="text-muted">Factures dépassant la date d'échéance</small>
+                <a routerLink="/admin/coproperties/unpaid-payments" class="btn btn-sm btn-outline-danger mt-2">
+                  <i class="bi bi-arrow-right"></i> Voir les impayés
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box mt-4">
+            <h6><i class="bi bi-info-circle"></i> Qu'est-ce que la trésorerie comptable ?</h6>
+            <p>La trésorerie comptable enregistre les <strong>obligations financières</strong> selon les règles comptables. 
+               Elle inclut les créances (ce qui est dû par les propriétaires) et les dettes (charges engagées), 
+               indépendamment de si les mouvements de cash ont eu lieu.</p>
+            <p><strong>Formule:</strong> Solde Comptable = Total Encaissé − Total Charges Engagées</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVOLUTION TAB -->
+    <div *ngIf="activeTab() === 'evolution'">
+      <div class="card detail-card">
+        <div class="card-header">
+          <h5><i class="bi bi-graph-up"></i> Évolution de la Trésorerie</h5>
+          <div class="month-selector">
+            <select class="form-select form-select-sm" [ngModel]="selectedMonths()" (ngModelChange)="selectedMonths.set($event)">
+              <option [value]="6">6 mois</option>
+              <option [value]="12">12 mois</option>
+              <option [value]="24">24 mois</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrapper large"><canvas id="treasuryEvolutionChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card detail-card mt-3">
+        <div class="card-header"><h5><i class="bi bi-pie-chart"></i> Répartition des Dépenses</h5></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="chart-wrapper"><canvas id="expensesBreakdownChart"></canvas></div>
+            </div>
+            <div class="col-md-6">
+              <div class="expenses-list">
+                <div class="expense-item" *ngFor="let expense of treasury()!.expensesByType; let i = index">
+                  <div class="expense-color" [style.background-color]="getExpenseColor(i)"></div>
+                  <div class="expense-info">
+                    <span class="expense-name">{{ expense.category }}</span>
+                    <span class="expense-amount">{{ formatAmount(expense.amount) }}</span>
+                  </div>
+                  <div class="expense-bar">
+                    <div class="expense-bar-fill" [style.width.%]="expense.percentage" [style.background-color]="getExpenseColor(i)"></div>
+                  </div>
+                  <span class="expense-pct">{{ expense.percentage | number:'1.1-1' }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

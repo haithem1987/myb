@@ -303,8 +303,10 @@
       display: none;
     }
     
-    .user-section .user-details {
-      display: none;
+    .user-section {
+      .user-details { display: none; }
+      .btn-switch-role span { display: none; }
+      .btn-switch-role { padding: 7px 10px; }
     }
     
     .btn-mobile-menu {
@@ -318,22 +320,75 @@
 }
 
 @media (max-width: 640px) {
-  .header .header-content {
-    padding: 0 16px;
+  .header {
+    .header-content {
+      padding: 0 12px;
+      height: 56px;
+      gap: 12px;
+    }
+
+    .logo {
+      gap: 8px;
+      .logo-image { height: 28px; }
+      .app-name { font-size: 14px; }
+    }
+
+    .user-section {
+      gap: 6px;
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+      }
+
+      .btn-switch-role {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+        i { font-size: 14px; }
+      }
+
+      .btn-logout {
+        width: 32px;
+        height: 32px;
+        i { font-size: 16px; }
+      }
+    }
+
+    .btn-mobile-menu {
+      width: 36px;
+      height: 36px;
+      i { font-size: 22px; }
+    }
+  }
+
+  .mobile-nav {
+    top: 56px;
+
+    .nav-link {
+      padding: 14px 16px;
+      i { font-size: 18px; }
+      span { font-size: 14px; }
+    }
   }
   
   .main-content .content-wrapper {
-    padding: 20px 16px;
+    padding: 16px 12px;
   }
   
   .footer .footer-content {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     text-align: center;
+    padding: 0 12px;
     
+    p { font-size: 13px; }
+
     .footer-links {
-      flex-direction: column;
-      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      a { font-size: 13px; }
     }
   }
 }

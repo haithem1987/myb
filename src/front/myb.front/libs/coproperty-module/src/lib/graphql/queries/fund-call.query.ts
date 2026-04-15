@@ -25,6 +25,7 @@ export const FUND_CALL_FRAGMENT = gql`
       amount
       paymentDate
       justificatif
+      paymentMethod
       createdAt
     }
   }
@@ -55,4 +56,26 @@ export const GET_FUND_CALL_BY_ID = gql`
     }
   }
   ${FUND_CALL_FRAGMENT}
+`;
+
+export const GET_FUND_CALLS_BY_OWNER = gql`
+  query GetFundCallsByOwner($ownerId: UUID!) {
+    fundCallsByOwner(ownerId: $ownerId) {
+      ...FundCallFields
+      coproperty {
+        id
+        name
+      }
+    }
+  }
+  ${FUND_CALL_FRAGMENT}
+`;
+
+export const GET_EXISTING_FUND_CALL_TOTALS = gql`
+  query GetExistingFundCallTotals($copropertyId: UUID!) {
+    existingFundCallTotals(copropertyId: $copropertyId) {
+      ownerId
+      remainingAmount
+    }
+  }
 `;

@@ -269,3 +269,24 @@
     --bs-gutter-x: 1rem;
   }
 }
+
+@media (max-width: 992px) {
+  .coproperty-new-container { padding: 1.25rem; }
+  .tab-pane-content { padding: 1.25rem; }
+}
+
+@media (max-width: 576px) {
+  .coproperty-new-container { padding: 0.75rem; }
+
+  .page-header .page-title { font-size: 1.4rem; }
+
+  .custom-tabs .nav-link { padding: 0.5rem 0.75rem; font-size: 0.85rem; }
+
+  .tab-pane-content { padding: 0.75rem; }
+  .form-card { padding: 1rem; }
+
+  .form-group .form-control,
+  .form-group .form-select { padding: 0.625rem 0.75rem; }
+
+  .btn { padding: 0.625rem 1rem; font-size: 0.9rem; }
+}

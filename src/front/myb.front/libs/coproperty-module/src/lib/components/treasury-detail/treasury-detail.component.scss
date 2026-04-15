@@ -1,0 +1,432 @@
+.treasury-detail-container {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  h1 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    i {
+      -webkit-text-fill-color: #667eea;
+      margin-right: 0.5rem;
+    }
+  }
+
+  .subtitle {
+    color: #6c757d;
+    margin: 0.25rem 0 0;
+  }
+}
+
+// Treasury Tabs
+.treasury-tabs {
+  background: white;
+  border-radius: 12px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .nav-link {
+    border-radius: 8px;
+    color: #6c757d;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.3s ease;
+
+    &.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    &:not(.active):hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+  }
+}
+
+// KPI Grid
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .kpi-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    &.danger {
+      background: linear-gradient(135deg, #dc3545 0%, #ff6b6b 100%);
+    }
+  }
+
+  .kpi-body {
+    display: flex;
+    flex-direction: column;
+
+    .kpi-label {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+
+    .kpi-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+
+      &.positive {
+        color: #28a745;
+      }
+
+      &.negative {
+        color: #dc3545;
+      }
+    }
+  }
+
+  .rate-badge {
+    font-size: 1.1rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+// Charts
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card, .detail-card, .comparison-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.05));
+    border-bottom: 2px solid #667eea;
+
+    h5 {
+      margin: 0;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 300px;
+
+  &.large {
+    height: 400px;
+  }
+
+  canvas {
+    max-height: 100%;
+  }
+}
+
+// Comparison Table
+.comparison-table {
+  .comparison-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+
+    &.header {
+      font-weight: 600;
+      color: #6c757d;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-weight: 500;
+    }
+
+    .col-real, .col-accounting, .col-diff {
+      text-align: right;
+      font-weight: 500;
+    }
+  }
+}
+
+// Formula Box (Real Treasury)
+.formula-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.03));
+  border-radius: 12px;
+
+  .formula {
+    text-align: center;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    min-width: 130px;
+
+    .formula-label {
+      display: block;
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+    }
+
+    .formula-value {
+      display: block;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    &.result {
+      border: 2px solid #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+
+      .formula-value {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .formula-operator {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #6c757d;
+  }
+}
+
+// Accounting Metrics
+.accounting-metrics {
+  .metric-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .metric-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    text-align: center;
+
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+
+    &.success {
+      border-color: rgba(40, 167, 69, 0.2);
+      background: rgba(40, 167, 69, 0.03);
+    }
+
+    &.warning {
+      border-color: rgba(255, 193, 7, 0.3);
+      background: rgba(255, 193, 7, 0.03);
+    }
+
+    &.danger {
+      border-color: rgba(220, 53, 69, 0.2);
+      background: rgba(220, 53, 69, 0.03);
+    }
+
+    .metric-label {
+      display: block;
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-value {
+      display: block;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+  }
+}
+
+// Info Box
+.info-box {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+
+  h6 {
+    color: #667eea;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    color: #495057;
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+
+  ul {
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.5rem;
+      color: #495057;
+    }
+  }
+}
+
+// Expenses List
+.expenses-list {
+  padding: 1rem;
+
+  .expense-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .expense-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .expense-info {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      min-width: 0;
+
+      .expense-name {
+        font-weight: 500;
+      }
+
+      .expense-amount {
+        font-weight: 600;
+        color: #2c3e50;
+      }
+    }
+
+    .expense-bar {
+      width: 80px;
+      height: 6px;
+      background: #e9ecef;
+      border-radius: 3px;
+      overflow: hidden;
+
+      .expense-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.5s ease;
+      }
+    }
+
+    .expense-pct {
+      font-size: 0.85rem;
+      color: #6c757d;
+      min-width: 45px;
+      text-align: right;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .treasury-detail-container {
+    padding: 1rem;
+  }
+
+  .formula-box {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .accounting-metrics .metric-row {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-table .comparison-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+}

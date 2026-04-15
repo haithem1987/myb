@@ -128,6 +128,20 @@ import { MaintenanceRequestsComponent } from './maintenance-requests/maintenance
       </div>
     </div>
   `,
+  styles: [`
+    @media (max-width: 992px) {
+      .col-md-6 { flex: 0 0 100%; max-width: 100%; margin-bottom: 1rem; }
+      .col-md-4 { margin-top: 0.75rem; }
+    }
+
+    @media (max-width: 576px) {
+      .container-fluid { padding: 0.75rem; }
+      h1 { font-size: 1.4rem; }
+      .col-md-4.text-end { text-align: start !important; }
+      .col-md-4 .btn { width: 100%; margin-bottom: 0.5rem; }
+      .nav-tabs .nav-link { padding: 0.5rem 0.75rem; font-size: 0.85rem; }
+    }
+  `],
 })
 export class CopropertyDetailComponent implements OnInit {
   coproperty: Coproperty | null = null;

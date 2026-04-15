@@ -29,7 +29,7 @@ interface Invoice {
         <div class="col-md-8">
           <h2 class="mb-1">
             <i class="bi bi-receipt me-2"></i>
-            Mes Factures
+            Mes Reçus
           </h2>
           <p class="text-muted">Historique de vos paiements et reçus de charges</p>
         </div>
@@ -50,7 +50,7 @@ interface Invoice {
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stats().total }}</div>
-              <div class="stat-label">Total factures</div>
+              <div class="stat-label">Total reçus</div>
             </div>
           </div>
         </div>
@@ -96,7 +96,7 @@ interface Invoice {
             <table class="table invoice-table">
               <thead>
                 <tr>
-                  <th>Facture</th>
+                  <th>Reçu</th>
                   <th>Description</th>
                   <th>Lot</th>
                   <th>Date</th>
@@ -149,7 +149,7 @@ interface Invoice {
       <div class="invoice-modal-header">
         <h5 class="mb-0">
           <i class="bi bi-file-earmark-text me-2"></i>
-          Détail de la facture
+          Détail du reçu
         </h5>
         <button type="button" class="btn-close" (click)="closeInvoiceModal()"></button>
       </div>
@@ -169,7 +169,7 @@ interface Invoice {
               </div>
             </div>
             <div class="inv-meta">
-              <h4 class="inv-title">FACTURE</h4>
+              <h4 class="inv-title">REÇU DE PAIEMENT</h4>
               <div class="inv-num"># {{ selectedInvoice()!.number }}</div>
               <span class="badge" [ngClass]="selectedInvoice()!.status === 'paid' ? 'bg-success' : 'bg-warning text-dark'">
                 {{ selectedInvoice()!.status === 'paid' ? 'Payée' : 'En attente' }}
@@ -182,7 +182,7 @@ interface Invoice {
           <!-- Dates row -->
           <div class="inv-dates">
             <div class="inv-date-item">
-              <span class="inv-date-label">Date de facture</span>
+              <span class="inv-date-label">Date d'émission</span>
               <span class="inv-date-value">{{ selectedInvoice()!.date | date:'dd/MM/yyyy' }}</span>
             </div>
             <div class="inv-date-item" *ngIf="selectedInvoice()!.paymentDate">
@@ -523,6 +523,45 @@ interface Invoice {
     @keyframes fadeIn {
       from { opacity: 0; }
       to   { opacity: 1; }
+    }
+
+    @media (max-width: 992px) {
+      .stat-card { padding: 16px; }
+      .stat-icon { width: 44px; height: 44px; font-size: 20px; }
+      .stat-value { font-size: 22px; }
+      .invoice-modal { width: 480px; right: -480px; }
+      .invoice-modal--open { right: 0; }
+    }
+
+    @media (max-width: 576px) {
+      .stat-card { padding: 14px; gap: 12px; }
+      .stat-icon { width: 40px; height: 40px; font-size: 18px; }
+      .stat-value { font-size: 20px; }
+      .stat-label { font-size: 12px; }
+
+      .invoice-table th { padding: 10px 8px; font-size: 13px; }
+      .invoice-table td { padding: 10px 8px; font-size: 13px; }
+      .action-buttons { flex-direction: column; gap: 4px; }
+
+      .invoice-modal {
+        width: 100vw;
+        right: -100vw;
+      }
+      .invoice-modal--open { right: 0; }
+
+      .invoice-modal-header { padding: 0.875rem 1rem; }
+      .invoice-modal-body { padding: 1rem; }
+      .invoice-modal-footer {
+        padding: 0.75rem 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .invoice-modal-footer .btn { width: 100%; }
+
+      .inv-header { flex-direction: column; gap: 0.75rem; }
+      .inv-meta { text-align: left; }
+      .inv-title { font-size: 1.2rem; }
+      .inv-dates { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
     }
   `]
 })

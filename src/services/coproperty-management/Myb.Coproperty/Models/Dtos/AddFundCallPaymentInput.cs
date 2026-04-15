@@ -13,4 +13,7 @@ public class AddFundCallPaymentInput
 
     /// <summary>Reference / justificatif (receipt number, file path, etc.)</summary>
     public string? Justificatif { get; set; }
+
+    /// <summary>Payment method (Espèces, Chèque, Virement, Mandat postal, etc.)</summary>
+    public string? PaymentMethod { get; set; }
 }

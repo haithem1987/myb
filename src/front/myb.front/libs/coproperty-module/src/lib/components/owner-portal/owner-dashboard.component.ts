@@ -10,6 +10,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { RouterModule } from '@angular/router';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { OwnerService } from '../../services/owner.service';
+import { CurrencyService } from '../../services/currency.service';
 import { Unit, CopropertyInvoice, MaintenanceRequest, InvoiceStatus, MaintenanceStatus } from '../../models';
 import { InvoicePaymentDialogComponent } from './invoice-payment-dialog.component';
 import { NewMaintenanceRequestDialogComponent } from './new-maintenance-request-dialog.component';
@@ -36,6 +37,23 @@ import { OwnerAssembliesComponent } from './owner-assemblies.component';
         <h1>My Properties</h1>
         <p class="subtitle">Manage your units, invoices, and maintenance requests</p>
       </div>
+
+      <!-- Overdue Alert Banner -->
+      @if (overdueInvoiceCount() > 0) {
+        <div class="overdue-alert-banner">
+          <div class="alert-content">
+            <mat-icon class="alert-icon">warning</mat-icon>
+            <div class="alert-text">
+              <strong>{{ overdueInvoiceCount() }} facture(s) en retard</strong>
+              <span>Montant total impayé : {{ formatAmount(overdueTotal()) }}</span>
+            </div>
+          </div>
+          <button mat-raised-button color="warn" class="alert-action" (click)="scrollToInvoices()">
+            <mat-icon>visibility</mat-icon>
+            Voir les factures
+          </button>
+        </div>
+      }
 
       <!-- My Units Section -->
       <section class="units-section">
@@ -120,7 +138,7 @@ import { OwnerAssembliesComponent } from './owner-assemblies.component';
               <ng-container matColumnDef="amount">
                 <th mat-header-cell *matHeaderCellDef>Amount</th>
                 <td mat-cell *matCellDef="let invoice" class="amount">
-                  {{ invoice.totalAmount | currency:'EUR' }}
+                  {{ formatAmount(invoice.totalAmount) }}
                 </td>
               </ng-container>
 
@@ -187,7 +205,7 @@ import { OwnerAssembliesComponent } from './owner-assemblies.component';
                       <span class="unit-label">{{ getUnitNumber(invoice.unitId) }}</span>
                     </div>
                     <div class="history-meta">
-                      <span class="amount">{{ invoice.totalAmount | currency:'EUR' }}</span>
+                      <span class="amount">{{ formatAmount(invoice.totalAmount) }}</span>
                       <span class="date">{{ invoice.paidDate | date:'dd/MM/yyyy' }}</span>
                       <mat-chip class="status-paid">Paid</mat-chip>
                     </div>
@@ -239,7 +257,7 @@ import { OwnerAssembliesComponent } from './owner-assemblies.component';
                   </div>
                   @if (request.estimatedCost) {
                     <div class="cost-estimate">
-                      Estimated: {{ request.estimatedCost | currency:'EUR' }}
+                      Estimated: {{ formatAmount(request.estimatedCost) }}
                     </div>
                   }
                 </mat-card-content>
@@ -265,6 +283,41 @@ import { OwnerAssembliesComponent } from './owner-assemblies.component';
       padding: 24px;
       max-width: 1400px;
       margin: 0 auto;
+    }
+
+    .overdue-alert-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+      border: 1px solid #f44336;
+      border-left: 4px solid #f44336;
+      border-radius: 8px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      gap: 16px;
+
+      .alert-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .alert-icon {
+          color: #f44336;
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+        }
+
+        .alert-text {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          strong { color: #c62828; font-size: 16px; }
+          span { color: rgba(0, 0, 0, 0.6); font-size: 14px; }
+        }
+      }
     }
 
     .dashboard-header {
@@ -559,6 +612,11 @@ export class OwnerDashboardComponent implements OnInit {
   private ownerService = inject(OwnerService);
   private dialog = inject(MatDialog);
   private keycloakService = inject(KeycloakService);
+  private currencyService = inject(CurrencyService);
+
+  formatAmount(amount: number | undefined | null): string {
+    return this.currencyService.formatAmount(amount ?? 0);
+  }
 
   // Signals for reactive data
   myUnits = signal<Unit[]>([]);
@@ -567,6 +625,8 @@ export class OwnerDashboardComponent implements OnInit {
   myMaintenanceRequests = signal<MaintenanceRequest[]>([]);
   loading = signal(true);
   primaryCopropertyId = signal<string>('');
+  overdueInvoiceCount = signal(0);
+  overdueTotal = signal(0);
 
   displayedColumns: string[] = ['invoiceNumber', 'unit', 'amount', 'dueDate', 'status', 'actions'];
 
@@ -613,6 +673,11 @@ export class OwnerDashboardComponent implements OnInit {
         
         this.pendingInvoices.set(pending);
         this.paidInvoices.set(paid);
+
+        // Calculate overdue metrics for alert banner
+        const overdue = invoices.filter(inv => inv.status === InvoiceStatus.OVERDUE);
+        this.overdueInvoiceCount.set(overdue.length);
+        this.overdueTotal.set(overdue.reduce((sum, inv) => sum + (inv.totalAmount ?? 0), 0));
       },
       error: (error) => console.error('Error loading invoices:', error)
     });
@@ -631,6 +696,11 @@ export class OwnerDashboardComponent implements OnInit {
 
   isOverdue(dueDate: Date): boolean {
     return new Date(dueDate) < new Date();
+  }
+
+  scrollToInvoices(): void {
+    const el = document.querySelector('.invoices-section');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   openPaymentDialog(invoice: CopropertyInvoice): void {

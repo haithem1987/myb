@@ -17,6 +17,12 @@
     background-clip: text;
   }
 
+  .subtitle {
+    color: #6c757d;
+    margin: 0.25rem 0 0;
+    font-size: 0.95rem;
+  }
+
   .btn {
     gap: 0.5rem;
     display: inline-flex;
@@ -118,55 +124,152 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 
-  &:hover {
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-    transform: translateY(-2px);
-  }
-
   .kpi-icon {
     width: 60px;
     height: 60px;
-    border-radius: 50%;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     color: white;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    flex-shrink: 0;
 
-    &.treasury {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    &.coproperties {
+      background: linear-gradient(135deg, #4a7dbd 0%, #3a6aa8 100%);
     }
 
-    &.charges {
-      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    &.lots {
+      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
     }
 
-    &.units {
-      background: linear-gradient(135deg, #8b7ee8 0%, #9060c8 100%);
+    &.budget {
+      background: linear-gradient(135deg, #26a69a 0%, #00897b 100%);
     }
 
-    &.maintenance {
-      background: linear-gradient(135deg, #9060c8 0%, #8b7ee8 100%);
+    &.owners {
+      background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+    }
+  }
+
+  .kpi-icon-sm {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+    flex-shrink: 0;
+
+    &.occupancy {
+      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+    }
+
+    &.charges-active {
+      background: linear-gradient(135deg, #26a69a 0%, #00897b 100%);
+    }
+
+    &.area {
+      background: linear-gradient(135deg, #78909c 0%, #546e7a 100%);
+    }
+
+    &.overdue {
+      background: linear-gradient(135deg, #ef5350 0%, #d32f2f 100%);
     }
   }
 
   .kpi-content {
     flex: 1;
+    min-width: 0;
 
     h3 {
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       color: #6c757d;
-      margin: 0 0 0.5rem 0;
+      margin: 0;
       font-weight: 500;
     }
 
-    .amount,
-    .count {
-      font-size: 1.8rem;
+    .amount {
+      font-size: 1.6rem;
       font-weight: 700;
       color: #2c3e50;
-      margin: 0;
+      margin: 0 0 0.1rem 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .count {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin: 0 0 0.1rem 0;
+
+      .count-sub {
+        font-size: 1rem;
+        color: #6c757d;
+        font-weight: 500;
+      }
+    }
+  }
+
+  // Clickable behavior
+  &.clickable {
+    cursor: pointer;
+    position: relative;
+    border: 2px solid transparent;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+      transform: translateY(-4px);
+      border-color: rgba(102, 126, 234, 0.3);
+
+      .kpi-hint {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    &.warning {
+      border-left: 4px solid #dc3545;
+    }
+
+    .kpi-hint {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.35rem;
+      font-size: 0.75rem;
+      color: #667eea;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: all 0.3s ease;
+
+      i {
+        font-size: 0.7rem;
+      }
+
+      &.text-danger {
+        color: #dc3545 !important;
+      }
+    }
+  }
+
+  // Progress bar for occupancy
+  .progress-bar-sm {
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    margin-top: 0.4rem;
+    overflow: hidden;
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #4caf50, #66bb6a);
+      transition: width 0.5s ease;
     }
   }
 }
@@ -359,6 +462,109 @@
 
     button {
       width: 100%;
+    }
+  }
+}
+
+// Treasury Summary Cards
+.treasury-summary-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.treasury-card {
+  cursor: pointer;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+    transform: translateY(-3px);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-radius: 12px 12px 0 0;
+
+    h5 {
+      margin: 0;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  &.real .card-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.05));
+    border-bottom: 2px solid #667eea;
+  }
+
+  &.accounting .card-header {
+    background: linear-gradient(135deg, rgba(13, 202, 240, 0.1), rgba(102, 126, 234, 0.05));
+    border-bottom: 2px solid #0dcaf0;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .treasury-metrics {
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+
+      .label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        i {
+          font-size: 0.85rem;
+        }
+      }
+
+      .value {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      &.total {
+        .label {
+          font-weight: 600;
+          color: #2c3e50;
+          font-size: 1rem;
+        }
+
+        .value {
+          font-size: 1.3rem;
+          font-weight: 700;
+        }
+      }
+    }
+
+    hr {
+      margin: 0.5rem 0;
+      border-color: rgba(0, 0, 0, 0.08);
     }
   }
 }

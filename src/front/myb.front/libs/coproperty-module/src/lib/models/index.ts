@@ -3,6 +3,7 @@ export * from './assembly.model';
 export * from './fund-call.model';
 export * from './owner.model';
 export * from './charge.model';
+export * from './treasury.model';
 
 // Export specific types from invoice.model to avoid conflicts
 export type { RecordPaymentInput } from './invoice.model';

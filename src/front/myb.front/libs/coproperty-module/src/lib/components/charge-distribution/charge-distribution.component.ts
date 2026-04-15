@@ -67,6 +67,8 @@ export class ChargeDistributionComponent implements OnInit {
   private toastService = inject(ToastService);
 
   loadedOwners = signal<OwnerWithUnits[]>([]);
+  /** IDs of charges that already have ChargeDistribution records (already distributed) */
+  distributedChargeIds = signal<Set<string>>(new Set());
 
   repartitionForm: FormGroup;
   coproperties = signal<Coproperty[]>([]);
@@ -182,10 +184,15 @@ export class ChargeDistributionComponent implements OnInit {
       charges: this.chargeService.getChargesByCoproperty(copropertyId).pipe(take(1), catchError(() => of([]))),
       owners: this.ownerService.getAllOwners(copropertyId).pipe(take(1), catchError(() => of([]))),
       units: this.unitService.getUnitsByCoproperty(copropertyId).pipe(take(1), catchError(() => of([]))),
+      distributions: this.chargeService.getCopropertyChargeDistributions(copropertyId).pipe(take(1), catchError(() => of([]))),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ charges, owners, units }) => {
+        next: ({ charges, owners, units, distributions }) => {
+          // Build set of charge IDs that already have distributions (already distributed)
+          const alreadyDistributed = new Set<string>(distributions.map(d => d.chargeId));
+          this.distributedChargeIds.set(alreadyDistributed);
+
           this.charges.set(charges);
           this.loadedOwners.set(owners);
 
@@ -217,16 +224,15 @@ export class ChargeDistributionComponent implements OnInit {
   }
 
   private recalculateTotal(): void {
-    const year = this.repartitionForm.get('year')?.value;
-    const allCharges = this.charges();
-    const filtered = allCharges.filter(c => c.frequency === year);
+    const filtered = this.getFilteredCharges();
     const total = filtered.reduce((sum, c) => sum + (c.totalAmount || 0), 0);
     this.calculatedTotal.set(total);
   }
 
   getFilteredCharges(): ChargeExtended[] {
     const year = this.repartitionForm.get('year')?.value;
-    return this.charges().filter(c => c.frequency === year);
+    const distributed = this.distributedChargeIds();
+    return this.charges().filter(c => c.frequency === year && (!c.id || !distributed.has(c.id)));
   }
 
   get currencySymbol(): string {
@@ -393,80 +399,117 @@ export class ChargeDistributionComponent implements OnInit {
   }
 
   private createFundCallsAfterDistribution(copropertyId: string, baseDescription: string, dueDate: any): void {
-    const fundCallEntries: { input: CreateFundCallInput; preview: DistributionPreview }[] =
-      this.distributionPreview.map((p) => ({
-        input: {
-          copropertyId,
-          ownerId: p.ownerId ?? undefined,
-          amount: p.amount,
-          dueDate,
-          description: `${baseDescription} - ${p.ownerName} (Lot ${p.unitNumber})`,
-          status: 'TO_PAY' as const,
-        },
-        preview: p,
-      }));
+    // Query existing unpaid fund call totals per owner to avoid double-charging
+    this.fundCallService.getExistingFundCallTotals(copropertyId).pipe(
+      catchError(() => of([] as { ownerId: string; remainingAmount: number }[])),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((existingTotals) => {
+      const existingByOwner = new Map<string, number>();
+      existingTotals.forEach(t => existingByOwner.set(t.ownerId, t.remainingAmount));
 
-    const createRequests = fundCallEntries.map(({ input, preview }) =>
-      this.fundCallService.createFundCall(input).pipe(
-        catchError((err) => {
-          const msg: string = err?.graphQLErrors?.[0]?.message ?? err?.message ?? '';
-          return of({ __error: msg, __preview: preview } as any);
-        })
-      )
-    );
+      const fundCallEntries: { input: CreateFundCallInput; preview: DistributionPreview }[] = [];
+      const skipped: string[] = [];
 
-    forkJoin(createRequests)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((results: any[]) => {
-        const errors = results.filter((r) => r?.__error).map((r) => r.__error as string);
-        const created = results.filter((r) => !r?.__error);
+      this.distributionPreview.forEach((p) => {
+        const existing = existingByOwner.get(p.ownerId ?? '') || 0;
+        const adjustedAmount = Math.max(0, p.amount - existing);
 
-        // For fund calls that have a paymentDate set, record an immediate payment
-        const paymentRequests = created
-          .map((fundCall, idx) => {
-            const preview = fundCallEntries[idx]?.preview;
-            if (preview?.paymentDate && preview.paymentAmount && preview.paymentAmount > 0) {
-              const paymentInput: AddFundCallPaymentInput = {
-                amount: preview.paymentAmount,
-                paymentDate: new Date(preview.paymentDate),
-                justificatif: `Paiement initial - ${preview.ownerName}`,
-              };
-              return this.fundCallService.addFundCallPayment(fundCall.id, paymentInput).pipe(
-                catchError(() => of(null))
-              );
-            }
-            return of(null);
-          })
-          .filter((req) => req !== null);
-
-        if (paymentRequests.length > 0) {
-          forkJoin(paymentRequests)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe();
+        if (adjustedAmount <= 0) {
+          skipped.push(p.ownerName);
+          return;
         }
 
-        this.saving.set(false);
-
-        if (created.length > 0) {
-          this.toastService.show(
-            `${created.length} appel(s) de fonds créé(s) avec succès`,
-            { classname: 'bg-success text-white', delay: 4000 }
-          );
-        }
-        if (errors.length > 0) {
-          const unique = [...new Set(errors)];
-          unique.forEach((msg) =>
-            this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 6000 })
-          );
-        }
-        if (created.length > 0) {
-          this.saveSuccess.set(true);
-          setTimeout(() => {
-            this.saveSuccess.set(false);
-            this.router.navigate(['/coproperty/syndic/fund-calls']);
-          }, 2000);
-        }
+        fundCallEntries.push({
+          input: {
+            copropertyId,
+            ownerId: p.ownerId ?? undefined,
+            amount: adjustedAmount,
+            dueDate,
+            description: `${baseDescription} - ${p.ownerName} (Lot ${p.unitNumber})`,
+            status: 'TO_PAY' as const,
+          },
+          preview: p,
+        });
       });
+
+      if (skipped.length > 0) {
+        this.toastService.show(
+          `${skipped.length} propriétaire(s) non facturé(s) (appels existants couvrent le montant): ${skipped.join(', ')}`,
+          { classname: 'bg-info text-white', delay: 5000 }
+        );
+      }
+
+      if (fundCallEntries.length === 0) {
+        this.saving.set(false);
+        this.toastService.show(
+          'Aucun nouvel appel de fonds à créer — les appels existants couvrent tous les montants.',
+          { classname: 'bg-warning text-dark', delay: 5000 }
+        );
+        return;
+      }
+
+      const createRequests = fundCallEntries.map(({ input, preview }) =>
+        this.fundCallService.createFundCall(input).pipe(
+          catchError((err) => {
+            const msg: string = err?.graphQLErrors?.[0]?.message ?? err?.message ?? '';
+            return of({ __error: msg, __preview: preview } as any);
+          })
+        )
+      );
+
+      forkJoin(createRequests)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((results: any[]) => {
+          const errors = results.filter((r) => r?.__error).map((r) => r.__error as string);
+          const created = results.filter((r) => !r?.__error);
+
+          // For fund calls that have a paymentDate set, record an immediate payment
+          const paymentRequests = created
+            .map((fundCall, idx) => {
+              const preview = fundCallEntries[idx]?.preview;
+              if (preview?.paymentDate && preview.paymentAmount && preview.paymentAmount > 0) {
+                const paymentInput: AddFundCallPaymentInput = {
+                  amount: preview.paymentAmount,
+                  paymentDate: new Date(preview.paymentDate),
+                  justificatif: `Paiement initial - ${preview.ownerName}`,
+                };
+                return this.fundCallService.addFundCallPayment(fundCall.id, paymentInput).pipe(
+                  catchError(() => of(null))
+                );
+              }
+              return of(null);
+            })
+            .filter((req) => req !== null);
+
+          if (paymentRequests.length > 0) {
+            forkJoin(paymentRequests)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe();
+          }
+
+          this.saving.set(false);
+
+          if (created.length > 0) {
+            this.toastService.show(
+              `${created.length} appel(s) de fonds créé(s) avec succès`,
+              { classname: 'bg-success text-white', delay: 4000 }
+            );
+          }
+          if (errors.length > 0) {
+            const unique = [...new Set(errors)];
+            unique.forEach((msg) =>
+              this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 6000 })
+            );
+          }
+          if (created.length > 0) {
+            this.saveSuccess.set(true);
+            setTimeout(() => {
+              this.saveSuccess.set(false);
+              this.router.navigate(['/coproperty/syndic/fund-calls']);
+            }, 2000);
+          }
+        });
+    });
   }
 
   reset(): void {

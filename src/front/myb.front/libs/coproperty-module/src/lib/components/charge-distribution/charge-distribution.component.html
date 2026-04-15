@@ -280,7 +280,7 @@
               <td><span class="shares-badge">{{ item.shares }}</span></td>
               <td>
                 <span *ngIf="selectedMethod !== DistributionMethod.Custom" class="amount-cell">
-                  {{ item.amount | currency: 'EUR' }}
+                  {{ formatAmount(item.amount) }}
                 </span>
                 <input
                   *ngIf="selectedMethod === DistributionMethod.Custom"
@@ -324,7 +324,7 @@
       <div class="preview-summary">
         <div class="summary-row">
           <span><i class="bi bi-calculator me-2"></i>{{ 'coproperty.charge.total' | translate }}</span>
-          <strong class="total-amount">{{ getTotalDistributedAmount() | currency: 'EUR' }}</strong>
+          <strong class="total-amount">{{ formatAmount(getTotalDistributedAmount()) }}</strong>
         </div>
         <div class="summary-note" *ngIf="selectedMethod !== DistributionMethod.Custom && Math.abs(getTotalDistributedAmount() - calculatedTotal()) > 0.01">
           <i class="bi bi-exclamation-triangle me-1"></i>

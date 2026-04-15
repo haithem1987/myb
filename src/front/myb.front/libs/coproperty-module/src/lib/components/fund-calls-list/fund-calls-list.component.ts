@@ -788,4 +788,68 @@ export class FundCallsListComponent implements OnInit {
     const percent = total > 0 ? Math.min(100, (paid / total) * 100) : 0;
     return { paid, total, percent };
   }
+
+  // ── Overdue / Late payment helpers ────────────────────────────────────────
+
+  /** Returns true if the fund call is overdue (past due date & not fully paid) */
+  isOverdue(fc: FundCallExtended): boolean {
+    if (fc.status === 'PAID' || fc.status === 'VALIDATED') return false;
+    if (!fc.dueDate) return false;
+    const dueDate = new Date(fc.dueDate as any);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return dueDate < today;
+  }
+
+  /** Number of days overdue */
+  getDaysOverdue(fc: FundCallExtended): number {
+    if (!fc.dueDate) return 0;
+    const dueDate = new Date(fc.dueDate as any);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    const diff = today.getTime() - dueDate.getTime();
+    return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+  }
+
+  /** Returns urgency level: 'warning' (1-30 days), 'danger' (31-90 days), 'critical' (90+ days) */
+  getOverdueLevel(fc: FundCallExtended): 'warning' | 'danger' | 'critical' {
+    const days = this.getDaysOverdue(fc);
+    if (days > 90) return 'critical';
+    if (days > 30) return 'danger';
+    return 'warning';
+  }
+
+  /** All overdue fund calls from the current filtered list */
+  get overdueFundCalls(): FundCallExtended[] {
+    return this.filteredFundCalls.filter((fc) => this.isOverdue(fc));
+  }
+
+  /** Total overdue amount (amount - paid) */
+  getTotalOverdueAmount(): number {
+    return this.overdueFundCalls.reduce((sum, fc) => {
+      return sum + this.getRemainingAmount(fc);
+    }, 0);
+  }
+
+  /** Count of overdue fund calls */
+  getOverdueCount(): number {
+    return this.overdueFundCalls.length;
+  }
+
+  /** Get overdue badge class */
+  getOverdueBadgeClass(fc: FundCallExtended): string {
+    const level = this.getOverdueLevel(fc);
+    if (level === 'critical') return 'bg-danger';
+    if (level === 'danger') return 'bg-danger bg-opacity-75';
+    return 'bg-warning text-dark';
+  }
+
+  /** Get overdue label with days */
+  getOverdueLabel(fc: FundCallExtended): string {
+    const days = this.getDaysOverdue(fc);
+    if (days > 90) return `${days}j - Critique`;
+    if (days > 30) return `${days}j - En retard`;
+    return `${days}j`;
+  }
 }

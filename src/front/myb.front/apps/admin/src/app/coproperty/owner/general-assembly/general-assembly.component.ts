@@ -383,6 +383,47 @@ interface OwnerAssembly {
       display: flex;
       gap: 8px;
     }
+
+    @media (max-width: 992px) {
+      .stat-card { padding: 16px; }
+      .stat-icon { width: 44px; height: 44px; font-size: 20px; }
+      .stat-value { font-size: 22px; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 576px) {
+      .stat-card { padding: 14px; gap: 12px; }
+      .stat-icon { width: 40px; height: 40px; font-size: 18px; }
+      .stat-value { font-size: 20px; }
+      .stat-label { font-size: 12px; }
+
+      .assembly-header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+      }
+
+      .date-badge {
+        align-self: flex-start;
+        min-width: 64px;
+        padding: 8px;
+      }
+      .date-badge .day { font-size: 22px; }
+      .date-badge .month { font-size: 12px; }
+
+      .assembly-body { padding: 14px; }
+      .info-item i { font-size: 18px; }
+      .info-value { font-size: 13px; }
+      .countdown-banner { padding: 10px; font-size: 14px; }
+
+      .assembly-footer {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+      }
+      .assembly-footer .btn { flex: 1; min-width: 120px; font-size: 13px; }
+
+      .documents-status { flex-direction: column; gap: 10px; }
+    }
   `]
 })
 export class OwnerGeneralAssemblyComponent implements OnInit {

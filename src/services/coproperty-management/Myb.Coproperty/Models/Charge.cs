@@ -18,6 +18,7 @@ public class Charge : IEntity<Guid>
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool IsContribution { get; set; } = false;
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public Guid CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChargeService, ChargeExtended, ChargeDistributionExtended } from '../../services/charge.service';
+import { CurrencyService } from '../../services/currency.service';
 
 @Component({
   selector: 'myb-charge-management',
@@ -19,6 +20,7 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
   private route = inject(ActivatedRoute);
   private chargeService = inject(ChargeService);
   private translateService = inject(TranslateService);
+  private currencyService = inject(CurrencyService);
 
   charges = signal<ChargeExtended[]>([]);
   distributions = signal<ChargeDistributionExtended[]>([]);
@@ -266,10 +268,18 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
     // This method can be extended to save the distribution if needed
     // For now, just close the modal and show a success message
     console.log(`Distribution confirmed for method: ${this.selectedDistributionMethod()}`);
-    console.log(`Total distributed: ${this.getTotalDistributedAmount().toFixed(2)} €`);
+    console.log(`Total distributed: ${this.getTotalDistributedAmount().toFixed(2)} ${this.currencyService.symbol}`);
     
     // Optionally, you can add a success toast notification here
     this.closeDistribution();
+  }
+
+  get currencySymbol(): string {
+    return this.currencyService.symbol;
+  }
+
+  formatAmount(amount: number | string | undefined | null): string {
+    return this.currencyService.formatAmount(amount);
   }
 
   private convertToISODateTime(dateString: string | null): string | null {

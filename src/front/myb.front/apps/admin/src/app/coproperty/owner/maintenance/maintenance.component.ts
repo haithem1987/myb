@@ -2,7 +2,7 @@ import { Component, signal, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalService, ToastService } from '@myb-front/shared-ui';
-import { OwnerService, MaintenanceRequest as BackendMaintenanceRequest, MaintenanceStatus, MaintenanceCategory, Priority, Unit } from '@myb-front/coproperty-module';
+import { OwnerService, MaintenanceRequest as BackendMaintenanceRequest, MaintenanceStatus, MaintenanceCategory, Priority, Unit, CurrencyService } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
 
 interface MaintenanceRequest {
@@ -167,7 +167,7 @@ interface MaintenanceRequest {
                   <i class="bi bi-cash text-warning"></i>
                   <div>
                     <div class="detail-label">Coût estimé</div>
-                    <div class="detail-value">{{ request.estimatedCost }} €</div>
+                    <div class="detail-value">{{ formatAmount(request.estimatedCost) }}</div>
                   </div>
                 </div>
               </div>
@@ -424,6 +424,40 @@ interface MaintenanceRequest {
       color: #6c757d;
       margin-bottom: 24px;
     }
+
+    @media (max-width: 992px) {
+      .stat-card { padding: 16px; }
+      .stat-icon { width: 44px; height: 44px; font-size: 20px; }
+      .stat-value { font-size: 22px; }
+      .request-details { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 576px) {
+      .stat-card { padding: 14px; gap: 12px; }
+      .stat-icon { width: 40px; height: 40px; font-size: 18px; }
+      .stat-value { font-size: 20px; }
+      .stat-label { font-size: 12px; }
+
+      .request-header { padding: 14px; }
+      .request-body { padding: 14px; }
+      .description { font-size: 14px; }
+      .detail-item i { font-size: 16px; }
+      .detail-value { font-size: 12px; }
+      .detail-label { font-size: 10px; }
+
+      .request-footer {
+        padding: 12px 14px;
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+      }
+      .request-footer .btn-group { display: flex; gap: 6px; }
+      .request-footer .btn-group .btn { flex: 1; }
+
+      .syndic-comments { padding: 10px; }
+      .empty-state { padding: 40px 16px; }
+      .empty-state i { font-size: 48px; }
+    }
   `]
 })
 export class OwnerMaintenanceComponent implements OnInit {
@@ -459,7 +493,12 @@ export class OwnerMaintenanceComponent implements OnInit {
 
   private ownerService = inject(OwnerService);
   private keycloakService = inject(KeycloakService);
+  private currencyService = inject(CurrencyService);
   private unitsById = new Map<string, Unit>();
+
+  formatAmount(amount: number | undefined | null): string {
+    return this.currencyService.formatAmount(amount ?? 0);
+  }
 
   ngOnInit(): void {
     const userId = this.getCurrentUserId();
@@ -665,7 +704,7 @@ export class OwnerMaintenanceComponent implements OnInit {
           <p><strong>Description:</strong></p>
           <p>${request.description}</p>
           ${request.assignedContractor ? `<p><strong>Artisan assigné:</strong> ${request.assignedContractor}</p>` : ''}
-          ${request.estimatedCost ? `<p><strong>Coût estimé:</strong> ${request.estimatedCost.toFixed(2)}€</p>` : ''}
+          ${request.estimatedCost ? `<p><strong>Coût estimé:</strong> ${this.formatAmount(request.estimatedCost)}</p>` : ''}
           ${request.syndicComments ? `<hr/><p><strong>Commentaires du syndic:</strong></p><p>${request.syndicComments}</p>` : ''}
         </div>
       `,

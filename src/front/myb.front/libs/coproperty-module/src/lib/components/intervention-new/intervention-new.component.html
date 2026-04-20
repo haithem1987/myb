@@ -1,0 +1,225 @@
+<div class="container-fluid mt-4">
+  <div class="return-header mb-4">
+    <a href="javascript:void(0)" class="text-primary common-back" (click)="cancel()">
+      <i class="bi bi-chevron-left"></i> {{ 'common.back' | translate }}
+    </a>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="page-title">
+        <i class="bi bi-wrench-adjustable me-2"></i>
+        {{ isEditMode() ? 'intervention.form.editTitle' : 'intervention.form.createTitle' | translate }}
+      </h1>
+    </div>
+    <div class="col-md-4 text-end">
+      <button class="btn btn-secondary me-2" (click)="cancel()">
+        {{ 'intervention.form.cancel' | translate }}
+      </button>
+      <button class="btn btn-primary btn-violet" (click)="save()" [disabled]="interventionForm.invalid || saving()">
+        <span *ngIf="saving()" class="spinner-border spinner-border-sm me-1"></span>
+        {{ isEditMode() ? 'intervention.form.update' : 'intervention.form.create' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="saveSuccess()" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle me-2"></i>
+    {{ isEditMode() ? 'Intervention updated successfully!' : 'Intervention created successfully!' }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="saveFailed()" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-circle me-2"></i>
+    {{ 'Error saving intervention. Please try again.' }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="text-center py-5">
+    <div class="spinner-border spinner-border-lg text-primary" role="status"></div>
+    <p class="mt-2 text-muted">{{ 'intervention.list.loading' | translate }}</p>
+  </div>
+
+  <!-- Form -->
+  <div *ngIf="!loading()" class="card">
+    <div class="card-header bg-light border-bottom">
+      <h5 class="mb-0">
+        <i class="bi bi-info-circle me-2"></i>
+        General Information
+      </h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="interventionForm">
+        <!-- Coproperty Selection -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">
+              {{ 'intervention.form.coproperty' | translate }} *
+            </label>
+            <select class="form-select" formControlName="copropertyId" (change)="onCopropertyChange()">
+              <option value="">Select a coproperty</option>
+              <option *ngFor="let cop of coproperties()" [value]="cop.id">
+                {{ cop.name }}
+              </option>
+            </select>
+            <div *ngIf="interventionForm.get('copropertyId')?.hasError('required') && interventionForm.get('copropertyId')?.touched" class="text-danger small mt-1">
+              Coproperty is required
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4 gx-3">
+          <!-- Title -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              {{ 'intervention.form.title' | translate }} *
+            </label>
+            <input type="text" class="form-control" formControlName="title" placeholder="Ex: Réparation fuite" [class.is-invalid]="interventionForm.get('title')?.touched && interventionForm.get('title')?.invalid">
+            <div *ngIf="interventionForm.get('title')?.hasError('required') && interventionForm.get('title')?.touched" class="text-danger small mt-1">
+              Title is required
+            </div>
+          </div>
+
+          <!-- Type -->
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">
+              {{ 'intervention.form.type' | translate }} *
+            </label>
+            <select class="form-select" formControlName="interventionType">
+              <option *ngFor="let type of interventionTypes" [value]="type.value">
+                {{ type.label }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Priority -->
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">
+              {{ 'intervention.form.priority' | translate }} *
+            </label>
+            <select class="form-select" formControlName="priority">
+              <option *ngFor="let priority of priorities" [value]="priority.value">
+                {{ priority.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Status (only for edit mode) -->
+        <div *ngIf="isEditMode()" class="row mb-4 gx-3">
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">
+              {{ 'intervention.form.status' | translate }}
+            </label>
+            <select class="form-select" formControlName="status">
+              <option *ngFor="let status of statuses" [value]="status.value">
+                {{ status.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">
+              {{ 'intervention.form.description' | translate }} *
+            </label>
+            <textarea class="form-control" formControlName="description" rows="3" placeholder="Describe the intervention..." [class.is-invalid]="interventionForm.get('description')?.touched && interventionForm.get('description')?.invalid"></textarea>
+            <div *ngIf="interventionForm.get('description')?.hasError('required') && interventionForm.get('description')?.touched" class="text-danger small mt-1">
+              Description is required
+            </div>
+          </div>
+        </div>
+
+        <!-- Provider Information -->
+        <div class="card bg-light mb-4">
+          <div class="card-header bg-white border-bottom">
+            <h6 class="mb-0">
+              <i class="bi bi-person-badge me-2"></i>
+              Provider Information
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row gx-3">
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                  {{ 'intervention.form.providerName' | translate }}
+                </label>
+                <input type="text" class="form-control" formControlName="providerName" placeholder="Provider name">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                  {{ 'intervention.form.providerPhone' | translate }}
+                </label>
+                <input type="tel" class="form-control" formControlName="providerPhone" placeholder="+33 6 12 34 56 78">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                  {{ 'intervention.form.providerEmail' | translate }}
+                </label>
+                <input type="email" class="form-control" formControlName="providerEmail" placeholder="email@example.com" [class.is-invalid]="interventionForm.get('providerEmail')?.touched && interventionForm.get('providerEmail')?.invalid">
+                <div *ngIf="interventionForm.get('providerEmail')?.hasError('invalidEmail') && interventionForm.get('providerEmail')?.touched" class="text-danger small mt-1">
+                  Invalid email format
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Planning & Costs -->
+        <div class="card bg-light mb-4">
+          <div class="card-header bg-white border-bottom">
+            <h6 class="mb-0">
+              <i class="bi bi-calendar-event me-2"></i>
+              Planning & Costs
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row gx-3">
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                  {{ 'intervention.form.plannedDate' | translate }}
+                </label>
+                <input type="date" class="form-control" formControlName="plannedDate">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                  {{ 'intervention.form.estimatedCost' | translate }}
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">{{ currencySymbol }}</span>
+                  <input type="number" class="form-control" formControlName="estimatedCost" placeholder="0.00" step="0.01" min="0">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">
+              {{ 'intervention.form.notes' | translate }}
+            </label>
+            <textarea class="form-control" formControlName="notes" rows="3" placeholder="Additional notes..."></textarea>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="row mt-4">
+          <div class="col-md-12 text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="cancel()">
+              {{ 'intervention.form.cancel' | translate }}
+            </button>
+            <button type="button" class="btn btn-primary btn-violet" (click)="save()" [disabled]="interventionForm.invalid || saving()">
+              <span *ngIf="saving()" class="spinner-border spinner-border-sm me-1"></span>
+              {{ isEditMode() ? 'intervention.form.update' : 'intervention.form.create' | translate }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

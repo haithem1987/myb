@@ -30,6 +30,7 @@ builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IOwnerRepo
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IOwnerUnitRepository, Myb.Coproperty.Infrastructure.Repositories.OwnerUnitRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IChargeRepository, Myb.Coproperty.Infrastructure.Repositories.ChargeRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IMaintenanceRepository, Myb.Coproperty.Infrastructure.Repositories.MaintenanceRepository>();
+builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IInterventionRepository, Myb.Coproperty.Infrastructure.Repositories.InterventionRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IInvoiceRepository, Myb.Coproperty.Infrastructure.Repositories.InvoiceRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IAssemblyRepository, Myb.Coproperty.Infrastructure.Repositories.AssemblyRepository>();
 // Register ChargeDistribution generic repository
@@ -41,6 +42,7 @@ builder.Services.AddScoped<Myb.Coproperty.Services.IUnitService, Myb.Coproperty.
 builder.Services.AddScoped<Myb.Coproperty.Services.IOwnerService, Myb.Coproperty.Services.OwnerService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IChargeService, Myb.Coproperty.Services.ChargeService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IMaintenanceService, Myb.Coproperty.Services.MaintenanceService>();
+builder.Services.AddScoped<Myb.Coproperty.Services.IInterventionService, Myb.Coproperty.Services.InterventionService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IFinanceService, Myb.Coproperty.Services.FinanceService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IFundCallService, Myb.Coproperty.Services.FundCallService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IAssemblyService, Myb.Coproperty.Services.AssemblyService>();
@@ -74,6 +76,7 @@ builder.Services
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.InvoiceQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.AssemblyQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.FundCallQueries>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.InterventionQueries>()
     .AddMutationType(d => d.Name("Mutation"))
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.CopropertyMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.UnitMutations>()
@@ -83,6 +86,7 @@ builder.Services
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.FinanceMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.FundCallMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.AssemblyMutations>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.InterventionMutations>()
     .AddType<Myb.Coproperty.GraphQL.Types.CopropertyType>()
     .AddType<Myb.Coproperty.GraphQL.Types.CopropertyInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.UnitType>()
@@ -99,6 +103,8 @@ builder.Services
     .AddType<Myb.Coproperty.GraphQL.Types.CreateChargeInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.MaintenanceRequestType>()
     .AddType<Myb.Coproperty.GraphQL.Types.MaintenanceRequestInputType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.InterventionObjectType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.InterventionTypeEnumType>()
     .AddType<Myb.Coproperty.GraphQL.Types.FundCallType>()
     .AddType<Myb.Coproperty.GraphQL.Types.FundCallPaymentType>()
     .AddType<Myb.Coproperty.GraphQL.Types.DashboardStatsType>()

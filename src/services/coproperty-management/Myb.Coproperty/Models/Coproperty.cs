@@ -30,4 +30,5 @@ public class Coproperty : IEntity<Guid>
     public ICollection<Unit> Units { get; set; } = new List<Unit>();
     public ICollection<Charge> Charges { get; set; } = new List<Charge>();
     public ICollection<MaintenanceRequest> MaintenanceRequests { get; set; } = new List<MaintenanceRequest>();
+    public ICollection<Intervention> Interventions { get; set; } = new List<Intervention>();
 }

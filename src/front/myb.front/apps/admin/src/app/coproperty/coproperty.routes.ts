@@ -71,6 +71,18 @@ export const COPROPERTY_ROUTES: Routes = [
         loadComponent: () => import('@myb-front/coproperty-module').then(m => m.MaintenanceListComponent),
       },
       {
+        path: 'interventions',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.InterventionListComponent),
+      },
+      {
+        path: 'interventions/new',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.InterventionNewComponent),
+      },
+      {
+        path: 'interventions/:id/edit',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.InterventionNewComponent),
+      },
+      {
         path: 'units',
         loadComponent: () => import('@myb-front/coproperty-module').then(m => m.UnitsListComponent),
       },

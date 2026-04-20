@@ -7,3 +7,4 @@ export * from './owner.service';
 export * from './assembly.service';
 export * from './payment-api.service';
 export * from './currency.service';
+export * from './intervention.service';

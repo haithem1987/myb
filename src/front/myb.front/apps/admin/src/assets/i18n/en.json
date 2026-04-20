@@ -393,5 +393,62 @@
     "userNotFound": "No user found with this email",
     "keycloakUser": "Keycloak User",
     "registeredUsers": "Registered Users"
+  },
+  "intervention": {
+    "list": {
+      "title": "Intervention Management",
+      "subtitle": "Plan, track and manage all interventions across your coproperties",
+      "add": "New Intervention",
+      "loading": "Loading interventions...",
+      "noData": "No interventions found"
+    },
+    "stats": {
+      "total": "Total",
+      "planned": "Planned",
+      "inProgress": "In Progress",
+      "emergencies": "Emergencies"
+    },
+    "filter": {
+      "coproperty": "Coproperty",
+      "allCoproperties": "All coproperties",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "priority": "Priority",
+      "allPriorities": "All priorities",
+      "type": "Type",
+      "allTypes": "All types",
+      "search": "Search"
+    },
+    "table": {
+      "title": "Title",
+      "type": "Type",
+      "priority": "Priority",
+      "status": "Status",
+      "provider": "Provider",
+      "plannedDate": "Planned Date",
+      "cost": "Estimated Cost",
+      "actions": "Actions"
+    },
+    "form": {
+      "createTitle": "New Intervention",
+      "editTitle": "Edit Intervention",
+      "coproperty": "Coproperty",
+      "title": "Title",
+      "type": "Intervention Type",
+      "priority": "Priority",
+      "status": "Status",
+      "description": "Description",
+      "providerName": "Provider Name",
+      "providerPhone": "Phone",
+      "providerEmail": "Email",
+      "plannedDate": "Planned Date",
+      "estimatedCost": "Estimated Cost",
+      "actualCost": "Actual Cost",
+      "notes": "Notes",
+      "resolution": "Resolution",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update"
+    }
   }
 }

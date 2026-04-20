@@ -1,0 +1,171 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2 class="page-title">
+        <i class="bi bi-wrench-adjustable me-2"></i>
+        {{ 'intervention.list.title' | translate }}
+      </h2>
+      <p class="text-muted">{{ 'intervention.list.subtitle' | translate }}</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <button class="btn btn-primary btn-violet" (click)="createNew()" routerLink="/coproperty/syndic/interventions/new">
+        <i class="bi bi-plus-circle me-2"></i>
+        {{ 'intervention.list.add' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-6 col-md-3 mb-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-primary-subtle text-primary">
+          <i class="bi bi-wrench"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ totalInterventions() }}</div>
+          <div class="stat-label">{{ 'intervention.stats.total' | translate }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-warning-subtle text-warning">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ plannedCount() }}</div>
+          <div class="stat-label">{{ 'intervention.stats.planned' | translate }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-info-subtle text-info">
+          <i class="bi bi-play-circle"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ inProgressCount() }}</div>
+          <div class="stat-label">{{ 'intervention.stats.inProgress' | translate }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-danger-subtle text-danger">
+          <i class="bi bi-exclamation-circle"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ emergencyCount() }}</div>
+          <div class="stat-label">{{ 'intervention.stats.emergencies' | translate }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">{{ 'intervention.filter.coproperty' | translate }}</label>
+          <select class="form-select" [(ngModel)]="selectedCopropertyId" (ngModelChange)="onFilterChange()">
+            <option value="">{{ 'intervention.filter.allCoproperties' | translate }}</option>
+            <option *ngFor="let cop of coproperties()" [value]="cop.id">{{ cop.name }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">{{ 'intervention.filter.status' | translate }}</label>
+          <select class="form-select" [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
+            <option value="">{{ 'intervention.filter.allStatuses' | translate }}</option>
+            <option value="Draft">Draft</option>
+            <option value="Planned">Planned</option>
+            <option value="InProgress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">{{ 'intervention.filter.priority' | translate }}</label>
+          <select class="form-select" [(ngModel)]="selectedPriority" (ngModelChange)="onFilterChange()">
+            <option value="">{{ 'intervention.filter.allPriorities' | translate }}</option>
+            <option value="Low">Low</option>
+            <option value="Normal">Normal</option>
+            <option value="High">High</option>
+            <option value="Emergency">Emergency</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">{{ 'intervention.filter.search' | translate }}</label>
+          <input type="text" class="form-control" [(ngModel)]="searchTerm" (ngModelChange)="onFilterChange()" placeholder="Search...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading()" class="text-center py-5">
+    <div class="spinner-border spinner-border-lg text-primary" role="status"></div>
+    <p class="mt-2 text-muted">{{ 'intervention.list.loading' | translate }}</p>
+  </div>
+
+  <!-- List Table -->
+  <div *ngIf="!isLoading()" class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>{{ 'intervention.table.title' | translate }}</th>
+            <th>{{ 'intervention.table.type' | translate }}</th>
+            <th>{{ 'intervention.table.priority' | translate }}</th>
+            <th>{{ 'intervention.table.status' | translate }}</th>
+            <th>{{ 'intervention.table.provider' | translate }}</th>
+            <th>{{ 'intervention.table.cost' | translate }}</th>
+            <th>{{ 'intervention.table.actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredInterventions()">
+            <td>
+              <div class="fw-semibold">{{ item.title }}</div>
+              <small class="text-muted">{{ getCopropertyName(item.copropertyId) }}</small>
+            </td>
+            <td>
+              <span class="badge bg-info">{{ getTypeLabel(item.interventionType) }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getPriorityClass(item.priority)">{{ getPriorityLabel(item.priority) }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getStatusClass(item.status)">{{ getStatusLabel(item.status) }}</span>
+            </td>
+            <td>
+              <small>{{ item.providerName || '-' }}</small>
+            </td>
+            <td>
+              <span *ngIf="item.estimatedCost">{{ formatAmount(item.estimatedCost) }}</span>
+              <span *ngIf="!item.estimatedCost" class="text-muted">-</span>
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-primary" (click)="editIntervention(item.id)" title="Edit">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-outline-danger" (click)="deleteIntervention(item)" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredInterventions().length === 0">
+            <td colspan="7" class="text-center py-4 text-muted">
+              <i class="bi bi-inbox display-5 d-block mb-2"></i>
+              {{ 'intervention.list.noData' | translate }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

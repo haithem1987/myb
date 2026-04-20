@@ -447,5 +447,62 @@
     "userNotFound": "Aucun utilisateur trouvé avec cet email",
     "keycloakUser": "Utilisateur Keycloak",
     "registeredUsers": "Utilisateurs inscrits"
+  },
+  "intervention": {
+    "list": {
+      "title": "Gestion des Interventions",
+      "subtitle": "Planifiez, suivez et gérez toutes les interventions de vos copropriétés",
+      "add": "Nouvelle Intervention",
+      "loading": "Chargement des interventions...",
+      "noData": "Aucune intervention trouvée"
+    },
+    "stats": {
+      "total": "Total",
+      "planned": "Planifiées",
+      "inProgress": "En cours",
+      "emergencies": "Urgences"
+    },
+    "filter": {
+      "coproperty": "Copropriété",
+      "allCoproperties": "Toutes les copropriétés",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts",
+      "priority": "Priorité",
+      "allPriorities": "Toutes les priorités",
+      "type": "Type",
+      "allTypes": "Tous les types",
+      "search": "Recherche"
+    },
+    "table": {
+      "title": "Titre",
+      "type": "Type",
+      "priority": "Priorité",
+      "status": "Statut",
+      "provider": "Intervenant",
+      "plannedDate": "Date prévue",
+      "cost": "Coût estimé",
+      "actions": "Actions"
+    },
+    "form": {
+      "createTitle": "Nouvelle Intervention",
+      "editTitle": "Modifier l'Intervention",
+      "coproperty": "Copropriété",
+      "title": "Titre",
+      "type": "Type d'intervention",
+      "priority": "Priorité",
+      "status": "Statut",
+      "description": "Description",
+      "providerName": "Nom intervenant",
+      "providerPhone": "Téléphone",
+      "providerEmail": "Email",
+      "plannedDate": "Date prévue",
+      "estimatedCost": "Coût estimé",
+      "actualCost": "Coût réel",
+      "notes": "Notes",
+      "resolution": "Résolution",
+      "cancel": "Annuler",
+      "create": "Créer",
+      "update": "Mettre à jour"
+    }
   }
 }

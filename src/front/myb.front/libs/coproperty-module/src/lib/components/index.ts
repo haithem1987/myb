@@ -22,4 +22,7 @@ export * from './owner-profile-completion/owner-profile-completion.component';
 export * from './charge-payments/charge-payments.component';
 export * from './treasury-detail/treasury-detail.component';
 export * from './unpaid-payments/unpaid-payments.component';
+export * from './intervention-list/intervention-list.component';
+export * from './intervention-new/intervention-new.component';
+export * from './intervention-management/intervention-management.component';
 export * from './coproperty.routes';

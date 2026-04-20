@@ -26,6 +26,7 @@ public class CopropertyDbContext : DbContext
     public DbSet<FundCallPayment> FundCallPayments { get; set; } = null!;
     public DbSet<Assembly> Assemblies { get; set; } = null!;
     public DbSet<AssemblyAttendance> AssemblyAttendances { get; set; } = null!;
+    public DbSet<Intervention> Interventions { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -524,6 +525,80 @@ public class CopropertyDbContext : DbContext
             
             entity.HasIndex(e => e.AssemblyId);
             entity.HasIndex(e => e.OwnerId);
+        });
+
+        // Intervention Configuration
+        modelBuilder.Entity<Intervention>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(e => e.Description)
+                .IsRequired()
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.InterventionType)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Priority)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .HasDefaultValue(Priority.Normal);
+
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .HasDefaultValue(InterventionStatus.Draft);
+
+            entity.Property(e => e.ProviderName)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.ProviderPhone)
+                .HasMaxLength(50);
+
+            entity.Property(e => e.ProviderEmail)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.EstimatedCost)
+                .HasPrecision(10, 2);
+
+            entity.Property(e => e.ActualCost)
+                .HasPrecision(10, 2);
+
+            entity.Property(e => e.Notes)
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.Resolution)
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.HasOne(e => e.Coproperty)
+                .WithMany(c => c.Interventions)
+                .HasForeignKey(e => e.CopropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Unit)
+                .WithMany()
+                .HasForeignKey(e => e.UnitId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.MaintenanceRequest)
+                .WithMany()
+                .HasForeignKey(e => e.MaintenanceRequestId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CopropertyId);
+            entity.HasIndex(e => e.PlannedDate);
         });
     }
 }

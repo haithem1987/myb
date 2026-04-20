@@ -328,12 +328,12 @@ export class CopropertyService {
 
   getCoproperties(): Observable<Coproperty[]> {
     return this.apollo
-      .watchQuery<{ coproperties: Coproperty[] }>({
+      .query<{ coproperties: Coproperty[] }>({
         query: GET_COPROPERTIES,
         fetchPolicy: 'network-only',
         context: { service: 'copropertyService' }
       })
-      .valueChanges.pipe(
+      .pipe(
         map(result => result.data.coproperties)
       );
   }

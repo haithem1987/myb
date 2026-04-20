@@ -7,6 +7,7 @@ import { Coproperty } from '../models/coproperty.models';
 import { UnitManagementComponent } from './unit-management/unit-management.component';
 import { ChargeManagementComponent } from './charge-management/charge-management.component';
 import { MaintenanceRequestsComponent } from './maintenance-requests/maintenance-requests.component';
+import { InterventionManagementComponent } from './intervention-management/intervention-management.component';
 
 @Component({
   selector: 'myb-coproperty-detail',
@@ -16,7 +17,8 @@ import { MaintenanceRequestsComponent } from './maintenance-requests/maintenance
     TranslateModule,
     UnitManagementComponent,
     ChargeManagementComponent,
-    MaintenanceRequestsComponent
+    MaintenanceRequestsComponent,
+    InterventionManagementComponent
   ],
   template: `
     <div class="container-fluid mt-4">
@@ -112,6 +114,11 @@ import { MaintenanceRequestsComponent } from './maintenance-requests/maintenance
                 {{ 'MAINTENANCE' | translate }}
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#interventions" data-bs-toggle="tab">
+                Interventions
+              </a>
+            </li>
           </ul>
           <div class="tab-content mt-3">
             <div id="units" class="tab-pane fade show active">
@@ -122,6 +129,9 @@ import { MaintenanceRequestsComponent } from './maintenance-requests/maintenance
             </div>
             <div id="maintenance" class="tab-pane fade">
               <myb-maintenance-requests [copropertyId]="coproperty?.id || null"></myb-maintenance-requests>
+            </div>
+            <div id="interventions" class="tab-pane fade">
+              <myb-intervention-management [copropertyId]="coproperty?.id || null"></myb-intervention-management>
             </div>
           </div>
         </div>

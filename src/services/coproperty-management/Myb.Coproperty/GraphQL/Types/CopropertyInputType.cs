@@ -28,6 +28,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Ignore(c => c.Units);
             descriptor.Ignore(c => c.Charges);
             descriptor.Ignore(c => c.MaintenanceRequests);
+            descriptor.Ignore(c => c.Interventions);
         }
     }
 }

@@ -1,0 +1,171 @@
+# docker-compose.gcp.yml
+# Focused deployment: myb-coproperty + dependencies only
+# Usage: docker compose -f docker-compose.gcp.yml up -d
+
+services:
+  # ─── Keycloak Auth Server ───────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.4
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=${KEYCLOAK_ADMIN_USER:-admin}
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/${KEYCLOAK_DB_NAME:-keycloak}
+      - KC_DB_USERNAME=${KEYCLOAK_DB_USER:-keycloak}
+      - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USER:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_HOSTNAME_STRICT=false
+      - KC_HTTP_ENABLED=true
+      - KC_PROXY=edge
+      - KC_HOSTNAME_URL=${KEYCLOAK_EXTERNAL_URL:-http://localhost:8080}
+      - KC_HOSTNAME_STRICT_HTTPS=false
+    networks:
+      - myb-network
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    command: start --db=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ─── Keycloak PostgreSQL ────────────────────────────────────────
+  keycloak-db:
+    image: postgres:16.2
+    container_name: keycloak-db
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME:-keycloak}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER:-keycloak}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/keycloak/data
+    networks:
+      - myb-network
+    volumes:
+      - postgres_keycloak_data:/var/lib/postgresql/keycloak/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${KEYCLOAK_DB_USER:-keycloak}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─── Coproperty PostgreSQL ─────────────────────────────────────
+  copropertyDB:
+    image: postgres:16.2
+    container_name: copropertyDB
+    environment:
+      POSTGRES_PASSWORD: ${COPROPERTY_DB_PASSWORD}
+      POSTGRES_DB: ${COPROPERTY_DB_NAME:-copropertyDB}
+      POSTGRES_USER: ${COPROPERTY_DB_USER:-postgres}
+      PGDATA: /var/lib/postgresql/coproperty/data
+    networks:
+      - myb-network
+    volumes:
+      - postgres_coproperty_data:/var/lib/postgresql/coproperty/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${COPROPERTY_DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─── RabbitMQ Message Broker ───────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"
+    networks:
+      - myb-network
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─── MYB Coproperty Backend ────────────────────────────────────
+  myb-coproperty:
+    build:
+      context: .
+      dockerfile: ./src/services/coproperty-management/Myb.Coproperty/Dockerfile
+    image: ${GCP_REGION:-europe-west1}-docker.pkg.dev/${GCP_PROJECT_ID}/myb-repo/myb-coproperty:${IMAGE_TAG:-latest}
+    ports:
+      - "8088:8080"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      copropertyDB:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - myb-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__CopropertyDBConnection=Host=copropertyDB;Port=5432;Database=${COPROPERTY_DB_NAME:-copropertyDB};Username=${COPROPERTY_DB_USER:-postgres};Password=${COPROPERTY_DB_PASSWORD}
+      - Keycloak__BaseUrl=${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080}/realms/MYB/protocol/openid-connect
+      - Keycloak__Authority=${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080}/realms/MYB
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
+      - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET}
+      - Keycloak__ServiceClientId=${KEYCLOAK_SERVICE_CLIENT_ID:-myb-backend}
+      - Keycloak__ServiceClientSecret=${KEYCLOAK_SERVICE_CLIENT_SECRET}
+      - Keycloak__ManagerRole=${KEYCLOAK_MANAGER_ROLE:-coproperty-syndic}
+      - RabbitMq__Host=rabbitmq
+    restart: unless-stopped
+
+  # ─── MYB Admin Frontend (Angular - Syndic & Owner portals) ────
+  myb-admin:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.frontend
+      args:
+        APP_NAME: admin
+    image: ${GCP_REGION:-europe-west1}-docker.pkg.dev/${GCP_PROJECT_ID}/myb-repo/myb-admin:${IMAGE_TAG:-latest}
+    ports:
+      - "4201:8080"
+    networks:
+      - myb-network
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      myb-coproperty:
+        condition: service_started
+    environment:
+      - PORT=8080
+      - PRODUCTION=true
+      - API_GATEWAY_URL=http://myb-coproperty:8080
+      - KEYCLOAK_URL=${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  myb-network:
+    driver: bridge
+
+volumes:
+  keycloak_data:
+  postgres_keycloak_data:
+  postgres_coproperty_data:
+  rabbitmq_data:

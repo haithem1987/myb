@@ -148,13 +148,19 @@
               <span *ngIf="!item.estimatedCost" class="text-muted">-</span>
             </td>
             <td>
-              <div class="btn-group btn-group-sm">
-                <button class="btn btn-outline-primary" (click)="editIntervention(item.id)" title="Edit">
-                  <i class="bi bi-pencil"></i>
+              <div ngbDropdown container="body" placement="bottom-end">
+                <button class="btn btn-sm btn-outline-secondary" ngbDropdownToggle>
+                  <i class="bi bi-three-dots-vertical"></i>
                 </button>
-                <button class="btn btn-outline-danger" (click)="deleteIntervention(item)" title="Delete">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <div ngbDropdownMenu>
+                  <button ngbDropdownItem (click)="editIntervention(item.id)">
+                    <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button ngbDropdownItem class="text-danger" (click)="deleteIntervention(item)">
+                    <i class="bi bi-trash me-2"></i>{{ 'common.deleteAction' | translate }}
+                  </button>
+                </div>
               </div>
             </td>
           </tr>

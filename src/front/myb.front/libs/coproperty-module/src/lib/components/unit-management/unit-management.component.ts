@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterModule, ActivatedRoute } from '@angular/router';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { UnitService, UnitExtended } from '../../services/unit.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
   selector: 'myb-unit-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, RouterModule, NgbDropdownModule],
   templateUrl: './unit-management.component.html',
   styleUrls: ['./unit-management.component.scss'],
 })

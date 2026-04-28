@@ -1,0 +1,70 @@
+# Admin Frontend Deployment (Angular/Nx)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myb-admin
+  namespace: myb-platform
+  labels:
+    app: myb-admin
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myb-admin
+  template:
+    metadata:
+      labels:
+        app: myb-admin
+        tier: frontend
+    spec:
+      imagePullSecrets:
+      - name: harbor-registry-credentials
+      containers:
+      - name: admin-frontend
+        image: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-admin:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: NODE_ENV
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myb-admin
+  namespace: myb-platform
+spec:
+  selector:
+    app: myb-admin
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  type: ClusterIP

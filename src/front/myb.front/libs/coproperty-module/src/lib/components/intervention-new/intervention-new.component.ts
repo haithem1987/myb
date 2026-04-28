@@ -142,9 +142,9 @@ export class InterventionNewComponent implements OnInit {
               copropertyId: intervention.copropertyId,
               title: intervention.title,
               description: intervention.description,
-              interventionType: intervention.interventionType,
-              priority: intervention.priority,
-              status: intervention.status,
+              interventionType: this.normalizeInterventionType(intervention.interventionType as string),
+              priority: this.normalizePriority(intervention.priority as string),
+              status: this.normalizeStatus(intervention.status as string),
               providerName: intervention.providerName || '',
               providerPhone: intervention.providerPhone || '',
               providerEmail: intervention.providerEmail || '',
@@ -172,6 +172,34 @@ export class InterventionNewComponent implements OnInit {
 
   private checkCopropertyFromUrl(): void {
     this.copropertyIdFromUrl = this.activatedRoute.snapshot.queryParamMap.get('copropertyId');
+  }
+
+  /** Normalize GraphQL SCREAMING_SNAKE_CASE enum values to the PascalCase values expected by the form selects */
+  private normalizeInterventionType(value: string): string {
+    const map: Record<string, string> = {
+      PLUMBING: 'Plumbing', ELECTRICITY: 'Electricity', ELEVATOR: 'Elevator',
+      CLEANING: 'Cleaning', PAINTING: 'Painting', LOCKSMITH: 'Locksmith',
+      GARDEN_MAINTENANCE: 'GardenMaintenance', PEST_CONTROL: 'PestControl',
+      FIRE_SAFETY: 'FireSafety', ROOF_REPAIR: 'RoofRepair',
+      COMMON_AREA_REPAIR: 'CommonAreaRepair', HEATING_COOLING: 'HeatingCooling',
+      SECURITY_SYSTEM: 'SecuritySystem', WASTE_MANAGEMENT: 'WasteManagement', OTHER: 'Other'
+    };
+    return map[value] ?? value;
+  }
+
+  private normalizePriority(value: string): string {
+    const map: Record<string, string> = {
+      LOW: 'Low', NORMAL: 'Normal', HIGH: 'High', EMERGENCY: 'Emergency'
+    };
+    return map[value] ?? value;
+  }
+
+  private normalizeStatus(value: string): string {
+    const map: Record<string, string> = {
+      DRAFT: 'Draft', PLANNED: 'Planned', IN_PROGRESS: 'InProgress',
+      COMPLETED: 'Completed', CANCELLED: 'Cancelled', INVOICED: 'Invoiced'
+    };
+    return map[value] ?? value;
   }
 
   onCopropertyChange(): void {

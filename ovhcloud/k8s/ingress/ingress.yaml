@@ -1,0 +1,82 @@
+# Ingress Configuration for OVHCloud Kubernetes
+# Exposes services via HTTP(S) using NGINX Ingress Controller
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myb-ingress
+  namespace: myb-platform
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    # For production with domain and SSL:
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  # Replace with your domain or use IP-based access
+  - host: myb.yourdomain.com  # Change this!
+    http:
+      paths:
+      # Admin Frontend
+      - path: /admin
+        pathType: Prefix
+        backend:
+          service:
+            name: myb-admin
+            port:
+              number: 80
+
+      # Client Frontend (Owner Portal)
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myb-client
+            port:
+              number: 80
+
+      # Keycloak
+      - path: /auth
+        pathType: Prefix
+        backend:
+          service:
+            name: keycloak
+            port:
+              number: 8080
+      
+      # Coproperty Service API
+      - path: /api/coproperty
+        pathType: Prefix
+        backend:
+          service:
+            name: myb-coproperty
+            port:
+              number: 8088
+      
+      # Invoice Service API
+      - path: /api/invoice
+        pathType: Prefix
+        backend:
+          service:
+            name: myb-invoice
+            port:
+              number: 8083
+      
+      # RabbitMQ Management (Optional - for debugging)
+      - path: /rabbitmq
+        pathType: Prefix
+        backend:
+          service:
+            name: rabbitmq
+            port:
+              number: 15672
+
+  # For production with SSL:
+  # tls:
+  # - hosts:
+  #   - myb.yourdomain.com
+  #   secretName: myb-tls-cert

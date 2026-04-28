@@ -9,7 +9,7 @@
     <div class="col-md-8">
       <h1 class="page-title">
         <i class="bi bi-wrench-adjustable me-2"></i>
-        {{ isEditMode() ? 'intervention.form.editTitle' : 'intervention.form.createTitle' | translate }}
+        {{ (isEditMode() ? 'intervention.form.editTitle' : 'intervention.form.createTitle') | translate }}
       </h1>
     </div>
     <div class="col-md-4 text-end">
@@ -18,7 +18,7 @@
       </button>
       <button class="btn btn-primary btn-violet" (click)="save()" [disabled]="interventionForm.invalid || saving()">
         <span *ngIf="saving()" class="spinner-border spinner-border-sm me-1"></span>
-        {{ isEditMode() ? 'intervention.form.update' : 'intervention.form.create' | translate }}
+        {{ (isEditMode() ? 'intervention.form.update' : 'intervention.form.create') | translate }}
       </button>
     </div>
   </div>
@@ -26,13 +26,13 @@
   <!-- Success Message -->
   <div *ngIf="saveSuccess()" class="alert alert-success alert-dismissible fade show" role="alert">
     <i class="bi bi-check-circle me-2"></i>
-    {{ isEditMode() ? 'Intervention updated successfully!' : 'Intervention created successfully!' }}
+    {{ (isEditMode() ? 'intervention.form.saveSuccessEdit' : 'intervention.form.saveSuccess') | translate }}
   </div>
 
   <!-- Error Message -->
   <div *ngIf="saveFailed()" class="alert alert-danger alert-dismissible fade show" role="alert">
     <i class="bi bi-exclamation-circle me-2"></i>
-    {{ 'Error saving intervention. Please try again.' }}
+    {{ 'intervention.form.saveError' | translate }}
   </div>
 
   <!-- Loading -->
@@ -46,7 +46,7 @@
     <div class="card-header bg-light border-bottom">
       <h5 class="mb-0">
         <i class="bi bi-info-circle me-2"></i>
-        General Information
+        {{ 'intervention.form.generalInfo' | translate }}
       </h5>
     </div>
     <div class="card-body">
@@ -58,13 +58,13 @@
               {{ 'intervention.form.coproperty' | translate }} *
             </label>
             <select class="form-select" formControlName="copropertyId" (change)="onCopropertyChange()">
-              <option value="">Select a coproperty</option>
+              <option value="">{{ 'intervention.form.selectCoproperty' | translate }}</option>
               <option *ngFor="let cop of coproperties()" [value]="cop.id">
                 {{ cop.name }}
               </option>
             </select>
             <div *ngIf="interventionForm.get('copropertyId')?.hasError('required') && interventionForm.get('copropertyId')?.touched" class="text-danger small mt-1">
-              Coproperty is required
+              {{ 'intervention.form.copropertyRequired' | translate }}
             </div>
           </div>
         </div>
@@ -77,7 +77,7 @@
             </label>
             <input type="text" class="form-control" formControlName="title" placeholder="Ex: Réparation fuite" [class.is-invalid]="interventionForm.get('title')?.touched && interventionForm.get('title')?.invalid">
             <div *ngIf="interventionForm.get('title')?.hasError('required') && interventionForm.get('title')?.touched" class="text-danger small mt-1">
-              Title is required
+              {{ 'intervention.form.titleRequired' | translate }}
             </div>
           </div>
 
@@ -128,7 +128,7 @@
             </label>
             <textarea class="form-control" formControlName="description" rows="3" placeholder="Describe the intervention..." [class.is-invalid]="interventionForm.get('description')?.touched && interventionForm.get('description')?.invalid"></textarea>
             <div *ngIf="interventionForm.get('description')?.hasError('required') && interventionForm.get('description')?.touched" class="text-danger small mt-1">
-              Description is required
+              {{ 'intervention.form.descriptionRequired' | translate }}
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@
           <div class="card-header bg-white border-bottom">
             <h6 class="mb-0">
               <i class="bi bi-person-badge me-2"></i>
-              Provider Information
+              {{ 'intervention.form.providerInfo' | translate }}
             </h6>
           </div>
           <div class="card-body">
@@ -161,7 +161,7 @@
                 </label>
                 <input type="email" class="form-control" formControlName="providerEmail" placeholder="email@example.com" [class.is-invalid]="interventionForm.get('providerEmail')?.touched && interventionForm.get('providerEmail')?.invalid">
                 <div *ngIf="interventionForm.get('providerEmail')?.hasError('invalidEmail') && interventionForm.get('providerEmail')?.touched" class="text-danger small mt-1">
-                  Invalid email format
+                  {{ 'intervention.form.emailInvalid' | translate }}
                 </div>
               </div>
             </div>
@@ -173,7 +173,7 @@
           <div class="card-header bg-white border-bottom">
             <h6 class="mb-0">
               <i class="bi bi-calendar-event me-2"></i>
-              Planning & Costs
+              {{ 'intervention.form.planningCosts' | translate }}
             </h6>
           </div>
           <div class="card-body">
@@ -215,7 +215,7 @@
             </button>
             <button type="button" class="btn btn-primary btn-violet" (click)="save()" [disabled]="interventionForm.invalid || saving()">
               <span *ngIf="saving()" class="spinner-border spinner-border-sm me-1"></span>
-              {{ isEditMode() ? 'intervention.form.update' : 'intervention.form.create' | translate }}
+              {{ (isEditMode() ? 'intervention.form.update' : 'intervention.form.create') | translate }}
             </button>
           </div>
         </div>

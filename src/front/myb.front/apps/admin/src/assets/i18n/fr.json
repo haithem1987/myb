@@ -385,7 +385,18 @@
     "amountPlaceholder": "0.00",
     "agendaPlaceholder": "Points à l'ordre du jour...",
     "assemblyTitlePlaceholder": "Assemblée Générale Annuelle",
-    "fundCallDescPlaceholder": "Charges T1"
+    "fundCallDescPlaceholder": "Charges T1",
+    "or": "ou",
+    "status": "Statut",
+    "role": "Rôle",
+    "assignRole": "Attribuer le rôle",
+    "unassignRole": "Retirer le rôle",
+    "roleAssigned": "Rôle attribué avec succès",
+    "roleUnassigned": "Rôle retiré avec succès",
+    "userNotFound": "Aucun utilisateur trouvé avec cet email",
+    "keycloakUser": "Utilisateur Keycloak",
+    "registeredUsers": "Utilisateurs inscrits",
+    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par email..."
   },
   "validation": {
     "NAME_REQUIRED": "est requis",
@@ -417,36 +428,6 @@
       "profileSaved": "Votre profil a été enregistré avec succès. Redirection...",
       "profileError": "Une erreur est survenue lors de l'enregistrement de votre profil. Veuillez réessayer."
     }
-  },
-  "common": {
-    "or": "ou",
-    "email": "Email",
-    "phone": "Téléphone",
-    "address": "Adresse",
-    "actions": "Actions",
-    "save": "Enregistrer",
-    "cancel": "Annuler",
-    "edit": "Modifier",
-    "delete": "Supprimer",
-    "search": "Rechercher",
-    "loading": "Chargement...",
-    "noData": "Aucune donnée trouvée",
-    "confirm": "Confirmer",
-    "close": "Fermer",
-    "editAction": "Modifier",
-    "deleteAction": "Supprimer",
-    "searchOwners": "Rechercher des copropriétaires...",
-    "searchUnits": "Rechercher des lots...",
-    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par email...",
-    "status": "Statut",
-    "role": "Rôle",
-    "assignRole": "Attribuer le rôle",
-    "unassignRole": "Retirer le rôle",
-    "roleAssigned": "Rôle attribué avec succès",
-    "roleUnassigned": "Rôle retiré avec succès",
-    "userNotFound": "Aucun utilisateur trouvé avec cet email",
-    "keycloakUser": "Utilisateur Keycloak",
-    "registeredUsers": "Utilisateurs inscrits"
   },
   "intervention": {
     "list": {
@@ -502,7 +483,18 @@
       "resolution": "Résolution",
       "cancel": "Annuler",
       "create": "Créer",
-      "update": "Mettre à jour"
+      "update": "Mettre à jour",
+      "generalInfo": "Informations Générales",
+      "providerInfo": "Informations Intervenant",
+      "planningCosts": "Planification & Coûts",
+      "selectCoproperty": "Sélectionner une copropriété",
+      "copropertyRequired": "La copropriété est requise",
+      "titleRequired": "Le titre est requis",
+      "descriptionRequired": "La description est requise",
+      "emailInvalid": "Format d'email invalide",
+      "saveSuccess": "Intervention créée avec succès !",
+      "saveSuccessEdit": "Intervention mise à jour avec succès !",
+      "saveError": "Erreur lors de l'enregistrement. Veuillez réessayer."
     }
   }
 }

@@ -331,7 +331,18 @@
     "amountPlaceholder": "0.00",
     "agendaPlaceholder": "Agenda items...",
     "assemblyTitlePlaceholder": "Annual General Assembly",
-    "fundCallDescPlaceholder": "Q1 charges"
+    "fundCallDescPlaceholder": "Q1 charges",
+    "or": "or",
+    "status": "Status",
+    "role": "Role",
+    "assignRole": "Assign role",
+    "unassignRole": "Unassign role",
+    "roleAssigned": "Role assigned successfully",
+    "roleUnassigned": "Role unassigned successfully",
+    "userNotFound": "No user found with this email",
+    "keycloakUser": "Keycloak User",
+    "registeredUsers": "Registered Users",
+    "searchKeycloakUsers": "Search registered user by email..."
   },
   "validation": {
     "NAME_REQUIRED": "is required",
@@ -363,36 +374,6 @@
       "profileSaved": "Your profile has been saved successfully. Redirecting...",
       "profileError": "An error occurred while saving your profile. Please try again."
     }
-  },
-  "common": {
-    "or": "or",
-    "email": "Email",
-    "phone": "Phone",
-    "address": "Address",
-    "actions": "Actions",
-    "save": "Save",
-    "cancel": "Cancel",
-    "edit": "Edit",
-    "delete": "Delete",
-    "search": "Search",
-    "loading": "Loading...",
-    "noData": "No data found",
-    "confirm": "Confirm",
-    "close": "Close",
-    "editAction": "Edit",
-    "deleteAction": "Delete",
-    "searchOwners": "Search owners...",
-    "searchUnits": "Search units...",
-    "searchKeycloakUsers": "Search registered user by email...",
-    "status": "Status",
-    "role": "Role",
-    "assignRole": "Assign role",
-    "unassignRole": "Unassign role",
-    "roleAssigned": "Role assigned successfully",
-    "roleUnassigned": "Role unassigned successfully",
-    "userNotFound": "No user found with this email",
-    "keycloakUser": "Keycloak User",
-    "registeredUsers": "Registered Users"
   },
   "intervention": {
     "list": {
@@ -448,7 +429,18 @@
       "resolution": "Resolution",
       "cancel": "Cancel",
       "create": "Create",
-      "update": "Update"
+      "update": "Update",
+      "generalInfo": "General Information",
+      "providerInfo": "Provider Information",
+      "planningCosts": "Planning & Costs",
+      "selectCoproperty": "Select a coproperty",
+      "copropertyRequired": "Coproperty is required",
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "emailInvalid": "Invalid email format",
+      "saveSuccess": "Intervention created successfully!",
+      "saveSuccessEdit": "Intervention updated successfully!",
+      "saveError": "Error saving intervention. Please try again."
     }
   }
 }

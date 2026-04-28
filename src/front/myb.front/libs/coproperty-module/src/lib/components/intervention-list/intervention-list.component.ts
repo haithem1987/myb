@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { InterventionService } from '../../services/intervention.service';
@@ -15,7 +16,7 @@ import { ToastService } from '@myb-front/shared-ui';
 @Component({
   selector: 'myb-intervention-list',
   standalone: true,
-  imports: [CommonModule, TranslateModule, RouterModule, FormsModule],
+  imports: [CommonModule, TranslateModule, RouterModule, FormsModule, NgbDropdownModule],
   templateUrl: './intervention-list.component.html',
   styleUrls: ['./intervention-list.component.scss'],
 })

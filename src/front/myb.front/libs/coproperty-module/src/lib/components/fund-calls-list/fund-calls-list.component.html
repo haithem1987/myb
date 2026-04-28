@@ -333,25 +333,22 @@
                 </ng-container>
               </td>
               <td class="text-end">
-                <div class="d-flex gap-1 justify-content-end flex-nowrap">
-                  <button
-                    class="btn btn-sm btn-outline-primary"
-                    title="Modifier / Ajouter un paiement"
-                    (click)="editFundCall(fundCall)">
-                    <i class="bi bi-pencil-fill"></i>
+                <div ngbDropdown container="body" placement="bottom-end">
+                  <button class="btn btn-sm btn-outline-secondary" ngbDropdownToggle>
+                    <i class="bi bi-three-dots-vertical"></i>
                   </button>
-                  <button
-                    class="btn btn-sm btn-outline-secondary"
-                    title="Prévisualiser / Générer la facture"
-                    (click)="previewInvoice(fundCall)">
-                    <i class="bi bi-file-earmark-text"></i>
-                  </button>
-                  <button
-                    class="btn btn-sm btn-outline-danger"
-                    title="Supprimer"
-                    (click)="deleteFundCall(fundCall)">
-                    <i class="bi bi-trash"></i>
-                  </button>
+                  <div ngbDropdownMenu>
+                    <button ngbDropdownItem (click)="editFundCall(fundCall)">
+                      <i class="bi bi-pencil-fill me-2"></i>Modifier / Paiement
+                    </button>
+                    <button ngbDropdownItem (click)="previewInvoice(fundCall)">
+                      <i class="bi bi-file-earmark-text me-2"></i>Prévisualiser facture
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button ngbDropdownItem class="text-danger" (click)="deleteFundCall(fundCall)">
+                      <i class="bi bi-trash me-2"></i>Supprimer
+                    </button>
+                  </div>
                 </div>
               </td>
             </tr>

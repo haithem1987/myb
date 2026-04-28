@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: myb-platform
+  labels:
+    name: myb-platform
+    environment: staging

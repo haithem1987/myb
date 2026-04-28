@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
@@ -14,7 +15,7 @@ import { map, finalize, switchMap } from 'rxjs/operators';
 @Component({
   selector: 'myb-charges-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, RouterModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, NgbDropdownModule],
   templateUrl: './charges-list.component.html',
   styleUrls: ['./charges-list.component.scss'],
 })

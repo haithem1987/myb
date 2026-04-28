@@ -1,0 +1,35 @@
+# Ignore files with actual secrets (after you've updated them)
+# Keep the template files in Git, but exclude personalized versions
+
+# Backup files
+*.bak
+*.backup
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Kubernetes secret backups (if you create any)
+secrets-backup*.yaml
+
+# Kubeconfig files
+kubeconfig*
+*.kubeconfig
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log

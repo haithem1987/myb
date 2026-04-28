@@ -285,12 +285,20 @@
                 </button>
               </td>
               <td>
-                <button class="btn btn-sm btn-primary me-1" (click)="editOwner(owner)" [title]="'common.editAction' | translate">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteOwner(owner)" [title]="'common.deleteAction' | translate">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <div ngbDropdown container="body" placement="bottom-end">
+                  <button class="btn btn-sm btn-outline-secondary" ngbDropdownToggle>
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <button ngbDropdownItem (click)="editOwner(owner)">
+                      <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button ngbDropdownItem class="text-danger" (click)="deleteOwner(owner)">
+                      <i class="bi bi-trash me-2"></i>{{ 'common.deleteAction' | translate }}
+                    </button>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr *ngIf="filteredOwners.length === 0">

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FundCallService, FundCallExtended } from '../../services/fund-call.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
@@ -27,7 +28,7 @@ import { InvoiceDetails } from 'libs/invoice-module/src/lib/models/invoiceDetail
 @Component({
   selector: 'myb-fund-calls-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, NgbDropdownModule],
   templateUrl: './fund-calls-list.component.html',
   styleUrls: ['./fund-calls-list.component.scss'],
 })

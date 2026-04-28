@@ -151,12 +151,20 @@
                 <span *ngIf="!unit.unitType" class="text-muted">-</span>
               </td>
               <td>
-                <button class="btn btn-sm btn-primary" (click)="editUnit(unit)" [title]="'common.editAction' | translate">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteUnit(unit)" [title]="'common.deleteAction' | translate">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <div ngbDropdown container="body" placement="bottom-end">
+                  <button class="btn btn-sm btn-outline-secondary" ngbDropdownToggle>
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <button ngbDropdownItem (click)="editUnit(unit)">
+                      <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button ngbDropdownItem class="text-danger" (click)="deleteUnit(unit)">
+                      <i class="bi bi-trash me-2"></i>{{ 'common.deleteAction' | translate }}
+                    </button>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>

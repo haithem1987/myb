@@ -1,0 +1,27 @@
+# Application Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: myb-platform
+data:
+  ASPNETCORE_ENVIRONMENT: "Staging"
+  NODE_ENV: "production"
+  
+  # Keycloak Configuration
+  KEYCLOAK_REALM: "MYB"
+  KEYCLOAK_CLIENT_ID: "MYB-client"
+  KEYCLOAK_SERVICE_CLIENT_ID: "myb-backend"
+  KEYCLOAK_MANAGER_ROLE: "coproperty-syndic"
+  
+  # Service URLs (Internal Kubernetes DNS)
+  KEYCLOAK_BASE_URL: "http://keycloak:8080/realms/MYB/protocol/openid-connect"
+  KEYCLOAK_AUTHORITY: "http://keycloak:8080/realms/MYB"
+  
+  # RabbitMQ Configuration
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_MANAGEMENT_PORT: "15672"
+  
+  # Timezone
+  TZ: "Europe/Paris"

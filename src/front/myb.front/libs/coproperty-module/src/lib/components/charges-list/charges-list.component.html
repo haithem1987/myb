@@ -224,27 +224,23 @@
                 </span>
               </td>
               <td>
-                <button 
-                  type="button" 
-                  class="btn btn-sm btn-outline-violet me-1"
-                  (click)="viewCharge(charge)"
-                  [title]="'coproperty.charge.viewDetails' | translate">
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button 
-                  type="button" 
-                  class="btn btn-sm btn-outline-violet me-1"
-                  [routerLink]="['/coproperty/syndic/budgets', charge.id, 'edit']"
-                  [title]="'coproperty.charge.modify' | translate">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button 
-                  type="button" 
-                  class="btn btn-sm btn-outline-danger"
-                  (click)="deleteCharge(charge)"
-                  [title]="'common.deleteAction' | translate">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <div ngbDropdown container="body" placement="bottom-end">
+                  <button class="btn btn-sm btn-outline-secondary" ngbDropdownToggle>
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <button ngbDropdownItem (click)="viewCharge(charge)">
+                      <i class="bi bi-eye me-2"></i>{{ 'common.viewAction' | translate }}
+                    </button>
+                    <button ngbDropdownItem [routerLink]="['/coproperty/syndic/budgets', charge.id, 'edit']">
+                      <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button ngbDropdownItem class="text-danger" (click)="deleteCharge(charge)">
+                      <i class="bi bi-trash me-2"></i>{{ 'common.deleteAction' | translate }}
+                    </button>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>

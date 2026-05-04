@@ -4,6 +4,20 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { OwnerService } from '../services/owner.service';
 import { firstValueFrom } from 'rxjs';
 
+/** Syndic/manager roles that bypass the owner-portal and go to the syndic dashboard. */
+const SYNDIC_ROLES = ['coproperty-syndic', 'coproperty-admin', 'system-admin'] as const;
+
+/**
+ * Returns the default post-login route based on Keycloak roles.
+ * NOTE: Only used by profileGuard (protecting existing dashboard routes).
+ * The register/complete-profile flow always routes to the owner dashboard.
+ */
+function getDefaultRoute(keycloakService: KeycloakService): string {
+  const roles = keycloakService.getUserRoles();
+  const isSyndic = roles.some(r => (SYNDIC_ROLES as readonly string[]).includes(r));
+  return isSyndic ? '/coproperty/syndic/dashboard' : '/coproperty/owner/dashboard';
+}
+
 /**
  * Guard that ensures an authenticated user has completed their owner profile.
  * If the user is not authenticated → redirect to /register (pick auth method there).
@@ -27,15 +41,22 @@ export const profileGuard: CanActivateFn = async (_route, _state) => {
   }
 
   try {
-    const owner = await firstValueFrom(ownerService.getOwnerByUserId(userId));
-    if (!owner) {
-      // Profile not yet created → send to completion page
+    const result = await firstValueFrom(ownerService.getOwnerByUserIdRaw(userId));
+    // Only redirect to complete-profile when the API confirms there is no owner
+    // (null data with no errors). Backend/network errors are treated as "unknown" —
+    // allow through so the dashboard can display a graceful error state.
+    if (result.errors && result.errors.length > 0) {
+      console.warn('[profileGuard] Backend error checking owner profile, allowing access:', result.errors);
+      return true;
+    }
+    if (!result.data) {
       return router.createUrlTree(['/register/complete-profile']);
     }
     return true;
   } catch {
-    // GraphQL error (e.g. owner not found) → redirect to completion
-    return router.createUrlTree(['/register/complete-profile']);
+    // Network-level error — allow access rather than falsely blocking the user
+    console.warn('[profileGuard] Network error checking owner profile, allowing access');
+    return true;
   }
 };
 
@@ -62,8 +83,9 @@ export const completeProfileGuard: CanActivateFn = async () => {
   try {
     const owner = await firstValueFrom(ownerService.getOwnerByUserId(userId));
     if (owner) {
-      // Profile already completed → go to dashboard
-      return router.createUrlTree(['/coproperty/owner']);
+      // Profile already completed — the complete-profile flow is owner-only,
+      // so always redirect to the owner dashboard.
+      return router.createUrlTree(['/coproperty/owner/dashboard']);
     }
     return true; // authenticated, no profile yet → show the form
   } catch {
@@ -89,8 +111,8 @@ export const noProfileGuard: CanActivateFn = async () => {
   try {
     const owner = await firstValueFrom(ownerService.getOwnerByUserId(userId));
     if (owner) {
-      // Already has a profile → go straight to dashboard
-      return router.createUrlTree(['/coproperty/owner']);
+      // Already has a profile → redirect to owner dashboard
+      return router.createUrlTree(['/coproperty/owner/dashboard']);
     }
     return true;
   } catch {

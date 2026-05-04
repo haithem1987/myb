@@ -1,15 +1,16 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { ToastService } from './toast.service';
 import { BehaviorSubject, map } from 'rxjs';
 import { Notification } from '../models/notification.model';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { ENVIRONMENT } from 'libs/auth/src/lib/environment.token';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private hubConnection: signalR.HubConnection | null = null;
-  private readonly apiUrl = 'http://localhost:8085';
+  private readonly apiUrl: string;
 
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
@@ -20,8 +21,11 @@ export class NotificationService {
   constructor(
     private http: HttpClient,
     private keycloakService: KeycloakService,
-    private toastService: ToastService
-  ) {}
+    private toastService: ToastService,
+    @Optional() @Inject(ENVIRONMENT) private environment: any
+  ) {
+    this.apiUrl = this.environment?.services?.notification?.baseUrl ?? 'http://localhost:8085';
+  }
   public async startConnection(): Promise<void> {
     await this.keycloakService.updateToken();
     const token = (await this.keycloakService.getToken()) || '';

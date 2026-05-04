@@ -85,7 +85,7 @@ jobs:
     if: github.ref == 'refs/heads/staging'
     environment:
       name: staging
-      url: https://staging.myb.yourdomain.com
+      url: https://staging.myb.yourdomain.com  # TODO: replace with your domain
 
     steps:
       - name: Checkout code
@@ -145,7 +145,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment:
       name: production
-      url: https://myb.yourdomain.com
+      url: https://myb.yourdomain.com  # TODO: replace with your domain
 
     steps:
       - name: Checkout code
@@ -195,7 +195,7 @@ jobs:
       - name: Run smoke tests
         run: |
           # Add your smoke tests here
-          curl -f https://myb.yourdomain.com/health || exit 1
+          curl -f https://myb.yourdomain.com/health || exit 1  # TODO: replace with your domain
 
       - name: Notify on success
         if: success()

@@ -10,6 +10,7 @@ WORKDIR /app
 COPY src/front/myb.front/package*.json ./
 COPY src/front/myb.front/nx.json ./
 COPY src/front/myb.front/tsconfig.base.json ./
+COPY src/front/myb.front/jest.preset.js ./
 
 # Install dependencies
 RUN npm ci --legacy-peer-deps
@@ -19,6 +20,7 @@ COPY src/front/myb.front/apps/client ./apps/client
 COPY src/front/myb.front/libs ./libs
 
 # Build the client app
+ENV NX_NO_CLOUD=true
 RUN npx nx build client --configuration=ovhcloud
 
 # Stage 2: Serve with NGINX

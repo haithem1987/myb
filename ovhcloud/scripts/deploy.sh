@@ -9,6 +9,9 @@ NAMESPACE="myb-platform"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 K8S_DIR="$PROJECT_ROOT/ovhcloud/k8s"
 
+# OVHCloud kubeconfig
+export KUBECONFIG="$PROJECT_ROOT/ovhcloud/kubeconfig-ebak4v.yml"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'

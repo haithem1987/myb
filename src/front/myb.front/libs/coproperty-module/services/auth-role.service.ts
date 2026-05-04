@@ -52,6 +52,7 @@ export class AuthRoleService {
     const roleMap: { [key: string]: CopropertyRole } = {
       'coproperty-syndic': CopropertyRole.SYNDIC,
       'coproperty-admin': CopropertyRole.SYNDIC,
+      'MYB_MANAGER': CopropertyRole.SYNDIC,
       'coproperty-owner': CopropertyRole.OWNER,
       'coproperty-council': CopropertyRole.COUNCIL,
       'coproperty-accountant': CopropertyRole.ACCOUNTANT,

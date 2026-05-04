@@ -7,19 +7,21 @@ metadata:
   name: myb-ingress
   namespace: myb-platform
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+    nginx.ingress.kubernetes.io/large-client-header-buffers: "4 128k"
     # For production with domain and SSL:
     # cert-manager.io/cluster-issuer: "letsencrypt-prod"
     # nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
+  ingressClassName: nginx
   rules:
-  # Replace with your domain or use IP-based access
-  - host: myb.yourdomain.com  # Change this!
-    http:
+  # No host = matches any IP or hostname (use this for IP-based access)
+  - http:
       paths:
       # Admin Frontend
       - path: /admin
@@ -48,24 +50,6 @@ spec:
             port:
               number: 8080
       
-      # Coproperty Service API
-      - path: /api/coproperty
-        pathType: Prefix
-        backend:
-          service:
-            name: myb-coproperty
-            port:
-              number: 8088
-      
-      # Invoice Service API
-      - path: /api/invoice
-        pathType: Prefix
-        backend:
-          service:
-            name: myb-invoice
-            port:
-              number: 8083
-      
       # RabbitMQ Management (Optional - for debugging)
       - path: /rabbitmq
         pathType: Prefix
@@ -78,5 +62,52 @@ spec:
   # For production with SSL:
   # tls:
   # - hosts:
-  #   - myb.yourdomain.com
+  #   - myb.forlink.com
   #   secretName: myb-tls-cert
+---
+# Separate ingress for backend APIs that need path prefix stripping
+# rewrite-target strips /api/coproperty and /api/invoice before forwarding
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myb-api-ingress
+  namespace: myb-platform
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+    nginx.ingress.kubernetes.io/large-client-header-buffers: "4 128k"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      # Coproperty API - strips /api/coproperty prefix
+      - path: /api/coproperty(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: myb-coproperty
+            port:
+              number: 8088
+      # Invoice API - strips /api/invoice prefix
+      - path: /api/invoice(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: myb-invoice
+            port:
+              number: 8083
+      # Notification API - strips /api/notification prefix
+      - path: /api/notification(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: myb-notification
+            port:
+              number: 8084

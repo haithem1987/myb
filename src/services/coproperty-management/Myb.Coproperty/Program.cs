@@ -124,8 +124,12 @@ builder.Services
     {
         if (error.Exception is InvalidOperationException or ArgumentException)
             return error.WithMessage(error.Exception.Message).RemoveExtensions();
+        // Log unexpected errors with their full details
+        if (error.Exception != null)
+            Console.Error.WriteLine($"[GraphQL] Unexpected error: {error.Exception}");
         return error;
-    });
+    })
+    .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true);
 
 
 builder.Services.AddControllers();
@@ -154,8 +158,10 @@ if (app.Environment.IsDevelopment())
     // Swagger disabled for GraphQL-only API
     // app.UseSwagger();
     // app.UseSwaggerUI();
+}
 
-    // Migrate database
+// Migrate database on startup (all environments)
+{
     using var scope = app.Services.CreateScope();
     var contextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<CopropertyDbContext>>();
     
@@ -168,7 +174,7 @@ if (app.Environment.IsDevelopment())
         {
             using var dbContext = contextFactory.CreateDbContext();
             await dbContext.Database.MigrateAsync();
-            // Seed data is disabled - create real data via frontend instead
+            app.Logger.LogInformation("Database migration completed successfully.");
             break;
         }
         catch (Exception ex)
@@ -181,7 +187,7 @@ if (app.Environment.IsDevelopment())
             else
             {
                 app.Logger.LogWarning(ex, "Failed to migrate database, retrying ({attempt}/{max})...", retryCount, maxRetries);
-                await Task.Delay(2000); // Wait 2 seconds before retry
+                await Task.Delay(2000);
             }
         }
     }

@@ -156,7 +156,7 @@ REGISTRY="your-registry.com/myb"
 **e) Ingress** (`ovhcloud/k8s/ingress/ingress.yaml`):
 ```bash
 # Update domain (or use IP initially)
-host: myb.yourdomain.com
+host: myb.forlink.com
 ```
 
 ### 6. Build and Deploy

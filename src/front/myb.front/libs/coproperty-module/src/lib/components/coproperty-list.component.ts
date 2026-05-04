@@ -1,8 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Observable, firstValueFrom } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { CopropertyService } from '../services/coproperty.service';
 import { Coproperty } from '../models/coproperty.models';
 import { ToastService, ModalService } from '@myb-front/shared-ui';
@@ -29,63 +31,80 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
         </div>
       </div>
 
-      <div *ngIf="coproperties$ | async as copropertiesList" class="row">
-        <div *ngFor="let coproperty of copropertiesList" class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm coproperty-card">
-            <div class="card-body">
-              <h5 class="card-title text-primary fw-bold">
-                <i class="bi bi-building me-2"></i>
-                {{ coproperty.name }}
-              </h5>
-              <p class="card-text text-muted mb-3">
-                <i class="bi bi-geo-alt-fill me-1"></i> {{ coproperty.address }}
-              </p>
-              <div class="row mt-3 mb-3">
-                <div class="col-6">
-                  <div class="stat-box">
-                    <div class="stat-label">{{ 'coproperty.list.totalUnits' | translate }}</div>
-                    <div class="stat-value text-primary">
-                      <i class="bi bi-building"></i> {{ coproperty.totalUnits }}
+      <ng-container *ngIf="coproperties$ | async as copropertiesList; else loadingOrError">
+        <div *ngIf="copropertiesList.length > 0; else emptyState" class="row">
+          <div *ngFor="let coproperty of copropertiesList" class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm coproperty-card">
+              <div class="card-body">
+                <h5 class="card-title text-primary fw-bold">
+                  <i class="bi bi-building me-2"></i>
+                  {{ coproperty.name }}
+                </h5>
+                <p class="card-text text-muted mb-3">
+                  <i class="bi bi-geo-alt-fill me-1"></i> {{ coproperty.address }}
+                </p>
+                <div class="row mt-3 mb-3">
+                  <div class="col-6">
+                    <div class="stat-box">
+                      <div class="stat-label">{{ 'coproperty.list.totalUnits' | translate }}</div>
+                      <div class="stat-value text-primary">
+                        <i class="bi bi-building"></i> {{ coproperty.totalUnits }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="stat-box">
+                      <div class="stat-label">{{ 'coproperty.list.totalShares' | translate }}</div>
+                      <div class="stat-value text-info">
+                        <i class="bi bi-pie-chart"></i> {{ coproperty.totalShares }}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="col-6">
-                  <div class="stat-box">
-                    <div class="stat-label">{{ 'coproperty.list.totalShares' | translate }}</div>
-                    <div class="stat-value text-info">
-                      <i class="bi bi-pie-chart"></i> {{ coproperty.totalShares }}
-                    </div>
-                  </div>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                  <button type="button" class="btn btn-sm btn-outline-primary flex-grow-1" 
+                    (click)="viewDetails(coproperty.id)" title="{{ 'coproperty.list.view' | translate }}">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-violet flex-grow-1" 
+                    (click)="editCoproperty(coproperty.id)" title="{{ 'coproperty.list.edit' | translate }}">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" 
+                    (click)="distributeCharges(coproperty.id)" title="Calculer distribution">
+                    <i class="bi bi-calculator"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" 
+                    (click)="deleteCoproperty(coproperty.id, coproperty.name)" title="{{ 'coproperty.list.delete' | translate }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </div>
-              </div>
-              <div class="d-flex flex-wrap gap-2 mt-3">
-                <button type="button" class="btn btn-sm btn-outline-primary flex-grow-1" 
-                  (click)="viewDetails(coproperty.id)" title="{{ 'coproperty.list.view' | translate }}">
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-violet flex-grow-1" 
-                  (click)="editCoproperty(coproperty.id)" title="{{ 'coproperty.list.edit' | translate }}">
-                  <i class="bi bi-pencil-square"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" 
-                  (click)="distributeCharges(coproperty.id)" title="Calculer distribution">
-                  <i class="bi bi-calculator"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-danger" 
-                  (click)="deleteCoproperty(coproperty.id, coproperty.name)" title="{{ 'coproperty.list.delete' | translate }}">
-                  <i class="bi bi-trash"></i>
-                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
+        <ng-template #emptyState>
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-buildings display-4 d-block mb-3"></i>
+            <p>{{ 'coproperty.list.noCoproperties' | translate }}</p>
+          </div>
+        </ng-template>
+      </ng-container>
 
-      <div *ngIf="!(coproperties$ | async)" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">{{ 'coproperty.list.loading' | translate }}</span>
+      <ng-template #loadingOrError>
+        <div *ngIf="!loadError()" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">{{ 'coproperty.list.loading' | translate }}</span>
+          </div>
         </div>
-      </div>
+        <div *ngIf="loadError()" class="text-center py-5">
+          <i class="bi bi-exclamation-triangle-fill text-danger display-4 d-block mb-3"></i>
+          <p class="text-danger">{{ loadError() }}</p>
+          <button class="btn btn-outline-primary mt-2" (click)="reload()">
+            <i class="bi bi-arrow-clockwise me-1"></i> Réessayer
+          </button>
+        </div>
+      </ng-template>
     </div>
   `,
   styles: [`
@@ -149,12 +168,28 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
 })
 export class CopropertyListComponent {
   coproperties$: Observable<Coproperty[]>;
+  readonly loadError = signal<string | null>(null);
   
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
 
   constructor(private copropertyService: CopropertyService, private router: Router) {
-    this.coproperties$ = this.copropertyService.getCoproperties();
+    this.coproperties$ = this.loadCoproperties();
+  }
+
+  private loadCoproperties(): Observable<Coproperty[]> {
+    this.loadError.set(null);
+    return this.copropertyService.getCoproperties().pipe(
+      catchError(err => {
+        const msg = err?.message || 'Erreur lors du chargement des copropriétés';
+        this.loadError.set(msg);
+        return of([] as Coproperty[]);
+      })
+    );
+  }
+
+  reload(): void {
+    this.coproperties$ = this.loadCoproperties();
   }
 
   viewDetails(id: string): void {
@@ -199,7 +234,7 @@ export class CopropertyListComponent {
         console.log('Calling delete mutation for ID:', id);
         await firstValueFrom(this.copropertyService.deleteCoproperty(id));
         this.toastService.show('La copropriété "' + name + '" a été supprimée avec succès', { classname: 'bg-success text-light' });
-        this.coproperties$ = this.copropertyService.getCoproperties();
+        this.reload();
       } catch (error: any) {
         console.error('Delete error:', error);
         const errorMsg = error?.error?.errors?.[0]?.message || error?.message || 'Erreur lors de la suppression';

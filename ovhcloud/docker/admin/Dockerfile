@@ -10,6 +10,7 @@ WORKDIR /app
 COPY src/front/myb.front/package*.json ./
 COPY src/front/myb.front/nx.json ./
 COPY src/front/myb.front/tsconfig.base.json ./
+COPY src/front/myb.front/jest.preset.js ./
 
 # Install dependencies
 RUN npm ci --legacy-peer-deps
@@ -17,8 +18,13 @@ RUN npm ci --legacy-peer-deps
 # Copy source files
 COPY src/front/myb.front/apps/admin ./apps/admin
 COPY src/front/myb.front/libs ./libs
+# @env/environment alias in tsconfig.base.json always resolves to apps/client/src/environments
+# shared libs also reference apps/client/src/assets/images via CSS
+COPY src/front/myb.front/apps/client/src/environments ./apps/client/src/environments
+COPY src/front/myb.front/apps/client/src/assets ./apps/client/src/assets
 
 # Build the admin app
+ENV NX_NO_CLOUD=true
 RUN npx nx build admin --configuration=ovhcloud
 
 # Stage 2: Serve with NGINX

@@ -1,5 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types;
+using Microsoft.Extensions.Logging;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Services;
 using Myb.Coproperty.GraphQL.Types;
@@ -16,7 +17,9 @@ namespace Myb.Coproperty.GraphQL.Mutations
         public async Task<Owner> CreateOwnerWithUnits(
             CreateOwnerWithUnitsInput input, 
             [Service] IOwnerService ownerService,
-            [Service] IOwnerUnitRepository ownerUnitRepository)
+            [Service] IOwnerUnitRepository ownerUnitRepository,
+            [Service] IKeycloakAdminService keycloakAdminService,
+            [Service] ILogger<OwnerMutations> logger)
         {
             // Create the owner first
             var owner = new Owner
@@ -50,6 +53,20 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 };
                 
                 await ownerUnitRepository.InsertAsync(ownerUnit);
+            }
+
+            // Assign the coproperty-owner Keycloak role so the user can access the owner portal
+            try
+            {
+                var assigned = await keycloakAdminService.AssignClientRoleAsync(
+                    input.UserId.ToString(), "coproperty-owner");
+                if (!assigned)
+                    logger.LogWarning("Could not assign coproperty-owner role to user {UserId}", input.UserId);
+            }
+            catch (Exception ex)
+            {
+                // Role assignment failure is non-fatal — owner record is already created
+                logger.LogError(ex, "Failed to assign coproperty-owner role to user {UserId}", input.UserId);
             }
             
             return createdOwner;

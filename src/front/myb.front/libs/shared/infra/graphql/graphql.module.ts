@@ -13,7 +13,7 @@ const microserviceLinks = {
   timesheetService: environment.services?.timesheet?.baseUrl + '/graphql' ?? 'http://localhost:8082/graphql',
   documentService: environment.services?.document?.graphqlUrl ?? 'http://localhost:8086/graphql',
   invoiceService: environment.services?.invoice?.graphqlUrl ?? 'http://localhost:8083/graphql',
-  copropertyService: 'http://localhost:8088/graphql',
+  copropertyService: (environment.services?.coproperty as any)?.graphqlUrl ?? environment.services?.coproperty?.baseUrl + '/graphql' ?? 'http://localhost:8088/graphql',
 };
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {

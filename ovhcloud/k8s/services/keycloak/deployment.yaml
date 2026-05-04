@@ -16,10 +16,12 @@ spec:
       labels:
         app: keycloak
     spec:
+      securityContext:
+        fsGroup: 1000
       containers:
       - name: keycloak
-        image: quay.io/keycloak/keycloak:23.0.4
-        args: ["start", "--db=postgres", "--proxy=edge"]
+        image: quay.io/keycloak/keycloak:26.0.7
+        args: ["start", "--db=postgres", "--proxy-headers=xforwarded", "--http-enabled=true", "--transaction-xa-enabled=false"]
         ports:
         - containerPort: 8080
           name: http
@@ -57,13 +59,17 @@ spec:
           value: "true"
         - name: KC_HOSTNAME_STRICT_HTTPS
           value: "false"
-        - name: KC_PROXY
-          value: "edge"
+        - name: KC_PROXY_HEADERS
+          value: "xforwarded"
         - name: KEYCLOAK_REALM
           valueFrom:
             configMapKeyRef:
               name: app-config
               key: KEYCLOAK_REALM
+        - name: KC_HEALTH_ENABLED
+          value: "true"
+        - name: KC_HTTP_RELATIVE_PATH
+          value: "/auth"
         resources:
           requests:
             memory: "1Gi"
@@ -72,19 +78,20 @@ spec:
             memory: "2Gi"
             cpu: "1000m"
         livenessProbe:
-          httpGet:
-            path: /health/live
+          tcpSocket:
             port: 8080
           initialDelaySeconds: 120
           periodSeconds: 30
           timeoutSeconds: 10
+          failureThreshold: 5
         readinessProbe:
           httpGet:
-            path: /health/ready
+            path: /auth/realms/master
             port: 8080
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          timeoutSeconds: 5
+          initialDelaySeconds: 90
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 10
         volumeMounts:
         - name: keycloak-data
           mountPath: /opt/keycloak/data

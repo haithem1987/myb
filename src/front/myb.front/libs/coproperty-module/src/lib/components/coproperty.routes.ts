@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { Routes, UrlMatcher, UrlSegment } from '@angular/router';
 import { CopropertyComponent } from './coproperty.component';
 import { CopropertyListComponent } from './coproperty-list.component';
 import { CopropertyDetailComponent } from './coproperty-detail.component';
@@ -10,6 +10,24 @@ import { FundCallNewComponent } from './fund-call-new/fund-call-new.component';
 import { TreasuryDetailComponent } from './treasury-detail/treasury-detail.component';
 import { UnpaidPaymentsComponent } from './unpaid-payments/unpaid-payments.component';
 import { profileGuard } from '../guards/profile.guard';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Matches a single path segment only when it is a valid UUID. */
+const uuidMatcher: UrlMatcher = (segments: UrlSegment[]) => {
+  if (segments.length === 1 && UUID_REGEX.test(segments[0].path)) {
+    return { consumed: segments, posParams: { id: segments[0] } };
+  }
+  return null;
+};
+
+/** Matches `:uuid/edit` — two segments where the first is a valid UUID. */
+const uuidEditMatcher: UrlMatcher = (segments: UrlSegment[]) => {
+  if (segments.length === 2 && UUID_REGEX.test(segments[0].path) && segments[1].path === 'edit') {
+    return { consumed: segments, posParams: { id: segments[0] } };
+  }
+  return null;
+};
 
 export const COPROPERTY_ROUTES: Routes = [
   {
@@ -38,14 +56,6 @@ export const COPROPERTY_ROUTES: Routes = [
         component: UnpaidPaymentsComponent,
       },
       {
-        path: ':id',
-        component: CopropertyDetailComponent,
-      },
-      {
-        path: ':id/edit',
-        component: CopropertyNewComponent,
-      },
-      {
         path: 'fund-calls',
         component: FundCallsListComponent,
       },
@@ -61,11 +71,26 @@ export const COPROPERTY_ROUTES: Routes = [
         path: 'fund-calls/:id/edit',
         component: FundCallNewComponent,
       },
-      // Owner Portal Routes — protected: requires completed owner profile
+      // Owner Portal Routes — protected: requires completed owner profile.
+      // Declared as a route group so that both /owner and /owner/dashboard work,
+      // and the static segment 'owner' is never confused with a :id param.
       {
         path: 'owner',
         canActivate: [profileGuard],
-        component: OwnerDashboardComponent,
+        children: [
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+          { path: 'dashboard', component: OwnerDashboardComponent },
+        ],
+      },
+      // UUID-only matchers prevent non-UUID segments (e.g. 'owner') from being
+      // treated as a coproperty ID.
+      {
+        matcher: uuidMatcher,
+        component: CopropertyDetailComponent,
+      },
+      {
+        matcher: uuidEditMatcher,
+        component: CopropertyNewComponent,
       },
     ],
   },

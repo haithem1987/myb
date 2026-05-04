@@ -2,191 +2,87 @@
 
 Account: **haithem khalifa** (haithem.khalifa@forlink-group.com)
 
----
-
-## Phase 1: Create Public Cloud Project
-
-### Step 1.1: Create a new Public Cloud project
-
-1. **In OVHcloud Manager**, click **"Public Cloud"** (left sidebar)
-2. Click **"Create project"** or **"Add a project"**
-3. Fill in:
-   - **Project name**: `myb-platform-staging` (or `myb-prod`)
-   - **Region preference**: Choose closest to users
-     - **GRA7** (Gravelines, France) - Western Europe
-     - **SBG5** (Strasbourg, France) - Central Europe
-     - **DE1** (Frankfurt, Germany) - Central Europe
-   - Click **"Create"**
-4. **Wait 1–2 minutes** for project creation
-5. **Note the Project ID** (shown in the interface, e.g., `abcd1234efgh5678`)
-
-### Step 1.2: Enable billing
-
-1. Inside your new project → **"Billing"** or **"Payment"**
-2. Ensure you have a **payment method** set (credit card or bank account)
-3. If not, add one via **"My payment methods"** in the top-right menu
+> **Current Status (April 28, 2026):** Infrastructure provisioned. Ready to build & deploy.
 
 ---
 
-## Phase 2: Create Managed Kubernetes Cluster
+## Phase 1: Create Public Cloud Project ✅ DONE
 
-### Step 2.1: Create Kubernetes cluster
+**Project name:** `MYB`
 
-1. In your Public Cloud project → **"Kubernetes"** (left menu)
-2. Click **"Create a cluster"**
-3. Configure:
-   - **Cluster name**: `myb-staging-k8s` (or similar)
-   - **Kubernetes version**: Choose latest stable (1.28+ recommended)
-   - **Region**: Same as project (GRA7 or SBG5)
-   - **Node pool name**: `worker-nodes`
-   - **Node flavor**: 
-     - **Staging**: `b2-7` (2 vCPU, 7GB RAM) × 3 nodes
-     - **Production**: `b2-15` (4 vCPU, 15GB RAM) × 3 nodes
-   - **Number of nodes**: `3`
-   - **Auto-scaling**: Enable if desired (optional)
-   - **SSH key** (optional): Upload your public key if you want SSH access to nodes
-4. Click **"Create"**
-5. **Wait 5–15 minutes** for cluster provisioning
-   - Status will show "pending" → "ready"
-
-### Step 2.2: Download kubeconfig
-
-1. Cluster page → **"kubeconfig"** tab
-2. Click **"Download kubeconfig"**
-3. A `.kubeconfig` file will be downloaded
-4. **Save it securely**:
-   ```bash
-   # macOS/Linux
-   mkdir -p ~/.kube
-   cp ~/Downloads/kubeconfig ~/.kube/config-myb-staging
-   export KUBECONFIG=~/.kube/config-myb-staging
-   
-   # Verify connection
-   kubectl cluster-info
-   kubectl get nodes
-   ```
+~~Step 1.1 / 1.2 — completed~~
 
 ---
 
-## Phase 3: Create Managed PostgreSQL Database
+## Phase 2: Create Managed Kubernetes Cluster ✅ DONE
 
-### Step 3.1: Create PostgreSQL instance
+**Cluster:** `myb-coproperty-k8s`  
+**ID:** `011d357c-71f3-4153-831a-051c9c7b...`  
+**Kubernetes version:** 1.35.2-1  
+**Region:** SBG5 (Strasbourg)  
+**Plan:** Free  
+**Status:** OK ✅  
+**API URL:** `ebak4v.c1.sbg5.k8s.ovh.net`
 
-1. In your Public Cloud project → **"Databases"** (left menu)
-2. Click **"Create a database"**
-3. Configure:
-   - **Engine**: PostgreSQL 16
-   - **Plan**:
-     - **Staging**: Essential (Single node, sufficient for dev)
-     - **Production**: Business (HA, automated backups)
-   - **Region**: Same as Kubernetes cluster
-   - **Node specifications** (Essential):
-     - 2 vCores, 4GB RAM, 80GB SSD
-   - **Backups**: Enable daily backups (automatic with Business plan)
-   - **Network**: Use private network or public (if within OVH infrastructure)
-4. Click **"Create"**
-5. **Wait 5–10 minutes** for provisioning
-6. **Note these credentials** (shown after creation):
-   - **Hostname**: `postgresql-xxxxx.database.cloud.ovh.net`
-   - **Port**: Usually `20184` (non-standard for security)
-   - **Admin username**: `avnadmin`
-   - **Admin password**: (generated, save securely)
+### Step 2.2: Configure kubectl (⚠️ do this if not done)
 
-### Step 3.2: Configure database access
-
-1. Database instance page → **"Authorized IPs"** tab
-2. Click **"Add authorized IP"**
-3. Add your **Kubernetes cluster node public IPs**:
-   ```bash
-   # Get node IPs from your cluster
-   kubectl get nodes -o wide
-   # Copy the EXTERNAL-IP column (or use the cluster's public subnet CIDR)
-   ```
-4. Add in CIDR format, e.g., `203.0.113.0/24` or individual IPs
-
-### Step 3.3: Create databases and users
-
-Use `psql` client to connect and create application databases:
+The kubeconfig file (`kubeconfig-ebak4v.yml`) is already in your repo at `ovhcloud/kubeconfig-ebak4v.yml`.
 
 ```bash
-# Install psql if needed
-# macOS: brew install postgresql
-# Ubuntu: sudo apt-get install postgresql-client
-
-# Connect to admin database
-psql "postgresql://avnadmin:YOUR_ADMIN_PASSWORD@postgresql-xxxxx.database.cloud.ovh.net:20184/defaultdb?sslmode=require"
-
-# Inside psql, run these commands:
-CREATE DATABASE "copropertyDB";
-CREATE DATABASE "invoiceDB";
-CREATE DATABASE "keycloak";
-
-CREATE USER coproperty_user WITH ENCRYPTED PASSWORD 'STRONG_PASS_1';
-CREATE USER invoice_user WITH ENCRYPTED PASSWORD 'STRONG_PASS_2';
-CREATE USER keycloak_user WITH ENCRYPTED PASSWORD 'STRONG_PASS_3';
-
-GRANT ALL PRIVILEGES ON DATABASE "copropertyDB" TO coproperty_user;
-GRANT ALL PRIVILEGES ON DATABASE "invoiceDB" TO invoice_user;
-GRANT ALL PRIVILEGES ON DATABASE "keycloak" TO keycloak_user;
+export KUBECONFIG=/Volumes/NidhalSSD/Projects/myb/ovhcloud/kubeconfig-ebak4v.yml
 
 # Verify
-\list
-\du
-\q
-```
-
-**Save these credentials securely:**
-```
-COPROPERTY_DB_USER: coproperty_user
-COPROPERTY_DB_PASSWORD: STRONG_PASS_1
-COPROPERTY_DB_HOST: postgresql-xxxxx.database.cloud.ovh.net
-COPROPERTY_DB_PORT: 20184
-COPROPERTY_DB_NAME: copropertyDB
-
-# ... repeat for invoice and keycloak
+kubectl cluster-info
+kubectl get nodes
 ```
 
 ---
 
-## Phase 4: Set Up Container Registry
+## Phase 3: Create Managed PostgreSQL Database ✅ DONE
 
-### Step 4.1: Create container registry
+**Instance:** `myb-instance-db`  
+**Engine:** PostgreSQL 16  
+**Plan:** Essential (Db1-4)  
+**Region:** Frankfurt (DE1)  
+**Status:** Available ✅  
+**Host:** `postgresql-72268bd4-oc862fcb1.database.cloud.ovh.net`  
+**Port:** `20184`  
+**SSL Mode:** require  
+**Databases:** 3 created (copropertyDB, invoiceDB, keycloak) ✅  
+**Users:** 3 created (coproperty_user, invoice_user, keycloak_user) ✅  
+**Backups:** 2 backups present ✅
 
-1. In your Public Cloud project → **"Container Registry"** (left menu)
-2. Click **"Create a registry"**
-3. Configure:
-   - **Name**: `myb-registry`
-   - **Region**: Same as cluster
-   - **Visibility**: Private (for security)
-4. Click **"Create"**
-5. **Note the registry URL**: `registry.gra7.container-registry.ovh.net/your-namespace`
+### Step 3.2: Configure database access (⚠️ verify this)
 
-### Step 4.2: Create registry credentials
+Make sure your **Kubernetes cluster node IPs** are whitelisted:
 
-1. Registry page → **"Users"** tab
-2. Click **"Create a user"**
-3. Configure:
-   - **Username**: `myb-deployer`
-   - **Password**: Generate strong password
-4. Click **"Create"**
-5. **Save credentials**:
-   ```
-   REGISTRY_URL: registry.gra7.container-registry.ovh.net/your-namespace
-   REGISTRY_USERNAME: myb-deployer
-   REGISTRY_PASSWORD: <generated_password>
-   ```
+```bash
+export KUBECONFIG=/Volumes/NidhalSSD/Projects/myb/ovhcloud/kubeconfig-ebak4v.yml
+kubectl get nodes -o wide
+# Copy the EXTERNAL-IP values and add them to:
+# OVHcloud → Databases → myb-instance-db → Authorized IPs
+```
+
+---
+
+## Phase 4: Set Up Container Registry ✅ DONE
+
+**Registry name:** `myb-registry`  
+**ID:** `ea84def0-51e6-49a3-8be6-e570c23236c4`  
+**Region:** GRA  
+**Plan:** S (200 GiB)  
+**Harbor version:** 2.14.2  
+**Status:** OK ✅  
+**Registry URL:** `93pf2bi9.gra7.container-registry.ovh.net`  
+**Login:** `QlAbsYCWXn`  
+**Password:** already configured in `ovhcloud/k8s/secrets/registry-secret.yaml` ✅
 
 ### Step 4.3: Test registry login
 
 ```bash
-docker login registry.gra7.container-registry.ovh.net
-# Username: myb-deployer
-# Password: <your_password>
-
-# Test push
-docker pull hello-world
-docker tag hello-world registry.gra7.container-registry.ovh.net/your-namespace/hello-world:test
-docker push registry.gra7.container-registry.ovh.net/your-namespace/hello-world:test
+docker login 93pf2bi9.gra7.container-registry.ovh.net
+# Username: QlAbsYCWXn
+# Password: 75924y8KlbY30G16
 ```
 
 ---
@@ -272,11 +168,29 @@ stringData:
 
 ### 6.4: Build script registry
 
-Edit `ovhcloud/scripts/build-images.sh` (line ~8):
+Already configured — `ovhcloud/scripts/build-images.sh` uses:
 
 ```bash
-REGISTRY="registry.gra7.container-registry.ovh.net/your-namespace/myb"
+REGISTRY="93pf2bi9.gra7.container-registry.ovh.net/myb"
 ```
+
+### 6.5: Nx Frontend Apps (Admin & Client)
+
+Both Angular/Nx apps have an `ovhcloud` build configuration that points all API URLs to the ingress domain automatically.
+
+**Admin panel** (`apps/admin`) — built via `ovhcloud/docker/admin/Dockerfile`:
+- Build config: `nx build admin --configuration=ovhcloud`
+- Environment file used: `apps/admin/src/environments/environment.ovhcloud.ts`
+- Served at: `https://yourdomain.com/admin`
+
+**Client portal** (`apps/client`) — built via `ovhcloud/docker/client/Dockerfile`:
+- Build config: `nx build client --configuration=ovhcloud`
+- Environment file used: `apps/client/src/environments/environment.ovhcloud.ts`
+- Served at: `https://yourdomain.com/`
+
+No manual changes needed — service URLs in both environment files resolve relative to `window.location.origin` through the ingress.
+
+> ⚠️ If your domain changes, **only update** `ovhcloud/k8s/ingress/ingress.yaml` (`host:` field). The Angular environments use `window.location.origin` so they adapt automatically.
 
 ---
 
@@ -288,18 +202,33 @@ Once all configuration is complete:
 # 1. Ensure kubeconfig is set
 export KUBECONFIG=~/.kube/config-myb-staging
 
-# 2. Build and push Docker images
+# 2. Build and push all Docker images
+#    Builds: coproperty, invoice, mailer, admin (Nx), client (Nx)
 ./ovhcloud/scripts/build-images.sh
 
-# 3. Deploy to Kubernetes
+# 3. Deploy everything to Kubernetes
+#    Deploys in order: namespace → secrets → configmaps → rabbitmq
+#    → keycloak → coproperty → invoice → mailer → myb-admin → myb-client → ingress
 ./ovhcloud/scripts/deploy.sh
 
-# 4. Monitor
+# 4. Monitor all pods
 kubectl get pods -n myb-platform -w
 
 # 5. Get access URLs
 kubectl get ingress -n myb-platform
 ```
+
+**Services deployed:**
+
+| Service | Type | URL path |
+|---------|------|----------|
+| myb-client | Frontend (Nx/Angular - Owner Portal) | `/` |
+| myb-admin | Frontend (Nx/Angular - Syndic Panel) | `/admin` |
+| keycloak | Auth | `/auth` |
+| myb-coproperty | Backend API | `/api/coproperty` |
+| myb-invoice | Backend API | `/api/invoice` |
+| myb-mailer | Backend (internal) | — |
+| rabbitmq | Message broker (internal) | — |
 
 ---
 
@@ -335,20 +264,24 @@ Monitor your spending:
 
 ## ✅ Completion Checklist
 
-After completing all phases:
-
-- [ ] Public Cloud project created
-- [ ] Kubernetes cluster deployed and kubeconfig downloaded
-- [ ] Managed PostgreSQL instance provisioned
-- [ ] 3 databases created (copropertyDB, invoiceDB, keycloak)
-- [ ] 3 database users created with passwords
-- [ ] Cluster nodes IP-whitelisted in database
-- [ ] Container registry created
-- [ ] Registry credentials saved
-- [ ] All `ovhcloud/k8s/secrets/*.yaml` files updated
-- [ ] Build script registry URL updated
-- [ ] Ready to run `./ovhcloud/scripts/build-images.sh`
-- [ ] Ready to run `./ovhcloud/scripts/deploy.sh`
+- [x] Public Cloud project created (`MYB`)
+- [x] Kubernetes cluster deployed — `myb-coproperty-k8s` (SBG5, v1.35.2-1, OK)
+- [x] kubeconfig downloaded — `ovhcloud/kubeconfig-ebak4v.yml`
+- [x] Managed PostgreSQL instance provisioned — `myb-instance-db` (Frankfurt, Available)
+- [x] 3 databases created (copropertyDB, invoiceDB, keycloak)
+- [x] 3 database users created (coproperty_user, invoice_user, keycloak_user)
+- [x] Container registry created — `myb-registry` (GRA, Harbor 2.14.2, OK)
+- [x] Registry credentials configured in `ovhcloud/k8s/secrets/registry-secret.yaml`
+- [x] Database secrets set in `ovhcloud/k8s/secrets/database-secrets.yaml`
+- [x] Nx admin environment (`environment.ovhcloud.ts`) created
+- [x] Nx client environment (`environment.ovhcloud.ts`) created
+- [ ] ⚠️ Cluster node IPs whitelisted in `myb-instance-db` → Authorized IPs
+- [ ] ⚠️ Keycloak secrets set (`KEYCLOAK_ADMIN_PASSWORD`, `KEYCLOAK_CLIENT_SECRET`)
+- [ ] ⚠️ Invoice DB credentials set (user/password not yet provided)
+- [ ] ⚠️ SMTP credentials set
+- [ ] ⚠️ Domain name set in `ovhcloud/k8s/ingress/ingress.yaml` (`host:` field)
+- [ ] Run `./ovhcloud/scripts/build-images.sh` (builds 5 images: coproperty, invoice, mailer, admin, client)
+- [ ] Run `./ovhcloud/scripts/deploy.sh` (deploys 7 services)
 
 ---
 

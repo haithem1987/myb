@@ -46,16 +46,20 @@ namespace Myb.Coproperty.GraphQL.Types
 
         private class OwnerResolvers
         {
-            public async Task<List<OwnerUnit>> GetOwnerUnits([Parent] Owner owner, [Service] CopropertyDbContext context)
+            public async Task<List<OwnerUnit>> GetOwnerUnits([Parent] Owner owner, [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
             {
+                // Create a dedicated context to avoid concurrent-access issues with the
+                // scoped DbContext that may already be in use by other resolvers.
+                await using var context = contextFactory.CreateDbContext();
                 return await context.OwnerUnits
                     .Include(ou => ou.Unit)
                     .Where(ou => ou.OwnerId == owner.Id)
                     .ToListAsync();
             }
             
-            public async Task<Unit?> GetUnit([Parent] Owner owner, [Service] CopropertyDbContext context)
+            public async Task<Unit?> GetUnit([Parent] Owner owner, [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
             {
+                await using var context = contextFactory.CreateDbContext();
                 var firstOwnerUnit = await context.OwnerUnits
                     .Include(ou => ou.Unit)
                     .Where(ou => ou.OwnerId == owner.Id)

@@ -29,8 +29,11 @@ export const authGuard: CanActivateFn = async (route, state) => {
         return router.createUrlTree(['/access-denied']);
       }
       
-      // First time - redirect to Keycloak, using the INTENDED URL as redirect URI
-      keycloakService.login(window.location.origin + state.url);
+      // First time - redirect to Keycloak, using the full browser URL as redirect URI.
+      // window.location.href is used (not origin + state.url) because Angular strips
+      // the base href prefix from state.url, so for apps mounted at a sub-path
+      // (e.g. /admin/) state.url would be missing that prefix.
+      keycloakService.login(window.location.href);
       return false;
     }
 

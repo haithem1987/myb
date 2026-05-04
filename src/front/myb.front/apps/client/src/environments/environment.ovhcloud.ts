@@ -11,6 +11,7 @@ export const environment = {
       clientId: 'MYB-client',
     },
     coproperty: {
+      graphqlUrl: `${window.location.origin}/api/coproperty/graphql/`,
       baseUrl: `${window.location.origin}/api/coproperty`,
     },
     invoice: {

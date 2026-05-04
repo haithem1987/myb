@@ -83,10 +83,10 @@ metadata:
 spec:
   tls:  # Add this section
   - hosts:
-    - myb.yourdomain.com
+    - myb.forlink.com
     secretName: myb-tls-cert
   rules:
-  - host: myb.yourdomain.com  # Update this
+  - host: myb.forlink.com  # Update this
     http:
       paths:
       - path: /admin
@@ -129,10 +129,10 @@ Certificate should show `Ready: True` within 2-3 minutes.
 kubectl get ingress myb-ingress -n myb-platform
 
 # Test HTTPS
-curl -I https://myb.yourdomain.com/admin
+curl -I https://myb.forlink.com/admin
 
 # Check certificate
-openssl s_client -connect myb.yourdomain.com:443 -servername myb.yourdomain.com
+openssl s_client -connect myb.forlink.com:443 -servername myb.forlink.com
 ```
 
 ## Troubleshooting
@@ -179,7 +179,7 @@ For multiple domains, add to TLS section:
 spec:
   tls:
   - hosts:
-    - myb.yourdomain.com
+    - myb.forlink.com
     - admin.yourdomain.com
     - api.yourdomain.com
     secretName: myb-tls-cert

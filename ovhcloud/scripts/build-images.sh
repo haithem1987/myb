@@ -36,7 +36,7 @@ build_and_push() {
     
     cd "$PROJECT_ROOT"
     
-    if docker build -f "$dockerfile" -t "$image_name" "$context"; then
+    if docker build --platform linux/amd64 -f "$dockerfile" -t "$image_name" "$context"; then
         echo -e "${GREEN}✓ Successfully built ${service}${NC}"
         
         echo -e "${YELLOW}Pushing ${service} to registry...${NC}"
@@ -64,6 +64,10 @@ echo -e "${GREEN}========================================${NC}"
 
 build_and_push "coproperty" \
     "./src/services/coproperty-management/Myb.Coproperty/Dockerfile" \
+    "."
+
+build_and_push "notification" \
+    "./src/services/notification-service/Myb.Notification/Dockerfile" \
     "."
 
 build_and_push "invoice" \
@@ -94,6 +98,7 @@ echo -e "${GREEN}Build Summary${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo -e "Images built and pushed:"
 echo -e "  - ${REGISTRY}/myb-coproperty:${TAG}"
+echo -e "  - ${REGISTRY}/myb-notification:${TAG}"
 echo -e "  - ${REGISTRY}/myb-invoice:${TAG}"
 echo -e "  - ${REGISTRY}/myb-mailer:${TAG}"
 echo -e "  - ${REGISTRY}/myb-admin:${TAG}"

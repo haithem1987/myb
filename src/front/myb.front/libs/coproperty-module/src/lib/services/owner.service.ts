@@ -541,10 +541,32 @@ export class OwnerService {
         query: GET_OWNER_BY_USER_ID,
         variables: { userId },
         fetchPolicy: 'no-cache',
+        errorPolicy: 'all',
         context: { service: 'copropertyService' }
       })
       .pipe(
-        map(result => result.data.ownerByUserId)
+        map(result => result.data?.ownerByUserId ?? null)
+      );
+  }
+
+  /**
+   * Like getOwnerByUserId but returns the raw Apollo result so callers can
+   * distinguish between "not found" (null data, no errors) and a backend error.
+   */
+  getOwnerByUserIdRaw(userId: string): Observable<{ data: OwnerWithUnits | null; errors?: readonly any[] }> {
+    return this.apollo
+      .query<{ ownerByUserId: OwnerWithUnits | null }>({
+        query: GET_OWNER_BY_USER_ID,
+        variables: { userId },
+        fetchPolicy: 'no-cache',
+        errorPolicy: 'all',
+        context: { service: 'copropertyService' }
+      })
+      .pipe(
+        map(result => ({
+          data: result.data?.ownerByUserId ?? null,
+          errors: result.errors
+        }))
       );
   }
 

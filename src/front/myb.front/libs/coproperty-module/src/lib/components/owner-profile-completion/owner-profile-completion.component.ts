@@ -15,6 +15,7 @@ import {
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { from, switchMap } from 'rxjs';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { OwnerService } from '../../services/owner.service';
 import { CreateOwnerWithUnitsInput } from '../../models/owner.model';
@@ -69,7 +70,9 @@ export class OwnerProfileCompletionComponent implements OnInit {
         .subscribe({
           next: (owner) => {
             if (owner) {
-              this.router.navigate(['/coproperty/owner']);
+              // Profile already exists — navigate to owner dashboard.
+              // router.navigate keeps Keycloak's in-memory token so authGuard passes.
+              this.router.navigate(['/coproperty/owner/dashboard']);
             }
           },
           error: () => {
@@ -96,6 +99,14 @@ export class OwnerProfileCompletionComponent implements OnInit {
     return this.profileForm.get('phone')!;
   }
 
+  /**
+   * This component is exclusively for owner self-registration.
+   * Always route to the owner dashboard after profile completion.
+   */
+  private getDefaultRoute(): string {
+    return '/coproperty/owner/dashboard';
+  }
+
   onSubmit(): void {
     this.submitted.set(true);
     this.errorMessage.set(null);
@@ -120,14 +131,19 @@ export class OwnerProfileCompletionComponent implements OnInit {
     this.loading.set(true);
     this.ownerService
       .createOwner(input)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        // Chain token refresh so the new coproperty-owner role is in the JWT
+        // before the route guards evaluate. Using switchMap keeps everything
+        // inside Angular's zone (no page reload = Keycloak keeps its token).
+        // forceTokenRefresh() never throws — errors are caught internally.
+        switchMap(() => from(this.keycloakService.forceTokenRefresh())),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: () => {
-          // Role assignment is now handled by the syndic via owner management
           this.loading.set(false);
           this.successMessage.set('auth.register.profileSaved');
-          // Brief delay so the user reads the success message
-          setTimeout(() => this.router.navigate(['/coproperty/owner']), 1200);
+          this.router.navigate([this.getDefaultRoute()]);
         },
         error: (err) => {
           this.loading.set(false);

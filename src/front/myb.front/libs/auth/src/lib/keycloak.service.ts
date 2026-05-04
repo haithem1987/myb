@@ -160,6 +160,19 @@ export class KeycloakService {
     }
   }
 
+  /**
+   * Force-refresh the Keycloak token regardless of expiry.
+   * Use this after a server-side role change (e.g. coproperty-owner assignment)
+   * so the new roles are reflected in the JWT claims immediately.
+   */
+  async forceTokenRefresh(): Promise<void> {
+    try {
+      await this.keycloak.updateToken(-1);
+    } catch (err) {
+      console.error('Failed to force-refresh Keycloak token', err);
+    }
+  }
+
   getProfile(): KeycloakProfile | null {
     return this.profileSubject?.value;
   }

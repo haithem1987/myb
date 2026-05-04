@@ -12,8 +12,8 @@ RUN npm ci --legacy-peer-deps
 # Copy NX workspace
 COPY src/front/myb.front/ ./
 
-# Build admin app with NX for production
-RUN npx nx build admin --configuration=production
+# Build admin app with NX for OVHCloud production
+RUN npx nx build admin --configuration=ovhcloud
 
 # Production stage - Use nginx for better performance  
 FROM nginx:alpine

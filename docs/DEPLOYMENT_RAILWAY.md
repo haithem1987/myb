@@ -255,10 +255,10 @@ railway add-plugin cloudflare-cdn
 1. Buy domain (Namecheap, GoDaddy, etc.)
 2. In Railway dashboard:
    - Go to "Domains"
-   - Add: `myb.yourdomain.com`
+   - Add: `myb.forlink.com`
    - Railway auto-provisions SSL certificate
 3. Point DNS:
-   - CNAME: `myb.yourdomain.com` → `your-railway-domain.railway.app`
+   - CNAME: `myb.forlink.com` → `your-railway-domain.railway.app`
 
 ---
 

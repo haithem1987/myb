@@ -1,0 +1,56 @@
+# MailHog - Fake SMTP server for HPRD (Hors Production) only
+# Catches all outgoing emails → viewable at http://<cluster-ip>/mailhog
+# Do NOT deploy this in PRD
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailhog
+  namespace: myb-hprd
+  labels:
+    app: mailhog
+    tier: infra
+    environment: hprd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mailhog
+  template:
+    metadata:
+      labels:
+        app: mailhog
+        tier: infra
+    spec:
+      containers:
+      - name: mailhog
+        image: mailhog/mailhog:v1.0.1
+        ports:
+        - containerPort: 1025
+          name: smtp
+        - containerPort: 8025
+          name: web-ui
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mailhog
+  namespace: myb-hprd
+  labels:
+    app: mailhog
+spec:
+  selector:
+    app: mailhog
+  ports:
+  - name: smtp
+    port: 1025
+    targetPort: 1025
+  - name: web-ui
+    port: 8025
+    targetPort: 8025

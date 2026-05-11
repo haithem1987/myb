@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: myb-prd
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  NODE_ENV: "production"
+
+  # Keycloak
+  KEYCLOAK_REALM: "MYB"
+  KEYCLOAK_CLIENT_ID: "MYB-client"
+  KEYCLOAK_SERVICE_CLIENT_ID: "myb-backend"
+  KEYCLOAK_MANAGER_ROLE: "coproperty-syndic"
+  KEYCLOAK_BASE_URL: "http://keycloak:8080/realms/MYB/protocol/openid-connect"
+  KEYCLOAK_AUTHORITY: "http://keycloak:8080/realms/MYB"
+
+  # RabbitMQ (internal service DNS)
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_MANAGEMENT_PORT: "15672"
+
+  # SMTP → real provider in PRD (values come from smtp-credentials secret)
+  SMTP_USE_MAILHOG: "false"
+
+  # Registry
+  REGISTRY: "93pf2bi9.gra7.container-registry.ovh.net/myb"
+
+  TZ: "Europe/Paris"

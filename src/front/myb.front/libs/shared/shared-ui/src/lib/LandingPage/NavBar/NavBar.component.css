@@ -1,0 +1,8 @@
+/* Ensure nav action buttons wrap nicely on small screens */
+@media (max-width: 991.98px) {
+  .collapse.navbar-collapse .d-flex {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+}

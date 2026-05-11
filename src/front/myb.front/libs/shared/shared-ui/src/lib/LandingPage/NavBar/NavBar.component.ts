@@ -8,6 +8,9 @@ import { UserDropdownComponent } from '../../components/user-dropdown/user-dropd
 import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
 import { TranslateModule } from '@ngx-translate/core';
 
+/** Roles that grant access to the Admin Portal */
+const ADMIN_ROLES = ['system-admin', 'coproperty-syndic', 'coproperty-admin'];
+
 @Component({
   selector: 'myb-front-nav-bar',
   standalone: true,
@@ -31,6 +34,28 @@ export class NavBarComponent {
     public counterService: CounterService,
     private router: Router,
   ) {}
+
+  /** Returns the admin app URL (same host, port 4201 in dev / /admin path in prod) */
+  get adminPortalUrl(): string {
+    const origin = window.location.origin;
+    // In dev the admin app runs on port 4201; in prod it is on the same port
+    if (origin.includes('localhost') || origin.match(/:\d+$/)) {
+      return origin.replace(/:4200$/, ':4201');
+    }
+    // Production: admin is served at the same origin (docker nginx serves both)
+    return origin + '/admin';
+  }
+
+  /** True when the logged-in user has at least one admin/syndic role */
+  get isAdminUser(): boolean {
+    if (!this.keycloakService.isAuthenticated()) return false;
+    try {
+      const roles = this.keycloakService.getUserRoles();
+      return ADMIN_ROLES.some(r => roles.includes(r));
+    } catch {
+      return false;
+    }
+  }
 
   incrementCount() {
     this.counterService.increment();

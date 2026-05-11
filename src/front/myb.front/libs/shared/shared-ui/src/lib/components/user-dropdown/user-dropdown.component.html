@@ -19,6 +19,27 @@
       aria-labelledby="navbarDropdown"
       class="dropdown-menu-end"
     >
+      <li *ngIf="isSystemAdmin && !isAdminApp">
+        <a class="dropdown-item" href="/admin/home">
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i>Espace Admin
+        </a>
+      </li>
+      <li *ngIf="isAdminApp">
+        <a class="dropdown-item" href="/">
+          <i class="bi bi-house-fill me-2"></i>Espace Client
+        </a>
+      </li>
+      <li *ngIf="isCopropertyOwner && !isAdminApp">
+        <a class="dropdown-item" href="/admin/coproperty/owner/dashboard">
+          <i class="bi bi-building me-2"></i>Espace Propriétaire
+        </a>
+      </li>
+      <li *ngIf="isCopropertyMember && !isAdminApp">
+        <a class="dropdown-item" href="/admin/coproperty">
+          <i class="bi bi-buildings me-2"></i>Espace Copropriété
+        </a>
+      </li>
+      <li *ngIf="isSystemAdmin || isCopropertyOwner || isCopropertyMember"><hr class="dropdown-divider" /></li>
       <li><a class="dropdown-item" href="#">Profile</a></li>
       <li>
         <a class="dropdown-item" [routerLink]="rootPath + '/settings'"

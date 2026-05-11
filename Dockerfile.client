@@ -20,7 +20,7 @@ FROM nginx:alpine
 
 # Copy custom nginx configuration
 RUN echo 'server { \
-    listen 8080; \
+    listen 80; \
     server_name _; \
     root /usr/share/nginx/html; \
     index index.html; \
@@ -42,8 +42,8 @@ RUN echo 'server { \
 # Copy built app from builder
 COPY --from=builder /app/dist/apps/client /usr/share/nginx/html
 
-# Expose port (Railway uses PORT env var)
-EXPOSE 8080
+# Expose port
+EXPOSE 80
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]

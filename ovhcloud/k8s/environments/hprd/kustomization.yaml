@@ -1,0 +1,51 @@
+################################################################################
+# Kustomize overlay – HPRD (Hors Production / Pre-production)
+# Namespace: myb-hprd  |  Replicas: 1  |  MailHog enabled (no real emails)
+################################################################################
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: myb-hprd
+
+resources:
+  - namespace.yaml
+  - ../../base
+  # MailHog HPRD-only (fake SMTP – catches all outbound email)
+  - ../../services/mailhog
+  # Environment-specific ConfigMap (overrides SMTP to use MailHog)
+  - configmap.yaml
+
+images:
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-admin
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-client
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-coproperty
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-invoice
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-mailer
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-notification
+    newTag: "latest"
+
+# HPRD: 1 replica everywhere to save resources
+patches:
+  - target:
+      kind: Deployment
+      labelSelector: "tier=backend"
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  - target:
+      kind: Deployment
+      labelSelector: "tier=frontend"
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+
+labels:
+  - pairs:
+      environment: hprd

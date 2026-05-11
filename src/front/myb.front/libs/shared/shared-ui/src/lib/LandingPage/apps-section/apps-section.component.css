@@ -1,3 +1,13 @@
 .apps-section {
   flex: 1;
 }
+
+.apps-grid {
+  width: 100%;
+}
+
+@media (min-width: 1200px) {
+  .apps-grid {
+    width: 70%;
+  }
+}

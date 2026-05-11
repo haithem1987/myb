@@ -105,8 +105,9 @@ export class KeycloakService {
    */
   login(redirectUri?: string): void {
     const uri = redirectUri ?? (window.location.origin + window.location.pathname);
+    const locale = localStorage.getItem('language') ?? 'en';
     console.log('Redirecting to Keycloak login with redirectUri:', uri);
-    this.keycloak.login({ redirectUri: uri });
+    this.keycloak.login({ redirectUri: uri, locale });
   }
 
   /**
@@ -114,8 +115,10 @@ export class KeycloakService {
    * After successful registration + email verification, Keycloak redirects to `redirectUri`.
    */
   registerWithRedirect(redirectUri?: string): void {
+    const locale = localStorage.getItem('language') ?? 'en';
     this.keycloak.register({
       redirectUri: redirectUri ?? (window.location.origin + '/register/complete-profile'),
+      locale,
     });
   }
 
@@ -124,9 +127,11 @@ export class KeycloakService {
    * Keycloak must have a "google" social IDP configured in the realm.
    */
   loginWithGoogle(redirectUri?: string): void {
+    const locale = localStorage.getItem('language') ?? 'en';
     this.keycloak.login({
       idpHint: 'google',
       redirectUri: redirectUri ?? (window.location.origin + '/register/complete-profile'),
+      locale,
     });
   }
 

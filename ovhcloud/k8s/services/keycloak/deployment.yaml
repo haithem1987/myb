@@ -8,6 +8,8 @@ metadata:
     app: keycloak
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: keycloak
@@ -53,8 +55,12 @@ spec:
             secretKeyRef:
               name: keycloak-credentials
               key: KEYCLOAK_ADMIN_PASSWORD
+        - name: KC_HOSTNAME
+          value: "https://myb-platform.com/auth"
+        - name: KC_HOSTNAME_ADMIN
+          value: "https://myb-platform.com/auth"
         - name: KC_HOSTNAME_STRICT
-          value: "false"
+          value: "true"
         - name: KC_HTTP_ENABLED
           value: "true"
         - name: KC_HOSTNAME_STRICT_HTTPS

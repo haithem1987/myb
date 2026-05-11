@@ -14,8 +14,19 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center gap-2">
         <myb-front-language-switcher class="ms-3"></myb-front-language-switcher>
+
+        <!-- Admin Portal shortcut — only visible for admin/syndic users -->
+        <a
+          *ngIf="isAdminUser"
+          [href]="adminPortalUrl"
+          class="btn btn-sm btn-warning fw-semibold"
+          title="Open Admin Portal"
+        >
+          <i class="bi bi-shield-lock-fill me-1"></i>Admin
+        </a>
+
         <button
           *ngIf="!keycloakService.isAuthenticated(); else userDropDown"
           class="btn btn-outline-secondary btn-sm"
@@ -29,7 +40,7 @@
         <!-- Only show the Register button if not authenticated -->
         <button
           *ngIf="!keycloakService.isAuthenticated()"
-          class="btn btn-outline-secondary btn-sm ms-1"
+          class="btn btn-outline-secondary btn-sm"
           (click)="onRegister()"
         >
           Register

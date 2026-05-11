@@ -1,3 +1,34 @@
 .hero-section {
   flex: 1;
 }
+
+/* Hero section responsive styles */
+.hero-section-container {
+  padding-top: 100px;
+}
+
+.hero-title {
+  font-size: clamp(2rem, 8vw, 3.75rem);
+}
+
+.hero-subtitle {
+  font-size: clamp(1.5rem, 6vw, 3.125rem);
+}
+
+.hero-image {
+  margin-top: 40px;
+}
+
+@media (min-width: 768px) {
+  .hero-section-container {
+    padding-top: 0;
+  }
+
+  .hero-title {
+    margin-top: 150px;
+  }
+
+  .hero-image {
+    margin-top: 100px;
+  }
+}

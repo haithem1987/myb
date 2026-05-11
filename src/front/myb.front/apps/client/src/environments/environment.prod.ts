@@ -6,7 +6,8 @@ export const environment = {
   // Service URLs - Use relative paths for Docker environment
   services: {
     keycloak: {
-      url: window.location.origin.replace(/:\d+/, ':8080'),
+      url: window.location.origin + '/auth',
+      adminUrl: window.location.origin + '/auth',
       realm: 'MYB',
       clientId: 'MYB-client',
     },

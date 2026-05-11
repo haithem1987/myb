@@ -1,0 +1,50 @@
+################################################################################
+# Kustomize overlay – PRD (Production)
+# Namespace: myb-prd  |  Replicas: higher  |  No MailHog
+################################################################################
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: myb-prd
+
+resources:
+  - namespace.yaml
+  - ../../base
+  # Environment-specific ConfigMap
+  - configmap.yaml
+
+# PRD image tags – use stable/versioned tags, not :latest
+images:
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-admin
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-client
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-coproperty
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-invoice
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-mailer
+    newTag: "latest"
+  - name: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-notification
+    newTag: "latest"
+
+# PRD: 2 replicas for app services
+patches:
+  - target:
+      kind: Deployment
+      name: myb-coproperty
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      kind: Deployment
+      name: myb-invoice
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+labels:
+  - pairs:
+      environment: prd

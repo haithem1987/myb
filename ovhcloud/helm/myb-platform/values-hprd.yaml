@@ -1,0 +1,46 @@
+################################################################################
+# values-hprd.yaml – Hors Production (pre-prod / staging) overrides
+# Usage: helm upgrade --install myb-hprd ./myb-platform -f values-hprd.yaml -n myb-hprd
+################################################################################
+
+global:
+  environment: hprd
+  imageTag: "latest"
+
+namespace: myb-hprd
+
+# MailHog enabled – intercepts all emails, accessible via /mailhog
+mailhog:
+  enabled: true
+
+smtp:
+  useMailhog: true
+  host: "mailhog"
+  port: 1025
+
+# HPRD: 1 replica everywhere – cost efficient
+services:
+  coproperty:
+    replicas: 1
+  invoice:
+    replicas: 1
+  mailer:
+    replicas: 1
+  notification:
+    replicas: 1
+  admin:
+    replicas: 1
+  client:
+    replicas: 1
+
+# HPRD: lightweight RabbitMQ
+rabbitmq:
+  replicas: 1
+
+# HPRD: no TLS (IP or staging domain)
+ingress:
+  host: ""
+  tlsEnabled: false
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"

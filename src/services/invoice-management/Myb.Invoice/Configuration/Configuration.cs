@@ -25,6 +25,7 @@ public static class Configuration
             });
         });
 
+        builder.Services.AddHealthChecks();
         builder.AddKeycloakSettings();
         builder.AddKeycloakAuthorization();
         builder.Services.RegisterServices();         // register IInvoiceService, IClientService, etc.
@@ -36,6 +37,7 @@ public static class Configuration
         app.UseCors("AllowAll");
         app.UseAuthentication();
         app.UseAuthorization();
+        app.MapHealthChecks("/health");
         app.MapGraphQL("/invoice/graphql","invoice");
    
     }

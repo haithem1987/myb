@@ -1,0 +1,144 @@
+################################################################################
+# Default values – overridden by values-prd.yaml or values-hprd.yaml
+################################################################################
+
+# ── Global ────────────────────────────────────────────────────────────────────
+global:
+  environment: hprd          # prd | hprd
+  registry: "93pf2bi9.gra7.container-registry.ovh.net/myb"
+  imageTag: "latest"
+  imagePullSecrets:
+    - name: harbor-registry-credentials
+  timezone: "Europe/Paris"
+
+# ── Namespace ─────────────────────────────────────────────────────────────────
+namespace: myb-hprd
+
+# ── Keycloak ──────────────────────────────────────────────────────────────────
+keycloak:
+  realm: "MYB"
+  clientId: "MYB-client"
+  serviceClientId: "myb-backend"
+  managerRole: "coproperty-syndic"
+  baseUrl: "http://keycloak:8080/realms/MYB/protocol/openid-connect"
+  authority: "http://keycloak:8080/realms/MYB"
+
+# ── RabbitMQ ──────────────────────────────────────────────────────────────────
+rabbitmq:
+  host: "rabbitmq"
+  port: 5672
+  managementPort: 15672
+  replicas: 1
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+# ── MailHog (HPRD only – fake SMTP) ──────────────────────────────────────────
+mailhog:
+  enabled: true             # set false in PRD
+  smtpPort: 1025
+  webPort: 8025
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "100m"
+
+# ── SMTP (PRD only – real provider) ───────────────────────────────────────────
+smtp:
+  useMailhog: true          # true = mailhog, false = real SMTP
+  host: "mailhog"
+  port: 1025
+
+# ── Services ──────────────────────────────────────────────────────────────────
+services:
+  admin:
+    replicas: 1
+    image: myb-admin
+    port: 80
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+
+  client:
+    replicas: 1
+    image: myb-client
+    port: 80
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+
+  coproperty:
+    replicas: 1
+    image: myb-coproperty
+    port: 8088
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "150m"
+      limits:
+        memory: "512Mi"
+        cpu: "300m"
+
+  invoice:
+    replicas: 1
+    image: myb-invoice
+    port: 8080
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "150m"
+      limits:
+        memory: "512Mi"
+        cpu: "300m"
+
+  mailer:
+    replicas: 1
+    image: myb-mailer
+    port: 8080
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+
+  notification:
+    replicas: 1
+    image: myb-notification
+    port: 8080
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+
+# ── Ingress ───────────────────────────────────────────────────────────────────
+ingress:
+  enabled: true
+  className: nginx
+  host: ""                  # empty = IP-based; set to domain for TLS
+  tlsEnabled: false
+  tlsSecretName: myb-tls-cert
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"

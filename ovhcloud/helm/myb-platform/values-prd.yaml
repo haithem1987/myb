@@ -1,0 +1,72 @@
+################################################################################
+# values-prd.yaml – Production overrides
+# Usage: helm upgrade --install myb-prd ./myb-platform -f values-prd.yaml -n myb-prd
+################################################################################
+
+global:
+  environment: prd
+  imageTag: "latest"          # pin to a specific tag in CI/CD: e.g. "1.2.3"
+
+namespace: myb-prd
+
+# MailHog disabled in PRD – real SMTP used
+mailhog:
+  enabled: false
+
+smtp:
+  useMailhog: false
+  # host/port/credentials come from the smtp-credentials secret
+
+# PRD: 2 replicas for critical backend services
+services:
+  coproperty:
+    replicas: 2
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+
+  invoice:
+    replicas: 2
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+
+  mailer:
+    replicas: 2
+
+  notification:
+    replicas: 2
+
+  admin:
+    replicas: 2
+
+  client:
+    replicas: 2
+
+# PRD: heavier RabbitMQ
+rabbitmq:
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+# PRD: TLS enabled
+ingress:
+  host: "myb-platform.com"
+  tlsEnabled: true
+  tlsSecretName: myb-platform-tls
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"

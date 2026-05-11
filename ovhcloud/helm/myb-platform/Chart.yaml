@@ -1,0 +1,16 @@
+apiVersion: v2
+name: myb-platform
+description: MYB Property Management Platform – full stack Helm chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - myb
+  - coproperty
+  - property-management
+
+maintainers:
+  - name: MYB Team
+
+dependencies: []

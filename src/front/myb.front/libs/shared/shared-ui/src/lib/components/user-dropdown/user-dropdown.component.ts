@@ -17,6 +17,10 @@ import { RouterModule } from '@angular/router';
 export class UserDropdownComponent implements OnInit {
   @Input() rootPath: string = '';
   user$: Observable<KeycloakProfile | null>;
+  isSystemAdmin = false;
+  isAdminApp = false;
+  isCopropertyOwner = false;
+  isCopropertyMember = false;
 
   constructor(private keycloakService: KeycloakService) {
     this.user$ = this.keycloakService.profile$;
@@ -25,7 +29,16 @@ export class UserDropdownComponent implements OnInit {
   ngOnInit(): void {
     if (this.keycloakService.isAuthenticated()) {
       this.user$ = this.keycloakService.profile$;
+      this.isSystemAdmin = this.keycloakService.hasRole('system-admin');
+      this.isCopropertyOwner = this.keycloakService.hasRole('coproperty-owner');
+      this.isCopropertyMember = this.keycloakService.hasAnyRole([
+        'coproperty-syndic',
+        'coproperty-admin',
+        'coproperty-council',
+        'coproperty-accountant',
+      ]);
     }
+    this.isAdminApp = window.location.pathname.startsWith('/admin');
   }
 
   logout(): void {

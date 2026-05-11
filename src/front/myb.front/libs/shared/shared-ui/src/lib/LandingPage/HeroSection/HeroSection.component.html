@@ -1,19 +1,16 @@
-<section class="container mb-5">
+<section class="container hero-section-container mb-5">
   <div class="row d-flex align-items-center">
     <div class="col-md-6 text-center text-md-start">
-      <h1
-        class="display-6 fw-bold text-darklight"
-        style="font-size: 60px; margin-top: 150px"
-      >
+      <h1 class="hero-title fw-bold text-darklight">
         MANAGE
       </h1>
-      <h1 class="display-6 fw-bold text-darklight">
-        <span class="text-altdark" style="font-size: 50px"> YOUR BUSINESS</span>
+      <h1 class="fw-bold text-darklight">
+        <span class="hero-subtitle text-altdark"> YOUR BUSINESS</span>
       </h1>
-      <h6 class="mt-5 w-100" style="line-height: 1.8; text-align: justify">
+      <h6 class="mt-4 mt-md-5 w-100" style="line-height: 1.8; text-align: justify">
         {{ 'BEST_SOLUTION' | translate }}
       </h6>
-      <h6 class="mt-5 w-100 text-center" style="line-height: 1.8">
+      <h6 class="mt-4 mt-md-5 w-100 text-center" style="line-height: 1.8">
         {{ 'ELEVATE' | translate }}
       </h6>
       <div class="mt-3" *ngIf="!keycloakService.isAuthenticated()">
@@ -29,8 +26,7 @@
       <img
         src="assets/images/rr.png"
         alt="Image"
-        class="img-fluid"
-        style="margin-top: 100px"
+        class="img-fluid hero-image"
       />
     </div>
   </div>

@@ -1,0 +1,11 @@
+# terraform/ovh/.gitignore
+# Never commit these
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
+.terraform/
+.terraform.lock.hcl
+kubeconfig-prd.yml
+kubeconfig-hprd.yml
+*.auto.tfvars
+backend.conf

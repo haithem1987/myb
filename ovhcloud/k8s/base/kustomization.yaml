@@ -1,0 +1,29 @@
+################################################################################
+# Kustomize base – all shared service manifests (namespace-agnostic)
+# References service directories as sub-kustomizations (required by kustomize
+# security model – cannot reference files above the kustomization root)
+################################################################################
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Secrets
+  - ../secrets
+  - ../ingress
+
+  # Infra
+  - ../services/rabbitmq
+
+  # Application services
+  - ../services/keycloak
+  - ../services/admin
+  - ../services/client
+  - ../services/coproperty
+  - ../services/invoice
+  - ../services/mailer
+  - ../services/notification
+
+labels:
+  - pairs:
+      project: myb
+      managed-by: kustomize

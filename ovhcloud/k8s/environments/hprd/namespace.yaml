@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: myb-hprd
+  labels:
+    name: myb-hprd
+    environment: hprd
+    project: myb

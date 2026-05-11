@@ -13,8 +13,10 @@
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
-  height: 700px;
+  min-height: 400px;
+  height: auto;
   width: 100%;
+  padding: 2rem 0;
 }
 .ilustration-section-2 {
   position: relative;
@@ -40,4 +42,11 @@
 
 .custom-shape-divider-top-1712699786 .shape-fill {
   fill: #00a6abb3;
+}
+
+@media (min-width: 768px) {
+  .feature-backround {
+    min-height: 700px;
+    padding: 0;
+  }
 }

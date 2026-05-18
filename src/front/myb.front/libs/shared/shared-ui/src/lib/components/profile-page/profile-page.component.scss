@@ -1,0 +1,429 @@
+// ─── Top Navbar ───────────────────────────────────────────────────────────────
+.profile-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 24px;
+
+  .navbar-brand {
+    font-size: 18px;
+    color: #1f2937;
+    &:hover { color: #3b82f6; }
+  }
+}
+
+// ─── Page Layout ──────────────────────────────────────────────────────────────
+.profile-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 6px 0;
+  display: flex;
+  align-items: center;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+// ─── Grid ─────────────────────────────────────────────────────────────────────
+.profile-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: start;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.details-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// ─── Card Base ────────────────────────────────────────────────────────────────
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-icon {
+  font-size: 20px;
+  color: #3b82f6;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+// ─── Avatar Card ──────────────────────────────────────────────────────────────
+.avatar-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.avatar-circle {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+}
+
+.avatar-initials {
+  font-size: 36px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 1px;
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.user-username {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+// ─── Roles ────────────────────────────────────────────────────────────────────
+.roles-section {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.roles-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.roles-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.badge-primary { background: #dbeafe; color: #1d4ed8; }
+  &.badge-success { background: #d1fae5; color: #065f46; }
+  &.badge-danger  { background: #fee2e2; color: #991b1b; }
+  &.badge-info    { background: #e0f2fe; color: #0369a1; }
+  &.badge-warning { background: #fef3c7; color: #92400e; }
+  &.badge-secondary { background: #f3f4f6; color: #6b7280; }
+}
+
+// ─── Status ───────────────────────────────────────────────────────────────────
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  flex-shrink: 0;
+
+  &.verified { background: #10b981; }
+}
+
+.status-text {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+// ─── Logout ───────────────────────────────────────────────────────────────────
+.btn-logout {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  background: #fff5f5;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+  }
+}
+
+// ─── Info Card form ────────────────────────────────────────────────────────────
+.info-card {
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 24px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+}
+
+.form-value {
+  font-size: 15px;
+  color: #1f2937;
+  font-weight: 500;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.email-value {
+  flex-wrap: wrap;
+}
+
+.verified-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  background: #d1fae5;
+  color: #065f46;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.form-input {
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #1f2937;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+
+  &.invalid {
+    border-color: #ef4444;
+  }
+}
+
+.form-error {
+  font-size: 12px;
+  color: #dc2626;
+  margin-top: 2px;
+}
+
+// ─── Form Actions ─────────────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 24px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.btn-edit {
+  padding: 8px 16px;
+  border: 1.5px solid #3b82f6;
+  border-radius: 8px;
+  background: white;
+  color: #3b82f6;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+
+  &:hover { background: #eff6ff; }
+}
+
+.btn-cancel {
+  padding: 10px 20px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) { background: #f9fafb; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-save {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #3b82f6;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover:not(:disabled) { background: #2563eb; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ─── Account Card ─────────────────────────────────────────────────────────────
+.account-rows {
+  padding: 8px 0;
+}
+
+.account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid #f9fafb;
+
+  &:last-child { border-bottom: none; }
+}
+
+.account-label {
+  font-size: 14px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+}
+
+.account-value {
+  font-size: 14px;
+  color: #1f2937;
+  font-weight: 500;
+
+  &.monospace { font-family: 'Courier New', monospace; letter-spacing: 0.02em; }
+  &.small { font-size: 12px; }
+}
+
+// ─── Alerts ───────────────────────────────────────────────────────────────────
+.alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+
+  &.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+  }
+
+  &.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+}

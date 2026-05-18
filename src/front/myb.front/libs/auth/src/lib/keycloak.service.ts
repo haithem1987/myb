@@ -564,4 +564,31 @@ export class KeycloakService {
       ?? (this.environment.services?.coproperty?.baseUrl + '/graphql')
       ?? 'http://localhost:8088/graphql';
   }
+
+  /**
+   * Update the current authenticated user's profile via Keycloak Account REST API.
+   * Only firstName, lastName, and email can be updated this way.
+   */
+  async updateMyProfile(data: { firstName: string; lastName: string; email: string }): Promise<void> {
+    const token = this.keycloak?.token;
+    if (!token) throw new Error('Not authenticated');
+
+    const keycloakUrl = this.environment.services.keycloak.url;
+    const realm = this.environment.services.keycloak.realm;
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+
+    await firstValueFrom(
+      this.http.post(
+        `${keycloakUrl}/realms/${realm}/account`,
+        { firstName: data.firstName, lastName: data.lastName, email: data.email },
+        { headers }
+      )
+    );
+
+    // Reload the local profile cache
+    await this.loadUserProfile();
+  }
 }

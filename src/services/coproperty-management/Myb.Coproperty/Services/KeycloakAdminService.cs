@@ -61,7 +61,9 @@ namespace Myb.Coproperty.Services
 
                 using var client = CreateAuthorizedClient(token);
                 var encodedEmail = Uri.EscapeDataString(email);
-                var url = $"{adminBaseUrl}/admin/realms/{realm}/users?email={encodedEmail}&max={max}";
+                // Use wildcard search so partial strings (e.g. "hait") match across
+                // username, email, firstName and lastName (Keycloak 19+ wildcard support).
+                var url = $"{adminBaseUrl}/admin/realms/{realm}/users?search=*{encodedEmail}*&max={max}";
                 var response = await client.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode)
@@ -193,6 +195,12 @@ namespace Myb.Coproperty.Services
 
                 if (!assignResponse.IsSuccessStatusCode)
                 {
+                    // 409 Conflict means the role is already assigned — treat as success
+                    if (assignResponse.StatusCode == HttpStatusCode.Conflict)
+                    {
+                        _logger.LogInformation("Role '{Role}' already assigned to user '{User}' — skipping", roleName, userId);
+                        return true;
+                    }
                     var body = await assignResponse.Content.ReadAsStringAsync();
                     _logger.LogWarning("Could not assign role '{Role}' to user '{User}': {Status} {Body}", roleName, userId, assignResponse.StatusCode, body);
                     return false;
@@ -251,10 +259,15 @@ namespace Myb.Coproperty.Services
         private (string adminBaseUrl, string realm) ParseAuthority()
         {
             var uri = new Uri(_options.Authority);
-            var adminBase = $"{uri.Scheme}://{uri.Host}:{uri.Port}";
-            // segments: ["/", "realms/", "MYB"]
+            var hostBase = $"{uri.Scheme}://{uri.Host}:{uri.Port}";
+            // Extract any path prefix before /realms/ (e.g. "/auth" when KC_HTTP_RELATIVE_PATH=/auth)
+            var path = uri.AbsolutePath;
+            var realmIdx = path.IndexOf("/realms/", StringComparison.OrdinalIgnoreCase);
+            var basePath = realmIdx > 0 ? path.Substring(0, realmIdx) : string.Empty; // e.g. "/auth"
+            var adminBaseUrl = hostBase + basePath;
+            // segments: e.g. ["/", "auth/", "realms/", "MYB"]
             var realm = uri.Segments.LastOrDefault()?.TrimEnd('/') ?? "MYB";
-            return (adminBase, realm);
+            return (adminBaseUrl, realm);
         }
 
         private async Task<string> GetAccessTokenAsync(string adminBaseUrl, string realm)
@@ -349,20 +362,32 @@ namespace Myb.Coproperty.Services
 
         private async Task<string?> GetClientUuidAsync(string adminBaseUrl, string realm, string clientId, string token)
         {
+            // If the UUID is hardcoded in config, skip the admin API call entirely
+            // (avoids needing view-clients permission on the service account)
+            if (!string.IsNullOrWhiteSpace(_options.ClientUuid))
+                return _options.ClientUuid;
+
             try
             {
                 using var client = CreateAuthorizedClient(token);
                 var url = $"{adminBaseUrl}/admin/realms/{realm}/clients?clientId={Uri.EscapeDataString(clientId)}";
                 var response = await client.GetAsync(url);
-                if (!response.IsSuccessStatusCode) return null;
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("GetClientUuidAsync: GET {Url} returned {Status}", url, response.StatusCode);
+                    return null;
+                }
 
                 var clients = await response.Content.ReadFromJsonAsync<List<JsonElement>>(JsonOptions);
                 if (clients != null && clients.Count > 0)
                     return clients[0].GetProperty("id").GetString();
+
+                _logger.LogWarning("GetClientUuidAsync: no client found with clientId='{ClientId}' (empty response — service account may lack view-clients permission)", clientId);
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "GetClientUuidAsync failed for clientId='{ClientId}'", clientId);
                 return null;
             }
         }

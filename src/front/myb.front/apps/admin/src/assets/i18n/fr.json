@@ -82,6 +82,7 @@
     "charges": {
       "title": "Gestion de Budget",
       "addCharge": "Ajouter un Budget",
+      "contribution": "Contribution",
       "editCharge": "Modifier le Budget",
       "deleteCharge": "Supprimer le Budget",
       "name": "Nom du Budget",

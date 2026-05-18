@@ -1,7 +1,7 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { OwnerService, Unit, CopropertyService, Coproperty } from '@myb-front/coproperty-module';
+import { OwnerService, Unit, CopropertyService, Coproperty } from '../../../index';
 import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';

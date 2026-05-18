@@ -30,25 +30,24 @@
         </a>
       </li>
       <li *ngIf="isCopropertyOwner && !isAdminApp">
-        <a class="dropdown-item" href="/admin/coproperty/owner/dashboard">
+        <a class="dropdown-item" href="/coproperty/owner/dashboard">
           <i class="bi bi-building me-2"></i>Espace Propriétaire
         </a>
       </li>
       <li *ngIf="isCopropertyMember && !isAdminApp">
-        <a class="dropdown-item" href="/admin/coproperty">
+        <a class="dropdown-item" href="/coproperty">
           <i class="bi bi-buildings me-2"></i>Espace Copropriété
         </a>
       </li>
       <li *ngIf="isSystemAdmin || isCopropertyOwner || isCopropertyMember"><hr class="dropdown-divider" /></li>
-      <li><a class="dropdown-item" href="#">Profile</a></li>
       <li>
-        <a class="dropdown-item" [routerLink]="rootPath + '/settings'"
-          >Settings</a
-        >
+        <a class="dropdown-item" [routerLink]="'/profile'">
+          <i class="bi bi-person-circle me-2"></i>Mon Profil
+        </a>
       </li>
-      <li>
+      <li *ngIf="hasSubscriptions">
         <a class="dropdown-item" [routerLink]="'/subscriptions'">
-          My subscriptions
+          <i class="bi bi-credit-card me-2"></i>My subscriptions
         </a>
       </li>
       <li><hr class="dropdown-divider" /></li>

@@ -108,6 +108,12 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('@myb-front/shared-ui').then((c) => c.AccessDeniedPageComponent),
   },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.ProfilePageComponent),
+  },
   // {
   //   path:'folder/:id' , component:FolderDetailsComponent
   // }

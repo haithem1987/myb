@@ -457,7 +457,14 @@ export class OwnerManagementComponent implements OnInit {
     try {
       if (owner.hasOwnerRole) {
         await this.keycloakService.unassignRoleFromUser(owner.userId, 'coproperty-owner');
-        owner.hasOwnerRole = false;
+        // Remove the owner record from this coproperty so the user is no longer linked to this syndic
+        await new Promise<void>((resolve, reject) => {
+          this.ownerService.deleteOwner(owner.id, this.copropertyId).subscribe({
+            next: () => resolve(),
+            error: reject
+          });
+        });
+        this.owners = this.owners.filter(o => o.id !== owner.id);
         this.translateService.get('common.roleUnassigned').subscribe(msg => this.showAlert('info', msg));
       } else {
         await this.keycloakService.assignRoleToUser(owner.userId, 'coproperty-owner');

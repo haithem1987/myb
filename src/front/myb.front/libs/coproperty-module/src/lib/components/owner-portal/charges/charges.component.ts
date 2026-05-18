@@ -2,7 +2,7 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { OwnerService, FundCallService, FundCallExtended, CurrencyService, FundCallPayment } from '@myb-front/coproperty-module';
+import { OwnerService, FundCallService, FundCallExtended, CurrencyService, FundCallPayment } from '../../../index';
 import { KeycloakService } from '@myb-front/auth';
 import { ToastService, ModalService } from '@myb-front/shared-ui';
 import { firstValueFrom, catchError, of } from 'rxjs';

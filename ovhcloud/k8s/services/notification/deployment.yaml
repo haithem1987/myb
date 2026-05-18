@@ -63,17 +63,15 @@ spec:
             memory: "512Mi"
             cpu: "250m"
         livenessProbe:
-          httpGet:
-            path: /health
+          tcpSocket:
             port: 8084
           initialDelaySeconds: 60
           periodSeconds: 30
           timeoutSeconds: 10
         readinessProbe:
-          httpGet:
-            path: /health
+          tcpSocket:
             port: 8084
-          initialDelaySeconds: 30
+          initialDelaySeconds: 15
           periodSeconds: 10
           timeoutSeconds: 5
 ---

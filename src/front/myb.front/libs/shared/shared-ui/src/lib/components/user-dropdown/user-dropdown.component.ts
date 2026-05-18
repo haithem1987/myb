@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { AvatarComponent } from '../avatar/avatar.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
+import { SubscriptionService } from 'libs/shared/infra/services/subscription.service';
 
 @Component({
   selector: 'myb-front-user-dropdown',
@@ -21,8 +22,12 @@ export class UserDropdownComponent implements OnInit {
   isAdminApp = false;
   isCopropertyOwner = false;
   isCopropertyMember = false;
+  hasSubscriptions = false;
 
-  constructor(private keycloakService: KeycloakService) {
+  constructor(
+    private keycloakService: KeycloakService,
+    private subscriptionService: SubscriptionService
+  ) {
     this.user$ = this.keycloakService.profile$;
   }
 
@@ -37,6 +42,14 @@ export class UserDropdownComponent implements OnInit {
         'coproperty-council',
         'coproperty-accountant',
       ]);
+
+      const userId = this.keycloakService.getProfile()?.id;
+      if (userId) {
+        this.subscriptionService.loadSubscriptions(userId).subscribe({
+          next: (subs) => { this.hasSubscriptions = subs && subs.length > 0; },
+          error: () => { this.hasSubscriptions = false; },
+        });
+      }
     }
     this.isAdminApp = window.location.pathname.startsWith('/admin');
   }

@@ -1,0 +1,196 @@
+<nav class="profile-navbar navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" routerLink="/">
+      <i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>MYB
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      <a class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" (click)="goBack()">
+        <i class="bi bi-arrow-left"></i>
+        <span class="d-none d-md-inline">Retour</span>
+      </a>
+      <myb-front-user-dropdown></myb-front-user-dropdown>
+    </div>
+  </div>
+</nav>
+
+<div class="profile-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <i class="bi bi-person-circle me-2"></i>Mon Profil
+      </h1>
+      <p class="page-subtitle">Gérez vos informations personnelles et votre compte</p>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+
+    <!-- Left: Avatar card -->
+    <div class="avatar-card card">
+      <div class="avatar-circle">
+        <span class="avatar-initials">{{ initials() }}</span>
+      </div>
+      <div class="user-name">{{ firstName.value }} {{ lastName.value }}</div>
+      <div class="user-username">{{ '@' + username() }}</div>
+
+      <div class="roles-section">
+        <div class="roles-label">Rôles</div>
+        <div class="roles-list">
+          <span
+            *ngFor="let role of roles()"
+            class="role-badge"
+            [ngClass]="getRoleBadgeClass(role)">
+            {{ getRoleLabel(role) }}
+          </span>
+          <span *ngIf="roles().length === 0" class="role-badge badge-secondary">Aucun rôle</span>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <span class="status-dot" [class.verified]="emailVerified()"></span>
+        <span class="status-text">{{ emailVerified() ? 'Email vérifié' : 'Email non vérifié' }}</span>
+      </div>
+
+      <button class="btn-logout" (click)="logout()">
+        <i class="bi bi-box-arrow-right me-2"></i>Se déconnecter
+      </button>
+    </div>
+
+    <!-- Right: Info & Edit form -->
+    <div class="details-col">
+
+      <!-- Success alert -->
+      <div class="alert alert-success" *ngIf="saveSuccess()">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        Profil mis à jour avec succès !
+      </div>
+
+      <!-- Error alert -->
+      <div class="alert alert-error" *ngIf="saveError()">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ saveError() }}
+      </div>
+
+      <!-- Personal Information card -->
+      <div class="card info-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <i class="bi bi-person-lines-fill card-icon"></i>
+            <h2 class="card-title">Informations personnelles</h2>
+          </div>
+          <button class="btn-edit" *ngIf="!editMode()" (click)="enableEdit()">
+            <i class="bi bi-pencil-fill me-1"></i>Modifier
+          </button>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSave()">
+          <div class="form-grid">
+
+            <!-- First Name -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-person me-1"></i>Prénom
+              </label>
+              <div *ngIf="!editMode()" class="form-value">{{ firstName.value || '—' }}</div>
+              <input
+                *ngIf="editMode()"
+                type="text"
+                class="form-input"
+                formControlName="firstName"
+                placeholder="Prénom"
+                [class.invalid]="firstName.invalid && firstName.touched">
+              <div class="form-error" *ngIf="editMode() && firstName.invalid && firstName.touched">
+                Le prénom est requis (min. 2 caractères)
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-person me-1"></i>Nom
+              </label>
+              <div *ngIf="!editMode()" class="form-value">{{ lastName.value || '—' }}</div>
+              <input
+                *ngIf="editMode()"
+                type="text"
+                class="form-input"
+                formControlName="lastName"
+                placeholder="Nom de famille"
+                [class.invalid]="lastName.invalid && lastName.touched">
+              <div class="form-error" *ngIf="editMode() && lastName.invalid && lastName.touched">
+                Le nom est requis (min. 2 caractères)
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group full-width">
+              <label class="form-label">
+                <i class="bi bi-envelope me-1"></i>Adresse e-mail
+              </label>
+              <div *ngIf="!editMode()" class="form-value email-value">
+                {{ email.value || '—' }}
+                <span class="verified-chip" *ngIf="emailVerified()">
+                  <i class="bi bi-patch-check-fill"></i> Vérifié
+                </span>
+              </div>
+              <input
+                *ngIf="editMode()"
+                type="email"
+                class="form-input"
+                formControlName="email"
+                placeholder="email@exemple.com"
+                [class.invalid]="email.invalid && email.touched">
+              <div class="form-error" *ngIf="editMode() && email.invalid && email.touched">
+                Veuillez entrer une adresse e-mail valide
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Edit actions -->
+          <div class="form-actions" *ngIf="editMode()">
+            <button type="button" class="btn-cancel" (click)="cancelEdit()" [disabled]="saving()">
+              Annuler
+            </button>
+            <button type="submit" class="btn-save" [disabled]="profileForm.invalid || saving()">
+              <span *ngIf="saving()" class="spinner"></span>
+              <i class="bi bi-floppy-fill me-1" *ngIf="!saving()"></i>
+              {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Account Info card -->
+      <div class="card account-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <i class="bi bi-shield-lock card-icon"></i>
+            <h2 class="card-title">Informations du compte</h2>
+          </div>
+        </div>
+        <div class="account-rows">
+          <div class="account-row">
+            <span class="account-label"><i class="bi bi-fingerprint me-2"></i>Identifiant</span>
+            <span class="account-value monospace">{{ username() }}</span>
+          </div>
+          <div class="account-row">
+            <span class="account-label"><i class="bi bi-key me-2"></i>ID utilisateur</span>
+            <span class="account-value monospace small">{{ userId() }}</span>
+          </div>
+          <div class="account-row">
+            <span class="account-label"><i class="bi bi-shield-check me-2"></i>Fournisseur</span>
+            <span class="account-value">Keycloak SSO</span>
+          </div>
+          <div class="account-row" *ngIf="joinedDate()">
+            <span class="account-label"><i class="bi bi-calendar3 me-2"></i>Session depuis</span>
+            <span class="account-value">{{ joinedDate() }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

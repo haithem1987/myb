@@ -66,6 +66,8 @@ export * from './lib/components/payment/payment.component';
 
 export * from './lib/subscriptions/subscriptions.component';
 
+export * from './lib/components/profile-page/profile-page.component';
+
 export * from './lib/components/notification-dropdown/notification-dropdown.component';
 
 export * from './lib/services/modal.service';

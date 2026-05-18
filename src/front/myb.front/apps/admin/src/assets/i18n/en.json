@@ -81,6 +81,7 @@
     "charges": {
       "title": "Budget Management",
       "addCharge": "Add Budget",
+      "contribution": "Contribution",
       "editCharge": "Edit Budget",
       "deleteCharge": "Delete Budget",
       "name": "Budget Name",

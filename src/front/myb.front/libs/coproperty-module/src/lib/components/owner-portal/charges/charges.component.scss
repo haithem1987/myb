@@ -1,0 +1,704 @@
+.stat-card {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: #fff;
+    margin-right: 1rem;
+    flex-shrink: 0;
+  }
+
+  .stat-content {
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+  }
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.charges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+.charge-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  border-left: 4px solid #dee2e6;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  &.unpaid {
+    border-left-color: #ffc107;
+  }
+
+  &.overdue {
+    border-left-color: #dc3545;
+  }
+
+  .charge-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1.25rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #f0f0f0;
+
+    .charge-type {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #6c757d;
+
+      i {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .charge-body {
+    padding: 1.25rem;
+
+    .charge-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .charge-desc {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 0.75rem;
+    }
+
+    .charge-details {
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.35rem 0;
+        font-size: 0.85rem;
+
+        .detail-label {
+          color: #6c757d;
+        }
+
+        .detail-value {
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  .charge-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: #f8f9fa;
+    border-top: 1px solid #f0f0f0;
+
+    .amount-section {
+      .amount-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .amount-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #dc3545;
+      }
+
+      .amount-total {
+        font-size: 0.75rem;
+        color: #6c757d;
+      }
+    }
+
+    .btn-pay {
+      padding: 0.5rem 1.25rem;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+  }
+}
+
+// Payments list inside fund call card
+.payments-list {
+  margin-top: 0.25rem;
+
+  .payment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    background: #f0fdf4;
+    border-radius: 6px;
+    margin-bottom: 0.25rem;
+
+    .payment-amount {
+      font-weight: 600;
+      color: #065f46;
+    }
+
+    .payment-info {
+      color: #6c757d;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+  }
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.badge-paid {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &.badge-partial {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &.badge-pending {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.badge-unpaid {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.badge-failed {
+    background: #fecaca;
+    color: #7f1d1d;
+  }
+}
+
+.empty-state {
+  padding: 3rem;
+}
+
+.all-paid-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #d1fae5;
+  color: #065f46;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+
+  i {
+    font-size: 1.5rem;
+  }
+}
+
+.table {
+  th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  td {
+    vertical-align: middle;
+    font-size: 0.9rem;
+  }
+}
+
+// Payment Justification Modal
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.payment-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 1rem;
+
+  .modal-dialog {
+    width: 100%;
+    max-width: 540px;
+  }
+
+  .modal-content {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+
+  .modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    background: #f8f9fa;
+
+    .modal-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}
+
+// Fund call summary in modal
+.fc-summary {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1rem;
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.35rem 0;
+    font-size: 0.9rem;
+
+    &.highlight {
+      border-top: 1px solid #dee2e6;
+      padding-top: 0.5rem;
+      margin-top: 0.25rem;
+      font-size: 1rem;
+    }
+  }
+}
+
+// Payment method selector
+.payment-methods {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+
+  .payment-method-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+
+    &:hover {
+      border-color: #adb5bd;
+      background: #f8f9fa;
+    }
+
+    &.selected {
+      border-color: #198754;
+      background: #f0fdf4;
+      color: #065f46;
+
+      i {
+        color: #198754;
+      }
+    }
+
+    i {
+      font-size: 1.1rem;
+      color: #6c757d;
+    }
+  }
+}
+
+// Virement bank details section
+.virement-details {
+  background: #f0f7ff;
+  border: 1px solid #b6d4fe;
+  border-radius: 10px;
+  padding: 1rem;
+
+  .virement-header {
+    font-size: 0.95rem;
+  }
+
+  .form-label {
+    margin-bottom: 0.25rem;
+    color: #495057;
+  }
+
+  .form-control {
+    font-size: 0.9rem;
+  }
+}
+
+// File upload zone
+.file-upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1.25rem;
+  border: 2px dashed #ced4da;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #6c757d;
+
+  &:hover {
+    border-color: #198754;
+    background: #f0fdf4;
+    color: #065f46;
+  }
+
+  i {
+    font-size: 1.5rem;
+  }
+
+  span {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  small {
+    font-size: 0.75rem;
+    color: #adb5bd;
+  }
+}
+
+.file-attached {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #f0fdf4;
+  border: 1px solid #a3cfbb;
+  border-radius: 10px;
+
+  .file-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #065f46;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// ── Payment Receipt ──────────────────────────────────────────────────────────
+.receipt-success-header {
+  background: linear-gradient(135deg, rgba(25, 135, 84, 0.08), rgba(25, 135, 84, 0.02));
+  border-bottom: 2px solid rgba(25, 135, 84, 0.2);
+}
+
+.receipt-body {
+  padding: 1.5rem 1.25rem;
+}
+
+.receipt-card {
+  text-align: center;
+
+  .receipt-check {
+    font-size: 3.5rem;
+    color: #198754;
+    line-height: 1;
+    margin-bottom: 0.75rem;
+  }
+
+  .receipt-headline {
+    font-weight: 600;
+    color: #198754;
+    margin-bottom: 1.25rem;
+    font-size: 1rem;
+  }
+}
+
+.receipt-document {
+  background: #fafbff;
+  border: 1px solid #e0e7ff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: left;
+
+  .receipt-doc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .receipt-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .receipt-company {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #2d3748;
+  }
+
+  .receipt-sub {
+    font-size: 0.75rem;
+    color: #718096;
+  }
+
+  .receipt-divider {
+    border-color: #e0e7ff;
+    margin: 0.75rem 0;
+  }
+
+  .receipt-num {
+    text-align: right;
+  }
+}
+
+.receipt-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed #e0e7ff;
+
+  &:last-child { border-bottom: none; }
+
+  &.highlight {
+    background: rgba(25, 135, 84, 0.06);
+    border-radius: 6px;
+    padding: 0.5rem 0.5rem;
+    border-bottom: none;
+    margin-bottom: 0.25rem;
+  }
+
+  .receipt-label {
+    font-size: 0.82rem;
+    color: #718096;
+    white-space: nowrap;
+  }
+
+  .receipt-value {
+    font-size: 0.9rem;
+    text-align: right;
+    font-weight: 500;
+  }
+}
+
+.receipt-footer-note {
+  margin-top: 0.875rem;
+  padding: 0.625rem 0.875rem;
+  background: #eff6ff;
+  border-left: 3px solid #667eea;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.8rem;
+  color: #4a5568;
+}
+
+// ── Tablet ──
+@media (max-width: 992px) {
+  .charges-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .payment-modal .modal-dialog {
+    max-width: 480px;
+  }
+}
+
+// ── Mobile ──
+@media (max-width: 576px) {
+  .container-fluid { padding-left: 10px; padding-right: 10px; }
+
+  h2 { font-size: 1.2rem; }
+
+  .stat-card {
+    padding: 0.875rem;
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+      margin-right: 0.75rem;
+    }
+
+    .stat-content {
+      .stat-value { font-size: 1.15rem; }
+      .stat-label { font-size: 0.75rem; }
+    }
+  }
+
+  .section-title { font-size: 1rem; }
+
+  .charges-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .charge-card {
+    .charge-header { padding: 0.75rem 1rem; }
+    .charge-body { padding: 1rem; }
+
+    .charge-footer {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+
+      .btn-pay { width: 100%; text-align: center; }
+    }
+  }
+
+  .payments-list .payment-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  // Table scroll on mobile
+  .table-responsive { margin: 0 -10px; padding: 0 10px; }
+  .table {
+    th { font-size: 0.7rem; white-space: nowrap; }
+    td { font-size: 0.8rem; }
+  }
+
+  .all-paid-banner {
+    font-size: 0.95rem;
+    padding: 0.75rem;
+    i { font-size: 1.2rem; }
+  }
+
+  // Full-screen modal on mobile
+  .payment-modal {
+    padding: 0;
+    align-items: flex-end;
+
+    .modal-dialog {
+      max-width: 100%;
+      margin: 0;
+    }
+
+    .modal-content {
+      border-radius: 16px 16px 0 0;
+      max-height: 95vh;
+    }
+
+    .modal-body {
+      max-height: 75vh;
+      padding: 1rem;
+    }
+
+    .modal-header { padding: 1rem; }
+    .modal-footer {
+      padding: 0.75rem 1rem;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .btn { width: 100%; }
+    }
+  }
+
+  .payment-methods {
+    grid-template-columns: 1fr;
+
+    .payment-method-option {
+      padding: 0.625rem 0.875rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  .fc-summary .summary-row { font-size: 0.85rem; }
+
+  .virement-details { padding: 0.75rem; }
+
+  .file-upload-zone {
+    padding: 1rem;
+    i { font-size: 1.25rem; }
+    span { font-size: 0.85rem; }
+  }
+}

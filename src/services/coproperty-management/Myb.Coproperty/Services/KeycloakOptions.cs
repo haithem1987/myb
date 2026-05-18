@@ -21,6 +21,15 @@ namespace Myb.Coproperty.Services
         /// <summary>Realm role name whose members are shown as manager candidates. Default: coproperty-syndic</summary>
         public string ManagerRole { get; set; } = "coproperty-syndic";
 
+        /// <summary>URL of the owner portal (used in welcome emails). E.g. https://myb-platform.com/coproperty/owner/dashboard</summary>
+        public string OwnerPortalUrl { get; set; } = "https://myb-platform.com/coproperty/owner/dashboard";
+
+        /// <summary>
+        /// Optional: hardcoded UUID of the frontend OIDC client (MYB-client) in the Keycloak realm.
+        /// When set, skips the /admin/realms/{realm}/clients?clientId= lookup (avoids needing view-clients permission).
+        /// </summary>
+        public string ClientUuid { get; set; } = "";
+
         // Resolved helpers
         public string EffectiveServiceClientId => !string.IsNullOrEmpty(ServiceClientId) ? ServiceClientId : ClientId;
         public string EffectiveServiceClientSecret => !string.IsNullOrEmpty(ServiceClientSecret) ? ServiceClientSecret : ClientSecret;

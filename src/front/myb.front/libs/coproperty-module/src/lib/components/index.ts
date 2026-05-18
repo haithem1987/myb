@@ -14,6 +14,7 @@ export * from './maintenance-list/maintenance-list.component';
 export * from './fund-calls-list/fund-calls-list.component';
 export * from './fund-call-new/fund-call-new.component';
 export * from './budget-new/budget-new.component';
+export * from './owner-portal/owner-layout/owner-layout.component';
 export * from './owner-portal/owner-dashboard.component';
 export * from './owner-portal/invoice-payment-dialog.component';
 export * from './manager-multi-select/manager-multi-select.component';
@@ -26,3 +27,4 @@ export * from './intervention-list/intervention-list.component';
 export * from './intervention-new/intervention-new.component';
 export * from './intervention-management/intervention-management.component';
 export * from './coproperty.routes';
+

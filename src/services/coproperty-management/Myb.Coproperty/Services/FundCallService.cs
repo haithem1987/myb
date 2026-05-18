@@ -222,8 +222,20 @@ public class FundCallService : IFundCallService
     {
         using var context = _contextFactory.CreateDbContext();
 
+        // Find the Keycloak UserId for this owner, then collect ALL owner records
+        // linked to the same Keycloak user (handles duplicate owner records and
+        // cases where the fund call was created under a different owner record for
+        // the same physical person).
+        var owner = await context.Owners.FindAsync(ownerId);
+        if (owner == null) return new List<FundCall>();
+
+        var allOwnerIds = await context.Owners
+            .Where(o => o.UserId == owner.UserId)
+            .Select(o => o.Id)
+            .ToListAsync();
+
         return await context.FundCalls
-            .Where(f => f.OwnerId == ownerId && f.IsActive)
+            .Where(f => f.OwnerId.HasValue && allOwnerIds.Contains(f.OwnerId.Value) && f.IsActive)
             .Include(f => f.Coproperty)
             .Include(f => f.Owner)
             .Include(f => f.Payments)
@@ -295,7 +307,7 @@ public class FundCallService : IFundCallService
 
         if (input.Amount > remaining)
             throw new InvalidOperationException(
-                $"Le montant du versement ({input.Amount:N3} DT) dépasse le reste à payer ({remaining:N3} DT). Montant maximum autorisé: {remaining:N3} DT.");
+                $"Le montant du versement ({input.Amount:N3}) dépasse le reste à payer ({remaining:N3}). Montant maximum autorisé: {remaining:N3}.");
 
         if (input.Amount <= 0)
             throw new InvalidOperationException("Le montant du versement doit être supérieur à 0.");

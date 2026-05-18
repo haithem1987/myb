@@ -1,0 +1,133 @@
+<div class="owner-layout">
+  <!-- Top Navigation -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <img src="assets/MYB%20LOGO.png" alt="MYB" class="logo-image">
+        <span class="app-name">MYB Copropriété</span>
+      </div>
+      
+      <nav class="main-nav">
+        <a routerLink="/coproperty/owner/dashboard" 
+           routerLinkActive="active" 
+           class="nav-link">
+          <i class="bi bi-house-door"></i>
+          <span>Mon Espace</span>
+        </a>
+        
+        <a routerLink="/coproperty/owner/my-units" 
+           routerLinkActive="active" 
+           class="nav-link">
+          <i class="bi bi-building"></i>
+          <span>Mes Lots</span>
+        </a>
+        
+        <a routerLink="/coproperty/owner/invoices" 
+           routerLinkActive="active" 
+           class="nav-link">
+          <i class="bi bi-receipt"></i>
+          <span>Mes Reçus</span>
+          <span class="badge" *ngIf="pendingInvoices() > 0">
+            {{ pendingInvoices() }}
+          </span>
+        </a>
+
+        <a routerLink="/coproperty/owner/charges" 
+           routerLinkActive="active" 
+           class="nav-link">
+          <i class="bi bi-cash-stack"></i>
+          <span>Mes Charges</span>
+        </a>
+      </nav>
+      
+      <div class="user-section">
+        <!-- Switch to syndic space if user has dual role -->
+        <button class="btn-switch-role" *ngIf="isSyndic()" (click)="switchToSyndicSpace()" title="Espace Syndic">
+          <i class="bi bi-shield-check"></i>
+          <span>Espace Syndic</span>
+        </button>
+
+        <div class="user-info" *ngIf="currentUser()">
+          <div class="user-avatar">
+            {{ currentUser().firstName[0] }}{{ currentUser().lastName[0] }}
+          </div>
+          <div class="user-details">
+            <div class="user-name">{{ currentUser().firstName }} {{ currentUser().lastName }}</div>
+            <div class="user-role">Copropriétaire</div>
+          </div>
+        </div>
+        <button class="btn-logout" (click)="logout()" title="Déconnexion">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+      
+      <!-- Mobile Menu Button -->
+      <button class="btn-mobile-menu" (click)="toggleMobileMenu()">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+  </header>
+  
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" [class.open]="isMobileMenuOpen()">
+    <a routerLink="/coproperty/owner/dashboard" 
+       routerLinkActive="active" 
+       class="nav-link"
+       (click)="toggleMobileMenu()">
+      <i class="bi bi-house-door"></i>
+      <span>Mon Espace</span>
+    </a>
+    
+    <a routerLink="/coproperty/owner/my-units" 
+       routerLinkActive="active" 
+       class="nav-link"
+       (click)="toggleMobileMenu()">
+      <i class="bi bi-building"></i>
+      <span>Mes Lots</span>
+    </a>
+    
+    <a routerLink="/coproperty/owner/invoices" 
+       routerLinkActive="active" 
+       class="nav-link"
+       (click)="toggleMobileMenu()">
+      <i class="bi bi-receipt"></i>
+      <span>Mes Reçus</span>
+      <span class="badge" *ngIf="pendingInvoices() > 0">
+        {{ pendingInvoices() }}
+      </span>
+    </a>
+
+    <a routerLink="/coproperty/owner/charges" 
+       routerLinkActive="active" 
+       class="nav-link"
+       (click)="toggleMobileMenu()">
+      <i class="bi bi-cash-stack"></i>
+      <span>Mes Charges</span>
+    </a>
+  </nav>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>&copy; 2026 MYB - Gestion de Copropriété</p>
+      <div class="footer-links">
+        <a href="#">Aide</a>
+        <a href="#">Contact</a>
+        <a href="#">Mentions légales</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- Toast Container -->
+<app-toasts-container></app-toasts-container>
+
+<!-- Modal Container -->
+<app-modal-container></app-modal-container>

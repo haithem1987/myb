@@ -15,8 +15,8 @@ data:
   KEYCLOAK_MANAGER_ROLE: "coproperty-syndic"
   
   # Service URLs (Internal Kubernetes DNS)
-  KEYCLOAK_BASE_URL: "http://keycloak:8080/realms/MYB/protocol/openid-connect"
-  KEYCLOAK_AUTHORITY: "http://keycloak:8080/realms/MYB"
+  KEYCLOAK_BASE_URL: "http://keycloak:8080/auth/realms/MYB/protocol/openid-connect"
+  KEYCLOAK_AUTHORITY: "http://keycloak:8080/auth/realms/MYB"
   
   # RabbitMQ Configuration
   RABBITMQ_HOST: "rabbitmq"

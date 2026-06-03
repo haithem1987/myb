@@ -76,8 +76,15 @@ export class FundCallsListComponent implements OnInit {
   // ── Bulk selection state ──────────────────────────────────────────────────
   selectedIds = signal<Set<string>>(new Set());
 
+  // ── Payment review state ──────────────────────────────────────────────────
+  reviewingPaymentId = signal<string | null>(null);
+  showRejectModal = signal<boolean>(false);
+  rejectReason = '';
+  private _pendingRejectPaymentId: string | null = null;
+
   readonly statusOptions: { value: FundCallStatus; label: string }[] = [
     { value: 'TO_PAY', label: FUND_CALL_STATUS_LABELS['TO_PAY'] },
+    { value: 'PENDING_VALIDATION', label: FUND_CALL_STATUS_LABELS['PENDING_VALIDATION'] },
     { value: 'PAID',   label: FUND_CALL_STATUS_LABELS['PAID'] },
     { value: 'VALIDATED', label: FUND_CALL_STATUS_LABELS['VALIDATED'] },
   ];
@@ -852,5 +859,99 @@ export class FundCallsListComponent implements OnInit {
     if (days > 90) return `${days}j - Critique`;
     if (days > 30) return `${days}j - En retard`;
     return `${days}j`;
+  }
+
+  // ── Payment Review ────────────────────────────────────────────────────────
+
+  approvePayment(paymentId: string): void {
+    this.reviewingPaymentId.set(paymentId);
+    // Optimistic update: immediately reflect the approval in the UI
+    const previousFc = this.editingFundCall();
+    if (previousFc?.payments) {
+      this.editingFundCall.set({
+        ...previousFc,
+        payments: previousFc.payments.map((p) =>
+          p.id === paymentId ? { ...p, validationStatus: 'Approved' } : p
+        ),
+      } as any);
+    }
+    this.fundCallService.reviewFundCallPayment(paymentId, true).subscribe({
+      next: () => {
+        this.toastService.show('Paiement validé avec succès.', { classname: 'bg-success text-white', delay: 4000 });
+        this.reviewingPaymentId.set(null);
+        this.reloadEditingFundCall();
+      },
+      error: (err) => {
+        // Revert optimistic update on failure
+        if (previousFc) this.editingFundCall.set(previousFc);
+        const msg = err?.graphQLErrors?.[0]?.message || 'Erreur lors de la validation du paiement';
+        this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
+        this.reviewingPaymentId.set(null);
+      },
+    });
+  }
+
+  openRejectDialog(paymentId: string): void {
+    this._pendingRejectPaymentId = paymentId;
+    this.rejectReason = '';
+    this.showRejectModal.set(true);
+  }
+
+  closeRejectDialog(): void {
+    this.showRejectModal.set(false);
+    this._pendingRejectPaymentId = null;
+    this.rejectReason = '';
+  }
+
+  confirmReject(): void {
+    if (!this._pendingRejectPaymentId || !this.rejectReason.trim()) return;
+    const paymentId = this._pendingRejectPaymentId;
+    const reason = this.rejectReason.trim();
+    this.reviewingPaymentId.set(paymentId);
+    // Optimistic update: immediately reflect the rejection in the UI
+    const previousFc = this.editingFundCall();
+    if (previousFc?.payments) {
+      this.editingFundCall.set({
+        ...previousFc,
+        payments: previousFc.payments.map((p) =>
+          p.id === paymentId ? { ...p, validationStatus: 'Rejected', rejectionReason: reason } : p
+        ),
+      } as any);
+    }
+    this.fundCallService.reviewFundCallPayment(paymentId, false, reason).subscribe({
+      next: () => {
+        this.toastService.show('Paiement refusé. Le propriétaire a été notifié.', { classname: 'bg-warning text-dark', delay: 4000 });
+        this.reviewingPaymentId.set(null);
+        this.closeRejectDialog();
+        this.reloadEditingFundCall();
+      },
+      error: (err) => {
+        // Revert optimistic update on failure
+        if (previousFc) this.editingFundCall.set(previousFc);
+        const msg = err?.graphQLErrors?.[0]?.message || 'Erreur lors du refus du paiement';
+        this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
+        this.reviewingPaymentId.set(null);
+      },
+    });
+  }
+
+  private reloadEditingFundCall(): void {
+    const current = this.editingFundCall();
+    if (!current) return;
+    this.fundCallService.getFundCallById(current.id).subscribe({
+      next: (updated) => {
+        if (!updated) return;
+        const coproperty = this.coproperties().find((c) => c.id === updated.copropertyId);
+        const enriched = { ...updated, copropertyName: coproperty?.name ?? current.copropertyName } as FundCallExtended;
+        this.editingFundCall.set(enriched);
+        // Sync the edit form status to reflect the new server state
+        this.editForm.patchValue({ status: enriched.status ?? 'TO_PAY' });
+        // Refresh the main list as well
+        this.fundCalls.update((list) =>
+          list.map((fc) => (fc.id === enriched.id ? enriched : fc))
+        );
+      },
+      error: () => { /* non-critical */ },
+    });
   }
 }

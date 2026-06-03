@@ -77,6 +77,7 @@
             (change)="onStatusFilterChange($event)">
             <option value="">Tous les statuts</option>
             <option value="TO_PAY">À payer</option>
+            <option value="PENDING_VALIDATION">En attente de validation</option>
             <option value="PAID">Réglé</option>
             <option value="VALIDATED">Validé</option>
           </select>
@@ -434,20 +435,54 @@
 
       <!-- Existing payments list -->
       <div *ngIf="editingFundCall()!.payments && editingFundCall()!.payments!.length > 0" class="payment-list mb-2">
-        <div *ngFor="let payment of editingFundCall()!.payments" class="payment-item">
+        <div *ngFor="let payment of editingFundCall()!.payments" class="payment-item"
+             [class.border-warning]="payment.validationStatus === 'Pending'"
+             [class.border-success]="payment.validationStatus === 'Approved'"
+             [class.border-danger]="payment.validationStatus === 'Rejected'">
           <div class="d-flex justify-content-between align-items-start">
             <div>
               <div class="fw-semibold">{{ formatAmount(payment.amount) }}</div>
               <div class="small text-muted">
                 <i class="bi bi-calendar2 me-1"></i>{{ formatDate(payment.paymentDate) }}
               </div>
+              <div *ngIf="payment.paymentMethod" class="small text-muted">
+                <i class="bi bi-credit-card me-1"></i>{{ payment.paymentMethod }}
+              </div>
               <div *ngIf="payment.justificatif" class="small text-muted text-truncate" style="max-width:160px" [title]="payment.justificatif">
                 <i class="bi bi-file-earmark me-1"></i>{{ payment.justificatif }}
               </div>
+              <div *ngIf="payment.validationStatus === 'Rejected' && payment.rejectionReason"
+                   class="small text-danger mt-1" style="max-width:180px">
+                <i class="bi bi-x-circle me-1"></i><em>{{ payment.rejectionReason }}</em>
+              </div>
             </div>
-            <span class="badge bg-success-subtle text-success">
-              <i class="bi bi-check2"></i>
-            </span>
+            <div class="d-flex flex-column align-items-end gap-1">
+              <!-- Validation status badge -->
+              <span class="badge"
+                [class.bg-warning]="payment.validationStatus === 'Pending'"
+                [class.text-dark]="payment.validationStatus === 'Pending'"
+                [class.bg-success]="payment.validationStatus === 'Approved'"
+                [class.bg-danger]="payment.validationStatus === 'Rejected'">
+                <ng-container *ngIf="payment.validationStatus === 'Pending'"><i class="bi bi-clock me-1"></i>En attente</ng-container>
+                <ng-container *ngIf="payment.validationStatus === 'Approved'"><i class="bi bi-check2 me-1"></i>Validé</ng-container>
+                <ng-container *ngIf="payment.validationStatus === 'Rejected'"><i class="bi bi-x-lg me-1"></i>Refusé</ng-container>
+              </span>
+              <!-- Review buttons for pending payments -->
+              <ng-container *ngIf="payment.validationStatus === 'Pending'">
+                <button type="button" class="btn btn-sm btn-success mt-1" style="font-size:0.7rem;padding:2px 8px"
+                  [disabled]="reviewingPaymentId() === payment.id"
+                  (click)="approvePayment(payment.id)"
+                  title="Valider ce paiement">
+                  <i class="bi bi-check-circle-fill me-1"></i>Valider
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger mt-1" style="font-size:0.7rem;padding:2px 8px"
+                  [disabled]="reviewingPaymentId() === payment.id"
+                  (click)="openRejectDialog(payment.id)"
+                  title="Refuser ce paiement">
+                  <i class="bi bi-x-circle me-1"></i>Refuser
+                </button>
+              </ng-container>
+            </div>
           </div>
         </div>
       </div>
@@ -740,5 +775,40 @@
         <i class="bi bi-download me-1"></i>Télécharger PDF
       </button>
     </ng-container>
+  </div>
+</div>
+
+<!-- ── Reject Payment Modal ──────────────────────────────────────────────────────── -->
+<div *ngIf="showRejectModal()" class="modal d-block" tabindex="-1" style="background:rgba(0,0,0,.45)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Refuser le paiement</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeRejectDialog()"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-3">
+          Indiquez le motif du refus. L'application de fonds sera remise à l'état <strong>À payer</strong>
+          et le propriétaire sera notifié par email.
+        </p>
+        <label class="form-label fw-semibold">Motif du refus <span class="text-danger">*</span></label>
+        <textarea class="form-control" rows="3" maxlength="500"
+          [(ngModel)]="rejectReason"
+          placeholder="Ex : justificatif illisible, date incorrecte, montant erroné...">
+        </textarea>
+        <div class="form-text text-end">{{ rejectReason.length }}/500</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeRejectDialog()">Annuler</button>
+        <button type="button" class="btn btn-danger"
+          [disabled]="!rejectReason.trim() || reviewingPaymentId() !== null"
+          (click)="confirmReject()">
+          <span *ngIf="reviewingPaymentId() === null"><i class="bi bi-x-circle me-1"></i>Confirmer le refus</span>
+          <span *ngIf="reviewingPaymentId() !== null">
+            <span class="spinner-border spinner-border-sm me-1" role="status"></span>En cours...
+          </span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>

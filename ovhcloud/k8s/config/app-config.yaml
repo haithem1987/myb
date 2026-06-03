@@ -25,3 +25,6 @@ data:
   
   # Timezone
   TZ: "Europe/Paris"
+  
+  # Frontend public URL (used in email links)
+  FRONTEND_URL: "https://myb-platform.com"

@@ -54,6 +54,8 @@ export const ADD_FUND_CALL_PAYMENT = gql`
       paymentDate
       justificatif
       paymentMethod
+      validationStatus
+      rejectionReason
       createdAt
     }
   }
@@ -72,6 +74,18 @@ export const GENERATE_INVOICES_FROM_FUND_CALL = gql`
       invoiceNumber
       totalAmount
       status
+    }
+  }
+`;
+
+export const REVIEW_FUND_CALL_PAYMENT = gql`
+  mutation ReviewFundCallPayment($paymentId: UUID!, $approved: Boolean!, $rejectionReason: String) {
+    reviewFundCallPayment(paymentId: $paymentId, approved: $approved, rejectionReason: $rejectionReason) {
+      id
+      fundCallId
+      amount
+      validationStatus
+      rejectionReason
     }
   }
 `;

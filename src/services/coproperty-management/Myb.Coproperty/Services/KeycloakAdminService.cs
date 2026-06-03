@@ -333,6 +333,35 @@ namespace Myb.Coproperty.Services
             }
         }
 
+        public async Task<ManagerDto?> GetUserByIdAsync(string userId)
+        {
+            try
+            {
+                var (adminBaseUrl, realm) = ParseAuthority();
+                var token = await GetAccessTokenAsync(adminBaseUrl, realm);
+
+                using var client = CreateAuthorizedClient(token);
+                var url = $"{adminBaseUrl}/admin/realms/{realm}/users/{Uri.EscapeDataString(userId)}";
+                var response = await client.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("GetUserByIdAsync: GET {Url} returned {Status}", url, response.StatusCode);
+                    return null;
+                }
+
+                var user = await response.Content.ReadFromJsonAsync<KeycloakUserDto>(JsonOptions);
+                if (user == null) return null;
+
+                return new ManagerDto(user.Id, user.FirstName ?? "", user.LastName ?? "", user.Email ?? "");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetUserByIdAsync failed for userId='{UserId}'", userId);
+                return null;
+            }
+        }
+
         private async Task<IEnumerable<ManagerDto>> GetUsersForRoleAsync(
             string adminBaseUrl, string realm, string roleName, string token)
         {

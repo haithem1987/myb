@@ -2,20 +2,24 @@ import { Component, signal, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
-import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService } from '@myb-front/coproperty-module';
+import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService, FundCallService, FundCallPaymentWithContext } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
 
 interface Invoice {
   id: string;
   number: string;
+  type: 'charge' | 'fundcall';
   description: string;
   date: Date;
   amount: number;
   period: string;
   unitNumber: string;
+  copropertyName?: string;
   paymentDate?: Date;
   paymentMethod: string;
   status: string;
+  validationStatus?: string;
+  rejectionReason?: string;
 }
 
 @Component({
@@ -109,11 +113,30 @@ interface Invoice {
                 <tr *ngFor="let invoice of filteredInvoices()">
                   <td>
                     <strong>{{ invoice.number }}</strong>
+                    <br>
+                    <span *ngIf="invoice.type === 'fundcall'" class="badge bg-primary" style="font-size:0.65rem">Appel de fonds</span>
+                    <span *ngIf="invoice.type === 'charge'" class="badge bg-secondary" style="font-size:0.65rem">Charge</span>
                   </td>
                   <td>
                     <span>{{ invoice.description }}</span>
                     <br>
-                    <small class="text-muted">{{ invoice.period }}</small>
+                    <small class="text-muted">{{ invoice.copropertyName ?? invoice.period }}</small>
+                    <!-- Fund call validation status -->
+                    <div *ngIf="invoice.type === 'fundcall'" class="mt-1">
+                      <span *ngIf="invoice.validationStatus === 'Pending'" class="badge bg-warning text-dark" style="font-size:0.65rem">
+                        <i class="bi bi-clock me-1"></i>En attente de validation
+                      </span>
+                      <span *ngIf="invoice.validationStatus === 'Approved'" class="badge bg-success" style="font-size:0.65rem">
+                        <i class="bi bi-check2 me-1"></i>Validé
+                      </span>
+                      <span *ngIf="invoice.validationStatus === 'Rejected'" class="badge bg-danger" style="font-size:0.65rem">
+                        <i class="bi bi-x-lg me-1"></i>Refusé
+                      </span>
+                      <div *ngIf="invoice.validationStatus === 'Rejected' && invoice.rejectionReason"
+                           class="small text-danger mt-1" style="font-size:0.8rem">
+                        <i class="bi bi-info-circle me-1"></i>{{ invoice.rejectionReason }}
+                      </div>
+                    </div>
                   </td>
                   <td><span class="badge bg-secondary">{{ invoice.unitNumber }}</span></td>
                   <td>{{ invoice.paymentDate | date:'dd/MM/yyyy' }}</td>
@@ -129,7 +152,7 @@ interface Invoice {
                       <button class="btn btn-sm btn-outline-primary me-1" (click)="viewInvoice(invoice.id)" title="Voir">
                         <i class="bi bi-eye"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-secondary" (click)="downloadInvoice(invoice.id)" title="Télécharger">
+                      <button *ngIf="invoice.type === 'charge'" class="btn btn-sm btn-outline-secondary" (click)="downloadInvoice(invoice.id)" title="Télécharger">
                         <i class="bi bi-download"></i>
                       </button>
                     </div>
@@ -590,6 +613,7 @@ export class OwnerInvoicesComponent implements OnInit {
   private ownerService = inject(OwnerService);
   private keycloakService = inject(KeycloakService);
   private currencyService = inject(CurrencyService);
+  private fundCallService = inject(FundCallService);
   private unitsById = new Map<string, Unit>();
 
   ngOnInit(): void {
@@ -602,12 +626,11 @@ export class OwnerInvoicesComponent implements OnInit {
     }
 
     if (!userId) {
-      // If user ID is not available, do not attempt to load data
       console.error('OwnerInvoicesComponent: user ID not available');
       return;
     }
 
-    // Load units to resolve unit numbers for invoices
+    // Load units to resolve unit numbers for charge invoices
     this.ownerService.getMyUnits(userId).subscribe({
       next: (units) => {
         units.forEach((unit) => this.unitsById.set(unit.id, unit));
@@ -617,15 +640,34 @@ export class OwnerInvoicesComponent implements OnInit {
       }
     });
 
-    // Load invoices for the current owner
+    // Load both charge invoices and fund call payments, then merge
     this.ownerService.getMyInvoices(userId).subscribe({
       next: (backendInvoices) => {
-        const mapped = backendInvoices.map((inv) => this.mapInvoice(inv));
-        this.invoices.set(mapped);
-        this.filteredInvoices.set(mapped);
+        const chargeInvoices = backendInvoices.map((inv) => this.mapInvoice(inv));
+        // Merge with any already-loaded fund call payments
+        const existing = this.invoices().filter(i => i.type === 'fundcall');
+        const merged = [...chargeInvoices, ...existing]
+          .sort((a, b) => (b.paymentDate ?? b.date).getTime() - (a.paymentDate ?? a.date).getTime());
+        this.invoices.set(merged);
+        this.filteredInvoices.set(merged);
+        this.filterInvoices();
       },
       error: (error) => {
         console.error('Error loading owner invoices:', error);
+      }
+    });
+
+    this.fundCallService.getFundCallPaymentsByOwner(userId).subscribe({
+      next: (payments) => {
+        const fcInvoices = payments.map((p) => this.mapFundCallPayment(p));
+        const existing = this.invoices().filter(i => i.type === 'charge');
+        const merged = [...existing, ...fcInvoices]
+          .sort((a, b) => (b.paymentDate ?? b.date).getTime() - (a.paymentDate ?? a.date).getTime());
+        this.invoices.set(merged);
+        this.filterInvoices();
+      },
+      error: (error) => {
+        console.error('Error loading fund call payments:', error);
       }
     });
   }
@@ -682,6 +724,7 @@ export class OwnerInvoicesComponent implements OnInit {
     return {
       id: inv.id,
       number: inv.invoiceNumber,
+      type: 'charge',
       description: inv.description ?? '',
       date,
       amount: inv.totalAmount,
@@ -690,6 +733,30 @@ export class OwnerInvoicesComponent implements OnInit {
       paymentDate: inv.paidDate ? new Date(inv.paidDate) : undefined,
       paymentMethod: inv.paymentMethod ?? '',
       status: inv.status === InvoiceStatus.PAID ? 'paid' : 'pending'
+    };
+  }
+
+  private mapFundCallPayment(p: FundCallPaymentWithContext): Invoice {
+    const date = new Date(p.paymentDate ?? p.createdAt);
+    const fc = p.fundCall;
+    const dueDate = fc?.dueDate ? new Date(fc.dueDate) : date;
+    return {
+      id: p.id,
+      number: `FC-${p.id.slice(0, 8).toUpperCase()}`,
+      type: 'fundcall',
+      description: fc?.description ? `Appel de fonds : ${fc.description}` : 'Appel de fonds',
+      date,
+      amount: p.amount,
+      period: this.getPeriodLabel(dueDate),
+      unitNumber: '—',
+      copropertyName: fc?.coproperty?.name,
+      paymentDate: date,
+      paymentMethod: p.paymentMethod ?? '',
+      status: p.validationStatus === 'Approved' ? 'paid'
+            : p.validationStatus === 'Rejected' ? 'rejected'
+            : 'pending',
+      validationStatus: p.validationStatus,
+      rejectionReason: p.rejectionReason,
     };
   }
 

@@ -370,6 +370,56 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Myb.Coproperty.Models.FundCallPayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FundCallId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Justificatif")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ValidationStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Pending");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FundCallId");
+
+                    b.ToTable("FundCallPayments");
+                });
+
             modelBuilder.Entity("Myb.Coproperty.Models.MaintenanceRequest", b =>
                 {
                     b.Property<Guid>("Id")
@@ -677,6 +727,17 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Coproperty");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.FundCallPayment", b =>
+                {
+                    b.HasOne("Myb.Coproperty.Models.FundCall", "FundCall")
+                        .WithMany("Payments")
+                        .HasForeignKey("FundCallId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FundCall");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.MaintenanceRequest", b =>

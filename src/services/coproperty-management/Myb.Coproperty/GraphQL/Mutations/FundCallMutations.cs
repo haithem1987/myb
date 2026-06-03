@@ -73,4 +73,18 @@ public class FundCallMutations
         var userId = authService.GetCurrentUserId();
         return await fundCallService.GenerateInvoicesFromFundCallAsync(fundCallId, userId);
     }
+
+    /// <summary>
+    /// Syndic reviews an owner payment: approve (→ Paid) or reject (→ back to ToPay, owner notified).
+    /// </summary>
+    public async Task<FundCallPayment> ReviewFundCallPayment(
+        Guid paymentId,
+        bool approved,
+        string? rejectionReason,
+        [Service] IFundCallService fundCallService,
+        [Service] IAuthenticationService authService)
+    {
+        var userId = authService.GetCurrentUserId();
+        return await fundCallService.ReviewPaymentAsync(paymentId, approved, rejectionReason, userId);
+    }
 }

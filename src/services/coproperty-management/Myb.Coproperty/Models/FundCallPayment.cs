@@ -24,6 +24,12 @@ public class FundCallPayment : IEntity<Guid>
     /// <summary>Payment method (Espèces, Chèque, Virement, Mandat postal, etc.)</summary>
     public string? PaymentMethod { get; set; }
 
+    /// <summary>Validation status set by the syndic: Pending, Approved, Rejected</summary>
+    public string ValidationStatus { get; set; } = "Pending";
+
+    /// <summary>Reason provided by the syndic when rejecting the payment</summary>
+    public string? RejectionReason { get; set; }
+
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
     public Guid CreatedBy { get; set; }

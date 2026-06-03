@@ -75,6 +75,11 @@ spec:
               key: KEYCLOAK_MANAGER_ROLE
         - name: Keycloak__ClientUuid
           value: "10bbc5e8-34ba-4f2c-9369-39d326839f0e"
+        - name: Services__FrontendUrl
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: FRONTEND_URL
         - name: RabbitMq__Host
           valueFrom:
             configMapKeyRef:

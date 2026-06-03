@@ -10,7 +10,10 @@ public enum FundCallStatus
     /// <summary>Payment is expected / à payer</summary>
     ToPay,
 
-    /// <summary>Payment has been received / réglé</summary>
+    /// <summary>Payment submitted by owner, awaiting syndic review / en attente de validation</summary>
+    PendingValidation,
+
+    /// <summary>Payment has been received and validated / réglé</summary>
     Paid,
 
     /// <summary>Fund call is approved / validé</summary>

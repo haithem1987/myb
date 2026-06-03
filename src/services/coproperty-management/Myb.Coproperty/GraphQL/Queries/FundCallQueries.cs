@@ -45,6 +45,15 @@ public class FundCallQueries
         await fundCallService.GetByOwnerIdAsync(ownerId);
 
     /// <summary>
+    /// Get all fund call payments for a specific owner (by Keycloak user ID).
+    /// Used by the owner receipt page ("Mes Reçus").
+    /// </summary>
+    public async Task<List<FundCallPayment>> GetFundCallPaymentsByOwner(
+        Guid ownerUserId,
+        [Service] IFundCallService fundCallService) =>
+        await fundCallService.GetPaymentsByOwnerUserIdAsync(ownerUserId);
+
+    /// <summary>
     /// Get remaining fund call totals per owner for a coproperty.
     /// Used during repartition to avoid double-charging owners who already have fund calls.
     /// </summary>

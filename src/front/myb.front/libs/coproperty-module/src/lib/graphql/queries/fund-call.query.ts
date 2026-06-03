@@ -26,6 +26,8 @@ export const FUND_CALL_FRAGMENT = gql`
       paymentDate
       justificatif
       paymentMethod
+      validationStatus
+      rejectionReason
       createdAt
     }
   }
@@ -76,6 +78,33 @@ export const GET_EXISTING_FUND_CALL_TOTALS = gql`
     existingFundCallTotals(copropertyId: $copropertyId) {
       ownerId
       remainingAmount
+    }
+  }
+`;
+
+export const GET_FUND_CALL_PAYMENTS_BY_OWNER = gql`
+  query GetFundCallPaymentsByOwner($ownerUserId: UUID!) {
+    fundCallPaymentsByOwner(ownerUserId: $ownerUserId) {
+      id
+      fundCallId
+      amount
+      paymentDate
+      paymentMethod
+      justificatif
+      validationStatus
+      rejectionReason
+      createdAt
+      fundCall {
+        id
+        description
+        amount
+        dueDate
+        currency
+        coproperty {
+          id
+          name
+        }
+      }
     }
   }
 `;

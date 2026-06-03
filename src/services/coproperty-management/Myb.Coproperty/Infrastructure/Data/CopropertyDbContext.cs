@@ -463,6 +463,14 @@ public class CopropertyDbContext : DbContext
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(100);
 
+            entity.Property(e => e.ValidationStatus)
+                .HasMaxLength(20)
+                .HasDefaultValue("Pending")
+                .IsRequired();
+
+            entity.Property(e => e.RejectionReason)
+                .HasMaxLength(500);
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 

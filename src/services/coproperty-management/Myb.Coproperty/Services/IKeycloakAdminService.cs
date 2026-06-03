@@ -16,6 +16,12 @@ namespace Myb.Coproperty.Services
         /// </summary>
         Task<IEnumerable<KeycloakUserSearchDto>> SearchUsersByEmailAsync(string email, int max = 20);
 
+        /// <summary>
+        /// Fetch a single Keycloak user by their exact user ID.
+        /// Returns null when the user does not exist or the call fails.
+        /// </summary>
+        Task<ManagerDto?> GetUserByIdAsync(string userId);
+
         /// <summary>Get the client roles assigned to a Keycloak user.</summary>
         Task<IEnumerable<string>> GetUserClientRolesAsync(string userId);
 

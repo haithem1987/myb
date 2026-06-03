@@ -224,8 +224,8 @@ export class OwnerChargesComponent implements OnInit {
       this.toastService.show(`Le montant ne peut pas dépasser ${this.formatAmount(remaining)}`, { classname: 'toast-danger' });
       return;
     }
-    if (!this.paymentForm.justificatif.trim()) {
-      this.toastService.show('Veuillez saisir une référence de justificatif', { classname: 'toast-danger' });
+    if (!this.justificatifFile) {
+      this.toastService.show('Veuillez joindre un justificatif (fichier obligatoire)', { classname: 'toast-danger' });
       return;
     }
     if (!this.paymentForm.paymentDate) {

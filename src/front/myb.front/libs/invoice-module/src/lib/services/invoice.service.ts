@@ -13,11 +13,10 @@ export class InvoiceService extends RepositoryService<Invoice> {
 
   constructor(apollo: Apollo) {
     super(apollo, 'Invoice', 'invoiceService');
-    this.loadInitialInvoices();
   }
 
-  private loadInitialInvoices(): void {
-    this.getAll().subscribe((products) => this.invoiceSubject.next(products));
+  loadInvoices(): void {
+    this.getAll().subscribe((invoices) => this.invoiceSubject.next(invoices));
   }
 
   protected override mapAllItems(result: any): Invoice[] {

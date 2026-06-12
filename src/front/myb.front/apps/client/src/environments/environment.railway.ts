@@ -1,36 +1,36 @@
-// Environment configuration for production (Railway deployment)
+// Environment configuration for local development (originally Railway, now localhost)
 export const environment = {
-  production: true,
-  apiBaseUrl: 'https://myb-client-production.up.railway.app',
+  production: false,
+  apiBaseUrl: 'http://localhost:4200',
 
-  // Service URLs - Point to Railway services
+  // Service URLs - Point to localhost services
   services: {
     keycloak: {
-      url: 'https://keycloak-production.up.railway.app',
+      url: 'http://localhost:8080',
       realm: 'MYB',
       clientId: 'MYB-client',
     },
     coproperty: {
-      graphqlUrl: 'https://myb-syndic-production.up.railway.app/graphql',
-      baseUrl: 'https://myb-syndic-production.up.railway.app',
+      graphqlUrl: 'http://localhost:8088/graphql',
+      baseUrl: 'http://localhost:8088',
     },
     payment: {
-      baseUrl: 'https://payment-production.up.railway.app',
+      baseUrl: 'http://localhost:8084',
       apiPath: '/api/payment',
     },
     document: {
-      graphqlUrl: 'https://document-production.up.railway.app/graphql',
-      baseUrl: 'https://document-production.up.railway.app',
+      graphqlUrl: 'http://localhost:8086/graphql',
+      baseUrl: 'http://localhost:8086',
     },
     invoice: {
-      graphqlUrl: 'https://invoice-production.up.railway.app/invoice/graphql',
-      baseUrl: 'https://invoice-production.up.railway.app',
+      graphqlUrl: 'http://localhost:8083/invoice/graphql',
+      baseUrl: 'http://localhost:8083',
     },
     timesheet: {
-      baseUrl: 'https://timesheet-production.up.railway.app',
+      baseUrl: 'http://localhost:8082',
     },
     notification: {
-      baseUrl: 'https://notification-production.up.railway.app',
+      baseUrl: 'http://localhost:8085',
     },
   },
 };

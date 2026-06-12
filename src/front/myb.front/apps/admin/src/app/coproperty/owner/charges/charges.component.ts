@@ -87,12 +87,25 @@ export class OwnerChargesComponent implements OnInit {
     return this.totalCharges - this.totalPaid;
   }
 
+  get today(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
   get unpaidFundCalls(): FundCallExtended[] {
     return this.fundCalls().filter(fc => fc.status === 'TO_PAY');
   }
 
+  /** PENDING_VALIDATION calls are included so the card stays visible while awaiting syndic review */
   get paidFundCalls(): FundCallExtended[] {
-    return this.fundCalls().filter(fc => fc.status === 'PAID' || fc.status === 'VALIDATED');
+    return this.fundCalls().filter(
+      fc => fc.status === 'PAID' || fc.status === 'VALIDATED' || fc.status === 'PENDING_VALIDATION'
+    );
+  }
+
+  /** True only when every fund call is truly settled (PAID or VALIDATED) */
+  get allTrulyPaid(): boolean {
+    const calls = this.fundCalls();
+    return calls.length > 0 && calls.every(fc => fc.status === 'PAID' || fc.status === 'VALIDATED');
   }
 
   ngOnInit(): void {
@@ -185,6 +198,16 @@ export class OwnerChargesComponent implements OnInit {
     }
   }
 
+  /** Normalize amount input: accept both comma and period as decimal separator */
+  normalizeAmountInput(input: string | number): number {
+    if (typeof input === 'number') return input;
+    if (!input) return 0;
+    // Replace comma with period for decimal separator
+    const normalized = String(input).trim().replace(',', '.');
+    const parsed = parseFloat(normalized);
+    return isNaN(parsed) ? 0 : Math.round(parsed * 1000) / 1000;
+  }
+
   // Payment justification modal
   openPaymentModal(fc: FundCallExtended): void {
     this.selectedFundCall.set(fc);
@@ -215,15 +238,20 @@ export class OwnerChargesComponent implements OnInit {
 
     const remaining = this.getFundCallRemainingAmount(fc);
 
-    // Validation
-    if (this.paymentForm.amount <= 0) {
+    // Normalize and validate amount early
+    const normalizedAmount = this.normalizeAmountInput(this.paymentForm.amount);
+    if (normalizedAmount <= 0) {
       this.toastService.show('Le montant doit être supérieur à 0', { classname: 'toast-danger' });
       return;
     }
-    if (this.paymentForm.amount > remaining) {
-      this.toastService.show(`Le montant ne peut pas dépasser ${this.formatAmount(remaining)}`, { classname: 'toast-danger' });
+
+    // Re-check against remaining with tolerance for floating-point imprecision
+    const remainingRounded = Math.round(remaining * 1000) / 1000;
+    if (normalizedAmount > remainingRounded + 0.001) {
+      this.toastService.show(`Le montant ne peut pas dépasser ${this.formatAmount(remainingRounded)}`, { classname: 'toast-danger' });
       return;
     }
+
     if (!this.justificatifFile) {
       this.toastService.show('Veuillez joindre un justificatif (fichier obligatoire)', { classname: 'toast-danger' });
       return;
@@ -232,25 +260,14 @@ export class OwnerChargesComponent implements OnInit {
       this.toastService.show('Veuillez sélectionner la date de paiement', { classname: 'toast-danger' });
       return;
     }
-    // Virement-specific validation
-    if (this.paymentForm.paymentMethod === 'Virement') {
-      if (!this.paymentForm.bankName.trim()) {
-        this.toastService.show('Veuillez saisir le nom de la banque', { classname: 'toast-danger' });
-        return;
-      }
-      if (!this.paymentForm.rib.trim()) {
-        this.toastService.show('Veuillez saisir le RIB', { classname: 'toast-danger' });
-        return;
-      }
-      if (!this.paymentForm.senderName.trim()) {
-        this.toastService.show('Veuillez saisir le nom de l\'émetteur', { classname: 'toast-danger' });
-        return;
-      }
-    }
+    // Banking info is now optional - no validation needed
 
     this.submittingPayment.set(true);
 
     try {
+      // Use normalized amount (already validated)
+      const safeAmount = Math.min(normalizedAmount, remainingRounded);
+
       // Build justificatif text with bank info for Virement
       let justificatifText = this.paymentForm.justificatif.trim();
       if (this.paymentForm.paymentMethod === 'Virement') {
@@ -260,10 +277,14 @@ export class OwnerChargesComponent implements OnInit {
         justificatifText += ` [Fichier: ${this.justificatifFile.name}]`;
       }
 
+      // Parse date as local date to avoid UTC timezone shifting (e.g. 2026-05-21 → 2026-05-20)
+      const [y, m, d] = this.paymentForm.paymentDate.split('-').map(Number);
+      const localDate = new Date(y, m - 1, d, 12, 0, 0);
+
       await firstValueFrom(
         this.fundCallService.addFundCallPayment(fc.id, {
-          amount: this.paymentForm.amount,
-          paymentDate: new Date(this.paymentForm.paymentDate),
+          amount: safeAmount,
+          paymentDate: localDate,
           justificatif: justificatifText,
           paymentMethod: this.paymentForm.paymentMethod
         })
@@ -275,7 +296,7 @@ export class OwnerChargesComponent implements OnInit {
       const receiptNumber = 'REC-' + Date.now().toString(36).toUpperCase();
       this.paymentReceipt.set({
         fundCallDescription: fc.description || 'Appel de fonds',
-        amount: this.paymentForm.amount,
+        amount: safeAmount,
         paymentMethod: this.paymentForm.paymentMethod,
         paymentDate: this.paymentForm.paymentDate,
         reference: this.paymentForm.justificatif.trim().substring(0, 80),
@@ -283,9 +304,13 @@ export class OwnerChargesComponent implements OnInit {
       });
 
       this.loadOwnerData();
-    } catch (err) {
+    } catch (err: any) {
       console.error('[OwnerCharges] Payment justification failed:', err);
-      this.toastService.show('L\'envoi du justificatif a échoué. Veuillez réessayer.', { classname: 'toast-danger' });
+      const serverMessage = err?.graphQLErrors?.[0]?.message || err?.message;
+      const userMessage = serverMessage
+        ? `Erreur: ${serverMessage}`
+        : 'L\'envoi du justificatif a échoué. Veuillez réessayer.';
+      this.toastService.show(userMessage, { classname: 'toast-danger' });
     } finally {
       this.submittingPayment.set(false);
     }
@@ -298,6 +323,8 @@ export class OwnerChargesComponent implements OnInit {
         return 'badge-paid';
       case 'TO_PAY':
         return 'badge-unpaid';
+      case 'PENDING_VALIDATION':
+        return 'badge-pending';
       default:
         return 'badge-pending';
     }
@@ -311,6 +338,8 @@ export class OwnerChargesComponent implements OnInit {
         return 'Validé';
       case 'TO_PAY':
         return 'À payer';
+      case 'PENDING_VALIDATION':
+        return 'En attente de validation';
       default:
         return status;
     }

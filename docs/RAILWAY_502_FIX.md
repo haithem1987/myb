@@ -72,7 +72,7 @@ curl https://myb-coproperty-production.up.railway.app/health
 ### Test Keycloak
 Open in browser:
 ```
-https://keycloak-production.up.railway.app
+http://localhost:4200
 ```
 **Expected:** Keycloak welcome page
 

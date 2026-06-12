@@ -4,7 +4,7 @@
 # This avoids ng-packagr rootDir issues in Docker build context
 #
 # Build command: 
-#   cd src/front/myb.front && npx nx build client --configuration=production
+#   cd src/front/myb.front && npx nx build admin --configuration=production
 #   cd ../../.. && docker compose build myb-front
 
 FROM nginx:alpine
@@ -12,8 +12,8 @@ FROM nginx:alpine
 # Remove default nginx content
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy prebuilt Angular app (path relative to docker-compose context root)
-COPY src/front/myb.front/dist/apps/client /usr/share/nginx/html
+# Copy prebuilt Angular admin app (path relative to docker-compose context root)
+COPY src/front/myb.front/dist/apps/admin /usr/share/nginx/html
 
 # Copy nginx configuration for SPA routing
 COPY src/front/myb.front/nginx.conf /etc/nginx/conf.d/default.conf

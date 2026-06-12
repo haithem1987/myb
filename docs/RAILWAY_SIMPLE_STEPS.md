@@ -175,7 +175,7 @@ Should return: `healthy`
 
 **Keycloak:**
 
-Open in browser: `https://keycloak-production.up.railway.app`
+Open in browser: `http://localhost:4200`
 
 Should show Keycloak welcome page.
 

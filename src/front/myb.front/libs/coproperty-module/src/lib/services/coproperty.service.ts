@@ -476,6 +476,22 @@ export class CopropertyService {
       );
   }
 
+  /**
+   * Fetch managers with network-only policy — bypasses cache.
+   * Use this for refresh/reload actions.
+   */
+  reloadManagers(): Observable<ManagerUser[]> {
+    return this.apollo
+      .watchQuery<{ managers: ManagerUser[] }>({
+        query: GET_MANAGERS,
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' }
+      })
+      .valueChanges.pipe(
+        map(result => result.data.managers)
+      );
+  }
+
   getTreasuryDashboard(copropertyId: string, months: number = 12): Observable<TreasuryDashboard> {
     return this.apollo
       .watchQuery<{ treasuryDashboard: TreasuryDashboard }>({

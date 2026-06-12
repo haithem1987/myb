@@ -371,6 +371,14 @@ public class FundCallService : IFundCallService
                     .OrderBy(cd => cd.CalculatedAt)
                     .ToListAsync();
 
+                // Calculate the starting sequence number ONCE before the loop to avoid
+                // duplicate InvoiceNumber when multiple invoices are created in the same
+                // transaction (EF hasn't flushed yet so CountAsync returns the same value
+                // on every iteration, causing a unique constraint violation).
+                var invoiceSeqBase = await context.CopropertyInvoices
+                    .CountAsync(i => i.CopropertyId == fundCall.CopropertyId);
+                var invoiceSeqCounter = invoiceSeqBase;
+
                 // Distribute payment across unpaid distributions (FIFO)
                 var remainingPayment = input.Amount;
                 foreach (var dist in unpaidDistributions)
@@ -416,9 +424,8 @@ public class FundCallService : IFundCallService
                     }
                     else
                     {
-                        // Create a new payment receipt
-                        var seq = await context.CopropertyInvoices
-                            .CountAsync(i => i.CopropertyId == fundCall.CopropertyId) + 1;
+                        // Increment counter for each new invoice to guarantee unique InvoiceNumber
+                        invoiceSeqCounter++;
                         var receipt = new CopropertyInvoice
                         {
                             Id = Guid.NewGuid(),
@@ -426,7 +433,7 @@ public class FundCallService : IFundCallService
                             ChargeId = dist.ChargeId,
                             UnitId = dist.UnitId,
                             OwnerId = effectiveOwnerId.Value,
-                            InvoiceNumber = $"PAY-{seq:D4}-{unitNumber}",
+                            InvoiceNumber = $"PAY-{invoiceSeqCounter:D4}-{unitNumber}",
                             Amount = payAmount,
                             TaxAmount = 0,
                             TotalAmount = payAmount,
@@ -454,15 +461,14 @@ public class FundCallService : IFundCallService
                         .Where(u => ownerUnitIds.Contains(u.Id))
                         .FirstOrDefaultAsync();
                     var unitNumber = ownerUnit?.UnitNumber ?? "";
-                    var seq = await context.CopropertyInvoices
-                        .CountAsync(i => i.CopropertyId == fundCall.CopropertyId) + 1;
+                    invoiceSeqCounter++;
                     var receipt = new CopropertyInvoice
                     {
                         Id = Guid.NewGuid(),
                         CopropertyId = fundCall.CopropertyId,
                         UnitId = ownerUnit?.Id ?? Guid.Empty,
                         OwnerId = effectiveOwnerId.Value,
-                        InvoiceNumber = $"PAY-{seq:D4}-{unitNumber}",
+                        InvoiceNumber = $"PAY-{invoiceSeqCounter:D4}-{unitNumber}",
                         Amount = input.Amount,
                         TaxAmount = 0,
                         TotalAmount = input.Amount,

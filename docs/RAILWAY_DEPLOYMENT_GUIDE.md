@@ -372,7 +372,7 @@ Should return GraphQL schema information.
 
 Open in browser:
 ```
-https://keycloak-production.up.railway.app
+http://localhost:4200
 ```
 
 Should show Keycloak welcome page.

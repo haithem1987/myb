@@ -52,6 +52,57 @@ docker compose up -d --build
 | `dev-backend-only.sh` | Start only backend services | `./scripts/dev-backend-only.sh` |
 | `dev-stop.sh` | Stop all Docker services | `./scripts/dev-stop.sh` |
 
+### Real Data & Testing
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `setup-real-data.sh` | 🌟 Create test users & real database data | `./scripts/setup-real-data.sh [full\|keycloak-only\|db-only]` |
+| `generate-budgets.sh` | 🎯 Generate budgets & fund calls for coproperties | `./scripts/generate-budgets.sh` |
+| `keycloak-setup-roles-users.sh` | Setup Keycloak roles & initial users | `./scripts/keycloak-setup-roles-users.sh` |
+| `generate-fake-data-ovh.sh` | Generate test data on OVH database | `./scripts/generate-fake-data-ovh.sh` |
+
+**Quick Start:**
+```bash
+# 1. Create real test users + database data (11 users, 4 coproperties, 36 units)
+./scripts/setup-real-data.sh
+
+# 2. Generate budgets & fund calls (19 budgets, 636k TND total)
+./scripts/generate-budgets.sh
+```
+
+📚 **Guides:**
+- **Real Data Quick Reference:** [docs/REAL_DATA_QUICK_REFERENCE.md](../docs/REAL_DATA_QUICK_REFERENCE.md)
+- **Real Data Complete Setup:** [docs/REAL_DATA_COMPLETE_SETUP.md](../docs/REAL_DATA_COMPLETE_SETUP.md)
+- **Real Data Full docs:** [docs/REAL_DATA_SETUP.md](../docs/REAL_DATA_SETUP.md)
+- **Budget Quick Start:** [BUDGET_QUICK_START.md](../BUDGET_QUICK_START.md)
+- **Budget Generation:** [docs/BUDGET_GENERATION.md](../docs/BUDGET_GENERATION.md)
+
+### Infrastructure Management (OVHcloud)
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `setup-ovh-credentials.sh` | 🌟 Setup OVH API credentials | `./scripts/setup-ovh-credentials.sh` |
+| `ovh-infra-status.sh` | Check cluster status & verify credentials | `./scripts/ovh-infra-status.sh [prd\|hprd]` |
+| `ovh-infra-up.sh` | Scale up infrastructure (provision nodes) | `./scripts/ovh-infra-up.sh prd` |
+| `ovh-infra-down.sh` | Scale down/pause or destroy infrastructure | `./scripts/ovh-infra-down.sh prd [--pause\|--destroy]` |
+
+**OVH Quick Start:**
+```bash
+# 1. Setup credentials (one time)
+./scripts/setup-ovh-credentials.sh
+
+# 2. Check status
+./scripts/ovh-infra-status.sh prd
+
+# 3. Pause infrastructure (cheapest)
+./scripts/ovh-infra-down.sh prd --pause
+
+# 4. Resume when needed
+./scripts/ovh-infra-up.sh prd
+```
+
+📚 **Full docs:** [docs/OVH_SETUP_QUICK_REFERENCE.md](../docs/OVH_SETUP_QUICK_REFERENCE.md)
+
 ## 🌐 Service Endpoints
 
 ### Frontend

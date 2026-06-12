@@ -643,7 +643,10 @@ export class OwnerInvoicesComponent implements OnInit {
     // Load both charge invoices and fund call payments, then merge
     this.ownerService.getMyInvoices(userId).subscribe({
       next: (backendInvoices) => {
-        const chargeInvoices = backendInvoices.map((inv) => this.mapInvoice(inv));
+        // Exclude fund-call related charge invoices — they appear separately via getFundCallPaymentsByOwner
+        const chargeInvoices = backendInvoices
+          .filter(inv => !(inv.description ?? '').toLowerCase().includes('appel de fonds'))
+          .map((inv) => this.mapInvoice(inv));
         // Merge with any already-loaded fund call payments
         const existing = this.invoices().filter(i => i.type === 'fundcall');
         const merged = [...chargeInvoices, ...existing]

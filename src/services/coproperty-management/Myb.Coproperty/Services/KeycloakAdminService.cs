@@ -365,13 +365,22 @@ namespace Myb.Coproperty.Services
         private async Task<IEnumerable<ManagerDto>> GetUsersForRoleAsync(
             string adminBaseUrl, string realm, string roleName, string token)
         {
+            // Query for CLIENT role users (not realm role users)
+            // since we assign coproperty-syndic as a client role on MYB-client
+            var clientUuid = await GetClientUuidAsync(adminBaseUrl, realm, _options.ClientId, token);
+            if (clientUuid == null)
+            {
+                _logger.LogWarning("Could not get client UUID for '{ClientId}' — cannot fetch users for role '{Role}'", _options.ClientId, roleName);
+                return Enumerable.Empty<ManagerDto>();
+            }
+
             using var client = CreateAuthorizedClient(token);
-            var url = $"{adminBaseUrl}/admin/realms/{realm}/roles/{roleName}/users";
+            var url = $"{adminBaseUrl}/admin/realms/{realm}/clients/{clientUuid}/roles/{Uri.EscapeDataString(roleName)}/users";
             var response = await client.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning("Could not fetch users for role '{Role}': {Status}", roleName, response.StatusCode);
+                _logger.LogWarning("Could not fetch users for client role '{Role}': {Status}", roleName, response.StatusCode);
                 return Enumerable.Empty<ManagerDto>();
             }
 

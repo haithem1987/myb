@@ -6,7 +6,7 @@
   
   <!-- Primary Stats -->
   <div class="stats-grid">
-    <div class="stat-card primary">
+    <div class="stat-card primary" routerLink="/coproperty/owner/my-units" style="cursor: pointer" title="Voir mes lots">
       <div class="stat-icon">
         <i class="bi bi-building"></i>
       </div>
@@ -16,7 +16,7 @@
       </div>
     </div>
     
-    <div class="stat-card info">
+    <div class="stat-card info" routerLink="/coproperty/owner/my-units" style="cursor: pointer" title="Voir mes lots">
       <div class="stat-icon">
         <i class="bi bi-pie-chart"></i>
       </div>
@@ -26,7 +26,8 @@
       </div>
     </div>
 
-    <div class="stat-card" [class.warning]="pendingInvoices().length > 0" [class.success]="pendingInvoices().length === 0">
+    <div class="stat-card" [class.warning]="pendingInvoices().length > 0" [class.success]="pendingInvoices().length === 0"
+         routerLink="/coproperty/owner/charges" style="cursor: pointer" title="Voir les appels de fonds">
       <div class="stat-icon">
         <i class="bi bi-receipt"></i>
       </div>
@@ -36,7 +37,8 @@
       </div>
     </div>
     
-    <div class="stat-card" [class.danger]="totalDue() > 0" [class.success]="totalDue() === 0">
+    <div class="stat-card" [class.danger]="totalDue() > 0" [class.success]="totalDue() === 0"
+         routerLink="/coproperty/owner/charges" style="cursor: pointer" title="Voir les appels de fonds">
       <div class="stat-icon">
         <i class="bi bi-cash-coin"></i>
       </div>
@@ -49,28 +51,29 @@
 
   <!-- Secondary Indicators -->
   <div class="indicators-row">
-    <div class="indicator" [class.alert]="overdueCount() > 0">
+    <div class="indicator" [class.alert]="overdueCount() > 0"
+         routerLink="/coproperty/owner/invoices" style="cursor: pointer" title="Voir mes reçus">
       <i class="bi bi-exclamation-triangle"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ overdueCount() }}</span>
         <span class="indicator-label">Paiements en retard</span>
       </div>
     </div>
-    <div class="indicator">
+    <div class="indicator" routerLink="/coproperty/owner/invoices" style="cursor: pointer" title="Voir mes reçus">
       <i class="bi bi-check2-circle"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ formatAmount(totalPaid()) }}</span>
         <span class="indicator-label">Total payé</span>
       </div>
     </div>
-    <div class="indicator">
+    <div class="indicator" routerLink="/coproperty/owner/my-units" style="cursor: pointer" title="Voir mes lots">
       <i class="bi bi-rulers"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ totalSurface() }} m²</span>
         <span class="indicator-label">Surface totale</span>
       </div>
     </div>
-    <div class="indicator">
+    <div class="indicator" routerLink="/coproperty/owner/charges" style="cursor: pointer" title="Voir mes charges">
       <i class="bi bi-wallet2"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ formatAmount(totalCharges()) }}</span>
@@ -93,7 +96,8 @@
             <i class="bi bi-building"></i>
             <p>Aucun lot associé</p>
           </div>
-          <div class="unit-item" *ngFor="let unit of myUnits()">
+          <div class="unit-item" *ngFor="let unit of myUnits()"
+               routerLink="/coproperty/owner/my-units" style="cursor: pointer">
             <div class="unit-icon">
               <i class="bi" 
                  [class.bi-building]="unit.type === 'Appartement'"

@@ -120,7 +120,7 @@ curl https://myb-coproperty-production.up.railway.app/health
 # Expected: {"status":"healthy"}
 
 # Keycloak
-curl https://keycloak-production.up.railway.app
+curl http://localhost:4200
 # Expected: Keycloak HTML page
 ```
 

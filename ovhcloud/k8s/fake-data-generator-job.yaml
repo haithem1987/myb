@@ -1,0 +1,116 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: generate-fake-data
+  namespace: myb-platform
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - name: postgres-client
+        image: postgres:15
+        command:
+        - sh
+        - -c
+        - |
+          echo "========================================";
+          echo "MYB OVH Database - Fake Data Generator";
+          echo "========================================";
+          echo "";
+          echo "Connecting to OVH Database...";
+          echo "Database: copropertyDB";
+          echo "";
+          echo "Executing SQL script...";
+          PGPASSWORD="fSC2TpHJnlya18re3D0B" psql \
+            -h "postgresql-72268bd4-oc862fcb1.database.cloud.ovh.net" \
+            -p "20184" \
+            -U "coproperty_user" \
+            -d "copropertyDB" \
+            -f /scripts/generate-fake-data.sql
+          
+          if [ $? -eq 0 ]; then
+            echo "";
+            echo "========================================";
+            echo "✓ Fake data generated successfully!";
+            echo "========================================";
+            echo "";
+            echo "Test Accounts Ready:";
+            echo "  1. haithem.khalifa@example.com";
+            echo "  2. fatima.benali@example.com";
+            echo "  3. mohamed.triki@example.com";
+            echo "  4. amina.mabrouk@example.com";
+            echo "  5. karim.salah@example.com";
+            echo "  6. leila.zahra@example.com";
+            exit 0
+          else
+            echo "✗ Failed to generate fake data";
+            exit 1
+          fi
+        volumeMounts:
+        - name: sql-scripts
+          mountPath: /scripts
+      volumes:
+      - name: sql-scripts
+        configMap:
+          name: fake-data-generator
+      restartPolicy: Never
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: generate-fake-data
+  namespace: myb-platform
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - name: postgres-client
+        image: postgres:15
+        command:
+        - sh
+        - -c
+        - |
+          echo "========================================";
+          echo "MYB OVH Database - Fake Data Generator";
+          echo "========================================";
+          echo "";
+          echo "Connecting to OVH Database...";
+          echo "Database: copropertyDB";
+          echo "";
+          echo "Executing SQL script...";
+          PGPASSWORD="fSC2TpHJnlya18re3D0B" psql \
+            -h "postgresql-72268bd4-oc862fcb1.database.cloud.ovh.net" \
+            -p "20184" \
+            -U "coproperty_user" \
+            -d "copropertyDB" \
+            -f /scripts/generate-fake-data.sql
+          
+          if [ $? -eq 0 ]; then
+            echo "";
+            echo "========================================";
+            echo "✓ Fake data generated successfully!";
+            echo "========================================";
+            echo "";
+            echo "Test Accounts Ready:";
+            echo "  1. haithem.khalifa@example.com";
+            echo "  2. fatima.benali@example.com";
+            echo "  3. mohamed.triki@example.com";
+            echo "  4. amina.mabrouk@example.com";
+            echo "  5. karim.salah@example.com";
+            echo "  6. leila.zahra@example.com";
+            exit 0
+          else
+            echo "✗ Failed to generate fake data";
+            exit 1
+          fi
+        volumeMounts:
+        - name: sql-scripts
+          mountPath: /scripts
+      volumes:
+      - name: sql-scripts
+        configMap:
+          name: fake-data-generator
+      restartPolicy: Never

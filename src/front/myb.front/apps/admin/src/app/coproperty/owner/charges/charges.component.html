@@ -174,7 +174,7 @@
     </div>
   </div>
 
-  <!-- Paid Fund Calls -->
+  <!-- Paid / Pending-Validation Fund Calls -->
   <div *ngIf="!loading() && paidFundCalls.length > 0">
     <h4 class="section-title">
       <i class="bi bi-check-circle text-success me-2"></i>
@@ -206,9 +206,17 @@
               </div>
             </td>
             <td>
-              <span class="status-badge" [ngClass]="getStatusClass(fc.status)">
-                {{ getStatusLabel(fc.status) }}
-              </span>
+              <div class="d-flex align-items-center gap-2">
+                <span class="status-badge" [ngClass]="getStatusClass(fc.status)">
+                  {{ getStatusLabel(fc.status) }}
+                </span>
+                <button *ngIf="getFundCallRemainingAmount(fc) > 0" 
+                        class="btn btn-sm btn-success"
+                        (click)="openPaymentModal(fc)"
+                        title="Payer le solde restant">
+                  <i class="bi bi-cash-coin me-1"></i>Payer
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -217,7 +225,7 @@
   </div>
 
   <!-- All Paid State -->
-  <div *ngIf="!loading() && !error() && fundCalls().length > 0 && unpaidFundCalls.length === 0" class="all-paid-banner">
+  <div *ngIf="!loading() && !error() && allTrulyPaid" class="all-paid-banner">
     <i class="bi bi-check-circle-fill"></i>
     <span>Tous vos appels de fonds sont réglés!</span>
   </div>
@@ -339,10 +347,10 @@
           <label class="form-label fw-bold">
             <i class="bi bi-cash me-1"></i> Montant du versement ({{ currencySymbol }}) *
           </label>
-          <input type="number" class="form-control" [(ngModel)]="paymentForm.amount"
-                 [max]="selectedFundCall() ? getFundCallRemainingAmount(selectedFundCall()!) : 0"
-                 min="0.01" step="0.001">
-          <small class="text-muted">Vous pouvez effectuer un paiement partiel (mensualité)</small>
+          <input type="text" class="form-control" [(ngModel)]="paymentForm.amount"
+                 placeholder="Ex: 100 ou 1250,50"
+                 inputmode="decimal">
+          <small class="text-muted">Vous pouvez effectuer un paiement partiel (mensualité). Utilisez une virgule ou un point pour les décimales.</small>
           <!-- Monthly installment suggestion -->
           <div class="installment-suggestion mt-2" *ngIf="selectedFundCall() as fc">
             <div *ngIf="getMonthsUntilDue(fc) > 1" class="d-flex align-items-center gap-2">
@@ -377,25 +385,26 @@
           </div>
         </div>
 
-        <!-- Virement: Bank information -->
+        <!-- Virement: Bank information (optional) -->
         <div *ngIf="paymentForm.paymentMethod === 'Virement'" class="virement-details mb-3">
           <div class="virement-header mb-2">
             <i class="bi bi-bank2 me-1 text-primary"></i>
             <span class="fw-bold">Informations bancaires</span>
+            <small class="text-muted fw-normal">(optionnel)</small>
           </div>
           <div class="row g-2">
             <div class="col-12">
-              <label class="form-label small">Nom de la banque *</label>
+              <label class="form-label small">Nom de la banque</label>
               <input type="text" class="form-control" [(ngModel)]="paymentForm.bankName"
                      placeholder="Ex: BIAT, STB, Attijari Bank...">
             </div>
             <div class="col-12">
-              <label class="form-label small">RIB (Relevé d'Identité Bancaire) *</label>
+              <label class="form-label small">RIB (Relevé d'Identité Bancaire)</label>
               <input type="text" class="form-control" [(ngModel)]="paymentForm.rib"
                      placeholder="XX XXX XXXXX XXXXXXXXXXXX XX" maxlength="30">
             </div>
             <div class="col-12">
-              <label class="form-label small">Nom de l'émetteur *</label>
+              <label class="form-label small">Nom de l'émetteur</label>
               <input type="text" class="form-control" [(ngModel)]="paymentForm.senderName"
                      placeholder="Nom complet du titulaire du compte">
             </div>
@@ -406,7 +415,8 @@
           <label class="form-label fw-bold">
             <i class="bi bi-calendar me-1"></i> Date de paiement *
           </label>
-          <input type="date" class="form-control" [(ngModel)]="paymentForm.paymentDate">
+          <input type="date" class="form-control" [(ngModel)]="paymentForm.paymentDate" [max]="today">
+          <small class="text-muted">Sélectionnez la date du paiement (jusqu'à aujourd'hui)</small>
         </div>
 
         <div class="mb-3">

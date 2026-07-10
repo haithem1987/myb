@@ -1,0 +1,146 @@
+.tenant-management-container {
+  padding: 2rem;
+
+  .management-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    h2 {
+      margin: 0;
+      color: #24324a;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0.25rem 0 0;
+      color: #6c757d;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+  }
+
+  .toolbar {
+    display: grid;
+    grid-template-columns: minmax(220px, 320px) minmax(260px, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .field label {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: #42526e;
+      font-weight: 600;
+    }
+  }
+
+  .alert {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    .btn-close {
+      margin-left: auto;
+    }
+  }
+
+  .card {
+    border: 1px solid #e6e9ef;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(20, 32, 54, 0.05);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+
+    .card-header {
+      background: #f7f9fc;
+      border-bottom: 1px solid #e6e9ef;
+      padding: 1rem 1.25rem;
+
+      h5 {
+        margin: 0;
+        color: #24324a;
+        font-weight: 700;
+      }
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+  }
+
+  .loading-state,
+  .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+  }
+
+  .empty-state {
+    flex-direction: column;
+    color: #7a869a;
+
+    i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .table {
+    margin-bottom: 0;
+
+    th {
+      color: #42526e;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+  }
+
+  .unit-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    background: #eef3ff;
+    color: #254b8f;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .tenant-management-container {
+    padding: 1rem;
+
+    .management-header {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .toolbar {
+      grid-template-columns: 1fr;
+    }
+  }
+}

@@ -5,12 +5,52 @@
 set -e  # Exit on error
 
 # Configuration
-NAMESPACE="myb-platform"
+NAMESPACE="${NAMESPACE:-myb-platform}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 K8S_DIR="$PROJECT_ROOT/ovhcloud/k8s"
+ASSUME_YES=false
+CONFIRM_SECRETS=false
+DRY_RUN=false
 
 # OVHCloud kubeconfig
-export KUBECONFIG="$PROJECT_ROOT/ovhcloud/kubeconfig-ebak4v.yml"
+export KUBECONFIG="${KUBECONFIG:-$PROJECT_ROOT/terraform/ovh/environments/hprd/kubeconfig-hprd.yml}"
+
+usage() {
+    echo "Usage: $0 [--yes] [--confirm-secrets] [--dry-run]"
+    echo "  --yes              Skip deployment confirmation prompt"
+    echo "  --confirm-secrets  Confirm production secrets are already updated"
+    echo "  --dry-run          Render/apply client-side validation only"
+    exit 1
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --yes|-y)
+            ASSUME_YES=true
+            shift
+            ;;
+        --confirm-secrets)
+            CONFIRM_SECRETS=true
+            shift
+            ;;
+        --dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        --help|-h)
+            usage
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            ;;
+    esac
+done
+
+KUBECTL_APPLY_ARGS=()
+if [[ "$DRY_RUN" == "true" ]]; then
+    KUBECTL_APPLY_ARGS+=(--dry-run=client)
+fi
 
 # Colors for output
 RED='\033[0;31m'
@@ -35,11 +75,13 @@ fi
 echo -e "\n${BLUE}Current cluster:${NC}"
 kubectl cluster-info | head -n 1
 
-echo -e "\n${YELLOW}This will deploy to cluster above. Continue? (y/N)${NC}"
-read -r response
-if [[ ! "$response" =~ ^[Yy]$ ]]; then
-    echo -e "${YELLOW}Deployment cancelled${NC}"
-    exit 0
+if [[ "$ASSUME_YES" != "true" ]]; then
+    echo -e "\n${YELLOW}This will deploy to cluster above. Continue? (y/N)${NC}"
+    read -r response
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        echo -e "${YELLOW}Deployment cancelled${NC}"
+        exit 0
+    fi
 fi
 
 # Function to wait for resource
@@ -53,7 +95,7 @@ wait_for_resource() {
         return 0
     else
         echo -e "${YELLOW}⚠ ${resource} is not ready yet, continuing...${NC}"
-        return 1
+        return 0
     fi
 }
 
@@ -62,7 +104,7 @@ echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}Step 1: Creating Namespace${NC}"
 echo -e "${GREEN}========================================${NC}"
 
-kubectl apply -f "$K8S_DIR/namespaces/myb-namespace.yaml"
+kubectl apply -f "$K8S_DIR/namespaces/myb-namespace.yaml" "${KUBECTL_APPLY_ARGS[@]}"
 echo -e "${GREEN}✓ Namespace created${NC}"
 
 # Step 2: Apply secrets
@@ -72,14 +114,16 @@ echo -e "${GREEN}========================================${NC}"
 
 echo -e "${RED}⚠ WARNING: Ensure you have updated all secrets before deploying!${NC}"
 echo -e "${YELLOW}Check files in: $K8S_DIR/secrets/${NC}"
-echo -e "\n${YELLOW}Have you updated all secrets with production values? (y/N)${NC}"
-read -r response
-if [[ ! "$response" =~ ^[Yy]$ ]]; then
-    echo -e "${RED}Please update secrets first, then run this script again${NC}"
-    exit 1
+if [[ "$CONFIRM_SECRETS" != "true" ]]; then
+    echo -e "\n${YELLOW}Have you updated all secrets with production values? (y/N)${NC}"
+    read -r response
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        echo -e "${RED}Please update secrets first, then run this script again${NC}"
+        exit 1
+    fi
 fi
 
-kubectl apply -f "$K8S_DIR/secrets/"
+kubectl apply -k "$K8S_DIR/secrets" "${KUBECTL_APPLY_ARGS[@]}"
 echo -e "${GREEN}✓ Secrets applied${NC}"
 
 # Step 3: Apply ConfigMaps
@@ -87,7 +131,7 @@ echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}Step 3: Applying ConfigMaps${NC}"
 echo -e "${GREEN}========================================${NC}"
 
-kubectl apply -f "$K8S_DIR/config/"
+kubectl apply -k "$K8S_DIR/config" "${KUBECTL_APPLY_ARGS[@]}"
 echo -e "${GREEN}✓ ConfigMaps applied${NC}"
 
 # Step 4: Deploy RabbitMQ
@@ -95,16 +139,16 @@ echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}Step 4: Deploying RabbitMQ${NC}"
 echo -e "${GREEN}========================================${NC}"
 
-kubectl apply -f "$K8S_DIR/services/rabbitmq/deployment.yaml"
-wait_for_resource "deployment/rabbitmq" 180
+kubectl apply -f "$K8S_DIR/services/rabbitmq/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
+[[ "$DRY_RUN" != "true" ]] && wait_for_resource "deployment/rabbitmq" 180
 
 # Step 5: Deploy Keycloak
 echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}Step 5: Deploying Keycloak${NC}"
 echo -e "${GREEN}========================================${NC}"
 
-kubectl apply -f "$K8S_DIR/services/keycloak/deployment.yaml"
-wait_for_resource "deployment/keycloak" 300
+kubectl apply -f "$K8S_DIR/services/keycloak/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
+[[ "$DRY_RUN" != "true" ]] && wait_for_resource "deployment/keycloak" 300
 
 # Step 6: Deploy Backend Services
 echo -e "\n${GREEN}========================================${NC}"
@@ -112,37 +156,44 @@ echo -e "${GREEN}Step 6: Deploying Backend Services${NC}"
 echo -e "${GREEN}========================================${NC}"
 
 echo -e "${YELLOW}Deploying Coproperty Service...${NC}"
-kubectl apply -f "$K8S_DIR/services/coproperty/deployment.yaml"
+kubectl apply -f "$K8S_DIR/services/coproperty/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
 
 echo -e "${YELLOW}Deploying Invoice Service...${NC}"
-kubectl apply -f "$K8S_DIR/services/invoice/deployment.yaml"
+kubectl apply -f "$K8S_DIR/services/invoice/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
 
 echo -e "${YELLOW}Deploying Mailer Service...${NC}"
-kubectl apply -f "$K8S_DIR/services/mailer/deployment.yaml"
+kubectl apply -f "$K8S_DIR/services/mailer/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
 
-wait_for_resource "deployment/myb-coproperty" 180
-wait_for_resource "deployment/myb-invoice" 180
-wait_for_resource "deployment/myb-mailer" 180
+if [[ "$DRY_RUN" != "true" ]]; then
+    wait_for_resource "deployment/myb-coproperty" 180
+    wait_for_resource "deployment/myb-invoice" 180
+    wait_for_resource "deployment/myb-mailer" 180
+fi
 
 # Step 7: Deploy Frontend
 echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}Step 7: Deploying Frontend${NC}"
 echo -e "${GREEN}========================================${NC}"
 
-kubectl apply -f "$K8S_DIR/services/admin/deployment.yaml"
-wait_for_resource "deployment/myb-admin" 120
+kubectl apply -f "$K8S_DIR/services/admin/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
+[[ "$DRY_RUN" != "true" ]] && wait_for_resource "deployment/myb-admin" 120
 
 echo -e "${YELLOW}Deploying Client Frontend (Owner Portal)...${NC}"
-kubectl apply -f "$K8S_DIR/services/client/deployment.yaml"
-wait_for_resource "deployment/myb-client" 120
+kubectl apply -f "$K8S_DIR/services/client/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
+[[ "$DRY_RUN" != "true" ]] && wait_for_resource "deployment/myb-client" 120
 
 # Step 8: Deploy Ingress
 echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}Step 8: Deploying Ingress${NC}"
 echo -e "${GREEN}========================================${NC}"
 
-kubectl apply -f "$K8S_DIR/ingress/ingress.yaml"
+kubectl apply -f "$K8S_DIR/ingress/ingress.yaml" "${KUBECTL_APPLY_ARGS[@]}"
 echo -e "${GREEN}✓ Ingress deployed${NC}"
+
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo -e "\n${GREEN}Dry run complete. No resources were changed.${NC}"
+    exit 0
+fi
 
 # Display deployment status
 echo -e "\n${GREEN}========================================${NC}"

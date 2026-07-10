@@ -236,7 +236,18 @@
       "ownerPhone": "Owner Phone",
       "noOwner": "No owner",
       "deleteConfirm": "Are you sure you want to delete this unit?",
-      "saveFirst": "Please save the coproperty first before managing units."
+      "saveFirst": "Please save the coproperty first before managing units.",
+      "types": {
+        "apartment": "Apartment",
+        "parking": "Parking",
+        "cave": "Cave",
+        "commercial": "Commercial",
+        "villa": "Villa",
+        "penthouse": "Penthouse",
+        "studio": "Studio",
+        "house": "House",
+        "other": "Other"
+      }
     },
     "owner": {
       "management": "Owner Management",
@@ -288,7 +299,7 @@
       "managerPlaceholder": "Manager name",
       "commonAreasLabel": "Common Areas",
       "commonAreasPlaceholder": "Garden, parking, elevator...",
-      "saveFirstMessage": "Save the coproperty first to access other tabs"  
+      "saveFirstMessage": "Save the coproperty first to access other tabs"
     }
   },
   "common": {

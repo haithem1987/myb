@@ -338,21 +338,29 @@ export class FundCallsListComponent implements OnInit {
     const isoDate = fundCall.dueDate
       ? new Date(fundCall.dueDate as any).toISOString().split('T')[0]
       : '';
+    // Patch non-owner fields immediately
     this.editForm.patchValue({
       copropertyId: fundCall.copropertyId,
-      ownerId: fundCall.ownerId ?? '',
       amount: fundCall.amount,
       dueDate: isoDate,
       description: fundCall.description ?? '',
       status: fundCall.status ?? 'TO_PAY',
     });
-    // Load owners for the fund call's coproperty
+    // Load owners first, then patch ownerId so the select renders the correct option
     this.editOwners.set([]);
     if (fundCall.copropertyId) {
       this.ownerService.getAllOwners(fundCall.copropertyId).subscribe({
-        next: (o) => this.editOwners.set(o),
-        error: () => this.editOwners.set([]),
+        next: (o) => {
+          this.editOwners.set(o);
+          this.editForm.patchValue({ ownerId: fundCall.ownerId ?? '' });
+        },
+        error: () => {
+          this.editOwners.set([]);
+          this.editForm.patchValue({ ownerId: fundCall.ownerId ?? '' });
+        },
       });
+    } else {
+      this.editForm.patchValue({ ownerId: fundCall.ownerId ?? '' });
     }
     this.showEditPanel.set(true);
   }

@@ -20,6 +20,8 @@
   "DOCUMENT_MANAGEMENT_DESC": "Organisez et stockez vos documents en toute sécurité.",
   "INVOICE_MANAGEMENT": "Gestion des factures",
   "INVOICE_MANAGEMENT_DESC": "Gérez vos factures efficacement.",
+  "COPROPERTY_MANAGEMENT": "Gestion de Copropriété",
+  "COPROPERTY_MANAGEMENT_DESC": "Gérez vos immeubles en copropriété et vos copropriétaires.",
   "PROJECTS": "Projets",
   "INTERVENANTS": "Intervenants",
   "TASKS": "Tâches",
@@ -31,7 +33,10 @@
     "thu": "Jeu",
     "fri": "Ven",
     "sat": "Sam",
-    "weekend": ["Dim", "Sam"]
+    "weekend": [
+      "Dim",
+      "Sam"
+    ]
   },
   "LOADING": "Chargement...",
   "TIMESHEET_MANAGER": "Gestionnaire de feuilles de temps",
@@ -456,7 +461,18 @@
       "ownerPhone": "Téléphone du Propriétaire",
       "noOwner": "Aucun propriétaire",
       "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce lot ?",
-      "saveFirst": "Veuillez d'abord enregistrer la copropriété avant de gérer les lots."
+      "saveFirst": "Veuillez d'abord enregistrer la copropriété avant de gérer les lots.",
+      "types": {
+        "apartment": "Appartement",
+        "parking": "Parking",
+        "cave": "Cave",
+        "commercial": "Commercial",
+        "villa": "Villa",
+        "penthouse": "Penthouse",
+        "studio": "Studio",
+        "house": "Maison",
+        "other": "Autre"
+      }
     },
     "owner": {
       "management": "Gestion des Copropriétaires",

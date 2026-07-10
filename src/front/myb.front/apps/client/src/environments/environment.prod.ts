@@ -3,6 +3,13 @@ export const environment = {
   production: true,
   apiBaseUrl: window.location.origin,
 
+  // App identity & cross-app URLs — both apps share the same origin in production (nginx routing)
+  app: {
+    currentApp: 'client' as const,
+    adminUrl: window.location.origin,
+    clientUrl: window.location.origin,
+  },
+
   // Service URLs - Use relative paths for Docker environment
   services: {
     keycloak: {

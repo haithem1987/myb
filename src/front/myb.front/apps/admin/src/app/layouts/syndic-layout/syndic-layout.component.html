@@ -12,14 +12,16 @@
     <nav class="main-nav">
       <a routerLink="/coproperty/syndic/dashboard" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-speedometer2"></i>
         <span class="nav-text">Tableau de bord</span>
       </a>
       
       <a routerLink="/coproperty/syndic/coproperties" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-building"></i>
         <span class="nav-text">Copropriétés</span>
         <span class="badge" *ngIf="managedCoproperties() > 0">
@@ -29,7 +31,8 @@
       
       <a routerLink="/coproperty/syndic/budgets" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-cash-stack"></i>
         <span class="nav-text">Budget</span>
         <span class="badge" *ngIf="totalBudgets() > 0">
@@ -39,14 +42,16 @@
       
       <a routerLink="/coproperty/syndic/distribution" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-pie-chart"></i>
         <span class="nav-text">Répartition</span>
       </a>
       
       <a routerLink="/coproperty/syndic/units" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-building"></i>
         <span class="nav-text">Lots</span>
         <span class="badge" *ngIf="totalUnits() > 0">
@@ -56,9 +61,18 @@
       
       <a routerLink="/coproperty/syndic/owners" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-person-badge"></i>
         <span class="nav-text">Copropriétaires</span>
+      </a>
+
+      <a routerLink="/coproperty/syndic/tenants"
+         routerLinkActive="active"
+         class="nav-item"
+         (click)="onNavItemClick()">
+        <i class="bi bi-person-lines-fill"></i>
+        <span class="nav-text">Locataires</span>
       </a>
       
       <!-- Invoice service is separate - commented out
@@ -87,28 +101,48 @@
       
       <a routerLink="/coproperty/syndic/fund-calls" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-calendar-check"></i>
         <span class="nav-text">Appels de Fonds</span>
       </a>
 
       <a routerLink="/coproperty/syndic/charge-payments" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-credit-card-2-front"></i>
         <span class="nav-text">Paiements Charges</span>
       </a>
 
       <a routerLink="/coproperty/syndic/interventions" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-wrench-adjustable"></i>
         <span class="nav-text">Interventions</span>
       </a>
 
+      <a routerLink="/coproperty/syndic/signalements" 
+         routerLinkActive="active" 
+         class="nav-item"
+         (click)="onNavItemClick()">
+        <i class="bi bi-megaphone"></i>
+        <span class="nav-text">Signalements</span>
+      </a>
+
+      <a routerLink="/coproperty/syndic/discussions"
+         routerLinkActive="active"
+         class="nav-item"
+         (click)="onNavItemClick()">
+        <i class="bi bi-chat-square-text"></i>
+        <span class="nav-text">Discussions</span>
+      </a>
+
       <a routerLink="/coproperty/syndic/settings" 
          routerLinkActive="active" 
-         class="nav-item">
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-gear"></i>
         <span class="nav-text">Paramètres</span>
       </a>
@@ -134,7 +168,7 @@
     
     <div class="sidebar-footer">
       <!-- Switch to coproprietaire space if user has dual role -->
-      <button class="btn-switch-role" *ngIf="isCoproprietaire()" (click)="switchToOwnerSpace()" title="Mon espace Copropriétaire">
+      <button class="btn-switch-role" *ngIf="isCoproprietaire()" (click)="switchToOwnerSpace(); onNavItemClick()" title="Mon espace Copropriétaire">
         <i class="bi bi-person-badge"></i>
         <span class="nav-text">Espace Copropriétaire</span>
       </button>
@@ -171,6 +205,7 @@
           (markAsRead)="onMarkAsRead($event)"
           (markAllAsRead)="onMarkAllAsRead()">
         </myb-front-notification-dropdown>
+        <myb-front-user-dropdown></myb-front-user-dropdown>
       </div>
     </header>
     

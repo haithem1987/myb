@@ -1,62 +1,98 @@
-<section>
-  <div class="feature-backround">
-    <div class="container">
-      <div class="row d-flex align-items-center">
-        <div
-          class="d-sm-none d-md-block col-md-6 text-center text-md-start mb-4 mb-md-0"
-        >
-          <img
-            src="assets/images/illus.png"
-            class="img-fluid"
-            alt="Illustration"
-          />
+<section class="features-section">
+  <div class="features-inner">
+
+    <!-- Left: visual panel -->
+    <div class="features-visual">
+      <div class="features-visual-card">
+        <!-- Checklist illustration -->
+        <div class="fv-header">
+          <span class="fv-title">Project Overview</span>
+          <span class="fv-badge">On Track</span>
         </div>
-        <div class="col-md-6">
-          <h1
-            class="fw-bold text-center text-darklight"
-            style="margin-bottom: 50px"
-          >
-            {{ 'RIGHT_PLACE' | translate }}
-          </h1>
-          <div class="d-flex align-items-center mb-3">
-            <img
-              src="assets/images/time-management.png"
-              width="50"
-              height="50"
-              alt=""
-              class="me-3"
-            />
-            <div>
-              <p class="text-darklight m-0">
-                {{ 'SUCCESS_STORY' | translate }}
-              </p>
+        <div class="fv-items">
+          <div class="fv-item fv-item-done">
+            <span class="fv-check">&#10003;</span>
+            <div class="fv-item-lines">
+              <div class="fv-line fv-line-full"></div>
+              <div class="fv-line fv-line-half"></div>
             </div>
           </div>
-          <div class="d-flex align-items-center mb-3">
-            <img
-              src="assets/images/financial.png"
-              width="50"
-              height="50"
-              alt=""
-              class="me-3"
-            />
+          <div class="fv-item fv-item-done">
+            <span class="fv-check">&#10003;</span>
+            <div class="fv-item-lines">
+              <div class="fv-line fv-line-full"></div>
+              <div class="fv-line" style="width:60%"></div>
+            </div>
+          </div>
+          <div class="fv-item fv-item-active">
+            <span class="fv-check fv-check-active">&#8226;</span>
+            <div class="fv-item-lines">
+              <div class="fv-line fv-line-full"></div>
+              <div class="fv-line" style="width:40%"></div>
+            </div>
+          </div>
+          <div class="fv-item">
+            <span class="fv-check fv-check-empty"></span>
+            <div class="fv-item-lines">
+              <div class="fv-line" style="width:75%;opacity:0.3"></div>
+              <div class="fv-line" style="width:35%;opacity:0.3"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Progress bar -->
+        <div class="fv-progress-row">
+          <span class="fv-progress-label">Completion</span>
+          <span class="fv-progress-pct">68%</span>
+        </div>
+        <div class="fv-progress-bar"><div class="fv-progress-fill" style="width:68%"></div></div>
+      </div>
+      <!-- Floating accent -->
+      <div class="features-accent-blob"></div>
+    </div>
 
-            <p class="text-darklight m-0">
-              {{ 'ACHIEVE_GOALS' | translate }}
-            </p>
-          </div>
-          <!-- <div class="d-flex align-items-center mb-3">
-            <img src="assets/images/chart.png" width="50" height="50" alt="" class="me-3" />
-            <p class="text-darklight">
-              {{ 'ACHIEVE_GOALS' | translate }}
-            </p>
-          </div>
-          <div class="d-flex align-items-center mb-3">
-            <img src="assets/images/idea.png" width="60" height="50" alt="" class="me-3" />
-            <p class="text-darklight">
-              {{ 'SUCCESS_STORY' | translate }}
-            </p>
-          </div> -->
+    <!-- Right: feature list -->
+    <div class="features-content">
+      <div class="features-eyebrow">Why MYB?</div>
+      <h2 class="features-title">{{ 'RIGHT_PLACE' | translate }}</h2>
+
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" class="feature-icon-svg">
+            <path d="M12 2l2.4 7.2H22l-6.2 4.6 2.4 7.2L12 17l-6.2 4 2.4-7.2L2 9.2h7.6z"
+              fill="#7c3aed" opacity="0.2" stroke="#7c3aed" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="feature-item-text">
+          <h4 class="feature-item-title">Success by Design</h4>
+          <p class="feature-item-desc">{{ 'SUCCESS_STORY' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" class="feature-icon-svg">
+            <path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10z"
+              fill="#4f46e5" opacity="0.15" stroke="#4f46e5" stroke-width="1.5"/>
+            <path d="M8 12l3 3 5-5" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="feature-item-text">
+          <h4 class="feature-item-title">Goal Achievement</h4>
+          <p class="feature-item-desc">{{ 'ACHIEVE_GOALS' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" class="feature-icon-svg">
+            <rect x="3" y="11" width="18" height="11" rx="2" fill="#7c3aed" opacity="0.15" stroke="#7c3aed" stroke-width="1.5"/>
+            <path d="M7 11V7a5 5 0 0110 0v4" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="12" cy="16" r="1.5" fill="#7c3aed"/>
+          </svg>
+        </div>
+        <div class="feature-item-text">
+          <h4 class="feature-item-title">Secure & Reliable</h4>
+          <p class="feature-item-desc">Enterprise-grade security protecting your business data 24/7.</p>
         </div>
       </div>
     </div>

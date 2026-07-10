@@ -2,8 +2,10 @@ import { Component, signal, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
-import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService } from '../../../index';
+import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService, ChargeDistribution } from '../../../index';
 import { KeycloakService } from '@myb-front/auth';
+import { forkJoin, of } from 'rxjs';
+import { catchError, take, switchMap } from 'rxjs/operators';
 
 interface Invoice {
   id: string;
@@ -607,25 +609,48 @@ export class OwnerInvoicesComponent implements OnInit {
       return;
     }
 
-    // Load units to resolve unit numbers for invoices
-    this.ownerService.getMyUnits(userId).subscribe({
-      next: (units) => {
+    // Load owner data first to get owner ID, then load all receipts
+    this.ownerService.getOwnerByUserId(userId).pipe(
+      take(1),
+      catchError(() => of(null)),
+      switchMap((owner) => {
+        const ownerId = owner?.id;
+        return forkJoin({
+          units: this.ownerService.getMyUnits(userId).pipe(take(1), catchError(() => of([] as Unit[]))),
+          invoices: this.ownerService.getMyInvoices(userId).pipe(take(1), catchError(() => of([] as CopropertyInvoice[]))),
+          distributions: ownerId
+            ? this.ownerService.getOwnerChargeDistributions(ownerId).pipe(take(1), catchError(() => of([] as ChargeDistribution[])))
+            : of([] as ChargeDistribution[]),
+        });
+      })
+    ).subscribe({
+      next: ({ units, invoices, distributions }) => {
+        // Store units for mapping
         units.forEach((unit) => this.unitsById.set(unit.id, unit));
-      },
-      error: (error) => {
-        console.error('Error loading owner units for invoices:', error);
-      }
-    });
 
-    // Load invoices for the current owner
-    this.ownerService.getMyInvoices(userId).subscribe({
-      next: (backendInvoices) => {
-        const mapped = backendInvoices.map((inv) => this.mapInvoice(inv));
-        this.invoices.set(mapped);
-        this.filteredInvoices.set(mapped);
+        // Map invoices (only PAID ones for receipts)
+        const paidInvoices = invoices.filter(inv => inv.status === InvoiceStatus.PAID);
+        const mappedInvoices = paidInvoices.map((inv) => this.mapInvoice(inv));
+
+        // Map charge distributions (only PAID ones for receipts)
+        const paidDistributions = distributions.filter(
+          d => d.paymentStatus === 'PAID' || d.paymentStatus === 'Paid'
+        );
+        const mappedDistributions = paidDistributions.map((dist) => this.mapChargeDistribution(dist));
+
+        // Merge and sort by date (descending)
+        const allReceipts = [...mappedInvoices, ...mappedDistributions]
+          .sort((a, b) => {
+            const dateA = a.paymentDate ?? a.date;
+            const dateB = b.paymentDate ?? b.date;
+            return dateB.getTime() - dateA.getTime();
+          });
+
+        this.invoices.set(allReceipts);
+        this.filteredInvoices.set(allReceipts);
       },
       error: (error) => {
-        console.error('Error loading owner invoices:', error);
+        console.error('Error loading owner receipts:', error);
       }
     });
   }
@@ -690,6 +715,25 @@ export class OwnerInvoicesComponent implements OnInit {
       paymentDate: inv.paidDate ? new Date(inv.paidDate) : undefined,
       paymentMethod: inv.paymentMethod ?? '',
       status: inv.status === InvoiceStatus.PAID ? 'paid' : 'pending'
+    };
+  }
+
+  private mapChargeDistribution(dist: ChargeDistribution): Invoice {
+    const date = new Date(dist.calculatedAt);
+    const unit = this.unitsById.get(dist.unitId);
+    const paymentDate = dist.paidAt ? new Date(dist.paidAt) : date;
+
+    return {
+      id: dist.id,
+      number: dist.id.substring(0, 8).toUpperCase(),
+      description: dist.chargeName || 'Appel de fonds',
+      date,
+      amount: dist.amount,
+      period: this.getPeriodLabel(paymentDate),
+      unitNumber: unit?.unitNumber ?? '—',
+      paymentDate,
+      paymentMethod: dist.paymentMethod ?? 'Virement',
+      status: 'paid'
     };
   }
 

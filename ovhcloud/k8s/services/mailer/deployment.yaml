@@ -8,7 +8,7 @@ metadata:
     app: myb-mailer
     tier: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: myb-mailer
@@ -81,7 +81,7 @@ spec:
         resources:
           requests:
             memory: "256Mi"
-            cpu: "100m"
+            cpu: "50m"
           limits:
             memory: "512Mi"
             cpu: "250m"

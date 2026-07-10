@@ -1,0 +1,62 @@
+<section class="discussion-page">
+  <div class="error-banner" *ngIf="error()"><i class="bi bi-exclamation-circle"></i>{{ error() }}<button (click)="error.set('')">×</button></div>
+  <header class="page-heading">
+    <div><span class="eyebrow">COMMUNAUTÉ</span><h1>Discussions</h1><p>Échangez simplement avec {{ isSyndic ? 'les copropriétaires' : 'votre syndic et vos voisins' }}.</p></div>
+    <button *ngIf="isSyndic" class="primary" (click)="showNewConversation.set(true)"><i class="bi bi-plus-lg"></i> Nouvelle discussion</button>
+  </header>
+
+  <div class="messenger">
+    <aside class="inbox" [class.mobile-hidden]="selected()">
+      <div class="inbox-title"><div><h2>Boîte de réception</h2><span>{{ unreadTotal() }} non lu{{ unreadTotal() > 1 ? 's' : '' }}</span></div><button class="icon-btn" title="Actualiser"><i class="bi bi-arrow-clockwise"></i></button></div>
+      <label class="search"><i class="bi bi-search"></i><input [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Rechercher une discussion"></label>
+      <div class="filters">
+        <button [class.active]="filter() === 'all'" (click)="filter.set('all')">Toutes</button>
+        <button [class.active]="filter() === 'unread'" (click)="filter.set('unread')">Non lues</button>
+        <button [class.active]="filter() === 'annonce'" (click)="filter.set('annonce')">Annonces</button>
+      </div>
+      <div class="conversation-list">
+        <button *ngFor="let c of filtered(); trackBy: trackById" class="conversation" [class.active]="selectedId() === c.id" (click)="select(c.id)">
+          <span class="topic-icon" [class.announcement]="c.kind === 'annonce'"><i class="bi" [ngClass]="c.kind === 'annonce' ? 'bi-megaphone' : 'bi-chat-dots'"></i></span>
+          <span class="summary"><strong>{{ c.title }}</strong><small>{{ c.coproperty }}</small><span>{{ lastMessage(c) }}</span></span>
+          <span class="meta"><i *ngIf="c.pinned" class="bi bi-pin-angle-fill"></i><b *ngIf="c.unread">{{ c.unread }}</b></span>
+        </button>
+        <div class="empty" *ngIf="!filtered().length"><i class="bi bi-chat-square"></i><p>Aucune discussion trouvée</p></div>
+      </div>
+    </aside>
+
+    <main class="thread" *ngIf="selected() as chat">
+      <header class="thread-header">
+        <button class="back" (click)="selectedId.set('')"><i class="bi bi-chevron-left"></i></button>
+        <span class="topic-icon" [class.announcement]="chat.kind === 'annonce'"><i class="bi" [ngClass]="chat.kind === 'annonce' ? 'bi-megaphone' : 'bi-chat-dots'"></i></span>
+        <div><h2>{{ chat.title }}</h2><p><span class="online"></span>{{ chat.coproperty }} · {{ chat.participants }} participant{{ chat.participants > 1 ? 's' : '' }}</p></div>
+        <button class="icon-btn" (click)="togglePin()" [title]="chat.pinned ? 'Désépingler' : 'Épingler'"><i class="bi" [ngClass]="chat.pinned ? 'bi-pin-angle-fill' : 'bi-pin-angle'"></i></button>
+      </header>
+      <div class="messages">
+        <div class="day"><span>Aujourd’hui</span></div>
+        <div class="announcement-banner" *ngIf="chat.kind === 'annonce'"><i class="bi bi-shield-check"></i><span><strong>Annonce officielle</strong> publiée par votre syndic</span></div>
+        <div *ngIf="!chat.messages.length" class="empty-thread"><i class="bi bi-chat-heart"></i><h3>Lancez la conversation</h3><p>Écrivez le premier message de cette discussion.</p></div>
+        <article *ngFor="let m of chat.messages; trackBy: trackById" class="message" [class.mine]="isMine(m)">
+          <span class="avatar" [class.syndic]="m.role === 'syndic'">{{ initials(m.author) }}</span>
+          <div><div class="author"><strong>{{ displayAuthor(m) }}</strong><span *ngIf="m.role === 'syndic'">Syndic</span><time>{{ time(m.sentAt) }}</time></div><p>{{ m.body }}</p></div>
+        </article>
+      </div>
+      <footer class="composer" *ngIf="chat.kind !== 'annonce' || isSyndic">
+        <button class="attach" title="Ajouter une pièce jointe"><i class="bi bi-paperclip"></i></button>
+        <textarea [(ngModel)]="draft" (keydown)="onComposerKeydown($event)" rows="1" placeholder="Écrire un message…"></textarea>
+        <button class="send" [disabled]="!draft.trim()" (click)="send()"><i class="bi bi-send-fill"></i></button>
+        <small>Entrée pour envoyer · Maj + Entrée pour une nouvelle ligne</small>
+      </footer>
+      <div class="read-only" *ngIf="chat.kind === 'annonce' && !isSyndic"><i class="bi bi-lock"></i> Cette annonce est en lecture seule</div>
+    </main>
+  </div>
+</section>
+
+<div class="modal-backdrop" *ngIf="showNewConversation()" (click)="showNewConversation.set(false)">
+  <form class="new-modal" (click)="$event.stopPropagation()" (ngSubmit)="createConversation()">
+    <header><div><span class="eyebrow">NOUVEL ÉCHANGE</span><h2>Créer une discussion</h2></div><button type="button" class="icon-btn" (click)="showNewConversation.set(false)"><i class="bi bi-x-lg"></i></button></header>
+    <label>Sujet<input name="title" [(ngModel)]="newTitle" autofocus placeholder="Ex. Travaux dans le hall" required maxlength="100"></label>
+    <label>Copropriété<select name="coproperty" [(ngModel)]="newCoproperty"><option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">{{ coproperty.name }}</option></select></label>
+    <div class="type-choice"><button type="button" [class.active]="newKind === 'discussion'" (click)="newKind='discussion'"><i class="bi bi-chat-dots"></i><span><strong>Discussion</strong><small>Les participants peuvent répondre</small></span></button><button type="button" [class.active]="newKind === 'annonce'" (click)="newKind='annonce'"><i class="bi bi-megaphone"></i><span><strong>Annonce</strong><small>Communication officielle</small></span></button></div>
+    <footer><button type="button" class="secondary" (click)="showNewConversation.set(false)">Annuler</button><button class="primary" [disabled]="!newTitle.trim()">Créer</button></footer>
+  </form>
+</div>

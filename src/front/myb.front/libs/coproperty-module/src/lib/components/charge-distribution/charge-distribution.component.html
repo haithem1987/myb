@@ -143,9 +143,15 @@
       </div>
 
       <!-- No charges message -->
-      <div *ngIf="!loadingCharges() && repartitionForm.get('copropertyId')?.value && getFilteredCharges().length === 0" class="alert alert-info mt-3">
+      <div *ngIf="!loadingCharges() && repartitionForm.get('copropertyId')?.value && getChargesForSelectedYear().length === 0" class="alert alert-info mt-3">
         <i class="bi bi-info-circle me-2"></i>
         {{ 'coproperty.distribution.noChargesForYear' | translate }}
+      </div>
+
+      <!-- Already distributed message -->
+      <div *ngIf="!loadingCharges() && repartitionForm.get('copropertyId')?.value && getChargesForSelectedYear().length > 0 && getFilteredCharges().length === 0" class="alert alert-warning mt-3">
+        <i class="bi bi-check-circle me-2"></i>
+        Tous les budgets de cette année ont déjà été répartis.
       </div>
     </div>
   </div>

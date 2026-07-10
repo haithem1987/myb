@@ -147,8 +147,8 @@ export class KeycloakService {
     return this.userIdSubject.value;
   }
 
-  logout(): void {
-    this.keycloak.logout();
+  logout(redirectUri?: string): void {
+    this.keycloak.logout({ redirectUri: redirectUri ?? window.location.origin });
   }
 
   getToken(): string | undefined {

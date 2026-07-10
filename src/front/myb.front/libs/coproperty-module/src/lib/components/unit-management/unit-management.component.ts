@@ -34,7 +34,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
   // Alert system
   alert = signal<{type: 'success' | 'danger' | 'warning' | null, message: string}>({type: null, message: ''});
 
-  unitTypes = ['APARTMENT', 'PARKING', 'CAVE', 'COMMERCIAL', 'OTHER'];
+  unitTypes = ['APARTMENT', 'PARKING', 'CAVE', 'COMMERCIAL', 'VILLA', 'PENTHOUSE', 'STUDIO', 'HOUSE', 'OTHER'];
 
   constructor() {
     this.unitForm = this.fb.group({

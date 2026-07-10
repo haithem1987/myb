@@ -4,8 +4,10 @@ import { RouterModule } from '@angular/router';
 import { OwnerService } from '../../services/owner.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
+import { FundCallService, FundCallExtended } from '../../services/fund-call.service';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
-import { Unit, CopropertyInvoice, InvoiceStatus, Coproperty, ChargeDistribution } from '../../models';
+import { Unit, Coproperty } from '../../models';
+import { FundCallPaymentWithContext } from '../../models/fund-call.model';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take, switchMap } from 'rxjs/operators';
 
@@ -47,6 +49,7 @@ interface RecentInvoice {
 export class OwnerDashboardComponent implements OnInit {
   private ownerService = inject(OwnerService);
   private copropertyService = inject(CopropertyService);
+  private fundCallService = inject(FundCallService);
   private keycloakService = inject(KeycloakService);
   private currencyService = inject(CurrencyService);
 
@@ -100,15 +103,17 @@ export class OwnerDashboardComponent implements OnInit {
         const ownerId = owner?.id;
         return forkJoin({
           units: this.ownerService.getMyUnits(userId).pipe(take(1), catchError(() => of([] as Unit[]))),
-          invoices: this.ownerService.getMyInvoices(userId).pipe(take(1), catchError(() => of([] as CopropertyInvoice[]))),
           coproperties: this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([] as Coproperty[]))),
-          distributions: ownerId
-            ? this.ownerService.getOwnerChargeDistributions(ownerId).pipe(take(1), catchError(() => of([] as ChargeDistribution[])))
-            : of([] as ChargeDistribution[]),
+          // Appels de fonds créés par le syndic pour ce propriétaire
+          fundCalls: ownerId
+            ? this.fundCallService.getFundCallsByOwner(ownerId).pipe(take(1), catchError(() => of([] as FundCallExtended[])))
+            : of([] as FundCallExtended[]),
+          // Paiements effectués par le propriétaire (= reçus)
+          payments: this.fundCallService.getFundCallPaymentsByOwner(userId).pipe(take(1), catchError(() => of([] as FundCallPaymentWithContext[]))),
         });
       })
     ).subscribe({
-      next: ({ units, invoices, coproperties, distributions }) => {
+      next: ({ units, coproperties, fundCalls, payments }) => {
         const copropertyMap = new Map<string, string>(
           coproperties.map((c) => [c.id, c.name])
         );
@@ -130,46 +135,46 @@ export class OwnerDashboardComponent implements OnInit {
           };
         }));
 
-        const pending = invoices.filter(inv =>
-          inv.status === InvoiceStatus.PENDING ||
-          inv.status === InvoiceStatus.OVERDUE ||
-          inv.status === InvoiceStatus.PARTIALLY_PAID
-        );
-        const overdue = invoices.filter(inv => inv.status === InvoiceStatus.OVERDUE);
-        this.overdueCount.set(overdue.length);
+        // Appels de fonds À PAYER = statut TO_PAY
+        const toPayFundCalls = fundCalls.filter(fc => fc.status === 'TO_PAY');
+        const overdueFundCalls = toPayFundCalls.filter(fc => new Date() > new Date(fc.dueDate));
+        this.overdueCount.set(overdueFundCalls.length);
 
-        this.pendingInvoices.set(pending.map(inv => ({
-          id: inv.id,
-          number: inv.invoiceNumber,
-          date: new Date(inv.invoiceDate),
-          amount: inv.totalAmount,
-          dueDate: new Date(inv.dueDate),
-          description: inv.notes || `Facture ${inv.invoiceNumber}`,
+        this.pendingInvoices.set(toPayFundCalls.map(fc => ({
+          id: fc.id,
+          number: fc.id.substring(0, 8).toUpperCase(),
+          date: new Date(fc.createdAt),
+          amount: fc.amount,
+          dueDate: new Date(fc.dueDate),
+          description: fc.description || 'Appel de fonds',
         })));
 
-        const paid = invoices.filter(inv => inv.status === InvoiceStatus.PAID);
-        this.totalPaid.set(paid.reduce((sum, inv) => sum + inv.totalAmount, 0));
+        // Total dû = somme des appels de fonds TO_PAY
+        this.totalDue.set(toPayFundCalls.reduce((sum, fc) => sum + fc.amount, 0));
 
-        const sorted = [...invoices].sort((a, b) =>
-          new Date(b.invoiceDate).getTime() - new Date(a.invoiceDate).getTime()
-        ).slice(0, 5);
-        this.recentInvoices.set(sorted.map(inv => ({
-          id: inv.id,
-          number: inv.invoiceNumber,
-          description: inv.description || inv.notes || `Facture ${inv.invoiceNumber}`,
-          date: new Date(inv.invoiceDate),
-          amount: inv.totalAmount,
-          status: inv.status === InvoiceStatus.PAID ? 'paid' : inv.status === InvoiceStatus.OVERDUE ? 'overdue' : 'pending',
-          paymentMethod: inv.paymentMethod ?? '',
-        })));
+        // Total charges = tous les appels de fonds du propriétaire
+        this.totalCharges.set(fundCalls.reduce((sum, fc) => sum + fc.amount, 0));
 
-        this.totalCharges.set(distributions.reduce((sum, d) => sum + d.amount, 0));
+        // Total payé = paiements approuvés
+        const approvedPayments = payments.filter(p => p.validationStatus === 'Approved');
+        this.totalPaid.set(approvedPayments.reduce((sum, p) => sum + p.amount, 0));
 
-        const chargeDue = distributions
-          .filter(d => d.paymentStatus !== 'PAID' && d.paymentStatus !== 'Paid')
-          .reduce((sum, d) => sum + d.amount - (d.paidAmount || 0), 0);
-        const invoiceDue = pending.reduce((sum, inv) => sum + inv.totalAmount, 0);
-        this.totalDue.set(Math.max(chargeDue, invoiceDue));
+        // Derniers reçus (5 max, triés par date de paiement)
+        const recentReceipts: RecentInvoice[] = payments
+          .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
+          .slice(0, 5)
+          .map(p => ({
+            id: p.id,
+            number: `FC-${p.id.slice(0, 8).toUpperCase()}`,
+            description: p.fundCall?.description
+              ? `Appel de fonds : ${p.fundCall.description}`
+              : 'Appel de fonds',
+            date: new Date(p.paymentDate),
+            amount: p.amount,
+            status: p.validationStatus === 'Approved' ? 'paid' : 'pending',
+            paymentMethod: p.paymentMethod ?? '',
+          }));
+        this.recentInvoices.set(recentReceipts);
 
         this.loading.set(false);
       },

@@ -25,7 +25,7 @@
         </a>
       </li>
       <li *ngIf="isAdminApp">
-        <a class="dropdown-item" href="/">
+        <a class="dropdown-item" href="#" (click)="$event.preventDefault(); navigateToClientApp()">
           <i class="bi bi-house-fill me-2"></i>Espace Client
         </a>
       </li>
@@ -40,15 +40,21 @@
         </a>
       </li>
       <li *ngIf="isSystemAdmin || isCopropertyOwner || isCopropertyMember"><hr class="dropdown-divider" /></li>
-      <li>
-        <a class="dropdown-item" [routerLink]="'/profile'">
+      <li *ngIf="!isProfilePage">
+        <a class="dropdown-item" href="/profile" (click)="$event.preventDefault(); navigateToProfile()">
           <i class="bi bi-person-circle me-2"></i>Mon Profil
         </a>
       </li>
-      <li *ngIf="hasSubscriptions">
-        <a class="dropdown-item" [routerLink]="'/subscriptions'">
+      <li *ngIf="isProfilePage" class="dropdown-item disabled">
+        <i class="bi bi-person-circle me-2"></i>Mon Profil
+      </li>
+      <li *ngIf="hasSubscriptions && !isSubscriptionsPage">
+        <a class="dropdown-item" href="/subscriptions" (click)="$event.preventDefault(); navigateToSubscriptions()">
           <i class="bi bi-credit-card me-2"></i>My subscriptions
         </a>
+      </li>
+      <li *ngIf="hasSubscriptions && isSubscriptionsPage" class="dropdown-item disabled">
+        <i class="bi bi-credit-card me-2"></i>My subscriptions
       </li>
       <li><hr class="dropdown-divider" /></li>
       <li>

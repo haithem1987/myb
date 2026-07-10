@@ -13,7 +13,7 @@ DOMAIN="myb-platform.com"
 NAMESPACE="myb-platform"
 CERT_MANAGER_VERSION="v1.15.3"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-export KUBECONFIG="$PROJECT_ROOT/ovhcloud/kubeconfig-ebak4v.yml"
+export KUBECONFIG="${KUBECONFIG:-$PROJECT_ROOT/terraform/ovh/environments/hprd/kubeconfig-hprd.yml}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -24,7 +24,7 @@ NC='\033[0m'
 echo -e "${GREEN}============================================================${NC}"
 echo -e "${GREEN}  MYB Platform – Domain Configuration${NC}"
 echo -e "${GREEN}  Domain : $DOMAIN${NC}"
-echo -e "${GREEN}  Cluster: myb-coproperty-k8s (SBG5)${NC}"
+echo -e "${GREEN}  Cluster: myb-coproperty-k8s (BHS5)${NC}"
 echo -e "${GREEN}============================================================${NC}"
 
 # ── 0. Preflight ───────────────────────────────────────────

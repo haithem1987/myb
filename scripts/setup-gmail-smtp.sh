@@ -21,7 +21,7 @@ KC_URL="${KEYCLOAK_URL:-https://54.38.0.191}"
 ADMIN="${KEYCLOAK_ADMIN:-admin}"
 ADMIN_PASS="${KEYCLOAK_ADMIN_PASSWORD:-admin}"
 REALM="${KEYCLOAK_REALM:-MYB}"
-KUBECONFIG_PATH="${KUBECONFIG:-/Volumes/NidhalSSD/Projects/myb/ovhcloud/kubeconfig-ebak4v.yml}"
+KUBECONFIG_PATH="${KUBECONFIG:-/Volumes/NidhalSSD/Projects/myb/terraform/ovh/environments/hprd/kubeconfig-hprd.yml}"
 NAMESPACE="myb-platform"
 
 GMAIL_USER="${GMAIL_USER:-myb.platform.contact@gmail.com}"

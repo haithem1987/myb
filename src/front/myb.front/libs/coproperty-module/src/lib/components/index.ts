@@ -9,6 +9,7 @@ export * from './charge-distribution/charge-distribution.component';
 export * from './charge-management/charge-management.component';
 export * from './charges-list/charges-list.component';
 export * from './owner-management/owner-management.component';
+export * from './tenant-management/tenant-management.component';
 export * from './maintenance-requests/maintenance-requests.component';
 export * from './maintenance-list/maintenance-list.component';
 export * from './fund-calls-list/fund-calls-list.component';
@@ -27,4 +28,5 @@ export * from './intervention-list/intervention-list.component';
 export * from './intervention-new/intervention-new.component';
 export * from './intervention-management/intervention-management.component';
 export * from './coproperty.routes';
-
+export * from './owner-portal/signalements/signalement-list/signalement-list.component';
+export * from './owner-portal/signalements/nouveau-signalement/nouveau-signalement.component';

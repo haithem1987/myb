@@ -83,12 +83,24 @@ export const COPROPERTY_ROUTES: Routes = [
         loadComponent: () => import('@myb-front/coproperty-module').then(m => m.InterventionNewComponent),
       },
       {
+        path: 'signalements',
+        loadComponent: () => import('./syndic/signalements/syndic-signalements.component').then(m => m.SyndicSignalementsComponent),
+      },
+      {
+        path: 'discussions',
+        loadComponent: () => import('./discussions/discussions.component').then(m => m.DiscussionsComponent),
+      },
+      {
         path: 'units',
         loadComponent: () => import('@myb-front/coproperty-module').then(m => m.UnitsListComponent),
       },
       {
         path: 'owners',
         loadComponent: () => import('@myb-front/coproperty-module').then(m => m.OwnerManagementComponent),
+      },
+      {
+        path: 'tenants',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.TenantManagementComponent),
       },
       {
         path: 'distribution',
@@ -140,7 +152,7 @@ export const COPROPERTY_ROUTES: Routes = [
     path: 'owner',
     component: OwnerLayoutComponent,
     canActivate: [authGuard, profileGuard],
-    data: { roles: ['coproperty-owner', 'coproperty-syndic', 'coproperty-admin', 'system-admin'] },
+    data: { roles: ['coproperty-owner', 'coproperty-syndic', 'coproperty-admin', 'system-admin', 'coproperty-tenant'] },
     children: [
       {
         path: '',
@@ -174,6 +186,18 @@ export const COPROPERTY_ROUTES: Routes = [
       {
         path: 'general-assembly',
         loadComponent: () => import('./owner/general-assembly/general-assembly.component').then(m => m.OwnerGeneralAssemblyComponent),
+      },
+      {
+        path: 'signalements',
+        loadComponent: () => import('./owner/signalements/owner-signalements.component').then(m => m.OwnerSignalementsComponent),
+      },
+      {
+        path: 'signalements/nouveau',
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.NouveauSignalementComponent),
+      },
+      {
+        path: 'discussions',
+        loadComponent: () => import('./discussions/discussions.component').then(m => m.DiscussionsComponent),
       },
     ],
   },

@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
 import { OwnerService, InvoiceStatus, CopropertyService, CurrencyService, Currency } from '../../../index';
-import { ToastsContainerComponent, ModalContainerComponent } from '@myb-front/shared-ui';
+import { ToastsContainerComponent, ModalContainerComponent, UserDropdownComponent } from '@myb-front/shared-ui';
 import { take, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
   selector: 'app-owner-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent],
+  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent, UserDropdownComponent],
   templateUrl: './owner-layout.component.html',
   styleUrls: ['./owner-layout.component.scss']
 })

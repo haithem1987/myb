@@ -229,10 +229,17 @@ export class ChargeDistributionComponent implements OnInit {
     this.calculatedTotal.set(total);
   }
 
+  getChargesForSelectedYear(): ChargeExtended[] {
+    const year = parseInt(this.repartitionForm.get('year')?.value, 10);
+    return this.charges().filter(c => new Date(c.startDate).getFullYear() === year);
+  }
+
   getFilteredCharges(): ChargeExtended[] {
-    const year = this.repartitionForm.get('year')?.value;
+    const year = parseInt(this.repartitionForm.get('year')?.value, 10);
     const distributed = this.distributedChargeIds();
-    return this.charges().filter(c => c.frequency === year && (!c.id || !distributed.has(c.id)));
+    return this.charges().filter(c =>
+      new Date(c.startDate).getFullYear() === year && (!c.id || !distributed.has(c.id))
+    );
   }
 
   get currencySymbol(): string {

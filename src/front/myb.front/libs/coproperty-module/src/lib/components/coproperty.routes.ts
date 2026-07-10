@@ -45,6 +45,11 @@ export const COPROPERTY_ROUTES: Routes = [
       { path: 'fund-calls/new', component: FundCallNewComponent },
       { path: 'fund-calls/:id', component: FundCallNewComponent },
       { path: 'fund-calls/:id/edit', component: FundCallNewComponent },
+      {
+        path: 'tenants',
+        loadComponent: () =>
+          import('./tenant-management/tenant-management.component').then(m => m.TenantManagementComponent),
+      },
 
       // Owner Portal — full space with layout nav and all sub-pages
       {
@@ -83,6 +88,16 @@ export const COPROPERTY_ROUTES: Routes = [
             path: 'general-assembly',
             loadComponent: () =>
               import('./owner-portal/general-assembly/general-assembly.component').then(m => m.OwnerGeneralAssemblyComponent),
+          },
+          {
+            path: 'signalements',
+            loadComponent: () =>
+              import('./owner-portal/signalements/signalement-list/signalement-list.component').then(m => m.SignalementListComponent),
+          },
+          {
+            path: 'signalements/nouveau',
+            loadComponent: () =>
+              import('./owner-portal/signalements/nouveau-signalement/nouveau-signalement.component').then(m => m.NouveauSignalementComponent),
           },
         ],
       },

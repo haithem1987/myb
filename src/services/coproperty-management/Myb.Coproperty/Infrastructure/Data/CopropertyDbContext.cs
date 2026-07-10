@@ -17,6 +17,7 @@ public class CopropertyDbContext : DbContext
     public DbSet<Unit> Units { get; set; } = null!;
     public DbSet<Owner> Owners { get; set; } = null!;
     public DbSet<OwnerUnit> OwnerUnits { get; set; } = null!;
+    public DbSet<Tenant> Tenants { get; set; } = null!;
     public DbSet<Charge> Charges { get; set; } = null!;
     public DbSet<ChargeDistribution> ChargeDistributions { get; set; } = null!;
     public DbSet<CopropertyInvoice> CopropertyInvoices { get; set; } = null!;
@@ -27,6 +28,9 @@ public class CopropertyDbContext : DbContext
     public DbSet<Assembly> Assemblies { get; set; } = null!;
     public DbSet<AssemblyAttendance> AssemblyAttendances { get; set; } = null!;
     public DbSet<Intervention> Interventions { get; set; } = null!;
+    public DbSet<Signalement> Signalements { get; set; } = null!;
+    public DbSet<Discussion> Discussions { get; set; } = null!;
+    public DbSet<DiscussionMessage> DiscussionMessages { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -181,6 +185,57 @@ public class CopropertyDbContext : DbContext
             entity.ToTable(t => t.HasCheckConstraint(
                 "CHK_Ownership_Percentage", 
                 "\"OwnershipPercentage\" > 0 AND \"OwnershipPercentage\" <= 100"));
+        });
+
+        // Tenant Configuration
+        modelBuilder.Entity<Tenant>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.FirstName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.LastName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(e => e.Phone)
+                .HasMaxLength(50);
+
+            entity.Property(e => e.MonthlyRent)
+                .HasPrecision(10, 2);
+
+            entity.Property(e => e.DepositAmount)
+                .HasPrecision(10, 2);
+
+            entity.Property(e => e.Notes)
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true);
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.HasOne(e => e.Unit)
+                .WithMany(u => u.Tenants)
+                .HasForeignKey(e => e.UnitId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.UnitId);
+            entity.HasIndex(e => e.Email);
+            entity.HasIndex(e => e.IsActive);
+            entity.HasIndex(e => new { e.UnitId, e.IsActive })
+                .IsUnique()
+                .HasFilter("\"IsActive\" = TRUE");
         });
 
         // Charge Configuration
@@ -607,6 +662,81 @@ public class CopropertyDbContext : DbContext
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CopropertyId);
             entity.HasIndex(e => e.PlannedDate);
+        });
+
+        // Signalement Configuration
+        modelBuilder.Entity<Signalement>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.ReporterName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(e => e.Type)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Zone)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .HasDefaultValue(SignalementStatus.EnCours);
+
+            entity.Property(e => e.Description)
+                .IsRequired()
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.PhotoUrl)
+                // The UI currently sends an image as a data URL. PostgreSQL's text
+                // type is required here because a base64 image is much larger than
+                // a conventional 500-character object-storage URL.
+                .HasColumnType("text");
+
+            entity.Property(e => e.SyndicComment)
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.HasOne(e => e.Coproperty)
+                .WithMany()
+                .HasForeignKey(e => e.CopropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CopropertyId);
+            entity.HasIndex(e => e.ReportedBy);
+        });
+
+        modelBuilder.Entity<Discussion>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Kind).HasConversion<string>().HasMaxLength(30);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.HasOne(e => e.Coproperty).WithMany().HasForeignKey(e => e.CopropertyId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.CopropertyId, e.UpdatedAt });
+        });
+
+        modelBuilder.Entity<DiscussionMessage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.AuthorId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.AuthorName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.AuthorRole).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.Body).IsRequired().HasMaxLength(5000);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.HasOne(e => e.Discussion).WithMany(d => d.Messages).HasForeignKey(e => e.DiscussionId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.DiscussionId, e.CreatedAt });
         });
     }
 }

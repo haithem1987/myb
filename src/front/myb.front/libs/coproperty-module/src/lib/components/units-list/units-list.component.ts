@@ -38,7 +38,7 @@ export class UnitsListComponent implements OnInit {
   showAddForm = signal<boolean>(false);
   editingUnitId = signal<string | null>(null);
 
-  unitTypes = ['APARTMENT', 'PARKING', 'CAVE', 'COMMERCIAL', 'OTHER'];
+  unitTypes = ['APARTMENT', 'PARKING', 'CAVE', 'COMMERCIAL', 'VILLA', 'PENTHOUSE', 'STUDIO', 'HOUSE', 'OTHER'];
   unitForm: FormGroup;
   
   // Alert system
@@ -184,6 +184,10 @@ export class UnitsListComponent implements OnInit {
       'PARKING': 'bg-info',
       'CAVE': 'bg-secondary',
       'COMMERCIAL': 'bg-warning',
+      'VILLA': 'bg-success',
+      'PENTHOUSE': 'bg-danger',
+      'STUDIO': 'bg-info',
+      'HOUSE': 'bg-success',
       'OTHER': 'bg-dark'
     };
     return typeMap[type] || 'bg-secondary';

@@ -1,25 +1,64 @@
-<footer class="position-relative w-100 custom-footer">
-  <div class="position-absolute bottom-0 w-100">
-    <div class="d-flex justify-content-around">
-      <div style="width: 30%">
-        <h5 class="text-uppercase">{{ contactInfo.location }}</h5>
-        <p><i class="bi bi-geo-alt-fill"></i> {{ contactInfo.location }}</p>
-        <p><i class="bi bi-envelope-fill"></i> {{ contactInfo.email }}</p>
-        <p><i class="bi bi-telephone-fill"></i> {{ contactInfo.phone }}</p>
+<footer class="footer">
+  <div class="footer-inner">
+
+    <!-- Top row -->
+    <div class="footer-top">
+      <!-- Brand col -->
+      <div class="footer-brand-col">
+        <div class="footer-brand">
+          <div class="footer-brand-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" opacity="0.9"/>
+              <rect x="13" y="2" width="9" height="9" rx="2" fill="currentColor" opacity="0.55"/>
+              <rect x="2" y="13" width="9" height="9" rx="2" fill="currentColor" opacity="0.55"/>
+              <rect x="13" y="13" width="9" height="9" rx="2" fill="currentColor" opacity="0.9"/>
+            </svg>
+          </div>
+          <span class="footer-brand-name">MYB</span>
+        </div>
+        <p class="footer-tagline">Manage Your Business — the all-in-one platform for modern enterprises.</p>
+        <div class="footer-contact">
+          <div class="footer-contact-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>{{ contactInfo?.location }}</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="bi bi-envelope-fill"></i>
+            <span>{{ contactInfo?.email }}</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="bi bi-telephone-fill"></i>
+            <span>{{ contactInfo?.phone }}</span>
+          </div>
+        </div>
       </div>
 
-      <div style="width: 30%">
-        <h5 class="text-uppercase">{{ aboutSection.title }}</h5>
-        <p>{{ aboutSection.content }}</p>
+      <!-- About col -->
+      <div class="footer-col">
+        <h5 class="footer-col-title">{{ aboutSection?.title }}</h5>
+        <p class="footer-col-text">{{ aboutSection?.content }}</p>
       </div>
 
-      <div style="width: 30%">
-        <h5 class="text-uppercase">{{ servicesSection.title }}</h5>
-        <p>{{ servicesSection.content }}</p>
+      <!-- Services col -->
+      <div class="footer-col">
+        <h5 class="footer-col-title">{{ servicesSection?.title }}</h5>
+        <div class="footer-services">
+          <span class="footer-service-tag" *ngFor="let s of serviceList">{{ s }}</span>
+        </div>
       </div>
     </div>
-    <div class="text-center p-3 fw-bold">
-      {{ copyRightText }}
+
+    <!-- Divider -->
+    <div class="footer-divider"></div>
+
+    <!-- Bottom row -->
+    <div class="footer-bottom">
+      <span class="footer-copyright">{{ copyRightText }}</span>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Privacy</a>
+        <a href="#" class="footer-link">Terms</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
     </div>
   </div>
 </footer>

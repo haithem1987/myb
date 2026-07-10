@@ -1,0 +1,198 @@
+<div class="tenant-management-container">
+  <div *ngIf="alert().type" class="alert" [ngClass]="{
+    'alert-success': alert().type === 'success',
+    'alert-danger': alert().type === 'danger',
+    'alert-info': alert().type === 'info'
+  }">
+    <i class="bi" [ngClass]="{
+      'bi-check-circle': alert().type === 'success',
+      'bi-exclamation-triangle': alert().type === 'danger',
+      'bi-info-circle': alert().type === 'info'
+    }"></i>
+    <span>{{ alert().message }}</span>
+    <button type="button" class="btn-close" (click)="alert.set({ type: null, message: '' })"></button>
+  </div>
+
+  <div class="management-header">
+    <div>
+      <h2>Gestion des locataires</h2>
+      <p>Suivi des occupants, baux et lots rattaches</p>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="openAddForm()" [disabled]="!selectedCopropertyId">
+      <i class="bi bi-person-plus"></i>
+      Ajouter
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <div class="field">
+      <label for="coproperty">Copropriete</label>
+      <select id="coproperty" class="form-select" [(ngModel)]="selectedCopropertyId" (change)="onCopropertyChange()">
+        <option value="">Selectionner une copropriete</option>
+        <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">{{ coproperty.name }}</option>
+      </select>
+    </div>
+
+    <div class="field search-field">
+      <label for="tenantSearch">Recherche</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input id="tenantSearch" class="form-control" type="text" [(ngModel)]="searchTerm" placeholder="Nom, email, telephone ou lot" />
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showForm" class="card form-card">
+    <div class="card-header">
+      <h5>{{ editingTenantId ? 'Modifier un locataire' : 'Nouveau locataire' }}</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="tenantForm" (ngSubmit)="saveTenant()">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="unitId">Lot *</label>
+            <select id="unitId" class="form-select" formControlName="unitId">
+              <option value="">Selectionner un lot</option>
+              <option *ngFor="let unit of availableUnits" [value]="unit.id">
+                {{ unit.unitNumber }} <span *ngIf="unit.floor !== null && unit.floor !== undefined">- etage {{ unit.floor }}</span>
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="firstName">Prenom *</label>
+            <input id="firstName" class="form-control" type="text" formControlName="firstName" />
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="lastName">Nom *</label>
+            <input id="lastName" class="form-control" type="text" formControlName="lastName" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="email">Email *</label>
+            <input id="email" class="form-control" type="email" formControlName="email" />
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="phone">Telephone</label>
+            <input id="phone" class="form-control" type="tel" formControlName="phone" />
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="isActive">Statut</label>
+            <select id="isActive" class="form-select" formControlName="isActive">
+              <option [ngValue]="true">Actif</option>
+              <option [ngValue]="false">Inactif</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label class="form-label" for="leaseStartDate">Debut du bail *</label>
+            <input id="leaseStartDate" class="form-control" type="date" formControlName="leaseStartDate" />
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label class="form-label" for="leaseEndDate">Fin du bail</label>
+            <input id="leaseEndDate" class="form-control" type="date" formControlName="leaseEndDate" />
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label class="form-label" for="monthlyRent">Loyer mensuel</label>
+            <input id="monthlyRent" class="form-control" type="number" min="0" step="0.01" formControlName="monthlyRent" />
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label class="form-label" for="depositAmount">Depot</label>
+            <input id="depositAmount" class="form-control" type="number" min="0" step="0.01" formControlName="depositAmount" />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="notes">Notes</label>
+          <textarea id="notes" class="form-control" rows="3" formControlName="notes"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-success" type="submit" [disabled]="saving()">
+            <span *ngIf="saving()" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!saving()" class="bi bi-save me-1"></i>
+            Enregistrer
+          </button>
+          <button class="btn btn-secondary" type="button" (click)="cancelForm()">
+            <i class="bi bi-x"></i>
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5>Locataires ({{ filteredTenants.length }})</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading()" class="loading-state">
+        <div class="spinner-border text-primary"></div>
+      </div>
+
+      <div *ngIf="!loading() && filteredTenants.length === 0" class="empty-state">
+        <i class="bi bi-person-lines-fill"></i>
+        <p>Aucun locataire trouve</p>
+      </div>
+
+      <div *ngIf="!loading() && filteredTenants.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Locataire</th>
+              <th>Lot</th>
+              <th>Bail</th>
+              <th>Loyer</th>
+              <th>Statut</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tenant of filteredTenants">
+              <td>
+                <strong>{{ tenant.firstName }} {{ tenant.lastName }}</strong>
+                <div class="text-muted small">{{ tenant.email }}</div>
+                <div class="text-muted small" *ngIf="tenant.phone">{{ tenant.phone }}</div>
+              </td>
+              <td>
+                <span class="unit-badge">{{ unitLabel(tenant.unitId) }}</span>
+              </td>
+              <td>
+                <div>{{ tenant.leaseStartDate | date:'dd/MM/yyyy' }}</div>
+                <small class="text-muted" *ngIf="tenant.leaseEndDate">Fin {{ tenant.leaseEndDate | date:'dd/MM/yyyy' }}</small>
+              </td>
+              <td>{{ formatCurrency(tenant.monthlyRent) }}</td>
+              <td>
+                <span class="badge" [ngClass]="tenant.isActive ? 'bg-success' : 'bg-secondary'">
+                  {{ tenant.isActive ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-primary me-2" type="button" (click)="editTenant(tenant)" title="Modifier">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button *ngIf="tenant.isActive" class="btn btn-sm btn-outline-warning me-2" type="button" (click)="deactivateTenant(tenant)" title="Desactiver">
+                  <i class="bi bi-pause-circle"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" type="button" (click)="removeTenant(tenant)" title="Supprimer">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

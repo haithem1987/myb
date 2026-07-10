@@ -28,9 +28,11 @@ builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.ICopropert
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IUnitRepository, Myb.Coproperty.Infrastructure.Repositories.UnitRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IOwnerRepository, Myb.Coproperty.Infrastructure.Repositories.OwnerRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IOwnerUnitRepository, Myb.Coproperty.Infrastructure.Repositories.OwnerUnitRepository>();
+builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.ITenantRepository, Myb.Coproperty.Infrastructure.Repositories.TenantRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IChargeRepository, Myb.Coproperty.Infrastructure.Repositories.ChargeRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IMaintenanceRepository, Myb.Coproperty.Infrastructure.Repositories.MaintenanceRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IInterventionRepository, Myb.Coproperty.Infrastructure.Repositories.InterventionRepository>();
+builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.ISignalementRepository, Myb.Coproperty.Infrastructure.Repositories.SignalementRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IInvoiceRepository, Myb.Coproperty.Infrastructure.Repositories.InvoiceRepository>();
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.IAssemblyRepository, Myb.Coproperty.Infrastructure.Repositories.AssemblyRepository>();
 // Register ChargeDistribution generic repository
@@ -40,9 +42,11 @@ builder.Services.AddScoped<Myb.Common.Repositories.IGenericRepository<Guid, Myb.
 builder.Services.AddScoped<Myb.Coproperty.Services.ICopropertyService, Myb.Coproperty.Services.CopropertyService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IUnitService, Myb.Coproperty.Services.UnitService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IOwnerService, Myb.Coproperty.Services.OwnerService>();
+builder.Services.AddScoped<Myb.Coproperty.Services.ITenantService, Myb.Coproperty.Services.TenantService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IChargeService, Myb.Coproperty.Services.ChargeService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IMaintenanceService, Myb.Coproperty.Services.MaintenanceService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IInterventionService, Myb.Coproperty.Services.InterventionService>();
+builder.Services.AddScoped<Myb.Coproperty.Services.ISignalementService, Myb.Coproperty.Services.SignalementService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IFinanceService, Myb.Coproperty.Services.FinanceService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IFundCallService, Myb.Coproperty.Services.FundCallService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IAssemblyService, Myb.Coproperty.Services.AssemblyService>();
@@ -71,22 +75,28 @@ builder.Services
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.CopropertyQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.UnitQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.OwnerQueries>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.TenantQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.ChargeQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.MaintenanceQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.InvoiceQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.AssemblyQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.FundCallQueries>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.InterventionQueries>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.SignalementQueries>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Queries.DiscussionQueries>()
     .AddMutationType(d => d.Name("Mutation"))
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.CopropertyMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.UnitMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.OwnerMutations>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.TenantMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.ChargeMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.MaintenanceMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.FinanceMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.FundCallMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.AssemblyMutations>()
         .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.InterventionMutations>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.SignalementMutations>()
+        .AddTypeExtension<Myb.Coproperty.GraphQL.Mutations.DiscussionMutations>()
     .AddType<Myb.Coproperty.GraphQL.Types.CopropertyType>()
     .AddType<Myb.Coproperty.GraphQL.Types.CopropertyInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.UnitType>()
@@ -94,6 +104,8 @@ builder.Services
     .AddType<Myb.Coproperty.GraphQL.Types.OwnerType>()
     .AddType<Myb.Coproperty.GraphQL.Types.OwnerInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.OwnerUnitType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.TenantType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.TenantInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.OwnerUnitInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.CreateOwnerWithUnitsInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.OwnerUnitInputTypeInternal>()
@@ -105,6 +117,11 @@ builder.Services
     .AddType<Myb.Coproperty.GraphQL.Types.MaintenanceRequestInputType>()
     .AddType<Myb.Coproperty.GraphQL.Types.InterventionObjectType>()
     .AddType<Myb.Coproperty.GraphQL.Types.InterventionTypeEnumType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.SignalementObjectType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.CreateSignalementInputType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.SignalementTypeEnumType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.SignalementZoneEnumType>()
+    .AddType<Myb.Coproperty.GraphQL.Types.SignalementStatusEnumType>()
     .AddType<Myb.Coproperty.GraphQL.Types.FundCallType>()
     .AddType<Myb.Coproperty.GraphQL.Types.FundCallPaymentType>()
     .AddType<Myb.Coproperty.GraphQL.Types.DashboardStatsType>()

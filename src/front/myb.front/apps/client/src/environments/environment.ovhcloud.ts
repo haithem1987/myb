@@ -4,6 +4,13 @@ export const environment = {
   production: true,
   apiBaseUrl: window.location.origin,
 
+  // App identity & cross-app URLs — both apps share the same origin in production (nginx routing)
+  app: {
+    currentApp: 'client' as const,
+    adminUrl: window.location.origin,
+    clientUrl: window.location.origin,
+  },
+
   services: {
     keycloak: {
       url: `${window.location.origin}/auth`,

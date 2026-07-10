@@ -8,7 +8,7 @@ metadata:
     app: myb-coproperty
     tier: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: myb-coproperty
@@ -87,8 +87,8 @@ spec:
               key: RABBITMQ_HOST
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "384Mi"
+            cpu: "100m"
           limits:
             memory: "1Gi"
             cpu: "500m"

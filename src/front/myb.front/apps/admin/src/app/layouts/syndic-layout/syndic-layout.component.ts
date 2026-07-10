@@ -2,7 +2,7 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
-import { ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, NotificationService } from '@myb-front/shared-ui';
+import { ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, NotificationService, UserDropdownComponent } from '@myb-front/shared-ui';
 import { CopropertyService, CurrencyService, Currency } from '@myb-front/coproperty-module';
 import { ChargeService } from '@myb-front/coproperty-module';
 import { UnitService } from '@myb-front/coproperty-module';
@@ -12,7 +12,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-syndic-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent],
+  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, UserDropdownComponent],
   templateUrl: './syndic-layout.component.html',
   styleUrls: ['./syndic-layout.component.scss']
 })
@@ -42,7 +42,7 @@ export class SyndicLayoutComponent implements OnInit {
   isCoproprietaire = signal(false);
 
   // Sidebar state
-  isSidebarCollapsed = signal(false);
+  isSidebarCollapsed = signal(true);
   
   ngOnInit(): void {
     this.loadUserFromKeycloak();
@@ -138,6 +138,13 @@ export class SyndicLayoutComponent implements OnInit {
   
   toggleSidebar(): void {
     this.isSidebarCollapsed.update(value => !value);
+  }
+
+  onNavItemClick(): void {
+    // Collapse sidebar on mobile when a nav item is clicked
+    if (window.innerWidth < 768) {
+      this.isSidebarCollapsed.set(true);
+    }
   }
 
   switchToOwnerSpace(): void {

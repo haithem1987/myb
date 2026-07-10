@@ -305,6 +305,10 @@
         "parking": "Parking",
         "cave": "Cave",
         "commercial": "Commercial",
+        "villa": "Villa",
+        "penthouse": "Penthouse",
+        "studio": "Studio",
+        "house": "Maison",
         "other": "Autre"
       }
     },

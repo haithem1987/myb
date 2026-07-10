@@ -20,6 +20,8 @@
   "DOCUMENT_MANAGEMENT_DESC": "Organize and store your documents securely.",
   "INVOICE_MANAGEMENT": "Invoice Management",
   "INVOICE_MANAGEMENT_DESC": "Manage your invoices efficiently.",
+  "COPROPERTY_MANAGEMENT": "Coproperty Management",
+  "COPROPERTY_MANAGEMENT_DESC": "Manage your co-ownership buildings and owners.",
   "PROJECTS": "Projects",
   "INTERVENANTS": "Intervenants",
   "TASKS": "Tasks",
@@ -31,7 +33,10 @@
     "thu": "Thu",
     "fri": "Fri",
     "sat": "Sat",
-    "weekend": ["Sun", "Sat"]
+    "weekend": [
+      "Sun",
+      "Sat"
+    ]
   },
   "LOADING": "Loading...",
   "TIMESHEET_MANAGER": "Timesheet Manager",
@@ -428,7 +433,18 @@
       "ownerPhone": "Owner Phone",
       "rentedTo": "Rented To",
       "deleteConfirm": "Are you sure you want to delete this unit?",
-      "saveFirst": "Please save the coproperty first before managing units."
+      "saveFirst": "Please save the coproperty first before managing units.",
+      "types": {
+        "apartment": "Apartment",
+        "parking": "Parking",
+        "cave": "Cave",
+        "commercial": "Commercial",
+        "villa": "Villa",
+        "penthouse": "Penthouse",
+        "studio": "Studio",
+        "house": "House",
+        "other": "Other"
+      }
     },
     "owner": {
       "management": "Owner Management",

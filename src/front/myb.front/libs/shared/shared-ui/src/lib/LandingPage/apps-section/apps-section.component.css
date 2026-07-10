@@ -1,13 +1,170 @@
+/* ── Section wrapper ─────────────────────────────────────────── */
 .apps-section {
-  flex: 1;
+  padding: 80px 24px 100px;
+  background: linear-gradient(160deg, #faf5ff 0%, #f0f4ff 100%);
+  overflow: hidden;
 }
 
-.apps-grid {
-  width: 100%;
+/* ── Header ──────────────────────────────────────────────────── */
+.apps-section-header {
+  text-align: center;
+  margin-bottom: 56px;
 }
 
-@media (min-width: 1200px) {
-  .apps-grid {
-    width: 70%;
+.apps-section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: white;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+}
+
+.apps-section-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.apps-section-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  letter-spacing: -0.5px;
+  margin: 0 0 12px;
+}
+
+.apps-section-subtitle {
+  font-size: 1.1rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ── Grid ────────────────────────────────────────────────────── */
+.apps-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+@media (min-width: 900px) {
+  .apps-cards-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
+
+@media (max-width: 600px) {
+  .apps-cards-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.app-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.08);
+  border: 1.5px solid rgba(124, 58, 237, 0.08);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.3s ease,
+              border-color 0.3s ease;
+
+  /* entrance animation */
+  opacity: 0;
+  animation: cardEntrance 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.app-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(124, 58, 237, 0.18);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+/* ── Icon wrapper ────────────────────────────────────────────── */
+.app-card-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.app-card:hover .app-card-icon-wrap {
+  background: linear-gradient(135deg, #ddd6fe 0%, #c7d2fe 100%);
+}
+
+.app-card-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.app-card-svg {
+  width: 44px;
+  height: 44px;
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+.app-card-body {
+  text-align: center;
+}
+
+.app-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.app-card-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Price tag ───────────────────────────────────────────────── */
+.app-card-tag {
+  margin-top: auto;
+  background: linear-gradient(135deg, #f5f3ff, #eef2ff);
+  border-radius: 50px;
+  padding: 4px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+.per-month {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* ── Entrance animation ──────────────────────────────────────── */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+

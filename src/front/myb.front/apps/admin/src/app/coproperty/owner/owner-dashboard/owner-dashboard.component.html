@@ -105,8 +105,8 @@
                  [class.bi-archive]="unit.type === 'Cave'"></i>
             </div>
             <div class="unit-info">
-              <div class="unit-name">{{ unit.buildingName }}</div>
-              <div class="unit-details">{{ unit.unitNumber }} • {{ unit.surface }}m² • {{ unit.shares }} tantièmes</div>
+              <div class="unit-name">Lot {{ unit.unitNumber }} <span class="text-muted" style="font-size: 0.9em;">• {{ unit.type }}</span></div>
+              <div class="unit-details">{{ unit.buildingName }} • {{ unit.surface }}m² • {{ unit.shares }} tantièmes</div>
             </div>
             <button class="btn-icon" title="Voir les détails">
               <i class="bi bi-chevron-right"></i>
@@ -120,12 +120,14 @@
     <div class="card">
       <div class="card-header">
         <h2>Paiements en Attente</h2>
-        <a routerLink="/coproperty/owner/invoices" class="btn-link">Voir tout</a>
+        <a routerLink="/coproperty/owner/charges" class="btn-link">Voir tout</a>
       </div>
       <div class="card-body">
         <div class="invoice-list" *ngIf="!loading(); else loadingTemplate">
           <div class="invoice-item" 
                *ngFor="let invoice of pendingInvoices()"
+               routerLink="/coproperty/owner/charges"
+               style="cursor: pointer"
                [class.overdue]="isOverdue(invoice.dueDate)">
             <div class="invoice-header">
               <div class="invoice-number">{{ invoice.number }}</div>

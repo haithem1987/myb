@@ -38,6 +38,20 @@
           <i class="bi bi-cash-stack"></i>
           <span>Mes Charges</span>
         </a>
+
+        <a routerLink="/coproperty/owner/signalements" 
+           routerLinkActive="active" 
+           class="nav-link">
+          <i class="bi bi-megaphone"></i>
+          <span>Signalements</span>
+        </a>
+
+        <a routerLink="/coproperty/owner/discussions"
+           routerLinkActive="active"
+           class="nav-link">
+          <i class="bi bi-chat-square-text"></i>
+          <span>Discussions</span>
+        </a>
       </nav>
       
       <div class="user-section">
@@ -47,18 +61,7 @@
           <span>Espace Syndic</span>
         </button>
 
-        <div class="user-info" *ngIf="currentUser()">
-          <div class="user-avatar">
-            {{ currentUser().firstName[0] }}{{ currentUser().lastName[0] }}
-          </div>
-          <div class="user-details">
-            <div class="user-name">{{ currentUser().firstName }} {{ currentUser().lastName }}</div>
-            <div class="user-role">Copropriétaire</div>
-          </div>
-        </div>
-        <button class="btn-logout" (click)="logout()" title="Déconnexion">
-          <i class="bi bi-box-arrow-right"></i>
-        </button>
+        <myb-front-user-dropdown></myb-front-user-dropdown>
       </div>
       
       <!-- Mobile Menu Button -->
@@ -103,6 +106,22 @@
        (click)="toggleMobileMenu()">
       <i class="bi bi-cash-stack"></i>
       <span>Mes Charges</span>
+    </a>
+
+    <a routerLink="/coproperty/owner/signalements" 
+       routerLinkActive="active" 
+       class="nav-link"
+       (click)="toggleMobileMenu()">
+      <i class="bi bi-megaphone"></i>
+      <span>Signalements</span>
+    </a>
+
+    <a routerLink="/coproperty/owner/discussions"
+       routerLinkActive="active"
+       class="nav-link"
+       (click)="toggleMobileMenu()">
+      <i class="bi bi-chat-square-text"></i>
+      <span>Discussions</span>
     </a>
   </nav>
   

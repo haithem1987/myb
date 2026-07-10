@@ -398,7 +398,10 @@ export class OwnerManagementComponent implements OnInit {
       const users = await this.keycloakService.searchKeycloakUsers(email);
       // Filter out users who are already owners
       const existingOwnerUserIds = new Set(this.owners.map(o => o.userId).filter(Boolean));
-      const filtered = users.filter(u => !existingOwnerUserIds.has(u.id));
+      const existingOwnerEmails = new Set(this.owners.map(o => o.email?.toLowerCase()).filter(Boolean));
+      const filtered = users.filter(u =>
+        !existingOwnerUserIds.has(u.id) && !existingOwnerEmails.has(u.email?.toLowerCase())
+      );
       this.keycloakSearchResults.set(filtered);
     } catch (err) {
       console.error('[Owner Management] Keycloak search error:', err);

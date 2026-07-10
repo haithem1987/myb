@@ -35,11 +35,11 @@ module "k8s_hprd" {
   source = "../../modules/k8s-cluster"
 
   service_name  = var.service_name
-  cluster_name  = "myb-hprd"
+  cluster_name  = "myb-coproperty-k8s"
   environment   = "hprd"
   region        = var.region
   kube_version  = var.kube_version
-  node_flavor   = "b3-8"          # 4 vCPU / 8 GB – pre-prod, cost efficient
+  node_flavor   = "b3-8" # 4 vCPU / 8 GB – pre-prod, cost efficient
   desired_nodes = var.desired_nodes
   min_nodes     = 0
   max_nodes     = 2

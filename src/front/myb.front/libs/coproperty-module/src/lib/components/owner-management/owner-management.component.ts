@@ -8,6 +8,7 @@ import { UnitService, UnitExtended } from '../../services/unit.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { OwnerService } from '../../services/owner.service';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { ModalService } from '@myb-front/shared-ui';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { of, from, Subject } from 'rxjs';
 import { map, finalize, switchMap, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
@@ -62,6 +63,7 @@ export class OwnerManagementComponent implements OnInit {
   private copropertyService = inject(CopropertyService);
   private ownerService = inject(OwnerService);
   private keycloakService = inject(KeycloakService);
+  private modalService = inject(ModalService);
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
   
@@ -148,7 +150,7 @@ export class OwnerManagementComponent implements OnInit {
           id: u.id!,
           unitNumber: u.unitNumber,
           copropertyId: u.copropertyId,
-          copropertyName: u.copropertyName || 'Unknown'
+          copropertyName: u.copropertyName || this.translateService.instant('common.unknown')
         }));
         this.availableUnits = [...this.allUnits];
         this.unitSearchTerm = '';
@@ -288,7 +290,7 @@ export class OwnerManagementComponent implements OnInit {
               if (success) {
                 // Remove from local list immediately for better UX
                 this.owners = this.owners.filter((o) => o.id !== owner.id);
-                this.translateService.get('coproperty.messages.deleted').subscribe((msg) => {
+                this.translateService.get('coproperty.messages.ownerDeleted').subscribe((msg) => {
                   this.showAlert('success', msg);
                 });
               }
@@ -311,14 +313,14 @@ export class OwnerManagementComponent implements OnInit {
     // Validate that at least one unit is selected
     if (selectedUnitIds.length === 0) {
       this.translateService.get('coproperty.owner.unitRequired').subscribe((msg) => {
-        this.showAlert('warning', msg || 'Veuillez sélectionner au moins une unité');
+        this.showAlert('warning', msg || this.translateService.instant('validation.required'));
       });
       return;
     }
 
     // For new owners, a Keycloak user must be selected
     if (!this.editingOwnerId && !this.selectedKeycloakUser()) {
-      this.showAlert('warning', 'Veuillez sélectionner un utilisateur inscrit');
+      this.showAlert('warning', this.translateService.instant('coproperty.owner.selectUserRequired'));
       return;
     }
     
@@ -363,7 +365,7 @@ export class OwnerManagementComponent implements OnInit {
     ).subscribe({
       next: (owner) => {
         console.log('[Owner Management] Owner saved:', owner);
-        const messageKey = this.editingOwnerId ? 'coproperty.messages.updated' : 'coproperty.messages.created';
+        const messageKey = this.editingOwnerId ? 'coproperty.messages.ownerUpdated' : 'coproperty.messages.ownerCreated';
         this.translateService.get(messageKey).subscribe((msg) => {
           this.showAlert('success', msg);
         });
@@ -455,6 +457,20 @@ export class OwnerManagementComponent implements OnInit {
    */
   async toggleOwnerRole(owner: Owner): Promise<void> {
     if (!owner.userId) return;
+
+    if (owner.hasOwnerRole) {
+      const confirmed = await this.modalService.confirm({
+        title: this.translateService.instant('coproperty.owner.removeRoleConfirmTitle'),
+        message: `${this.translateService.instant('coproperty.owner.removeRoleConfirmMessage')}<br/><br/><strong>${owner.firstName} ${owner.lastName}</strong>`,
+        confirmButtonText: this.translateService.instant('common.confirm'),
+        confirmButtonClass: 'btn-danger',
+        cancelButtonText: this.translateService.instant('common.cancel')
+      });
+
+      if (!confirmed) {
+        return;
+      }
+    }
     
     this.assigningRole.set(owner.userId);
     try {
@@ -504,9 +520,9 @@ export class OwnerManagementComponent implements OnInit {
   
   getOwnerUnits(owner: Owner): string {
     if (owner.ownerUnits && owner.ownerUnits.length > 0) {
-      return owner.ownerUnits.map(ou => ou.unit?.unitNumber || 'Unknown').join(', ');
+      return owner.ownerUnits.map(ou => ou.unit?.unitNumber || this.translateService.instant('common.unknown')).join(', ');
     }
-    return 'No units';
+    return this.translateService.instant('coproperty.unit.noUnitsAvailable');
   }
   
   isUnitSelected(unitId: string): boolean {

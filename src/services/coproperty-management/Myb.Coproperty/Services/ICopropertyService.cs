@@ -6,6 +6,7 @@ namespace Myb.Coproperty.Services
     {
         Task<IEnumerable<Models.Coproperty>> GetAllAsync();
         Task<Models.Coproperty> GetByIdAsync(Guid id);
+        Task<Models.Coproperty> GetByNameAsync(string name, Guid? excludeId = null);
         Task<Models.Coproperty> CreateAsync(Models.Coproperty coproperty);
         Task UpdateAsync(Models.Coproperty coproperty);
         Task DeleteAsync(Guid id);

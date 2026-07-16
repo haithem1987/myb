@@ -66,6 +66,7 @@
               <div class="form-group">
                 <label class="form-label">
                   {{ 'coproperty.form.nameLabel' | translate }}
+                  <span class="text-danger">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -74,8 +75,14 @@
                   [placeholder]="'coproperty.form.namePlaceholder' | translate"
                   [class.is-invalid]="copropertyForm.get('name')?.invalid && copropertyForm.get('name')?.touched"
                 >
-                <div class="invalid-feedback" *ngIf="copropertyForm.get('name')?.invalid && copropertyForm.get('name')?.touched">
+                <div class="invalid-feedback" *ngIf="copropertyForm.get('name')?.hasError('required') && copropertyForm.get('name')?.touched">
                   {{ 'validation.required' | translate }}
+                </div>
+                <div class="invalid-feedback" *ngIf="copropertyForm.get('name')?.hasError('minlength') && copropertyForm.get('name')?.touched">
+                  {{ 'validation.minLength' | translate }}
+                </div>
+                <div class="invalid-feedback" *ngIf="copropertyForm.get('name')?.hasError('duplicateName') && copropertyForm.get('name')?.touched">
+                  {{ 'coproperty.messages.duplicateName' | translate }}
                 </div>
               </div>
             </div>
@@ -93,6 +100,7 @@
               <div class="form-group">
                 <label class="form-label">
                   {{ 'coproperty.form.addressLabel' | translate }}
+                  <span class="text-danger">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -112,6 +120,7 @@
               <div class="form-group">
                 <label class="form-label">
                   {{ 'coproperty.form.cityLabel' | translate }}
+                  <span class="text-danger">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -128,6 +137,7 @@
               <div class="form-group">
                 <label class="form-label">
                   {{ 'coproperty.form.postalCodeLabel' | translate }}
+                  <span class="text-danger">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -144,6 +154,7 @@
               <div class="form-group">
                 <label class="form-label">
                   {{ 'coproperty.form.countryLabel' | translate }}
+                  <span class="text-danger">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -161,6 +172,7 @@
                 <label class="form-label">
                   <i class="bi bi-currency-exchange me-1"></i>
                   {{ 'coproperty.form.currencyLabel' | translate }}
+                  <span class="text-danger">*</span>
                 </label>
                 <select 
                   class="form-select" 
@@ -182,6 +194,7 @@
               <div class="form-group">
                 <label class="form-label">
                   {{ 'coproperty.form.totalUnitsLabel' | translate }}
+                  <span class="text-danger">*</span>
                 </label>
                 <input 
                   type="number" 
@@ -198,6 +211,7 @@
               <div class="form-group">
                 <label class="form-label">
                   {{ 'coproperty.form.totalSharesLabel' | translate }}
+                  <span class="text-danger">*</span>
                 </label>
                 <input 
                   type="number" 

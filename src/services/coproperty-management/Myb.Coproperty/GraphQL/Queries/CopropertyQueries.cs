@@ -20,6 +20,15 @@ namespace Myb.Coproperty.GraphQL.Queries
             await copropertyService.GetByManagerIdAsync(managerId);
 
         /// <summary>
+        /// Get a coproperty by name (for duplicate name checking)
+        /// </summary>
+        public async Task<Models.Coproperty> GetCopropertyByName(
+            string name,
+            Guid? excludeId,
+            [Service] ICopropertyService copropertyService) =>
+            await copropertyService.GetByNameAsync(name, excludeId);
+
+        /// <summary>
         /// Get dashboard statistics for coproperties
         /// </summary>
         public async Task<DashboardStats> GetDashboardStats(

@@ -39,6 +39,35 @@ namespace Myb.Coproperty.Services
 
         public async Task DeleteAsync(Guid id)
         {
+            var coproperty = _copropertyRepository.GetById(id);
+            
+            if (coproperty == null)
+                throw new InvalidOperationException($"Coproperty with ID {id} not found");
+            
+            // Prevent deletion if coproperty has associated units
+            if (coproperty.Units != null && coproperty.Units.Any())
+            {
+                throw new InvalidOperationException(
+                    $"Cannot delete coproperty '{coproperty.Name}' - it has {coproperty.Units.Count} associated unit(s). " +
+                    $"Please remove all units before deleting this coproperty.");
+            }
+            
+            // Prevent deletion if coproperty has associated charges
+            if (coproperty.Charges != null && coproperty.Charges.Any())
+            {
+                throw new InvalidOperationException(
+                    $"Cannot delete coproperty '{coproperty.Name}' - it has {coproperty.Charges.Count} associated charge(s). " +
+                    $"Please remove all charges before deleting this coproperty.");
+            }
+            
+            // Prevent deletion if coproperty has associated maintenance requests
+            if (coproperty.MaintenanceRequests != null && coproperty.MaintenanceRequests.Any())
+            {
+                throw new InvalidOperationException(
+                    $"Cannot delete coproperty '{coproperty.Name}' - it has associated maintenance requests. " +
+                    $"Please remove these before deleting this coproperty.");
+            }
+            
             await _copropertyRepository.DeleteAsync(id);
         }
 
@@ -50,6 +79,11 @@ namespace Myb.Coproperty.Services
         public async Task<Models.Coproperty> GetByIdAsync(Guid id)
         {
             return await Task.FromResult(_copropertyRepository.GetById(id)!);
+        }
+
+        public async Task<Models.Coproperty> GetByNameAsync(string name, Guid? excludeId = null)
+        {
+            return await Task.FromResult(_copropertyRepository.GetByName(name, excludeId)!);
         }
 
         public async Task<IEnumerable<Models.Coproperty>> GetByManagerIdAsync(Guid managerId)

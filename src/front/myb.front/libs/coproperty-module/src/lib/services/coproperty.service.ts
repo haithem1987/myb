@@ -133,6 +133,15 @@ const DELETE_COPROPERTY = gql`
   }
 `;
 
+const CHECK_COPROPERTY_NAME_EXISTS = gql`
+  query CheckCopropertyNameExists($name: String!, $excludeId: UUID) {
+    copropertyByName(name: $name, excludeId: $excludeId) {
+      id
+      name
+    }
+  }
+`;
+
 const CREATE_FUND_CALL = gql`
   mutation CreateFundCall($input: CreateFundCallInput!) {
     createFundCall(input: $input) {
@@ -405,6 +414,19 @@ export class CopropertyService {
       })
       .pipe(
         map(result => result.data!.deleteCoproperty)
+      );
+  }
+
+  checkCopropertyNameExists(name: string, excludeId?: string): Observable<boolean> {
+    return this.apollo
+      .query<{ copropertyByName: Coproperty | null }>({
+        query: CHECK_COPROPERTY_NAME_EXISTS,
+        variables: { name, excludeId },
+        context: { service: 'copropertyService' },
+        fetchPolicy: 'network-only'
+      })
+      .pipe(
+        map(result => result.data.copropertyByName !== null)
       );
   }
 

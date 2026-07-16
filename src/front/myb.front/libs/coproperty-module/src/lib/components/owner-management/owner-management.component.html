@@ -252,7 +252,7 @@
               <td>{{ owner.phone }}</td>
               <td>
                 <span class="badge bg-secondary me-1" *ngFor="let ownerUnit of owner.ownerUnits">
-                  <i class="bi bi-building"></i> {{ ownerUnit.unit?.unitNumber || 'Unknown' }}
+                  <i class="bi bi-building"></i> {{ ownerUnit.unit?.unitNumber || ('common.unknown' | translate) }}
                   <small *ngIf="ownerUnit.ownershipPercentage !== 100"> ({{ ownerUnit.ownershipPercentage }}%)</small>
                 </span>
                 <span *ngIf="!owner.ownerUnits || owner.ownerUnits.length === 0" class="text-muted">

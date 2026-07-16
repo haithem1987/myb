@@ -1,12 +1,15 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, AsyncValidatorFn } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CreateCopropertyInput, Coproperty, Currency } from '../../models/coproperty.model';
 import { ManagerMultiSelectComponent } from '../manager-multi-select/manager-multi-select.component';
 import { KeycloakService } from '@myb-front/auth';
+import { Observable, of } from 'rxjs';
+import { map, catchError, debounceTime, first } from 'rxjs/operators';
+import { ToastService } from '@myb-front/shared-ui';
 
 @Component({
   selector: 'myb-coproperty-new',
@@ -27,6 +30,8 @@ export class CopropertyNewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private copropertyService = inject(CopropertyService);
   private keycloakService = inject(KeycloakService);
+  private toastService = inject(ToastService);
+  private translateService = inject(TranslateService);
 
   activeTab = signal<string>('info');
   copropertyForm!: FormGroup;
@@ -73,9 +78,27 @@ export class CopropertyNewComponent implements OnInit {
     }
   }
 
+  // Create async validator for duplicate name check
+  private duplicateNameValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value) {
+        return of(null);
+      }
+
+      const excludeId = this.isEditMode() ? this.copropertyId() || undefined : undefined;
+
+      return this.copropertyService.checkCopropertyNameExists(control.value, excludeId).pipe(
+        debounceTime(500),
+        map(exists => exists ? { duplicateName: true } : null),
+        catchError(() => of(null)),
+        first()
+      );
+    };
+  }
+
   initializeForm(): void {
     this.copropertyForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', [Validators.required, Validators.minLength(3)], [this.duplicateNameValidator()]],
       address: ['', [Validators.required]],
       city: ['', [Validators.required]],
       postalCode: ['', [Validators.required]],

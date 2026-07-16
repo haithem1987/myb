@@ -1,20 +1,21 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { Observable, firstValueFrom } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Observable, firstValueFrom, combineLatest, switchMap, of } from 'rxjs';
+import { catchError, map, debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { CopropertyService } from '../services/coproperty.service';
 import { Coproperty } from '../models/coproperty.models';
-import { ToastService, ModalService } from '@myb-front/shared-ui';
+import { ModalService, ToastService } from '@myb-front/shared-ui';
 
 @Component({
   selector: 'myb-coproperty-list',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, ReactiveFormsModule],
   template: `
     <div class="container-fluid mt-4">
+      <!-- Header Section -->
       <div class="row mb-4">
         <div class="col-md-8">
           <h1>
@@ -31,15 +32,50 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
         </div>
       </div>
 
-      <ng-container *ngIf="coproperties$ | async as copropertiesList; else loadingOrError">
+      <!-- Search and Filter Section -->
+      <div class="row mb-4">
+        <div class="col-md-6 mb-2 mb-md-0">
+          <div class="input-group">
+            <span class="input-group-text bg-light">
+              <i class="bi bi-search"></i>
+            </span>
+            <input 
+              type="text" 
+              class="form-control" 
+              [placeholder]="'coproperty.list.search' | translate"
+              [formControl]="searchControl"
+              aria-label="Search coproperties"
+            >
+          </div>
+        </div>
+        <div class="col-md-6">
+          <select 
+            class="form-select" 
+            [formControl]="filterControl"
+            aria-label="Filter by status"
+          >
+            <option [value]="''">{{ 'coproperty.list.allCoproperties' | translate }}</option>
+            <option [value]="'active'">{{ 'coproperty.list.active' | translate }}</option>
+            <option [value]="'inactive'">{{ 'coproperty.list.inactive' | translate }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Coproperties List -->
+      <ng-container *ngIf="filteredCoproperties$ | async as copropertiesList; else loadingOrError">
         <div *ngIf="copropertiesList.length > 0; else emptyState" class="row">
           <div *ngFor="let coproperty of copropertiesList" class="col-md-6 col-lg-4 mb-4">
             <div class="card h-100 shadow-sm coproperty-card">
               <div class="card-body">
-                <h5 class="card-title text-primary fw-bold">
-                  <i class="bi bi-building me-2"></i>
-                  {{ coproperty.name }}
-                </h5>
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="card-title text-primary fw-bold mb-0">
+                    <i class="bi bi-building me-2"></i>
+                    {{ coproperty.name }}
+                  </h5>
+                  <span class="badge" [ngClass]="coproperty.isActive ? 'bg-success' : 'bg-secondary'">
+                    {{ (coproperty.isActive ? 'coproperty.list.active' : 'coproperty.list.inactive') | translate }}
+                  </span>
+                </div>
                 <p class="card-text text-muted mb-3">
                   <i class="bi bi-geo-alt-fill me-1"></i> {{ coproperty.address }}
                 </p>
@@ -63,19 +99,19 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
                 </div>
                 <div class="d-flex flex-wrap gap-2 mt-3">
                   <button type="button" class="btn btn-sm btn-outline-primary flex-grow-1" 
-                    (click)="viewDetails(coproperty.id)" title="{{ 'coproperty.list.view' | translate }}">
+                    (click)="viewDetails(coproperty.id)" [title]="'coproperty.list.view' | translate">
                     <i class="bi bi-eye"></i>
                   </button>
                   <button type="button" class="btn btn-sm btn-violet flex-grow-1" 
-                    (click)="editCoproperty(coproperty.id)" title="{{ 'coproperty.list.edit' | translate }}">
+                    (click)="editCoproperty(coproperty.id)" [title]="'coproperty.list.edit' | translate">
                     <i class="bi bi-pencil-square"></i>
                   </button>
                   <button type="button" class="btn btn-sm btn-outline-secondary" 
-                    (click)="distributeCharges(coproperty.id)" title="Calculer distribution">
+                    (click)="distributeCharges(coproperty.id)" title="Calculate distribution">
                     <i class="bi bi-calculator"></i>
                   </button>
-                  <button type="button" class="btn btn-sm btn-outline-danger" 
-                    (click)="deleteCoproperty(coproperty.id, coproperty.name)" title="{{ 'coproperty.list.delete' | translate }}">
+                  <button type="button" class="btn btn-sm btn-outline-danger"
+                    (click)="deleteCoproperty(coproperty)" [title]="'coproperty.list.delete' | translate">
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>
@@ -91,6 +127,7 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
         </ng-template>
       </ng-container>
 
+      <!-- Loading and Error States -->
       <ng-template #loadingOrError>
         <div *ngIf="!loadError()" class="text-center py-5">
           <div class="spinner-border text-primary" role="status">
@@ -101,7 +138,7 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
           <i class="bi bi-exclamation-triangle-fill text-danger display-4 d-block mb-3"></i>
           <p class="text-danger">{{ loadError() }}</p>
           <button class="btn btn-outline-primary mt-2" (click)="reload()">
-            <i class="bi bi-arrow-clockwise me-1"></i> Réessayer
+            <i class="bi bi-arrow-clockwise me-1"></i> {{ 'coproperty.list.retry' | translate }}
           </button>
         </div>
       </ng-template>
@@ -150,6 +187,16 @@ import { ToastService, ModalService } from '@myb-front/shared-ui';
       background-clip: text;
     }
 
+    .input-group {
+      border: 1px solid #dee2e6;
+      border-radius: 0.375rem;
+    }
+
+    .input-group .form-control,
+    .input-group .input-group-text {
+      border: none;
+    }
+
     @media (max-width: 992px) {
       .col-lg-4 { flex: 0 0 50%; max-width: 50%; }
     }
@@ -170,18 +217,70 @@ export class CopropertyListComponent {
   coproperties$: Observable<Coproperty[]>;
   readonly loadError = signal<string | null>(null);
   
+  // Form controls for search and filter
+  readonly searchControl = new FormControl('');
+  readonly filterControl = new FormControl('');
+
+  filteredCoproperties$: Observable<Coproperty[]>;
+
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
+  private translateService = inject(TranslateService);
 
   constructor(private copropertyService: CopropertyService, private router: Router) {
     this.coproperties$ = this.loadCoproperties();
+    this.filteredCoproperties$ = combineLatest([
+      this.coproperties$,
+      this.searchControl.valueChanges.pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        map(val => val?.toLowerCase() || ''),
+        // Important: emit initial value to prevent combineLatest from blocking
+        // Without this, the observable won't emit until user types in search
+        startWith('')
+      ),
+      this.filterControl.valueChanges.pipe(
+        distinctUntilChanged(),
+        // Important: emit initial value to prevent combineLatest from blocking
+        startWith('')
+      )
+    ]).pipe(
+      map(([coproperties, searchTerm, filterStatus]) => {
+        let filtered = [...coproperties];
+
+        // Sort by createdAt descending (newest first)
+        filtered.sort((a, b) => {
+          const dateA = new Date(a.createdAt).getTime();
+          const dateB = new Date(b.createdAt).getTime();
+          return dateB - dateA;
+        });
+
+        // Filter by search term (name, address)
+        if (searchTerm) {
+          filtered = filtered.filter(c =>
+            c.name.toLowerCase().includes(searchTerm) ||
+            c.address.toLowerCase().includes(searchTerm)
+          );
+        }
+
+        // Filter by status
+        if (filterStatus === 'active') {
+          filtered = filtered.filter(c => c.isActive);
+        } else if (filterStatus === 'inactive') {
+          filtered = filtered.filter(c => !c.isActive);
+        }
+
+        return filtered;
+      })
+    );
   }
 
+  
   private loadCoproperties(): Observable<Coproperty[]> {
     this.loadError.set(null);
     return this.copropertyService.getCoproperties().pipe(
       catchError(err => {
-        const msg = err?.message || 'Erreur lors du chargement des copropriétés';
+        const msg = err?.message || this.translateService.instant('Error loading coproperties');
         this.loadError.set(msg);
         return of([] as Coproperty[]);
       })
@@ -206,39 +305,57 @@ export class CopropertyListComponent {
 
   manageTravaux(id: string): void {
     this.router.navigate(['/coproperty/syndic/coproperties', id], { queryParams: { tab: 'maintenance' } });
-    this.toastService.show('Accès à la gestion des travaux', { classname: 'bg-info text-light' });
+    this.toastService.show(this.translateService.instant('Access to work management'), { classname: 'bg-info text-light' });
   }
 
   createInvoice(id: string): void {
     // Invoice module is separate and not yet integrated
-    this.toastService.show('La fonctionnalité de facturation sera bientôt disponible', { classname: 'bg-warning text-dark' });
+    this.toastService.show(this.translateService.instant('Billing feature will be available soon'), { classname: 'bg-warning text-dark' });
   }
 
   distributeCharges(id: string): void {
     this.router.navigate(['/coproperty/syndic/distribution'], { queryParams: { copropertyId: id } });
-    this.toastService.show('Calcul de la distribution des charges', { classname: 'bg-info text-light' });
+    this.toastService.show(this.translateService.instant('Calculate charge distribution'), { classname: 'bg-info text-light' });
   }
 
-  async deleteCoproperty(id: string, name: string): Promise<void> {
-    console.log('Attempting to delete coproperty with ID:', id);
+  async deleteCoproperty(coproperty: Coproperty): Promise<void> {
+    // Check if there are associated units
+    if (coproperty && coproperty.totalUnits && coproperty.totalUnits > 0) {
+      // Show confirmation modal to delete units as well
+      const deleteWithUnits = await this.modalService.confirm({
+        title: this.translateService.instant('coproperty.unit.deleteUnitsWithCoproperty'),
+        message: `${this.translateService.instant('coproperty.unit.deleteUnitsWarning').replace('{{count}}', coproperty.totalUnits.toString())}<br/><br/><strong class="text-danger">${this.translateService.instant('coproperty.list.deleteWarning')}</strong>`,
+        confirmButtonText: this.translateService.instant('common.delete'),
+        confirmButtonClass: 'btn-danger',
+        cancelButtonText: this.translateService.instant('common.cancel')
+      });
+
+      if (!deleteWithUnits) {
+        return;
+      }
+    }
+
+    // Show final confirmation dialog before deletion
     const confirmed = await this.modalService.confirm({
-      title: 'Supprimer la copropriété',
-      message: 'Êtes-vous sûr de vouloir supprimer la copropriété "' + name + '" ?<br/><br/><strong class="text-danger">Cette action est irréversible.</strong><br/>Toutes les données associées (lots, charges, propriétaires) seront supprimées.',
-      confirmButtonText: 'Supprimer',
+      title: this.translateService.instant('coproperty.list.deleteConfirm'),
+      message: `${this.translateService.instant('common.deleteMessage')}<br/>"<strong>${coproperty.name}</strong>"?<br/><br/><strong class="text-danger">${this.translateService.instant('coproperty.list.deleteWarning')}</strong>`,
+      confirmButtonText: this.translateService.instant('common.delete'),
       confirmButtonClass: 'btn-danger',
-      cancelButtonText: 'Annuler'
+      cancelButtonText: this.translateService.instant('common.cancel')
     });
-    console.log('User confirmation result:', confirmed);
+
     if (confirmed) {
       try {
-        console.log('Calling delete mutation for ID:', id);
-        await firstValueFrom(this.copropertyService.deleteCoproperty(id));
-        this.toastService.show('La copropriété "' + name + '" a été supprimée avec succès', { classname: 'bg-success text-light' });
+        await firstValueFrom(this.copropertyService.deleteCoproperty(coproperty.id));
+        this.toastService.show(
+          `"${coproperty.name}" ${this.translateService.instant('coproperty.messages.deleted')}`,
+          { classname: 'bg-success text-light' }
+        );
         this.reload();
       } catch (error: any) {
         console.error('Delete error:', error);
-        const errorMsg = error?.error?.errors?.[0]?.message || error?.message || 'Erreur lors de la suppression';
-        this.toastService.show('Erreur: ' + errorMsg, { classname: 'bg-danger text-light' });
+        const errorMsg = error?.error?.errors?.[0]?.message || error?.message || this.translateService.instant('Error deleting coproperty');
+        this.toastService.show(`Error: ${errorMsg}`, { classname: 'bg-danger text-light' });
       }
     }
   }

@@ -21,6 +21,8 @@ namespace Myb.Coproperty.GraphQL.Mutations
 
         public async Task<bool> DeleteCoproperty(Guid id, [Service] ICopropertyService copropertyService)
         {
+            // Service will throw InvalidOperationException if coproperty has associated data
+            // HotChocolate automatically converts exceptions to GraphQL errors
             await copropertyService.DeleteAsync(id);
             return true;
         }

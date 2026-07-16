@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
@@ -11,6 +11,7 @@ import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, finalize } from 'rxjs/operators';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { ModalService } from '@myb-front/shared-ui';
 
 @Component({
   selector: 'myb-units-list',
@@ -27,6 +28,7 @@ export class UnitsListComponent implements OnInit {
   private fb = inject(FormBuilder);
   private toastService = inject(ToastService);
   private translateService = inject(TranslateService);
+  private modalService = inject(ModalService);
 
   units = signal<UnitExtended[]>([]);
   coproperties = signal<Coproperty[]>([]);
@@ -35,6 +37,7 @@ export class UnitsListComponent implements OnInit {
   searchTerm = signal<string>('');
   filterType = signal<string>('');
   filterOccupancy = signal<string>('');
+  sortBy = signal<'newest' | 'oldest' | 'number' | 'area' | 'shares'>('newest');
   showAddForm = signal<boolean>(false);
   editingUnitId = signal<string | null>(null);
 
@@ -91,8 +94,8 @@ export class UnitsListComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading units:', err);
-        this.showAlert('danger', 'Erreur lors du chargement des lots');
-         this.loading.set(false);
+        this.showAlert('danger', this.translateService.instant('coproperty.unit.noUnitsFound'));
+        this.loading.set(false);
       }
     });
   }
@@ -115,6 +118,11 @@ export class UnitsListComponent implements OnInit {
   onOccupancyFilterChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
     this.filterOccupancy.set(select.value);
+  }
+
+  onSortChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.sortBy.set(select.value as any);
   }
 
   onSearchInput(event: Event): void {
@@ -152,7 +160,48 @@ export class UnitsListComponent implements OnInit {
       filtered = filtered.filter(unit => unit.isOccupied === isOccupied);
     }
 
+    // Apply sorting
+    filtered = this.sortUnits(filtered);
+
     return filtered;
+  }
+
+  // Getter for occupied form control to avoid template type issues
+  get occupiedControl(): FormControl {
+    return this.unitForm.get('isOccupied') as FormControl;
+  }
+
+  private sortUnits(units: UnitExtended[]): UnitExtended[] {
+    const sorted = [...units];
+    const sortValue = this.sortBy();
+
+    switch (sortValue) {
+      case 'newest':
+        // Sort by creation date descending (newest first)
+        return sorted.sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
+      case 'oldest':
+        // Sort by creation date ascending (oldest first)
+        return sorted.sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateA - dateB;
+        });
+      case 'number':
+        // Sort by unit number
+        return sorted.sort((a, b) => a.unitNumber.localeCompare(b.unitNumber));
+      case 'area':
+        // Sort by area descending
+        return sorted.sort((a, b) => (b.area || 0) - (a.area || 0));
+      case 'shares':
+        // Sort by shares descending
+        return sorted.sort((a, b) => b.shares - a.shares);
+      default:
+        return sorted;
+    }
   }
 
   getOccupiedUnitsCount(): number {
@@ -247,27 +296,36 @@ export class UnitsListComponent implements OnInit {
     });
   }
 
-  deleteUnit(unit: UnitExtended): void {
-    this.translateService.get('coproperty.unit.deleteConfirm').subscribe((confirmMsg) => {
-      if (confirm(confirmMsg)) {
-        this.loading.set(true);
-        this.unitService.deleteUnit(unit.id!).subscribe({
-          next: () => {
-            this.translateService.get('coproperty.messages.deleted').subscribe((msg) => {
-              this.showAlert('success', msg);
-            });
-            this.loadAllUnits();
-          },
-          error: (err) => {
-            console.error('Error deleting unit:', err);
-            this.translateService.get('coproperty.messages.error').subscribe((msg) => {
-              this.showAlert('danger', msg);
-            });
-            this.loading.set(false);
-          }
-        });
-      }
+  async deleteUnit(unit: UnitExtended): Promise<void> {
+    const confirmed = await this.modalService.confirm({
+      title: this.translateService.instant('coproperty.unit.deleteConfirm'),
+      message: `${this.translateService.instant('common.deleteMessage')}<br/>"<strong>${unit.unitNumber}</strong>"?<br/><br/><strong class="text-danger">${this.translateService.instant('coproperty.unit.deleteWarning')}</strong>`,
+      confirmButtonText: this.translateService.instant('common.delete'),
+      confirmButtonClass: 'btn-danger',
+      cancelButtonText: this.translateService.instant('common.cancel')
     });
+
+    if (confirmed) {
+      this.loading.set(true);
+      this.unitService.deleteUnit(unit.id!).subscribe({
+        next: () => {
+          const successMsg = `"${unit.unitNumber}" ${this.translateService.instant('coproperty.messages.unitDeleted')}`;
+          this.showAlert('success', successMsg);
+          this.loadAllUnits();
+        },
+        error: (err) => {
+          console.error('Error deleting unit:', err);
+          const rawErrorMessage = err?.error?.errors?.[0]?.message || err?.message || '';
+          const normalizedError = rawErrorMessage.toLowerCase();
+          const key = normalizedError.includes('associated with one or more owners')
+            ? 'coproperty.messages.unitDeleteBlockedDueToOwners'
+            : 'coproperty.messages.error';
+          const errorMsg = this.translateService.instant(key);
+          this.showAlert('danger', errorMsg);
+          this.loading.set(false);
+        }
+      });
+    }
   }
 
   saveUnit(): void {
@@ -285,12 +343,11 @@ export class UnitsListComponent implements OnInit {
       operation.subscribe({
         next: () => {
           const messageKey = this.editingUnitId() 
-            ? 'coproperty.messages.updated'
-            : 'coproperty.messages.created';
+            ? 'coproperty.messages.unitUpdated'
+            : 'coproperty.messages.unitCreated';
           
-          this.translateService.get(messageKey).subscribe((msg) => {
-            this.showAlert('success', msg);
-          });
+          const successMsg = this.translateService.instant(messageKey);
+          this.showAlert('success', successMsg);
           
           this.showAddForm.set(false);
           this.unitForm.reset();
@@ -300,22 +357,21 @@ export class UnitsListComponent implements OnInit {
           console.error('Error saving unit:', err);
           
           const errorMessage = err?.error?.errors?.[0]?.message || err?.message || '';
-          let translationKey = 'coproperty.messages.saveFailed';
+          const normalizedError = errorMessage.toLowerCase();
+          let translationKey = 'coproperty.messages.unitSaveFailed';
           
-          if (errorMessage.includes('duplicate') || errorMessage.includes('already exists')) {
-            translationKey = 'coproperty.unit.duplicateError';
+          if (normalizedError.includes('duplicate') || normalizedError.includes('already exists')) {
+            translationKey = 'validation.duplicateError';
           }
           
-          this.translateService.get(translationKey).subscribe((msg) => {
-            this.showAlert('danger', msg);
-          });
+          const errorMsg = this.translateService.instant(translationKey);
+          this.showAlert('danger', errorMsg);
           this.loading.set(false);
         }
       });
     } else {
-      this.translateService.get('validation.required').subscribe((msg) => {
-        this.showAlert('warning', msg);
-      });
+      const validationMsg = this.translateService.instant('validation.required');
+      this.showAlert('warning', validationMsg);
     }
   }
 

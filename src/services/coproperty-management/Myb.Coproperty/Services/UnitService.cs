@@ -14,6 +14,17 @@ namespace Myb.Coproperty.Services
 
         public async Task<Unit> CreateAsync(Unit unit)
         {
+            unit.UnitNumber = unit.UnitNumber?.Trim() ?? string.Empty;
+
+            var duplicateExists = _unitRepository.GetAll().Any(u =>
+                u.CopropertyId == unit.CopropertyId &&
+                u.UnitNumber.ToLower() == unit.UnitNumber.ToLower());
+
+            if (duplicateExists)
+            {
+                throw new InvalidOperationException("A unit with this number already exists in this coproperty.");
+            }
+
             var result = await _unitRepository.InsertAsync(unit);
             
             if (result.Errors != null && result.Errors.Any())
@@ -31,7 +42,24 @@ namespace Myb.Coproperty.Services
 
         public async Task DeleteAsync(Guid id)
         {
-            await _unitRepository.DeleteAsync(id);
+            var unit = _unitRepository.GetById(id);
+            if (unit == null)
+            {
+                throw new InvalidOperationException($"Unit with ID {id} not found");
+            }
+
+            var hasOwners = _unitRepository.GetAll().Any(u => u.Id == id && u.OwnerUnits.Any());
+            if (hasOwners)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot delete unit '{unit.UnitNumber}' because it is associated with one or more owners. Remove owner associations first.");
+            }
+
+            var result = await _unitRepository.DeleteAsync(id);
+            if (result.Errors != null && result.Errors.Any())
+            {
+                throw new InvalidOperationException($"Failed to delete unit: {string.Join(", ", result.Errors)}");
+            }
         }
 
         public async Task<Unit> GetByIdAsync(Guid id)
@@ -56,7 +84,23 @@ namespace Myb.Coproperty.Services
 
         public async Task UpdateAsync(Unit unit)
         {
-            await _unitRepository.UpdateAsync(unit);
+            unit.UnitNumber = unit.UnitNumber?.Trim() ?? string.Empty;
+
+            var duplicateExists = _unitRepository.GetAll().Any(u =>
+                u.CopropertyId == unit.CopropertyId &&
+                u.Id != unit.Id &&
+                u.UnitNumber.ToLower() == unit.UnitNumber.ToLower());
+
+            if (duplicateExists)
+            {
+                throw new InvalidOperationException("A unit with this number already exists in this coproperty.");
+            }
+
+            var result = await _unitRepository.UpdateAsync(unit);
+            if (result.Errors != null && result.Errors.Any())
+            {
+                throw new InvalidOperationException($"Failed to update unit: {string.Join(", ", result.Errors)}");
+            }
         }
     }
 }

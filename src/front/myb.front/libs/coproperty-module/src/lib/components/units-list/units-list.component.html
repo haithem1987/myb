@@ -36,7 +36,7 @@
     <div class="card-body">
       <div class="row g-3">
         <!-- Coproperty Filter -->
-        <div class="col-md-4">
+        <div class="col-md-3">
           <label for="copropertyFilter" class="form-label">
             <i class="bi bi-building me-1"></i>
             {{ 'coproperty.charge.coproperty' | translate }}
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Type Filter -->
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label for="typeFilter" class="form-label">
             <i class="bi bi-tag me-1"></i>
             {{ 'coproperty.unit.type' | translate }}
@@ -72,7 +72,7 @@
         </div>
 
         <!-- Occupancy Filter -->
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label for="occupancyFilter" class="form-label">
             <i class="bi bi-people me-1"></i>
             {{ 'coproperty.unit.occupancyStatus' | translate }}
@@ -88,8 +88,27 @@
           </select>
         </div>
 
-        <!-- Search -->
+        <!-- Sorting -->
         <div class="col-md-2">
+          <label for="sortFilter" class="form-label">
+            <i class="bi bi-sort-down me-1"></i>
+            {{ 'coproperty.unit.sortBy' | translate }}
+          </label>
+          <select 
+            id="sortFilter" 
+            class="form-select"
+            [value]="sortBy()"
+            (change)="onSortChange($event)">
+            <option value="newest">{{ 'coproperty.unit.sortByNewest' | translate }}</option>
+            <option value="oldest">{{ 'coproperty.unit.sortByOldest' | translate }}</option>
+            <option value="number">{{ 'coproperty.unit.sortByNumber' | translate }}</option>
+            <option value="area">{{ 'coproperty.unit.sortByArea' | translate }}</option>
+            <option value="shares">{{ 'coproperty.unit.sortByShares' | translate }}</option>
+          </select>
+        </div>
+
+        <!-- Search -->
+        <div class="col-md-3">
           <label for="searchInput" class="form-label">
             <i class="bi bi-search me-1"></i>
             {{ 'coproperty.charge.search' | translate }}
@@ -200,14 +219,31 @@
               <i class="bi bi-people me-1"></i>
               {{ 'coproperty.unit.status' | translate }}
             </label>
-            <div class="form-check form-switch mt-2">
+            <div class="btn-group w-100 mt-2" role="group">
               <input 
-                class="form-check-input" 
-                type="checkbox" 
-                id="formIsOccupied" 
-                formControlName="isOccupied" />
-              <label class="form-check-label" for="formIsOccupied">
+                type="radio" 
+                class="btn-check" 
+                id="occupiedYes" 
+                name="isOccupied"
+                [value]="true"
+                [formControl]="occupiedControl"
+                (change)="unitForm.get('isOccupied')?.setValue(true)">
+              <label class="btn btn-outline-success" for="occupiedYes">
+                <i class="bi bi-check-circle me-1"></i>
                 {{ 'coproperty.unit.occupied' | translate }}
+              </label>
+
+              <input 
+                type="radio" 
+                class="btn-check" 
+                id="occupiedNo" 
+                name="isOccupied"
+                [value]="false"
+                [formControl]="occupiedControl"
+                (change)="unitForm.get('isOccupied')?.setValue(false)">
+              <label class="btn btn-outline-warning" for="occupiedNo">
+                <i class="bi bi-x-circle me-1"></i>
+                {{ 'coproperty.unit.vacant' | translate }}
               </label>
             </div>
           </div>

@@ -114,7 +114,22 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('@myb-front/shared-ui').then((c) => c.ProfilePageComponent),
   },
+  {
+    path: 'contact',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.ContactPageComponent),
+  },
+  {
+    path: 'terms',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.TermsPageComponent),
+  },
+  {
+    path: 'privacy',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.PrivacyPageComponent),
+  },
   // {
-  //   path:'folder/:id' , component:FolderDetailsComponent
+    // path:'folder/:id' , component:FolderDetailsComponent
   // }
 ];

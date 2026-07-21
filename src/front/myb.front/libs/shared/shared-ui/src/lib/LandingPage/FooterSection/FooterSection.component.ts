@@ -1,11 +1,13 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ContactInfo, FooterSection } from './footer-data.model';
 
 @Component({
   selector: 'myb-front-footer-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   templateUrl: './FooterSection.component.html',
   styleUrl: './FooterSection.component.css',
 })

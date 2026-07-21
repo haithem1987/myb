@@ -1,0 +1,16 @@
+.static-page {
+  padding: 4rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.static-page-inner {
+  line-height: 1.8;
+}
+.static-page-inner h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+.static-page-inner p {
+  margin-bottom: 1rem;
+  color: #4a5568;
+}

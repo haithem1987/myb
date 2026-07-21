@@ -8,36 +8,36 @@
     <div class="hero-text">
       <div class="hero-badge">
         <span class="hero-badge-dot"></span>
-        Manage Your Business
+        {{ 'HERO_BADGE' | translate }}
       </div>
       <h1 class="hero-title">
-        The smarter way to
-        <span class="hero-title-gradient">run your business</span>
+        {{ 'HERO_TITLE_PART1' | translate }}
+        <span class="hero-title-gradient">{{ 'HERO_TITLE_GRADIENT' | translate }}</span>
       </h1>
       <p class="hero-subtitle">{{ 'BEST_SOLUTION' | translate }}</p>
 
       <div class="hero-actions" *ngIf="!keycloakService.isAuthenticated()">
-        <button class="hero-btn-primary">
-          Get Started Free
+        <a class="hero-btn-primary" routerLink="/register">
+          {{ 'GET_STARTED_FREE' | translate }}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="hero-btn-ghost">Learn More</button>
+        </a>
+        <a class="hero-btn-ghost" href="#features">{{ 'LEARN_MORE' | translate }}</a>
       </div>
 
       <div class="hero-stats">
         <div class="hero-stat">
           <span class="hero-stat-num">500+</span>
-          <span class="hero-stat-label">Businesses</span>
+          <span class="hero-stat-label">{{ 'STAT_BUSINESSES' | translate }}</span>
         </div>
         <div class="hero-stat-divider"></div>
         <div class="hero-stat">
           <span class="hero-stat-num">4</span>
-          <span class="hero-stat-label">Modules</span>
+          <span class="hero-stat-label">{{ 'STAT_MODULES' | translate }}</span>
         </div>
         <div class="hero-stat-divider"></div>
         <div class="hero-stat">
           <span class="hero-stat-num">99%</span>
-          <span class="hero-stat-label">Uptime</span>
+          <span class="hero-stat-label">{{ 'STAT_UPTIME' | translate }}</span>
         </div>
       </div>
     </div>
@@ -61,17 +61,17 @@
             <div class="dash-bar" style="height:60%; background: linear-gradient(to top, #7c3aed, #a78bfa)"></div>
             <div class="dash-bar" style="height:45%; background: linear-gradient(to top, #4f46e5, #818cf8)"></div>
           </div>
-          <div class="dash-label">Revenue Overview</div>
+          <div class="dash-label">{{ 'DASH_LABEL' | translate }}</div>
         </div>
         <!-- Floating stat badge -->
         <div class="dash-badge dash-badge-top">
           <i class="bi bi-arrow-up-right" style="color:#22c55e"></i>
-          <span>+24% this month</span>
+          <span>{{ 'DASH_BADGE_TOP' | translate }}</span>
         </div>
         <!-- Floating mini card -->
         <div class="dash-badge dash-badge-bottom">
           <div class="dash-badge-icon">✓</div>
-          <span>12 tasks done</span>
+          <span>{{ 'DASH_BADGE_BOTTOM' | translate }}</span>
         </div>
       </div>
     </div>

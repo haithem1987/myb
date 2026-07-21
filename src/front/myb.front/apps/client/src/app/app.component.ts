@@ -9,6 +9,7 @@ import {
   NotificationService,
   ToastsContainerComponent,
 } from '@myb-front/shared-ui';
+import { LanguageService } from '@myb-front/shared-ui';
 @Component({
   standalone: true,
   imports: [NxWelcomeComponent, RouterModule, ToastsContainerComponent],
@@ -24,15 +25,21 @@ export class AppComponent implements OnInit {
     private router: Router,
     private translate: TranslateService,
     private location: Location,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private languageService: LanguageService
   ) {
     this.translate.addLangs(['en', 'fr']);
     this.translate.setDefaultLang('en');
   }
 
   ngOnInit(): void {
-    const browserLang: any = this.translate.getBrowserLang();
-    this.translate.use(browserLang.match(/en|fr/) ? browserLang : 'en');
+    const savedLanguage = localStorage.getItem('language') || 'en';
+    this.translate.use(savedLanguage);
+    this.languageService.language$.subscribe((lang) => {
+      if (lang && lang !== this.translate.currentLang) {
+        this.translate.use(lang);
+      }
+    });
     this.notificationService.startConnection();
   }
   private removeQueryParamsFromUrl(): void {

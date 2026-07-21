@@ -3,8 +3,8 @@
 
     <!-- Section header -->
     <div class="overview-header">
-      <div class="overview-eyebrow">Built for Growth</div>
-      <h2 class="overview-title">Everything your business needs, in one place</h2>
+      <div class="overview-eyebrow">{{ 'OVERVIEW_EYEBROW' | translate }}</div>
+      <h2 class="overview-title">{{ 'OVERVIEW_TITLE' | translate }}</h2>
     </div>
 
     <!-- Stats grid -->
@@ -18,7 +18,7 @@
           </svg>
         </div>
         <div class="overview-stat-num">500+</div>
-        <div class="overview-stat-label">Active Businesses</div>
+        <div class="overview-stat-label">{{ 'STAT_ACTIVE_BUSINESSES' | translate }}</div>
       </div>
 
       <div class="overview-stat-card">
@@ -29,7 +29,7 @@
           </svg>
         </div>
         <div class="overview-stat-num">4</div>
-        <div class="overview-stat-label">Integrated Modules</div>
+        <div class="overview-stat-label">{{ 'STAT_INTEGRATED_MODULES' | translate }}</div>
       </div>
 
       <div class="overview-stat-card">
@@ -40,7 +40,7 @@
           </svg>
         </div>
         <div class="overview-stat-num">99.9%</div>
-        <div class="overview-stat-label">Uptime SLA</div>
+        <div class="overview-stat-label">{{ 'STAT_UPTIME_SLA' | translate }}</div>
       </div>
 
       <div class="overview-stat-card">
@@ -51,19 +51,19 @@
           </svg>
         </div>
         <div class="overview-stat-num">24/7</div>
-        <div class="overview-stat-label">Support Available</div>
+        <div class="overview-stat-label">{{ 'STAT_SUPPORT_AVAILABLE' | translate }}</div>
       </div>
     </div>
 
     <!-- CTA Banner -->
     <div class="overview-cta">
       <div class="overview-cta-text">
-        <h3>Ready to transform your business?</h3>
-        <p>Join hundreds of companies already using MYB to streamline their operations.</p>
+        <h3>{{ 'CTA_READY' | translate }}</h3>
+        <p>{{ 'CTA_JOIN' | translate }}</p>
       </div>
       <div class="overview-cta-actions">
-        <button class="overview-btn-primary">Start Free Trial</button>
-        <button class="overview-btn-ghost">View Demo</button>
+        <a class="overview-btn-primary" routerLink="/register">{{ 'START_FREE_TRIAL' | translate }}</a>
+        <a class="overview-btn-ghost" href="#features">{{ 'VIEW_DEMO' | translate }}</a>
       </div>
     </div>
 

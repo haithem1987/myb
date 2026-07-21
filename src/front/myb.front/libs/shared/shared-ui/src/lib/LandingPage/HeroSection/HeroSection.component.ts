@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
 @Component({
   selector: 'myb-front-hero-section',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   templateUrl: './HeroSection.component.html',
   styleUrl: './HeroSection.component.css',
 })

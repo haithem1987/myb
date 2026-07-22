@@ -7,6 +7,7 @@ import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
+import { KeycloakService } from '@myb-front/auth';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -25,6 +26,7 @@ export class BudgetNewComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
   private currencyService = inject(CurrencyService);
+  private keycloakService = inject(KeycloakService);
 
   get currencySymbol(): string {
     return this.currencyService.symbol;
@@ -90,7 +92,8 @@ export class BudgetNewComponent implements OnInit {
   }
 
   private loadCoproperties(): void {
-    this.copropertyService.getCoproperties()
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -226,15 +229,13 @@ export class BudgetNewComponent implements OnInit {
         next: (result) => {
           this.saving.set(false);
           this.saveSuccess.set(true);
-          
-          // Navigate back to list after showing success message
-          // The refetchQueries in the service ensures the list will have fresh data
-          setTimeout(() => {
-            this.saveSuccess.set(false);
-            this.router.navigate(['/coproperty/syndic/budgets'], {
-              queryParams: { refresh: Date.now() } // Force component reload
-            });
-          }, 1500);
+
+          this.router.navigate(['/coproperty/syndic/budgets'], {
+            queryParams: {
+              refresh: Date.now(),
+              year: formValue.frequency
+            }
+          });
         },
         error: (error) => {
           console.error('Error saving budget:', error);

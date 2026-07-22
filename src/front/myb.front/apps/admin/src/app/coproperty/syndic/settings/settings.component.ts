@@ -552,7 +552,8 @@ export class SyndicSettingsComponent implements OnInit {
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   ngOnInit(): void {
-    this.copropertyService.getCoproperties().pipe(take(1)).subscribe({
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId).pipe(take(1)).subscribe({
       next: (coproperties) => {
         this.coproperties.set(coproperties);
         if (coproperties.length > 0) {

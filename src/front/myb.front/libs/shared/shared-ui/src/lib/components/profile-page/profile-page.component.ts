@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { UserDropdownComponent } from '../user-dropdown/user-dropdown.component';
@@ -23,8 +23,6 @@ export class ProfilePageComponent implements OnInit {
   editMode = signal(false);
 
   // Read-only info from token
-  username = signal('');
-  userId = signal('');
   roles = signal<string[]>([]);
   emailVerified = signal(false);
   joinedDate = signal('');
@@ -32,11 +30,25 @@ export class ProfilePageComponent implements OnInit {
   // Initials for avatar
   initials = signal('');
 
+  // Password change state
+  isChangingPassword = signal(false);
+  passwordSaving = signal(false);
+  passwordSaveSuccess = signal(false);
+  passwordSaveError = signal<string | null>(null);
+
   profileForm = this.fb.group({
     firstName: ['', [Validators.required, Validators.minLength(2)]],
     lastName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
   });
+
+  passwordForm = this.fb.group({
+    currentPassword: ['', [Validators.required, Validators.minLength(6)]],
+    newPassword: ['', [Validators.required, Validators.minLength(8), Validators.pattern(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/
+    )]],
+    confirmPassword: ['', [Validators.required]],
+  }, { validators: this.passwordMatchValidator });
 
   ngOnInit(): void {
     this.loadProfile();
@@ -55,13 +67,10 @@ export class ProfilePageComponent implements OnInit {
     const firstName = profile?.firstName ?? tokenData.given_name ?? '';
     const lastName = profile?.lastName ?? tokenData.family_name ?? '';
     const email = profile?.email ?? tokenData.email ?? '';
-    const username = profile?.username ?? tokenData.preferred_username ?? '';
 
-    this.username.set(username);
-    this.userId.set(profile?.id ?? tokenData.sub ?? '');
     this.emailVerified.set(tokenData.email_verified ?? false);
     this.initials.set(
-      ((firstName[0] ?? '') + (lastName[0] ?? '')).toUpperCase() || username[0]?.toUpperCase() || '?'
+      ((firstName[0] ?? '') + (lastName[0] ?? '')).toUpperCase() || email[0]?.toUpperCase() || '?'
     );
 
     // Parse roles — only show meaningful ones (not internal Keycloak noise)
@@ -71,7 +80,7 @@ export class ProfilePageComponent implements OnInit {
     );
     this.roles.set(meaningful.length > 0 ? meaningful : allRoles.slice(0, 5));
 
-    // Creation date from token (iat = issued-at is not creation, use sub prefix as fallback)
+    // Authentication session date from token iat
     const iat = tokenData.iat ? new Date(tokenData.iat * 1000).toLocaleDateString('fr-FR') : '';
     this.joinedDate.set(iat);
 
@@ -115,6 +124,46 @@ export class ProfilePageComponent implements OnInit {
       this.saving.set(false);
     }
   }
+
+  // ─── Password Change ─────────────────────────────────────────────────
+
+  private passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
+    const newPw = form.get('newPassword')?.value;
+    const confirm = form.get('confirmPassword')?.value;
+    if (newPw && confirm && newPw !== confirm) {
+      form.get('confirmPassword')?.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    }
+    return null;
+  }
+
+  async onChangePassword(): Promise<void> {
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+    this.passwordSaving.set(true);
+    this.passwordSaveError.set(null);
+    this.passwordSaveSuccess.set(false);
+
+    try {
+      const { currentPassword, newPassword, confirmPassword } = this.passwordForm.value;
+      await this.keycloakService.changePassword(
+        currentPassword!,
+        newPassword!,
+        confirmPassword!
+      );
+      this.passwordSaveSuccess.set(true);
+      this.passwordForm.reset();
+      this.isChangingPassword.set(false);
+    } catch (error: any) {
+      this.passwordSaveError.set(error.message || 'Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      this.passwordSaving.set(false);
+    }
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────
 
   getRoleLabel(role: string): string {
     const labels: Record<string, string> = {

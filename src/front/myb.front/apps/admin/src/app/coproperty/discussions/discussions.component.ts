@@ -59,7 +59,8 @@ export class DiscussionsComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      const items = await firstValueFrom(this.copropertyService.getCoproperties());
+      const managerId = this.keycloak.getSyndicManagerId();
+      const items = await firstValueFrom(this.copropertyService.getCoproperties(managerId));
       this.coproperties.set(items.map(c => ({ id: c.id, name: c.name })));
       this.newCoproperty = items[0]?.id || '';
       if (this.newCoproperty) await this.loadDiscussions(this.newCoproperty);

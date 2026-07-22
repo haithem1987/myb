@@ -8,6 +8,7 @@ import { FundCallService, FundCallExtended } from '../../services/fund-call.serv
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
 import { OwnerService } from '../../services/owner.service';
+import { KeycloakService } from '@myb-front/auth';
 import { Coproperty } from '../../models/coproperty.models';
 import { OwnerWithUnits } from '../../models/owner.model';
 import {
@@ -37,6 +38,7 @@ export class FundCallsListComponent implements OnInit {
   private copropertyService = inject(CopropertyService);
   private currencyService = inject(CurrencyService);
   private ownerService = inject(OwnerService);
+  private keycloakService = inject(KeycloakService);
   private invoiceService = inject(InvoiceService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -127,7 +129,8 @@ export class FundCallsListComponent implements OnInit {
   /** Load coproperties first, then load all fund calls in one coordinated flow */
   loadCopropertiesAndFundCalls(): void {
     this.loading.set(true);
-    this.copropertyService.getCoproperties().subscribe({
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
         this.loadAllFundCalls();
@@ -140,7 +143,8 @@ export class FundCallsListComponent implements OnInit {
   }
 
   loadCoproperties(): void {
-    this.copropertyService.getCoproperties().subscribe({
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
         if (data.length > 0) {
@@ -476,11 +480,10 @@ export class FundCallsListComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error generating invoice:', err);
-          const graphqlMsg = err?.graphQLErrors?.[0]?.message;
-          const networkMsg = err?.networkError?.error?.errors?.[0]?.message
-            ?? err?.networkError?.message;
-          const msg = graphqlMsg || networkMsg || 'Erreur lors de la génération de la facture';
-          this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 7000 });
+          this.toastService.show(
+            'La génération de la facture a échoué. Veuillez réessayer. Si le problème persiste, contactez le support.',
+            { classname: 'bg-danger text-white', delay: 7000 }
+          );
         },
       });
   }

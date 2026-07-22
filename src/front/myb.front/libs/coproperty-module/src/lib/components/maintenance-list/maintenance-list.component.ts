@@ -7,6 +7,7 @@ import { MaintenanceService, MaintenanceRequestExtended } from '../../services/m
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
+import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, finalize, switchMap } from 'rxjs/operators';
@@ -21,6 +22,7 @@ import { map, finalize, switchMap } from 'rxjs/operators';
 export class MaintenanceListComponent implements OnInit {
   private maintenanceService = inject(MaintenanceService);
   private copropertyService = inject(CopropertyService);
+  private keycloakService = inject(KeycloakService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   requests = signal<MaintenanceRequestExtended[]>([]);
@@ -42,7 +44,8 @@ export class MaintenanceListComponent implements OnInit {
   }
 
   loadCoproperties(): void {
-    this.copropertyService.getCoproperties().subscribe({
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
         // Auto-select first coproperty by default
@@ -58,7 +61,8 @@ export class MaintenanceListComponent implements OnInit {
 
   loadAllRequests(): void {
     this.loading.set(true);
-    this.copropertyService.getCoproperties()
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId)
       .pipe(
         switchMap((coproperties) => {
           if (coproperties.length === 0) {

@@ -7,6 +7,7 @@ import { InterventionService } from '../../services/intervention.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
+import { KeycloakService } from '@myb-front/auth';
 import { Intervention, CreateInterventionInput, UpdateInterventionInput } from '../../models/intervention.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -26,6 +27,7 @@ export class InterventionNewComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
   private currencyService = inject(CurrencyService);
+  private keycloakService = inject(KeycloakService);
 
   get currencySymbol(): string {
     return this.currencyService.symbol;
@@ -108,7 +110,8 @@ export class InterventionNewComponent implements OnInit {
   }
 
   private loadCoproperties(): void {
-    this.copropertyService.getCoproperties()
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {

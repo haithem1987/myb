@@ -4,20 +4,40 @@ using Myb.Coproperty.Models;
 using Myb.Coproperty.Models.Dtos;
 using Myb.Coproperty.Services;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace Myb.Coproperty.GraphQL.Queries
 {
     [ExtendObjectType("Query")]
     public class CopropertyQueries
     {
-        public async Task<IEnumerable<Models.Coproperty>> GetCoproperties([Service] ICopropertyService copropertyService) =>
-            await copropertyService.GetAllAsync();
+        public async Task<IEnumerable<Models.Coproperty>> GetCoproperties(
+            ClaimsPrincipal? user,
+            [Service] ICopropertyService copropertyService,
+            Guid? managerId = null) =>
+            await copropertyService.GetAllAsync(CopropertyAccessControl.ResolveEffectiveManagerId(user, managerId));
 
-        public async Task<Models.Coproperty> GetCopropertyById(Guid id, [Service] ICopropertyService copropertyService) =>
-            await copropertyService.GetByIdAsync(id);
+        public async Task<Models.Coproperty> GetCopropertyById(
+            Guid id,
+            ClaimsPrincipal? user,
+            [Service] ICopropertyService copropertyService)
+        {
+            var coproperty = await copropertyService.GetByIdAsync(id);
+            if (coproperty != null)
+                CopropertyAccessControl.EnsureOwnership(user, coproperty.ManagerId);
 
-        public async Task<IEnumerable<Models.Coproperty>> GetCopropertiesByManager(Guid managerId, [Service] ICopropertyService copropertyService) =>
-            await copropertyService.GetByManagerIdAsync(managerId);
+            return coproperty;
+        }
+
+        public async Task<IEnumerable<Models.Coproperty>> GetCopropertiesByManager(
+            Guid managerId,
+            ClaimsPrincipal? user,
+            [Service] ICopropertyService copropertyService)
+        {
+            var effectiveManagerId = CopropertyAccessControl.ResolveEffectiveManagerId(user, managerId)
+                ?? managerId;
+            return await copropertyService.GetByManagerIdAsync(effectiveManagerId);
+        }
 
         /// <summary>
         /// Get a coproperty by name (for duplicate name checking)

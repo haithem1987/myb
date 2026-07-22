@@ -19,10 +19,8 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(c => c.TotalShares).Type<NonNullType<IntType>>();
             descriptor.Field(c => c.CommonAreas).Type<StringType>();
             descriptor.Field(c => c.ManagerName).Type<StringType>();
+            descriptor.Field(c => c.ManagerId).Type<UuidType>();
             descriptor.Field(c => c.IsActive).Type<BooleanType>().DefaultValue(true);
-            
-            // Ignore ManagerId from input - we only use ManagerName
-            descriptor.Ignore(c => c.ManagerId);
             
             // Ignore navigation properties
             descriptor.Ignore(c => c.Units);

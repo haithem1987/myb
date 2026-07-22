@@ -9,6 +9,7 @@ import { takeUntil } from 'rxjs/operators';
 import { InterventionService } from '../../services/intervention.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
+import { KeycloakService } from '@myb-front/auth';
 import { Intervention } from '../../models/intervention.model';
 import { Coproperty } from '../../models/coproperty.models';
 import { ToastService } from '@myb-front/shared-ui';
@@ -24,6 +25,7 @@ export class InterventionListComponent implements OnInit, OnDestroy {
   private interventionService = inject(InterventionService);
   private copropertyService = inject(CopropertyService);
   private currencyService = inject(CurrencyService);
+  private keycloakService = inject(KeycloakService);
   private toastService = inject(ToastService);
   private router = inject(Router);
 
@@ -66,7 +68,8 @@ export class InterventionListComponent implements OnInit, OnDestroy {
   private loadData(): void {
     this.isLoading.set(true);
 
-    this.copropertyService.getCoproperties()
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (cops) => {

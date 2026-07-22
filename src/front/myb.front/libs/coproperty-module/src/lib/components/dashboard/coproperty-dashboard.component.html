@@ -111,17 +111,6 @@
       </div>
     </div>
 
-    <div class="kpi-card clickable" routerLink="/admin/coproperties/list">
-      <div class="kpi-icon-sm area">
-        <i class="bi bi-bounding-box-circles"></i>
-      </div>
-      <div class="kpi-content">
-        <p class="count">{{ totalArea() | number:'1.0-0' }} m²</p>
-        <h3>{{ 'coproperty.dashboard.totalArea' | translate }}</h3>
-        <small class="kpi-hint"><i class="bi bi-arrow-right-circle"></i> {{ 'coproperty.dashboard.viewDetails' | translate }}</small>
-      </div>
-    </div>
-
     <div class="kpi-card clickable warning" routerLink="/admin/coproperties/unpaid-payments" [queryParams]="{ filter: 'overdue' }" *ngIf="overdueCount() > 0">
       <div class="kpi-icon-sm overdue">
         <i class="bi bi-exclamation-triangle-fill"></i>

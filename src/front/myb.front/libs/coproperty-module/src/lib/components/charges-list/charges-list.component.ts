@@ -8,14 +8,16 @@ import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
+import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, finalize, switchMap } from 'rxjs/operators';
+import { ChargeDistributionComponent } from '../charge-distribution/charge-distribution.component';
 
 @Component({
   selector: 'myb-charges-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, NgbDropdownModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, NgbDropdownModule, ChargeDistributionComponent],
   templateUrl: './charges-list.component.html',
   styleUrls: ['./charges-list.component.scss'],
 })
@@ -23,6 +25,7 @@ export class ChargesListComponent implements OnInit {
   private chargeService = inject(ChargeService);
   private copropertyService = inject(CopropertyService);
   private currencyService = inject(CurrencyService);
+  private keycloakService = inject(KeycloakService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
@@ -31,14 +34,20 @@ export class ChargesListComponent implements OnInit {
   coproperties = signal<Coproperty[]>([]);
   selectedCopropertyId = signal<string | null>(null);
   loading = signal<boolean>(false);
+  activeSection = signal<'budget-lines' | 'allocation'>('budget-lines');
   searchTerm = signal<string>('');
   filterType = signal<string>('');
-  filterFrequency = signal<string>('');
+  readonly currentYear = new Date().getFullYear().toString();
+  filterFrequency = signal<string>(this.currentYear);
 
   chargeTypes = ['CLEANING', 'MAINTENANCE', 'INSURANCE', 'ELEVATOR', 'HEATING', 'WATER', 'ELECTRICITY', 'GARDENING', 'SECURITY', 'OTHER'];
-  frequencies = ['2024', '2025', '2026', '2027', '2028', '2029', '2030'];
+  frequencies = this.generateFrequencyOptions();
 
   ngOnInit(): void {
+    if (this.route.snapshot.routeConfig?.path === 'distribution') {
+      this.activeSection.set('allocation');
+    }
+
     this.loadCoproperties();
     this.loadAllCharges();
     
@@ -46,6 +55,16 @@ export class ChargesListComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
+        if (params['section'] === 'allocation') {
+          this.activeSection.set('allocation');
+        } else if (this.route.snapshot.routeConfig?.path !== 'distribution') {
+          this.activeSection.set('budget-lines');
+        }
+
+        if (params['year']) {
+          this.filterFrequency.set(String(params['year']));
+        }
+
         if (params['refresh']) {
           this.loadAllCharges();
           // Clean up the URL by removing the refresh param
@@ -58,8 +77,24 @@ export class ChargesListComponent implements OnInit {
       });
   }
 
+  setSection(section: 'budget-lines' | 'allocation'): void {
+    this.activeSection.set(section);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { section: section === 'allocation' ? 'allocation' : null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  private generateFrequencyOptions(): string[] {
+    const baseYear = new Date().getFullYear();
+    return Array.from({ length: 11 }, (_, index) => (baseYear - 5 + index).toString());
+  }
+
   loadCoproperties(): void {
-    this.copropertyService.getCoproperties().subscribe({
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
         // Auto-select first coproperty by default
@@ -75,7 +110,8 @@ export class ChargesListComponent implements OnInit {
 
   loadAllCharges(): void {
     this.loading.set(true);
-    this.copropertyService.getCoproperties()
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId)
       .pipe(
         switchMap((coproperties) => {
           if (coproperties.length === 0) {
@@ -169,7 +205,16 @@ export class ChargesListComponent implements OnInit {
       filtered = filtered.filter(charge => charge.frequency === this.filterFrequency());
     }
 
-    return filtered;
+    return [...filtered].sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (dateA !== dateB) {
+        return dateB - dateA;
+      }
+      const fallbackA = a.startDate ? new Date(a.startDate).getTime() : 0;
+      const fallbackB = b.startDate ? new Date(b.startDate).getTime() : 0;
+      return fallbackB - fallbackA;
+    });
   }
 
   getTotalBudgetAmount(): number {

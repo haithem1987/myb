@@ -104,7 +104,7 @@ export const COPROPERTY_ROUTES: Routes = [
       },
       {
         path: 'distribution',
-        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.ChargeDistributionComponent),
+        loadComponent: () => import('@myb-front/coproperty-module').then(m => m.ChargesListComponent),
       },
       {
         path: 'fund-calls',

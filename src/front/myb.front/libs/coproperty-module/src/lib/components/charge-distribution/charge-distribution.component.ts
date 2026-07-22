@@ -12,6 +12,7 @@ import { UnitService } from '../../services/unit.service';
 import { OwnerWithUnits } from '../../models/owner.model';
 import { AddFundCallPaymentInput, CreateFundCallInput } from '../../models/fund-call.model';
 import { Coproperty } from '../../models/coproperty.models';
+import { KeycloakService } from '@myb-front/auth';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { forkJoin, of } from 'rxjs';
@@ -57,6 +58,7 @@ export class ChargeDistributionComponent implements OnInit {
   private chargeService = inject(ChargeService);
   private copropertyService = inject(CopropertyService);
   private currencyService = inject(CurrencyService);
+  private keycloakService = inject(KeycloakService);
   private fundCallService = inject(FundCallService);
   private ownerService = inject(OwnerService);
   private unitService = inject(UnitService);
@@ -127,7 +129,8 @@ export class ChargeDistributionComponent implements OnInit {
 
   private loadCoproperties(): void {
     this.loading.set(true);
-    this.copropertyService.getCoproperties()
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {

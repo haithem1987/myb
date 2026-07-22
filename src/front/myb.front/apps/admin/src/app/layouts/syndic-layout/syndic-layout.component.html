@@ -34,18 +34,10 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-cash-stack"></i>
-        <span class="nav-text">Budget</span>
+        <span class="nav-text">Lignes budgétaires & Répartition</span>
         <span class="badge" *ngIf="totalBudgets() > 0">
           {{ totalBudgets() }}
         </span>
-      </a>
-      
-      <a routerLink="/coproperty/syndic/distribution" 
-         routerLinkActive="active" 
-         class="nav-item"
-         (click)="onNavItemClick()">
-        <i class="bi bi-pie-chart"></i>
-        <span class="nav-text">Répartition</span>
       </a>
       
       <a routerLink="/coproperty/syndic/units" 

@@ -117,7 +117,8 @@ export class OwnerManagementComponent implements OnInit {
       this.loadOwners();
     } else {
       // Try to get first coproperty from the list
-      this.copropertyService.getCoproperties()
+      const managerId = this.keycloakService.getSyndicManagerId();
+      this.copropertyService.getCoproperties(managerId)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (coproperties) => {

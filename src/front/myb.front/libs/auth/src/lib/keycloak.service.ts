@@ -49,6 +49,42 @@ export class KeycloakService {
     return id;
   }
 
+  private static readonly SUPPORTED_LANGUAGES = ['fr', 'en'];
+
+  private normalizeLanguage(language: string | null | undefined): string {
+    const normalized = language?.trim().toLowerCase().split('-')[0];
+    return KeycloakService.SUPPORTED_LANGUAGES.includes(normalized ?? '') ? normalized! : 'en';
+  }
+
+  private getPreferredLanguage(): string {
+    const saved = localStorage.getItem('language') ?? sessionStorage.getItem('language');
+    const docLang = typeof document !== 'undefined' ? document.documentElement.lang : null;
+    return this.normalizeLanguage(saved ?? docLang);
+  }
+
+  private withLanguageInRedirectUri(redirectUri: string, language: string): string {
+    const url = new URL(redirectUri, window.location.origin);
+    url.searchParams.set('app_lang', language);
+    return url.toString();
+  }
+
+  private getScopedUserId(): string | undefined {
+    const fromProfile = this.getProfile()?.id ?? this.getUserId();
+    if (fromProfile) {
+      return fromProfile;
+    }
+
+    const rawSub = this.keycloak?.tokenParsed?.sub;
+    if (typeof rawSub !== 'string' || rawSub.length === 0) {
+      return undefined;
+    }
+
+    const normalized = this.normalizeUuid(rawSub);
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(normalized)
+      ? normalized
+      : undefined;
+  }
+
   async init(): Promise<boolean> {
     // If already initialized, return the authentication status
     if (this.initialized) {
@@ -104,8 +140,13 @@ export class KeycloakService {
    *                    Defaults to current origin + pathname if omitted.
    */
   login(redirectUri?: string): void {
-    const uri = redirectUri ?? (window.location.origin + window.location.pathname);
-    const locale = localStorage.getItem('language') ?? 'en';
+    const locale = this.getPreferredLanguage();
+    const uri = this.withLanguageInRedirectUri(
+      redirectUri ?? (window.location.origin + window.location.pathname),
+      locale
+    );
+    localStorage.setItem('language', locale);
+    sessionStorage.setItem('language', locale);
     console.log('Redirecting to Keycloak login with redirectUri:', uri);
     this.keycloak.login({ redirectUri: uri, locale });
   }
@@ -115,9 +156,15 @@ export class KeycloakService {
    * After successful registration + email verification, Keycloak redirects to `redirectUri`.
    */
   registerWithRedirect(redirectUri?: string): void {
-    const locale = localStorage.getItem('language') ?? 'en';
+    const locale = this.getPreferredLanguage();
+    const uri = this.withLanguageInRedirectUri(
+      redirectUri ?? (window.location.origin + '/register/complete-profile'),
+      locale
+    );
+    localStorage.setItem('language', locale);
+    sessionStorage.setItem('language', locale);
     this.keycloak.register({
-      redirectUri: redirectUri ?? (window.location.origin + '/register/complete-profile'),
+      redirectUri: uri,
       locale,
     });
   }
@@ -127,10 +174,16 @@ export class KeycloakService {
    * Keycloak must have a "google" social IDP configured in the realm.
    */
   loginWithGoogle(redirectUri?: string): void {
-    const locale = localStorage.getItem('language') ?? 'en';
+    const locale = this.getPreferredLanguage();
+    const uri = this.withLanguageInRedirectUri(
+      redirectUri ?? (window.location.origin + '/register/complete-profile'),
+      locale
+    );
+    localStorage.setItem('language', locale);
+    sessionStorage.setItem('language', locale);
     this.keycloak.login({
       idpHint: 'google',
-      redirectUri: redirectUri ?? (window.location.origin + '/register/complete-profile'),
+      redirectUri: uri,
       locale,
     });
   }
@@ -201,6 +254,25 @@ export class KeycloakService {
   // Alias for getUserRoles for convenience
   getRoles(): string[] {
     return this.getUserRoles();
+  }
+
+  private static readonly ADMIN_ROLES = ['coproperty-admin', 'system-admin'];
+
+  /**
+   * Returns the current user's id to use when scoping a coproperty list to
+   * "only my assigned coproperties", or `undefined` when the caller should
+   * see every coproperty (admin/system-admin, or any other non-syndic role).
+   *
+   * Only callers who hold the `coproperty-syndic` role and no admin-level
+   * role are scoped — admins retain full visibility even on syndic-facing
+   * screens/routes.
+   */
+  getSyndicManagerId(): string | undefined {
+    const roles = this.getUserRoles();
+    const isSyndic = roles.includes('coproperty-syndic');
+    const isAdmin = roles.some((role) => KeycloakService.ADMIN_ROLES.includes(role));
+
+    return isSyndic && !isAdmin ? this.getScopedUserId() : undefined;
   }
 
   hasRole(role: string): boolean {
@@ -590,5 +662,31 @@ export class KeycloakService {
 
     // Reload the local profile cache
     await this.loadUserProfile();
+  }
+
+  /**
+   * Change the current authenticated user's password via Keycloak Account REST API.
+   * The user must be authenticated — uses the current session bearer token.
+   *
+   * Endpoint: POST /realms/{realm}/account/credentials/password
+   */
+  async changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Promise<void> {
+    const token = this.keycloak?.token;
+    if (!token) throw new Error('Not authenticated');
+
+    const keycloakUrl = this.environment.services.keycloak.url;
+    const realm = this.environment.services.keycloak.realm;
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+
+    await firstValueFrom(
+      this.http.post(
+        `${keycloakUrl}/realms/${realm}/account/credentials/password`,
+        { currentPassword, newPassword, confirmation: confirmPassword },
+        { headers }
+      )
+    );
   }
 }

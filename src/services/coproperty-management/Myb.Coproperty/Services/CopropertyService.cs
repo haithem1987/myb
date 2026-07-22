@@ -71,8 +71,11 @@ namespace Myb.Coproperty.Services
             await _copropertyRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<Models.Coproperty>> GetAllAsync()
+        public async Task<IEnumerable<Models.Coproperty>> GetAllAsync(Guid? managerId = null)
         {
+            if (managerId.HasValue)
+                return await _copropertyRepository.GetByManagerIdAsync(managerId.Value);
+
             return await Task.FromResult(_copropertyRepository.GetAll().ToList());
         }
 

@@ -99,8 +99,9 @@ export class SyndicLayoutComponent implements OnInit {
   
   private loadStatistics(): void {
     // Load all statistics in parallel using forkJoin
+    const managerId = this.keycloakService.getSyndicManagerId();
     forkJoin({
-      coproperties: this.copropertyService.getCoproperties(),
+      coproperties: this.copropertyService.getCoproperties(managerId),
       charges: this.chargeService.getAllCharges()
     }).subscribe({
       next: (results) => {

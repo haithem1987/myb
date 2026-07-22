@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { KeycloakService } from '@myb-front/auth';
 import { 
   Coproperty,
   Currency,
@@ -19,8 +20,8 @@ import {
 } from '../models';
 
 const GET_COPROPERTIES = gql`
-  query GetCoproperties {
-    coproperties {
+  query GetCoproperties($managerId: UUID) {
+    coproperties(managerId: $managerId) {
       id
       name
       address
@@ -60,23 +61,6 @@ const GET_COPROPERTY = gql`
       isActive
       createdAt
       updatedAt
-    }
-  }
-`;
-
-const GET_COPROPERTIES_BY_MANAGER = gql`
-  query GetCopropertiesByManager($managerId: UUID!) {
-    copropertiesByManager(managerId: $managerId) {
-      id
-      name
-      address
-      city
-      postalCode
-      country
-      totalUnits
-      totalShares
-      isActive
-      createdAt
     }
   }
 `;
@@ -333,12 +317,14 @@ const GET_OWNER_PAYMENT_SUMMARY = gql`
   providedIn: 'root'
 })
 export class CopropertyService {
-  constructor(private apollo: Apollo) {}
+  constructor(private apollo: Apollo, private keycloakService: KeycloakService) {}
 
-  getCoproperties(): Observable<Coproperty[]> {
+  getCoproperties(managerId?: string): Observable<Coproperty[]> {
+    const effectiveManagerId = managerId ?? this.keycloakService.getSyndicManagerId();
     return this.apollo
       .query<{ coproperties: Coproperty[] }>({
         query: GET_COPROPERTIES,
+        variables: { managerId: effectiveManagerId || undefined },
         fetchPolicy: 'network-only',
         context: { service: 'copropertyService' }
       })
@@ -378,8 +364,11 @@ export class CopropertyService {
       .mutate<{ createCoproperty: Coproperty }>({
         mutation: CREATE_COPROPERTY,
         variables: { coproperty: input },
-        refetchQueries: [{ query: GET_COPROPERTIES }],
-        awaitRefetchQueries: true,
+        // No refetchQueries here: GET_COPROPERTIES now takes an optional
+        // managerId variable, and refetching without it would run an
+        // unfiltered fetch distinct from the caller's scoped query. Callers
+        // already reload the list explicitly (with the correct managerId)
+        // after this mutation resolves.
         context: { service: 'copropertyService' }
       })
       .pipe(
@@ -392,7 +381,7 @@ export class CopropertyService {
       .mutate<{ updateCoproperty: Coproperty }>({
         mutation: UPDATE_COPROPERTY,
         variables: { id, coproperty: input },
-        refetchQueries: [{ query: GET_COPROPERTIES }, { query: GET_COPROPERTY, variables: { id } }],
+        refetchQueries: [{ query: GET_COPROPERTY, variables: { id } }],
         awaitRefetchQueries: true,
         context: { service: 'copropertyService' }
       })
@@ -401,15 +390,11 @@ export class CopropertyService {
       );
   }
 
-
-
   deleteCoproperty(id: string): Observable<boolean> {
     return this.apollo
       .mutate<{ deleteCoproperty: boolean }>({
         mutation: DELETE_COPROPERTY,
         variables: { id },
-        refetchQueries: [{ query: GET_COPROPERTIES }],
-        awaitRefetchQueries: true,
         context: { service: 'copropertyService' }
       })
       .pipe(

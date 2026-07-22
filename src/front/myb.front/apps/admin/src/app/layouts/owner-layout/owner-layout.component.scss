@@ -36,7 +36,7 @@
     .app-name {
       font-size: 18px;
       font-weight: 700;
-      color: #1e3a8a;
+      color: #667eea;
     }
   }
   
@@ -83,8 +83,8 @@
       }
       
       &.active {
-        background: #eff6ff;
-        color: #2563eb;
+        background: rgba(102, 126, 234, 0.08);
+        color: #667eea;
       }
     }
   }
@@ -103,7 +103,7 @@
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         display: flex;
         align-items: center;
@@ -132,7 +132,7 @@
       align-items: center;
       gap: 6px;
       padding: 7px 14px;
-      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border: none;
       color: white;
       border-radius: 8px;
@@ -243,8 +243,8 @@
     }
     
     &.active {
-      background: #eff6ff;
-      color: #2563eb;
+      background: rgba(102, 126, 234, 0.08);
+      color: #667eea;
     }
   }
 }
@@ -290,7 +290,7 @@
         transition: color 0.2s ease;
         
         &:hover {
-          color: #2563eb;
+          color: #667eea;
         }
       }
     }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SignalementService, CopropertyService } from '@myb-front/coproperty-module';
+import { KeycloakService } from '@myb-front/auth';
 import { ToastService } from '@myb-front/shared-ui';
 import {
   Signalement,
@@ -286,6 +287,7 @@ type Tab = 'en-cours' | 'resolus';
 export class SyndicSignalementsComponent implements OnInit {
   private signalementService = inject(SignalementService);
   private copropertyService = inject(CopropertyService);
+  private keycloakService = inject(KeycloakService);
   private toastService = inject(ToastService);
 
   allSignalements = signal<Signalement[]>([]);
@@ -318,7 +320,8 @@ export class SyndicSignalementsComponent implements OnInit {
 
   private loadSignalements(): void {
     this.loading.set(true);
-    this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([]))).subscribe(cops => {
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId).pipe(take(1), catchError(() => of([]))).subscribe(cops => {
       if (!cops.length) { this.loading.set(false); return; }
       this.signalementService.getSignalements(cops[0].id)
         .pipe(take(1), catchError(() => of([])))

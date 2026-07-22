@@ -4,6 +4,7 @@ import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
 import { AssemblyService, CopropertyService } from '@myb-front/coproperty-module';
+import { KeycloakService } from '@myb-front/auth';
 import { Assembly, AssemblyType, AssemblyStatus, CreateAssemblyInput, Coproperty } from '@myb-front/coproperty-module';
 
 interface GeneralAssembly {
@@ -655,6 +656,7 @@ export class GeneralAssemblyComponent implements OnInit {
   private toastService = inject(ToastService);
   private assemblyService = inject(AssemblyService);
   private copropertyService = inject(CopropertyService);
+  private keycloakService = inject(KeycloakService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -707,7 +709,8 @@ export class GeneralAssemblyComponent implements OnInit {
   }
 
   loadCoproperties(): void {
-    this.copropertyService.getCoproperties().subscribe({
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId).subscribe({
       next: (coproperties) => {
         this.availableCoproperties.set(coproperties);
         // Auto-select if only one exists and none selected yet

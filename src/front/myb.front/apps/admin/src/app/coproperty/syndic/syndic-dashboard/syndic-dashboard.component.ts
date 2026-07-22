@@ -5,6 +5,7 @@ import { CopropertyService } from 'libs/coproperty-module/src/lib/services/copro
 import { UnitService } from 'libs/coproperty-module/src/lib/services/unit.service';
 import { ChargeService } from 'libs/coproperty-module/src/lib/services/charge.service';
 import { CurrencyService } from 'libs/coproperty-module/src/lib/services/currency.service';
+import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { take, timeout, catchError } from 'rxjs/operators';
@@ -17,7 +18,6 @@ interface DashboardStats {
   totalOwners: number;
   activeCharges: number;
   occupancyRate: number;
-  totalSurface: number;
 }
 
 interface RecentActivity {
@@ -41,6 +41,7 @@ export class SyndicDashboardComponent implements OnInit {
   private unitService = inject(UnitService);
   private chargeService = inject(ChargeService);
   private currencyService = inject(CurrencyService);
+  private keycloakService = inject(KeycloakService);
   private destroyRef = inject(DestroyRef);
   
   stats = signal<DashboardStats>({
@@ -50,8 +51,7 @@ export class SyndicDashboardComponent implements OnInit {
     totalBudget: 0,
     totalOwners: 0,
     activeCharges: 0,
-    occupancyRate: 0,
-    totalSurface: 0
+    occupancyRate: 0
   });
   
   recentActivities = signal<RecentActivity[]>([]);
@@ -68,7 +68,8 @@ export class SyndicDashboardComponent implements OnInit {
   private loadDashboardData(): void {
     this.loading.set(true);
     
-    const coproperties$ = this.copropertyService.getCoproperties().pipe(
+    const managerId = this.keycloakService.getSyndicManagerId();
+    const coproperties$ = this.copropertyService.getCoproperties(managerId).pipe(
       take(1),
       timeout(10000),
       catchError(err => {
@@ -109,7 +110,6 @@ export class SyndicDashboardComponent implements OnInit {
         const totalUnits = units.length;
         const activeUnits = units.filter(u => u.isOccupied).length;
         const occupancyRate = totalUnits > 0 ? Math.round((activeUnits / totalUnits) * 100) : 0;
-        const totalSurface = units.reduce((sum, u) => sum + (u.area || 0), 0);
         
         this.stats.set({
           totalCoproperties: coproperties.length,
@@ -118,8 +118,7 @@ export class SyndicDashboardComponent implements OnInit {
           totalBudget,
           totalOwners,
           activeCharges: activeCharges.length,
-          occupancyRate,
-          totalSurface
+          occupancyRate
         });
         
         // Create recent activities from latest charges
@@ -139,7 +138,7 @@ export class SyndicDashboardComponent implements OnInit {
           activities.push({
             id: charge.id || '',
             type: 'budget',
-            title: 'Nouveau budget créé',
+            title: 'Nouvelle ligne budgétaire créée',
             description: `${charge.name} - ${this.formatAmount(charge.totalAmount)}`,
             timestamp: charge.createdAt ? new Date(charge.createdAt) : new Date(),
             coproperty: copropertyName

@@ -33,7 +33,6 @@
         <span class="avatar-initials">{{ initials() }}</span>
       </div>
       <div class="user-name">{{ firstName.value }} {{ lastName.value }}</div>
-      <div class="user-username">{{ '@' + username() }}</div>
 
       <div class="roles-section">
         <div class="roles-label">Rôles</div>
@@ -168,27 +167,109 @@
         <div class="card-header">
           <div class="card-header-left">
             <i class="bi bi-shield-lock card-icon"></i>
-            <h2 class="card-title">Informations du compte</h2>
+            <h2 class="card-title">Sécurité</h2>
           </div>
         </div>
         <div class="account-rows">
-          <div class="account-row">
-            <span class="account-label"><i class="bi bi-fingerprint me-2"></i>Identifiant</span>
-            <span class="account-value monospace">{{ username() }}</span>
-          </div>
-          <div class="account-row">
-            <span class="account-label"><i class="bi bi-key me-2"></i>ID utilisateur</span>
-            <span class="account-value monospace small">{{ userId() }}</span>
-          </div>
-          <div class="account-row">
-            <span class="account-label"><i class="bi bi-shield-check me-2"></i>Fournisseur</span>
-            <span class="account-value">Keycloak SSO</span>
-          </div>
           <div class="account-row" *ngIf="joinedDate()">
-            <span class="account-label"><i class="bi bi-calendar3 me-2"></i>Session depuis</span>
+            <span class="account-label"><i class="bi bi-calendar3 me-2"></i>Session active depuis</span>
             <span class="account-value">{{ joinedDate() }}</span>
           </div>
         </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="card account-card mt-3">
+        <div class="card-header">
+          <div class="card-header-left">
+            <i class="bi bi-lock-fill card-icon"></i>
+            <h2 class="card-title">Changer le mot de passe</h2>
+          </div>
+        </div>
+        <div class="card-body">
+        <!-- Success alert -->
+        <div class="alert alert-success" *ngIf="passwordSaveSuccess()">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          Mot de passe modifié avec succès. Utilisez-le lors de votre prochaine connexion.
+        </div>
+
+        <!-- Error alert -->
+        <div class="alert alert-error" *ngIf="passwordSaveError()">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ passwordSaveError() }}
+        </div>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+          <div class="form-grid">
+            <!-- Current Password -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-key me-1"></i>Mot de passe actuel <span class="text-danger">*</span>
+              </label>
+              <input
+                type="password"
+                class="form-input"
+                formControlName="currentPassword"
+                placeholder="Votre mot de passe actuel"
+                [class.invalid]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched">
+              <div class="form-error" *ngIf="passwordForm.get('currentPassword')?.errors?.['required'] && passwordForm.get('currentPassword')?.touched">
+                Le mot de passe actuel est requis.
+              </div>
+              <div class="form-error" *ngIf="passwordForm.get('currentPassword')?.errors?.['minlength']">
+                Minimum 6 caractères.
+              </div>
+            </div>
+
+            <!-- New Password -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-lock me-1"></i>Nouveau mot de passe <span class="text-danger">*</span>
+              </label>
+              <input
+                type="password"
+                class="form-input"
+                formControlName="newPassword"
+                placeholder="Votre nouveau mot de passe"
+                [class.invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+              <div class="form-error" *ngIf="passwordForm.get('newPassword')?.errors?.['required'] && passwordForm.get('newPassword')?.touched">
+                Le nouveau mot de passe est requis.
+              </div>
+              <div class="form-error" *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">
+                Minimum 8 caractères.
+              </div>
+              <div class="form-error" *ngIf="passwordForm.get('newPassword')?.errors?.['pattern']">
+                Doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial.
+              </div>
+            </div>
+
+            <!-- Confirm New Password -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-lock-fill me-1"></i>Confirmer le mot de passe <span class="text-danger">*</span>
+              </label>
+              <input
+                type="password"
+                class="form-input"
+                formControlName="confirmPassword"
+                placeholder="Confirmez votre nouveau mot de passe"
+                [class.invalid]="(passwordForm.get('confirmPassword')?.invalid || passwordForm.hasError('passwordMismatch')) && passwordForm.get('confirmPassword')?.touched">
+              <div class="form-error" *ngIf="passwordForm.get('confirmPassword')?.errors?.['required'] && passwordForm.get('confirmPassword')?.touched">
+                Veuillez confirmer le nouveau mot de passe.
+              </div>
+              <div class="form-error" *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.get('confirmPassword')?.touched">
+                Les mots de passe ne correspondent pas.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-save" [disabled]="passwordForm.invalid || passwordSaving()">
+              <span *ngIf="passwordSaving()" class="spinner"></span>
+              <i class="bi bi-shield-check me-1" *ngIf="!passwordSaving()"></i>
+              {{ passwordSaving() ? 'Modification...' : 'Mettre à jour le mot de passe' }}
+            </button>
+          </div>
+        </form>
       </div>
 
     </div>

@@ -7,6 +7,7 @@ import { FundCallService, FundCallExtended } from '../../services/fund-call.serv
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
 import { OwnerService } from '../../services/owner.service';
+import { KeycloakService } from '@myb-front/auth';
 import { Coproperty } from '../../models/coproperty.models';
 import { OwnerWithUnits } from '../../models/owner.model';
 import {
@@ -30,6 +31,7 @@ export class FundCallNewComponent implements OnInit {
   private copropertyService = inject(CopropertyService);
   private currencyService = inject(CurrencyService);
   private ownerService = inject(OwnerService);
+  private keycloakService = inject(KeycloakService);
   private formBuilder = inject(FormBuilder);
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
@@ -92,7 +94,8 @@ export class FundCallNewComponent implements OnInit {
   }
 
   private loadCoproperties(): void {
-    this.copropertyService.getCoproperties()
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {

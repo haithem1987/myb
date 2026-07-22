@@ -70,13 +70,6 @@
         <span class="indicator-label">Charges actives</span>
       </div>
     </a>
-    <a routerLink="/coproperty/syndic/units" class="indicator clickable">
-      <i class="bi bi-rulers"></i>
-      <div class="indicator-info">
-        <span class="indicator-value">{{ stats().totalSurface | number:'1.0-0' }} m²</span>
-        <span class="indicator-label">Surface totale gérée</span>
-      </div>
-    </a>
   </div>
   
   <!-- Quick Actions -->
@@ -88,14 +81,14 @@
         <span>Ajouter une copropriété</span>
       </a>
       
-      <a routerLink="/coproperty/syndic/units/new" class="action-card">
+      <a routerLink="/coproperty/syndic/units" class="action-card">
         <i class="bi bi-house-door"></i>
         <span>Ajouter un lot</span>
       </a>
       
-      <a routerLink="/coproperty/syndic/charges/new" class="action-card">
+      <a routerLink="/coproperty/syndic/budgets/new" class="action-card">
         <i class="bi bi-plus-circle"></i>
-        <span>Ajouter un budget</span>
+        <span>Ajouter une ligne budgétaire</span>
       </a>
       
       <a routerLink="/coproperty/syndic/owners" class="action-card">

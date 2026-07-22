@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Myb.Common.Authentification.Extensions;
 using Myb.Common.Messaging;
 using Myb.Coproperty.Infrastructure.Data;
 
@@ -22,6 +24,13 @@ builder.Services.AddDbContextFactory<CopropertyDbContext>(options =>
 
 // Add HttpContextAccessor for authentication
 builder.Services.AddHttpContextAccessor();
+
+// Validate incoming Keycloak JWTs so resolvers can identify the authenticated caller.
+// This populates HttpContext.User when a valid bearer token is present; it does NOT
+// reject anonymous/unauthenticated requests by itself (no [Authorize] is applied here),
+// so existing callers that don't yet send a token are unaffected.
+builder.AddKeycloakAuthorization();
+builder.Services.AddTransient<IClaimsTransformation, Myb.Coproperty.Services.KeycloakRoleClaimsTransformation>();
 
 // Add Repositories
 builder.Services.AddScoped<Myb.Coproperty.Infrastructure.Repositories.ICopropertyRepository, Myb.Coproperty.Infrastructure.Repositories.CopropertyRepository>();
@@ -218,6 +227,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseCors("AllowAll");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Health check endpoint for Railway

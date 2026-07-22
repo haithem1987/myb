@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using Myb.Common.Authentification.Services;
 using Myb.Common.Authentification.Interfaces;
 using Myb.Common.Authentification.Settings;
-using System.Text;
 using Microsoft.AspNetCore.Http;
 namespace Myb.Common.Authentification.Extensions
 {
@@ -50,9 +49,8 @@ namespace Myb.Common.Authentification.Extensions
                     {
                         ValidIssuer = settings.Authority,
                         ValidateIssuer = true,
-                        ValidAudience = settings.ClientId,
+                        ValidAudiences = new[] { settings.ClientId, "account" },
                         ValidateAudience = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.ClientSecret)),
                         ValidateIssuerSigningKey = true,
                         //ClockSkew = TimeSpan.Zero // enable this line to validate the expiration time below 5mins
                     };
@@ -61,14 +59,7 @@ namespace Myb.Common.Authentification.Extensions
                         OnAuthenticationFailed = c =>
                         {
                             c.NoResult();
-
-                            c.Response.StatusCode = 500;
-                            c.Response.ContentType = "text/plain";
-
-                            // Debug only for security reasons
-                             return c.Response.WriteAsync(c.Exception.ToString());
-
-                            //return c.Response.ToString();
+                            return Task.CompletedTask;
                         }
                     };
                 });

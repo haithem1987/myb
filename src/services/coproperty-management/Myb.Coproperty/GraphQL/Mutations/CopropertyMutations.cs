@@ -2,25 +2,56 @@ using HotChocolate;
 using HotChocolate.Types;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Services;
+using System.Security.Claims;
 
 namespace Myb.Coproperty.GraphQL.Mutations
 {
     [ExtendObjectType("Mutation")]
     public class CopropertyMutations
     {
-        public async Task<Models.Coproperty> CreateCoproperty(Models.Coproperty coproperty, [Service] ICopropertyService copropertyService) =>
-            await copropertyService.CreateAsync(coproperty);
-
-        public async Task<Models.Coproperty> UpdateCoproperty(Guid id, Models.Coproperty coproperty, [Service] ICopropertyService copropertyService)
+        public async Task<Models.Coproperty> CreateCoproperty(
+            Models.Coproperty coproperty,
+            ClaimsPrincipal? user,
+            [Service] ICopropertyService copropertyService)
         {
+            // Force-scope ManagerId to the authenticated syndic's own id; only
+            // admin-level callers may set an arbitrary ManagerId on create.
+            coproperty.ManagerId = CopropertyAccessControl.ResolveManagerIdForWrite(user, coproperty.ManagerId);
+            return await copropertyService.CreateAsync(coproperty);
+        }
+
+        public async Task<Models.Coproperty> UpdateCoproperty(
+            Guid id,
+            Models.Coproperty coproperty,
+            ClaimsPrincipal? user,
+            [Service] ICopropertyService copropertyService)
+        {
+            // Verify the caller actually owns the record being updated before
+            // touching anything — a syndic can never modify a coproperty that
+            // isn't already assigned to them, regardless of the id supplied.
+            var existing = await copropertyService.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("Copropriété introuvable.");
+            CopropertyAccessControl.EnsureOwnership(user, existing.ManagerId);
+
             coproperty.Id = id;
             coproperty.UpdatedAt = DateTime.UtcNow;
+            // Same enforcement as create: a syndic can never reassign a coproperty
+            // to a different manager id, regardless of what the client supplies.
+            coproperty.ManagerId = CopropertyAccessControl.ResolveManagerIdForWrite(user, coproperty.ManagerId);
             await copropertyService.UpdateAsync(coproperty);
             return await copropertyService.GetByIdAsync(id);
         }
 
-        public async Task<bool> DeleteCoproperty(Guid id, [Service] ICopropertyService copropertyService)
+        public async Task<bool> DeleteCoproperty(
+            Guid id,
+            ClaimsPrincipal? user,
+            [Service] ICopropertyService copropertyService)
         {
+            // A syndic may only delete coproperties assigned to them.
+            var existing = await copropertyService.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("Copropriété introuvable.");
+            CopropertyAccessControl.EnsureOwnership(user, existing.ManagerId);
+
             // Service will throw InvalidOperationException if coproperty has associated data
             // HotChocolate automatically converts exceptions to GraphQL errors
             await copropertyService.DeleteAsync(id);

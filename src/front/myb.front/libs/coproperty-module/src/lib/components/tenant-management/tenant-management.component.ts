@@ -7,6 +7,7 @@ import { CopropertyService } from '../../services/coproperty.service';
 import { TenantService } from '../../services/tenant.service';
 import { UnitExtended, UnitService } from '../../services/unit.service';
 import { Tenant, TenantInput } from '../../models/tenant.model';
+import { KeycloakService } from '@myb-front/auth';
 
 @Component({
   selector: 'myb-tenant-management',
@@ -21,6 +22,7 @@ export class TenantManagementComponent implements OnInit {
   private copropertyService = inject(CopropertyService);
   private tenantService = inject(TenantService);
   private unitService = inject(UnitService);
+  private keycloakService = inject(KeycloakService);
 
   tenants: Tenant[] = [];
   units: UnitExtended[] = [];
@@ -76,7 +78,8 @@ export class TenantManagementComponent implements OnInit {
 
   loadCoproperties(): void {
     this.loading.set(true);
-    this.copropertyService.getCoproperties()
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loading.set(false))

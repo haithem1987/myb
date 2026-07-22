@@ -19,6 +19,7 @@ import { LanguageService } from '@myb-front/shared-ui';
 })
 export class AppComponent implements OnInit {
   title = 'client';
+  private static readonly SUPPORTED_LANGUAGES = ['fr', 'en'];
 
   constructor(
     private keycloakService: KeycloakService,
@@ -32,9 +33,30 @@ export class AppComponent implements OnInit {
     this.translate.setDefaultLang('en');
   }
 
+  private getLanguageFromRedirectParams(): string | null {
+    const params = new URLSearchParams(window.location.search);
+    const redirectLang =
+      params.get('app_lang')
+      ?? params.get('kc_locale')
+      ?? params.get('ui_locales')?.split(' ')[0]
+      ?? null;
+    const normalized = redirectLang?.trim().toLowerCase().split('-')[0] ?? null;
+    return AppComponent.SUPPORTED_LANGUAGES.includes(normalized ?? '') ? normalized : null;
+  }
+
   ngOnInit(): void {
-    const savedLanguage = localStorage.getItem('language') || 'en';
+    const redirectLanguage = this.getLanguageFromRedirectParams();
+    if (redirectLanguage) {
+      localStorage.setItem('language', redirectLanguage);
+      sessionStorage.setItem('language', redirectLanguage);
+    }
+
+    const savedLanguage = localStorage.getItem('language') || sessionStorage.getItem('language') || 'en';
     this.translate.use(savedLanguage);
+    this.translate.onLangChange.subscribe((event) => {
+      localStorage.setItem('language', event.lang);
+      sessionStorage.setItem('language', event.lang);
+    });
     this.languageService.language$.subscribe((lang) => {
       if (lang && lang !== this.translate.currentLang) {
         this.translate.use(lang);

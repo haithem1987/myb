@@ -7,6 +7,7 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { UnitService, UnitExtended } from '../../services/unit.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { Coproperty } from '../../models/coproperty.models';
+import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, finalize } from 'rxjs/operators';
@@ -23,6 +24,7 @@ import { ModalService } from '@myb-front/shared-ui';
 export class UnitsListComponent implements OnInit {
   private unitService = inject(UnitService);
   private copropertyService = inject(CopropertyService);
+  private keycloakService = inject(KeycloakService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
@@ -66,7 +68,8 @@ export class UnitsListComponent implements OnInit {
   }
 
   loadCoproperties(): void {
-    this.copropertyService.getCoproperties().subscribe({
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
         // Load all units regardless of coproperties

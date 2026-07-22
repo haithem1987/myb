@@ -8,6 +8,7 @@ import { catchError, map, debounceTime, distinctUntilChanged, startWith } from '
 import { CopropertyService } from '../services/coproperty.service';
 import { Coproperty } from '../models/coproperty.models';
 import { ModalService, ToastService } from '@myb-front/shared-ui';
+import { KeycloakService } from '@myb-front/auth';
 
 @Component({
   selector: 'myb-coproperty-list',
@@ -226,6 +227,7 @@ export class CopropertyListComponent {
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
   private translateService = inject(TranslateService);
+  private keycloakService = inject(KeycloakService);
 
   constructor(private copropertyService: CopropertyService, private router: Router) {
     this.coproperties$ = this.loadCoproperties();
@@ -278,7 +280,8 @@ export class CopropertyListComponent {
   
   private loadCoproperties(): Observable<Coproperty[]> {
     this.loadError.set(null);
-    return this.copropertyService.getCoproperties().pipe(
+    const managerId = this.keycloakService.getSyndicManagerId();
+    return this.copropertyService.getCoproperties(managerId).pipe(
       catchError(err => {
         const msg = err?.message || this.translateService.instant('Error loading coproperties');
         this.loadError.set(msg);

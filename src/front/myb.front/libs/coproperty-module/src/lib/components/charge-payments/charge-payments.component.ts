@@ -6,6 +6,7 @@ import { ChargeService, ChargeDistributionPayment } from '../../services/charge.
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
+import { KeycloakService } from '@myb-front/auth';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, catchError } from 'rxjs/operators';
 import { forkJoin, of } from 'rxjs';
@@ -41,6 +42,7 @@ export class ChargePaymentsComponent implements OnInit {
   private chargeService = inject(ChargeService);
   private copropertyService = inject(CopropertyService);
   private currencyService = inject(CurrencyService);
+  private keycloakService = inject(KeycloakService);
   private toastService = inject(ToastService);
   private destroyRef = inject(DestroyRef);
 
@@ -66,7 +68,8 @@ export class ChargePaymentsComponent implements OnInit {
   }
 
   private loadCoproperties(): void {
-    this.copropertyService.getCoproperties()
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.copropertyService.getCoproperties(managerId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {

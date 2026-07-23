@@ -664,29 +664,30 @@ export class KeycloakService {
     await this.loadUserProfile();
   }
 
-  /**
-   * Change the current authenticated user's password via Keycloak Account REST API.
-   * The user must be authenticated — uses the current session bearer token.
-   *
-   * Endpoint: POST /realms/{realm}/account/credentials/password
-   */
   async changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Promise<void> {
-    const token = this.keycloak?.token;
-    if (!token) throw new Error('Not authenticated');
+    if (!this.currentUserToken) throw new Error('Not authenticated');
 
-    const keycloakUrl = this.environment.services.keycloak.url;
-    const realm = this.environment.services.keycloak.realm;
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${this.currentUserToken}`,
       'Content-Type': 'application/json',
     });
+    const body = {
+      query: `mutation ChangeOwnPassword($currentPassword: String!, $newPassword: String!, $confirmPassword: String!) {
+        changeOwnPassword(
+          currentPassword: $currentPassword,
+          newPassword: $newPassword,
+          confirmPassword: $confirmPassword
+        )
+      }`,
+      variables: { currentPassword, newPassword, confirmPassword },
+    };
 
-    await firstValueFrom(
-      this.http.post(
-        `${keycloakUrl}/realms/${realm}/account/credentials/password`,
-        { currentPassword, newPassword, confirmation: confirmPassword },
-        { headers }
-      )
+    const response: any = await firstValueFrom(
+      this.http.post(this.getGraphqlUrl(), body, { headers })
     );
+    if (response?.errors?.length) throw new Error(response.errors[0].message);
+    if (response?.data?.changeOwnPassword !== true) {
+      throw new Error('Password change failed');
+    }
   }
 }

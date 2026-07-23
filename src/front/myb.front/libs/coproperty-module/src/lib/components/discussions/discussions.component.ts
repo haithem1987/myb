@@ -17,7 +17,7 @@ const SEND_MESSAGE = gql`mutation SendDiscussionMessage($input: SendDiscussionMe
 const TOGGLE_PIN = gql`mutation ToggleDiscussionPin($id: UUID!) { toggleDiscussionPin(id: $id) }`;
 
 @Component({
-  selector: 'app-discussions', standalone: true, imports: [CommonModule, FormsModule],
+  selector: 'myb-coproperty-discussions', standalone: true, imports: [CommonModule, FormsModule],
   templateUrl: './discussions.component.html', styleUrls: ['./discussions.component.scss']
 })
 export class DiscussionsComponent implements OnInit {

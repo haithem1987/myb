@@ -18,7 +18,7 @@ import { of } from 'rxjs';
 type Tab = 'en-cours' | 'resolus';
 
 @Component({
-  selector: 'app-owner-signalements',
+  selector: 'myb-coproperty-owner-signalements',
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `

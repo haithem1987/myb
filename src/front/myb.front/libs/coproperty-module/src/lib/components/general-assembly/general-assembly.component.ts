@@ -24,7 +24,7 @@ interface GeneralAssembly {
 }
 
 @Component({
-  selector: 'app-general-assembly',
+  selector: 'myb-coproperty-general-assembly',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
   template: `

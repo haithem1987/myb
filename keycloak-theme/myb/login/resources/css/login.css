@@ -1,0 +1,150 @@
+/* ── MYB Login Page ── */
+
+/* Reset & Base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 40%, #e0e7ff 100%);
+  color: #1e1b4b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom element block display */
+myb-auth-layout {
+  display: block;
+  min-height: 100vh;
+}
+
+/* ── Login Wrapper ── */
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+/* ── Login Card ── */
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow:
+    0 4px 24px rgba(124, 58, 237, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  padding: 40px;
+  animation: loginCardFadeIn 0.4s ease;
+}
+
+@keyframes loginCardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Header ── */
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.brand-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 12px;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.25);
+}
+
+.brand-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.brand-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+/* ── Keycloak Form Elements Override ── */
+.login-card .pf-c-form__label-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.login-card .pf-c-form-control {
+  border-radius: 10px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  padding: 11px 14px !important;
+  font-size: 0.925rem !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.login-card .pf-c-form-control:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+}
+
+.login-card .pf-c-button.pf-m-primary {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 24px !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  transition: transform 0.15s ease, box-shadow 0.2s ease !important;
+}
+
+.login-card .pf-c-button.pf-m-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3) !important;
+}
+
+.login-card .pf-c-button.pf-m-link {
+  color: #7c3aed !important;
+  font-weight: 600 !important;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 24px;
+    border-radius: 12px;
+  }
+
+  .brand-title {
+    font-size: 1.3rem;
+  }
+
+  .brand-icon {
+    width: 48px;
+    height: 48px;
+    padding: 10px;
+    border-radius: 12px;
+  }
+}

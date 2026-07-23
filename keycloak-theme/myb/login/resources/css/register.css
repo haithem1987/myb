@@ -1,0 +1,134 @@
+/* ── MYB Registration Page ── */
+
+/* Registration wrapper fills the auth-content area */
+.registration-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 56px);
+  padding: 32px 24px;
+}
+
+/* ── Registration Card ── */
+.registration-card {
+  width: 100%;
+  max-width: 500px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow:
+    0 4px 24px rgba(124, 58, 237, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  padding: 40px;
+  animation: registerCardFadeIn 0.4s ease;
+}
+
+@keyframes registerCardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Header ── */
+.registration-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.brand-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 12px;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.25);
+}
+
+.brand-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.brand-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  letter-spacing: -0.5px;
+  margin: 0 0 6px;
+}
+
+.brand-subtitle {
+  font-size: 0.925rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Keycloak Form Elements Override ── */
+.registration-card .pf-c-form__label-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.registration-card .pf-c-form-control {
+  border-radius: 10px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  padding: 11px 14px !important;
+  font-size: 0.925rem !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.registration-card .pf-c-form-control:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+}
+
+.registration-card .pf-c-button.pf-m-primary {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 24px !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  width: 100% !important;
+  transition: transform 0.15s ease, box-shadow 0.2s ease !important;
+}
+
+.registration-card .pf-c-button.pf-m-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3) !important;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .registration-wrapper {
+    padding: 20px 16px;
+    min-height: calc(100vh - 56px);
+  }
+
+  .registration-card {
+    padding: 28px 20px;
+    border-radius: 12px;
+  }
+
+  .brand-title {
+    font-size: 1.3rem;
+  }
+
+  .brand-icon {
+    width: 48px;
+    height: 48px;
+    padding: 10px;
+    border-radius: 12px;
+  }
+}

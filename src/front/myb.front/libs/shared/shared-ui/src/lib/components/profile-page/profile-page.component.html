@@ -190,7 +190,7 @@
         <!-- Success alert -->
         <div class="alert alert-success" *ngIf="passwordSaveSuccess()">
           <i class="bi bi-check-circle-fill me-2"></i>
-          Mot de passe modifié avec succès. Utilisez-le lors de votre prochaine connexion.
+          Mot de passe modifié avec succès.
         </div>
 
         <!-- Error alert -->
@@ -266,7 +266,7 @@
             <button type="submit" class="btn-save" [disabled]="passwordForm.invalid || passwordSaving()">
               <span *ngIf="passwordSaving()" class="spinner"></span>
               <i class="bi bi-shield-check me-1" *ngIf="!passwordSaving()"></i>
-              {{ passwordSaving() ? 'Modification...' : 'Mettre à jour le mot de passe' }}
+              {{ passwordSaving() ? 'Modification...' : 'Mettre à jour' }}
             </button>
           </div>
         </form>

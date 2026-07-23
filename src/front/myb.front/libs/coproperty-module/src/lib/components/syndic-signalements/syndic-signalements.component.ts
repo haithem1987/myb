@@ -20,7 +20,7 @@ import { of } from 'rxjs';
 type Tab = 'en-cours' | 'resolus';
 
 @Component({
-  selector: 'app-syndic-signalements',
+  selector: 'myb-coproperty-syndic-signalements',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   template: `

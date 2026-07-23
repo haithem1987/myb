@@ -21,7 +21,7 @@ interface KeycloakSearchUser {
 const SYNDIC_ROLE = 'coproperty-syndic';
 
 @Component({
-  selector: 'app-syndic-settings',
+  selector: 'myb-coproperty-syndic-settings',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `

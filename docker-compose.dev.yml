@@ -18,10 +18,14 @@ services:
       - KC_PROXY=edge
       - KC_HOSTNAME_URL=http://localhost:8080
       - KC_HOSTNAME_STRICT_HTTPS=false
+      # Disable theme caching in dev for instant FTL/CSS reload
+      - KC_SPI_THEME_CACHE_THEMES=false
+      - KC_SPI_THEME_STATIC_MAX_AGE=-1
     networks:
       - my-network
     volumes:
       - keycloak_data:/opt/keycloak/data
+      - ./keycloak-theme:/opt/keycloak/themes
     command: start --db=postgres
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080"]

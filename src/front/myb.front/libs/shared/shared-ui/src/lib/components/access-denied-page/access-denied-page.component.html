@@ -1,13 +1,30 @@
-<div class="container text-center mt-5">
-  <h1 class="display-4 text-danger">{{ 'ACCESS_DENIED' | translate }}</h1>
-  <p class="lead">{{ 'ACCESS_DENIED_MESSAGE' | translate }}</p>
-  <button
-    class="btn btn-link text-secondary text-decoration-none me-2"
-    (click)="goToHome()"
-  >
-    {{ 'GO_TO_HOME' | translate }}
-  </button>
-  <button class="btn btn-primary" (click)="goToLogin()">
-    {{ 'GO_TO_LOGIN' | translate }}
-  </button>
+<div class="access-denied-wrapper">
+  <div class="access-denied-card">
+    <!-- Icon -->
+    <div class="ad-icon-wrapper">
+      <i class="bi bi-shield-exclamation"></i>
+    </div>
+
+    <!-- Title -->
+    <h1 class="ad-title">{{ 'ACCESS_DENIED' | translate }}</h1>
+
+    <!-- Message -->
+    <p class="ad-message">{{ 'ACCESS_DENIED_MESSAGE' | translate }}</p>
+
+    <!-- Actions -->
+    <div class="ad-actions">
+      <button class="ad-btn-secondary" (click)="goToHome()">
+        <i class="bi bi-house-door"></i>
+        {{ 'GO_TO_HOME' | translate }}
+      </button>
+      <button class="ad-btn-primary" (click)="goToLogin()">
+        <i class="bi bi-box-arrow-in-right"></i>
+        {{ 'GO_TO_LOGIN' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Decorative background blobs (matching landing page) -->
+  <div class="ad-blob ad-blob-1"></div>
+  <div class="ad-blob ad-blob-2"></div>
 </div>

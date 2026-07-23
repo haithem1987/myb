@@ -2,18 +2,23 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  flex: 1;
   padding: 2rem 1rem;
 }
 
 .completion-card {
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 32px rgba(79, 70, 229, 0.08);
   padding: 2.5rem 2rem;
   width: 100%;
   max-width: 520px;
+  animation: compFadeUp 0.5s ease both;
+}
+
+@keyframes compFadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Header */
@@ -23,20 +28,23 @@
 
   .header-icon {
     font-size: 2.5rem;
-    color: #6c4fbd;
+    color: #7c3aed;
+    display: block;
+    margin-bottom: 0.5rem;
   }
 
   h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1a1a2e;
-    margin: 0.5rem 0 0.25rem;
+    color: #1e1b4b;
+    margin: 0 0 0.25rem;
   }
 
   .header-subtitle {
-    color: #6b7280;
+    color: #64748b;
     font-size: 0.875rem;
     margin: 0;
+    line-height: 1.5;
   }
 }
 
@@ -68,30 +76,37 @@
 /* Info note */
 .info-note {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #64748b;
   background: #f0f4ff;
-  border-left: 3px solid #6c4fbd;
+  border-left: 3px solid #7c3aed;
   border-radius: 4px;
   padding: 0.6rem 0.75rem;
 }
 
-/* Primary violet button */
-.btn-violet {
-  background: #6c4fbd;
-  border-color: #6c4fbd;
-  font-weight: 500;
-  padding: 0.75rem;
-  border-radius: 8px;
-  transition: background 0.2s, box-shadow 0.2s;
+/* Submit button - unified gradient */
+.btn-submit {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  border: none;
+  font-weight: 600;
+  padding: 0.8rem;
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+  color: #fff;
 
   &:hover:not(:disabled) {
-    background: #5a3fa3;
-    border-color: #5a3fa3;
-    box-shadow: 0 4px 12px rgba(108, 79, 189, 0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4);
   }
 
   &:disabled {
-    opacity: 0.7;
+    opacity: 0.65;
     cursor: not-allowed;
+  }
+}
+
+@media (max-width: 480px) {
+  .completion-card {
+    padding: 2rem 1.5rem;
   }
 }

@@ -30,7 +30,7 @@ interface RecentActivity {
 }
 
 @Component({
-  selector: 'app-syndic-dashboard',
+  selector: 'myb-coproperty-syndic-dashboard',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './syndic-dashboard.component.html',

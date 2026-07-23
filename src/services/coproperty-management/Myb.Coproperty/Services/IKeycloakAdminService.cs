@@ -30,5 +30,10 @@ namespace Myb.Coproperty.Services
 
         /// <summary>Remove a client role from a Keycloak user.</summary>
         Task<bool> UnassignClientRoleAsync(string userId, string roleName);
+
+        /// <summary>
+        /// Verifies the caller's current password and replaces it with a new permanent password.
+        /// </summary>
+        Task ChangeOwnPasswordAsync(string userId, string username, string currentPassword, string newPassword);
     }
 }

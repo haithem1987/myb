@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { AuthLayoutComponent } from 'libs/shared/shared-ui/src/lib/components/auth-layout/auth-layout.component';
 
 @Component({
   selector: 'myb-owner-registration',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, AuthLayoutComponent],
   templateUrl: './owner-registration.component.html',
   styleUrls: ['./owner-registration.component.scss'],
 })

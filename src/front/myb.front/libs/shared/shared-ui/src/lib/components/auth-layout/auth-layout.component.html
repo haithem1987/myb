@@ -1,0 +1,51 @@
+<nav class="auth-navbar">
+  <div class="auth-navbar-inner">
+    <!-- Back to Home -->
+    <a class="auth-back-btn" routerLink="/">
+      <i class="bi bi-house-door-fill"></i>
+      <span>{{ 'auth.backToHome' | translate }}</span>
+    </a>
+
+    <!-- Brand -->
+    <div class="auth-brand">
+      <div class="auth-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" opacity="0.9"/>
+          <rect x="13" y="2" width="9" height="9" rx="2" fill="currentColor" opacity="0.55"/>
+          <rect x="2" y="13" width="9" height="9" rx="2" fill="currentColor" opacity="0.55"/>
+          <rect x="13" y="13" width="9" height="9" rx="2" fill="currentColor" opacity="0.9"/>
+        </svg>
+      </div>
+      <span class="auth-brand-text">{{ 'NAV_BRAND' | translate }}</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Stepper (if multi-step) -->
+<div class="auth-stepper" *ngIf="currentStep && totalSteps">
+  <div class="auth-stepper-inner">
+    <ng-container *ngFor="let step of stepIndices; let i = index">
+      <div class="auth-step" [class.auth-step--active]="step === currentStep" [class.auth-step--done]="step < currentStep">
+        <div class="auth-step-circle">
+          <i *ngIf="step < currentStep" class="bi bi-check-lg"></i>
+          <span *ngIf="step >= currentStep">{{ step }}</span>
+        </div>
+        <span class="auth-step-label">
+          {{ stepLabels[i] || ('auth.step' + step + 'of' + totalSteps | translate) }}
+        </span>
+      </div>
+      <div *ngIf="i < totalSteps - 1" class="auth-step-line" [class.auth-step-line--done]="step < currentStep"></div>
+    </ng-container>
+  </div>
+</div>
+
+<!-- Content slot -->
+<main class="auth-content">
+  <ng-content></ng-content>
+</main>
+
+<!-- Trust badges -->
+<div class="auth-trust-badges">
+  <i class="bi bi-shield-check"></i>
+  <span>{{ 'auth.trustBadges' | translate }}</span>
+</div>

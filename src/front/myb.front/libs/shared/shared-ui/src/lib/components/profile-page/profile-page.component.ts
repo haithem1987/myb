@@ -131,7 +131,6 @@ export class ProfilePageComponent implements OnInit {
     const newPw = form.get('newPassword')?.value;
     const confirm = form.get('confirmPassword')?.value;
     if (newPw && confirm && newPw !== confirm) {
-      form.get('confirmPassword')?.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     }
     return null;
@@ -147,17 +146,18 @@ export class ProfilePageComponent implements OnInit {
     this.passwordSaveSuccess.set(false);
 
     try {
-      const { currentPassword, newPassword, confirmPassword } = this.passwordForm.value;
+      const { currentPassword, newPassword, confirmPassword } = this.passwordForm.getRawValue();
       await this.keycloakService.changePassword(
         currentPassword!,
         newPassword!,
         confirmPassword!
       );
-      this.passwordSaveSuccess.set(true);
       this.passwordForm.reset();
-      this.isChangingPassword.set(false);
+      this.passwordSaveSuccess.set(true);
     } catch (error: any) {
-      this.passwordSaveError.set(error.message || 'Une erreur est survenue. Veuillez réessayer.');
+      this.passwordSaveError.set(
+        error?.message || 'Le mot de passe n\'a pas pu être modifié.'
+      );
     } finally {
       this.passwordSaving.set(false);
     }

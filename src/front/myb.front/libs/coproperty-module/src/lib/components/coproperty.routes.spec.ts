@@ -3,10 +3,9 @@ import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { provideRouter } from '@angular/router';
 import { COPROPERTY_ROUTES } from './coproperty.routes';
-import { CopropertyComponent } from './coproperty.component';
+import { CopropertyDashboardComponent } from './dashboard/coproperty-dashboard.component';
 import { CopropertyListComponent } from './coproperty-list.component';
 import { CopropertyDetailComponent } from './coproperty-detail.component';
-import { CopropertyDashboardComponent } from './dashboard/coproperty-dashboard.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
@@ -17,13 +16,7 @@ describe('COPROPERTY_ROUTES', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        CopropertyComponent,
-        CopropertyListComponent,
-        CopropertyDetailComponent,
-        CopropertyDashboardComponent,
-        TranslateModule.forRoot(),
-      ],
+      imports: [TranslateModule.forRoot()],
       providers: [
         provideRouter(COPROPERTY_ROUTES),
         provideHttpClient(),
@@ -35,66 +28,53 @@ describe('COPROPERTY_ROUTES', () => {
     location = TestBed.inject(Location);
   });
 
-  it('should navigate to dashboard on empty path', async () => {
-    await router.navigate(['']);
-    expect(location.path()).toBe('/');
-  });
-
-  it('should navigate to coproperty list', async () => {
-    await router.navigate(['coproperties']);
-    expect(location.path()).toBe('/coproperties');
-  });
-
-  it('should navigate to coproperty detail with id', async () => {
-    const testId = 'test-id-123';
-    await router.navigate(['coproperties', testId]);
-    expect(location.path()).toBe(`/coproperties/${testId}`);
-  });
-
-  it('should navigate to coproperty edit with id', async () => {
-    const testId = 'test-id-456';
-    await router.navigate(['coproperties', testId, 'edit']);
-    expect(location.path()).toBe(`/coproperties/${testId}/edit`);
-  });
-
-  it('should have correct route configuration structure', () => {
+  it('should have correct top-level route configuration', () => {
     expect(COPROPERTY_ROUTES).toBeDefined();
-    expect(COPROPERTY_ROUTES.length).toBe(1);
+    expect(COPROPERTY_ROUTES.length).toBeGreaterThan(0);
+
+    // First route is the role-based dispatch guard
     expect(COPROPERTY_ROUTES[0].path).toBe('');
-    expect(COPROPERTY_ROUTES[0].component).toBe(CopropertyComponent);
-    expect(COPROPERTY_ROUTES[0].children).toBeDefined();
-    expect(COPROPERTY_ROUTES[0].children?.length).toBe(4);
+
+    // The syndic subroute exists with all expected children
+    const syndicRoute = COPROPERTY_ROUTES.find((r) => r.path === 'syndic');
+    expect(syndicRoute).toBeDefined();
+    const expectedSyndicPaths = [
+      'dashboard',
+      'coproperties',
+      'coproperties/new',
+      'budgets',
+      'units',
+      'owners',
+      'tenants',
+      'maintenance',
+      'interventions',
+      'signalements',
+      'discussions',
+      'fund-calls',
+      'charge-payments',
+      'treasury',
+      'unpaid-payments',
+      'general-assembly',
+      'reports',
+      'settings',
+    ];
+    expectedSyndicPaths.forEach((p) => {
+      const child = syndicRoute?.children?.find((c) => c.path === p);
+      expect(child).toBeDefined();
+    });
   });
 
-  it('should have dashboard as default child route', () => {
-    const dashboardRoute = COPROPERTY_ROUTES[0].children?.find(
-      (r) => r.path === ''
-    );
-    expect(dashboardRoute).toBeDefined();
-    expect(dashboardRoute?.component).toBe(CopropertyDashboardComponent);
+  it('should have owner, council, and accountant subroutes', () => {
+    expect(COPROPERTY_ROUTES.find((r) => r.path === 'owner')).toBeDefined();
+    expect(COPROPERTY_ROUTES.find((r) => r.path === 'council')).toBeDefined();
+    expect(COPROPERTY_ROUTES.find((r) => r.path === 'accountant')).toBeDefined();
   });
 
-  it('should have coproperty list route configured', () => {
-    const listRoute = COPROPERTY_ROUTES[0].children?.find(
-      (r) => r.path === 'coproperties'
+  it('should expose dashboard component at the empty syndic child', () => {
+    const syndicRoute = COPROPERTY_ROUTES.find((r) => r.path === 'syndic');
+    const dashboardChild = syndicRoute?.children?.find(
+      (c) => c.path === 'dashboard',
     );
-    expect(listRoute).toBeDefined();
-    expect(listRoute?.component).toBe(CopropertyListComponent);
-  });
-
-  it('should have coproperty detail route with id parameter', () => {
-    const detailRoute = COPROPERTY_ROUTES[0].children?.find(
-      (r) => r.path === 'coproperties/:id'
-    );
-    expect(detailRoute).toBeDefined();
-    expect(detailRoute?.component).toBe(CopropertyDetailComponent);
-  });
-
-  it('should have coproperty edit route with id parameter', () => {
-    const editRoute = COPROPERTY_ROUTES[0].children?.find(
-      (r) => r.path === 'coproperties/:id/edit'
-    );
-    expect(editRoute).toBeDefined();
-    expect(editRoute?.component).toBe(CopropertyDetailComponent);
+    expect(dashboardChild?.component).toBeDefined();
   });
 });

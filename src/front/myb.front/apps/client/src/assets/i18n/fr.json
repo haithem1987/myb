@@ -586,6 +586,10 @@
     "phoneInvalid": "Format de numéro de téléphone invalide"
   },
   "auth": {
+    "backToHome": "Retour à l'accueil",
+    "trustBadges": "Inscription sécurisée \u2022 Cryptée SSL \u2022 Confidentialité protégée",
+    "step1of2": "Créer un compte",
+    "step2of2": "Compléter le profil",
     "login": "Se connecter",
     "error": {
       "notAuthenticated": "Vous devez être connecté pour continuer."

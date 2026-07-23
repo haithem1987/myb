@@ -19,11 +19,12 @@ import { from, switchMap } from 'rxjs';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { OwnerService } from '../../services/owner.service';
 import { CreateOwnerWithUnitsInput } from '../../models/owner.model';
+import { AuthLayoutComponent } from 'libs/shared/shared-ui/src/lib/components/auth-layout/auth-layout.component';
 
 @Component({
   selector: 'myb-owner-profile-completion',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule, AuthLayoutComponent],
   templateUrl: './owner-profile-completion.component.html',
   styleUrls: ['./owner-profile-completion.component.scss'],
 })
@@ -70,8 +71,6 @@ export class OwnerProfileCompletionComponent implements OnInit {
         .subscribe({
           next: (owner) => {
             if (owner) {
-              // Profile already exists — navigate to owner dashboard.
-              // router.navigate keeps Keycloak's in-memory token so authGuard passes.
               this.router.navigate(['/coproperty/owner/dashboard']);
             }
           },
@@ -99,10 +98,6 @@ export class OwnerProfileCompletionComponent implements OnInit {
     return this.profileForm.get('phone')!;
   }
 
-  /**
-   * This component is exclusively for owner self-registration.
-   * Always route to the owner dashboard after profile completion.
-   */
   private getDefaultRoute(): string {
     return '/coproperty/owner/dashboard';
   }
@@ -125,17 +120,13 @@ export class OwnerProfileCompletionComponent implements OnInit {
       lastName: this.keycloakLastName,
       email: this.keycloakEmail,
       phone: this.phone.value,
-      units: [], // No units at self-registration — admin assigns units later
+      units: [],
     };
 
     this.loading.set(true);
     this.ownerService
       .createOwner(input)
       .pipe(
-        // Chain token refresh so the new coproperty-owner role is in the JWT
-        // before the route guards evaluate. Using switchMap keeps everything
-        // inside Angular's zone (no page reload = Keycloak keeps its token).
-        // forceTokenRefresh() never throws — errors are caught internally.
         switchMap(() => from(this.keycloakService.forceTokenRefresh())),
         takeUntilDestroyed(this.destroyRef)
       )

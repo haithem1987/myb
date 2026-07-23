@@ -10,7 +10,7 @@ import { Notification } from 'libs/shared/infra/models/notification.model';
 import { forkJoin } from 'rxjs';
 
 @Component({
-  selector: 'app-syndic-layout',
+  selector: 'myb-coproperty-syndic-layout',
   standalone: true,
   imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, UserDropdownComponent],
   templateUrl: './syndic-layout.component.html',
@@ -41,8 +41,8 @@ export class SyndicLayoutComponent implements OnInit {
   // Dual-role flag: syndic who is also a coproprietaire
   isCoproprietaire = signal(false);
 
-  // Sidebar state
-  isSidebarCollapsed = signal(true);
+  // Sidebar state: expanded by default on desktop (>992px), collapsed on mobile/tablet
+  isSidebarCollapsed = signal(window.innerWidth <= 992);
   
   ngOnInit(): void {
     this.loadUserFromKeycloak();

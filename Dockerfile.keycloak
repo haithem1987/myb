@@ -1,5 +1,8 @@
 FROM quay.io/keycloak/keycloak:23.0.4
 
+# Copy custom MYB theme into the Keycloak themes directory
+COPY keycloak-theme/ /opt/keycloak/themes/
+
 # Set environment defaults for production
 ENV KC_DB=postgres
 ENV KC_HEALTH_ENABLED=true

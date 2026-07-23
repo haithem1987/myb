@@ -14,7 +14,7 @@ interface Report {
 }
 
 @Component({
-  selector: 'app-reports',
+  selector: 'myb-coproperty-reports',
   standalone: true,
   imports: [CommonModule],
   template: `

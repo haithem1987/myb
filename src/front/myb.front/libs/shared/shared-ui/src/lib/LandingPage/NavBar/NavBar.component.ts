@@ -8,8 +8,8 @@ import { UserDropdownComponent } from '../../components/user-dropdown/user-dropd
 import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
 import { TranslateModule } from '@ngx-translate/core';
 
-/** Roles that grant access to the Admin Portal */
-const ADMIN_ROLES = ['system-admin', 'coproperty-syndic', 'coproperty-admin'];
+/** Roles that grant access to the Admin Portal (excludes pure syndic) */
+const ADMIN_ROLES = ['system-admin', 'coproperty-admin'];
 
 @Component({
   selector: 'myb-front-nav-bar',

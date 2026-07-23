@@ -604,6 +604,10 @@
     "phoneInvalid": "Invalid phone number format"
   },
   "auth": {
+    "backToHome": "Back to Home",
+    "trustBadges": "Secure registration \u2022 SSL encrypted \u2022 Privacy protected",
+    "step1of2": "Create Account",
+    "step2of2": "Complete Profile",
     "login": "Log in",
     "error": {
       "notAuthenticated": "You must be logged in to continue."

@@ -1,0 +1,157 @@
+.access-denied-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #faf5ff 0%, #f0f4ff 60%, #e0e7ff 100%);
+  padding: 2rem 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative blobs */
+.ad-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.18;
+  pointer-events: none;
+}
+.ad-blob-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #a78bfa, #7c3aed);
+  top: -120px;
+  right: -80px;
+}
+.ad-blob-2 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, #818cf8, #4f46e5);
+  bottom: -80px;
+  left: -60px;
+}
+
+.access-denied-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 12px 48px rgba(79, 70, 229, 0.1);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  animation: adFadeUp 0.5s ease both;
+}
+
+/* Icon */
+.ad-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(124, 58, 237, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.ad-icon-wrapper i {
+  font-size: 2.5rem;
+  color: #7c3aed;
+}
+
+/* Title */
+.ad-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin: 0 0 0.75rem;
+}
+
+/* Message */
+.ad-message {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0 0 2rem;
+}
+
+/* Action buttons */
+.ad-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ad-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+}
+
+.ad-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.4);
+}
+
+.ad-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 24px;
+  border: 1.5px solid rgba(124, 58, 237, 0.25);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: transparent;
+  color: #7c3aed;
+}
+
+.ad-btn-secondary:hover {
+  background: rgba(124, 58, 237, 0.06);
+  border-color: #7c3aed;
+}
+
+@keyframes adFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .access-denied-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .ad-icon-wrapper {
+    width: 64px;
+    height: 64px;
+  }
+
+  .ad-icon-wrapper i {
+    font-size: 2rem;
+  }
+}

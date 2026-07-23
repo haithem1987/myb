@@ -16,6 +16,9 @@ services:
       - KC_HOSTNAME_STRICT=false
       - KC_HTTP_ENABLED=true
       - KC_HOSTNAME_STRICT_HTTPS=false
+      # Disable theme caching in dev for instant FTL/CSS reload
+      - KC_SPI_THEME_CACHE_THEMES=false
+      - KC_SPI_THEME_STATIC_MAX_AGE=-1
       # SMTP settings used by the configure-keycloak-smtp.sh init script
       - SMTP_HOST=${SMTP_HOST:-mailhog}
       - SMTP_PORT=${SMTP_PORT:-1025}

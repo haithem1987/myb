@@ -21,10 +21,12 @@ import {
 } from '../../models/fund-call.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, finalize } from 'rxjs/operators';
-import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { ToastService, ModalService, ErrorMessageService } from '@myb-front/shared-ui';
 import { InvoiceService } from 'libs/invoice-module/src/lib/services/invoice.service';
 import { Invoice } from 'libs/invoice-module/src/lib/models/invoice.model';
 import { InvoiceDetails } from 'libs/invoice-module/src/lib/models/invoiceDetails.model';
+import { FundCallModalService } from '../../components/fund-call-modals/fund-call-modal.service';
+import { CancellationReason } from '../../components/fund-call-modals/cancel-fund-call-modal/cancel-fund-call-modal.component';
 
 @Component({
   selector: 'myb-fund-calls-list',
@@ -43,7 +45,10 @@ export class FundCallsListComponent implements OnInit {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private toastService = inject(ToastService);
+  private modalService = inject(ModalService);
   private fb = inject(FormBuilder);
+  private errorMessageService = inject(ErrorMessageService);
+  private fundCallModalService = inject(FundCallModalService);
 
   fundCalls = signal<FundCallExtended[]>([]);
   coproperties = signal<Coproperty[]>([]);
@@ -84,11 +89,14 @@ export class FundCallsListComponent implements OnInit {
   rejectReason = '';
   private _pendingRejectPaymentId: string | null = null;
 
+  // Status options exposed in the edit-panel dropdown. "VALIDATED" is intentionally
+  // omitted: it is a derived state set by the backend once a payment is approved
+  // and is not a user-selectable status from the UI.
   readonly statusOptions: { value: FundCallStatus; label: string }[] = [
     { value: 'TO_PAY', label: FUND_CALL_STATUS_LABELS['TO_PAY'] },
     { value: 'PENDING_VALIDATION', label: FUND_CALL_STATUS_LABELS['PENDING_VALIDATION'] },
     { value: 'PAID',   label: FUND_CALL_STATUS_LABELS['PAID'] },
-    { value: 'VALIDATED', label: FUND_CALL_STATUS_LABELS['VALIDATED'] },
+    { value: 'CANCELLED', label: FUND_CALL_STATUS_LABELS['CANCELLED'] },
   ];
 
   /** Expose labels/badges to the template */
@@ -172,8 +180,11 @@ export class FundCallsListComponent implements OnInit {
       )
       .subscribe({
         next: (fundCalls) => {
-          // Enrich each fund call with the coproperty name from already-loaded coproperties
+          // The server already resolves copropertyName (falling back to the historical
+          // snapshot if the coproperty was deleted). Only fall back to a local lookup
+          // if the server didn't return a value for some reason.
           const enriched = fundCalls.map((fc) => {
+            if (fc.copropertyName) return fc as FundCallExtended;
             const coproperty = this.coproperties().find((c) => c.id === fc.copropertyId);
             return { ...fc, copropertyName: coproperty?.name ?? '' } as FundCallExtended;
           });
@@ -245,9 +256,16 @@ export class FundCallsListComponent implements OnInit {
       );
     }
 
-    // Status filter (local)
-    if (this.filterStatus()) {
-      filtered = filtered.filter((fc) => fc.status === this.filterStatus());
+    // Status filter (local). "UNPAID" is a synthetic value that matches every
+    // fund call which has not yet been fully paid/validated, so syndics can
+    // quickly surface owners with outstanding balances.
+    const statusFilter = this.filterStatus();
+    if (statusFilter === 'UNPAID') {
+      filtered = filtered.filter(
+        (fc) => fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION'
+      );
+    } else if (statusFilter) {
+      filtered = filtered.filter((fc) => fc.status === statusFilter);
     }
 
     // Search filter (local)
@@ -271,6 +289,15 @@ export class FundCallsListComponent implements OnInit {
 
   getStatusBadge(status: FundCallStatus | string): string {
     return FUND_CALL_STATUS_BADGE[status as FundCallStatus] ?? 'bg-secondary';
+  }
+
+  /**
+   * True when the fund call is in the terminal CANCELLED state.
+   * The row is then read-only — no edit / payment / status-change affordance.
+   * (FRS-FCF-LCM-2026-001 §4.3)
+   */
+  isCancelled(fc: FundCallExtended): boolean {
+    return fc?.status === 'CANCELLED';
   }
 
   getActiveFundCallsCount(): number {
@@ -405,28 +432,221 @@ export class FundCallsListComponent implements OnInit {
     });
   }
 
-  deleteFundCall(fundCall: FundCallExtended): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet appel de fonds ?')) {
-      if (!fundCall.id) {
-        this.toastService.show("Impossible de supprimer : identifiant manquant", { classname: 'bg-danger text-white', delay: 4000 });
-        return;
-      }
-      // Optimistically remove the item immediately
-      this.fundCalls.update((list) => list.filter((fc) => fc.id !== fundCall.id));
+  /**
+   * A fund call is considered "published" / processed when it is no longer
+   * in its initial ToPay state, has already been cancelled, or has any
+   * associated payment. Such records cannot be deleted, only cancelled.
+   */
+  isPublished(fc: FundCallExtended): boolean {
+    if (!fc) return false;
+    if (fc.status === 'CANCELLED') return true;
+    if (fc.status !== 'TO_PAY') return true;
+    const payments = (fc as any).payments as FundCallPayment[] | undefined;
+    return !!payments && payments.length > 0;
+  }
 
-      this.fundCallService.deleteFundCall(fundCall.id, fundCall.copropertyId).subscribe({
-        next: () => {
-          this.toastService.show("Appel de fonds supprimé avec succès", { classname: 'bg-success text-white', delay: 4000 });
-        },
-        error: (err) => {
-          console.error('Error deleting fund call:', err);
-          // Restore the removed item on error
-          this.loadAllFundCalls();
-          const msg = err?.graphQLErrors?.[0]?.message || "Erreur lors de la suppression de l'appel de fonds";
-          this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
-        },
-      });
+  /**
+   * True only for true drafts (FRS-FCF-LCM-2026-001 §2.1).
+   * The server is the single source of truth: the GraphQL `deletable` field
+   * is computed from the same EvaluateDeleteBlocker logic in the backend,
+   * so the UI can never accidentally expose a Supprimer option for a record
+   * that has reached a non-deletable state.
+   */
+  canDelete(fc: FundCallExtended): boolean {
+    // Prefer the server flag; fall back to the legacy client-side heuristic
+    // for older API responses that do not yet expose the field.
+    if (typeof fc.deletable === 'boolean') return fc.deletable;
+    return !this.isPublished(fc);
+  }
+
+  /** True when the user can trigger the cancellation workflow on this row. */
+  canCancel(fc: FundCallExtended): boolean {
+    if (typeof fc.cancellable === 'boolean') return fc.cancellable;
+    return !!fc && fc.status !== 'CANCELLED';
+  }
+
+  /**
+   * French reason why a delete is blocked (FRS-FCF-LCM-2026-001 §4.4).
+   * Surfaced in the toast when a delete is attempted via any path.
+   */
+  deleteBlockerReason(fc: FundCallExtended): string | null {
+    if (fc.deleteBlockerReason) return fc.deleteBlockerReason;
+    return this.canDelete(fc) ? null : this.publishReasonLabel(fc);
+  }
+
+  /**
+   * Opens the appropriate modal (Delete or Cancel) based on fund call state.
+   * Routes to DeleteFundCallModalComponent for unpublished drafts.
+   * Routes to CancelFundCallModalComponent for published/processed fund calls.
+   */
+  openActionModal(fundCall: FundCallExtended): void {
+    const modalRef = this.fundCallModalService.openActionModal(fundCall);
+    if (!modalRef) {
+      return;
     }
+
+    // Subscribe to modal result when closed
+    modalRef.result.then(
+      () => {
+        // Modal closed with success — refresh the fund calls list
+        this.loadAllFundCalls();
+      },
+      (reason) => {
+        // Modal dismissed — no action needed
+      }
+    );
+  }
+
+  /**
+   * Hard-delete a fund call. Only allowed for true drafts (the server returns
+   * the `deletable` flag on every row). For any other record we transparently
+   * route to the cancellation workflow and surface the server-provided
+   * French reason (FRS-FCF-LCM-2026-001 §2.1 / §4.4 / AC-25).
+   */
+  deleteFundCall(fundCall: FundCallExtended): void {
+    if (!fundCall.id) {
+      this.toastService.show("Impossible de supprimer : identifiant manquant", { classname: 'bg-danger text-white', delay: 4000 });
+      return;
+    }
+    // Refuse to delete a non-draft: explain why, then offer the cancel path.
+    if (!this.canDelete(fundCall)) {
+      const blocker = this.deleteBlockerReason(fundCall)
+        ?? "Suppression impossible. Cet appel de fonds a déjà été publié ou comporte des versements. Utilisez l'annulation à la place.";
+      this.toastService.show(blocker, { classname: 'bg-warning text-dark', delay: 6000 });
+      this.promptCancelFundCall(fundCall);
+      return;
+    }
+
+    // Open the friction-check delete modal (FRS-FCF-LCM-2026-001 §4.2.1).
+    // The modal itself performs the typed-confirmation check and the actual
+    // deleteFundCall call to the service; on success it closes itself.
+    const ref = this.fundCallModalService.openActionModal(fundCall);
+    if (!ref) return;
+    ref.result
+      .then(() => {
+        this.toastService.show("Appel de fonds supprimé avec succès", { classname: 'bg-success text-white', delay: 4000 });
+        // Reload the list to reflect the removed row.
+        this.loadAllFundCalls();
+      })
+      .catch(() => { /* dismissed */ });
+  }
+
+  /**
+   * Opens the cancellation modal (FRS-FCF-LCM-2026-001 §4.2.2) for a single
+   * fund call. Collects a preset reason + a free-text detail (≥10 chars).
+   */
+  promptCancelFundCall(fundCall: FundCallExtended): void {
+    if (!fundCall.id) return;
+    if (!this.canCancel(fundCall)) {
+      this.toastService.show("Cet appel de fonds est déjà annulé.", { classname: 'bg-info text-white', delay: 4000 });
+      return;
+    }
+
+    this.fundCallModalService
+      .openCancelForSingle(fundCall)
+      .then((reason) => {
+        if (!reason) return;
+        this.cancelFundCall(fundCall, reason);
+      });
+  }
+
+  /**
+   * Bulk cancellation (FRS-FCF-LCM-2026-001 §4.2.3 / AC-20 / AC-21).
+   * Calls the service for each fund call sequentially; on partial failure,
+   * an error toast names the IDs that failed.
+   */
+  promptBulkCancelFundCall(fundCalls: FundCallExtended[]): void {
+    if (!fundCalls.length) return;
+    const totalAmount = fundCalls.reduce((sum, fc) => {
+      const n = typeof fc.amount === 'string' ? parseFloat(fc.amount as any) : (fc.amount ?? 0);
+      return sum + (isNaN(n) ? 0 : n);
+    }, 0);
+
+    this.fundCallModalService
+      .openCancelForBulk(fundCalls, this.formatAmount(totalAmount))
+      .then((reason) => {
+        if (!reason) return;
+        this.bulkCancelWithReason(fundCalls, reason);
+      });
+  }
+
+  private bulkCancelWithReason(fundCalls: FundCallExtended[], reason: CancellationReason): void {
+    let remaining = fundCalls.length;
+    let failed: string[] = [];
+
+    fundCalls.forEach((fc) => {
+      this.fundCallService.cancelFundCall(fc.id, reason.detail).subscribe({
+        next: () => {
+          remaining--;
+          if (remaining === 0 && failed.length === 0) {
+            this.toastService.show(
+              `${fundCalls.length} appel(s) annulé(s) avec succès. Les copropriétaires ont été notifiés.`,
+              { classname: 'bg-success text-white', delay: 4000 }
+            );
+            this.loadAllFundCalls();
+            this.selectedIds.set(new Set());
+          } else if (remaining === 0 && failed.length > 0) {
+            this.loadAllFundCalls();
+            this.toastService.show(
+              `${failed.length} appel(s) n'ont pas pu être annulés. Voir le détail dans la console.`,
+              { classname: 'bg-danger text-white', delay: 6000 }
+            );
+            console.error('[bulkCancel] Failed IDs:', failed);
+          }
+        },
+        error: (err: any) => {
+          failed.push(fc.id);
+          remaining--;
+          console.error(`[bulkCancel] Failed to cancel ${fc.id}:`, err);
+        }
+      });
+    });
+  }
+
+  /** Human-readable explanation of why the fund call cannot be deleted. */
+  private publishReasonLabel(fc: FundCallExtended): string {
+    const reasons: string[] = [];
+    if (fc.status === 'CANCELLED') reasons.push('il a déjà été annulé');
+    else if (fc.status === 'PAID') reasons.push('le paiement a déjà été encaissé');
+    else if (fc.status === 'VALIDATED') reasons.push('l\'appel de fonds a été validé');
+    else if (fc.status === 'PENDING_VALIDATION') reasons.push('un versement est en attente de validation');
+    if ((fc as any).payments?.length) reasons.push('des versements sont associés');
+    if (reasons.length === 0) return 'L\'appel de fonds a été publié.';
+    return 'Cet appel de fonds ne peut pas être supprimé car ' + reasons.join(' et ') + '.';
+  }
+
+  /**
+   * Cancel a single fund call (FRS-FCF-LCM-2026-001 §3.3.1). The reason is
+   * collected by the cancellation modal and forwarded to the backend where
+   * it is persisted in the FundCallAuditLog.
+   */
+  cancelFundCall(fundCall: FundCallExtended, reason: CancellationReason): void {
+    if (!fundCall.id) return;
+    this.fundCallService.cancelFundCall(fundCall.id, reason.detail).subscribe({
+      next: () => {
+        this.toastService.show('Appel de fonds annulé avec succès. Les copropriétaires ont été notifiés.', { classname: 'bg-success text-white', delay: 4000 });
+        this.loadAllFundCalls();
+        // If the fund call is currently open in the edit panel, refresh it.
+        const editing = this.editingFundCall();
+        if (editing && editing.id === fundCall.id) {
+          this.reloadEditingFundCall();
+        }
+      },
+      error: (err: any) => {
+        const userError = this.errorMessageService.translateError(err);
+        this.toastService.show(userError.message, { classname: `bg-${userError.severity === 'danger' ? 'danger' : 'warning'} text-white`, delay: 5000 });
+      },
+    });
+  }
+
+  private escapeHtml(value: string | undefined | null): string {
+    if (value == null) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   /** Step 1: build the invoice locally and show the preview modal. */
@@ -466,6 +686,10 @@ export class FundCallsListComponent implements OnInit {
     const invoice = this.pendingInvoice();
     if (!invoice) return;
 
+    // Guard against a user double-clicking "Confirmer & Générer" while a request
+    // is already in flight, which would otherwise produce a confusing second error.
+    if (this.generatingInvoice()) return;
+
     this.generatingInvoice.set(true);
     this.invoiceService.create(invoice)
       .pipe(finalize(() => this.generatingInvoice.set(false)))
@@ -478,12 +702,17 @@ export class FundCallsListComponent implements OnInit {
           );
           this.loadAllFundCalls();
         },
-        error: (err) => {
-          console.error('Error generating invoice:', err);
+        error: (err: any) => {
+          // Translate the technical error into a clear, user-friendly French message.
+          // translateInvoiceError guarantees no raw HTTP/GraphQL text ever reaches
+          // the end user — the technical details are only logged to the console.
+          const userError = this.errorMessageService.translateInvoiceError(err);
           this.toastService.show(
-            'La génération de la facture a échoué. Veuillez réessayer. Si le problème persiste, contactez le support.',
-            { classname: 'bg-danger text-white', delay: 7000 }
+            `${userError.message} ${userError.suggestion}`.trim(),
+            { classname: `bg-${userError.severity === 'danger' ? 'danger' : 'warning'} text-white`, delay: 7000 }
           );
+          // Close the modal so the user can retry with corrected data.
+          this.closeInvoiceModal();
         },
       });
   }
@@ -635,8 +864,20 @@ export class FundCallsListComponent implements OnInit {
   }
 
   getOwnerName(fundCall: FundCallExtended): string {
-    if (!fundCall.owner) return '-';
-    return `${fundCall.owner.firstName} ${fundCall.owner.lastName}`;
+    if (fundCall.owner) return `${fundCall.owner.firstName} ${fundCall.owner.lastName}`;
+    // Fall back to the historical snapshot preserved by the backend when the
+    // Owner record has since been deleted.
+    return fundCall.ownerName || '-';
+  }
+
+  /**
+   * The Amount field on the inline edit panel is only editable while the fund
+   * call is awaiting validation ("En attente de validation"). Once published
+   * with any other status, the amount is locked to prevent unauthorized
+   * changes to the called amount.
+   */
+  isAmountLocked(): boolean {
+    return this.editForm?.get('status')?.value !== 'PENDING_VALIDATION';
   }
 
   // ── Payment helpers ─────────────────────────────────────────────────────
@@ -687,10 +928,10 @@ export class FundCallsListComponent implements OnInit {
         this.selectedJustificatifFile.set(null);
         this.showPaymentForm.set(false);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.addingPayment.set(false);
-        const msg = err?.graphQLErrors?.[0]?.message || "Erreur lors de l'ajout du versement";
-        this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
+        const userError = this.errorMessageService.translateError(err);
+        this.toastService.show(userError.message, { classname: `bg-${userError.severity === 'danger' ? 'danger' : 'warning'} text-white`, delay: 5000 });
       },
     });
   }
@@ -755,50 +996,161 @@ export class FundCallsListComponent implements OnInit {
     const ids = [...this.selectedIds()];
     if (!ids.length) return;
     const label = FUND_CALL_STATUS_LABELS[status] ?? status;
-    if (!confirm(`Changer le statut de ${ids.length} appel(s) en "${label}" ?`)) return;
-    let remaining = ids.length;
-    let hadError = false;
-    ids.forEach((id) => {
-      const fc = this.fundCalls().find((f) => f.id === id);
-      if (!fc) { remaining--; return; }
-      const input: CreateFundCallInput = {
-        copropertyId: fc.copropertyId,
-        ownerId: fc.ownerId ?? undefined,
-        amount: typeof fc.amount === 'string' ? parseFloat(fc.amount as any) : (fc.amount ?? 0),
-        dueDate: fc.dueDate as any,
-        description: fc.description,
-        status,
-      };
-      this.fundCallService.updateFundCall(id, input).subscribe({
-        next: () => {
-          this.fundCalls.update((list) =>
-            list.map((item) => (item.id === id ? { ...item, status } : item))
-          );
-          remaining--;
-          if (remaining === 0 && !hadError) {
-            this.selectedIds.set(new Set());
-            this.toastService.show(`${ids.length} appel(s) mis à jour en "${label}"`, { classname: 'bg-success text-white', delay: 3000 });
-          }
-        },
-        error: () => { hadError = true; remaining--; },
+
+    // Build a quick summary of the selected items so the user can review before confirming.
+    const selectedFundCalls = ids
+      .map((id) => this.fundCalls().find((f) => f.id === id))
+      .filter((fc): fc is FundCallExtended => !!fc);
+
+    const totalAmount = selectedFundCalls.reduce((sum, fc) => {
+      const n = typeof fc.amount === 'string' ? parseFloat(fc.amount as any) : (fc.amount ?? 0);
+      return sum + (isNaN(n) ? 0 : n);
+    }, 0);
+
+    const statusBadgeHtml = (s: string) =>
+      `<span class="badge ${this.getStatusBadge(s)}">${this.escapeHtml(this.getStatusLabel(s))}</span>`;
+
+    // Show up to 5 items in the modal; collapse the rest behind a "+N autres" hint.
+    const previewItems = selectedFundCalls.slice(0, 5).map((fc) => `
+      <li class="d-flex align-items-center justify-content-between gap-2 py-1 border-bottom small">
+        <span class="text-truncate" style="max-width:55%">
+          <i class="bi bi-receipt me-1 text-muted"></i>${this.escapeHtml(fc.description || '—')}
+        </span>
+        <span>${statusBadgeHtml(fc.status || '')}</span>
+        <i class="bi bi-arrow-right text-muted"></i>
+        <span><span class="badge ${this.getStatusBadge(status)}">${this.escapeHtml(label)}</span></span>
+      </li>`).join('');
+
+    const overflowHint = selectedFundCalls.length > 5
+      ? `<li class="text-muted small text-center pt-2">+ ${selectedFundCalls.length - 5} autre(s) appel(s)…</li>`
+      : '';
+
+    const impactNote = status === 'CANCELLED'
+      ? `<div class="alert alert-warning py-2 px-3 mb-3 small d-flex align-items-start gap-2">
+           <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+           <div>L'annulation empêchera tout nouveau versement tout en conservant la trace comptable.</div>
+         </div>`
+      : status === 'PAID'
+        ? `<div class="alert alert-info py-2 px-3 mb-3 small d-flex align-items-start gap-2">
+             <i class="bi bi-info-circle-fill mt-1"></i>
+             <div>Le statut <strong>Réglé</strong> est généralement attribué après validation d'un versement par le syndic.</div>
+           </div>`
+        : '';
+
+    this.modalService.confirm({
+      title: `<i class="bi bi-arrow-repeat me-2 text-primary"></i>Confirmer le changement de statut`,
+      message: `
+        <div class="text-start">
+          <p class="mb-2">
+            Vous allez modifier le statut de
+            <strong>${selectedFundCalls.length}</strong> appel(s) de fonds
+            pour un montant total de
+            <strong>${this.formatAmount(totalAmount)}</strong>.
+          </p>
+          ${impactNote}
+          <ul class="list-unstyled mb-3 px-2 py-2 bg-light rounded">
+            ${previewItems}${overflowHint}
+          </ul>
+          <div class="d-flex align-items-center gap-2 small text-muted">
+            <i class="bi bi-clock-history"></i>
+            <span>Cette action est immédiate et sera visible par les copropriétaires.</span>
+          </div>
+        </div>`,
+      confirmButtonText: '<i class="bi bi-check2-circle me-1"></i>Appliquer le changement',
+      cancelButtonText: 'Annuler',
+      confirmButtonClass: status === 'CANCELLED' ? 'btn-warning' : 'btn-primary',
+    }).then((ok) => {
+      if (!ok) return;
+      let remaining = ids.length;
+      let hadError = false;
+      ids.forEach((id) => {
+        const fc = this.fundCalls().find((f) => f.id === id);
+        if (!fc) { remaining--; return; }
+        const input: CreateFundCallInput = {
+          copropertyId: fc.copropertyId,
+          ownerId: fc.ownerId ?? undefined,
+          amount: typeof fc.amount === 'string' ? parseFloat(fc.amount as any) : (fc.amount ?? 0),
+          dueDate: fc.dueDate as any,
+          description: fc.description,
+          status,
+        };
+        this.fundCallService.updateFundCall(id, input).subscribe({
+          next: () => {
+            this.fundCalls.update((list) =>
+              list.map((item) => (item.id === id ? { ...item, status } : item))
+            );
+            remaining--;
+            if (remaining === 0 && !hadError) {
+              this.selectedIds.set(new Set());
+              this.toastService.show(`${ids.length} appel(s) mis à jour en "${label}"`, { classname: 'bg-success text-white', delay: 3000 });
+              // Reload from server so the local state stays in sync with backend
+              // (especially the PaidAmount / RemainingAmount aggregates that this
+              // optimistic update does not recompute).
+              this.loadAllFundCalls();
+            }
+          },
+          error: (err: any) => {
+            hadError = true;
+            remaining--;
+            const userError = this.errorMessageService.translateError(err);
+            this.toastService.show(userError.message, { classname: `bg-${userError.severity === 'danger' ? 'danger' : 'warning'} text-white`, delay: 5000 });
+          },
+        });
       });
     });
   }
 
+  /**
+   * Bulk delete is no longer offered in the action bar (FRS-FCF-LCM-2026-001
+   * §2.3). The bulk action is "Annuler la sélection" only. This method is
+   * kept as a no-op + toast so any caller wiring from a saved tab does not
+   * silently break; the real workflow is the cancellation modal below.
+   */
   bulkDelete(): void {
     const ids = [...this.selectedIds()];
     if (!ids.length) return;
-    if (!confirm(`Supprimer ${ids.length} appel(s) de fonds ? Cette action est irréversible.`)) return;
-    ids.forEach((id) => {
-      const fc = this.fundCalls().find((f) => f.id === id);
-      if (!fc) return;
-      this.fundCalls.update((list) => list.filter((item) => item.id !== id));
-      this.fundCallService.deleteFundCall(id, fc.copropertyId).subscribe({
-        error: () => this.loadAllFundCalls(),
-      });
-    });
-    this.selectedIds.set(new Set());
-    this.toastService.show(`${ids.length} appel(s) supprimé(s)`, { classname: 'bg-success text-white', delay: 3000 });
+    this.toastService.show(
+      "La suppression en masse n'est plus disponible. Utilisez l'annulation à la place.",
+      { classname: 'bg-warning text-dark', delay: 5000 }
+    );
+    // Forward to the cancellation flow so the user is never blocked.
+    const selected = ids
+      .map((id) => this.fundCalls().find((f) => f.id === id))
+      .filter((fc): fc is FundCallExtended => !!fc && this.canCancel(fc));
+    if (selected.length) {
+      this.cancelSelectedPublished();
+    } else {
+      this.selectedIds.set(new Set());
+    }
+  }
+
+  /**
+   * Helper used by the bulk-action bar: collect the selected fund calls that
+   * are published/processed (and therefore can only be cancelled) and open
+   * the bulk-cancel confirmation modal.
+   */
+  cancelSelectedPublished(): void {
+    const blocked = this.filteredFundCalls.filter(
+      (fc) => this.isSelected(fc.id) && this.canCancel(fc) && !this.canDelete(fc)
+    );
+    if (!blocked.length) {
+      this.toastService.show(
+        'Aucun appel de fonds publié n\'est sélectionné. Sélectionnez des appels de fonds publiés (non supprimables) pour pouvoir les annuler.',
+        { classname: 'bg-info text-white', delay: 4000 }
+      );
+      return;
+    }
+    this.bulkCancel(blocked);
+  }
+
+  /**
+   * Bulk-cancel a list of fund calls using the new modal
+   * (FRS-FCF-LCM-2026-001 §4.2.3 / AC-20 / AC-21).
+   * Delegates to promptBulkCancelFundCall so the UX is the same as the
+   * per-row cancel flow.
+   */
+  bulkCancel(fundCalls: FundCallExtended[]): void {
+    this.promptBulkCancelFundCall(fundCalls);
   }
 
   getPaymentProgress(fc: FundCallExtended): { paid: number; total: number; percent: number } {

@@ -332,6 +332,24 @@
         "custom": "Custom"
       }
     },
+    "distribution": {
+      "title": "Allocation Management",
+      "subtitle": "Distribute budget lines across owners",
+      "details": "Allocation Details",
+      "totalAmount": "Total Amount",
+      "totalAmountHelp": "Automatically calculated from budget lines for the selected year",
+      "budgetBreakdown": "Budget line breakdown",
+      "noChargesForYear": "No budget lines found for this coproperty in the selected year",
+      "method": "Allocation Method",
+      "selectMethod": "Choose a method",
+      "calculate": "Calculate Allocation",
+      "noChargesToDistribute": "No budget lines to allocate for this year",
+      "fundCallCreated": "Allocation saved and fund calls created successfully"
+    },
+    "fundCall": {
+      "paymentDate": "Payment Date",
+      "paymentAmount": "Payment Amount"
+    },
     "charge": {
       "title": "Charge Management",
       "subtitle": "Manage all charges for your coproperties",
@@ -359,6 +377,7 @@
       "frequency": "Frequency",
       "description": "Description",
       "calculateDistribution": "Calculate Distribution",
+      "noChargesToDistribute": "No budget lines to distribute for this year",
       "coproperty": "Coproperty",
       "coproperties": "Coproperties",
       "allCoproperties": "All coproperties",
@@ -590,6 +609,7 @@
     "error": "Error",
     "warning": "Warning",
     "info": "Information",
+    "total": "Total",
     "or": "or"
   },
   "validation": {

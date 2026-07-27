@@ -1,7 +1,7 @@
 import { Currency } from './coproperty.models';
 
 // ─── Status enum — values match HotChocolate's SCREAMING_SNAKE_CASE output ───
-export type FundCallStatus = 'TO_PAY' | 'PENDING_VALIDATION' | 'PAID' | 'VALIDATED';
+export type FundCallStatus = 'TO_PAY' | 'PENDING_VALIDATION' | 'PAID' | 'VALIDATED' | 'CANCELLED';
 
 /** French display labels for fund call statuses */
 export const FUND_CALL_STATUS_LABELS: Record<FundCallStatus, string> = {
@@ -9,6 +9,7 @@ export const FUND_CALL_STATUS_LABELS: Record<FundCallStatus, string> = {
   PENDING_VALIDATION: 'En attente de validation',
   PAID: 'Réglé',
   VALIDATED: 'Validé',
+  CANCELLED: 'Annulé',
 };
 
 /** Bootstrap badge color classes for each status */
@@ -17,6 +18,7 @@ export const FUND_CALL_STATUS_BADGE: Record<FundCallStatus, string> = {
   PENDING_VALIDATION: 'bg-info text-dark',
   PAID: 'bg-success',
   VALIDATED: 'bg-primary',
+  CANCELLED: 'bg-secondary',
 };
 
 // ─── Owner summary (minimal) ─────────────────────────────────────────────────
@@ -46,6 +48,7 @@ export interface FundCall {
   id: string;
   copropertyId: string;
   copropertyName?: string;
+  ownerName?: string;
   ownerId?: string;
   owner?: FundCallOwner;
   amount: number;
@@ -57,7 +60,41 @@ export interface FundCall {
   updatedAt: Date;
   currency: Currency;
   payments?: FundCallPayment[];
+
+  // ── Server-computed flags (FRS-FCF-LCM-2026-001) ──────────────────────────
+  /** True only for true drafts (TO_PAY, no payments, no invoices, ≤30 days old). */
+  deletable?: boolean;
+  /** False when the fund call is in the terminal CANCELLED state. */
+  cancellable?: boolean;
+  /** French reason why a hard delete is blocked; null when the row is deletable. */
+  deleteBlockerReason?: string | null;
+  /** Audit-log entries, newest first. Optional — only loaded on demand. */
+  auditLog?: FundCallAuditLogEntry[];
 }
+
+/** Audit-log entry (FRS-FCF-LCM-2026-001 §2.4). */
+export interface FundCallAuditLogEntry {
+  id: string;
+  fundCallId: string;
+  action: FundCallAuditAction;
+  previousStatus?: FundCallStatus;
+  newStatus?: FundCallStatus;
+  reason?: string;
+  actorUserId: string;
+  actorRole?: string;
+  actorDisplayName?: string;
+  createdAt?: Date;
+}
+
+export type FundCallAuditAction =
+  | 'Created'
+  | 'Updated'
+  | 'Published'
+  | 'PaymentAdded'
+  | 'PaymentApproved'
+  | 'PaymentRejected'
+  | 'Cancelled'
+  | 'Deleted';
 
 // ─── DTOs ────────────────────────────────────────────────────────────────────
 export interface CreateFundCallInput {

@@ -1,0 +1,58 @@
+<div *ngIf="error" class="alert" [ngClass]="getAlertClass()" role="alert">
+  <div class="d-flex gap-3">
+    <!-- Icon -->
+    <i 
+      *ngIf="error.icon"
+      [class]="'bi ' + error.icon" 
+      style="font-size: 1.25rem; flex-shrink: 0; margin-top: 0.125rem;"></i>
+
+    <!-- Content -->
+    <div class="flex-grow-1">
+      <!-- Title -->
+      <h6 class="mb-2 fw-600">
+        {{ getTitleForSeverity(error.severity) }}
+      </h6>
+
+      <!-- Main message -->
+      <p class="mb-2">{{ error.message }}</p>
+
+      <!-- Contextual suggestion -->
+      <div *ngIf="error.suggestion" class="small opacity-75 mb-3">
+        <strong>Suggestion :</strong> {{ error.suggestion }}
+      </div>
+
+      <!-- Action buttons based on error severity -->
+      <div *ngIf="error.severity === 'danger'" class="button-group">
+        <button 
+          class="btn btn-sm btn-outline-danger me-2" 
+          (click)="retry()"
+          type="button">
+          <i class="bi bi-arrow-clockwise me-1"></i>Réessayer
+        </button>
+        <button 
+          class="btn btn-sm btn-outline-secondary" 
+          (click)="contactSupport()"
+          type="button">
+          <i class="bi bi-question-circle me-1"></i>Contacter le support
+        </button>
+      </div>
+
+      <!-- Retry button for warnings -->
+      <div *ngIf="error.severity === 'warning'" class="button-group">
+        <button 
+          class="btn btn-sm btn-outline-warning" 
+          (click)="retry()"
+          type="button">
+          <i class="bi bi-arrow-clockwise me-1"></i>Réessayer
+        </button>
+      </div>
+    </div>
+
+    <!-- Close button -->
+    <button 
+      class="btn-close flex-shrink-0" 
+      (click)="dismiss()"
+      aria-label="Fermer"
+      type="button"></button>
+  </div>
+</div>

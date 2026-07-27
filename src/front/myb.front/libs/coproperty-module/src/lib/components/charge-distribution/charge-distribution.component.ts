@@ -184,10 +184,18 @@ export class ChargeDistributionComponent implements OnInit {
     // take(1) is required on all three because watchQuery never completes on its own,
     // which would prevent forkJoin from ever emitting.
     forkJoin({
-      charges: this.chargeService.getChargesByCoproperty(copropertyId).pipe(take(1), catchError(() => of([]))),
-      owners: this.ownerService.getAllOwners(copropertyId).pipe(take(1), catchError(() => of([]))),
-      units: this.unitService.getUnitsByCoproperty(copropertyId).pipe(take(1), catchError(() => of([]))),
-      distributions: this.chargeService.getCopropertyChargeDistributions(copropertyId).pipe(take(1), catchError(() => of([]))),
+      charges: this.chargeService
+        .getChargesByCoproperty(copropertyId)
+        .pipe(take(1), catchError((err) => this.handleLoadError('budgets', err))),
+      owners: this.ownerService
+        .getAllOwners(copropertyId)
+        .pipe(take(1), catchError((err) => this.handleLoadError('owners', err))),
+      units: this.unitService
+        .getUnitsByCoproperty(copropertyId)
+        .pipe(take(1), catchError((err) => this.handleLoadError('units', err))),
+      distributions: this.chargeService
+        .getCopropertyChargeDistributions(copropertyId)
+        .pipe(take(1), catchError((err) => this.handleLoadError('distribution history', err))),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -226,6 +234,15 @@ export class ChargeDistributionComponent implements OnInit {
       });
   }
 
+  private handleLoadError(entity: string, err: unknown) {
+    console.error(`[ChargeDistribution] Failed to load ${entity}:`, err);
+    this.toastService.show(
+      `Impossible de charger ${entity}. Vérifiez le service GraphQL et réessayez.`,
+      { classname: 'bg-warning text-dark', delay: 5000 }
+    );
+    return of([]);
+  }
+
   private recalculateTotal(): void {
     const filtered = this.getFilteredCharges();
     const total = filtered.reduce((sum, c) => sum + (c.totalAmount || 0), 0);
@@ -259,11 +276,50 @@ export class ChargeDistributionComponent implements OnInit {
     this.totalArea = this.units.reduce((sum, u) => sum + u.area, 0);
   }
 
-  calculateDistribution(): void {
+  calculateDistribution(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+
     const totalAmount = this.calculatedTotal();
-    if (!totalAmount || totalAmount <= 0 || this.units.length === 0) return;
+    // eslint-disable-next-line no-console
+    console.log('[ChargeDistribution] calculateDistribution', {
+      totalAmount,
+      unitsCount: this.units.length,
+      formValid: this.repartitionForm.valid,
+      selectedMethod: this.selectedMethod,
+      filteredCharges: this.getFilteredCharges().length,
+    });
+    if (!totalAmount || totalAmount <= 0 || this.units.length === 0) {
+      // eslint-disable-next-line no-console
+      console.warn('[ChargeDistribution] calculateDistribution early-return: ' +
+        (!totalAmount || totalAmount <= 0 ? 'no charges' : 'no units'));
+      this.toastService.show(
+        !totalAmount || totalAmount <= 0
+          ? 'Aucun budget à répartir pour les filtres sélectionnés.'
+          : 'Aucun lot disponible pour calculer la répartition.',
+        { classname: 'bg-info text-white', delay: 4000 }
+      );
+      return;
+    }
 
     this.calculateTotals();
+
+    if (this.selectedMethod === DistributionMethod.ByShares && this.totalShares <= 0) {
+      this.toastService.show(
+        'Impossible de répartir par tantièmes: le total des tantièmes est nul.',
+        { classname: 'bg-warning text-dark', delay: 5000 }
+      );
+      return;
+    }
+
+    if (this.selectedMethod === DistributionMethod.ByArea && this.totalArea <= 0) {
+      this.toastService.show(
+        'Impossible de répartir par surface: la surface totale est nulle.',
+        { classname: 'bg-warning text-dark', delay: 5000 }
+      );
+      return;
+    }
+
     this.distributionPreview = [];
 
     switch (this.selectedMethod) {

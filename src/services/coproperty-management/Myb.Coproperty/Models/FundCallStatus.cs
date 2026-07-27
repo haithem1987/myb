@@ -17,5 +17,8 @@ public enum FundCallStatus
     Paid,
 
     /// <summary>Fund call is approved / validé</summary>
-    Validated
+    Validated,
+
+    /// <summary>Fund call was published/processed then cancelled by the syndic (no further payments allowed) / annulé</summary>
+    Cancelled
 }

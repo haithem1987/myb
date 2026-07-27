@@ -9,26 +9,26 @@
     }" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">{{ modal.config.title }}</h5>
+          <h5 class="modal-title" [innerHTML]="modal.config.title"></h5>
           <button type="button" class="btn-close" (click)="handleCancel(modal)" aria-label="Close"></button>
         </div>
         <div class="modal-body" *ngIf="modal.config.message">
           <div [innerHTML]="modal.config.message"></div>
         </div>
         <div class="modal-footer">
-          <button 
-            *ngIf="modal.config.showCancelButton" 
-            type="button" 
-            class="btn btn-secondary" 
+          <button
+            *ngIf="modal.config.showCancelButton"
+            type="button"
+            class="btn btn-secondary"
             (click)="handleCancel(modal)">
-            {{ modal.config.cancelButtonText }}
+            <span [innerHTML]="modal.config.cancelButtonText"></span>
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn"
             [ngClass]="modal.config.confirmButtonClass"
             (click)="handleConfirm(modal)">
-            {{ modal.config.confirmButtonText }}
+            <span [innerHTML]="modal.config.confirmButtonText"></span>
           </button>
         </div>
       </div>

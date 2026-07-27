@@ -11,7 +11,7 @@ import { KeycloakService } from '@myb-front/auth';
     <div class="accountant-layout">
       <aside class="sidebar">
         <div class="logo">
-          <img src="assets/MYB-LOGO.png" alt="MYB">
+          <img src="assets/MYB-LOGO-dark.png" alt="MYB">
           <span class="role-badge">Comptable</span>
         </div>
         

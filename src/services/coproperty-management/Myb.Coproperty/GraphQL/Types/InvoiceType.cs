@@ -32,6 +32,14 @@ public class InvoiceType : ObjectType<CopropertyInvoice>
         descriptor.Field(x => x.CreatedAt).Description("Creation date");
         descriptor.Field(x => x.UpdatedAt).Description("Last update date");
         descriptor.Field("currency").ResolveWith<InvoiceResolvers>(r => r.GetCurrency(default!, default!)).Type<NonNullType<CurrencyType>>().Description("Currency from the associated charge's coproperty");
+
+        // The FundCall navigation on CopropertyInvoice exists in the EF model
+        // (for the optional FundCall ↔ CopropertyInvoice relationship) but is
+        // NOT exposed in the GraphQL schema. Exposing it would create a
+        // bidirectional reference that broke the Hot Chocolate 12 schema
+        // builder with "Unable to infer or resolve a schema type from the
+        // type reference IValueNode (Input)".
+        descriptor.Ignore(x => x.FundCall);
     }
 
     private class InvoiceResolvers

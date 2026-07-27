@@ -40,18 +40,9 @@ export class CopropertyNewComponent implements OnInit {
   saving = signal<boolean>(false);
   saveSuccess = signal<boolean>(false);
   private currentIsActive = true;
-  
-  // Available currencies
-  currencies = [
-    { value: Currency.USD, label: 'US Dollar (USD)', icon: 'bi-currency-dollar' },
-    { value: Currency.EUR, label: 'Euro (EUR)', icon: 'bi-currency-euro' },
-    { value: Currency.TND, label: 'Tunisian Dinar (TND)', icon: 'bi-cash' },
-    { value: Currency.GBP, label: 'British Pound (GBP)', icon: 'bi-currency-pound' },
-    { value: Currency.CHF, label: 'Swiss Franc (CHF)', icon: 'bi-cash' },
-    { value: Currency.CAD, label: 'Canadian Dollar (CAD)', icon: 'bi-currency-dollar' },
-    { value: Currency.AED, label: 'UAE Dirham (AED)', icon: 'bi-cash' },
-    { value: Currency.MAD, label: 'Moroccan Dirham (MAD)', icon: 'bi-cash' }
-  ];
+  // Currency is configured separately in Settings; preserve the existing value
+  // (or default to EUR for a brand-new coproperty) instead of exposing it here.
+  private currentCurrency: Currency = Currency.EUR;
 
   private isValidUUID(str: string): boolean {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -107,7 +98,6 @@ export class CopropertyNewComponent implements OnInit {
       totalUnits: [0, [Validators.required, Validators.min(1)]],
       totalShares: [0, [Validators.required, Validators.min(1)]],
       commonAreas: [''],
-      currency: [Currency.EUR, [Validators.required]],
       managerName: ['']
     });
   }
@@ -125,10 +115,11 @@ export class CopropertyNewComponent implements OnInit {
           totalUnits: coproperty.totalUnits,
           totalShares: coproperty.totalShares,
           commonAreas: coproperty.commonAreas,
-          currency: coproperty.currency || Currency.EUR,
           managerName: coproperty.managerName || ''
         });
         this.currentIsActive = coproperty.isActive;
+        // Currency is managed via Settings, not this form — preserve the existing value.
+        this.currentCurrency = coproperty.currency || Currency.EUR;
       },
       error: (error) => {
         console.error('Failed to load coproperty', error);
@@ -158,7 +149,7 @@ export class CopropertyNewComponent implements OnInit {
       name: formData.name,
       address: formData.address,
       city: formData.city,
-      currency: formData.currency ?? Currency.EUR,
+      currency: this.currentCurrency,
       postalCode: formData.postalCode,
       country: formData.country ?? 'France',
       description: formData.description,

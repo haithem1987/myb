@@ -15,6 +15,7 @@ import {
   UPDATE_FUND_CALL_STATUS,
   ADD_FUND_CALL_PAYMENT,
   DELETE_FUND_CALL,
+  CANCEL_FUND_CALL,
   GENERATE_INVOICES_FROM_FUND_CALL,
   REVIEW_FUND_CALL_PAYMENT,
 } from '../graphql/mutations/fund-call.mutation';
@@ -92,7 +93,7 @@ export class FundCallService {
       })
       .pipe(map((result) => result.data.fundCallsByOwner.map(fc => ({
         ...fc,
-        copropertyName: fc.coproperty?.name || fc.copropertyName
+        copropertyName: fc.copropertyName || fc.coproperty?.name
       }))));
   }
 
@@ -101,13 +102,15 @@ export class FundCallService {
       .mutate<{ createFundCall: FundCallExtended }>({
         mutation: CREATE_FUND_CALL,
         variables: { input },
+        // Best-effort refetch: do not block the mutation on this query. The
+        // component refreshes the list manually after a successful create.
         refetchQueries: [
           {
             query: GET_FUND_CALLS_BY_COPROPERTY,
             variables: { copropertyId: input.copropertyId, ownerId: null, year: null },
           },
         ],
-        awaitRefetchQueries: true,
+        awaitRefetchQueries: false,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createFundCall));
@@ -118,6 +121,10 @@ export class FundCallService {
       .mutate<{ updateFundCall: FundCallExtended }>({
         mutation: UPDATE_FUND_CALL,
         variables: { id, input },
+        // Best-effort refetch: do not block the mutation on these queries. If the
+        // refetch fails (e.g. transient backend hiccup, GraphQL validation error
+        // on a derived query), the user still sees their update as successful and
+        // the component refreshes the list manually via loadAllFundCalls().
         refetchQueries: [
           { query: GET_FUND_CALL_BY_ID, variables: { id } },
           {
@@ -125,7 +132,7 @@ export class FundCallService {
             variables: { copropertyId: input.copropertyId, ownerId: null, year: null },
           },
         ],
-        awaitRefetchQueries: true,
+        awaitRefetchQueries: false,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateFundCall));
@@ -151,7 +158,7 @@ export class FundCallService {
         mutation: ADD_FUND_CALL_PAYMENT,
         variables: { fundCallId, input },
         refetchQueries: [{ query: GET_FUND_CALL_BY_ID, variables: { id: fundCallId } }],
-        awaitRefetchQueries: true,
+        awaitRefetchQueries: false,
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.addFundCallPayment));
@@ -167,6 +174,27 @@ export class FundCallService {
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteFundCall));
+  }
+
+  /**
+   * Cancel a published/processed fund call (FRS-FCF-LCM-2026-001 §2.5).
+   * The reason is mandatory (≥10 chars, validated server-side). The mutation
+   * is fire-and-refresh: the list is automatically reloaded so the cancelled
+   * badge shows up immediately.
+   */
+  cancelFundCall(id: string, reason: string): Observable<FundCallExtended> {
+    return this.apollo
+      .mutate<{ cancelFundCall: FundCallExtended }>({
+        mutation: CANCEL_FUND_CALL,
+        variables: { id, reason },
+        refetchQueries: [
+          { query: GET_ALL_FUND_CALLS },
+          { query: GET_FUND_CALL_BY_ID, variables: { id } },
+        ],
+        awaitRefetchQueries: false,
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data!.cancelFundCall));
   }
 
   getExistingFundCallTotals(copropertyId: string): Observable<{ ownerId: string; remainingAmount: number }[]> {

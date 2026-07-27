@@ -67,6 +67,23 @@ export const DELETE_FUND_CALL = gql`
   }
 `;
 
+export const CANCEL_FUND_CALL = gql`
+  mutation CancelFundCall($id: UUID!, $reason: String!) {
+    cancelFundCall(id: $id, reason: $reason) {
+      id
+      copropertyId
+      ownerId
+      amount
+      dueDate
+      description
+      status
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const GENERATE_INVOICES_FROM_FUND_CALL = gql`
   mutation GenerateInvoicesFromFundCall($fundCallId: UUID!) {
     generateInvoicesFromFundCall(fundCallId: $fundCallId) {

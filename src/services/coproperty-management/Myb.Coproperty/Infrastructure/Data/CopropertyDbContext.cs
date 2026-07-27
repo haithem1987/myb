@@ -31,6 +31,7 @@ public class CopropertyDbContext : DbContext
     public DbSet<Signalement> Signalements { get; set; } = null!;
     public DbSet<Discussion> Discussions { get; set; } = null!;
     public DbSet<DiscussionMessage> DiscussionMessages { get; set; } = null!;
+    public DbSet<FundCallAuditLog> FundCallAuditLogs { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -302,7 +303,7 @@ public class CopropertyDbContext : DbContext
                 .HasDefaultValue(ChargePaymentStatus.Unpaid);
 
             entity.Property(e => e.PaymentTransactionId)
-                .HasMaxLength(200);
+                .HasMaxLength(500);
 
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(50);
@@ -467,7 +468,15 @@ public class CopropertyDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(20)
                 .HasDefaultValue(FundCallStatus.ToPay);
-            
+
+            // FRS historical-data preservation: snapshot columns so the UI can keep
+            // displaying the owner/coproperty name even after the related record is deleted.
+            entity.Property(e => e.OwnerNameSnapshot)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.CopropertyNameSnapshot)
+                .HasMaxLength(200);
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
             
@@ -484,7 +493,18 @@ public class CopropertyDbContext : DbContext
                 .HasForeignKey(e => e.OwnerId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
-            
+
+            // Inverse navigation for the optional FundCall ↔ CopropertyInvoice relationship.
+            // The FK column (FundCallId) lives on CopropertyInvoice and is nullable; the
+            // Invoices collection on FundCall is now a real bidirectional navigation
+            // instead of a shadow FK, which was causing EF to throw at materialization
+            // time on some queries (manifesting as ERR_EMPTY_RESPONSE on the client).
+            entity.HasMany(e => e.Invoices)
+                .WithOne(i => i.FundCall)
+                .HasForeignKey(i => i.FundCallId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .IsRequired(false);
+
             entity.HasIndex(e => e.CopropertyId);
             entity.HasIndex(e => e.IsActive);
             entity.HasIndex(e => e.Status);
@@ -737,6 +757,49 @@ public class CopropertyDbContext : DbContext
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.HasOne(e => e.Discussion).WithMany(d => d.Messages).HasForeignKey(e => e.DiscussionId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => new { e.DiscussionId, e.CreatedAt });
+        });
+
+        // FundCallAuditLog Configuration — added per FRS-FCF-LCM-2026-001
+        // to maintain financial audit integrity for the Call for Funds lifecycle.
+        modelBuilder.Entity<FundCallAuditLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Action)
+                .HasConversion<string>()
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(e => e.PreviousStatus)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            entity.Property(e => e.NewStatus)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            entity.Property(e => e.Reason)
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.ActorRole)
+                .HasMaxLength(50);
+
+            entity.Property(e => e.ActorDisplayName)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.MetadataJson)
+                .HasColumnType("text");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            // The FK to FundCalls is intentionally NOT declared as a navigation:
+            // we want the audit row to survive the (rare) hard-delete of a draft
+            // so the deletion itself remains traceable. The Id is stored as a
+            // plain Guid.
+            entity.HasIndex(e => e.FundCallId);
+            entity.HasIndex(e => e.CreatedAt);
+            entity.HasIndex(e => new { e.FundCallId, e.CreatedAt });
         });
     }
 }

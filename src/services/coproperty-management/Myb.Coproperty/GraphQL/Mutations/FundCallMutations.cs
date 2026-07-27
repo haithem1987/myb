@@ -55,13 +55,32 @@ public class FundCallMutations
         return await fundCallService.AddPaymentAsync(fundCallId, input, userId);
     }
 
-    /// <summary>Delete a fund call</summary>
+    /// <summary>Delete a fund call. Refuses to delete anything that has been
+    /// published, has payments, has invoices, or is older than the
+    /// deletion grace period (FRS-FCF-LCM-2026-001 §2.1). The user is
+    /// pointed at the cancellation workflow in the error message.</summary>
     public async Task<bool> DeleteFundCall(
         Guid id,
-        [Service] IFundCallService fundCallService)
+        [Service] IFundCallService fundCallService,
+        [Service] IAuthenticationService authService)
     {
-        await fundCallService.DeleteAsync(id);
+        var userId = authService.GetCurrentUserId();
+        await fundCallService.DeleteAsync(id, userId);
         return true;
+    }
+
+    /// <summary>Cancel a published/processed fund call. Sets status to Cancelled,
+    /// deactivates the record, cascades invoices to Cancelled, and writes an
+    /// audit-log entry (FRS-FCF-LCM-2026-001 §2.4 / §2.5). The <paramref name="reason"/>
+    /// is mandatory and must be at least 10 characters long.</summary>
+    public async Task<FundCall> CancelFundCall(
+        Guid id,
+        string? reason,
+        [Service] IFundCallService fundCallService,
+        [Service] IAuthenticationService authService)
+    {
+        var userId = authService.GetCurrentUserId();
+        return await fundCallService.CancelAsync(id, userId, reason);
     }
 
     /// <summary>Generate invoices from a fund call</summary>

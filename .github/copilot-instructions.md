@@ -1,5 +1,19 @@
 # COPILOT CORE INSTRUCTIONS
+- Be concise.
 
+- Prefer implementation over explanation.
+
+- Modify only requested files.
+
+- Never scan the entire repository unless requested.
+
+- Do not generate documentation.
+
+- Do not explain code unless asked.
+
+- Read the minimum number of files required.
+
+- Keep responses under 50 words.
 ## 1. CLARITY & DISAMBIGUATION PROTOCOL
 
 ### When Requests Are Ambiguous:
@@ -180,3 +194,15 @@ When user preferences conflict with these instructions, **user preference always
 
 **CORE PRINCIPLE:** 
 *Be helpful, be clear, be thorough, be honest.*
+
+Analyze the provided Angular console logs, stack traces, and GraphQL request data to perform a root cause analysis on the following three technical issues. For each issue, provide a technical diagnosis, a list of specific files to inspect (e.g., `angular.json`, `proxy.conf.json`, or component files), and a step-by-step troubleshooting guide to resolve the problem.
+
+1. **Asset Loading Failures (404 Not Found)**: 
+Investigate why the assets `MYB%20LOGO.png` and `MYB-LOGO-dark.png` are failing to load from `http://localhost:4200/assets/`. Specifically, evaluate whether the failure is caused by URL encoding discrepancies (the use of `%20` vs. literal spaces), misconfiguration in the `assets` array within `angular.json`, or incorrect relative/absolute pathing within the component templates.
+
+2. **Network Connectivity & API Failures**: 
+Diagnose the failed network requests, specifically focusing on:
+- The `Connection Refused` error for the GET request to `http://localhost:8084/api/payment/subscriptions/...` originating from `user-dropdown.component.ts`. Determine if this is due to a downed backend service, a misconfigured `proxy.conf.json`, or CORS policy violations.
+- The GraphQL `GetOwners` operation failure. Analyze the provided payload (query, variables, and operation name) to determine why the response failed to load, considering potential issues with the GraphQL endpoint, schema mismatches, or backend service availability.
+
+3. **Functional Regression (Silent Failure)**: 

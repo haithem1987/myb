@@ -4,6 +4,8 @@ export const FUND_CALL_FRAGMENT = gql`
   fragment FundCallFields on FundCall {
     id
     copropertyId
+    copropertyName
+    ownerName
     ownerId
     owner {
       id
@@ -19,6 +21,11 @@ export const FUND_CALL_FRAGMENT = gql`
     createdAt
     updatedAt
     currency
+    # FRS-FCF-LCM-2026-001 — server-computed lifecycle flags so the UI does
+    # not need to recompute the delete/cancel preconditions.
+    deletable
+    cancellable
+    deleteBlockerReason
     payments {
       id
       fundCallId

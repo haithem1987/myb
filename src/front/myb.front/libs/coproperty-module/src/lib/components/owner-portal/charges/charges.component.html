@@ -74,6 +74,45 @@
     <p class="text-muted" *ngIf="!ownerId()">Votre compte propriétaire n'a pas été trouvé. Contactez votre syndic.</p>
   </div>
 
+  <!-- Filters & Search -->
+  <div class="card mb-4" *ngIf="!loading() && !error() && fundCalls().length > 0">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-5">
+          <label for="ownerFundCallSearch" class="form-label">
+            <i class="bi bi-search me-1"></i>Recherche
+          </label>
+          <input
+            type="text"
+            id="ownerFundCallSearch"
+            class="form-control"
+            placeholder="Rechercher par description ou copropriété..."
+            [value]="searchTerm()"
+            (input)="onSearchInput($event)">
+        </div>
+        <div class="col-md-4">
+          <label for="ownerFundCallStatus" class="form-label">
+            <i class="bi bi-bookmark me-1"></i>Statut
+          </label>
+          <select id="ownerFundCallStatus" class="form-select" [value]="filterStatus()" (change)="onStatusFilterChange($event)">
+            <option value="">Tous les statuts</option>
+            <option value="unpaid">À payer</option>
+            <option value="paid">Réglés</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="ownerFundCallYear" class="form-label">
+            <i class="bi bi-calendar me-1"></i>Année
+          </label>
+          <select id="ownerFundCallYear" class="form-select" [value]="filterYear()" (change)="onYearFilterChange($event)">
+            <option value="">Toutes</option>
+            <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Unpaid Fund Calls -->
   <div *ngIf="!loading() && unpaidFundCalls.length > 0" class="mb-4">
     <h4 class="section-title">
@@ -216,8 +255,14 @@
     </div>
   </div>
 
+  <!-- No results match active filters -->
+  <div *ngIf="!loading() && !error() && fundCalls().length > 0 && unpaidFundCalls.length === 0 && paidFundCalls.length === 0 && hasActiveFilters" class="text-center py-5">
+    <i class="bi bi-search display-1 text-muted"></i>
+    <p class="text-muted mt-3">Aucun appel de fonds ne correspond à vos critères de recherche.</p>
+  </div>
+
   <!-- All Paid State -->
-  <div *ngIf="!loading() && !error() && fundCalls().length > 0 && unpaidFundCalls.length === 0" class="all-paid-banner">
+  <div *ngIf="!loading() && !error() && allFundCallsPaid" class="all-paid-banner">
     <i class="bi bi-check-circle-fill"></i>
     <span>Tous vos appels de fonds sont réglés!</span>
   </div>

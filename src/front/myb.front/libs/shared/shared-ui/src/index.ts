@@ -66,6 +66,8 @@ export * from './lib/components/date-cell/date-cell.component';
 
 export * from './lib/components/payment/payment.component';
 
+export * from './lib/components/error-alert/error-alert.component';
+
 export * from './lib/subscriptions/subscriptions.component';
 
 export * from './lib/components/profile-page/profile-page.component';
@@ -79,5 +81,7 @@ export * from './lib/components/notification-dropdown/notification-dropdown.comp
 export * from './lib/services/modal.service';
 
 export * from './lib/services/file-download.service';
+
+export * from './lib/services/error-message.service';
 
 export * from '../../infra/services/toast.service';

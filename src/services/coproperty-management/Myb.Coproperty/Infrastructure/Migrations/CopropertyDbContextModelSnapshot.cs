@@ -130,8 +130,8 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasColumnType("character varying(20)");
 
                     b.Property<string>("PaymentTransactionId")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<decimal>("Percentage")
                         .HasColumnType("numeric");

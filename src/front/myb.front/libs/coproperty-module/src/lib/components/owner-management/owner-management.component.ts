@@ -115,6 +115,7 @@ export class OwnerManagementComponent implements OnInit {
     // Load coproperty first if copropertyId is provided, otherwise load all owners
     if (this.copropertyId) {
       this.loadOwners();
+      this.loadAvailableUnits();
     } else {
       // Try to get first coproperty from the list
       const managerId = this.keycloakService.getSyndicManagerId();
@@ -125,19 +126,26 @@ export class OwnerManagementComponent implements OnInit {
             if (coproperties.length > 0) {
               this.copropertyId = coproperties[0].id;
               this.loadOwners();
+              this.loadAvailableUnits();
             }
           }
         });
     }
-    this.loadAvailableUnits();
   }
 
   loadAvailableUnits(): void {
+    if (!this.copropertyId) {
+      console.warn('[Owner Management] No coproperty ID available for unit loading');
+      this.availableUnits = [];
+      this.allUnits = [];
+      return;
+    }
+
     this.loading.set(true);
     console.log('[Owner Management] Loading units started');
     
-    // Load all units at once using the new getAllUnits query
-    this.unitService.getAllUnits().pipe(
+    // Load only units belonging to the active coproperty to keep owner links consistent.
+    this.unitService.getUnitsByCoproperty(this.copropertyId).pipe(
       takeUntilDestroyed(this.destroyRef),
       finalize(() => {
         console.log('[Owner Management] Loading units finalized');
@@ -316,6 +324,14 @@ export class OwnerManagementComponent implements OnInit {
       this.translateService.get('coproperty.owner.unitRequired').subscribe((msg) => {
         this.showAlert('warning', msg || this.translateService.instant('validation.required'));
       });
+      return;
+    }
+
+    // Prevent creating an owner with units outside of the active coproperty scope.
+    const validUnitIds = new Set(this.allUnits.map(unit => unit.id));
+    const hasInvalidUnits = selectedUnitIds.some(unitId => !validUnitIds.has(unitId));
+    if (hasInvalidUnits) {
+      this.showAlert('warning', this.translateService.instant('coproperty.messages.error'));
       return;
     }
 

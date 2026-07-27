@@ -109,6 +109,7 @@
       "deleteConfirm": "Are you sure you want to delete this budget line?",
       "saveFirst": "Please save the coproperty first before managing budget lines.",
       "calculateDistribution": "Calculate Distribution",
+      "noChargesToDistribute": "No budget lines to distribute for this year",
       "types": {
         "cleaning": "Cleaning",
         "security": "Security",
@@ -130,6 +131,20 @@
         "equal": "Equal",
         "custom": "Custom"
       }
+    },
+    "distribution": {
+      "title": "Allocation Management",
+      "subtitle": "Distribute budget lines across owners",
+      "details": "Allocation Details",
+      "totalAmount": "Total Amount",
+      "totalAmountHelp": "Automatically calculated from budget lines for the selected year",
+      "budgetBreakdown": "Budget line breakdown",
+      "noChargesForYear": "No budget lines found for this coproperty in the selected year",
+      "method": "Allocation Method",
+      "selectMethod": "Choose a method",
+      "calculate": "Calculate Allocation",
+      "noChargesToDistribute": "No budget lines to allocate for this year",
+      "fundCallCreated": "Allocation saved and fund calls created successfully"
     },
     "maintenance": {
       "title": "Maintenance Requests",
@@ -208,6 +223,7 @@
       "generalInfo": "General information",
       "selectCoproperty": "Select a coproperty",
       "distributionAndDates": "Distribution and dates",
+      "datesSection": "Dates",
       "budgetCreated": "Budget line created successfully",
       "budgetUpdated": "Budget line updated successfully",
       "coproperties": "Coproperties",
@@ -314,6 +330,10 @@
       "noRegisteredUsers": "No registered users without owner profile",
       "pendingUsers": "Users pending assignment",
       "pendingUsersHelp": "These users have registered but have not been assigned as owners yet"
+    },
+    "fundCall": {
+      "paymentDate": "Payment Date",
+      "paymentAmount": "Payment Amount"
     },
     "messages": {
       "created": "Coproperty created successfully",

@@ -341,7 +341,12 @@
       "method": "Méthode de Répartition",
       "selectMethod": "Choisir une méthode",
       "calculate": "Calculer la Répartition",
+      "noChargesToDistribute": "Aucune ligne budgétaire à répartir pour cette année",
       "fundCallCreated": "Répartition enregistrée et appel de fonds créé avec succès"
+    },
+    "fundCall": {
+      "paymentDate": "Date de paiement",
+      "paymentAmount": "Montant payé"
     },
     "maintenance": {
       "title": "Demandes de Maintenance",
@@ -572,6 +577,7 @@
     "error": "Erreur",
     "warning": "Avertissement",
     "info": "Information",
+    "total": "Total",
     "or": "ou"
   },
   "validation": {

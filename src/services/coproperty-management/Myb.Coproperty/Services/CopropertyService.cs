@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Myb.Coproperty.Infrastructure.Data;
 using Myb.Coproperty.Infrastructure.Repositories;
 using Myb.Coproperty.Models;
 
@@ -6,10 +8,14 @@ namespace Myb.Coproperty.Services
     public class CopropertyService : ICopropertyService
     {
         private readonly ICopropertyRepository _copropertyRepository;
+        private readonly IDbContextFactory<CopropertyDbContext> _contextFactory;
 
-        public CopropertyService(ICopropertyRepository copropertyRepository)
+        public CopropertyService(
+            ICopropertyRepository copropertyRepository,
+            IDbContextFactory<CopropertyDbContext> contextFactory)
         {
             _copropertyRepository = copropertyRepository;
+            _contextFactory = contextFactory;
         }
 
         public async Task<Models.Coproperty> CreateAsync(Models.Coproperty coproperty)
@@ -43,7 +49,20 @@ namespace Myb.Coproperty.Services
             
             if (coproperty == null)
                 throw new InvalidOperationException($"Coproperty with ID {id} not found");
-            
+
+            // Preserve historical Call for Funds data: block deletion instead of letting
+            // the FK cascade destroy financial records tied to this coproperty.
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var hasFundCalls = await context.FundCalls.AnyAsync(f => f.CopropertyId == id);
+                if (hasFundCalls)
+                {
+                    throw new InvalidOperationException(
+                        $"Cannot delete coproperty '{coproperty.Name}' - it has associated Call for Funds (appels de fonds) records. " +
+                        $"These are kept for financial history and must not be removed.");
+                }
+            }
+
             // Prevent deletion if coproperty has associated units
             if (coproperty.Units != null && coproperty.Units.Any())
             {

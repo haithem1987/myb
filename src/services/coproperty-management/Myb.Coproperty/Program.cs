@@ -58,6 +58,7 @@ builder.Services.AddScoped<Myb.Coproperty.Services.IInterventionService, Myb.Cop
 builder.Services.AddScoped<Myb.Coproperty.Services.ISignalementService, Myb.Coproperty.Services.SignalementService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IFinanceService, Myb.Coproperty.Services.FinanceService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IFundCallService, Myb.Coproperty.Services.FundCallService>();
+builder.Services.AddScoped<Myb.Coproperty.Services.IFundCallAuditLogService, Myb.Coproperty.Services.FundCallAuditLogService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IAssemblyService, Myb.Coproperty.Services.AssemblyService>();
 builder.Services.AddScoped<Myb.Coproperty.GraphQL.Mutations.IAuthenticationService, Myb.Coproperty.Services.AuthenticationService>();
 builder.Services.AddEmailPublisher();

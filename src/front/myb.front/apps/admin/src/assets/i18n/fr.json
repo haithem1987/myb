@@ -144,6 +144,7 @@
       "method": "Méthode de Répartition",
       "selectMethod": "Choisir une méthode",
       "calculate": "Calculer la Répartition",
+      "noChargesToDistribute": "Aucune ligne budgétaire à répartir pour cette année",
       "fundCallCreated": "Répartition enregistrée et appel de fonds créé avec succès"
     },
     "maintenance": {
@@ -372,6 +373,10 @@
     "noRegisteredUsers": "Aucun utilisateur inscrit sans profil copropriétaire",
     "pendingUsers": "Utilisateurs en attente d'attribution",
     "pendingUsersHelp": "Ces utilisateurs se sont inscrits mais n'ont pas encore été assignés comme copropriétaires"
+    },
+    "fundCall": {
+      "paymentDate": "Date de paiement",
+      "paymentAmount": "Montant payé"
     },
     "messages": {
       "created": "Copropriété créée avec succès",

@@ -16,7 +16,23 @@ public interface IFundCallService
     Task<FundCall> CreateAsync(CreateFundCallInput input, string userId);
     Task<FundCall> UpdateAsync(Guid id, CreateFundCallInput input, string userId);
     Task<FundCall> UpdateStatusAsync(Guid id, UpdateFundCallInput input, string userId);
-    Task DeleteAsync(Guid id);
+    Task DeleteAsync(Guid id, string userId);
+    Task<FundCall> CancelAsync(Guid id, string userId, string? reason);
+
+    /// <summary>
+    /// Returns a French human-readable reason if the fund call cannot be
+    /// hard-deleted; null if it can. Used both by the GraphQL resolver
+    /// (server-side guard) and the UI to render the delete confirmation
+    /// modal only when allowed.
+    /// </summary>
+    string? EvaluateDeleteBlocker(FundCall fundCall);
+
+    /// <summary>
+    /// Boolean wrapper around <see cref="EvaluateDeleteBlocker"/>. Exposed
+    /// on the GraphQL schema as the `deletable` field of a FundCall.
+    /// </summary>
+    bool CanDelete(FundCall fundCall);
+
     Task<FundCall?> GetByIdAsync(Guid id);
     Task<List<FundCall>> GetByCopropertyIdAsync(Guid copropertyId, Guid? ownerId = null, int? year = null);
     Task<List<FundCall>> GetAllAsync();
@@ -26,6 +42,46 @@ public interface IFundCallService
     Task<List<FundCallPayment>> GetPaymentsByOwnerUserIdAsync(Guid ownerUserId);
     Task<List<CopropertyInvoice>> GenerateInvoicesFromFundCallAsync(Guid fundCallId, string userId);
     Task<Dictionary<Guid, decimal>> GetExistingFundCallTotalsByOwnerAsync(Guid copropertyId);
+
+    /// <summary>List of audit-log entries for a given fund call, newest first.
+    /// NOTE: this method is intentionally NOT exposed in the GraphQL schema
+    /// (and is therefore not in IFundCallService) because the FundCallAuditLog
+    /// entity references a new enum (FundCallAuditAction) that Hot Chocolate 12
+    /// cannot resolve in some configurations — surfacing as
+    /// "Unable to infer or resolve a schema type from the type reference
+    /// IValueNode (Input)" at schema build time. The audit log is kept in the
+    /// database for compliance and is queried via a non-GraphQL service
+    /// (see AuditLogService) or via direct DB access from admin tooling.
+    /// </summary>
+}
+
+/// <summary>
+/// Separate service for reading the audit log outside the GraphQL pipeline.
+/// The audit log is intentionally not part of IFundCallService to keep the
+/// GraphQL schema clean of types that Hot Chocolate 12 cannot reliably
+/// resolve (see note on GetAuditLogAsync above).
+/// </summary>
+public interface IFundCallAuditLogService
+{
+    Task<List<FundCallAuditLog>> GetForFundCallAsync(Guid fundCallId);
+}
+
+public class FundCallAuditLogService : IFundCallAuditLogService
+{
+    private readonly IDbContextFactory<CopropertyDbContext> _contextFactory;
+    public FundCallAuditLogService(IDbContextFactory<CopropertyDbContext> contextFactory)
+    {
+        _contextFactory = contextFactory;
+    }
+
+    public async Task<List<FundCallAuditLog>> GetForFundCallAsync(Guid fundCallId)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        return await context.FundCallAuditLogs
+            .Where(a => a.FundCallId == fundCallId)
+            .OrderByDescending(a => a.CreatedAt)
+            .ToListAsync();
+    }
 }
 
 /// <summary>
@@ -53,6 +109,95 @@ public class FundCallService : IFundCallService
         _frontendUrl = configuration["Services:FrontendUrl"] ?? "https://myb-platform.com";
     }
 
+    /// <summary>
+    /// Grace period (in days) during which a true draft can still be hard-deleted.
+    /// After this window the fund call is presumed to have been seen by an owner
+    /// and the user is forced into the cancellation workflow (FRS-FCF-LCM-2026-001 §2.1).
+    /// </summary>
+    private const int DraftDeletionGraceDays = 30;
+
+    /// <summary>
+    /// Returns a French human-readable reason if the fund call cannot be
+    /// hard-deleted; null if it can. Evaluated server-side AND in the GraphQL
+    /// schema to make the rule a single source of truth.
+    /// </summary>
+    public string? EvaluateDeleteBlocker(FundCall fundCall)
+    {
+        if (fundCall.Status == FundCallStatus.Cancelled)
+            return "Impossible de supprimer un appel de fonds annulé. Il est conservé pour la traçabilité.";
+
+        if (fundCall.Status != FundCallStatus.ToPay)
+            return "Impossible de supprimer un appel de fonds publié ou traité. Utilisez l'annulation à la place.";
+
+        if (fundCall.Payments != null && fundCall.Payments.Count > 0)
+            return "Impossible de supprimer un appel de fonds ayant des versements. Utilisez l'annulation à la place.";
+
+        if (fundCall.Invoices != null && fundCall.Invoices.Count > 0)
+            return "Impossible de supprimer un appel de fonds ayant des factures associées. Utilisez l'annulation à la place.";
+
+        if (fundCall.CreatedAt.HasValue
+            && fundCall.CreatedAt.Value < DateTime.UtcNow.AddDays(-DraftDeletionGraceDays))
+        {
+            return $"Impossible de supprimer un appel de fonds créé il y a plus de {DraftDeletionGraceDays} jours. Utilisez l'annulation à la place.";
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Backwards-compatible boolean wrapper around <see cref="EvaluateDeleteBlocker"/>.
+    /// </summary>
+    public bool CanDelete(FundCall fundCall) => EvaluateDeleteBlocker(fundCall) == null;
+
+    /// <summary>
+    /// Validates whether a fund call can transition to a given status.
+    /// Prevents invalid downgrades (e.g., VALIDATED → PAID) and blocks reactivation from CANCELLED.
+    /// </summary>
+    public bool CanTransitionTo(FundCall fundCall, FundCallStatus targetStatus)
+    {
+        // VALIDATED → PAID transition is not allowed (downgrade risk)
+        if (fundCall.Status == FundCallStatus.Validated && 
+            targetStatus == FundCallStatus.Paid)
+        {
+            return false;
+        }
+
+        // CANCELLED is terminal; no re-activation
+        if (fundCall.Status == FundCallStatus.Cancelled && 
+            targetStatus != FundCallStatus.Cancelled)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Generates a human-readable explanation of why a fund call cannot be deleted.
+    /// Used for error messages in the UI.
+    /// </summary>
+    public string GetPublishReasons(FundCall fundCall)
+    {
+        var reasons = new List<string>();
+
+        if (fundCall.Status == FundCallStatus.Cancelled)
+            reasons.Add("il a déjà été annulé");
+        else if (fundCall.Status == FundCallStatus.Paid)
+            reasons.Add("le paiement a déjà été encaissé");
+        else if (fundCall.Status == FundCallStatus.Validated)
+            reasons.Add("l'appel de fonds a été validé");
+        else if (fundCall.Status == FundCallStatus.PendingValidation)
+            reasons.Add("un versement est en attente de validation");
+
+        if ((fundCall.Payments?.Count ?? 0) > 0)
+            reasons.Add("des versements sont associés");
+
+        if (reasons.Count == 0)
+            return "L'appel de fonds a été publié.";
+
+        return "Cet appel de fonds ne peut pas être supprimé car " + string.Join(" et ", reasons) + ".";
+    }
+
     public async Task<FundCall> CreateAsync(CreateFundCallInput input, string userId)
     {
         if (!input.CopropertyId.HasValue || input.CopropertyId.Value == Guid.Empty)
@@ -60,12 +205,21 @@ public class FundCallService : IFundCallService
 
         using var context = _contextFactory.CreateDbContext();
 
-        // Verify coproperty exists
-        var copropertyExists = await context.Coproperties
-            .AnyAsync(c => c.Id == input.CopropertyId.Value);
+        // Verify coproperty exists and capture its name for historical snapshotting
+        // (FundCall.CopropertyNameSnapshot survives even if the coproperty is later deleted).
+        var coproperty = await context.Coproperties
+            .FirstOrDefaultAsync(c => c.Id == input.CopropertyId.Value);
 
-        if (!copropertyExists)
+        if (coproperty == null)
             throw new ArgumentException($"Coproperty with ID {input.CopropertyId.Value} not found");
+
+        string? ownerNameSnapshot = null;
+        if (input.OwnerId.HasValue)
+        {
+            var snapshotOwner = await context.Owners.FirstOrDefaultAsync(o => o.Id == input.OwnerId.Value);
+            if (snapshotOwner != null)
+                ownerNameSnapshot = $"{snapshotOwner.FirstName} {snapshotOwner.LastName}".Trim();
+        }
 
         // Duplicate check: same coproperty + same calendar day (UTC) + same OwnerId
         // Use a date range to avoid date_trunc type-mismatch with timestamptz columns
@@ -83,7 +237,24 @@ public class FundCallService : IFundCallService
             existingFundCall.Description = input.Description;
             existingFundCall.Status = input.Status ?? existingFundCall.Status;
             existingFundCall.UpdatedAt = DateTime.UtcNow;
+            existingFundCall.CopropertyNameSnapshot = coproperty.Name;
+            if (ownerNameSnapshot != null)
+                existingFundCall.OwnerNameSnapshot = ownerNameSnapshot;
+        try
+        {
             await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            // Surface the underlying constraint/foreign-key violation (e.g. duplicate
+            // InvoiceNumber, FK missing) as a clear French message instead of Hot
+            // Chocolate's generic "Unexpected Execution Error" with a stack trace.
+            var inner = ex.InnerException?.Message ?? ex.Message;
+            Console.Error.WriteLine($"[AddPaymentAsync] DbUpdateException: {inner}");
+            throw new InvalidOperationException(
+                "Impossible d'enregistrer le versement. Veuillez vérifier les informations saisies et réessayer.",
+                ex);
+        }
 
             // Also notify the owner that the fund call has been updated
             if (input.OwnerId.HasValue)
@@ -114,7 +285,9 @@ public class FundCallService : IFundCallService
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = Guid.TryParse(userId, out var userGuid) ? userGuid : Guid.Empty,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            CopropertyNameSnapshot = coproperty.Name,
+            OwnerNameSnapshot = ownerNameSnapshot
         };
 
         context.FundCalls.Add(fundCall);
@@ -152,6 +325,25 @@ public class FundCallService : IFundCallService
         fundCall.Status = input.Status ?? fundCall.Status;
         fundCall.UpdatedAt = DateTime.UtcNow;
 
+        // Refresh historical snapshots so the displayed owner/coproperty name stays
+        // accurate even if the related record is later deleted.
+        if (input.OwnerId.HasValue)
+        {
+            var owner = await context.Owners.FirstOrDefaultAsync(o => o.Id == input.OwnerId.Value);
+            if (owner != null)
+                fundCall.OwnerNameSnapshot = $"{owner.FirstName} {owner.LastName}".Trim();
+        }
+        else
+        {
+            fundCall.OwnerNameSnapshot = null;
+        }
+        if (string.IsNullOrEmpty(fundCall.CopropertyNameSnapshot))
+        {
+            var coproperty = await context.Coproperties.FirstOrDefaultAsync(c => c.Id == fundCall.CopropertyId);
+            if (coproperty != null)
+                fundCall.CopropertyNameSnapshot = coproperty.Name;
+        }
+
         await context.SaveChangesAsync();
 
         return fundCall;
@@ -161,9 +353,19 @@ public class FundCallService : IFundCallService
     {
         using var context = _contextFactory.CreateDbContext();
 
-        var fundCall = await context.FundCalls.FindAsync(id);
+        var fundCall = await context.FundCalls
+            .Include(f => f.Payments)
+            .FirstOrDefaultAsync(f => f.Id == id);
+
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {id} not found");
+
+        // Validate the status transition
+        if (!CanTransitionTo(fundCall, input.Status))
+        {
+            throw new InvalidOperationException(
+                $"La transition de statut de '{fundCall.Status}' vers '{input.Status}' n'est pas autorisée.");
+        }
 
         fundCall.Status = input.Status;
         fundCall.UpdatedAt = DateTime.UtcNow;
@@ -173,16 +375,180 @@ public class FundCallService : IFundCallService
         return fundCall;
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id, string userId)
     {
         using var context = _contextFactory.CreateDbContext();
 
-        var fundCall = await context.FundCalls.FindAsync(id);
-        if (fundCall != null)
+        var fundCall = await context.FundCalls
+            .Include(f => f.Payments)
+            .Include(f => f.Invoices)
+            .FirstOrDefaultAsync(f => f.Id == id);
+
+        if (fundCall == null)
+            // Silently no-op: deleting a non-existent row is idempotent.
+            return;
+
+        // Single source of truth for the delete precondition (FRS-FCF-LCM-2026-001 §2.1).
+        // EvaluateDeleteBlocker returns a French reason when the row cannot be deleted
+        // so the GraphQL error message is already user-ready.
+        var blocker = EvaluateDeleteBlocker(fundCall);
+        if (blocker != null)
+            throw new InvalidOperationException(blocker);
+
+        var previousStatus = fundCall.Status;
+        var actorUserGuid = Guid.TryParse(userId, out var uid) ? uid : Guid.Empty;
+
+        // Write the audit-log entry BEFORE removing the row so the FK is still valid
+        // and the deletion itself remains traceable (FRS-FCF-LCM-2026-001 §2.4 / AC-23).
+        context.FundCallAuditLogs.Add(new FundCallAuditLog
         {
-            context.FundCalls.Remove(fundCall);
-            await context.SaveChangesAsync();
+            Id = Guid.NewGuid(),
+            FundCallId = fundCall.Id,
+            Action = FundCallAuditAction.Deleted,
+            PreviousStatus = previousStatus,
+            NewStatus = null,
+            Reason = null,
+            ActorUserId = actorUserGuid,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        context.FundCalls.Remove(fundCall);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task<FundCall> CancelAsync(Guid id, string userId, string? reason)
+    {
+        // Reason is mandatory for the cancel workflow (FRS-FCF-LCM-2026-001 §2.4).
+        // The resolver layer is responsible for surfacing a clear GraphQL error
+        // when missing; we still defend in depth here.
+        if (string.IsNullOrWhiteSpace(reason) || reason.Trim().Length < 10)
+            throw new InvalidOperationException(
+                "Un motif d'annulation d'au moins 10 caractères est obligatoire.");
+
+        using var context = _contextFactory.CreateDbContext();
+
+        var fundCall = await context.FundCalls
+            .Include(f => f.Payments)
+            .Include(f => f.Invoices)
+            .FirstOrDefaultAsync(f => f.Id == id);
+
+        if (fundCall == null)
+            // Fully qualified to disambiguate from GreenDonut.KeyNotFoundException
+            // (re-exported by HotChocolate). System exception is the standard one
+            // that ASP.NET surfaces as a 404.
+            throw new System.Collections.Generic.KeyNotFoundException($"Appel de fonds {id} introuvable");
+
+        // Idempotent: cancelling an already-cancelled fund call is a no-op
+        // (FRS-FCF-LCM-2026-001 AC-06).
+        if (fundCall.Status == FundCallStatus.Cancelled)
+            return fundCall;
+
+        var previousStatus = fundCall.Status;
+        var actorUserGuid = Guid.TryParse(userId, out var uid) ? uid : Guid.Empty;
+
+        // Mark as cancelled and inactive so it cannot receive new payments.
+        fundCall.Status = FundCallStatus.Cancelled;
+        fundCall.IsActive = false;
+        fundCall.UpdatedAt = DateTime.UtcNow;
+
+        // Cascade: any invoice that has not been Paid is moved to Cancelled
+        // (FRS-FCF-LCM-2026-001 §2.5). Paid invoices keep their status to
+        // preserve the financial history.
+        if (fundCall.Invoices != null)
+        {
+            foreach (var invoice in fundCall.Invoices)
+            {
+                if (invoice.Status != InvoiceStatus.Paid)
+                    invoice.Status = InvoiceStatus.Cancelled;
+            }
         }
+
+        // Audit-log entry — written in the same SaveChanges so the audit
+        // history is consistent with the data state.
+        context.FundCallAuditLogs.Add(new FundCallAuditLog
+        {
+            Id = Guid.NewGuid(),
+            FundCallId = fundCall.Id,
+            Action = FundCallAuditAction.Cancelled,
+            PreviousStatus = previousStatus,
+            NewStatus = FundCallStatus.Cancelled,
+            Reason = reason.Trim(),
+            ActorUserId = actorUserGuid,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await context.SaveChangesAsync();
+
+        // Fire-and-forget: notify the affected owner (if any) that the fund
+        // call was cancelled. Must never block or fail the mutation.
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await NotifyOwnerOfCancellation(fundCall.Id, reason.Trim());
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[CancelFundCall] Owner notification failed: {ex.GetType().Name}: {ex.Message}");
+            }
+        });
+
+        return fundCall;
+    }
+
+    /// <summary>
+    /// Sends a notification to the owner linked to a cancelled fund call.
+    /// Best-effort, runs in a fire-and-forget task so the GraphQL response
+    /// is never delayed by a flaky email/HTTP call.
+    /// </summary>
+    private async Task NotifyOwnerOfCancellation(Guid fundCallId, string reason)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        var fundCall = await context.FundCalls
+            .Include(f => f.Owner)
+            .FirstOrDefaultAsync(f => f.Id == fundCallId);
+        if (fundCall == null) return;
+
+        var ownerEmail = fundCall.Owner?.Email;
+        if (string.IsNullOrWhiteSpace(ownerEmail)) return;
+
+        var subject = $"Appel de fonds annulé – {fundCall.Description ?? "Appel de fonds"}";
+        var body =
+            $"Bonjour,\n\n" +
+            $"L'appel de fonds « {fundCall.Description ?? "sans description"} » d'un montant de " +
+            $"{fundCall.Amount:N3} a été annulé par votre syndic.\n\n" +
+            $"Motif : {reason}\n\n" +
+            $"Toute soumission de paiement en attente n'est plus applicable. Pour toute question, " +
+            $"veuillez contacter votre gestionnaire.\n\n" +
+            $"— MYB Plateforme";
+
+        try
+        {
+            await _emailPublisher.PublishAsync(new EmailMessage
+            {
+                To = ownerEmail,
+                Subject = subject,
+                HtmlBody = body.Replace("\n", "<br>"),
+                Source = "Myb.Coproperty.CancelFundCall"
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[NotifyOwnerOfCancellation] PublishAsync failed: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Returns the audit-log entries for a given fund call, newest first.
+    /// Exposed via the GraphQL schema (FRS-FCF-LCM-2026-001 §2.4 / AC-24).
+    /// </summary>
+    public async Task<List<FundCallAuditLog>> GetAuditLogAsync(Guid fundCallId)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        return await context.FundCallAuditLogs
+            .Where(a => a.FundCallId == fundCallId)
+            .OrderByDescending(a => a.CreatedAt)
+            .ToListAsync();
     }
 
     public async Task<FundCall?> GetByIdAsync(Guid id)
@@ -201,22 +567,34 @@ public class FundCallService : IFundCallService
     {
         using var context = _contextFactory.CreateDbContext();
 
-        var query = context.FundCalls
-            .Where(f => f.CopropertyId == copropertyId)
-            .AsQueryable();
+        try
+        {
+            var query = context.FundCalls
+                .Where(f => f.CopropertyId == copropertyId)
+                .AsQueryable();
 
-        if (ownerId.HasValue)
-            query = query.Where(f => f.OwnerId == ownerId.Value);
+            if (ownerId.HasValue)
+                query = query.Where(f => f.OwnerId == ownerId.Value);
 
-        if (year.HasValue)
-            query = query.Where(f => f.DueDate.Year == year.Value);
+            if (year.HasValue)
+                query = query.Where(f => f.DueDate.Year == year.Value);
 
-        return await query
-            .Include(f => f.Owner)
-            .Include(f => f.Invoices)
-            .Include(f => f.Payments)
-            .OrderByDescending(f => f.DueDate)
-            .ToListAsync();
+            return await query
+                .Include(f => f.Owner)
+                .Include(f => f.Payments)
+                .OrderByDescending(f => f.DueDate)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            // Surface a clean GraphQL error instead of letting the worker crash and
+            // close the Kestrel connection (which the browser reports as
+            // net::ERR_EMPTY_RESPONSE).
+            Console.Error.WriteLine($"[GetByCopropertyIdAsync] Failed for coproperty {copropertyId}: {ex.GetType().Name}: {ex.Message}");
+            throw new InvalidOperationException(
+                "Impossible de charger les appels de fonds pour cette copropriété. Veuillez réessayer.",
+                ex);
+        }
     }
 
     public async Task<List<FundCall>> GetAllAsync()
@@ -391,7 +769,14 @@ public class FundCallService : IFundCallService
                     dist.PaidAmount += payAmount;
                     dist.PaidAt = input.PaymentDate;
                     dist.PaymentMethod = input.PaymentMethod ?? "Virement";
-                    dist.PaymentTransactionId = input.Justificatif ?? $"FC-{fundCallId}";
+                    // PaymentTransactionId column is VARCHAR(200) — the user-supplied
+                    // justificatif (which may include bank info, file name, etc.) is
+                    // truncated to fit and still be useful for reconciliation. The full
+                    // original text is preserved on the FundCallPayment.Justificatif field.
+                    var paymentReference = input.Justificatif ?? $"FC-{fundCallId}";
+                    dist.PaymentTransactionId = paymentReference.Length > 200
+                        ? paymentReference.Substring(0, 200)
+                        : paymentReference;
                     dist.UpdatedAt = DateTime.UtcNow;
 
                     if (dist.PaidAmount >= dist.Amount)

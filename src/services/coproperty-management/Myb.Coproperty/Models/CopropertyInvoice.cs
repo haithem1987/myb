@@ -13,6 +13,14 @@ public class CopropertyInvoice : IEntity<Guid>
     public Guid ChargeId { get; set; }
     public Guid UnitId { get; set; }
     public Guid OwnerId { get; set; }
+
+    /// <summary>Optional link to the fund call that produced this invoice.
+    /// Nullable because some invoices are created independently of a fund call
+    /// (e.g. manually issued charge invoices). Matches the FundCallId column
+    /// in the database schema and the relationship configured in
+    /// <c>CopropertyDbContext</c>.</summary>
+    public Guid? FundCallId { get; set; }
+
     public decimal Amount { get; set; }
     public decimal TaxAmount { get; set; }
     public decimal TotalAmount { get; set; }
@@ -26,10 +34,11 @@ public class CopropertyInvoice : IEntity<Guid>
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public Guid CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
-    
+
     // Navigation Properties
     public Charge Charge { get; set; } = null!;
     public Unit Unit { get; set; } = null!;
     public Owner Owner { get; set; } = null!;
+    public FundCall? FundCall { get; set; }
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }

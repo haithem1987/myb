@@ -76,10 +76,11 @@
             [value]="filterStatus()"
             (change)="onStatusFilterChange($event)">
             <option value="">Tous les statuts</option>
+            <option value="UNPAID">Impayés (À payer + En attente)</option>
             <option value="TO_PAY">À payer</option>
             <option value="PENDING_VALIDATION">En attente de validation</option>
             <option value="PAID">Réglé</option>
-            <option value="VALIDATED">Validé</option>
+            <option value="CANCELLED">Annulé</option>
           </select>
         </div>
 
@@ -228,7 +229,7 @@
         <p class="text-muted">Les appels de fonds seront affichés ici une fois créés</p>
       </div>
 
-      <!-- Bulk action bar -->
+      <!-- Bulk action bar — FRS-FCF-LCM-2026-001 §2.3 / §4.1 -->
       <div *ngIf="hasSelection" class="bulk-action-bar d-flex align-items-center gap-2 mb-3 px-3 py-2 rounded-3 border border-primary bg-primary bg-opacity-10">
         <span class="badge bg-primary rounded-pill">{{ selectedCount }}</span>
         <span class="small text-primary fw-semibold">sélectionné(s)</span>
@@ -236,15 +237,14 @@
         <button class="btn btn-sm btn-success" (click)="bulkChangeStatus('PAID')" title="Marquer comme Réglé">
           <i class="bi bi-check-circle-fill me-1"></i>Réglé
         </button>
-        <button class="btn btn-sm btn-info text-white" (click)="bulkChangeStatus('VALIDATED')" title="Marquer comme Validé">
-          <i class="bi bi-patch-check-fill me-1"></i>Validé
-        </button>
         <button class="btn btn-sm btn-warning" (click)="bulkChangeStatus('TO_PAY')" title="Remettre en À payer">
           <i class="bi bi-arrow-counterclockwise me-1"></i>À payer
         </button>
-        <div class="ms-auto">
-          <button class="btn btn-sm btn-outline-danger" (click)="bulkDelete()" title="Supprimer la sélection">
-            <i class="bi bi-trash me-1"></i>Supprimer
+        <div class="ms-auto d-flex gap-2">
+          <button class="btn btn-sm btn-warning text-white"
+                  (click)="cancelSelectedPublished()"
+                  title="Annuler les appels de fonds sélectionnés (workflow non-destructif)">
+            <i class="bi bi-x-octagon me-1"></i>Annuler la sélection
           </button>
         </div>
       </div>
@@ -302,7 +302,10 @@
                 </span>
               </td>
               <td>
-                <span class="badge" [ngClass]="getStatusBadge(fundCall.status)">
+                <span class="badge d-inline-flex align-items-center gap-1"
+                      [ngClass]="getStatusBadge(fundCall.status)"
+                      [attr.aria-label]="isCancelled(fundCall) ? 'Appel de fonds annulé (lecture seule)' : null">
+                  <i *ngIf="isCancelled(fundCall)" class="bi bi-lock-fill" aria-hidden="true"></i>
                   {{ getStatusLabel(fundCall.status) }}
                 </span>
                 <span *ngIf="isOverdue(fundCall)" class="badge bg-danger ms-1" title="Relance nécessaire">
@@ -339,15 +342,33 @@
                     <i class="bi bi-three-dots-vertical"></i>
                   </button>
                   <div ngbDropdownMenu>
-                    <button ngbDropdownItem (click)="editFundCall(fundCall)">
-                      <i class="bi bi-pencil-fill me-2"></i>Modifier / Paiement
+                    <button ngbDropdownItem
+                            (click)="editFundCall(fundCall)"
+                            [disabled]="isCancelled(fundCall)">
+                      <i class="bi bi-pencil-fill me-2"></i>
+                      {{ isCancelled(fundCall) ? 'Voir (lecture seule)' : 'Modifier / Paiement' }}
                     </button>
-                    <button ngbDropdownItem (click)="previewInvoice(fundCall)">
+                    <button ngbDropdownItem
+                            (click)="previewInvoice(fundCall)"
+                            [disabled]="isCancelled(fundCall)">
                       <i class="bi bi-file-earmark-text me-2"></i>Prévisualiser facture
                     </button>
-                    <div class="dropdown-divider"></div>
-                    <button ngbDropdownItem class="text-danger" (click)="deleteFundCall(fundCall)">
+                    <div class="dropdown-divider" *ngIf="canDelete(fundCall) || canCancel(fundCall)"></div>
+
+                    <!-- Delete option: ONLY for true drafts (FRS-FCF-LCM-2026-001 §4.1).
+                         Server-side `deletable` flag is the source of truth. -->
+                    <button *ngIf="canDelete(fundCall)" ngbDropdownItem class="text-danger" (click)="deleteFundCall(fundCall)">
                       <i class="bi bi-trash me-2"></i>Supprimer
+                    </button>
+
+                    <!-- Cancel option: for any non-terminal record that is not
+                         a true draft. Triggers the cancellation modal with a
+                         mandatory reason. -->
+                    <button *ngIf="canCancel(fundCall) && !canDelete(fundCall)"
+                            ngbDropdownItem
+                            class="text-warning"
+                            (click)="promptCancelFundCall(fundCall)">
+                      <i class="bi bi-x-octagon me-2"></i>Annuler l'appel de fonds
                     </button>
                   </div>
                 </div>
@@ -601,8 +622,12 @@
         </label>
         <input type="number" class="form-control" step="0.01" min="0.01"
           formControlName="amount"
+          [disabled]="isAmountLocked()"
           [class.is-invalid]="editForm.get('amount')?.invalid && editForm.get('amount')?.touched">
         <div class="invalid-feedback">Montant invalide</div>
+        <small *ngIf="isAmountLocked()" class="form-text text-muted">
+          <i class="bi bi-lock-fill me-1"></i>Le montant ne peut être modifié que lorsque le statut est "En attente de validation".
+        </small>
       </div>
 
       <!-- Due Date -->

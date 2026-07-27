@@ -88,11 +88,57 @@ export class OwnerChargesComponent implements OnInit {
   }
 
   get unpaidFundCalls(): FundCallExtended[] {
-    return this.fundCalls().filter(fc => fc.status === 'TO_PAY');
+    if (this.filterStatus() === 'paid') return [];
+    return this.fundCalls().filter(fc => fc.status === 'TO_PAY' && this.matchesFilters(fc));
   }
 
   get paidFundCalls(): FundCallExtended[] {
-    return this.fundCalls().filter(fc => fc.status === 'PAID' || fc.status === 'VALIDATED');
+    if (this.filterStatus() === 'unpaid') return [];
+    return this.fundCalls().filter(fc => (fc.status === 'PAID' || fc.status === 'VALIDATED') && this.matchesFilters(fc));
+  }
+
+  // ── Search & filter state ─────────────────────────────────────────────────
+  searchTerm = signal<string>('');
+  filterStatus = signal<string>('');
+  filterYear = signal<string>('');
+
+  get availableYears(): number[] {
+    const years = new Set<number>();
+    this.fundCalls().forEach(fc => years.add(new Date(fc.dueDate).getFullYear()));
+    return Array.from(years).sort((a, b) => b - a);
+  }
+
+  private matchesFilters(fc: FundCallExtended): boolean {
+    if (this.filterYear() && new Date(fc.dueDate).getFullYear().toString() !== this.filterYear()) {
+      return false;
+    }
+    const term = this.searchTerm().trim().toLowerCase();
+    if (term) {
+      const haystack = `${fc.description || ''} ${fc.copropertyName || ''}`.toLowerCase();
+      if (!haystack.includes(term)) return false;
+    }
+    return true;
+  }
+
+  onSearchInput(event: Event): void {
+    this.searchTerm.set((event.target as HTMLInputElement).value);
+  }
+
+  onStatusFilterChange(event: Event): void {
+    this.filterStatus.set((event.target as HTMLSelectElement).value);
+  }
+
+  onYearFilterChange(event: Event): void {
+    this.filterYear.set((event.target as HTMLSelectElement).value);
+  }
+
+  get hasActiveFilters(): boolean {
+    return !!this.searchTerm() || !!this.filterStatus() || !!this.filterYear();
+  }
+
+  /** True once every fund call (ignoring active filters) has been settled. */
+  get allFundCallsPaid(): boolean {
+    return this.fundCalls().length > 0 && !this.fundCalls().some(fc => fc.status === 'TO_PAY');
   }
 
   ngOnInit(): void {

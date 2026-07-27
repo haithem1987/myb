@@ -53,10 +53,13 @@ export class FundCallNewComponent implements OnInit {
   currentFundCall = signal<FundCallExtended | null>(null);
   showPaymentForm = signal<boolean>(false);
 
+  // "VALIDATED" is intentionally omitted: it is a derived state managed by the
+  // backend once a payment is approved, not a status the user can set directly.
   readonly statusOptions: { value: FundCallStatus; label: string }[] = [
     { value: 'TO_PAY', label: FUND_CALL_STATUS_LABELS['TO_PAY'] },
+    { value: 'PENDING_VALIDATION', label: FUND_CALL_STATUS_LABELS['PENDING_VALIDATION'] },
     { value: 'PAID', label: FUND_CALL_STATUS_LABELS['PAID'] },
-    { value: 'VALIDATED', label: FUND_CALL_STATUS_LABELS['VALIDATED'] },
+    { value: 'CANCELLED', label: FUND_CALL_STATUS_LABELS['CANCELLED'] },
   ];
 
   ngOnInit(): void {
@@ -64,6 +67,17 @@ export class FundCallNewComponent implements OnInit {
     this.initializePaymentForm();
     this.loadCoproperties();
     this.checkEditMode();
+  }
+
+  /**
+   * The Amount field is only editable while the fund call is awaiting
+   * validation ("En attente de validation"). Once created with any other
+   * status (or once validated/paid), the amount is locked to prevent
+   * unauthorized changes to the called amount.
+   */
+  isAmountLocked(): boolean {
+    if (!this.isEditMode()) return false;
+    return this.fundCallForm?.get('status')?.value !== 'PENDING_VALIDATION';
   }
 
   private initializeForm(): void {

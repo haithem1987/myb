@@ -1,0 +1,118 @@
+.modal-content {
+  border-radius: 8px;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  .modal-header {
+    border-radius: 8px 8px 0 0;
+    padding: 1.25rem;
+
+    h5 {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0;
+      color: #721c24;
+    }
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+    background-color: white;
+
+    .alert {
+      border-left: 4px solid #dc3545;
+      background-color: rgba(220, 53, 69, 0.05);
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+
+      i {
+        font-size: 1.25rem;
+      }
+    }
+
+    .card-sm {
+      font-size: 0.875rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+
+      .text-sm {
+        font-size: 0.875rem;
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+    }
+
+    .form-check {
+      margin-bottom: 1rem;
+
+      .form-check-input {
+        cursor: pointer;
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+
+      .form-check-label {
+        cursor: pointer;
+        user-select: none;
+        font-size: 0.875rem;
+        padding-left: 0.5rem;
+      }
+    }
+  }
+
+  .modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    background-color: white;
+    border-radius: 0 0 8px 8px;
+
+    .btn {
+      min-width: 140px;
+      font-weight: 500;
+      white-space: nowrap;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s ease;
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    .modal-body {
+      padding: 1rem;
+
+      .card-sm {
+        margin-bottom: 1rem;
+
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+
+    .modal-footer {
+      flex-direction: column;
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}

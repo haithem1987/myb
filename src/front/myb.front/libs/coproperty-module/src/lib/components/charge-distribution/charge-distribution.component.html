@@ -235,10 +235,14 @@
 
       </div>
 
-      <button class="btn btn-violet mt-4" (click)="calculateDistribution()" [disabled]="!repartitionForm.valid || calculatedTotal() <= 0">
+      <button type="button" class="btn btn-violet mt-4" (click)="calculateDistribution($event)" [disabled]="!repartitionForm.valid || calculatedTotal() <= 0">
         <i class="bi bi-calculator me-2"></i>
         {{ 'coproperty.distribution.calculate' | translate }}
       </button>
+      <div *ngIf="repartitionForm.valid && calculatedTotal() <= 0" class="text-muted small mt-2">
+        <i class="bi bi-info-circle me-1"></i>
+        {{ 'coproperty.distribution.noChargesToDistribute' | translate }}
+      </div>
     </div>
   </div>
 
@@ -339,7 +343,7 @@
       </div>
 
       <div class="preview-actions">
-        <button class="btn btn-violet" (click)="saveDistribution()" [disabled]="!repartitionForm.valid || saving()">
+        <button type="button" class="btn btn-violet" (click)="saveDistribution()" [disabled]="!repartitionForm.valid || saving()">
           <span *ngIf="!saving()">
             <i class="bi bi-save me-2"></i>
             {{ 'common.save' | translate }}
@@ -349,7 +353,7 @@
             {{ 'validation.SAVING' | translate }}
           </span>
         </button>
-        <button class="btn btn-outline-violet" (click)="reset()">
+        <button type="button" class="btn btn-outline-violet" (click)="reset()">
           <i class="bi bi-arrow-clockwise me-2"></i>
           {{ 'common.reset' | translate }}
         </button>

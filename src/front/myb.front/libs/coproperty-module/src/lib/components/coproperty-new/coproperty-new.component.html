@@ -166,29 +166,6 @@
               </div>
             </div>
 
-            <!-- Currency -->
-            <div class="col-md-4">
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="bi bi-currency-exchange me-1"></i>
-                  {{ 'coproperty.form.currencyLabel' | translate }}
-                  <span class="text-danger">*</span>
-                </label>
-                <select 
-                  class="form-select" 
-                  formControlName="currency"
-                  [class.is-invalid]="copropertyForm.get('currency')?.invalid && copropertyForm.get('currency')?.touched"
-                >
-                  <option [value]="currencyOption.value" *ngFor="let currencyOption of currencies">
-                    <i [class]="currencyOption.icon"></i> {{ currencyOption.label }}
-                  </option>
-                </select>
-                <small class="form-text text-muted">
-                  {{ 'coproperty.form.currencyHelp' | translate }}
-                </small>
-              </div>
-            </div>
-
             <!-- Total Units -->
             <div class="col-md-6">
               <div class="form-group">

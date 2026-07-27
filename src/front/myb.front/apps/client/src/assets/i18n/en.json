@@ -240,7 +240,14 @@
       "search": "Search coproperties...",
       "filter": "Filter",
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "subtitle": "Manage all your coproperties in one place",
+      "noCoproperties": "No coproperties found",
+      "filterByStatus": "Filter by status",
+      "allCoproperties": "All coproperties",
+      "deleteConfirm": "Are you sure you want to delete this coproperty?",
+      "deleteWarning": "This action is irreversible. All associated data (units, charges, properties) will be deleted.",
+      "retry": "Retry"
     },
     "detail": {
       "title": "Coproperty Details",
@@ -284,7 +291,10 @@
       "managerPlaceholder": "Property manager name",
       "commonAreasLabel": "Common Areas",
       "commonAreasPlaceholder": "Garden, parking, elevator...",
-      "validationError": "Please fill in all required fields correctly"
+      "validationError": "Please fill in all required fields correctly",
+      "currencyLabel": "Currency",
+      "currencyHelp": "Select the currency for this coproperty",
+      "saveFirstMessage": "Save the coproperty first to access other tabs"
     },
     "charges": {
       "management": "Charge Management",
@@ -330,7 +340,9 @@
         "byArea": "By Area",
         "equal": "Equal",
         "custom": "Custom"
-      }
+      },
+      "calculateDistribution": "Calculate Distribution",
+      "noChargesToDistribute": "No budget lines to distribute for this year"
     },
     "distribution": {
       "title": "Allocation Management",
@@ -396,7 +408,12 @@
       "amountPlaceholder": "0.00",
       "descriptionPlaceholder": "Additional information...",
       "budgetCreated": "Budget created successfully",
-      "budgetUpdated": "Budget updated successfully"
+      "budgetUpdated": "Budget updated successfully",
+      "addBudget": "Add Budget Line",
+      "budgetManagement": "Budget Line Management",
+      "manageAllBudgets": "Manage all budget lines for your coproperties",
+      "distributionAndDates": "Distribution and dates",
+      "modify": "Modify"
     },
     "filters": {
       "period": "Period",
@@ -478,7 +495,36 @@
         "studio": "Studio",
         "house": "House",
         "other": "Other"
-      }
+      },
+      "manageAllUnits": "Manage all units across your coproperties",
+      "numberPlaceholder": "E.g., 101, APT-1",
+      "floorMin": "Floor must be a valid number",
+      "areaPlaceholder": "E.g., 75.5",
+      "areaMin": "Area must be greater than 0",
+      "sharesPlaceholder": "E.g., 100",
+      "sharesMin": "Shares must be greater than 0",
+      "allTypes": "All types",
+      "optional": "Optional",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter unit description...",
+      "totalUnits": "Total Units",
+      "occupiedUnits": "Occupied Units",
+      "vacantUnits": "Vacant Units",
+      "totalShares": "Total Shares",
+      "noUnitsFound": "No units found",
+      "noUnitsMessage": "Units will be displayed here once created",
+      "noUnitsAvailable": "No units available",
+      "selectUnitsHelp": "Select one or more units for this owner",
+      "deleteWarning": "This action is irreversible. The unit will be permanently deleted.",
+      "deleteUnitsWithCoproperty": "Delete associated units?",
+      "deleteUnitsWarning": "This coproperty has {{count}} associated unit(s). These will be permanently deleted.",
+      "sortBy": "Sort by",
+      "sortByNewest": "Newest first",
+      "sortByOldest": "Oldest first",
+      "sortByNumber": "Unit number",
+      "sortByArea": "Area",
+      "sortByShares": "Shares",
+      "sorting": "Sort"
     },
     "owner": {
       "management": "Owner Management",
@@ -489,7 +535,24 @@
       "firstName": "First Name",
       "lastName": "Last Name",
       "units": "Units Owned",
-      "deleteConfirm": "Are you sure you want to delete this owner?"
+      "deleteConfirm": "Are you sure you want to delete this owner?",
+      "unitRequired": "Please select at least one unit",
+      "linkExistingUser": "Link existing user",
+      "searchUserByEmail": "Search registered user by email",
+      "userFound": "User found",
+      "userNotRegistered": "This user is not registered yet. They must create an account first.",
+      "selectUserRequired": "Please select a registered user",
+      "roleStatus": "Role status",
+      "hasOwnerRole": "Owner role active",
+      "noOwnerRole": "Owner role not assigned",
+      "assignOwnerRole": "Assign owner role",
+      "removeOwnerRole": "Remove owner role",
+      "removeRoleConfirmTitle": "Remove owner role?",
+      "removeRoleConfirmMessage": "This owner will lose the owner role and be removed from this coproperty. Do you want to continue?",
+      "createFromUser": "Create owner from user",
+      "noRegisteredUsers": "No registered users without owner profile",
+      "pendingUsers": "Users pending assignment",
+      "pendingUsersHelp": "These users have registered but have not been assigned as owners yet"
     },
     "maintenance": {
       "title": "Maintenance Requests",
@@ -522,7 +585,10 @@
         "elevator": "Elevator",
         "roof": "Roof",
         "facade": "Facade",
-        "other": "Other"
+        "other": "Other",
+        "cleaning": "Cleaning",
+        "security": "Security",
+        "structural": "Structural"
       },
       "priorities": {
         "low": "Low",
@@ -537,6 +603,23 @@
         "completed": "Completed",
         "cancelled": "Cancelled"
       }
+    },
+    "messages": {
+      "created": "Coproperty created successfully",
+      "updated": "Coproperty updated successfully",
+      "deleted": "Coproperty deleted successfully",
+      "ownerCreated": "Owner created successfully",
+      "ownerUpdated": "Owner updated successfully",
+      "ownerDeleted": "Owner deleted successfully",
+      "duplicateName": "A coproperty with this name already exists. Please use a different name.",
+      "unitCreated": "Unit created successfully",
+      "unitUpdated": "Unit updated successfully",
+      "unitDeleted": "Unit deleted successfully",
+      "unitSaveFailed": "Failed to save unit. Please try again.",
+      "unitDeleteBlockedDueToOwners": "Cannot delete this unit because it is associated with one or more owners. Remove owner associations first.",
+      "error": "An error occurred. Please try again.",
+      "saveFailed": "Failed to save. Please try again.",
+      "deleteBlockedDueToUnits": "Cannot delete this coproperty. It contains associated units. Please remove all units first."
     }
   },
   "owner": {
@@ -610,7 +693,34 @@
     "warning": "Warning",
     "info": "Information",
     "total": "Total",
-    "or": "or"
+    "or": "or",
+    "unknown": "Unknown",
+    "validationErrors": "Validation errors",
+    "searchPlaceholder": "Search...",
+    "searchUnits": "Search units...",
+    "searchOwners": "Search owners...",
+    "editAction": "Edit",
+    "deleteAction": "Delete",
+    "viewAction": "View",
+    "generateInvoices": "Generate invoices",
+    "amountPlaceholder": "0.00",
+    "agendaPlaceholder": "Agenda items...",
+    "assemblyTitlePlaceholder": "Annual General Assembly",
+    "fundCallDescPlaceholder": "Q1 charges",
+    "areYouSure": "Are you sure?",
+    "deleteConfirm": "Are you sure you want to delete this?",
+    "deleteMessage": "Are you sure you want to delete",
+    "status": "Status",
+    "role": "Role",
+    "assignRole": "Assign role",
+    "unassignRole": "Unassign role",
+    "roleAssigned": "Role assigned successfully",
+    "roleUnassigned": "Role unassigned successfully",
+    "userNotFound": "No user found with this email",
+    "keycloakUser": "Keycloak User",
+    "registeredUsers": "Registered Users",
+    "searchKeycloakUsers": "Search registered user by email...",
+    "update": "Update"
   },
   "validation": {
     "NAME_REQUIRED": "is required",
@@ -621,11 +731,12 @@
     "min": "Minimum value must be",
     "email": "Invalid email",
     "pattern": "Invalid format",
-    "phoneInvalid": "Invalid phone number format"
+    "phoneInvalid": "Invalid phone number format",
+    "duplicateError": "This unit already exists in this coproperty"
   },
   "auth": {
     "backToHome": "Back to Home",
-    "trustBadges": "Secure registration \u2022 SSL encrypted \u2022 Privacy protected",
+    "trustBadges": "Secure registration • SSL encrypted • Privacy protected",
     "step1of2": "Create Account",
     "step2of2": "Complete Profile",
     "login": "Log in",
@@ -691,5 +802,73 @@
   "STATIC_TERMS_TITLE": "Terms of Service",
   "STATIC_TERMS_DESC": "Please read our terms of service.",
   "STATIC_PRIVACY_TITLE": "Privacy Policy",
-  "STATIC_PRIVACY_DESC": "Please read our privacy policy."
+  "STATIC_PRIVACY_DESC": "Please read our privacy policy.",
+  "intervention": {
+    "list": {
+      "title": "Intervention Management",
+      "subtitle": "Plan, track and manage all interventions across your coproperties",
+      "add": "New Intervention",
+      "loading": "Loading interventions...",
+      "noData": "No interventions found"
+    },
+    "stats": {
+      "total": "Total",
+      "planned": "Planned",
+      "inProgress": "In Progress",
+      "emergencies": "Emergencies"
+    },
+    "filter": {
+      "coproperty": "Coproperty",
+      "allCoproperties": "All coproperties",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "priority": "Priority",
+      "allPriorities": "All priorities",
+      "type": "Type",
+      "allTypes": "All types",
+      "search": "Search"
+    },
+    "table": {
+      "title": "Title",
+      "type": "Type",
+      "priority": "Priority",
+      "status": "Status",
+      "provider": "Provider",
+      "plannedDate": "Planned Date",
+      "cost": "Estimated Cost",
+      "actions": "Actions"
+    },
+    "form": {
+      "createTitle": "New Intervention",
+      "editTitle": "Edit Intervention",
+      "coproperty": "Coproperty",
+      "title": "Title",
+      "type": "Intervention Type",
+      "priority": "Priority",
+      "status": "Status",
+      "description": "Description",
+      "providerName": "Provider Name",
+      "providerPhone": "Phone",
+      "providerEmail": "Email",
+      "plannedDate": "Planned Date",
+      "estimatedCost": "Estimated Cost",
+      "actualCost": "Actual Cost",
+      "notes": "Notes",
+      "resolution": "Resolution",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update",
+      "generalInfo": "General Information",
+      "providerInfo": "Provider Information",
+      "planningCosts": "Planning & Costs",
+      "selectCoproperty": "Select a coproperty",
+      "copropertyRequired": "Coproperty is required",
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "emailInvalid": "Invalid email format",
+      "saveSuccess": "Intervention created successfully!",
+      "saveSuccessEdit": "Intervention updated successfully!",
+      "saveError": "Error saving intervention. Please try again."
+    }
+  }
 }

@@ -241,7 +241,14 @@
       "search": "Rechercher des copropriétés...",
       "filter": "Filtrer",
       "active": "Actif",
-      "inactive": "Inactif"
+      "inactive": "Inactif",
+      "subtitle": "Gérez toutes vos copropriétés en un seul endroit",
+      "noCoproperties": "Aucune copropriété trouvée",
+      "filterByStatus": "Filtrer par statut",
+      "allCoproperties": "Toutes les copropriétés",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette copropriété ?",
+      "deleteWarning": "Cette action est irréversible. Toutes les données associées (lots, charges, propriétés) seront supprimées.",
+      "retry": "Réessayer"
     },
     "detail": {
       "title": "Détails de la Copropriété",
@@ -328,7 +335,8 @@
         "equalDesc": "Distribution égale entre toutes les unités",
         "custom": "Répartition Personnalisée",
         "customDesc": "Saisie manuelle du montant par unité"
-      }
+      },
+      "calculateDistribution": "Calculer la Répartition"
     },
     "distribution": {
       "title": "Gestion de Répartition",
@@ -390,7 +398,8 @@
         "inProgress": "En Cours",
         "completed": "Terminée",
         "cancelled": "Annulée"
-      }
+      },
+      "requests": "Demandes"
     },
     "form": {
       "newCoproperty": "Nouvelle Copropriété",
@@ -414,7 +423,10 @@
       "managerLabel": "Gestionnaire",
       "managerPlaceholder": "Nom du gestionnaire",
       "commonAreasLabel": "Parties Communes",
-      "commonAreasPlaceholder": "Jardin, parking, ascenseur..."
+      "commonAreasPlaceholder": "Jardin, parking, ascenseur...",
+      "currencyLabel": "Devise",
+      "currencyHelp": "Sélectionnez la devise pour cette copropriété",
+      "saveFirstMessage": "Enregistrez d'abord la copropriété pour accéder aux autres onglets"
     },
     "charge": {
       "title": "Gestion des Charges",
@@ -457,7 +469,13 @@
       "amountPlaceholder": "0.00",
       "descriptionPlaceholder": "Informations complémentaires...",
       "budgetCreated": "Budget créé avec succès",
-      "budgetUpdated": "Budget mis à jour avec succès"
+      "budgetUpdated": "Budget mis à jour avec succès",
+      "status": "Statut",
+      "addBudget": "Ajouter une Ligne Budgétaire",
+      "budgetManagement": "Gestion des Lignes Budgétaires",
+      "manageAllBudgets": "Gérez toutes les lignes budgétaires de vos copropriétés",
+      "distributionAndDates": "Répartition et dates",
+      "modify": "Modifier"
     },
     "unit": {
       "management": "Gestion des Lots",
@@ -492,7 +510,37 @@
         "studio": "Studio",
         "house": "Maison",
         "other": "Autre"
-      }
+      },
+      "manageAllUnits": "Gérez tous les lots de vos copropriétés",
+      "numberPlaceholder": "Ex: A23, B12, 101",
+      "floorMin": "L'étage doit être au moins 0",
+      "areaPlaceholder": "Ex: 75.5",
+      "areaMin": "La superficie doit être au moins 1 m²",
+      "sharesPlaceholder": "Ex: 100",
+      "sharesMin": "Les tantièmes doivent être au moins 1",
+      "allTypes": "Tous les types",
+      "optional": "optionnel",
+      "description": "Description",
+      "descriptionPlaceholder": "Entrez la description du lot...",
+      "totalUnits": "Total Lots",
+      "occupiedUnits": "Lots Occupés",
+      "vacantUnits": "Lots Vacants",
+      "totalShares": "Total Tantièmes",
+      "noUnitsFound": "Aucun lot trouvé",
+      "noUnitsMessage": "Les lots seront affichés ici une fois créés",
+      "noUnitsAvailable": "Aucun lot disponible",
+      "selectUnitsHelp": "Sélectionnez un ou plusieurs lots pour ce copropriétaire",
+      "deleteWarning": "Cette action est irréversible. Le lot sera définitivement supprimé.",
+      "deleteUnitsWithCoproperty": "Supprimer les lots associés ?",
+      "deleteUnitsWarning": "Cette copropriété a {{count}} lot(s) associé(s). Ceux-ci seront définitivement supprimés.",
+      "sortBy": "Trier par",
+      "sortByNewest": "Les plus récents d'abord",
+      "sortByOldest": "Les plus anciens d'abord",
+      "sortByNumber": "Numéro du lot",
+      "sortByArea": "Superficie",
+      "sortByShares": "Tantièmes",
+      "sorting": "Tri",
+      "duplicateError": "Ce numéro de lot existe déjà pour cette copropriété"
     },
     "owner": {
       "management": "Gestion des Copropriétaires",
@@ -504,7 +552,41 @@
       "lastName": "Nom de famille",
       "units": "Lots Possédés",
       "unitRequired": "Veuillez sélectionner au moins un lot",
-      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce copropriétaire ?"
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce copropriétaire ?",
+      "selectCopropertyHelp": "Sélectionnez d'abord la copropriété pour afficher les lots disponibles",
+      "linkExistingUser": "Lier un utilisateur existant",
+      "searchUserByEmail": "Rechercher un utilisateur inscrit par email",
+      "userFound": "Utilisateur trouvé",
+      "userNotRegistered": "Cet utilisateur n'est pas encore inscrit. Il doit d'abord créer un compte.",
+      "selectUserRequired": "Veuillez sélectionner un utilisateur inscrit",
+      "roleStatus": "Statut du rôle",
+      "hasOwnerRole": "Rôle copropriétaire actif",
+      "noOwnerRole": "Rôle copropriétaire non attribué",
+      "assignOwnerRole": "Attribuer le rôle copropriétaire",
+      "removeOwnerRole": "Retirer le rôle copropriétaire",
+      "removeRoleConfirmTitle": "Retirer le rôle copropriétaire ?",
+      "removeRoleConfirmMessage": "Ce copropriétaire perdra son rôle et sera retiré de cette copropriété. Voulez-vous continuer ?",
+      "createFromUser": "Créer le copropriétaire à partir de l'utilisateur",
+      "noRegisteredUsers": "Aucun utilisateur inscrit sans profil copropriétaire",
+      "pendingUsers": "Utilisateurs en attente d'attribution",
+      "pendingUsersHelp": "Ces utilisateurs se sont inscrits mais n'ont pas encore été assignés comme copropriétaires"
+    },
+    "messages": {
+      "created": "Copropriété créée avec succès",
+      "updated": "Copropriété modifiée avec succès",
+      "deleted": "Copropriété supprimée avec succès",
+      "ownerCreated": "Copropriétaire créé avec succès",
+      "ownerUpdated": "Copropriétaire modifié avec succès",
+      "ownerDeleted": "Copropriétaire supprimé avec succès",
+      "duplicateName": "Une copropriété portant ce nom existe déjà. Veuillez utiliser un nom différent.",
+      "unitCreated": "Lot créé avec succès",
+      "unitUpdated": "Lot modifié avec succès",
+      "unitDeleted": "Lot supprimé avec succès",
+      "unitSaveFailed": "Échec de l'enregistrement du lot. Veuillez réessayer.",
+      "unitDeleteBlockedDueToOwners": "Impossible de supprimer ce lot car il est associé à un ou plusieurs copropriétaires. Retirez d'abord les associations.",
+      "error": "Une erreur s'est produite. Veuillez réessayer.",
+      "saveFailed": "Échec de l'enregistrement. Veuillez réessayer.",
+      "deleteBlockedDueToUnits": "Impossible de supprimer cette copropriété. Elle contient des lots associés. Veuillez d'abord supprimer tous les lots."
     }
   },
   "owner": {
@@ -578,7 +660,35 @@
     "warning": "Avertissement",
     "info": "Information",
     "total": "Total",
-    "or": "ou"
+    "or": "ou",
+    "unknown": "Inconnu",
+    "all": "Tous",
+    "update": "Mettre à jour",
+    "validationErrors": "Erreurs de validation",
+    "searchPlaceholder": "Rechercher...",
+    "searchUnits": "Rechercher des lots...",
+    "searchOwners": "Rechercher des copropriétaires...",
+    "editAction": "Modifier",
+    "deleteAction": "Supprimer",
+    "viewAction": "Voir",
+    "generateInvoices": "Générer les factures",
+    "amountPlaceholder": "0.00",
+    "agendaPlaceholder": "Points à l'ordre du jour...",
+    "assemblyTitlePlaceholder": "Assemblée Générale Annuelle",
+    "fundCallDescPlaceholder": "Charges T1",
+    "areYouSure": "Êtes-vous sûr ?",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ceci ?",
+    "deleteMessage": "Êtes-vous sûr de vouloir supprimer",
+    "status": "Statut",
+    "role": "Rôle",
+    "assignRole": "Attribuer le rôle",
+    "unassignRole": "Retirer le rôle",
+    "roleAssigned": "Rôle attribué avec succès",
+    "roleUnassigned": "Rôle retiré avec succès",
+    "userNotFound": "Aucun utilisateur trouvé avec cet email",
+    "keycloakUser": "Utilisateur Keycloak",
+    "registeredUsers": "Utilisateurs inscrits",
+    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par email..."
   },
   "validation": {
     "NAME_REQUIRED": "est requis",
@@ -589,11 +699,12 @@
     "min": "La valeur minimale doit être de",
     "email": "Email invalide",
     "pattern": "Format invalide",
-    "phoneInvalid": "Format de numéro de téléphone invalide"
+    "phoneInvalid": "Format de numéro de téléphone invalide",
+    "duplicateError": "Ce lot existe déjà dans cette copropriété"
   },
   "auth": {
     "backToHome": "Retour à l'accueil",
-    "trustBadges": "Inscription sécurisée \u2022 Cryptée SSL \u2022 Confidentialité protégée",
+    "trustBadges": "Inscription sécurisée • Cryptée SSL • Confidentialité protégée",
     "step1of2": "Créer un compte",
     "step2of2": "Compléter le profil",
     "login": "Se connecter",
@@ -659,5 +770,73 @@
   "STATIC_TERMS_TITLE": "Conditions d'utilisation",
   "STATIC_TERMS_DESC": "Veuillez lire nos conditions d'utilisation.",
   "STATIC_PRIVACY_TITLE": "Politique de confidentialité",
-  "STATIC_PRIVACY_DESC": "Veuillez lire notre politique de confidentialité."
+  "STATIC_PRIVACY_DESC": "Veuillez lire notre politique de confidentialité.",
+  "intervention": {
+    "list": {
+      "title": "Gestion des Interventions",
+      "subtitle": "Planifiez, suivez et gérez toutes les interventions de vos copropriétés",
+      "add": "Nouvelle Intervention",
+      "loading": "Chargement des interventions...",
+      "noData": "Aucune intervention trouvée"
+    },
+    "stats": {
+      "total": "Total",
+      "planned": "Planifiées",
+      "inProgress": "En cours",
+      "emergencies": "Urgences"
+    },
+    "filter": {
+      "coproperty": "Copropriété",
+      "allCoproperties": "Toutes les copropriétés",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts",
+      "priority": "Priorité",
+      "allPriorities": "Toutes les priorités",
+      "type": "Type",
+      "allTypes": "Tous les types",
+      "search": "Recherche"
+    },
+    "table": {
+      "title": "Titre",
+      "type": "Type",
+      "priority": "Priorité",
+      "status": "Statut",
+      "provider": "Intervenant",
+      "plannedDate": "Date prévue",
+      "cost": "Coût estimé",
+      "actions": "Actions"
+    },
+    "form": {
+      "createTitle": "Nouvelle Intervention",
+      "editTitle": "Modifier l'Intervention",
+      "coproperty": "Copropriété",
+      "title": "Titre",
+      "type": "Type d'intervention",
+      "priority": "Priorité",
+      "status": "Statut",
+      "description": "Description",
+      "providerName": "Nom intervenant",
+      "providerPhone": "Téléphone",
+      "providerEmail": "Email",
+      "plannedDate": "Date prévue",
+      "estimatedCost": "Coût estimé",
+      "actualCost": "Coût réel",
+      "notes": "Notes",
+      "resolution": "Résolution",
+      "cancel": "Annuler",
+      "create": "Créer",
+      "update": "Mettre à jour",
+      "generalInfo": "Informations Générales",
+      "providerInfo": "Informations Intervenant",
+      "planningCosts": "Planification & Coûts",
+      "selectCoproperty": "Sélectionner une copropriété",
+      "copropertyRequired": "La copropriété est requise",
+      "titleRequired": "Le titre est requis",
+      "descriptionRequired": "La description est requise",
+      "emailInvalid": "Format d'email invalide",
+      "saveSuccess": "Intervention créée avec succès !",
+      "saveSuccessEdit": "Intervention mise à jour avec succès !",
+      "saveError": "Erreur lors de l'enregistrement. Veuillez réessayer."
+    }
+  }
 }

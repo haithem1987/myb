@@ -17,10 +17,109 @@ namespace Myb.Coproperty.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Myb.Coproperty.Models.Assembly", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Agenda")
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<string>("AssemblyType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("CopropertyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("MeetingDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Minutes")
+                        .HasMaxLength(10000)
+                        .HasColumnType("character varying(10000)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CopropertyId");
+
+                    b.HasIndex("MeetingDate");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("Assemblies");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.AssemblyAttendance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssemblyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CheckInTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("HasProxy")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPresent")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ProxyHolderName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssemblyId");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("AssemblyAttendances");
+                });
 
             modelBuilder.Entity("Myb.Coproperty.Models.Charge", b =>
                 {
@@ -114,8 +213,10 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("PaidAmount")
+                        .ValueGeneratedOnAdd()
                         .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)");
+                        .HasColumnType("numeric(10,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<DateTime?>("PaidAt")
                         .HasColumnType("timestamp with time zone");
@@ -126,8 +227,10 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Unpaid");
 
                     b.Property<string>("PaymentTransactionId")
                         .HasMaxLength(500)
@@ -143,6 +246,8 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PaymentStatus");
 
                     b.HasIndex("UnitId");
 
@@ -198,11 +303,12 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("ManagerId")
+                    b.Property<Guid?>("ManagerId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("ManagerName")
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -328,6 +434,91 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.ToTable("CopropertyInvoices");
                 });
 
+            modelBuilder.Entity("Myb.Coproperty.Models.Discussion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CopropertyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<bool>("IsPinned")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CopropertyId", "UpdatedAt");
+
+                    b.ToTable("Discussions");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.DiscussionMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("AuthorRole")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("DiscussionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscussionId", "CreatedAt");
+
+                    b.ToTable("DiscussionMessages");
+                });
+
             modelBuilder.Entity("Myb.Coproperty.Models.FundCall", b =>
                 {
                     b.Property<Guid>("Id")
@@ -340,6 +531,10 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.Property<Guid>("CopropertyId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("CopropertyNameSnapshot")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -360,6 +555,20 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("OwnerNameSnapshot")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("ToPay");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -371,10 +580,76 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.HasIndex("IsActive");
 
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("CopropertyId", "DueDate", "OwnerId")
+                        .IsUnique();
+
                     b.ToTable("FundCalls", t =>
                         {
                             t.HasCheckConstraint("CHK_FundCall_Amount", "\"Amount\" >= 0");
                         });
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.FundCallAuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("ActorDisplayName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ActorRole")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("ActorUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("FundCallId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("MetadataJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NewStatus")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("PreviousStatus")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("FundCallId");
+
+                    b.HasIndex("FundCallId", "CreatedAt");
+
+                    b.ToTable("FundCallAuditLogs");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.FundCallPayment", b =>
@@ -425,6 +700,118 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.HasIndex("FundCallId");
 
                     b.ToTable("FundCallPayments");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.Intervention", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("ActualCost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<Guid?>("AssignedTo")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CopropertyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<decimal?>("EstimatedCost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<string>("InterventionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("MaintenanceRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("PlannedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Normal");
+
+                    b.Property<string>("ProviderEmail")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ProviderName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ProviderPhone")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("RequestedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Resolution")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("StartedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Draft");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid?>("UnitId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CopropertyId");
+
+                    b.HasIndex("MaintenanceRequestId");
+
+                    b.HasIndex("PlannedDate");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("UnitId");
+
+                    b.ToTable("Interventions");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.MaintenanceRequest", b =>
@@ -516,30 +903,61 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Owners");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.OwnerUnit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsMainOwner")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("OwnershipPercentage")
                         .ValueGeneratedOnAdd()
                         .HasPrecision(5, 2)
                         .HasColumnType("numeric(5,2)")
                         .HasDefaultValue(100.00m);
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -550,16 +968,16 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
 
                     b.HasIndex("UnitId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("OwnerId", "UnitId")
+                        .IsUnique();
 
-                    b.ToTable("Owners", t =>
+                    b.ToTable("OwnerUnits", t =>
                         {
                             t.HasCheckConstraint("CHK_Ownership_Percentage", "\"OwnershipPercentage\" > 0 AND \"OwnershipPercentage\" <= 100");
                         });
@@ -610,6 +1028,76 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("Myb.Coproperty.Models.Signalement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CopropertyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ReportedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ReporterName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("EnCours");
+
+                    b.Property<string>("SyndicComment")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("ViewsCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Zone")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CopropertyId");
+
+                    b.HasIndex("ReportedBy");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("Signalements");
+                });
+
             modelBuilder.Entity("Myb.Coproperty.Models.Tenant", b =>
                 {
                     b.Property<Guid>("Id")
@@ -640,16 +1128,16 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<DateTime?>("LeaseEndDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LeaseStartDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<decimal?>("MonthlyRent")
                         .HasPrecision(10, 2)
@@ -712,9 +1200,6 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<bool>("IsOccupied")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("OccupancyStatus")
-                        .HasColumnType("text");
-
                     b.Property<int>("Shares")
                         .HasColumnType("integer");
 
@@ -738,6 +1223,28 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Units");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.Assembly", b =>
+                {
+                    b.HasOne("Myb.Coproperty.Models.Coproperty", "Coproperty")
+                        .WithMany()
+                        .HasForeignKey("CopropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coproperty");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.AssemblyAttendance", b =>
+                {
+                    b.HasOne("Myb.Coproperty.Models.Assembly", "Assembly")
+                        .WithMany("Attendances")
+                        .HasForeignKey("AssemblyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assembly");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.Charge", b =>
@@ -778,9 +1285,10 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Myb.Coproperty.Models.FundCall", null)
+                    b.HasOne("Myb.Coproperty.Models.FundCall", "FundCall")
                         .WithMany("Invoices")
-                        .HasForeignKey("FundCallId");
+                        .HasForeignKey("FundCallId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Myb.Coproperty.Models.Owner", "Owner")
                         .WithMany("Invoices")
@@ -796,9 +1304,33 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.Navigation("Charge");
 
+                    b.Navigation("FundCall");
+
                     b.Navigation("Owner");
 
                     b.Navigation("Unit");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.Discussion", b =>
+                {
+                    b.HasOne("Myb.Coproperty.Models.Coproperty", "Coproperty")
+                        .WithMany()
+                        .HasForeignKey("CopropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coproperty");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.DiscussionMessage", b =>
+                {
+                    b.HasOne("Myb.Coproperty.Models.Discussion", "Discussion")
+                        .WithMany("Messages")
+                        .HasForeignKey("DiscussionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Discussion");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.FundCall", b =>
@@ -809,7 +1341,14 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Myb.Coproperty.Models.Owner", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Coproperty");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.FundCallPayment", b =>
@@ -821,6 +1360,31 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("FundCall");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.Intervention", b =>
+                {
+                    b.HasOne("Myb.Coproperty.Models.Coproperty", "Coproperty")
+                        .WithMany("Interventions")
+                        .HasForeignKey("CopropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Myb.Coproperty.Models.MaintenanceRequest", "MaintenanceRequest")
+                        .WithMany()
+                        .HasForeignKey("MaintenanceRequestId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Myb.Coproperty.Models.Unit", "Unit")
+                        .WithMany()
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Coproperty");
+
+                    b.Navigation("MaintenanceRequest");
+
+                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.MaintenanceRequest", b =>
@@ -841,13 +1405,21 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("Myb.Coproperty.Models.Owner", b =>
+            modelBuilder.Entity("Myb.Coproperty.Models.OwnerUnit", b =>
                 {
+                    b.HasOne("Myb.Coproperty.Models.Owner", "Owner")
+                        .WithMany("OwnerUnits")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Myb.Coproperty.Models.Unit", "Unit")
-                        .WithMany("Owners")
+                        .WithMany("OwnerUnits")
                         .HasForeignKey("UnitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Owner");
 
                     b.Navigation("Unit");
                 });
@@ -861,6 +1433,17 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Invoice");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.Signalement", b =>
+                {
+                    b.HasOne("Myb.Coproperty.Models.Coproperty", "Coproperty")
+                        .WithMany()
+                        .HasForeignKey("CopropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coproperty");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.Tenant", b =>
@@ -885,6 +1468,11 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Navigation("Coproperty");
                 });
 
+            modelBuilder.Entity("Myb.Coproperty.Models.Assembly", b =>
+                {
+                    b.Navigation("Attendances");
+                });
+
             modelBuilder.Entity("Myb.Coproperty.Models.Charge", b =>
                 {
                     b.Navigation("Distributions");
@@ -896,6 +1484,8 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                 {
                     b.Navigation("Charges");
 
+                    b.Navigation("Interventions");
+
                     b.Navigation("MaintenanceRequests");
 
                     b.Navigation("Units");
@@ -906,14 +1496,23 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Navigation("Payments");
                 });
 
+            modelBuilder.Entity("Myb.Coproperty.Models.Discussion", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("Myb.Coproperty.Models.FundCall", b =>
                 {
                     b.Navigation("Invoices");
+
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.Owner", b =>
                 {
                     b.Navigation("Invoices");
+
+                    b.Navigation("OwnerUnits");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.Unit", b =>
@@ -922,90 +1521,10 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.Navigation("Invoices");
 
+                    b.Navigation("OwnerUnits");
+
                     b.Navigation("Tenants");
-
-                    b.Navigation("Owners");
                 });
-
-            modelBuilder.Entity("Myb.Coproperty.Models.Signalement", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CopropertyId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ReportedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ReporterName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Zone")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("PhotoUrl")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasDefaultValue("EnCours")
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<int>("ViewsCount")
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-                    b.Property<string>("SyndicComment")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CopropertyId");
-
-                    b.HasIndex("ReportedBy");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("Signalements");
-                });
-
-            modelBuilder.Entity("Myb.Coproperty.Models.Signalement", b =>
-                {
-                    b.HasOne("Myb.Coproperty.Models.Coproperty", "Coproperty")
-                        .WithMany()
-                        .HasForeignKey("CopropertyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Coproperty");
-                });
-
 #pragma warning restore 612, 618
         }
     }

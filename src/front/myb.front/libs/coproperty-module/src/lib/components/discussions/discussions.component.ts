@@ -69,7 +69,7 @@ export class DiscussionsComponent implements OnInit {
   }
 
   private async loadDiscussions(copropertyId: string): Promise<void> {
-    const result: any = await firstValueFrom(this.apollo.query({ query: DISCUSSIONS_QUERY, variables: { copropertyId }, fetchPolicy: 'network-only' }));
+    const result: any = await firstValueFrom(this.apollo.query({ query: DISCUSSIONS_QUERY, variables: { copropertyId }, context: { service: 'copropertyService' }, fetchPolicy: 'network-only' }));
     const rows: any[] = result.data?.discussions || [];
     this.conversations.set(rows.map(c => ({
       id: c.id, copropertyId: c.copropertyId, title: c.title, coproperty: c.coproperty?.name || '',
@@ -87,7 +87,7 @@ export class DiscussionsComponent implements OnInit {
     if (!body || !this.selected()) return;
     this.draft = '';
     try {
-      const result: any = await firstValueFrom(this.apollo.mutate({ mutation: SEND_MESSAGE, variables: { input: { discussionId: this.selectedId(), authorId: this.currentUserId, authorName: this.currentUserName, authorRole: this.isSyndic ? 'syndic' : 'owner', body } } }));
+      const result: any = await firstValueFrom(this.apollo.mutate({ mutation: SEND_MESSAGE, variables: { input: { discussionId: this.selectedId(), authorId: this.currentUserId, authorName: this.currentUserName, authorRole: this.isSyndic ? 'syndic' : 'owner', body } }, context: { service: 'copropertyService' } }));
       const m = result.data.sendDiscussionMessage;
       const message: ChatMessage = { id: m.id, authorId: m.authorId, author: m.authorName, role: m.authorRole, body: m.body, sentAt: m.createdAt };
       this.conversations.update(items => items.map(c => c.id === this.selectedId() ? { ...c, messages: [...c.messages, message] } : c));
@@ -101,7 +101,7 @@ export class DiscussionsComponent implements OnInit {
     if (!this.newTitle.trim() || !this.newCoproperty) return;
     try {
       const title = this.newTitle.trim();
-      const result: any = await firstValueFrom(this.apollo.mutate({ mutation: CREATE_DISCUSSION, variables: { input: { copropertyId: this.newCoproperty, title, kind: this.newKind === 'annonce' ? 'ANNOUNCEMENT' : 'DISCUSSION' } } }));
+      const result: any = await firstValueFrom(this.apollo.mutate({ mutation: CREATE_DISCUSSION, variables: { input: { copropertyId: this.newCoproperty, title, kind: this.newKind === 'annonce' ? 'ANNOUNCEMENT' : 'DISCUSSION' } }, context: { service: 'copropertyService' } }));
       const row = result.data.createDiscussion;
       const name = this.coproperties().find(c => c.id === this.newCoproperty)?.name || '';
       this.conversations.update(items => [{ id: row.id, copropertyId: row.copropertyId, title, coproperty: name, kind: this.newKind, participants: 0, unread: 0, messages: [] }, ...items]);
@@ -110,7 +110,7 @@ export class DiscussionsComponent implements OnInit {
   }
 
   async togglePin(): Promise<void> {
-    try { await firstValueFrom(this.apollo.mutate({ mutation: TOGGLE_PIN, variables: { id: this.selectedId() } })); this.conversations.update(items => items.map(c => c.id === this.selectedId() ? { ...c, pinned: !c.pinned } : c)); }
+    try {       await firstValueFrom(this.apollo.mutate({ mutation: TOGGLE_PIN, variables: { id: this.selectedId() }, context: { service: 'copropertyService' } })); this.conversations.update(items => items.map(c => c.id === this.selectedId() ? { ...c, pinned: !c.pinned } : c)); }
     catch { this.error.set("Impossible de modifier l'épinglage."); }
   }
 

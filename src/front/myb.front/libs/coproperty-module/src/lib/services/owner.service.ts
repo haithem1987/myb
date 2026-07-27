@@ -576,7 +576,11 @@ export class OwnerService {
   createOwner(input: CreateOwnerWithUnitsInput, copropertyId?: string): Observable<Owner> {
     const refetchQueries: any[] = [];
     if (copropertyId) {
-      refetchQueries.push({ query: GET_ALL_OWNERS, variables: { copropertyId } });
+      refetchQueries.push({
+        query: GET_ALL_OWNERS,
+        variables: { copropertyId },
+        context: { service: 'copropertyService' }
+      });
     }
     return this.apollo
       .mutate<{ createOwnerWithUnits: Owner }>({
@@ -597,8 +601,16 @@ export class OwnerService {
   updateOwner(id: string, input: CreateOwnerWithUnitsInput, copropertyId?: string): Observable<Owner> {
     const refetchQueries: any[] = [];
     if (copropertyId) {
-      refetchQueries.push({ query: GET_ALL_OWNERS, variables: { copropertyId } });
-      refetchQueries.push({ query: GET_OWNER_BY_ID, variables: { id } });
+      refetchQueries.push({
+        query: GET_ALL_OWNERS,
+        variables: { copropertyId },
+        context: { service: 'copropertyService' }
+      });
+      refetchQueries.push({
+        query: GET_OWNER_BY_ID,
+        variables: { id },
+        context: { service: 'copropertyService' }
+      });
     }
     return this.apollo
       .mutate<{ updateOwnerWithUnits: Owner }>({
@@ -619,7 +631,11 @@ export class OwnerService {
   deleteOwner(id: string, copropertyId?: string): Observable<boolean> {
     const refetchQueries: any[] = [];
     if (copropertyId) {
-      refetchQueries.push({ query: GET_ALL_OWNERS, variables: { copropertyId } });
+      refetchQueries.push({
+        query: GET_ALL_OWNERS,
+        variables: { copropertyId },
+        context: { service: 'copropertyService' }
+      });
     }
     return this.apollo
       .mutate<{ removeOwner: boolean }>({

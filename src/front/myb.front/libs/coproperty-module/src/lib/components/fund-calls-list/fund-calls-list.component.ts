@@ -870,6 +870,13 @@ export class FundCallsListComponent implements OnInit {
     return fundCall.ownerName || '-';
   }
 
+  getEditingOwnerDisplayName(): string {
+    const fc = this.editingFundCall();
+    if (!fc) return '-';
+    if (!fc.ownerId) return 'Tous les copropriétaires';
+    return this.getOwnerName(fc);
+  }
+
   /**
    * The Amount field on the inline edit panel is only editable while the fund
    * call is awaiting validation ("En attente de validation"). Once published

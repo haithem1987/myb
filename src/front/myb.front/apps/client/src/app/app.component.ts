@@ -21,6 +21,11 @@ export class AppComponent implements OnInit {
   title = 'client';
   private static readonly SUPPORTED_LANGUAGES = ['fr', 'en'];
 
+  private normalizeLanguage(language: string | null): string {
+    const normalized = language?.trim().toLowerCase().split('-')[0] ?? '';
+    return AppComponent.SUPPORTED_LANGUAGES.includes(normalized) ? normalized : 'en';
+  }
+
   constructor(
     private keycloakService: KeycloakService,
     private router: Router,
@@ -51,14 +56,16 @@ export class AppComponent implements OnInit {
       sessionStorage.setItem('language', redirectLanguage);
     }
 
-    const savedLanguage = localStorage.getItem('language') || sessionStorage.getItem('language') || 'en';
+    const savedLanguage = this.normalizeLanguage(
+      localStorage.getItem('language') || sessionStorage.getItem('language') || 'en'
+    );
     this.translate.use(savedLanguage);
     this.translate.onLangChange.subscribe((event) => {
       localStorage.setItem('language', event.lang);
       sessionStorage.setItem('language', event.lang);
     });
     this.languageService.language$.subscribe((lang) => {
-      if (lang && lang !== this.translate.currentLang) {
+      if (lang && AppComponent.SUPPORTED_LANGUAGES.includes(lang) && lang !== this.translate.currentLang) {
         this.translate.use(lang);
       }
     });

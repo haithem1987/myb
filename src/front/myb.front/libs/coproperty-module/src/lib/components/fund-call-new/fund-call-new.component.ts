@@ -70,14 +70,39 @@ export class FundCallNewComponent implements OnInit {
   }
 
   /**
-   * The Amount field is only editable while the fund call is awaiting
-   * validation ("En attente de validation"). Once created with any other
-   * status (or once validated/paid), the amount is locked to prevent
-   * unauthorized changes to the called amount.
+   * The Amount field is read-only in edit mode. Once a fund call is
+   * created, the called amount is fixed to prevent inconsistencies
+   * with already-issued notifications and recorded payments.
    */
   isAmountLocked(): boolean {
-    if (!this.isEditMode()) return false;
-    return this.fundCallForm?.get('status')?.value !== 'PENDING_VALIDATION';
+    return this.isEditMode();
+  }
+
+  /**
+   * Returns the display name of the currently selected owner (for the
+   * read-only owner field in edit mode), or null when the fund call
+   * targets all owners of the coproperty.
+   */
+  selectedOwnerLabel(): string | null {
+    const id: string = this.fundCallForm?.get('ownerId')?.value;
+    if (!id) return null;
+    const owner = this.owners().find((o) => o.id === id);
+    if (!owner) return null;
+    const first = (owner.firstName ?? '').trim();
+    const last = (owner.lastName ?? '').trim();
+    const full = `${first} ${last}`.trim();
+    return full || null;
+  }
+
+  /**
+   * The Owner (Copropriétaire) field is locked once the fund call is being
+   * edited. Changing the target owner on an existing call would silently
+   * retarget every already-sent notification and future payment, so the
+   * field stays visible for reference but is non-editable in update mode.
+   * In create mode the user must still be able to pick an owner.
+   */
+  isOwnerLocked(): boolean {
+    return this.isEditMode();
   }
 
   private initializeForm(): void {

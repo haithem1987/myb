@@ -32,8 +32,8 @@ namespace Myb.Coproperty.Services
         Task<bool> UnassignClientRoleAsync(string userId, string roleName);
 
         /// <summary>
-        /// Verifies the caller's current password and replaces it with a new permanent password.
+        /// Change the authenticated user's password after validating the current password.
         /// </summary>
-        Task ChangeOwnPasswordAsync(string userId, string username, string currentPassword, string newPassword);
+        Task<bool> ChangeOwnPasswordAsync(string userId, string currentPassword, string newPassword, string confirmPassword);
     }
 }

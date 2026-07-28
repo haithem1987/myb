@@ -97,15 +97,8 @@ jobs:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBE_CONFIG_STAGING }}
 
-      - name: Update secrets
-        run: |
-          kubectl create secret generic database-credentials \
-            --from-literal=COPROPERTY_DB_HOST=${{ secrets.DB_HOST }} \
-            --from-literal=COPROPERTY_DB_PASSWORD=${{ secrets.COPROPERTY_DB_PASSWORD }} \
-            --from-literal=INVOICE_DB_PASSWORD=${{ secrets.INVOICE_DB_PASSWORD }} \
-            --from-literal=KEYCLOAK_DB_PASSWORD=${{ secrets.KEYCLOAK_DB_PASSWORD }} \
-            --namespace=${{ env.NAMESPACE }} \
-            --dry-run=client -o yaml | kubectl apply -f -
+      # Kubernetes secrets are provisioned and rotated separately. Do not
+      # recreate them here: this application workflow must only deploy images.
 
       - name: Deploy to Kubernetes
         run: |
@@ -157,15 +150,8 @@ jobs:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBE_CONFIG_PROD }}
 
-      - name: Update secrets
-        run: |
-          kubectl create secret generic database-credentials \
-            --from-literal=COPROPERTY_DB_HOST=${{ secrets.PROD_DB_HOST }} \
-            --from-literal=COPROPERTY_DB_PASSWORD=${{ secrets.PROD_COPROPERTY_DB_PASSWORD }} \
-            --from-literal=INVOICE_DB_PASSWORD=${{ secrets.PROD_INVOICE_DB_PASSWORD }} \
-            --from-literal=KEYCLOAK_DB_PASSWORD=${{ secrets.PROD_KEYCLOAK_DB_PASSWORD }} \
-            --namespace=${{ env.NAMESPACE }} \
-            --dry-run=client -o yaml | kubectl apply -f -
+      # Kubernetes secrets are provisioned and rotated separately. Do not
+      # recreate them here: this application workflow must only deploy images.
 
       - name: Deploy to Kubernetes
         run: |

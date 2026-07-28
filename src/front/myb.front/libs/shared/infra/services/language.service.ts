@@ -11,12 +11,20 @@ export class LanguageService {
   private static readonly SUPPORTED_LANGUAGES = ['fr', 'en'];
   private static readonly DEFAULT_LANGUAGE = 'fr';
 
+  private normalizeLanguage(language: string | null): string {
+    const normalized = language?.trim().toLowerCase().split('-')[0] ?? '';
+    return LanguageService.SUPPORTED_LANGUAGES.includes(normalized)
+      ? normalized
+      : LanguageService.DEFAULT_LANGUAGE;
+  }
+
   constructor(private translate: TranslateService) {
     // Restore language from localStorage (persistent) or sessionStorage (session-only)
-    const savedLanguage =
+    const savedLanguage = this.normalizeLanguage(
       localStorage.getItem(LanguageService.STORAGE_KEY) ??
       sessionStorage.getItem(LanguageService.STORAGE_KEY) ??
-      LanguageService.DEFAULT_LANGUAGE;
+      LanguageService.DEFAULT_LANGUAGE
+    );
 
     this.languageSubject = new BehaviorSubject<string>(savedLanguage);
     this.translate.setDefaultLang(LanguageService.DEFAULT_LANGUAGE);

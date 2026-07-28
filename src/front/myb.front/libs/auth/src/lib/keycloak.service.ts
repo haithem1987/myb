@@ -665,12 +665,15 @@ export class KeycloakService {
   }
 
   async changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Promise<void> {
-    if (!this.currentUserToken) throw new Error('Not authenticated');
+    if (!this.currentUserToken) {
+      throw new Error('Not authenticated');
+    }
 
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.currentUserToken}`,
       'Content-Type': 'application/json',
     });
+
     const body = {
       query: `mutation ChangeOwnPassword($currentPassword: String!, $newPassword: String!, $confirmPassword: String!) {
         changeOwnPassword(
@@ -685,7 +688,11 @@ export class KeycloakService {
     const response: any = await firstValueFrom(
       this.http.post(this.getGraphqlUrl(), body, { headers })
     );
-    if (response?.errors?.length) throw new Error(response.errors[0].message);
+
+    if (response?.errors?.length) {
+      throw new Error(response.errors[0].message);
+    }
+
     if (response?.data?.changeOwnPassword !== true) {
       throw new Error('Password change failed');
     }

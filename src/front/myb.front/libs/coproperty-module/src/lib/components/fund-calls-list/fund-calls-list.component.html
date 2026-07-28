@@ -607,12 +607,9 @@
         <label class="form-label">
           <i class="bi bi-person me-1"></i>Copropriétaire
         </label>
-        <select class="form-select" formControlName="ownerId">
-          <option value="">Tous les copropriétaires</option>
-          <option *ngFor="let owner of editOwners()" [value]="owner.id">
-            {{ owner.firstName }} {{ owner.lastName }}
-          </option>
-        </select>
+        <div class="form-control" role="textbox" aria-readonly="true">
+          {{ getEditingOwnerDisplayName() }}
+        </div>
       </div>
 
       <!-- Amount -->
@@ -622,11 +619,11 @@
         </label>
         <input type="number" class="form-control" step="0.01" min="0.01"
           formControlName="amount"
-          [disabled]="isAmountLocked()"
+          readonly
           [class.is-invalid]="editForm.get('amount')?.invalid && editForm.get('amount')?.touched">
         <div class="invalid-feedback">Montant invalide</div>
-        <small *ngIf="isAmountLocked()" class="form-text text-muted">
-          <i class="bi bi-lock-fill me-1"></i>Le montant ne peut être modifié que lorsque le statut est "En attente de validation".
+        <small class="form-text text-muted">
+          <i class="bi bi-lock-fill me-1"></i>Le montant est en lecture seule et ne peut pas être modifié.
         </small>
       </div>
 

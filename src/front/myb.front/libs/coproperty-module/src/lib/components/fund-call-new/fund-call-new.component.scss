@@ -87,6 +87,28 @@
             box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
           }
         }
+
+        &.is-locked {
+          background-color: #f3f4f6;
+          color: #6b7280;
+          cursor: not-allowed;
+          opacity: 0.85;
+        }
+
+        &.owner-readonly {
+          background-color: #f3f4f6;
+          color: #1f2937;
+          display: flex;
+          align-items: center;
+          min-height: calc(2.25rem + 2px);
+          padding: 0.75rem 1rem;
+        }
+
+        &[readonly] {
+          background-color: #f3f4f6;
+          color: #6b7280;
+          cursor: not-allowed;
+        }
       }
 
       .invalid-feedback {

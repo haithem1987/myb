@@ -39,6 +39,38 @@ namespace Myb.Common.Authentification.Extensions
                 ClientSecret = keycloakSettings.GetSection("ClientSecret").Value,
                 Authority = keycloakSettings.GetSection("Authority").Value,
             };
+
+            var validIssuers = new List<string>();
+            if (!string.IsNullOrWhiteSpace(settings.Authority))
+            {
+                validIssuers.Add(settings.Authority);
+
+                // In local Docker, metadata is resolved via internal host (keycloak)
+                // while tokens are often issued with public localhost issuer.
+                try
+                {
+                    var authorityUri = new Uri(settings.Authority);
+                    if (string.Equals(authorityUri.Host, "keycloak", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var localhostBuilder = new UriBuilder(authorityUri)
+                        {
+                            Host = "localhost"
+                        };
+                        validIssuers.Add(localhostBuilder.Uri.ToString().TrimEnd('/'));
+                    }
+                }
+                catch
+                {
+                    // Keep default authority only if URI parsing fails.
+                }
+            }
+
+            validIssuers = validIssuers
+                .Where(i => !string.IsNullOrWhiteSpace(i))
+                .Select(i => i.TrimEnd('/'))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -47,7 +79,7 @@ namespace Myb.Common.Authentification.Extensions
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = settings.Authority,
+                        ValidIssuers = validIssuers,
                         ValidateIssuer = true,
                         ValidAudiences = new[] { settings.ClientId, "account" },
                         ValidateAudience = true,
@@ -58,6 +90,7 @@ namespace Myb.Common.Authentification.Extensions
                     {
                         OnAuthenticationFailed = c =>
                         {
+                            Console.Error.WriteLine($"[JWT] Authentication failed: {c.Exception.Message}");
                             c.NoResult();
                             return Task.CompletedTask;
                         }

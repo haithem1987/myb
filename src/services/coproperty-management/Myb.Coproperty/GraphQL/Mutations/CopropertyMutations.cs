@@ -72,52 +72,34 @@ namespace Myb.Coproperty.GraphQL.Mutations
             [Service] IKeycloakAdminService keycloakAdminService) =>
             await keycloakAdminService.UnassignClientRoleAsync(userId, roleName);
 
-        /// <summary>
-        /// Changes only the authenticated caller's password. The user id and username
-        /// are derived from the validated bearer token and never accepted from the client.
-        /// </summary>
+        /// <summary>Change current authenticated user's password without leaving the app.</summary>
         public async Task<bool> ChangeOwnPassword(
             string currentPassword,
             string newPassword,
             string confirmPassword,
             ClaimsPrincipal? user,
+            [Service] IHttpContextAccessor httpContextAccessor,
             [Service] IKeycloakAdminService keycloakAdminService)
         {
-            if (!CopropertyAccessControl.IsAuthenticated(user))
-                throw new UnauthorizedAccessException("Authentification requise.");
-            if (newPassword != confirmPassword)
-                throw new InvalidOperationException("Les mots de passe ne correspondent pas.");
+            var effectiveUser = user?.Identity?.IsAuthenticated == true
+                ? user
+                : httpContextAccessor.HttpContext?.User;
 
-            var userId = CopropertyAccessControl.GetUserId(user)?.ToString()
-                ?? throw new UnauthorizedAccessException("Utilisateur authentifié introuvable.");
-            var username = user!.FindFirst("preferred_username")?.Value
-                ?? user.FindFirst(ClaimTypes.Name)?.Value
-                ?? user.FindFirst(ClaimTypes.Email)?.Value
-                ?? throw new UnauthorizedAccessException("Identifiant utilisateur introuvable.");
+            if (effectiveUser?.Identity?.IsAuthenticated != true)
+                throw new InvalidOperationException("Authentification requise.");
 
-            try
-            {
-                await keycloakAdminService.ChangeOwnPasswordAsync(
-                    userId,
-                    username,
-                    currentPassword,
-                    newPassword);
-                return true;
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                throw new GraphQLException(ErrorBuilder.New()
-                    .SetMessage(ex.Message)
-                    .SetCode("PASSWORD_VERIFICATION_FAILED")
-                    .Build());
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new GraphQLException(ErrorBuilder.New()
-                    .SetMessage(ex.Message)
-                    .SetCode("PASSWORD_CHANGE_FAILED")
-                    .Build());
-            }
+            var userId = effectiveUser.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? effectiveUser.FindFirst("sub")?.Value
+                ?? effectiveUser.FindFirst("nameid")?.Value;
+
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new InvalidOperationException("Impossible d'identifier l'utilisateur authentifié.");
+
+            return await keycloakAdminService.ChangeOwnPasswordAsync(
+                userId,
+                currentPassword,
+                newPassword,
+                confirmPassword);
         }
     }
 }

@@ -254,43 +254,95 @@ namespace Myb.Coproperty.Services
             }
         }
 
-        public async Task ChangeOwnPasswordAsync(
-            string userId,
-            string username,
-            string currentPassword,
-            string newPassword)
+        public async Task<bool> ChangeOwnPasswordAsync(string userId, string currentPassword, string newPassword, string confirmPassword)
         {
-            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(username))
-                throw new UnauthorizedAccessException("Utilisateur authentifié introuvable.");
-            if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword))
-                throw new InvalidOperationException("Les mots de passe sont requis.");
-            if (currentPassword == newPassword)
-                throw new InvalidOperationException("Le nouveau mot de passe doit être différent du mot de passe actuel.");
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new InvalidOperationException("Utilisateur introuvable.");
+
+            if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+                throw new InvalidOperationException("Tous les champs de mot de passe sont requis.");
+
+            if (newPassword != confirmPassword)
+                throw new InvalidOperationException("Les mots de passe ne correspondent pas.");
+
+            if (newPassword.Length < 8)
+                throw new InvalidOperationException("Le nouveau mot de passe doit contenir au moins 8 caractères.");
 
             var (adminBaseUrl, realm) = ParseAuthority();
-            await VerifyCurrentPasswordAsync(username, currentPassword);
+            var token = await GetAccessTokenAsync(adminBaseUrl, realm);
 
-            var adminToken = await GetAccessTokenAsync(adminBaseUrl, realm);
-            using var client = CreateAuthorizedClient(adminToken);
-            var url = $"{adminBaseUrl}/admin/realms/{realm}/users/{Uri.EscapeDataString(userId)}/reset-password";
-            using var response = await client.PutAsJsonAsync(url, new
+            // Resolve the user's username/email from Keycloak first.
+            string username;
+            using (var getUserClient = CreateAuthorizedClient(token))
             {
-                type = "password",
-                value = newPassword,
-                temporary = false
-            });
+                var userUrl = $"{adminBaseUrl}/admin/realms/{realm}/users/{Uri.EscapeDataString(userId)}";
+                var userResponse = await getUserClient.GetAsync(userUrl);
+                if (!userResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("ChangeOwnPasswordAsync: could not fetch user '{UserId}': {Status}", userId, userResponse.StatusCode);
+                    throw new InvalidOperationException("Utilisateur introuvable.");
+                }
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var body = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning(
-                    "Keycloak rejected password update for user '{UserId}': {Status} {Body}",
-                    userId,
-                    response.StatusCode,
-                    body);
-                throw new InvalidOperationException(
-                    "Le mot de passe n'a pas pu être modifié. Vérifiez la politique de mot de passe.");
+                var user = await userResponse.Content.ReadFromJsonAsync<KeycloakUserDto>(JsonOptions)
+                    ?? throw new InvalidOperationException("Utilisateur introuvable.");
+
+                username = !string.IsNullOrWhiteSpace(user.Username)
+                    ? user.Username!
+                    : (!string.IsNullOrWhiteSpace(user.Email) ? user.Email! : string.Empty);
             }
+
+            if (string.IsNullOrWhiteSpace(username))
+                throw new InvalidOperationException("Nom d'utilisateur introuvable.");
+
+            // Validate current password by attempting a password grant with the user's credentials.
+            var tokenUrl = $"{_options.Authority}/protocol/openid-connect/token";
+            using (var verifyClient = _httpClientFactory.CreateClient("keycloak-admin"))
+            {
+                var formData = new Dictionary<string, string>
+                {
+                    ["grant_type"] = "password",
+                    ["client_id"] = _options.ClientId,
+                    ["username"] = username,
+                    ["password"] = currentPassword,
+                    ["scope"] = "openid"
+                };
+
+                if (!string.IsNullOrWhiteSpace(_options.ClientSecret))
+                {
+                    formData["client_secret"] = _options.ClientSecret;
+                }
+
+                using var verifyForm = new FormUrlEncodedContent(formData);
+                var verifyResponse = await verifyClient.PostAsync(tokenUrl, verifyForm);
+
+                if (!verifyResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("ChangeOwnPasswordAsync: current password verification failed for user '{UserId}' with status {Status}", userId, verifyResponse.StatusCode);
+                    throw new InvalidOperationException("Le mot de passe actuel est incorrect.");
+                }
+            }
+
+            // Current password is valid; perform admin reset-password as non-temporary.
+            using (var resetClient = CreateAuthorizedClient(token))
+            {
+                var resetUrl = $"{adminBaseUrl}/admin/realms/{realm}/users/{Uri.EscapeDataString(userId)}/reset-password";
+                var payload = JsonContent.Create(new
+                {
+                    type = "password",
+                    value = newPassword,
+                    temporary = false
+                });
+
+                var resetResponse = await resetClient.PutAsync(resetUrl, payload);
+                if (!resetResponse.IsSuccessStatusCode)
+                {
+                    var body = await resetResponse.Content.ReadAsStringAsync();
+                    _logger.LogWarning("ChangeOwnPasswordAsync: reset password failed for user '{UserId}': {Status} {Body}", userId, resetResponse.StatusCode, body);
+                    throw new InvalidOperationException("Le mot de passe n'a pas pu être modifié.");
+                }
+            }
+
+            return true;
         }
 
         // ── Helpers ──────────────────────────────────────────────────────────
@@ -340,35 +392,6 @@ namespace Myb.Coproperty.Services
             _tokenExpiry = DateTimeOffset.UtcNow.AddSeconds(expiresIn - 30);
 
             return _cachedToken;
-        }
-
-        private async Task VerifyCurrentPasswordAsync(string username, string currentPassword)
-        {
-            using var client = _httpClientFactory.CreateClient("keycloak-admin");
-            var values = new Dictionary<string, string>
-            {
-                ["grant_type"] = "password",
-                ["client_id"] = _options.ClientId,
-                ["username"] = username,
-                ["password"] = currentPassword,
-                ["scope"] = "openid"
-            };
-            if (!string.IsNullOrWhiteSpace(_options.ClientSecret))
-                values["client_secret"] = _options.ClientSecret;
-
-            using var response = await client.PostAsync(
-                $"{_options.Authority}/protocol/openid-connect/token",
-                new FormUrlEncodedContent(values));
-
-            if (response.IsSuccessStatusCode)
-                return;
-
-            if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
-                throw new UnauthorizedAccessException("Le mot de passe actuel est incorrect.");
-
-            _logger.LogWarning("Could not verify current password: {Status}", response.StatusCode);
-            throw new InvalidOperationException(
-                "La vérification du mot de passe est indisponible. Vérifiez que Direct Access Grants est activé pour le client Keycloak.");
         }
 
         private async Task EnsureRoleExistsAsync(
@@ -503,6 +526,7 @@ namespace Myb.Coproperty.Services
         private sealed class KeycloakUserDto
         {
             public string Id { get; set; } = "";
+            [JsonPropertyName("username")] public string? Username { get; set; }
             [JsonPropertyName("firstName")] public string? FirstName { get; set; }
             [JsonPropertyName("lastName")] public string? LastName { get; set; }
             [JsonPropertyName("email")] public string? Email { get; set; }

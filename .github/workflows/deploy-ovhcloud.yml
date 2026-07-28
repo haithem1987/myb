@@ -207,7 +207,11 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0.x'
+          # Unit tests currently target .NET 7, 8, and 10.
+          dotnet-version: |
+            7.0.x
+            8.0.x
+            10.0.x
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -216,7 +220,8 @@ jobs:
 
       - name: Run backend tests
         run: |
-          dotnet test src/tests/unit-tests/
+          find src/tests/unit-tests -name '*Tests.csproj' -print0 \
+            | xargs -0 -n1 dotnet test --configuration Release
 
       - name: Run frontend tests
         run: |

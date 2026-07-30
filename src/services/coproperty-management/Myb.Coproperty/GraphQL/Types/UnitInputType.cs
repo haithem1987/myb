@@ -7,6 +7,11 @@ namespace Myb.Coproperty.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<Unit> descriptor)
         {
+            // UnitInput is a public mutation contract. Keep timestamps,
+            // navigation properties, and future persistence-only fields
+            // server-managed by allowing only the fields listed below.
+            descriptor.BindFieldsExplicitly();
+
             descriptor.Field(u => u.Id).Type<IdType>().DefaultValue(Guid.Empty);
             descriptor.Field(u => u.CopropertyId).Type<NonNullType<IdType>>();
             descriptor.Field(u => u.UnitNumber).Type<NonNullType<StringType>>();
@@ -16,14 +21,6 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(u => u.UnitType).Type<StringType>();
             descriptor.Field(u => u.Description).Type<StringType>();
             descriptor.Field(u => u.IsOccupied).Type<BooleanType>().DefaultValue(false);
-            
-            // Ignore navigation properties
-            descriptor.Ignore(u => u.Coproperty);
-            descriptor.Ignore(u => u.Owners);
-            descriptor.Ignore(u => u.OwnerUnits);
-            descriptor.Ignore(u => u.ChargeDistributions);
-            descriptor.Ignore(u => u.Invoices);
-            descriptor.Ignore(u => u.Tenants);
         }
     }
 }

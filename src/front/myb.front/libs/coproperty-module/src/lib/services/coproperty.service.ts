@@ -381,8 +381,9 @@ export class CopropertyService {
       .mutate<{ updateCoproperty: Coproperty }>({
         mutation: UPDATE_COPROPERTY,
         variables: { id, coproperty: input },
-        refetchQueries: [{ query: GET_COPROPERTY, variables: { id } }],
-        awaitRefetchQueries: true,
+        // UPDATE_COPROPERTY already returns the complete updated record. Waiting
+        // for a second request here can incorrectly surface a refetch failure as
+        // a failed save after the backend has committed the update.
         context: { service: 'copropertyService' }
       })
       .pipe(

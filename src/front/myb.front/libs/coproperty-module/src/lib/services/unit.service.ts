@@ -71,11 +71,9 @@ export class UnitService {
       .mutate<{ createUnit: UnitExtended }>({
         mutation: CREATE_UNIT,
         variables: { item: unit },
-        refetchQueries: [
-          { query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId: unit.copropertyId } },
-          { query: GET_ALL_UNITS }
-        ],
-        awaitRefetchQueries: true,
+        // The mutation returns the created unit and callers reload their list
+        // after success. A failed follow-up query must not turn a committed
+        // create into a frontend failure.
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.createUnit));
@@ -86,28 +84,19 @@ export class UnitService {
       .mutate<{ updateUnit: UnitExtended }>({
         mutation: UPDATE_UNIT,
         variables: { item: unit },
-        refetchQueries: [
-          { query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId: unit.copropertyId } },
-          { query: GET_ALL_UNITS },
-          { query: GET_UNIT_BY_ID, variables: { id: unit.id } }
-        ],
-        awaitRefetchQueries: true,
+        // The mutation response is authoritative; callers explicitly reload
+        // after success.
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.updateUnit));
   }
 
-  deleteUnit(id: string, copropertyId?: string): Observable<boolean> {
-    const refetchQueries: any[] = [{ query: GET_ALL_UNITS }];
-    if (copropertyId) {
-      refetchQueries.push({ query: GET_UNITS_BY_COPROPERTY, variables: { copropertyId } });
-    }
+  deleteUnit(id: string): Observable<boolean> {
     return this.apollo
       .mutate<{ deleteUnit: boolean }>({
         mutation: DELETE_UNIT,
         variables: { id },
-        refetchQueries,
-        awaitRefetchQueries: true,
+        // Callers reload only after this mutation has returned success.
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.deleteUnit));

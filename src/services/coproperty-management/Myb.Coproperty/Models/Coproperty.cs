@@ -22,6 +22,8 @@ public class Coproperty : IEntity<Guid>
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
     
     // Optional Foreign Key (if manager is tracked in system)
     public Guid? ManagerId { get; set; }

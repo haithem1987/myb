@@ -3,6 +3,8 @@ using Myb.Common.Messaging;
 using Myb.Common.Messaging.Models;
 using Myb.Coproperty.Infrastructure.Repositories;
 using Myb.Coproperty.Models;
+using Microsoft.EntityFrameworkCore;
+using Myb.Coproperty.Infrastructure.Data;
 
 namespace Myb.Coproperty.Services
 {
@@ -11,12 +13,18 @@ namespace Myb.Coproperty.Services
         private readonly IOwnerRepository _ownerRepository;
         private readonly IEmailPublisher _emailPublisher;
         private readonly KeycloakOptions _keycloakOptions;
+        private readonly IDbContextFactory<CopropertyDbContext> _contextFactory;
 
-        public OwnerService(IOwnerRepository ownerRepository, IEmailPublisher emailPublisher, IOptions<KeycloakOptions> keycloakOptions)
+        public OwnerService(
+            IOwnerRepository ownerRepository,
+            IEmailPublisher emailPublisher,
+            IOptions<KeycloakOptions> keycloakOptions,
+            IDbContextFactory<CopropertyDbContext> contextFactory)
         {
             _ownerRepository = ownerRepository;
             _emailPublisher = emailPublisher;
             _keycloakOptions = keycloakOptions.Value;
+            _contextFactory = contextFactory;
         }
 
         public async Task<Owner> CreateAsync(Owner owner)
@@ -62,7 +70,26 @@ namespace Myb.Coproperty.Services
 
         public async Task DeleteAsync(Guid id)
         {
-            await _ownerRepository.DeleteAsync(id);
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            var owner = await context.Owners
+                .Include(o => o.OwnerUnits)
+                .SingleOrDefaultAsync(o => o.Id == id);
+            if (owner == null)
+                throw new InvalidOperationException($"Owner with ID {id} not found");
+
+            var deletedAt = DateTime.UtcNow;
+            owner.IsDeleted = true;
+            owner.DeletedAt = deletedAt;
+            owner.UpdatedAt = deletedAt;
+            foreach (var link in owner.OwnerUnits.Where(link => link.EndDate == null))
+            {
+                link.EndDate = deletedAt;
+                link.UpdatedAt = deletedAt;
+            }
+
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
 
         public async Task<Owner> GetByIdAsync(Guid id)

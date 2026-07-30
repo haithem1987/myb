@@ -2,6 +2,7 @@ import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface ServiceCard {
   id: string;
@@ -17,7 +18,7 @@ interface ServiceCard {
 @Component({
   selector: 'app-admin-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   template: `
     <div class="admin-home">
       <header class="header">
@@ -32,7 +33,7 @@ interface ServiceCard {
         </div>
         <button class="btn-logout" (click)="logout()">
           <i class="bi bi-box-arrow-right"></i>
-          Logout
+          {{ 'navigation.logout' | translate }}
         </button>
       </header>
 

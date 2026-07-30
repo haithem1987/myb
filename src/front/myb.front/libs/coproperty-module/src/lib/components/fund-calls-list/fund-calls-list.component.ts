@@ -58,7 +58,7 @@ export class FundCallsListComponent implements OnInit {
   searchTerm = signal<string>('');
   filterStatus = signal<string>('');
   filterOwnerId = signal<string>('');
-  filterYear = signal<number | null>(null);
+  filterYear = signal<number | null>(new Date().getFullYear());
 
   // ── Inline edit panel state ──────────────────────────────────────────────
   showEditPanel = signal<boolean>(false);
@@ -103,8 +103,22 @@ export class FundCallsListComponent implements OnInit {
   readonly statusLabels = FUND_CALL_STATUS_LABELS;
   readonly statusBadge = FUND_CALL_STATUS_BADGE;
 
-  /** Available years (last 5 years + current) for dropdown */
-  readonly availableYears: number[] = Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - i);
+  /** Current/recent years plus any years present in loaded data, newest first. */
+  get availableYears(): number[] {
+    const currentYear = new Date().getFullYear();
+    const years = new Set<number>(
+      Array.from({ length: 11 }, (_, index) => currentYear - index)
+    );
+
+    for (const fundCall of this.fundCalls()) {
+      const year = fundCall.dueDate
+        ? new Date(fundCall.dueDate as any).getFullYear()
+        : Number.NaN;
+      if (Number.isInteger(year)) years.add(year);
+    }
+
+    return [...years].sort((a, b) => b - a);
+  }
 
   /**
    * Get today's date formatted as yyyy-MM-dd for HTML5 date input
@@ -324,6 +338,73 @@ export class FundCallsListComponent implements OnInit {
 
   getTotalRemainingAmount(): number {
     return Math.max(0, this.getTotalAmount() - this.getTotalPaidAmount());
+  }
+
+  private getTotalAmountDisplay(
+    amountSelector: (fundCall: FundCallExtended) => number,
+    fundCalls: FundCallExtended[] = this.filteredFundCalls
+  ): string {
+    const totals = new Map<string, number>();
+    for (const fundCall of fundCalls) {
+      const currency = fundCall.currency
+        ?? this.coproperties().find(c => c.id === fundCall.copropertyId)?.currency
+        ?? this.currencyService.current;
+      totals.set(currency, (totals.get(currency) ?? 0) + amountSelector(fundCall));
+    }
+
+    if (totals.size === 0) {
+      const currency = this.coproperties()
+        .find(c => c.id === this.selectedCopropertyId())?.currency;
+      return this.currencyService.formatAmount(0, currency);
+    }
+
+    return [...totals.entries()]
+      .map(([currency, amount]) => this.currencyService.formatAmount(amount, currency))
+      .join(' · ');
+  }
+
+  getCalledAmountDisplay(): string {
+    return this.getTotalAmountDisplay(fundCall => {
+      const amount = typeof fundCall.amount === 'string'
+        ? parseFloat(fundCall.amount as any)
+        : fundCall.amount || 0;
+      return Number.isNaN(amount) ? 0 : amount;
+    });
+  }
+
+  getPaidAmountDisplay(): string {
+    return this.getTotalAmountDisplay(fundCall =>
+      this.getFundCallPaidAmount(fundCall)
+    );
+  }
+
+  getRemainingAmountDisplay(): string {
+    return this.getTotalAmountDisplay(fundCall => {
+      const amount = typeof fundCall.amount === 'string'
+        ? parseFloat(fundCall.amount as any)
+        : fundCall.amount || 0;
+      return Math.max(
+        0,
+        (Number.isNaN(amount) ? 0 : amount) - this.getFundCallPaidAmount(fundCall)
+      );
+    });
+  }
+
+  getOverdueAmountDisplay(): string {
+    return this.getTotalAmountDisplay(
+      fundCall => this.getRemainingAmount(fundCall),
+      this.overdueFundCalls
+    );
+  }
+
+  getFundCallPaidAmount(fundCall: FundCallExtended): number {
+    return (fundCall.payments ?? []).reduce((sum, payment) => {
+      const rawAmount = payment.amount as number | string;
+      const amount = typeof rawAmount === 'string'
+        ? parseFloat(rawAmount)
+        : rawAmount || 0;
+      return sum + (Number.isNaN(amount) ? 0 : amount);
+    }, 0);
   }
 
   getToPayCount(): number {
@@ -557,13 +638,20 @@ export class FundCallsListComponent implements OnInit {
    */
   promptBulkCancelFundCall(fundCalls: FundCallExtended[]): void {
     if (!fundCalls.length) return;
-    const totalAmount = fundCalls.reduce((sum, fc) => {
-      const n = typeof fc.amount === 'string' ? parseFloat(fc.amount as any) : (fc.amount ?? 0);
-      return sum + (isNaN(n) ? 0 : n);
-    }, 0);
 
     this.fundCallModalService
-      .openCancelForBulk(fundCalls, this.formatAmount(totalAmount))
+      .openCancelForBulk(
+        fundCalls,
+        this.getTotalAmountDisplay(
+          fundCall => {
+            const amount = typeof fundCall.amount === 'string'
+              ? parseFloat(fundCall.amount as any)
+              : fundCall.amount ?? 0;
+            return Number.isNaN(amount) ? 0 : amount;
+          },
+          fundCalls
+        )
+      )
       .then((reason) => {
         if (!reason) return;
         this.bulkCancelWithReason(fundCalls, reason);
@@ -955,8 +1043,10 @@ export class FundCallsListComponent implements OnInit {
     return Math.max(0, total - this.getTotalPayments(fc));
   }
 
-  formatAmount(amount: number | string | undefined | null): string {
-    return this.currencyService.formatAmount(amount);
+  formatAmount(amount: number | string | undefined | null, currency?: string): string {
+    const selectedCurrency = this.coproperties()
+      .find(c => c.id === this.selectedCopropertyId())?.currency;
+    return this.currencyService.formatAmount(amount, currency ?? selectedCurrency);
   }
 
   formatDate(date: Date | string | undefined): string {
@@ -1009,11 +1099,6 @@ export class FundCallsListComponent implements OnInit {
       .map((id) => this.fundCalls().find((f) => f.id === id))
       .filter((fc): fc is FundCallExtended => !!fc);
 
-    const totalAmount = selectedFundCalls.reduce((sum, fc) => {
-      const n = typeof fc.amount === 'string' ? parseFloat(fc.amount as any) : (fc.amount ?? 0);
-      return sum + (isNaN(n) ? 0 : n);
-    }, 0);
-
     const statusBadgeHtml = (s: string) =>
       `<span class="badge ${this.getStatusBadge(s)}">${this.escapeHtml(this.getStatusLabel(s))}</span>`;
 
@@ -1052,7 +1137,15 @@ export class FundCallsListComponent implements OnInit {
             Vous allez modifier le statut de
             <strong>${selectedFundCalls.length}</strong> appel(s) de fonds
             pour un montant total de
-            <strong>${this.formatAmount(totalAmount)}</strong>.
+            <strong>${this.getTotalAmountDisplay(
+              fundCall => {
+                const amount = typeof fundCall.amount === 'string'
+                  ? parseFloat(fundCall.amount as any)
+                  : fundCall.amount ?? 0;
+                return Number.isNaN(amount) ? 0 : amount;
+              },
+              selectedFundCalls
+            )}</strong>.
           </p>
           ${impactNote}
           <ul class="list-unstyled mb-3 px-2 py-2 bg-light rounded">

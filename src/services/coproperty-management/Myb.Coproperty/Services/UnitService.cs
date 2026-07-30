@@ -48,7 +48,8 @@ namespace Myb.Coproperty.Services
                 throw new InvalidOperationException($"Unit with ID {id} not found");
             }
 
-            var hasOwners = _unitRepository.GetAll().Any(u => u.Id == id && u.OwnerUnits.Any());
+            var hasOwners = _unitRepository.GetAll()
+                .Any(u => u.Id == id && u.OwnerUnits.Any(ou => ou.EndDate == null));
             if (hasOwners)
             {
                 throw new InvalidOperationException(

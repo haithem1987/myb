@@ -102,6 +102,10 @@ export interface CopropertyInvoice {
   paymentMethod?: string;
   description?: string;
   notes?: string;
+  ownerNameSnapshot?: string;
+  copropertyNameSnapshot?: string;
+  unitNumberSnapshot?: string;
+  currency?: Currency;
   createdAt: Date;
 }
 

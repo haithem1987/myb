@@ -15,6 +15,8 @@ public class Owner : IEntity<Guid>
     public string? Phone { get; set; }
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
     
     // Navigation Properties
     public ICollection<OwnerUnit> OwnerUnits { get; set; } = new List<OwnerUnit>();

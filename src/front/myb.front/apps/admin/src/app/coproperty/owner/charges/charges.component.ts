@@ -92,13 +92,12 @@ export class OwnerChargesComponent implements OnInit {
   }
 
   get unpaidFundCalls(): FundCallExtended[] {
-    return this.fundCalls().filter(fc => fc.status === 'TO_PAY');
+    return this.fundCalls().filter(fc => fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION');
   }
 
-  /** PENDING_VALIDATION calls are included so the card stays visible while awaiting syndic review */
   get paidFundCalls(): FundCallExtended[] {
     return this.fundCalls().filter(
-      fc => fc.status === 'PAID' || fc.status === 'VALIDATED' || fc.status === 'PENDING_VALIDATION'
+      fc => fc.status === 'PAID' || fc.status === 'VALIDATED'
     );
   }
 
@@ -166,7 +165,9 @@ export class OwnerChargesComponent implements OnInit {
   }
 
   getFundCallPaidAmount(fc: FundCallExtended): number {
-    return (fc.payments || []).reduce((sum, p) => sum + p.amount, 0);
+    return (fc.payments || [])
+      .filter(p => p.validationStatus !== 'Rejected')
+      .reduce((sum, p) => sum + p.amount, 0);
   }
 
   getFundCallRemainingAmount(fc: FundCallExtended): number {
@@ -385,12 +386,14 @@ export class OwnerChargesComponent implements OnInit {
     return fc.status === 'TO_PAY' && new Date(fc.dueDate) < new Date();
   }
 
-  formatAmount(amount: number): string {
-    return this.currencyService.formatAmount(amount);
+  formatAmount(amount: number, currency?: string): string {
+    return this.currencyService.formatAmount(amount, currency);
   }
 
   get currencySymbol(): string {
-    return this.currencyService.symbol;
+    return this.currencyService.getSymbol(
+      this.selectedFundCall()?.currency ?? this.fundCalls()[0]?.currency
+    );
   }
 
   formatDate(date: Date | string): string {

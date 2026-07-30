@@ -3,8 +3,8 @@
   <aside class="sidebar">
     <div class="logo">
       <img src="assets/MYB-LOGO-dark.png" alt="MYB" class="logo-image">
-      <span class="role-badge">Syndic</span>
-      <button class="btn-close-sidebar" (click)="toggleSidebar()" title="Fermer le menu">
+      <span class="role-badge">{{ 'navigation.syndic' | translate }}</span>
+      <button class="btn-close-sidebar" (click)="toggleSidebar()" [title]="'navigation.closeMenu' | translate">
         <i class="bi bi-chevron-left"></i>
       </button>
     </div>
@@ -15,7 +15,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-speedometer2"></i>
-        <span class="nav-text">Tableau de bord</span>
+        <span class="nav-text">{{ 'navigation.dashboard' | translate }}</span>
       </a>
       
       <a routerLink="/coproperty/syndic/coproperties" 
@@ -23,7 +23,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-building"></i>
-        <span class="nav-text">Copropriétés</span>
+        <span class="nav-text">{{ 'navigation.coproperties' | translate }}</span>
         <span class="badge" *ngIf="managedCoproperties() > 0">
           {{ managedCoproperties() }}
         </span>
@@ -34,7 +34,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-cash-stack"></i>
-        <span class="nav-text">Lignes budgétaires & Répartition</span>
+        <span class="nav-text">{{ 'navigation.budgetsAndAllocation' | translate }}</span>
         <span class="badge" *ngIf="totalBudgets() > 0">
           {{ totalBudgets() }}
         </span>
@@ -45,7 +45,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-building"></i>
-        <span class="nav-text">Lots</span>
+        <span class="nav-text">{{ 'navigation.units' | translate }}</span>
         <span class="badge" *ngIf="totalUnits() > 0">
           {{ totalUnits() }}
         </span>
@@ -56,7 +56,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-person-badge"></i>
-        <span class="nav-text">Copropriétaires</span>
+        <span class="nav-text">{{ 'navigation.owners' | translate }}</span>
       </a>
 
       <a routerLink="/coproperty/syndic/tenants"
@@ -64,7 +64,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-person-lines-fill"></i>
-        <span class="nav-text">Locataires</span>
+        <span class="nav-text">{{ 'navigation.tenants' | translate }}</span>
       </a>
       
       <!-- Invoice service is separate - commented out
@@ -96,7 +96,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-calendar-check"></i>
-        <span class="nav-text">Appels de Fonds</span>
+        <span class="nav-text">{{ 'navigation.fundCalls' | translate }}</span>
       </a>
 
       <a routerLink="/coproperty/syndic/charge-payments" 
@@ -104,7 +104,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-credit-card-2-front"></i>
-        <span class="nav-text">Paiements Charges</span>
+        <span class="nav-text">{{ 'navigation.chargePayments' | translate }}</span>
       </a>
 
       <a routerLink="/coproperty/syndic/interventions" 
@@ -112,7 +112,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-wrench-adjustable"></i>
-        <span class="nav-text">Interventions</span>
+        <span class="nav-text">{{ 'navigation.interventions' | translate }}</span>
       </a>
 
       <a routerLink="/coproperty/syndic/signalements" 
@@ -120,7 +120,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-megaphone"></i>
-        <span class="nav-text">Signalements</span>
+        <span class="nav-text">{{ 'navigation.reports' | translate }}</span>
       </a>
 
       <a routerLink="/coproperty/syndic/discussions"
@@ -128,7 +128,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-chat-square-text"></i>
-        <span class="nav-text">Discussions</span>
+        <span class="nav-text">{{ 'navigation.discussions' | translate }}</span>
       </a>
 
       <a routerLink="/coproperty/syndic/settings" 
@@ -136,7 +136,7 @@
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-gear"></i>
-        <span class="nav-text">Paramètres</span>
+        <span class="nav-text">{{ 'navigation.settings' | translate }}</span>
       </a>
       
       <!-- Hidden: Assemblées Générales
@@ -160,9 +160,9 @@
     
     <div class="sidebar-footer">
       <!-- Switch to coproprietaire space if user has dual role -->
-      <button class="btn-switch-role" *ngIf="isCoproprietaire()" (click)="switchToOwnerSpace(); onNavItemClick()" title="Mon espace Copropriétaire">
+      <button class="btn-switch-role" *ngIf="isCoproprietaire()" (click)="switchToOwnerSpace(); onNavItemClick()" [title]="'navigation.ownerSpace' | translate">
         <i class="bi bi-person-badge"></i>
-        <span class="nav-text">Espace Copropriétaire</span>
+        <span class="nav-text">{{ 'navigation.ownerSpace' | translate }}</span>
       </button>
 
       <div class="user-info" *ngIf="currentUser()">
@@ -171,12 +171,12 @@
         </div>
         <div class="user-details">
           <div class="user-name">{{ currentUser().firstName }} {{ currentUser().lastName }}</div>
-          <div class="user-role">Syndic</div>
+          <div class="user-role">{{ 'navigation.syndic' | translate }}</div>
         </div>
       </div>
       <button class="btn-logout" (click)="logout()">
         <i class="bi bi-box-arrow-right"></i>
-        <span class="nav-text">Déconnexion</span>
+        <span class="nav-text">{{ 'navigation.logout' | translate }}</span>
       </button>
     </div>
   </aside>

@@ -62,16 +62,16 @@
             aria-labelledby="navbarDropdown"
             class="dropdown-menu-end"
           >
-            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#">{{ 'navigation.profile' | translate }}</a></li>
             <li>
               <a class="dropdown-item" [routerLink]="'/subscriptions'">
-                My subscriptions
+                {{ 'navigation.subscriptions' | translate }}
               </a>
             </li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">{{ 'navigation.settings' | translate }}</a></li>
             <li><hr class="dropdown-divider" /></li>
             <li>
-              <a class="dropdown-item" href="#" (click)="logout()">Logout</a>
+              <a class="dropdown-item" href="#" (click)="logout()">{{ 'navigation.logout' | translate }}</a>
             </li>
           </ul>
         </li>

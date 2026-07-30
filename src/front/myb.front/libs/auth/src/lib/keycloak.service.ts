@@ -190,7 +190,7 @@ export class KeycloakService {
 
   /** @deprecated Use registerWithRedirect instead */
   register(): void {
-    this.keycloak.register();
+    this.registerWithRedirect();
   }
 
   /**

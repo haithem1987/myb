@@ -32,7 +32,8 @@ namespace Myb.Coproperty.Infrastructure.Repositories
             return await GetAll()
                 .Include(o => o.OwnerUnits)
                     .ThenInclude(ou => ou.Unit)
-                .Where(o => o.OwnerUnits.Any(ou => ou.Unit.CopropertyId == copropertyId))
+                .Where(o => o.OwnerUnits.Any(ou =>
+                    ou.Unit.CopropertyId == copropertyId && ou.EndDate == null))
                 .ToListAsync();
         }
 
@@ -41,7 +42,7 @@ namespace Myb.Coproperty.Infrastructure.Repositories
             return await GetAll()
                 .Include(o => o.OwnerUnits)
                     .ThenInclude(ou => ou.Unit)
-                .Where(o => o.OwnerUnits.Any(ou => ou.UnitId == unitId))
+                .Where(o => o.OwnerUnits.Any(ou => ou.UnitId == unitId && ou.EndDate == null))
                 .ToListAsync();
         }
     }

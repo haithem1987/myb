@@ -127,7 +127,7 @@
               </div>
               <div class="ms-3">
                 <h6 class="text-muted mb-0">{{ 'coproperty.charge.totalBudgets' | translate }}</h6>
-                <h3 class="mb-0">{{ formatAmount(getTotalBudgetAmount()) }}</h3>
+                <h3 class="mb-0">{{ getTotalBudgetDisplay() }}</h3>
               </div>
             </div>
           </div>
@@ -235,7 +235,7 @@
                   </span>
                 </td>
                 <td>
-                  <strong>{{ formatAmount(charge.totalAmount) }}</strong>
+                  <strong>{{ formatAmount(charge.totalAmount, charge.currency) }}</strong>
                 </td>
                 <td>
                   {{ charge.frequency }}

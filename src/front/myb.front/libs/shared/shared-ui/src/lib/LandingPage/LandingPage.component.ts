@@ -34,14 +34,14 @@ export class LandingPageComponent implements OnDestroy {
 
   aboutSection: FooterSection = {
     title: '',
-    content: `M.Y.B (Manage Your Business) is an all-in-one platform designed to simplify business operations. From invoicing to time management and document handling, M.Y.B offers intuitive tools that enhance productivity for companies of all sizes, helping you focus on growth.`,
+    content: '',
     module2: '',
     module3: '',
   };
 
   servicesSection: FooterSection = {
     title: '',
-    content: 'Timesheet | Invoice | Document',
+    content: '',
     module2: 'TimeSheet',
     module3: 'Documents',
   };
@@ -51,44 +51,35 @@ export class LandingPageComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(private translate: TranslateService) {
+    this.updateFooterTranslations();
+
+    this.translate.onLangChange.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updateFooterTranslations();
+    });
+  }
+
+  private updateFooterTranslations(): void {
     this.translate
       .get([
         'FOOTER_ABOUT_TITLE',
+        'FOOTER_ABOUT_CONTENT',
         'FOOTER_SERVICES_TITLE',
+        'FOOTER_SERVICES_CONTENT',
         'FOOTER_COPYRIGHT',
-        'FOOTER_TAGLINE',
       ])
-      .subscribe((translations: any) => {
+      .subscribe((translations: Record<string, string>) => {
         this.aboutSection = {
           ...this.aboutSection,
           title: translations['FOOTER_ABOUT_TITLE'],
+          content: translations['FOOTER_ABOUT_CONTENT'],
         };
         this.servicesSection = {
           ...this.servicesSection,
           title: translations['FOOTER_SERVICES_TITLE'],
+          content: translations['FOOTER_SERVICES_CONTENT'],
         };
         this.copyRightText = translations['FOOTER_COPYRIGHT'];
       });
-
-    this.translate.onLangChange.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.translate
-        .get([
-          'FOOTER_ABOUT_TITLE',
-          'FOOTER_SERVICES_TITLE',
-          'FOOTER_COPYRIGHT',
-        ])
-        .subscribe((translations: any) => {
-          this.aboutSection = {
-            ...this.aboutSection,
-            title: translations['FOOTER_ABOUT_TITLE'],
-          };
-          this.servicesSection = {
-            ...this.servicesSection,
-            title: translations['FOOTER_SERVICES_TITLE'],
-          };
-          this.copyRightText = translations['FOOTER_COPYRIGHT'];
-        });
-    });
   }
 
   ngOnDestroy(): void {

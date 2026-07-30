@@ -92,17 +92,11 @@ export class ChargeDistributionComponent implements OnInit {
   totalShares: number = 0;
   totalArea: number = 0;
 
-  years: number[] = [];
-
   // Computed total from budgets for the selected coproperty & year
   calculatedTotal = signal<number>(0);
 
   constructor() {
     const currentYear = new Date().getFullYear();
-    for (let i = currentYear - 2; i <= currentYear + 5; i++) {
-      this.years.push(i);
-    }
-
     this.repartitionForm = this.fb.group({
       copropertyId: ['', Validators.required],
       year: [currentYear.toString(), Validators.required],
@@ -262,12 +256,29 @@ export class ChargeDistributionComponent implements OnInit {
     );
   }
 
+  get years(): number[] {
+    const currentYear = new Date().getFullYear();
+    const years = new Set<number>(
+      Array.from({ length: 11 }, (_, index) => currentYear - index)
+    );
+
+    for (const charge of this.charges()) {
+      const year = new Date(charge.startDate).getFullYear();
+      if (Number.isInteger(year)) years.add(year);
+    }
+
+    return [...years].sort((a, b) => b - a);
+  }
+
   get currencySymbol(): string {
-    return this.currencyService.symbol;
+    return this.currencyService.getSymbol(this.selectedCoproperty()?.currency);
   }
 
   formatAmount(amount: number): string {
-    return this.currencyService.formatAmount(amount);
+    return this.currencyService.formatAmount(
+      amount,
+      this.selectedCoproperty()?.currency
+    );
   }
 
   // Distribution calculation logic

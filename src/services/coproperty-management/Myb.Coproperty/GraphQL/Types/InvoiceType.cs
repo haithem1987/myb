@@ -18,6 +18,9 @@ public class InvoiceType : ObjectType<CopropertyInvoice>
         descriptor.Field(x => x.ChargeId).Description("Associated charge ID");
         descriptor.Field(x => x.UnitId).Description("Unit ID");
         descriptor.Field(x => x.OwnerId).Description("Owner ID");
+        descriptor.Field(x => x.OwnerNameSnapshot).Description("Historical owner name");
+        descriptor.Field(x => x.CopropertyNameSnapshot).Description("Historical coproperty name");
+        descriptor.Field(x => x.UnitNumberSnapshot).Description("Historical unit number");
         descriptor.Field(x => x.Amount).Description("Base amount");
         descriptor.Field(x => x.TaxAmount).Description("Tax amount");
         descriptor.Field(x => x.TotalAmount).Description("Total amount due");
@@ -47,10 +50,10 @@ public class InvoiceType : ObjectType<CopropertyInvoice>
         public Currency GetCurrency([Parent] CopropertyInvoice invoice, [Service] CopropertyDbContext context)
         {
             var charge = context.Charges.FirstOrDefault(c => c.Id == invoice.ChargeId);
-            if (charge == null) return Currency.EUR;
+            if (charge == null) return invoice.CurrencySnapshot;
             
             var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == charge.CopropertyId);
-            return coproperty?.Currency ?? Currency.EUR;
+            return coproperty?.Currency ?? invoice.CurrencySnapshot;
         }
     }
 }

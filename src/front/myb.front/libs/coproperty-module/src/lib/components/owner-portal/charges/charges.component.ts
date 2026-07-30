@@ -89,7 +89,9 @@ export class OwnerChargesComponent implements OnInit {
 
   get unpaidFundCalls(): FundCallExtended[] {
     if (this.filterStatus() === 'paid') return [];
-    return this.fundCalls().filter(fc => fc.status === 'TO_PAY' && this.matchesFilters(fc));
+    return this.fundCalls().filter(
+      fc => (fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION') && this.matchesFilters(fc)
+    );
   }
 
   get paidFundCalls(): FundCallExtended[] {
@@ -138,7 +140,8 @@ export class OwnerChargesComponent implements OnInit {
 
   /** True once every fund call (ignoring active filters) has been settled. */
   get allFundCallsPaid(): boolean {
-    return this.fundCalls().length > 0 && !this.fundCalls().some(fc => fc.status === 'TO_PAY');
+    return this.fundCalls().length > 0 &&
+      this.fundCalls().every(fc => fc.status === 'PAID' || fc.status === 'VALIDATED');
   }
 
   ngOnInit(): void {
@@ -199,7 +202,9 @@ export class OwnerChargesComponent implements OnInit {
   }
 
   getFundCallPaidAmount(fc: FundCallExtended): number {
-    return (fc.payments || []).reduce((sum, p) => sum + p.amount, 0);
+    return (fc.payments || [])
+      .filter(p => p.validationStatus !== 'Rejected')
+      .reduce((sum, p) => sum + p.amount, 0);
   }
 
   getFundCallRemainingAmount(fc: FundCallExtended): number {
@@ -402,12 +407,14 @@ export class OwnerChargesComponent implements OnInit {
     return fc.status === 'TO_PAY' && new Date(fc.dueDate) < new Date();
   }
 
-  formatAmount(amount: number): string {
-    return this.currencyService.formatAmount(amount);
+  formatAmount(amount: number, currency?: string): string {
+    return this.currencyService.formatAmount(amount, currency);
   }
 
   get currencySymbol(): string {
-    return this.currencyService.symbol;
+    return this.currencyService.getSymbol(
+      this.selectedFundCall()?.currency ?? this.fundCalls()[0]?.currency
+    );
   }
 
   formatDate(date: Date | string): string {

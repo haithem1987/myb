@@ -40,6 +40,7 @@ public class InvoiceRepository : IInvoiceRepository
     public async Task<CopropertyInvoice?> GetByIdAsync(Guid id)
     {
         return await _context.CopropertyInvoices
+            .IgnoreQueryFilters()
             .Include(i => i.Unit)
             .Include(i => i.Owner)
             .Include(i => i.Charge)
@@ -53,6 +54,7 @@ public class InvoiceRepository : IInvoiceRepository
     public async Task<List<CopropertyInvoice>> GetByUnitIdAsync(Guid unitId)
     {
         return await _context.CopropertyInvoices
+            .IgnoreQueryFilters()
             .Where(i => i.UnitId == unitId)
             .Include(i => i.Owner)
             .Include(i => i.Charge)
@@ -67,6 +69,7 @@ public class InvoiceRepository : IInvoiceRepository
     public async Task<List<CopropertyInvoice>> GetByCopropertyIdAsync(Guid copropertyId)
     {
         return await _context.CopropertyInvoices
+            .IgnoreQueryFilters()
             .Where(i => i.Charge.CopropertyId == copropertyId)
             .Include(i => i.Unit)
             .Include(i => i.Owner)
@@ -83,6 +86,7 @@ public class InvoiceRepository : IInvoiceRepository
     {
         var now = DateTime.UtcNow;
         return await _context.CopropertyInvoices
+            .IgnoreQueryFilters()
             .Where(i => i.Charge.CopropertyId == copropertyId &&
                        (i.Status == InvoiceStatus.Pending || i.Status == InvoiceStatus.PartiallyPaid) &&
                        i.DueDate < now)
@@ -100,6 +104,7 @@ public class InvoiceRepository : IInvoiceRepository
     public async Task<List<CopropertyInvoice>> GetUnpaidInvoicesAsync(Guid copropertyId)
     {
         return await _context.CopropertyInvoices
+            .IgnoreQueryFilters()
             .Where(i => i.Charge.CopropertyId == copropertyId &&
                        (i.Status == InvoiceStatus.Pending || i.Status == InvoiceStatus.PartiallyPaid || i.Status == InvoiceStatus.Overdue))
             .Include(i => i.Unit)
@@ -149,6 +154,7 @@ public class InvoiceRepository : IInvoiceRepository
     public async Task<List<CopropertyInvoice>> GetByChargeIdAsync(Guid chargeId)
     {
         return await _context.CopropertyInvoices
+            .IgnoreQueryFilters()
             .Where(i => i.ChargeId == chargeId)
             .Include(i => i.Unit)
             .Include(i => i.Owner)
@@ -163,6 +169,7 @@ public class InvoiceRepository : IInvoiceRepository
     public async Task<List<CopropertyInvoice>> GetByStatusAsync(InvoiceStatus status)
     {
         return await _context.CopropertyInvoices
+            .IgnoreQueryFilters()
             .Where(i => i.Status == status)
             .Include(i => i.Unit)
             .Include(i => i.Owner)
@@ -178,6 +185,7 @@ public class InvoiceRepository : IInvoiceRepository
     public async Task<List<CopropertyInvoice>> GetByOwnerUserIdAsync(Guid ownerUserId)
     {
         return await _context.CopropertyInvoices
+            .IgnoreQueryFilters()
             .Where(i => i.Owner.UserId == ownerUserId)
             .Include(i => i.Unit)
             .Include(i => i.Owner)

@@ -238,6 +238,7 @@ public class FundCallService : IFundCallService
             existingFundCall.Status = input.Status ?? existingFundCall.Status;
             existingFundCall.UpdatedAt = DateTime.UtcNow;
             existingFundCall.CopropertyNameSnapshot = coproperty.Name;
+            existingFundCall.CurrencySnapshot = coproperty.Currency;
             if (ownerNameSnapshot != null)
                 existingFundCall.OwnerNameSnapshot = ownerNameSnapshot;
         try
@@ -287,7 +288,8 @@ public class FundCallService : IFundCallService
             CreatedBy = Guid.TryParse(userId, out var userGuid) ? userGuid : Guid.Empty,
             UpdatedAt = DateTime.UtcNow,
             CopropertyNameSnapshot = coproperty.Name,
-            OwnerNameSnapshot = ownerNameSnapshot
+            OwnerNameSnapshot = ownerNameSnapshot,
+            CurrencySnapshot = coproperty.Currency
         };
 
         context.FundCalls.Add(fundCall);
@@ -318,6 +320,13 @@ public class FundCallService : IFundCallService
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {id} not found");
 
+        if (fundCall.Status != FundCallStatus.PendingValidation &&
+            fundCall.Amount != input.Amount)
+        {
+            throw new InvalidOperationException(
+                "Le montant d'un appel de fonds ne peut être modifié que lorsqu'il est en attente de validation.");
+        }
+
         fundCall.Amount = input.Amount;
         fundCall.DueDate = input.DueDate;
         fundCall.Description = input.Description;
@@ -337,11 +346,12 @@ public class FundCallService : IFundCallService
         {
             fundCall.OwnerNameSnapshot = null;
         }
-        if (string.IsNullOrEmpty(fundCall.CopropertyNameSnapshot))
+        var snapshotCoproperty = await context.Coproperties
+            .FirstOrDefaultAsync(c => c.Id == fundCall.CopropertyId);
+        if (snapshotCoproperty != null)
         {
-            var coproperty = await context.Coproperties.FirstOrDefaultAsync(c => c.Id == fundCall.CopropertyId);
-            if (coproperty != null)
-                fundCall.CopropertyNameSnapshot = coproperty.Name;
+            fundCall.CopropertyNameSnapshot = snapshotCoproperty.Name;
+            fundCall.CurrencySnapshot = snapshotCoproperty.Currency;
         }
 
         await context.SaveChangesAsync();
@@ -556,6 +566,7 @@ public class FundCallService : IFundCallService
         using var context = _contextFactory.CreateDbContext();
 
         return await context.FundCalls
+            .IgnoreQueryFilters()
             .Include(f => f.Coproperty)
             .Include(f => f.Owner)
             .Include(f => f.Invoices)
@@ -570,6 +581,7 @@ public class FundCallService : IFundCallService
         try
         {
             var query = context.FundCalls
+                .IgnoreQueryFilters()
                 .Where(f => f.CopropertyId == copropertyId)
                 .AsQueryable();
 
@@ -602,6 +614,7 @@ public class FundCallService : IFundCallService
         using var context = _contextFactory.CreateDbContext();
 
         return await context.FundCalls
+            .IgnoreQueryFilters()
             .Include(f => f.Owner)
             .Include(f => f.Invoices)
             .Include(f => f.Payments)
@@ -617,15 +630,19 @@ public class FundCallService : IFundCallService
         // linked to the same Keycloak user (handles duplicate owner records and
         // cases where the fund call was created under a different owner record for
         // the same physical person).
-        var owner = await context.Owners.FindAsync(ownerId);
+        var owner = await context.Owners
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(o => o.Id == ownerId);
         if (owner == null) return new List<FundCall>();
 
         var allOwnerIds = await context.Owners
+            .IgnoreQueryFilters()
             .Where(o => o.UserId == owner.UserId)
             .Select(o => o.Id)
             .ToListAsync();
 
         return await context.FundCalls
+            .IgnoreQueryFilters()
             .Where(f => f.OwnerId.HasValue && allOwnerIds.Contains(f.OwnerId.Value) && f.IsActive)
             .Include(f => f.Coproperty)
             .Include(f => f.Owner)
@@ -675,22 +692,12 @@ public class FundCallService : IFundCallService
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {fundCallId} not found");
 
-        // Resolve the paying owner: prefer the owner linked on the fund call, fall back to
-        // the Keycloak user ID of whoever is calling this mutation (supports generic fund calls
-        // where OwnerId is null = applies to all owners).
         var payingUserGuid = Guid.TryParse(userId, out var userGuidParsed) ? userGuidParsed : Guid.Empty;
 
-        var effectiveOwnerId = fundCall.OwnerId;
-        if (!effectiveOwnerId.HasValue && payingUserGuid != Guid.Empty)
-        {
-            var ownerByUser = await context.Owners
-                .FirstOrDefaultAsync(o => o.UserId == payingUserGuid);
-            if (ownerByUser != null)
-                effectiveOwnerId = ownerByUser.Id;
-        }
-
         // Calculate remaining amount and prevent overpayment
-        var existingTotal = fundCall.Payments.Sum(p => p.Amount);
+        var existingTotal = fundCall.Payments
+            .Where(p => p.ValidationStatus != "Rejected")
+            .Sum(p => p.Amount);
         var remaining = fundCall.Amount - existingTotal;
 
         if (remaining <= 0)
@@ -722,155 +729,10 @@ public class FundCallService : IFundCallService
         fundCall.Status = FundCallStatus.PendingValidation;
         fundCall.UpdatedAt = DateTime.UtcNow;
 
-        // Sync payment to charge distributions for this owner/coproperty
-        // This ensures coherence between fund call payments and charge payment statuses
-        if (effectiveOwnerId.HasValue)
-        {
-            // Get all unit IDs owned by this owner in this coproperty
-            var ownerUnitIds = await context.OwnerUnits
-                .Where(ou => ou.OwnerId == effectiveOwnerId.Value)
-                .Join(context.Units,
-                    ou => ou.UnitId,
-                    u => u.Id,
-                    (ou, u) => new { ou.UnitId, u.CopropertyId })
-                .Where(x => x.CopropertyId == fundCall.CopropertyId)
-                .Select(x => x.UnitId)
-                .ToListAsync();
-
-            if (ownerUnitIds.Count > 0)
-            {
-                // Get unpaid charge distributions for these units, ordered by oldest first (FIFO)
-                var unpaidDistributions = await context.ChargeDistributions
-                    .Include(cd => cd.Charge)
-                    .Include(cd => cd.Unit)
-                    .Where(cd => ownerUnitIds.Contains(cd.UnitId)
-                        && cd.Charge.CopropertyId == fundCall.CopropertyId
-                        && cd.PaymentStatus != ChargePaymentStatus.Paid)
-                    .OrderBy(cd => cd.CalculatedAt)
-                    .ToListAsync();
-
-                // Calculate the starting sequence number ONCE before the loop to avoid
-                // duplicate InvoiceNumber when multiple invoices are created in the same
-                // transaction (EF hasn't flushed yet so CountAsync returns the same value
-                // on every iteration, causing a unique constraint violation).
-                var invoiceSeqBase = await context.CopropertyInvoices
-                    .CountAsync(i => i.CopropertyId == fundCall.CopropertyId);
-                var invoiceSeqCounter = invoiceSeqBase;
-
-                // Distribute payment across unpaid distributions (FIFO)
-                var remainingPayment = input.Amount;
-                foreach (var dist in unpaidDistributions)
-                {
-                    if (remainingPayment <= 0) break;
-
-                    var amountDue = dist.Amount - dist.PaidAmount;
-                    var payAmount = Math.Min(remainingPayment, amountDue);
-
-                    dist.PaidAmount += payAmount;
-                    dist.PaidAt = input.PaymentDate;
-                    dist.PaymentMethod = input.PaymentMethod ?? "Virement";
-                    // PaymentTransactionId column is VARCHAR(200) — the user-supplied
-                    // justificatif (which may include bank info, file name, etc.) is
-                    // truncated to fit and still be useful for reconciliation. The full
-                    // original text is preserved on the FundCallPayment.Justificatif field.
-                    var paymentReference = input.Justificatif ?? $"FC-{fundCallId}";
-                    dist.PaymentTransactionId = paymentReference.Length > 200
-                        ? paymentReference.Substring(0, 200)
-                        : paymentReference;
-                    dist.UpdatedAt = DateTime.UtcNow;
-
-                    if (dist.PaidAmount >= dist.Amount)
-                        dist.PaymentStatus = ChargePaymentStatus.Paid;
-                    else if (dist.PaidAmount > 0)
-                        dist.PaymentStatus = ChargePaymentStatus.PartiallyPaid;
-
-                    // Generate a payment receipt (CopropertyInvoice) for this distribution
-                    var unitNumber = dist.Unit?.UnitNumber ?? "";
-                    var chargeName = dist.Charge?.Name ?? fundCall.Description ?? "Charge";
-
-                    // Check if a pending invoice already exists for this distribution
-                    var existingInvoice = await context.CopropertyInvoices
-                        .FirstOrDefaultAsync(i =>
-                            i.CopropertyId == fundCall.CopropertyId &&
-                            i.UnitId == dist.UnitId &&
-                            i.OwnerId == effectiveOwnerId.Value &&
-                            i.ChargeId == dist.ChargeId &&
-                            i.Status != InvoiceStatus.Paid);
-
-                    if (existingInvoice != null)
-                    {
-                        // Update existing invoice to reflect payment
-                        existingInvoice.Status = dist.PaymentStatus == ChargePaymentStatus.Paid
-                            ? InvoiceStatus.Paid : InvoiceStatus.PartiallyPaid;
-                        existingInvoice.PaidDate = input.PaymentDate;
-                        existingInvoice.PaymentMethod = input.PaymentMethod ?? "Virement";
-                        existingInvoice.Notes = input.Justificatif ?? $"FC-{fundCallId}";
-                        existingInvoice.UpdatedAt = DateTime.UtcNow;
-                    }
-                    else
-                    {
-                        // Increment counter for each new invoice to guarantee unique InvoiceNumber
-                        invoiceSeqCounter++;
-                        var receipt = new CopropertyInvoice
-                        {
-                            Id = Guid.NewGuid(),
-                            CopropertyId = fundCall.CopropertyId,
-                            ChargeId = dist.ChargeId,
-                            UnitId = dist.UnitId,
-                            OwnerId = effectiveOwnerId.Value,
-                            InvoiceNumber = $"PAY-{invoiceSeqCounter:D4}-{unitNumber}",
-                            Amount = payAmount,
-                            TaxAmount = 0,
-                            TotalAmount = payAmount,
-                            InvoiceDate = input.PaymentDate,
-                            DueDate = input.PaymentDate,
-                            Status = dist.PaymentStatus == ChargePaymentStatus.Paid
-                                ? InvoiceStatus.Paid : InvoiceStatus.PartiallyPaid,
-                            PaidDate = input.PaymentDate,
-                            PaymentMethod = input.PaymentMethod ?? "Virement",
-                            Description = $"Appel de fonds - {chargeName} - Lot {unitNumber}",
-                            Notes = input.Justificatif ?? $"FC-{fundCallId}",
-                            CreatedAt = DateTime.UtcNow,
-                            CreatedBy = payingUserGuid
-                        };
-                        context.CopropertyInvoices.Add(receipt);
-                    }
-
-                    remainingPayment -= payAmount;
-                }
-
-                // If no distributions were found (no charges yet), create a standalone receipt
-                if (unpaidDistributions.Count == 0)
-                {
-                    var ownerUnit = await context.Units
-                        .Where(u => ownerUnitIds.Contains(u.Id))
-                        .FirstOrDefaultAsync();
-                    var unitNumber = ownerUnit?.UnitNumber ?? "";
-                    invoiceSeqCounter++;
-                    var receipt = new CopropertyInvoice
-                    {
-                        Id = Guid.NewGuid(),
-                        CopropertyId = fundCall.CopropertyId,
-                        UnitId = ownerUnit?.Id ?? Guid.Empty,
-                        OwnerId = effectiveOwnerId.Value,
-                        InvoiceNumber = $"PAY-{invoiceSeqCounter:D4}-{unitNumber}",
-                        Amount = input.Amount,
-                        TaxAmount = 0,
-                        TotalAmount = input.Amount,
-                        InvoiceDate = input.PaymentDate,
-                        DueDate = input.PaymentDate,
-                        Status = InvoiceStatus.Paid,
-                        PaidDate = input.PaymentDate,
-                        PaymentMethod = input.PaymentMethod ?? "Virement",
-                        Description = $"Appel de fonds - {fundCall.Description} - Lot {unitNumber}",
-                        Notes = input.Justificatif ?? $"FC-{fundCallId}",
-                        CreatedAt = DateTime.UtcNow,
-                        CreatedBy = payingUserGuid
-                    };
-                    context.CopropertyInvoices.Add(receipt);
-                }
-            }
-        }
+        // A submitted proof is only a payment claim until the syndic approves it.
+        // Do not mutate charge distributions or generate accounting receipts here:
+        // those side effects made proof submission fail on unrelated invoice
+        // constraints and incorrectly accounted unapproved payments.
 
         await context.SaveChangesAsync();
 
@@ -1159,6 +1021,7 @@ public class FundCallService : IFundCallService
         using var context = _contextFactory.CreateDbContext();
 
         var ownerIds = await context.Owners
+            .IgnoreQueryFilters()
             .Where(o => o.UserId == ownerUserId)
             .Select(o => o.Id)
             .ToListAsync();
@@ -1166,6 +1029,7 @@ public class FundCallService : IFundCallService
         if (!ownerIds.Any()) return new List<FundCallPayment>();
 
         return await context.FundCallPayments
+            .IgnoreQueryFilters()
             .Include(p => p.FundCall)
                 .ThenInclude(f => f.Coproperty)
             .Where(p => p.FundCall != null
@@ -1226,6 +1090,10 @@ public class FundCallService : IFundCallService
                     DueDate = fundCall.DueDate,
                     Status = InvoiceStatus.Pending,
                     Description = fundCall.Description,
+                    OwnerNameSnapshot = $"{owner.FirstName} {owner.LastName}".Trim(),
+                    CopropertyNameSnapshot = coproperty.Name,
+                    UnitNumberSnapshot = unit.UnitNumber,
+                    CurrencySnapshot = coproperty.Currency,
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = Guid.TryParse(userId, out var userGuid) ? userGuid : Guid.Empty
                 };

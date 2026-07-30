@@ -8,11 +8,12 @@ import { AvatarComponent } from '../avatar/avatar.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router, RouterModule } from '@angular/router';
 import { SubscriptionService } from 'libs/shared/infra/services/subscription.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-front-user-dropdown',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgbDropdownModule, AvatarComponent],
+  imports: [CommonModule, RouterModule, NgbDropdownModule, AvatarComponent, TranslateModule],
   templateUrl: './user-dropdown.component.html',
   styleUrl: './user-dropdown.component.css',
 })
@@ -82,16 +83,27 @@ export class UserDropdownComponent implements OnInit {
     return origin;
   }
 
+  private withPreferredLanguage(url: string): string {
+    const language =
+      localStorage.getItem('language') ??
+      sessionStorage.getItem('language') ??
+      document.documentElement.lang ??
+      'fr';
+    const target = new URL(url, window.location.origin);
+    target.searchParams.set('app_lang', language.split('-')[0]);
+    return target.toString();
+  }
+
   navigateToProfile(): void {
-    window.location.href = this.clientAppUrl + '/profile';
+    window.location.href = this.withPreferredLanguage(this.clientAppUrl + '/profile');
   }
 
   navigateToSubscriptions(): void {
-    window.location.href = this.clientAppUrl + '/subscriptions';
+    window.location.href = this.withPreferredLanguage(this.clientAppUrl + '/subscriptions');
   }
 
   navigateToClientApp(): void {
-    window.location.href = this.clientAppUrl;
+    window.location.href = this.withPreferredLanguage(this.clientAppUrl);
   }
 
   logout(): void {

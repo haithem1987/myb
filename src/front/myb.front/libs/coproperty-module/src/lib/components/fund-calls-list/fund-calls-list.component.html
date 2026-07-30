@@ -115,7 +115,7 @@
             </div>
             <div class="ms-3">
               <h6 class="text-muted mb-0">Montant Appelé</h6>
-              <h3 class="mb-0">{{ formatAmount(getTotalAmount()) }}</h3>
+              <h3 class="mb-0">{{ getCalledAmountDisplay() }}</h3>
               <small class="text-muted">{{ filteredFundCalls.length }} appel(s)</small>
             </div>
           </div>
@@ -132,7 +132,7 @@
             </div>
             <div class="ms-3">
               <h6 class="text-muted mb-0">Encaissé</h6>
-              <h3 class="mb-0">{{ formatAmount(getTotalPaidAmount()) }}</h3>
+              <h3 class="mb-0">{{ getPaidAmountDisplay() }}</h3>
               <small class="text-muted">{{ getPaidCount() }} réglé(s)</small>
             </div>
           </div>
@@ -149,7 +149,7 @@
             </div>
             <div class="ms-3">
               <h6 class="text-muted mb-0">Reste à percevoir</h6>
-              <h3 class="mb-0">{{ formatAmount(getTotalRemainingAmount()) }}</h3>
+              <h3 class="mb-0">{{ getRemainingAmountDisplay() }}</h3>
               <small class="text-muted">{{ getToPayCount() }} en attente</small>
             </div>
           </div>
@@ -197,7 +197,7 @@
           </h6>
           <p class="mb-0 small">
             <strong>{{ getOverdueCount() }}</strong> appel(s) de fonds en retard de paiement pour un montant total impayé de
-            <strong class="text-danger">{{ formatAmount(getTotalOverdueAmount()) }}</strong>.
+            <strong class="text-danger">{{ getOverdueAmountDisplay() }}</strong>.
             Veuillez relancer les copropriétaires concernés.
           </p>
         </div>
@@ -294,7 +294,7 @@
                 <div class="fw-semibold">{{ fundCall.description || '-' }}</div>
               </td>
               <td>
-                <strong>{{ formatAmount(fundCall.amount) }}</strong>
+                <strong>{{ formatAmount(fundCall.amount, fundCall.currency) }}</strong>
               </td>
               <td>{{ formatDate(fundCall.dueDate) }}
                 <span *ngIf="isOverdue(fundCall)" class="badge ms-1" [ngClass]="getOverdueBadgeClass(fundCall)">
@@ -320,9 +320,9 @@
                         [class.text-success]="prog.percent >= 100"
                         [class.text-warning]="prog.percent > 0 && prog.percent < 100"
                         [class.text-danger]="prog.percent === 0">
-                        {{ formatAmount(prog.paid) }}
+                        {{ formatAmount(prog.paid, fundCall.currency) }}
                       </span>
-                      <span class="text-muted"> / {{ formatAmount(prog.total) }}</span>
+                      <span class="text-muted"> / {{ formatAmount(prog.total, fundCall.currency) }}</span>
                     </div>
                     <div class="progress" style="height:5px">
                       <div class="progress-bar"
@@ -416,9 +416,9 @@
           <div class="d-flex justify-content-between small fw-semibold mb-1">
             <span [class.text-success]="getRemainingAmount(editingFundCall()!) === 0"
                   [class.text-warning]="getRemainingAmount(editingFundCall()!) > 0">
-              {{ formatAmount(getTotalPayments(editingFundCall()!)) }}
+              {{ formatAmount(getTotalPayments(editingFundCall()!), editingFundCall()!.currency) }}
             </span>
-            <span class="text-muted">/ {{ formatAmount(editingFundCall()!.amount) }}</span>
+            <span class="text-muted">/ {{ formatAmount(editingFundCall()!.amount, editingFundCall()!.currency) }}</span>
           </div>
           <div class="progress" style="height:6px">
             <div class="progress-bar"
@@ -432,7 +432,7 @@
             [class.text-danger]="getRemainingAmount(editingFundCall()!) > 0"
             [class.text-success]="getRemainingAmount(editingFundCall()!) === 0">
             <ng-container *ngIf="getRemainingAmount(editingFundCall()!) > 0">
-              Reste : {{ formatAmount(getRemainingAmount(editingFundCall()!)) }}
+              Reste : {{ formatAmount(getRemainingAmount(editingFundCall()!), editingFundCall()!.currency) }}
             </ng-container>
             <ng-container *ngIf="getRemainingAmount(editingFundCall()!) === 0">
               <i class="bi bi-check-circle-fill me-1"></i>Soldé
@@ -462,7 +462,7 @@
              [class.border-danger]="payment.validationStatus === 'Rejected'">
           <div class="d-flex justify-content-between align-items-start">
             <div>
-              <div class="fw-semibold">{{ formatAmount(payment.amount) }}</div>
+              <div class="fw-semibold">{{ formatAmount(payment.amount, editingFundCall()!.currency) }}</div>
               <div class="small text-muted">
                 <i class="bi bi-calendar2 me-1"></i>{{ formatDate(payment.paymentDate) }}
               </div>
@@ -619,11 +619,11 @@
         </label>
         <input type="number" class="form-control" step="0.01" min="0.01"
           formControlName="amount"
-          readonly
+          [readonly]="isAmountLocked()"
           [class.is-invalid]="editForm.get('amount')?.invalid && editForm.get('amount')?.touched">
         <div class="invalid-feedback">Montant invalide</div>
-        <small class="form-text text-muted">
-          <i class="bi bi-lock-fill me-1"></i>Le montant est en lecture seule et ne peut pas être modifié.
+        <small *ngIf="isAmountLocked()" class="form-text text-muted">
+          <i class="bi bi-lock-fill me-1"></i>Le montant ne peut être modifié qu'en attente de validation.
         </small>
       </div>
 

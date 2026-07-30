@@ -41,14 +41,18 @@ export class CurrencyService {
     this.currencySubject.next(currency);
   }
 
-  formatAmount(amount: number | string | undefined | null): string {
+  formatAmount(
+    amount: number | string | undefined | null,
+    currency: Currency | string = this.current
+  ): string {
     const value = typeof amount === 'string' ? parseFloat(amount) : (amount ?? 0);
-    if (isNaN(value)) return '0,00 ' + this.symbol;
+    const currencyCode = currency as Currency;
+    if (isNaN(value)) return '0,00 ' + this.getSymbol(currencyCode);
 
-    const locale = CURRENCY_LOCALES[this.current] ?? 'fr-FR';
+    const locale = CURRENCY_LOCALES[currencyCode] ?? 'fr-FR';
     return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: this.current,
+      currency: currencyCode,
     }).format(value);
   }
 

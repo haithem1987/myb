@@ -82,7 +82,11 @@ public class FinanceService : IFinanceService
         using var context = _contextFactory.CreateDbContext();
         
         var charge = await context.Charges
+            .Include(c => c.Coproperty)
             .Include(c => c.Distributions)
+                .ThenInclude(d => d.Unit)
+                    .ThenInclude(u => u.OwnerUnits)
+                        .ThenInclude(ou => ou.Owner)
             .FirstOrDefaultAsync(c => c.Id == chargeId);
 
         if (charge == null)
@@ -95,6 +99,18 @@ public class FinanceService : IFinanceService
 
         foreach (var distribution in distributions)
         {
+            var unit = distribution.Unit;
+            var owner = unit.OwnerUnits
+                .Where(link => link.EndDate == null)
+                .OrderByDescending(link => link.IsMainOwner)
+                .Select(link => link.Owner)
+                .FirstOrDefault();
+
+            // An invoice must always have a real owner. An unassigned unit can
+            // receive its invoice after an owner is assigned.
+            if (owner == null)
+                continue;
+
             // Calculate invoice amount based on distribution
             var invoiceAmount = distribution.Percentage > 0 
                 ? (charge.TotalAmount * distribution.Percentage) / 100 
@@ -108,7 +124,7 @@ public class FinanceService : IFinanceService
                 CopropertyId = charge.CopropertyId,
                 ChargeId = chargeId,
                 UnitId = distribution.UnitId,
-                OwnerId = Guid.Empty,
+                OwnerId = owner.Id,
                 Amount = invoiceAmount,
                 TaxAmount = 0, // Calculate based on tax settings
                 TotalAmount = invoiceAmount,
@@ -117,6 +133,10 @@ public class FinanceService : IFinanceService
                 Status = InvoiceStatus.Pending,
                 CreatedBy = Guid.TryParse(createdBy, out var userGuid) ? userGuid : Guid.Empty,
                 Description = charge.Description,
+                OwnerNameSnapshot = $"{owner.FirstName} {owner.LastName}".Trim(),
+                CopropertyNameSnapshot = charge.Coproperty.Name,
+                UnitNumberSnapshot = unit.UnitNumber,
+                CurrencySnapshot = charge.Coproperty.Currency,
                 CreatedAt = DateTime.UtcNow
             };
 

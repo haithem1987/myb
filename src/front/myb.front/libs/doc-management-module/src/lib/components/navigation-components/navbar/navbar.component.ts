@@ -6,12 +6,13 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { KeycloakProfile } from 'keycloak-js';
 import { Observable } from 'rxjs';
 import { NavLinksComponent } from '../nav-links/nav-links.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
   selector: 'myb-front-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgbDropdownModule , NavLinksComponent],
+  imports: [CommonModule, RouterModule, NgbDropdownModule, NavLinksComponent, TranslateModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })

@@ -13,6 +13,10 @@ public class CopropertyInvoice : IEntity<Guid>
     public Guid ChargeId { get; set; }
     public Guid UnitId { get; set; }
     public Guid OwnerId { get; set; }
+    public string? OwnerNameSnapshot { get; set; }
+    public string? CopropertyNameSnapshot { get; set; }
+    public string? UnitNumberSnapshot { get; set; }
+    public Currency CurrencySnapshot { get; set; } = Currency.EUR;
 
     /// <summary>Optional link to the fund call that produced this invoice.
     /// Nullable because some invoices are created independently of a fund call

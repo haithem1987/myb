@@ -33,10 +33,10 @@ public class PaymentType : ObjectType<Payment>
             if (invoice == null) return Currency.EUR;
             
             var charge = context.Charges.FirstOrDefault(c => c.Id == invoice.ChargeId);
-            if (charge == null) return Currency.EUR;
+            if (charge == null) return invoice.CurrencySnapshot;
             
             var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == charge.CopropertyId);
-            return coproperty?.Currency ?? Currency.EUR;
+            return coproperty?.Currency ?? invoice.CurrencySnapshot;
         }
     }
 }

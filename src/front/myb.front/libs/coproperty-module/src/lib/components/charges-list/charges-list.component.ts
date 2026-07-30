@@ -41,7 +41,6 @@ export class ChargesListComponent implements OnInit {
   filterFrequency = signal<string>(this.currentYear);
 
   chargeTypes = ['CLEANING', 'MAINTENANCE', 'INSURANCE', 'ELEVATOR', 'HEATING', 'WATER', 'ELECTRICITY', 'GARDENING', 'SECURITY', 'OTHER'];
-  frequencies = this.generateFrequencyOptions();
 
   ngOnInit(): void {
     if (this.route.snapshot.routeConfig?.path === 'distribution') {
@@ -87,9 +86,25 @@ export class ChargesListComponent implements OnInit {
     });
   }
 
-  private generateFrequencyOptions(): string[] {
-    const baseYear = new Date().getFullYear();
-    return Array.from({ length: 11 }, (_, index) => (baseYear - 5 + index).toString());
+  get frequencies(): string[] {
+    const currentYear = new Date().getFullYear();
+    const years = new Set<number>(
+      Array.from({ length: 11 }, (_, index) => currentYear - index)
+    );
+
+    for (const charge of this.charges()) {
+      const frequencyYear = Number(charge.frequency);
+      const startDateYear = charge.startDate
+        ? new Date(charge.startDate).getFullYear()
+        : Number.NaN;
+
+      if (Number.isInteger(frequencyYear)) years.add(frequencyYear);
+      if (Number.isInteger(startDateYear)) years.add(startDateYear);
+    }
+
+    return [...years]
+      .sort((a, b) => b - a)
+      .map(String);
   }
 
   loadCoproperties(): void {
@@ -123,7 +138,8 @@ export class ChargesListComponent implements OnInit {
             this.chargeService.getChargesByCoproperty(coproperty.id).pipe(
               map(charges => ({
                 charges,
-                copropertyName: coproperty.name
+                copropertyName: coproperty.name,
+                copropertyCurrency: coproperty.currency
               }))
             )
           );
@@ -132,7 +148,8 @@ export class ChargesListComponent implements OnInit {
             map(results => results.flatMap(result =>
               result.charges.map(charge => ({
                 ...charge,
-                copropertyName: result.copropertyName
+                copropertyName: result.copropertyName,
+                currency: charge.currency ?? result.copropertyCurrency
               } as any))
             ))
           );
@@ -169,7 +186,8 @@ export class ChargesListComponent implements OnInit {
             const coproperty = this.coproperties().find(c => c.id === copropertyId);
             const chargesWithCoproperty = charges.map(charge => ({
               ...charge,
-              copropertyName: coproperty?.name || ''
+              copropertyName: coproperty?.name || '',
+              currency: charge.currency ?? coproperty?.currency
             } as any));
             this.charges.set(chargesWithCoproperty);
             this.loading.set(false);
@@ -230,6 +248,21 @@ export class ChargesListComponent implements OnInit {
     return this.filteredCharges.filter(charge => charge.frequency === currentYear).length;
   }
 
+  get selectedCurrency(): string | undefined {
+    const selectedId = this.selectedCopropertyId();
+    return this.coproperties().find(c => c.id === selectedId)?.currency;
+  }
+
+  getTotalBudgetDisplay(): string {
+    return this.formatCurrencyGroups(
+      this.filteredCharges.map(charge => ({
+        amount: charge.totalAmount || 0,
+        currency: charge.currency
+          ?? this.coproperties().find(c => c.id === charge.copropertyId)?.currency
+      }))
+    );
+  }
+
   viewCharge(charge: ChargeExtended): void {
     // Navigate to coproperty detail with charges tab
     this.router.navigate(['/coproperty/syndic/coproperties', charge.copropertyId], { 
@@ -275,8 +308,26 @@ export class ChargesListComponent implements OnInit {
     return (charge as any).copropertyName || '';
   }
 
-  formatAmount(amount: number): string {
-    return this.currencyService.formatAmount(amount);
+  formatAmount(amount: number, currency?: string): string {
+    return this.currencyService.formatAmount(amount, currency);
+  }
+
+  private formatCurrencyGroups(
+    values: Array<{ amount: number; currency?: string }>
+  ): string {
+    const totals = new Map<string, number>();
+    for (const value of values) {
+      const currency = value.currency ?? this.currencyService.current;
+      totals.set(currency, (totals.get(currency) ?? 0) + value.amount);
+    }
+
+    if (totals.size === 0) {
+      return this.currencyService.formatAmount(0, this.selectedCurrency);
+    }
+
+    return [...totals.entries()]
+      .map(([currency, amount]) => this.currencyService.formatAmount(amount, currency))
+      .join(' · ');
   }
 
   deleteCharge(charge: ChargeExtended): void {

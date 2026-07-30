@@ -21,12 +21,12 @@
     >
       <li *ngIf="isSystemAdmin && !isAdminApp">
         <a class="dropdown-item" href="/admin/home">
-          <i class="bi bi-grid-3x3-gap-fill me-2"></i>Espace Admin
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i>{{ 'navigation.adminSpace' | translate }}
         </a>
       </li>
       <li *ngIf="isAdminApp">
         <a class="dropdown-item" href="#" (click)="$event.preventDefault(); navigateToClientApp()">
-          <i class="bi bi-house-fill me-2"></i>Espace Client
+          <i class="bi bi-house-fill me-2"></i>{{ 'navigation.clientSpace' | translate }}
         </a>
       </li>
       <!--
@@ -37,30 +37,30 @@
       -->
       <li *ngIf="isCopropertyOwner">
         <a class="dropdown-item" href="/coproperty/owner/dashboard">
-          <i class="bi bi-building me-2"></i>Espace Propriétaire
+          <i class="bi bi-building me-2"></i>{{ 'navigation.ownerSpace' | translate }}
         </a>
       </li>
       <li *ngIf="isCopropertyMember && !isAdminApp">
         <a class="dropdown-item" routerLink="/coproperty/syndic/dashboard">
-          <i class="bi bi-buildings me-2"></i>Espace Syndic
+          <i class="bi bi-buildings me-2"></i>{{ 'navigation.syndicSpace' | translate }}
         </a>
       </li>
       <li *ngIf="isSystemAdmin || isCopropertyOwner || isCopropertyMember"><hr class="dropdown-divider" /></li>
       <li *ngIf="!isProfilePage">
         <a class="dropdown-item" href="/profile" (click)="$event.preventDefault(); navigateToProfile()">
-          <i class="bi bi-person-circle me-2"></i>Mon Profil
+          <i class="bi bi-person-circle me-2"></i>{{ 'navigation.profile' | translate }}
         </a>
       </li>
       <li *ngIf="isProfilePage" class="dropdown-item disabled">
-        <i class="bi bi-person-circle me-2"></i>Mon Profil
+        <i class="bi bi-person-circle me-2"></i>{{ 'navigation.profile' | translate }}
       </li>
       <li *ngIf="hasSubscriptions && !isSubscriptionsPage">
         <a class="dropdown-item" href="/subscriptions" (click)="$event.preventDefault(); navigateToSubscriptions()">
-          <i class="bi bi-credit-card me-2"></i>My subscriptions
+          <i class="bi bi-credit-card me-2"></i>{{ 'navigation.subscriptions' | translate }}
         </a>
       </li>
       <li *ngIf="hasSubscriptions && isSubscriptionsPage" class="dropdown-item disabled">
-        <i class="bi bi-credit-card me-2"></i>My subscriptions
+        <i class="bi bi-credit-card me-2"></i>{{ 'navigation.subscriptions' | translate }}
       </li>
       <li><hr class="dropdown-divider" /></li>
       <li>
@@ -68,7 +68,7 @@
           class="dropdown-item"
           href="#"
           (click)="$event.stopPropagation(); logout()"
-          >Logout</a
+          >{{ 'navigation.logout' | translate }}</a
         >
       </li>
     </ul>

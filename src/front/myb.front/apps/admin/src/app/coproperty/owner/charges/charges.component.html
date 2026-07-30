@@ -103,13 +103,13 @@
               <span class="detail-label">
                 <i class="bi bi-cash me-1"></i> Montant total
               </span>
-              <span class="detail-value">{{ formatAmount(fc.amount) }}</span>
+              <span class="detail-value">{{ formatAmount(fc.amount, fc.currency) }}</span>
             </div>
             <div class="detail-row" *ngIf="getFundCallPaidAmount(fc) > 0">
               <span class="detail-label">
                 <i class="bi bi-check2 me-1"></i> Déjà payé
               </span>
-              <span class="detail-value text-success">{{ formatAmount(getFundCallPaidAmount(fc)) }}</span>
+              <span class="detail-value text-success">{{ formatAmount(getFundCallPaidAmount(fc), fc.currency) }}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">
@@ -127,7 +127,7 @@
             <small class="text-muted fw-bold">Versements effectués:</small>
             <div class="payments-list">
               <div class="payment-item" *ngFor="let p of fc.payments">
-                <span class="payment-amount">{{ formatAmount(p.amount) }}</span>
+                <span class="payment-amount">{{ formatAmount(p.amount, fc.currency) }}</span>
                 <span class="payment-info">
                   <i class="bi" [ngClass]="getPaymentMethodIcon(p.paymentMethod || '')"></i>
                   {{ p.paymentMethod || '-' }} · {{ formatDate(p.paymentDate) }}
@@ -155,11 +155,11 @@
         <div class="charge-footer">
           <div class="amount-section">
             <div class="amount-label">RESTE À PAYER</div>
-            <div class="amount-value">{{ formatAmount(getFundCallRemainingAmount(fc)) }}</div>
+            <div class="amount-value">{{ formatAmount(getFundCallRemainingAmount(fc), fc.currency) }}</div>
             <div class="monthly-hint" *ngIf="getMonthsUntilDue(fc) > 1">
               <small class="text-info">
                 <i class="bi bi-calendar2-week me-1"></i>
-                ~{{ formatAmount(getSuggestedMonthlyAmount(fc)) }}/mois
+                ~{{ formatAmount(getSuggestedMonthlyAmount(fc), fc.currency) }}/mois
               </small>
             </div>
           </div>
@@ -198,11 +198,11 @@
               <strong>{{ fc.description || 'Appel de fonds' }}</strong>
             </td>
             <td>{{ fc.copropertyName || '-' }}</td>
-            <td class="text-end">{{ formatAmount(fc.amount) }}</td>
+            <td class="text-end">{{ formatAmount(fc.amount, fc.currency) }}</td>
             <td>{{ formatDate(fc.dueDate) }}</td>
             <td>
               <div *ngFor="let p of fc.payments" class="small">
-                {{ formatAmount(p.amount) }} · {{ p.paymentMethod || '-' }} · {{ formatDate(p.paymentDate) }}
+                {{ formatAmount(p.amount, fc.currency) }} · {{ p.paymentMethod || '-' }} · {{ formatDate(p.paymentDate) }}
               </div>
             </td>
             <td>
@@ -328,15 +328,15 @@
           </div>
           <div class="summary-row">
             <span>Montant total:</span>
-            <strong>{{ formatAmount(fc.amount) }}</strong>
+            <strong>{{ formatAmount(fc.amount, fc.currency) }}</strong>
           </div>
           <div class="summary-row" *ngIf="getFundCallPaidAmount(fc) > 0">
             <span>Déjà payé:</span>
-            <strong class="text-success">{{ formatAmount(getFundCallPaidAmount(fc)) }}</strong>
+            <strong class="text-success">{{ formatAmount(getFundCallPaidAmount(fc), fc.currency) }}</strong>
           </div>
           <div class="summary-row highlight">
             <span>Reste à payer:</span>
-            <strong class="text-danger">{{ formatAmount(getFundCallRemainingAmount(fc)) }}</strong>
+            <strong class="text-danger">{{ formatAmount(getFundCallRemainingAmount(fc), fc.currency) }}</strong>
           </div>
         </div>
 
@@ -357,7 +357,7 @@
               <i class="bi bi-calendar2-week text-info"></i>
               <span class="small">
                 Mensualité suggérée:
-                <strong class="text-info">{{ formatAmount(getSuggestedMonthlyAmount(fc)) }}</strong>
+                <strong class="text-info">{{ formatAmount(getSuggestedMonthlyAmount(fc), fc.currency) }}</strong>
                 /mois ({{ getMonthsUntilDue(fc) }} mois restants)
               </span>
               <button type="button" class="btn btn-outline-info btn-sm" (click)="setMonthlyAmount()">

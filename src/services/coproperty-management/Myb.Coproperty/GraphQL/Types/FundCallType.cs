@@ -88,7 +88,7 @@ namespace Myb.Coproperty.GraphQL.Types
             public Currency GetCurrency([Parent] FundCall fundCall, [Service] CopropertyDbContext context)
             {
                 var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == fundCall.CopropertyId);
-                return coproperty?.Currency ?? Currency.EUR;
+                return coproperty?.Currency ?? fundCall.CurrencySnapshot;
             }
 
             public string? GetCopropertyName([Parent] FundCall fundCall, [Service] CopropertyDbContext context)

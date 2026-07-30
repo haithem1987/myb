@@ -53,7 +53,7 @@ namespace Myb.Coproperty.GraphQL.Types
                 await using var context = contextFactory.CreateDbContext();
                 return await context.OwnerUnits
                     .Include(ou => ou.Unit)
-                    .Where(ou => ou.OwnerId == owner.Id)
+                    .Where(ou => ou.OwnerId == owner.Id && ou.EndDate == null)
                     .ToListAsync();
             }
             
@@ -62,7 +62,7 @@ namespace Myb.Coproperty.GraphQL.Types
                 await using var context = contextFactory.CreateDbContext();
                 var firstOwnerUnit = await context.OwnerUnits
                     .Include(ou => ou.Unit)
-                    .Where(ou => ou.OwnerId == owner.Id)
+                    .Where(ou => ou.OwnerId == owner.Id && ou.EndDate == null)
                     .FirstOrDefaultAsync();
                     
                 return firstOwnerUnit?.Unit;

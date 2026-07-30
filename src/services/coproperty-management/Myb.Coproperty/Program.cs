@@ -16,9 +16,8 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 // Add services to the container.
 
 // Add DbContext
-// Prefer container-provided connection string; fall back to DefaultConnection for local dev
-var connectionString = builder.Configuration.GetConnectionString("CopropertyDBConnection")
-                      ?? builder.Configuration.GetConnectionString("DefaultConnection");
+// Accept both Npgsql's key/value format and Railway's postgresql:// DATABASE_URL.
+var connectionString = PostgresConnectionString.Resolve(builder.Configuration);
 builder.Services.AddDbContextFactory<CopropertyDbContext>(options =>
     options.UseNpgsql(connectionString));
 

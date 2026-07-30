@@ -2,11 +2,12 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-accountant-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   template: `
     <div class="accountant-layout">
       <aside class="sidebar">
@@ -49,7 +50,7 @@ import { KeycloakService } from '@myb-front/auth';
         <div class="sidebar-footer">
           <button class="btn-logout" (click)="logout()">
             <i class="bi bi-box-arrow-right"></i>
-            <span>Déconnexion</span>
+            <span>{{ 'navigation.logout' | translate }}</span>
           </button>
         </div>
       </aside>

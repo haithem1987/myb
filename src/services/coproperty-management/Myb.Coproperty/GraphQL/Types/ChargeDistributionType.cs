@@ -145,7 +145,7 @@ namespace Myb.Coproperty.GraphQL.Types
                 .Resolve(context =>
                 {
                     var distribution = context.Parent<ChargeDistribution>();
-                    var owner = distribution.Unit?.OwnerUnits?.FirstOrDefault()?.Owner;
+                    var owner = distribution.Unit?.OwnerUnits?.FirstOrDefault(ou => ou.EndDate == null)?.Owner;
                     if (owner != null)
                         return $"{owner.FirstName} {owner.LastName}";
                     return "Non assigné";
@@ -158,7 +158,7 @@ namespace Myb.Coproperty.GraphQL.Types
                 .Resolve(context =>
                 {
                     var distribution = context.Parent<ChargeDistribution>();
-                    var owner = distribution.Unit?.OwnerUnits?.FirstOrDefault()?.Owner;
+                    var owner = distribution.Unit?.OwnerUnits?.FirstOrDefault(ou => ou.EndDate == null)?.Owner;
                     return owner?.Email ?? "";
                 });
         }

@@ -29,10 +29,10 @@ import { InterventionManagementComponent } from './intervention-management/inter
         </div>
         <div class="col-md-4 text-end">
           <button class="btn btn-secondary me-2" (click)="goBack()">
-            {{ 'BACK' | translate }}
+            {{ 'common.back' | translate }}
           </button>
           <button class="btn btn-primary" (click)="edit()">
-            {{ 'EDIT' | translate }}
+            {{ 'common.edit' | translate }}
           </button>
         </div>
       </div>
@@ -41,25 +41,25 @@ import { InterventionManagementComponent } from './intervention-management/inter
         <div class="col-md-6">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">{{ 'INFORMATION' | translate }}</h5>
+              <h5 class="card-title">{{ 'coproperty.detail.generalInfo' | translate }}</h5>
               <p>
-                <strong>{{ 'ADDRESS' | translate }}:</strong>
+                <strong>{{ 'coproperty.detail.address' | translate }}:</strong>
                 {{ coproperty.address }}
               </p>
               <p>
-                <strong>{{ 'CITY' | translate }}:</strong>
+                <strong>{{ 'coproperty.detail.city' | translate }}:</strong>
                 {{ coproperty.city }}
               </p>
               <p>
-                <strong>{{ 'POSTAL_CODE' | translate }}:</strong>
+                <strong>{{ 'coproperty.detail.postalCode' | translate }}:</strong>
                 {{ coproperty.postalCode }}
               </p>
               <p>
-                <strong>{{ 'COUNTRY' | translate }}:</strong>
+                <strong>{{ 'coproperty.detail.country' | translate }}:</strong>
                 {{ coproperty.country }}
               </p>
               <p *ngIf="coproperty.description">
-                <strong>{{ 'DESCRIPTION' | translate }}:</strong>
+                <strong>{{ 'coproperty.detail.description' | translate }}:</strong>
                 {{ coproperty.description }}
               </p>
             </div>
@@ -69,26 +69,26 @@ import { InterventionManagementComponent } from './intervention-management/inter
         <div class="col-md-6">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">{{ 'STATISTICS' | translate }}</h5>
+              <h5 class="card-title">{{ 'coproperty.detail.statistics' | translate }}</h5>
               <p>
-                <strong>{{ 'TOTAL_UNITS' | translate }}:</strong>
+                <strong>{{ 'coproperty.detail.totalUnits' | translate }}:</strong>
                 {{ coproperty.totalUnits }}
               </p>
               <p>
-                <strong>{{ 'TOTAL_SHARES' | translate }}:</strong>
+                <strong>{{ 'coproperty.detail.totalShares' | translate }}:</strong>
                 {{ coproperty.totalShares }}
               </p>
               <p>
-                <strong>{{ 'STATUS' | translate }}:</strong>
+                <strong>{{ 'coproperty.detail.isActive' | translate }}:</strong>
                 <span
                   class="badge"
                   [ngClass]="coproperty.isActive ? 'bg-success' : 'bg-danger'"
                 >
-                  {{ coproperty.isActive ? 'ACTIVE' : 'INACTIVE' | translate }}
+                  {{ (coproperty.isActive ? 'coproperty.list.active' : 'coproperty.list.inactive') | translate }}
                 </span>
               </p>
               <p>
-                <strong>{{ 'CREATED_AT' | translate }}:</strong>
+                <strong>{{ 'common.createdAt' | translate }}:</strong>
                 {{ coproperty.createdAt | date : 'short' }}
               </p>
             </div>
@@ -101,22 +101,22 @@ import { InterventionManagementComponent } from './intervention-management/inter
           <ul class="nav nav-tabs">
             <li class="nav-item">
               <a class="nav-link active" href="#units" data-bs-toggle="tab">
-                {{ 'UNITS' | translate }}
+                {{ 'coproperty.units.title' | translate }}
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#charges" data-bs-toggle="tab">
-                {{ 'CHARGES' | translate }}
+                {{ 'coproperty.charges.title' | translate }}
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#maintenance" data-bs-toggle="tab">
-                {{ 'MAINTENANCE' | translate }}
+                {{ 'coproperty.maintenance.title' | translate }}
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#interventions" data-bs-toggle="tab">
-                Interventions
+                {{ 'intervention.list.title' | translate }}
               </a>
             </li>
           </ul>

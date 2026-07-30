@@ -49,6 +49,7 @@ public class CopropertyDbContext : DbContext
         modelBuilder.Entity<Models.Coproperty>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
             
             entity.Property(e => e.Name)
                 .IsRequired()
@@ -95,6 +96,7 @@ public class CopropertyDbContext : DbContext
             
             entity.HasIndex(e => e.IsActive);
             entity.HasIndex(e => e.ManagerId);
+            entity.HasIndex(e => e.IsDeleted);
         });
 
         // Unit Configuration
@@ -133,6 +135,7 @@ public class CopropertyDbContext : DbContext
         modelBuilder.Entity<Owner>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
             
             entity.Property(e => e.FirstName)
                 .IsRequired()
@@ -149,8 +152,11 @@ public class CopropertyDbContext : DbContext
             entity.Property(e => e.Phone)
                 .HasMaxLength(50);
             
-            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.UserId)
+                .IsUnique()
+                .HasFilter("\"IsDeleted\" = FALSE");
             entity.HasIndex(e => e.Email);
+            entity.HasIndex(e => e.IsDeleted);
             
             // Ignore deprecated properties
             entity.Ignore(e => e.UnitId);
@@ -176,8 +182,17 @@ public class CopropertyDbContext : DbContext
                 .HasForeignKey(e => e.UnitId)
                 .OnDelete(DeleteBehavior.Cascade);
             
+            // Keep historical ownership rows while allowing a unit to return to a
+            // former owner later. Only active relationships must be unique.
             entity.HasIndex(e => new { e.OwnerId, e.UnitId })
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("\"EndDate\" IS NULL");
+
+            // A unit can have only one active owner. Ownership changes must close
+            // the current row before creating the next historical period.
+            entity.HasIndex(e => e.UnitId)
+                .IsUnique()
+                .HasFilter("\"EndDate\" IS NULL");
             
             entity.HasIndex(e => e.OwnerId);
             entity.HasIndex(e => e.UnitId);
@@ -355,6 +370,20 @@ public class CopropertyDbContext : DbContext
             
             entity.Property(e => e.Notes)
                 .HasMaxLength(2000);
+
+            entity.Property(e => e.OwnerNameSnapshot)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.CopropertyNameSnapshot)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.UnitNumberSnapshot)
+                .HasMaxLength(50);
+
+            entity.Property(e => e.CurrencySnapshot)
+                .HasConversion<string>()
+                .HasMaxLength(10)
+                .HasDefaultValue(Currency.EUR);
             
             entity.HasOne(e => e.Charge)
                 .WithMany(c => c.Invoices)
@@ -476,6 +505,11 @@ public class CopropertyDbContext : DbContext
 
             entity.Property(e => e.CopropertyNameSnapshot)
                 .HasMaxLength(200);
+
+            entity.Property(e => e.CurrencySnapshot)
+                .HasConversion<string>()
+                .HasMaxLength(10)
+                .HasDefaultValue(Currency.EUR);
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");

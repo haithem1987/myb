@@ -39,10 +39,12 @@ public class FundCall : IEntity<Guid>
     /// </summary>
     public string? CopropertyNameSnapshot { get; set; }
 
+    /// <summary>Currency captured with the fund call for historical display.</summary>
+    public Currency CurrencySnapshot { get; set; } = Currency.EUR;
+
     // Navigation Properties
     public Coproperty Coproperty { get; set; } = null!;
     public Owner? Owner { get; set; }
     public ICollection<CopropertyInvoice> Invoices { get; set; } = new List<CopropertyInvoice>();
     public ICollection<FundCallPayment> Payments { get; set; } = new List<FundCallPayment>();
 }
-

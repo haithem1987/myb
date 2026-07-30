@@ -134,6 +134,10 @@ const GET_MY_INVOICES = gql`
       paymentMethod
       description
       notes
+      ownerNameSnapshot
+      copropertyNameSnapshot
+      unitNumberSnapshot
+      currency
       createdAt
     }
   }
@@ -268,6 +272,19 @@ const UPDATE_OWNER_WITH_UNITS = gql`
       phone
       createdAt
       updatedAt
+    }
+  }
+`;
+
+const CHANGE_UNIT_OWNER = gql`
+  mutation ChangeUnitOwner($unitId: UUID!, $newOwnerId: UUID!) {
+    changeUnitOwner(unitId: $unitId, newOwnerId: $newOwnerId) {
+      id
+      ownerId
+      unitId
+      startDate
+      endDate
+      isMainOwner
     }
   }
 `;
@@ -623,6 +640,24 @@ export class OwnerService {
       .pipe(
         map(result => result.data!.updateOwnerWithUnits)
       );
+  }
+
+  changeUnitOwner(unitId: string, newOwnerId: string, copropertyId?: string): Observable<unknown> {
+    const refetchQueries: any[] = [];
+    if (copropertyId) {
+      refetchQueries.push({
+        query: GET_ALL_OWNERS,
+        variables: { copropertyId },
+        context: { service: 'copropertyService' }
+      });
+    }
+    return this.apollo.mutate({
+      mutation: CHANGE_UNIT_OWNER,
+      variables: { unitId, newOwnerId },
+      context: { service: 'copropertyService' },
+      refetchQueries,
+      awaitRefetchQueries: true
+    }).pipe(map(result => result.data));
   }
 
   /**

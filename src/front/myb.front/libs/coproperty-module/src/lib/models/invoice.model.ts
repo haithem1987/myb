@@ -1,3 +1,5 @@
+import { Currency } from './coproperty.models';
+
 export enum InvoiceStatus {
   Pending = 'PENDING',
   PartiallyPaid = 'PARTIALLY_PAID',
@@ -22,6 +24,10 @@ export interface CopropertyInvoice {
   paymentMethod?: string;
   description?: string;
   notes?: string;
+  ownerNameSnapshot?: string;
+  copropertyNameSnapshot?: string;
+  unitNumberSnapshot?: string;
+  currency?: Currency;
   createdAt: Date;
 }
 

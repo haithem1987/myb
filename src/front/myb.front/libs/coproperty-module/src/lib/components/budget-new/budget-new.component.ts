@@ -29,7 +29,10 @@ export class BudgetNewComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
 
   get currencySymbol(): string {
-    return this.currencyService.symbol;
+    const currency =
+      this.selectedCoproperty()?.currency ??
+      this.coproperties().find(c => c.id === this.budgetForm?.get('copropertyId')?.value)?.currency;
+    return this.currencyService.getSymbol(currency);
   }
 
   budgetForm!: FormGroup;
@@ -109,6 +112,9 @@ export class BudgetNewComponent implements OnInit {
             // Auto-select first coproperty by default
             this.selectedCoproperty.set(data[0]);
             this.budgetForm.patchValue({ copropertyId: data[0].id });
+          } else {
+            const selected = data.find(c => c.id === this.budgetForm.get('copropertyId')?.value);
+            if (selected) this.selectedCoproperty.set(selected);
           }
         },
         error: (err) => {
@@ -191,6 +197,8 @@ export class BudgetNewComponent implements OnInit {
           }
           
           this.budgetForm.patchValue(formData);
+          const selected = this.coproperties().find(c => c.id === budget.copropertyId);
+          if (selected) this.selectedCoproperty.set(selected);
           this.loading.set(false);
         },
         error: (err) => {

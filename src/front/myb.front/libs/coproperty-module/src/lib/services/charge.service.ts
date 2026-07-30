@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { Observable, map } from 'rxjs';
+import { Observable, Subject, map } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import {
   GET_ALL_CHARGES,
   GET_CHARGE_BY_ID,
@@ -14,6 +15,7 @@ import {
   CALCULATE_CHARGE_DISTRIBUTION,
   MARK_CHARGE_DISTRIBUTION_PAID,
 } from '../graphql/mutations/charge.mutation';
+import { Currency } from '../models/coproperty.models';
 
 export interface ChargeExtended {
   id?: string;
@@ -31,6 +33,7 @@ export interface ChargeExtended {
   createdBy: string;
   createdAt?: Date;
   updatedAt?: Date;
+  currency?: Currency;
 }
 
 export interface ChargeDistributionExtended {
@@ -70,6 +73,8 @@ export interface ChargeDistributionPayment {
 })
 export class ChargeService {
   private apollo = inject(Apollo);
+  private budgetChanges = new Subject<void>();
+  readonly budgetChanges$ = this.budgetChanges.asObservable();
 
   getAllCharges(): Observable<ChargeExtended[]> {
     return this.apollo
@@ -114,7 +119,10 @@ export class ChargeService {
         awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
-      .pipe(map((result) => result.data!.createCharge));
+      .pipe(
+        map((result) => result.data!.createCharge),
+        tap(() => this.budgetChanges.next())
+      );
   }
 
   updateCharge(charge: ChargeExtended): Observable<ChargeExtended> {
@@ -129,7 +137,10 @@ export class ChargeService {
         awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
-      .pipe(map((result) => result.data!.updateCharge));
+      .pipe(
+        map((result) => result.data!.updateCharge),
+        tap(() => this.budgetChanges.next())
+      );
   }
 
   deleteCharge(id: string, copropertyId?: string): Observable<boolean> {
@@ -145,7 +156,10 @@ export class ChargeService {
         awaitRefetchQueries: true,
         context: { service: 'copropertyService' },
       })
-      .pipe(map((result) => result.data!.deleteCharge));
+      .pipe(
+        map((result) => result.data!.deleteCharge),
+        tap(() => this.budgetChanges.next())
+      );
   }
 
   calculateDistribution(chargeId: string): Observable<ChargeDistributionExtended[]> {

@@ -289,6 +289,9 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Currency")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -301,6 +304,9 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasColumnType("character varying(2000)");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<Guid?>("ManagerId")
@@ -335,9 +341,15 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.HasIndex("IsActive");
 
+                    b.HasIndex("IsDeleted");
+
                     b.HasIndex("ManagerId");
 
                     b.ToTable("Coproperties");
+
+                    b.HasQueryFilter(
+                        (System.Linq.Expressions.Expression<Func<Myb.Coproperty.Models.Coproperty, bool>>)
+                        (e => !e.IsDeleted));
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.CopropertyInvoice", b =>
@@ -356,11 +368,22 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<Guid>("CopropertyId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CopropertyNameSnapshot")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("CurrencySnapshot")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("EUR");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -385,6 +408,10 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("OwnerNameSnapshot")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime?>("PaidDate")
                         .HasColumnType("timestamp with time zone");
@@ -412,6 +439,10 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("UnitNumberSnapshot")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -535,6 +566,13 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<string>("CopropertyNameSnapshot")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<string>("CurrencySnapshot")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("EUR");
 
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -841,6 +879,9 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2000)
@@ -901,6 +942,9 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -916,6 +960,9 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Phone")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
@@ -930,9 +977,17 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.HasIndex("Email");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("IsDeleted");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = FALSE");
 
                     b.ToTable("Owners");
+
+                    b.HasQueryFilter(
+                        (System.Linq.Expressions.Expression<Func<Myb.Coproperty.Models.Owner, bool>>)
+                        (e => !e.IsDeleted));
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.OwnerUnit", b =>
@@ -972,10 +1027,13 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitId")
+                        .IsUnique()
+                        .HasFilter("\"EndDate\" IS NULL");
 
                     b.HasIndex("OwnerId", "UnitId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"EndDate\" IS NULL");
 
                     b.ToTable("OwnerUnits", t =>
                         {

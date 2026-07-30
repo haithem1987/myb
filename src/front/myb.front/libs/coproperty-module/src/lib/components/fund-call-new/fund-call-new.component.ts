@@ -69,13 +69,8 @@ export class FundCallNewComponent implements OnInit {
     this.checkEditMode();
   }
 
-  /**
-   * The Amount field is read-only in edit mode. Once a fund call is
-   * created, the called amount is fixed to prevent inconsistencies
-   * with already-issued notifications and recorded payments.
-   */
   isAmountLocked(): boolean {
-    return this.isEditMode();
+    return this.isEditMode() && this.currentFundCall()?.status !== 'PENDING_VALIDATION';
   }
 
   /**
@@ -316,11 +311,17 @@ export class FundCallNewComponent implements OnInit {
   }
 
   get currencySymbol(): string {
-    return this.currencyService.symbol;
+    const copropertyId = this.fundCallForm?.get('copropertyId')?.value;
+    const currency = this.coproperties().find(c => c.id === copropertyId)?.currency
+      ?? this.currentFundCall()?.currency;
+    return this.currencyService.getSymbol(currency);
   }
 
   formatAmount(amount: number | string | undefined | null): string {
-    return this.currencyService.formatAmount(amount);
+    const copropertyId = this.fundCallForm?.get('copropertyId')?.value;
+    const currency = this.coproperties().find(c => c.id === copropertyId)?.currency
+      ?? this.currentFundCall()?.currency;
+    return this.currencyService.formatAmount(amount, currency);
   }
 
   goBack(): void {

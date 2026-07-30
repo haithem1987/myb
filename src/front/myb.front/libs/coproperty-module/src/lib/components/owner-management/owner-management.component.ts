@@ -33,6 +33,8 @@ interface Owner {
     unitId: string;
     ownershipPercentage: number;
     isMainOwner: boolean;
+    startDate?: Date;
+    endDate?: Date | null;
     unit?: Unit;
   }>;
   units?: Unit[]; // For backward compatibility
@@ -90,6 +92,8 @@ export class OwnerManagementComponent implements OnInit {
 
   // ── Role assignment state ──
   assigningRole = signal<string | null>(null); // userId being assigned
+  ownershipTransfer = signal<{ unitId: string; unitNumber: string; currentOwnerId: string; currentOwnerName: string } | null>(null);
+  transferNewOwnerId = signal<string>('');
 
   constructor() {
     this.ownerForm = this.fb.group({
@@ -176,9 +180,19 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   get filteredAvailableUnits(): Unit[] {
-    if (!this.unitSearchTerm.trim()) return this.availableUnits;
+    const activeOwnerByUnit = new Map<string, string>();
+    this.owners.forEach(owner =>
+      (owner.ownerUnits || [])
+        .filter(link => !link.endDate)
+        .forEach(link => activeOwnerByUnit.set(link.unitId, owner.id))
+    );
+    const selectable = this.availableUnits.filter(unit => {
+      const assignedOwnerId = activeOwnerByUnit.get(unit.id);
+      return !assignedOwnerId || assignedOwnerId === this.editingOwnerId;
+    });
+    if (!this.unitSearchTerm.trim()) return selectable;
     const term = this.unitSearchTerm.toLowerCase();
-    return this.availableUnits.filter(u =>
+    return selectable.filter(u =>
       u.unitNumber.toLowerCase().includes(term) ||
       (u.copropertyName || '').toLowerCase().includes(term)
     );
@@ -201,16 +215,35 @@ export class OwnerManagementComponent implements OnInit {
       .subscribe({
         next: async (owners) => {
           console.log('[Owner Management] Owners loaded:', owners.length);
-          this.owners = owners.map(o => ({
-            id: o.id,
-            userId: o.userId,
-            firstName: o.firstName,
-            lastName: o.lastName,
-            email: o.email,
-            phone: o.phone || '',
-            hasOwnerRole: false,
-            ownerUnits: o.ownerUnits || []
-          }));
+          // Legacy databases may contain duplicate Owner rows for the same
+          // Keycloak user. Render one logical owner while the migration
+          // reconciles those records permanently.
+          const ownersByUser = new Map<string, Owner>();
+          owners.forEach(o => {
+            const key = o.userId || o.email.toLowerCase();
+            const current = ownersByUser.get(key);
+            const activeLinks = (o.ownerUnits || []).filter(link => !link.endDate);
+            if (!current) {
+              ownersByUser.set(key, {
+                id: o.id,
+                userId: o.userId,
+                firstName: o.firstName,
+                lastName: o.lastName,
+                email: o.email,
+                phone: o.phone || '',
+                hasOwnerRole: false,
+                ownerUnits: activeLinks
+              });
+              return;
+            }
+
+            const knownUnitIds = new Set((current.ownerUnits || []).map(link => link.unitId));
+            current.ownerUnits = [
+              ...(current.ownerUnits || []),
+              ...activeLinks.filter(link => !knownUnitIds.has(link.unitId))
+            ];
+          });
+          this.owners = Array.from(ownersByUser.values());
 
           // Enrich owners with Keycloak role status
           for (const owner of this.owners) {
@@ -548,6 +581,10 @@ export class OwnerManagementComponent implements OnInit {
   }
   
   toggleUnitSelection(unitId: string): void {
+    if (this.editingOwnerId) {
+      this.showAlert('info', this.translateService.instant('coproperty.owner.useChangeOwnerAction'));
+      return;
+    }
     const selectedUnits = this.ownerForm.get('selectedUnits')?.value || [];
     const index = selectedUnits.indexOf(unitId);
     
@@ -558,6 +595,68 @@ export class OwnerManagementComponent implements OnInit {
     }
     
     this.ownerForm.patchValue({ selectedUnits: [...selectedUnits] });
+  }
+
+  openOwnershipTransfer(owner: Owner, ownerUnit: NonNullable<Owner['ownerUnits']>[number]): void {
+    if (!ownerUnit.unit) return;
+    this.transferNewOwnerId.set('');
+    this.ownershipTransfer.set({
+      unitId: ownerUnit.unitId,
+      unitNumber: ownerUnit.unit.unitNumber,
+      currentOwnerId: owner.id,
+      currentOwnerName: this.getOwnerFullName(owner)
+    });
+  }
+
+  cancelOwnershipTransfer(): void {
+    this.ownershipTransfer.set(null);
+    this.transferNewOwnerId.set('');
+  }
+
+  get transferOwnerOptions(): Owner[] {
+    const transfer = this.ownershipTransfer();
+    return transfer ? this.owners.filter(owner => owner.id !== transfer.currentOwnerId) : [];
+  }
+
+  async confirmOwnershipTransfer(): Promise<void> {
+    const transfer = this.ownershipTransfer();
+    const newOwner = this.owners.find(owner => owner.id === this.transferNewOwnerId());
+    if (!transfer || !newOwner) return;
+
+    const confirmed = await this.modalService.confirm({
+      title: this.translateService.instant('coproperty.owner.confirmChangeTitle'),
+      message: this.translateService.instant('coproperty.owner.confirmChangeMessage', {
+        unit: transfer.unitNumber,
+        previousOwner: transfer.currentOwnerName,
+        newOwner: this.getOwnerFullName(newOwner)
+      }),
+      confirmButtonText: this.translateService.instant('coproperty.owner.changeOwner'),
+      confirmButtonClass: 'btn-warning',
+      cancelButtonText: this.translateService.instant('common.cancel')
+    });
+    if (!confirmed) return;
+
+    this.loading.set(true);
+    this.ownerService.changeUnitOwner(transfer.unitId, newOwner.id, this.copropertyId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false))
+      )
+      .subscribe({
+        next: () => {
+          this.cancelOwnershipTransfer();
+          this.showAlert('success', this.translateService.instant('coproperty.owner.changeSuccess', {
+            unit: transfer.unitNumber
+          }));
+          this.loadOwners();
+        },
+        error: (err) => {
+          console.error('[Owner Management] Ownership transfer failed:', err);
+          const message = err?.graphQLErrors?.[0]?.message ||
+            this.translateService.instant('coproperty.owner.changeFailed');
+          this.showAlert('danger', message);
+        }
+      });
   }
 
   private showAlert(type: 'success' | 'danger' | 'warning' | 'info', message: string) {

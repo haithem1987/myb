@@ -18,6 +18,7 @@ interface Invoice {
   paymentDate?: Date;
   paymentMethod: string;
   status: string;
+  currency?: string;
 }
 
 @Component({
@@ -119,7 +120,7 @@ interface Invoice {
                   </td>
                   <td><span class="badge bg-secondary">{{ invoice.unitNumber }}</span></td>
                   <td>{{ invoice.paymentDate | date:'dd/MM/yyyy' }}</td>
-                  <td class="fw-bold">{{ formatAmount(invoice.amount) }}</td>
+                  <td class="fw-bold">{{ formatAmount(invoice.amount, invoice.currency) }}</td>
                   <td>
                     <span class="badge bg-light text-dark">
                       <i class="bi" [class.bi-credit-card]="invoice.paymentMethod === 'Card'" [class.bi-bank]="invoice.paymentMethod === 'BankTransfer'" [class.bi-cash]="invoice.paymentMethod !== 'Card' && invoice.paymentMethod !== 'BankTransfer'"></i>
@@ -231,18 +232,18 @@ interface Invoice {
               <tr>
                 <td>{{ selectedInvoice()!.description }}</td>
                 <td class="text-center">1</td>
-                <td class="text-end">{{ formatAmount(selectedInvoice()!.amount) }}</td>
-                <td class="text-end"><strong>{{ formatAmount(selectedInvoice()!.amount) }}</strong></td>
+                <td class="text-end">{{ formatAmount(selectedInvoice()!.amount, selectedInvoice()!.currency) }}</td>
+                <td class="text-end"><strong>{{ formatAmount(selectedInvoice()!.amount, selectedInvoice()!.currency) }}</strong></td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="inv-subtotal">
                 <td colspan="3" class="text-end">Sous-total HT</td>
-                <td class="text-end">{{ formatAmount(selectedInvoice()!.amount) }}</td>
+                <td class="text-end">{{ formatAmount(selectedInvoice()!.amount, selectedInvoice()!.currency) }}</td>
               </tr>
               <tr class="inv-total">
                 <td colspan="3" class="text-end"><strong>TOTAL TTC</strong></td>
-                <td class="text-end"><strong>{{ formatAmount(selectedInvoice()!.amount) }}</strong></td>
+                <td class="text-end"><strong>{{ formatAmount(selectedInvoice()!.amount, selectedInvoice()!.currency) }}</strong></td>
               </tr>
             </tfoot>
           </table>
@@ -678,8 +679,8 @@ export class OwnerInvoicesComponent implements OnInit {
     return labels[method] || method || '—';
   }
 
-  formatAmount(amount: number | string | undefined | null): string {
-    return this.currencyService.formatAmount(amount);
+  formatAmount(amount: number | string | undefined | null, currency?: string): string {
+    return this.currencyService.formatAmount(amount, currency);
   }
 
   private modalService = inject(ModalService);
@@ -711,10 +712,11 @@ export class OwnerInvoicesComponent implements OnInit {
       date,
       amount: inv.totalAmount,
       period: this.getPeriodLabel(date),
-      unitNumber: unit?.unitNumber ?? '—',
+      unitNumber: inv.unitNumberSnapshot ?? unit?.unitNumber ?? '—',
       paymentDate: inv.paidDate ? new Date(inv.paidDate) : undefined,
       paymentMethod: inv.paymentMethod ?? '',
-      status: inv.status === InvoiceStatus.PAID ? 'paid' : 'pending'
+      status: inv.status === InvoiceStatus.PAID ? 'paid' : 'pending',
+      currency: inv.currency,
     };
   }
 
@@ -733,7 +735,8 @@ export class OwnerInvoicesComponent implements OnInit {
       unitNumber: unit?.unitNumber ?? '—',
       paymentDate,
       paymentMethod: dist.paymentMethod ?? 'Virement',
-      status: 'paid'
+      status: 'paid',
+      currency: dist.currency,
     };
   }
 
@@ -774,7 +777,7 @@ export class OwnerInvoicesComponent implements OnInit {
     const invoice = this.invoices().find(inv => inv.id === id);
     if (!invoice) return;
 
-    const fmt = (v: number) => this.currencyService.formatAmount(v);
+    const fmt = (v: number) => this.currencyService.formatAmount(v, invoice.currency);
     const fmtD = (d: Date | undefined) => d ? d.toLocaleDateString('fr-FR') : '-';
     const owner = this.ownerName() || '—';
 

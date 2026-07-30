@@ -236,7 +236,7 @@ namespace Myb.Coproperty.Services
                 distribution.PaymentStatus = ChargePaymentStatus.PartiallyPaid;
 
             // 2. Update existing pending invoice OR create a new one as payment receipt
-            var owner = distribution.Unit?.OwnerUnits?.FirstOrDefault()?.Owner;
+            var owner = distribution.Unit?.OwnerUnits?.FirstOrDefault(ou => ou.EndDate == null)?.Owner;
             var charge = distribution.Charge;
             var coproperty = charge?.Coproperty;
 
@@ -284,6 +284,10 @@ namespace Myb.Coproperty.Services
                         PaidDate = DateTime.UtcNow,
                         PaymentMethod = paymentMethod,
                         Description = $"Paiement de charge : {charge.Name} - Lot {unitNumber}",
+                        OwnerNameSnapshot = $"{owner.FirstName} {owner.LastName}".Trim(),
+                        CopropertyNameSnapshot = coproperty?.Name,
+                        UnitNumberSnapshot = unitNumber,
+                        CurrencySnapshot = coproperty?.Currency ?? Currency.EUR,
                         Notes = $"Transaction: {transactionId}",
                         CreatedAt = DateTime.UtcNow,
                         CreatedBy = owner.UserId

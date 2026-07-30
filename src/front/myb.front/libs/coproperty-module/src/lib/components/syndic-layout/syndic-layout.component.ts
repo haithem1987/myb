@@ -8,11 +8,14 @@ import { ChargeService } from '@myb-front/coproperty-module';
 import { UnitService } from '@myb-front/coproperty-module';
 import { Notification } from 'libs/shared/infra/models/notification.model';
 import { forkJoin } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DestroyRef } from '@angular/core';
 
 @Component({
   selector: 'myb-coproperty-syndic-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, UserDropdownComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, UserDropdownComponent],
   templateUrl: './syndic-layout.component.html',
   styleUrls: ['./syndic-layout.component.scss']
 })
@@ -24,6 +27,7 @@ export class SyndicLayoutComponent implements OnInit {
   private unitService = inject(UnitService);
   private notificationService = inject(NotificationService);
   private currencyService = inject(CurrencyService);
+  private destroyRef = inject(DestroyRef);
   
   // State signals
   unpaidInvoices = signal(0);
@@ -48,6 +52,9 @@ export class SyndicLayoutComponent implements OnInit {
     this.loadUserFromKeycloak();
     // Load dashboard statistics
     this.loadStatistics();
+    this.chargeService.budgetChanges$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadStatistics());
     // Start real-time notifications
     this.initNotifications();
   }
@@ -100,36 +107,42 @@ export class SyndicLayoutComponent implements OnInit {
   private loadStatistics(): void {
     // Load all statistics in parallel using forkJoin
     const managerId = this.keycloakService.getSyndicManagerId();
-    forkJoin({
-      coproperties: this.copropertyService.getCoproperties(managerId),
-      charges: this.chargeService.getAllCharges()
-    }).subscribe({
-      next: (results) => {
+    this.copropertyService.getCoproperties(managerId).subscribe({
+      next: (coproperties) => {
         // Set coproperty count
-        this.managedCoproperties.set(results.coproperties.length);
+        this.managedCoproperties.set(coproperties.length);
 
         // Initialize currency from first coproperty
-        if (results.coproperties.length > 0 && results.coproperties[0].currency) {
-          this.currencyService.setCurrency(results.coproperties[0].currency as Currency);
+        if (coproperties.length > 0 && coproperties[0].currency) {
+          this.currencyService.setCurrency(coproperties[0].currency as Currency);
         }
-        
-        // Set budgets count
-        this.totalBudgets.set(results.charges.length);
-        
-        // Load units from all coproperties
-        if (results.coproperties.length > 0) {
-          const unitRequests = results.coproperties.map(coproperty =>
-            this.unitService.getUnitsByCoproperty(coproperty.id)
-          );
-          
-          forkJoin(unitRequests).subscribe({
-            next: (unitResults) => {
-              const allUnits = unitResults.flat();
-              this.totalUnits.set(allUnits.length);
-            },
-            error: (err) => console.error('Error loading units count:', err)
-          });
+
+        if (coproperties.length === 0) {
+          this.totalBudgets.set(0);
+          this.totalUnits.set(0);
+          return;
         }
+
+        const budgetRequests = coproperties.map(coproperty =>
+          this.chargeService.getChargesByCoproperty(coproperty.id)
+        );
+        const unitRequests = coproperties.map(coproperty =>
+          this.unitService.getUnitsByCoproperty(coproperty.id)
+        );
+
+        forkJoin({
+          budgets: forkJoin(budgetRequests),
+          units: forkJoin(unitRequests)
+        }).subscribe({
+          next: ({ budgets, units }) => {
+            const currentYear = new Date().getFullYear().toString();
+            this.totalBudgets.set(
+              budgets.flat().filter(budget => budget.frequency === currentYear).length
+            );
+            this.totalUnits.set(units.flat().length);
+          },
+          error: (err) => console.error('Error loading sidebar statistics:', err)
+        });
       },
       error: (err) => console.error('Error loading statistics:', err)
     });

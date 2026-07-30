@@ -27,7 +27,7 @@ namespace Myb.Coproperty.GraphQL.Types
 
             public IQueryable<OwnerUnit> GetOwnerUnits([Parent] Unit unit, [Service] CopropertyDbContext context)
             {
-                return context.OwnerUnits.Where(ou => ou.UnitId == unit.Id);
+                return context.OwnerUnits.Where(ou => ou.UnitId == unit.Id && ou.EndDate == null);
             }
 
             public Currency GetCurrency([Parent] Unit unit, [Service] CopropertyDbContext context)

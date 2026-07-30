@@ -190,6 +190,7 @@
                       type="checkbox" 
                       [id]="'unit-' + unit.id"
                       [checked]="isUnitSelected(unit.id)"
+                      [disabled]="!!editingOwnerId"
                       (change)="toggleUnitSelection(unit.id)"
                     />
                     <label class="form-check-label" [for]="'unit-' + unit.id">
@@ -205,7 +206,10 @@
                   </div>
                 </div>
               </div>
-              <small class="text-muted">{{ 'coproperty.unit.selectUnitsHelp' | translate }}</small>
+              <small class="text-muted" *ngIf="!editingOwnerId">{{ 'coproperty.unit.selectUnitsHelp' | translate }}</small>
+              <small class="text-muted" *ngIf="editingOwnerId">
+                <i class="bi bi-lock-fill me-1"></i>{{ 'coproperty.owner.unitsLockedHelp' | translate }}
+              </small>
             </div>
           </div>
         </div>
@@ -222,6 +226,37 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div *ngIf="ownershipTransfer() as transfer" class="card border-warning mb-4">
+    <div class="card-header bg-warning-subtle">
+      <strong><i class="bi bi-arrow-left-right me-2"></i>{{ 'coproperty.owner.changeOwnerForUnit' | translate:{ unit: transfer.unitNumber } }}</strong>
+    </div>
+    <div class="card-body">
+      <p class="mb-3">
+        {{ 'coproperty.owner.currentOwner' | translate }} : <strong>{{ transfer.currentOwnerName }}</strong>.
+        {{ 'coproperty.owner.historyWillBeKept' | translate }}
+      </p>
+      <label for="newOwner" class="form-label">{{ 'coproperty.owner.newOwner' | translate }}</label>
+      <select id="newOwner" class="form-select mb-3"
+        [value]="transferNewOwnerId()"
+        (change)="transferNewOwnerId.set($any($event.target).value)">
+        <option value="">{{ 'coproperty.owner.selectNewOwner' | translate }}</option>
+        <option *ngFor="let owner of transferOwnerOptions" [value]="owner.id">
+          {{ getOwnerFullName(owner) }} — {{ owner.email }}
+        </option>
+      </select>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-warning"
+          [disabled]="!transferNewOwnerId() || loading()"
+          (click)="confirmOwnershipTransfer()">
+          <i class="bi bi-arrow-left-right me-1"></i>{{ 'coproperty.owner.changeOwner' | translate }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="cancelOwnershipTransfer()">
+          {{ 'common.cancel' | translate }}
+        </button>
+      </div>
     </div>
   </div>
 
@@ -254,6 +289,12 @@
                 <span class="badge bg-secondary me-1" *ngFor="let ownerUnit of owner.ownerUnits">
                   <i class="bi bi-building"></i> {{ ownerUnit.unit?.unitNumber || ('common.unknown' | translate) }}
                   <small *ngIf="ownerUnit.ownershipPercentage !== 100"> ({{ ownerUnit.ownershipPercentage }}%)</small>
+                  <button *ngIf="ownerUnit.unit" type="button"
+                    class="btn btn-link btn-sm text-white p-0 ms-1"
+                    [title]="'coproperty.owner.changeOwner' | translate"
+                    (click)="openOwnershipTransfer(owner, ownerUnit)">
+                    <i class="bi bi-arrow-left-right"></i>
+                  </button>
                 </span>
                 <span *ngIf="!owner.ownerUnits || owner.ownerUnits.length === 0" class="text-muted">
                   <i class="bi bi-exclamation-circle"></i> {{ 'coproperty.unit.noOwner' | translate }}

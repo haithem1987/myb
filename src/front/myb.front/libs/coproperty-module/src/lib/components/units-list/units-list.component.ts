@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, finalize } from 'rxjs/operators';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { ModalService } from '@myb-front/shared-ui';
+import { getUnitErrorTranslation } from '../../utils/unit-error.util';
 
 @Component({
   selector: 'myb-units-list',
@@ -85,9 +86,12 @@ export class UnitsListComponent implements OnInit {
 
   loadAllUnits(): void {
     this.loading.set(true);
-    
-    // Load all units - copropertyName now comes from GraphQL backend
-    this.unitService.getAllUnits().pipe(
+
+    // The backend derives/enforces the authenticated syndic scope. The
+    // managerId is also supplied for compatibility with deployments where
+    // authentication claims are not yet available to the GraphQL resolver.
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.unitService.getAllUnitsBySyndic(managerId).pipe(
       finalize(() => this.loading.set(false)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
@@ -312,18 +316,16 @@ export class UnitsListComponent implements OnInit {
       this.loading.set(true);
       this.unitService.deleteUnit(unit.id!).subscribe({
         next: () => {
-          const successMsg = `"${unit.unitNumber}" ${this.translateService.instant('coproperty.messages.unitDeleted')}`;
+          const successMsg = this.translateService.instant('coproperty.messages.unitDeleted', {
+            unitNumber: unit.unitNumber,
+          });
           this.showAlert('success', successMsg);
           this.loadAllUnits();
         },
         error: (err) => {
           console.error('Error deleting unit:', err);
-          const rawErrorMessage = err?.error?.errors?.[0]?.message || err?.message || '';
-          const normalizedError = rawErrorMessage.toLowerCase();
-          const key = normalizedError.includes('associated with one or more owners')
-            ? 'coproperty.messages.unitDeleteBlockedDueToOwners'
-            : 'coproperty.messages.error';
-          const errorMsg = this.translateService.instant(key);
+          const errorMessage = getUnitErrorTranslation(err, 'delete', unit.unitNumber);
+          const errorMsg = this.translateService.instant(errorMessage.key, errorMessage.params);
           this.showAlert('danger', errorMsg);
           this.loading.set(false);
         }
@@ -349,7 +351,9 @@ export class UnitsListComponent implements OnInit {
             ? 'coproperty.messages.unitUpdated'
             : 'coproperty.messages.unitCreated';
           
-          const successMsg = this.translateService.instant(messageKey);
+          const successMsg = this.translateService.instant(messageKey, {
+            unitNumber: unitData.unitNumber,
+          });
           this.showAlert('success', successMsg);
           
           this.showAddForm.set(false);
@@ -359,21 +363,16 @@ export class UnitsListComponent implements OnInit {
         error: (err) => {
           console.error('Error saving unit:', err);
           
-          const errorMessage = err?.error?.errors?.[0]?.message || err?.message || '';
-          const normalizedError = errorMessage.toLowerCase();
-          let translationKey = 'coproperty.messages.unitSaveFailed';
-          
-          if (normalizedError.includes('duplicate') || normalizedError.includes('already exists')) {
-            translationKey = 'validation.duplicateError';
-          }
-          
-          const errorMsg = this.translateService.instant(translationKey);
+          const action = this.editingUnitId() ? 'update' : 'create';
+          const errorMessage = getUnitErrorTranslation(err, action, unitData.unitNumber);
+          const errorMsg = this.translateService.instant(errorMessage.key, errorMessage.params);
           this.showAlert('danger', errorMsg);
           this.loading.set(false);
         }
       });
     } else {
-      const validationMsg = this.translateService.instant('validation.required');
+      this.unitForm.markAllAsTouched();
+      const validationMsg = this.translateService.instant('coproperty.messages.unitFormInvalid');
       this.showAlert('warning', validationMsg);
     }
   }
@@ -386,6 +385,7 @@ export class UnitsListComponent implements OnInit {
 
   private showAlert(type: 'success' | 'danger' | 'warning', message: string): void {
     this.alert.set({type, message});
-    setTimeout(() => this.alert.set({type: null, message: ''}), 5000);
+    const duration = type === 'danger' ? 8000 : type === 'warning' ? 7000 : 5000;
+    setTimeout(() => this.alert.set({type: null, message: ''}), duration);
   }
 }

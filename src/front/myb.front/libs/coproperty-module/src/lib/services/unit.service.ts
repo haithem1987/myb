@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
 import {
-  GET_ALL_UNITS,
+  GET_ALL_UNITS_BY_SYNDIC,
   GET_UNIT_BY_ID,
   GET_UNITS_BY_COPROPERTY,
 } from '../graphql/queries/unit.query';
@@ -33,15 +33,15 @@ export interface UnitExtended {
 export class UnitService {
   private apollo = inject(Apollo);
 
-  getAllUnits(): Observable<UnitExtended[]> {
+  getAllUnitsBySyndic(managerId?: string): Observable<UnitExtended[]> {
     return this.apollo
-      .watchQuery<{ allUnits: UnitExtended[] }>({
-        query: GET_ALL_UNITS,
+      .watchQuery<{ allUnitsBySyndic: UnitExtended[] }>({
+        query: GET_ALL_UNITS_BY_SYNDIC,
+        variables: { managerId: managerId || undefined },
         fetchPolicy: 'network-only',
         context: { service: 'copropertyService' },
       })
-      .valueChanges
-      .pipe(map((result) => result.data.allUnits));
+      .valueChanges.pipe(map((result) => result.data.allUnitsBySyndic));
   }
 
   getUnitById(id: string): Observable<UnitExtended> {

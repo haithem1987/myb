@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
-export const GET_ALL_UNITS = gql`
-  query GetAllUnits {
-    allUnits {
+export const GET_ALL_UNITS_BY_SYNDIC = gql`
+  query GetAllUnitsBySyndic($managerId: UUID) {
+    allUnitsBySyndic(managerId: $managerId) {
       id
       copropertyId
       copropertyName

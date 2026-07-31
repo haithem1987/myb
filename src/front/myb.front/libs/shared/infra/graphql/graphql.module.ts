@@ -5,7 +5,9 @@ import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache, ApolloLink, from } from '@apollo/client/core';
 import { onError } from '@apollo/client/link/error';
+import { setContext } from '@apollo/client/link/context';
 import { Router } from '@angular/router';
+import { KeycloakService } from '@myb-front/auth';
 import { environment } from '../../../../apps/client/src/environments/environment';
 
 // Define your microservices' endpoints (use explicit per-service URIs)
@@ -24,6 +26,18 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
+// These operations belong to the coproperty schema. Keeping an explicit map
+// prevents a missing/overwritten Apollo context from ever sending unit traffic
+// to the timesheet endpoint.
+const copropertyOperationNames = new Set([
+  'GetAllUnitsBySyndic',
+  'GetUnitsByCoproperty',
+  'GetUnitById',
+  'CreateUnit',
+  'UpdateUnit',
+  'DeleteUnit',
+]);
+
 const createServiceLink = (httpLink: HttpLink) => {
   const serviceLinks = Object.entries(microserviceLinks).reduce(
     (links, [key, uri]) => {
@@ -33,26 +47,60 @@ const createServiceLink = (httpLink: HttpLink) => {
     {} as { [key: string]: ApolloLink }
   );
   return new ApolloLink((operation, forward) => {
-    const targetService = operation?.getContext()['service'] ?? 'timesheetService';
+    // Coproperty is the primary API used by the client application. Some Apollo
+    // follow-up/refetch operations do not retain the caller's custom context, so
+    // defaulting those requests to timesheet sends coproperty queries to
+    // /api/timesheet/graphql (and results in a 405).
+    const targetService = copropertyOperationNames.has(operation.operationName ?? '')
+      ? 'copropertyService'
+      : operation.getContext()['service'] ?? 'copropertyService';
     const link = serviceLinks[targetService];
+
+    if (!link) {
+      throw new Error(
+        `Unknown GraphQL service "${targetService}" for operation "${operation.operationName || 'UnnamedOperation'}".`
+      );
+    }
+
     return link.request(operation, forward);
   });
 };
+
+const createAuthLink = (keycloakService: KeycloakService) =>
+  setContext((operation, previousContext) => {
+    const targetService = copropertyOperationNames.has(operation.operationName ?? '')
+      ? 'copropertyService'
+      : previousContext['service'] ?? 'copropertyService';
+
+    if (targetService !== 'copropertyService') {
+      return {};
+    }
+
+    const token = keycloakService.getToken();
+    return token
+      ? {
+          headers: {
+            ...previousContext['headers'],
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      : {};
+  });
 
 @NgModule({
   imports: [BrowserModule, ApolloModule, HttpClientModule],
   providers: [
     {
       provide: APOLLO_OPTIONS,
-      useFactory: (httpLink: HttpLink, router: Router) => {
+      useFactory: (httpLink: HttpLink, router: Router, keycloakService: KeycloakService) => {
         return {
           cache: new InMemoryCache({
             addTypename: false,
           }),
-          link: from([errorLink, createServiceLink(httpLink)]),
+          link: from([errorLink, createAuthLink(keycloakService), createServiceLink(httpLink)]),
         };
       },
-      deps: [HttpLink, Router],
+      deps: [HttpLink, Router, KeycloakService],
     },
   ],
 })

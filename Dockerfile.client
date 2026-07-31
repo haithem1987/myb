@@ -13,7 +13,7 @@ RUN npm ci --legacy-peer-deps
 COPY src/front/myb.front/ ./
 
 # Build client app with NX for OVHCloud production
-RUN npx nx build client --configuration=ovhcloud
+RUN npx nx build client --configuration=ovhcloud --skip-nx-cache
 
 # Production stage - Use nginx for better performance
 FROM nginx:alpine

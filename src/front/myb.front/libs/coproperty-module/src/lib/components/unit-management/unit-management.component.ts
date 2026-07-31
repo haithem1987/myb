@@ -1,11 +1,13 @@
 import { Component, OnInit, signal, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { UnitService, UnitExtended } from '../../services/unit.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { ModalService } from '@myb-front/shared-ui';
+import { getUnitErrorTranslation } from '../../utils/unit-error.util';
 
 @Component({
   selector: 'myb-unit-management',
@@ -21,6 +23,8 @@ export class UnitManagementComponent implements OnInit, OnChanges {
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private toastService = inject(ToastService);
+  private translateService = inject(TranslateService);
+  private modalService = inject(ModalService);
 
   units = signal<UnitExtended[]>([]);
   loading = signal(false);
@@ -87,7 +91,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
       },
       error: (err) => {
         console.error('Error loading units:', err);
-        this.showAlert('danger', 'Échec du chargement des lots. Veuillez réessayer.');
+        this.showAlert('danger', this.translateService.instant('coproperty.messages.unitLoadFailed'));
         this.loading.set(false);
       }
     });
@@ -130,17 +134,36 @@ export class UnitManagementComponent implements OnInit, OnChanges {
     });
   }
 
-  deleteUnit(unit: UnitExtended): void {
-    if (confirm(`Are you sure you want to delete unit ${unit.unitNumber}?`)) {
+  async deleteUnit(unit: UnitExtended): Promise<void> {
+    const confirmed = await this.modalService.confirm({
+      title: this.translateService.instant('coproperty.unit.deleteConfirm'),
+      message: this.translateService.instant('coproperty.unit.deleteDetailedConfirm', {
+        unitNumber: unit.unitNumber,
+      }),
+      confirmButtonText: this.translateService.instant('common.delete'),
+      confirmButtonClass: 'btn-danger',
+      cancelButtonText: this.translateService.instant('common.cancel'),
+    });
+
+    if (confirmed) {
       this.loading.set(true);
       this.unitService.deleteUnit(unit.id!).subscribe({
         next: () => {
-          this.showAlert('success', `Lot ${unit.unitNumber} supprimé avec succès!`);
+          this.showAlert(
+            'success',
+            this.translateService.instant('coproperty.messages.unitDeleted', {
+              unitNumber: unit.unitNumber,
+            })
+          );
           this.loadUnits();
         },
         error: (err) => {
           console.error('Error deleting unit:', err);
-          this.showAlert('danger', 'Échec de la suppression du lot. Veuillez réessayer.');
+          const errorMessage = getUnitErrorTranslation(err, 'delete', unit.unitNumber);
+          this.showAlert(
+            'danger',
+            this.translateService.instant(errorMessage.key, errorMessage.params)
+          );
           this.loading.set(false);
         }
       });
@@ -162,9 +185,12 @@ export class UnitManagementComponent implements OnInit, OnChanges {
 
       operation.subscribe({
         next: () => {
-          const message = this.editingUnitId 
-            ? `Lot ${unitData.unitNumber} mis à jour avec succès!`
-            : `Lot ${unitData.unitNumber} créé avec succès!`;
+          const message = this.translateService.instant(
+            this.editingUnitId
+              ? 'coproperty.messages.unitUpdated'
+              : 'coproperty.messages.unitCreated',
+            { unitNumber: unitData.unitNumber }
+          );
           
           this.showAlert('success', message);
           
@@ -174,21 +200,21 @@ export class UnitManagementComponent implements OnInit, OnChanges {
         },
         error: (err) => {
           console.error('Error saving unit:', err);
-          
-          // Check for duplicate unit number error
-          const errorMessage = err?.error?.errors?.[0]?.message || err?.message || '';
-          let displayMessage = 'Échec de l\'enregistrement du lot. Veuillez réessayer.';
-          
-          if (errorMessage.includes('duplicate') || errorMessage.includes('already exists')) {
-            displayMessage = `Le numéro de lot ${unitData.unitNumber} existe déjà pour cette copropriété. Veuillez utiliser un numéro différent.`;
-          }
-          
-          this.showAlert('danger', displayMessage);
+          const action = this.editingUnitId ? 'update' : 'create';
+          const errorMessage = getUnitErrorTranslation(err, action, unitData.unitNumber);
+          this.showAlert(
+            'danger',
+            this.translateService.instant(errorMessage.key, errorMessage.params)
+          );
           this.loading.set(false);
         }
       });
     } else {
-      this.showAlert('warning', 'Veuillez remplir tous les champs requis correctement.');
+      this.unitForm.markAllAsTouched();
+      this.showAlert(
+        'warning',
+        this.translateService.instant('coproperty.messages.unitFormInvalid')
+      );
     }
   }
 
@@ -200,6 +226,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
 
   private showAlert(type: 'success' | 'danger' | 'warning', message: string): void {
     this.alert.set({type, message});
-    setTimeout(() => this.alert.set({type: null, message: ''}), 5000);
+    const duration = type === 'danger' ? 8000 : type === 'warning' ? 7000 : 5000;
+    setTimeout(() => this.alert.set({type: null, message: ''}), duration);
   }
 }

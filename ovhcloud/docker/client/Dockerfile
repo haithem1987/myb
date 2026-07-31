@@ -21,7 +21,7 @@ COPY src/front/myb.front/libs ./libs
 
 # Build the client app
 ENV NX_NO_CLOUD=true
-RUN npx nx build client --configuration=ovhcloud
+RUN npx nx build client --configuration=ovhcloud --skip-nx-cache
 
 # Stage 2: Serve with NGINX
 FROM nginx:1.25-alpine

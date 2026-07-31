@@ -5,6 +5,7 @@ namespace Myb.Coproperty.Services
     public interface IUnitService
     {
         Task<IEnumerable<Unit>> GetAllAsync();
+        Task<IEnumerable<Unit>> GetByManagerIdAsync(Guid managerId);
         Task<IEnumerable<Unit>> GetByCopropertyIdAsync(Guid copropertyId);
         Task<Unit> GetByIdAsync(Guid id);
         Task<Unit> CreateAsync(Unit unit);

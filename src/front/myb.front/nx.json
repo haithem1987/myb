@@ -18,7 +18,7 @@
       "!{projectRoot}/**/*.cy.[jt]s?(x)",
       "!{projectRoot}/cypress.config.[jt]s"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": ["{workspaceRoot}/libs/**/*"]
   },
   "targetDefaults": {
     "@angular-devkit/build-angular:application": {

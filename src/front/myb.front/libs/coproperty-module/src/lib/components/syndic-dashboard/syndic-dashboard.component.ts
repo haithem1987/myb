@@ -78,7 +78,7 @@ export class SyndicDashboardComponent implements OnInit {
       })
     );
     
-    const units$ = this.unitService.getAllUnits().pipe(
+    const units$ = this.unitService.getAllUnitsBySyndic(managerId).pipe(
       take(1),
       timeout(10000),
       catchError(err => {

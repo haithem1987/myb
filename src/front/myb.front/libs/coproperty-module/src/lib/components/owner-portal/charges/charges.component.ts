@@ -96,7 +96,13 @@ export class OwnerChargesComponent implements OnInit {
 
   get paidFundCalls(): FundCallExtended[] {
     if (this.filterStatus() === 'unpaid') return [];
+    if (this.filterStatus() === 'cancelled') return [];
     return this.fundCalls().filter(fc => (fc.status === 'PAID' || fc.status === 'VALIDATED') && this.matchesFilters(fc));
+  }
+
+  get cancelledFundCalls(): FundCallExtended[] {
+    if (this.filterStatus() === 'unpaid' || this.filterStatus() === 'paid') return [];
+    return this.fundCalls().filter(fc => fc.status === 'CANCELLED' && this.matchesFilters(fc));
   }
 
   // ── Search & filter state ─────────────────────────────────────────────────
@@ -141,7 +147,7 @@ export class OwnerChargesComponent implements OnInit {
   /** True once every fund call (ignoring active filters) has been settled. */
   get allFundCallsPaid(): boolean {
     return this.fundCalls().length > 0 &&
-      this.fundCalls().every(fc => fc.status === 'PAID' || fc.status === 'VALIDATED');
+      this.fundCalls().every(fc => fc.status === 'PAID' || fc.status === 'VALIDATED' || fc.status === 'CANCELLED');
   }
 
   ngOnInit(): void {
@@ -349,6 +355,8 @@ export class OwnerChargesComponent implements OnInit {
         return 'badge-paid';
       case 'TO_PAY':
         return 'badge-unpaid';
+      case 'CANCELLED':
+        return 'badge-cancelled';
       default:
         return 'badge-pending';
     }
@@ -362,6 +370,8 @@ export class OwnerChargesComponent implements OnInit {
         return 'Validé';
       case 'TO_PAY':
         return 'À payer';
+      case 'CANCELLED':
+        return 'Annulé';
       default:
         return status;
     }

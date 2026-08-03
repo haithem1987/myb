@@ -98,6 +98,7 @@
             <option value="">Tous les statuts</option>
             <option value="unpaid">À payer</option>
             <option value="paid">Réglés</option>
+            <option value="cancelled">Annulés</option>
           </select>
         </div>
         <div class="col-md-3">
@@ -255,8 +256,44 @@
     </div>
   </div>
 
+  <!-- Cancelled Fund Calls (read-only history) -->
+  <div *ngIf="!loading() && cancelledFundCalls.length > 0" class="mt-4">
+    <h4 class="section-title">
+      <i class="bi bi-x-circle text-secondary me-2"></i>
+      Appels de fonds annulés ({{ cancelledFundCalls.length }})
+    </h4>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Copropriété</th>
+            <th class="text-end">Montant</th>
+            <th>Échéance</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fc of cancelledFundCalls">
+            <td>
+              <strong>{{ fc.description || 'Appel de fonds' }}</strong>
+            </td>
+            <td>{{ fc.copropertyName || '-' }}</td>
+            <td class="text-end">{{ formatAmount(fc.amount, fc.currency) }}</td>
+            <td>{{ formatDate(fc.dueDate) }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(fc.status)">
+                {{ getStatusLabel(fc.status) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- No results match active filters -->
-  <div *ngIf="!loading() && !error() && fundCalls().length > 0 && unpaidFundCalls.length === 0 && paidFundCalls.length === 0 && hasActiveFilters" class="text-center py-5">
+  <div *ngIf="!loading() && !error() && fundCalls().length > 0 && unpaidFundCalls.length === 0 && paidFundCalls.length === 0 && cancelledFundCalls.length === 0 && hasActiveFilters" class="text-center py-5">
     <i class="bi bi-search display-1 text-muted"></i>
     <p class="text-muted mt-3">Aucun appel de fonds ne correspond à vos critères de recherche.</p>
   </div>

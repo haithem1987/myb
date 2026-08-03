@@ -84,7 +84,7 @@ export class BudgetNewComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
       chargeType: ['CLEANING', Validators.required],
-      frequency: [currentYear.toString(), Validators.required],
+      frequency: [currentYear, Validators.required],
       totalAmount: ['', [Validators.required, Validators.min(0.01)]],
       distributionMethod: ['BY_SHARES'],
       startDate: ['', Validators.required],

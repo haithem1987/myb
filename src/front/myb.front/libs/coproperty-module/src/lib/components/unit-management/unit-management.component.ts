@@ -149,13 +149,17 @@ export class UnitManagementComponent implements OnInit, OnChanges {
       this.loading.set(true);
       this.unitService.deleteUnit(unit.id!).subscribe({
         next: () => {
+          // The mutation response confirms the delete. Update the signal directly
+          // instead of issuing a second GraphQL list request (which previously
+          // caused a stale refresh and, in some deployments, a 405 on timesheet).
+          this.units.update((units) => units.filter((item) => item.id !== unit.id));
           this.showAlert(
             'success',
             this.translateService.instant('coproperty.messages.unitDeleted', {
               unitNumber: unit.unitNumber,
             })
           );
-          this.loadUnits();
+          this.loading.set(false);
         },
         error: (err) => {
           console.error('Error deleting unit:', err);
@@ -184,7 +188,17 @@ export class UnitManagementComponent implements OnInit, OnChanges {
         : this.unitService.createUnit(unitData);
 
       operation.subscribe({
-        next: () => {
+        next: (savedUnit) => {
+          this.units.update((units) => {
+            const existingIndex = units.findIndex((unit) => unit.id === savedUnit.id);
+            if (existingIndex === -1) {
+              return [savedUnit, ...units];
+            }
+
+            return units.map((unit) =>
+              unit.id === savedUnit.id ? { ...unit, ...savedUnit } : unit
+            );
+          });
           const message = this.translateService.instant(
             this.editingUnitId
               ? 'coproperty.messages.unitUpdated'
@@ -195,8 +209,9 @@ export class UnitManagementComponent implements OnInit, OnChanges {
           this.showAlert('success', message);
           
           this.showAddForm = false;
+          this.editingUnitId = null;
           this.unitForm.reset();
-          this.loadUnits();
+          this.loading.set(false);
         },
         error: (err) => {
           console.error('Error saving unit:', err);

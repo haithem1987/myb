@@ -258,21 +258,35 @@ export class KeycloakService {
 
   private static readonly ADMIN_ROLES = ['coproperty-admin', 'system-admin'];
 
+  private isSyndicPortalRoute(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    return window.location.pathname.startsWith('/coproperty/syndic');
+  }
+
   /**
    * Returns the current user's id to use when scoping a coproperty list to
    * "only my assigned coproperties", or `undefined` when the caller should
-   * see every coproperty (admin/system-admin, or any other non-syndic role).
+   * see every coproperty (admin/system-admin, or any non-syndic role).
    *
-   * Only callers who hold the `coproperty-syndic` role and no admin-level
-   * role are scoped — admins retain full visibility even on syndic-facing
-   * screens/routes.
+   * In syndic portal routes, scoping is always enforced for syndic users,
+   * including dual-role accounts, to prevent seeing non-assigned coproperties.
+   * Outside syndic routes, admin-level users retain full visibility.
    */
   getSyndicManagerId(): string | undefined {
     const roles = this.getUserRoles();
     const isSyndic = roles.includes('coproperty-syndic');
-    const isAdmin = roles.some((role) => KeycloakService.ADMIN_ROLES.includes(role));
+    if (!isSyndic) {
+      return undefined;
+    }
 
-    return isSyndic && !isAdmin ? this.getScopedUserId() : undefined;
+    if (this.isSyndicPortalRoute()) {
+      return this.getScopedUserId();
+    }
+
+    const isAdmin = roles.some((role) => KeycloakService.ADMIN_ROLES.includes(role));
+    return isAdmin ? undefined : this.getScopedUserId();
   }
 
   hasRole(role: string): boolean {

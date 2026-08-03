@@ -643,7 +643,10 @@ public class FundCallService : IFundCallService
 
         return await context.FundCalls
             .IgnoreQueryFilters()
-            .Where(f => f.OwnerId.HasValue && allOwnerIds.Contains(f.OwnerId.Value) && f.IsActive)
+            .Where(f =>
+                f.OwnerId.HasValue &&
+                allOwnerIds.Contains(f.OwnerId.Value) &&
+                (f.IsActive || f.Status == FundCallStatus.Cancelled))
             .Include(f => f.Coproperty)
             .Include(f => f.Owner)
             .Include(f => f.Payments)

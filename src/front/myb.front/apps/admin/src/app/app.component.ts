@@ -21,13 +21,25 @@ export class AppComponent implements OnInit {
     this.translate.addLangs(['fr', 'en']);
     this.translate.setDefaultLang('fr');
 
-    // Restore language from URL redirect params (Keycloak) if present
-    this.restoreLanguageFromRedirectParams();
-
-    // LanguageService handles persistence reactively via its constructor
+    // Restore language from URL redirect params (Keycloak) if present,
+    // otherwise fall back to the value persisted in localStorage/sessionStorage.
+    const redirectLang = this.getLanguageFromRedirectParams();
+    if (redirectLang) {
+      this.languageService.setLanguage(redirectLang);
+    } else {
+      const saved = this.normalizeLanguage(
+        localStorage.getItem('language') ?? sessionStorage.getItem('language') ?? 'fr'
+      );
+      this.languageService.setLanguage(saved);
+    }
   }
 
-  private restoreLanguageFromRedirectParams(): void {
+  private normalizeLanguage(lang: string | null): string {
+    const normalized = lang?.trim().toLowerCase().split('-')[0] ?? '';
+    return ['fr', 'en'].includes(normalized) ? normalized : 'fr';
+  }
+
+  private getLanguageFromRedirectParams(): string | null {
     const params = new URLSearchParams(window.location.search);
     const redirectLang =
       params.get('app_lang')
@@ -35,9 +47,6 @@ export class AppComponent implements OnInit {
       ?? params.get('ui_locales')?.split(' ')[0]
       ?? null;
     const normalized = redirectLang?.trim().toLowerCase().split('-')[0] ?? null;
-
-    if (normalized && ['fr', 'en'].includes(normalized)) {
-      this.languageService.setLanguage(normalized);
-    }
+    return normalized && ['fr', 'en'].includes(normalized) ? normalized : null;
   }
 }

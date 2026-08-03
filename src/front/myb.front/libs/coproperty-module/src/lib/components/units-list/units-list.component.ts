@@ -316,11 +316,15 @@ export class UnitsListComponent implements OnInit {
       this.loading.set(true);
       this.unitService.deleteUnit(unit.id!).subscribe({
         next: () => {
+          // Keep the list in sync from the successful mutation itself. A second
+          // list query is unnecessary and was the source of the erroneous
+          // /graphql/timesheet refresh seen after a successful delete.
+          this.units.update((units) => units.filter((item) => item.id !== unit.id));
           const successMsg = this.translateService.instant('coproperty.messages.unitDeleted', {
             unitNumber: unit.unitNumber,
           });
           this.showAlert('success', successMsg);
-          this.loadAllUnits();
+          this.loading.set(false);
         },
         error: (err) => {
           console.error('Error deleting unit:', err);
@@ -346,7 +350,24 @@ export class UnitsListComponent implements OnInit {
         : this.unitService.createUnit(unitData);
 
       operation.subscribe({
-        next: () => {
+        next: (savedUnit) => {
+          const copropertyName = this.coproperties()
+            .find((coproperty) => coproperty.id === savedUnit.copropertyId)?.name;
+          const enrichedUnit: UnitExtended = {
+            ...savedUnit,
+            copropertyName: savedUnit.copropertyName ?? copropertyName,
+          };
+
+          this.units.update((units) => {
+            const existingIndex = units.findIndex((unit) => unit.id === enrichedUnit.id);
+            if (existingIndex === -1) {
+              return [enrichedUnit, ...units];
+            }
+
+            return units.map((unit) =>
+              unit.id === enrichedUnit.id ? { ...unit, ...enrichedUnit } : unit
+            );
+          });
           const messageKey = this.editingUnitId() 
             ? 'coproperty.messages.unitUpdated'
             : 'coproperty.messages.unitCreated';
@@ -357,8 +378,9 @@ export class UnitsListComponent implements OnInit {
           this.showAlert('success', successMsg);
           
           this.showAddForm.set(false);
+          this.editingUnitId.set(null);
           this.unitForm.reset();
-          this.loadAllUnits();
+          this.loading.set(false);
         },
         error: (err) => {
           console.error('Error saving unit:', err);

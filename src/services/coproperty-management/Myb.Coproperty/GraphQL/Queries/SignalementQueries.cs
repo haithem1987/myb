@@ -2,6 +2,7 @@ using HotChocolate;
 using HotChocolate.Types;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Services;
+using System.Security.Claims;
 
 namespace Myb.Coproperty.GraphQL.Queries
 {
@@ -10,23 +11,49 @@ namespace Myb.Coproperty.GraphQL.Queries
     {
         public async Task<IEnumerable<Signalement>> GetSignalements(
             Guid copropertyId,
-            [Service] ISignalementService signalementService) =>
-            await signalementService.GetByCopropertyIdAsync(copropertyId);
+            ClaimsPrincipal? user,
+            [Service] ISignalementService signalementService,
+            [Service] ICopropertyService copropertyService)
+        {
+            await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, copropertyId, copropertyService);
+            return await signalementService.GetByCopropertyIdAsync(copropertyId);
+        }
 
         public async Task<IEnumerable<Signalement>> GetSignalementsByStatus(
             Guid copropertyId,
             SignalementStatus status,
-            [Service] ISignalementService signalementService) =>
-            await signalementService.GetByStatusAsync(copropertyId, status);
+            ClaimsPrincipal? user,
+            [Service] ISignalementService signalementService,
+            [Service] ICopropertyService copropertyService)
+        {
+            await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, copropertyId, copropertyService);
+            return await signalementService.GetByStatusAsync(copropertyId, status);
+        }
 
         public async Task<IEnumerable<Signalement>> GetMySignalements(
             Guid userId,
-            [Service] ISignalementService signalementService) =>
-            await signalementService.GetByReporterAsync(userId);
+            ClaimsPrincipal? user,
+            [Service] ISignalementService signalementService,
+            [Service] ICopropertyService copropertyService)
+        {
+            var signalements = await signalementService.GetByReporterAsync(userId);
+            var scopedIds = await CopropertyAccessControl.GetScopedCopropertyIdsAsync(user, copropertyService);
+            if (scopedIds == null)
+                return signalements;
+
+            return signalements.Where(signalement => scopedIds.Contains(signalement.CopropertyId)).ToList();
+        }
 
         public async Task<Signalement?> GetSignalementById(
             Guid id,
-            [Service] ISignalementService signalementService) =>
-            await signalementService.GetByIdAsync(id);
+            ClaimsPrincipal? user,
+            [Service] ISignalementService signalementService,
+            [Service] ICopropertyService copropertyService)
+        {
+            var signalement = await signalementService.GetByIdAsync(id);
+            if (signalement != null)
+                await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, signalement.CopropertyId, copropertyService);
+            return signalement;
+        }
     }
 }

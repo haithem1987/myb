@@ -64,9 +64,8 @@ public class FundCallMutations
         [Service] IFundCallService fundCallService,
         [Service] IAuthenticationService authService)
     {
-        var userId = authService.GetCurrentUserId();
-        await fundCallService.DeleteAsync(id, userId);
-        return true;
+        throw new InvalidOperationException(
+            "La suppression d'un appel de fonds n'est plus autorisée. Utilisez la mutation cancelFundCall.");
     }
 
     /// <summary>Cancel a published/processed fund call. Sets status to Cancelled,

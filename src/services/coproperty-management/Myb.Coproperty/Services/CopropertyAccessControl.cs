@@ -120,5 +120,39 @@ namespace Myb.Coproperty.Services
             if (copropertyManagerId != ownId)
                 throw new InvalidOperationException("Accès refusé : cette copropriété ne vous est pas assignée.");
         }
+
+        /// <summary>
+        /// Validates that a syndic-only caller has access to the provided coproperty id.
+        /// Admin-level callers bypass this check.
+        /// </summary>
+        public static async Task EnsureCopropertyOwnershipAsync(
+            ClaimsPrincipal? user,
+            Guid copropertyId,
+            ICopropertyService copropertyService)
+        {
+            if (!IsSyndicOnly(user))
+                return;
+
+            var coproperty = await copropertyService.GetByIdAsync(copropertyId);
+            EnsureOwnership(user, coproperty?.ManagerId);
+        }
+
+        /// <summary>
+        /// For syndic-only callers, returns the exact set of coproperty ids they are
+        /// allowed to access. Returns null for admin/non-syndic callers.
+        /// </summary>
+        public static async Task<HashSet<Guid>?> GetScopedCopropertyIdsAsync(
+            ClaimsPrincipal? user,
+            ICopropertyService copropertyService)
+        {
+            if (!IsSyndicOnly(user))
+                return null;
+
+            var managerId = GetUserId(user)
+                ?? throw new InvalidOperationException("Impossible d'identifier l'utilisateur authentifié.");
+
+            var coproperties = await copropertyService.GetAllAsync(managerId);
+            return coproperties.Select(c => c.Id).ToHashSet();
+        }
     }
 }

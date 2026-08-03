@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
@@ -47,6 +47,8 @@ enum DistributionMethod {
   Custom = 'custom',
 }
 
+const ACTIVE_COPROPERTY_STORAGE_KEY = 'activeCopropertyId';
+
 @Component({
   selector: 'myb-charge-distribution',
   standalone: true,
@@ -67,6 +69,7 @@ export class ChargeDistributionComponent implements OnInit {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private toastService = inject(ToastService);
+  private translateService = inject(TranslateService);
 
   loadedOwners = signal<OwnerWithUnits[]>([]);
   /** IDs of charges that already have ChargeDistribution records (already distributed) */
@@ -153,6 +156,9 @@ export class ChargeDistributionComponent implements OnInit {
     this.selectedCoproperty.set(coproperty || null);
     this.repartitionForm.patchValue({ copropertyId });
     if (copropertyId) {
+      localStorage.setItem(ACTIVE_COPROPERTY_STORAGE_KEY, copropertyId);
+    }
+    if (copropertyId) {
       this.loadChargesForCoproperty(copropertyId);
     } else {
       this.charges.set([]);
@@ -203,9 +209,7 @@ export class ChargeDistributionComponent implements OnInit {
 
           // Map real units and attach the matching owner from ownerUnits relationships
           this.units = units.map((u) => {
-            const matchingOwner = owners.find((o) =>
-              o.ownerUnits?.some((ou) => ou.unitId === u.id)
-            );
+            const matchingOwner = this.findOwnerForUnit(u, owners);
             return {
               id: u.id!,
               unitNumber: u.unitNumber,
@@ -226,6 +230,45 @@ export class ChargeDistributionComponent implements OnInit {
           this.loadingCharges.set(false);
         },
       });
+  }
+
+  private normalizeEntityId(value: string | null | undefined): string {
+    return (value ?? '').replace(/-/g, '').toLowerCase();
+  }
+
+  private getUnassignedOwnerLabel(): string {
+    const translated = this.translateService.instant('coproperty.owner.noOwner');
+    return translated && translated !== 'coproperty.owner.noOwner' ? translated : 'Non assigné';
+  }
+
+  private findOwnerForUnit(
+    unit: { id?: string; unitNumber?: string },
+    owners: OwnerWithUnits[]
+  ): OwnerWithUnits | undefined {
+    const normalizedUnitId = this.normalizeEntityId(unit.id);
+    const normalizedUnitNumber = (unit.unitNumber ?? '').trim().toLowerCase();
+    const selectedCopropertyId = this.repartitionForm.get('copropertyId')?.value as string | null;
+
+    return owners.find((owner) =>
+      owner.ownerUnits?.some((link) => {
+        if (link.endDate) return false;
+
+        const linkCopropertyId = link.unit?.copropertyId;
+        if (selectedCopropertyId && linkCopropertyId && linkCopropertyId !== selectedCopropertyId) {
+          return false;
+        }
+
+        const linkedUnitId = this.normalizeEntityId(link.unitId ?? link.unit?.id);
+        if (normalizedUnitId && linkedUnitId && linkedUnitId === normalizedUnitId) {
+          return true;
+        }
+
+        const linkedUnitNumber = (link.unit?.unitNumber ?? '').trim().toLowerCase();
+        return !!normalizedUnitNumber
+          && !!linkedUnitNumber
+          && linkedUnitNumber === normalizedUnitNumber;
+      })
+    );
   }
 
   private handleLoadError(entity: string, err: unknown) {
@@ -287,45 +330,60 @@ export class ChargeDistributionComponent implements OnInit {
     this.totalArea = this.units.reduce((sum, u) => sum + u.area, 0);
   }
 
+  /** Units that have an assigned owner — only these are included in the distribution. */
+  private get assignedUnits(): Unit[] {
+    return this.units.filter(u => u.owners.length > 0);
+  }
+
   calculateDistribution(event?: Event): void {
     event?.preventDefault();
     event?.stopPropagation();
 
     const totalAmount = this.calculatedTotal();
-    // eslint-disable-next-line no-console
-    console.log('[ChargeDistribution] calculateDistribution', {
-      totalAmount,
-      unitsCount: this.units.length,
-      formValid: this.repartitionForm.valid,
-      selectedMethod: this.selectedMethod,
-      filteredCharges: this.getFilteredCharges().length,
-    });
+    const assigned = this.assignedUnits;
+    const unassignedCount = this.units.length - assigned.length;
+
     if (!totalAmount || totalAmount <= 0 || this.units.length === 0) {
-      // eslint-disable-next-line no-console
-      console.warn('[ChargeDistribution] calculateDistribution early-return: ' +
-        (!totalAmount || totalAmount <= 0 ? 'no charges' : 'no units'));
       this.toastService.show(
         !totalAmount || totalAmount <= 0
-          ? 'Aucun budget à répartir pour les filtres sélectionnés.'
-          : 'Aucun lot disponible pour calculer la répartition.',
+          ? this.translateService.instant('coproperty.distribution.noChargesToDistribute')
+          : this.translateService.instant('coproperty.distribution.noUnitsAvailable'),
         { classname: 'bg-info text-white', delay: 4000 }
       );
       return;
     }
 
-    this.calculateTotals();
-
-    if (this.selectedMethod === DistributionMethod.ByShares && this.totalShares <= 0) {
+    if (assigned.length === 0) {
       this.toastService.show(
-        'Impossible de répartir par tantièmes: le total des tantièmes est nul.',
+        this.translateService.instant('coproperty.distribution.noAssignedOwners'),
         { classname: 'bg-warning text-dark', delay: 5000 }
       );
       return;
     }
 
-    if (this.selectedMethod === DistributionMethod.ByArea && this.totalArea <= 0) {
+    if (unassignedCount > 0) {
       this.toastService.show(
-        'Impossible de répartir par surface: la surface totale est nulle.',
+        this.translateService.instant('coproperty.distribution.unassignedLotsSkipped', { count: unassignedCount }),
+        { classname: 'bg-info text-white', delay: 5000 }
+      );
+    }
+
+    this.calculateTotals();
+    // Recalculate totals using only assigned units
+    const assignedTotalShares = assigned.reduce((sum, u) => sum + u.shares, 0);
+    const assignedTotalArea = assigned.reduce((sum, u) => sum + u.area, 0);
+
+    if (this.selectedMethod === DistributionMethod.ByShares && assignedTotalShares <= 0) {
+      this.toastService.show(
+        this.translateService.instant('coproperty.distribution.noSharesForDistribution'),
+        { classname: 'bg-warning text-dark', delay: 5000 }
+      );
+      return;
+    }
+
+    if (this.selectedMethod === DistributionMethod.ByArea && assignedTotalArea <= 0) {
+      this.toastService.show(
+        this.translateService.instant('coproperty.distribution.noAreaForDistribution'),
         { classname: 'bg-warning text-dark', delay: 5000 }
       );
       return;
@@ -335,16 +393,16 @@ export class ChargeDistributionComponent implements OnInit {
 
     switch (this.selectedMethod) {
       case DistributionMethod.ByShares:
-        this.distributionByShares(totalAmount);
+        this.distributionByShares(totalAmount, assigned, assignedTotalShares);
         break;
       case DistributionMethod.ByArea:
-        this.distributionByArea(totalAmount);
+        this.distributionByArea(totalAmount, assigned, assignedTotalArea);
         break;
       case DistributionMethod.Equal:
-        this.distributionEqual(totalAmount);
+        this.distributionEqual(totalAmount, assigned);
         break;
       case DistributionMethod.Custom:
-        this.initializeCustomDistribution(totalAmount);
+        this.initializeCustomDistribution(totalAmount, assigned);
         break;
     }
     this.showPreview = true;
@@ -352,22 +410,22 @@ export class ChargeDistributionComponent implements OnInit {
 
   /** Resolve a real owner ID from loaded owners by matching display name */
   private resolveOwnerId(ownerName: string): string | undefined {
-    if (!ownerName || ownerName === 'Non assigné') return undefined;
+    if (!ownerName || ownerName === this.getUnassignedOwnerLabel()) return undefined;
     const match = this.loadedOwners().find(
       (o) => `${o.firstName} ${o.lastName}`.toLowerCase() === ownerName.toLowerCase()
     );
     return match?.id;
   }
 
-  private distributionByShares(totalAmount: number): void {
-    this.units.forEach((unit) => {
-      const percentage = (unit.shares / this.totalShares) * 100;
-      const amount = (totalAmount * unit.shares) / this.totalShares;
-      const ownerName = unit.owners.length > 0 ? `${unit.owners[0].firstName} ${unit.owners[0].lastName}` : 'Non assigné';
+  private distributionByShares(totalAmount: number, units: Unit[], totalShares: number): void {
+    units.forEach((unit) => {
+      const percentage = (unit.shares / totalShares) * 100;
+      const amount = (totalAmount * unit.shares) / totalShares;
+      const ownerName = `${unit.owners[0].firstName} ${unit.owners[0].lastName}`;
       this.distributionPreview.push({
         unitId: unit.id,
         unitNumber: unit.unitNumber,
-        ownerId: unit.owners[0]?.id ?? this.resolveOwnerId(ownerName),
+        ownerId: unit.owners[0].id ?? this.resolveOwnerId(ownerName),
         ownerName,
         area: unit.area,
         shares: unit.shares,
@@ -377,15 +435,15 @@ export class ChargeDistributionComponent implements OnInit {
     });
   }
 
-  private distributionByArea(totalAmount: number): void {
-    this.units.forEach((unit) => {
-      const percentage = (unit.area / this.totalArea) * 100;
-      const amount = (totalAmount * unit.area) / this.totalArea;
-      const ownerName = unit.owners.length > 0 ? `${unit.owners[0].firstName} ${unit.owners[0].lastName}` : 'Non assigné';
+  private distributionByArea(totalAmount: number, units: Unit[], totalArea: number): void {
+    units.forEach((unit) => {
+      const percentage = (unit.area / totalArea) * 100;
+      const amount = (totalAmount * unit.area) / totalArea;
+      const ownerName = `${unit.owners[0].firstName} ${unit.owners[0].lastName}`;
       this.distributionPreview.push({
         unitId: unit.id,
         unitNumber: unit.unitNumber,
-        ownerId: unit.owners[0]?.id ?? this.resolveOwnerId(ownerName),
+        ownerId: unit.owners[0].id ?? this.resolveOwnerId(ownerName),
         ownerName,
         area: unit.area,
         shares: unit.shares,
@@ -395,15 +453,15 @@ export class ChargeDistributionComponent implements OnInit {
     });
   }
 
-  private distributionEqual(totalAmount: number): void {
-    const amount = totalAmount / this.units.length;
-    const percentage = 100 / this.units.length;
-    this.units.forEach((unit) => {
-      const ownerName = unit.owners.length > 0 ? `${unit.owners[0].firstName} ${unit.owners[0].lastName}` : 'Non assigné';
+  private distributionEqual(totalAmount: number, units: Unit[]): void {
+    const amount = totalAmount / units.length;
+    const percentage = 100 / units.length;
+    units.forEach((unit) => {
+      const ownerName = `${unit.owners[0].firstName} ${unit.owners[0].lastName}`;
       this.distributionPreview.push({
         unitId: unit.id,
         unitNumber: unit.unitNumber,
-        ownerId: unit.owners[0]?.id ?? this.resolveOwnerId(ownerName),
+        ownerId: unit.owners[0].id ?? this.resolveOwnerId(ownerName),
         ownerName,
         area: unit.area,
         shares: unit.shares,
@@ -413,13 +471,13 @@ export class ChargeDistributionComponent implements OnInit {
     });
   }
 
-  private initializeCustomDistribution(totalAmount: number): void {
-    this.units.forEach((unit) => {
-      const ownerName = unit.owners.length > 0 ? `${unit.owners[0].firstName} ${unit.owners[0].lastName}` : 'Non assigné';
+  private initializeCustomDistribution(totalAmount: number, units: Unit[]): void {
+    units.forEach((unit) => {
+      const ownerName = `${unit.owners[0].firstName} ${unit.owners[0].lastName}`;
       this.distributionPreview.push({
         unitId: unit.id,
         unitNumber: unit.unitNumber,
-        ownerId: unit.owners[0]?.id ?? this.resolveOwnerId(ownerName),
+        ownerId: unit.owners[0].id ?? this.resolveOwnerId(ownerName),
         ownerName,
         area: unit.area,
         shares: unit.shares,

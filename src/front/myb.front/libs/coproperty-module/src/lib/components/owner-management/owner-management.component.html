@@ -25,6 +25,23 @@
 
   <!-- Search Bar -->
   <div class="search-section">
+    <div class="mb-3" *ngIf="coproperties().length > 0">
+      <label for="ownerCopropertyFilter" class="form-label fw-semibold">
+        <i class="bi bi-building me-1"></i>
+        {{ 'coproperty.charge.coproperty' | translate }}
+      </label>
+      <select
+        id="ownerCopropertyFilter"
+        class="form-select"
+        [ngModel]="copropertyId"
+        (ngModelChange)="onCopropertySelectionChange($event)"
+      >
+        <option *ngFor="let coproperty of coproperties()" [ngValue]="coproperty.id">
+          {{ coproperty.name }}
+        </option>
+      </select>
+    </div>
+
     <input
       type="text"
       class="form-control"

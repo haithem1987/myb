@@ -2,6 +2,10 @@
   max-width: 1200px;
 }
 
+.home-container {
+  padding-inline: 1rem;
+}
+
 .card {
   border: none;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -28,13 +32,36 @@ h1 {
   color: #333;
 }
 
+.home-title {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  line-height: 1.2;
+}
+
 .lead {
   color: #666;
   font-size: 1.2rem;
+}
+
+.home-lead {
+  font-size: clamp(1rem, 2vw, 1.2rem);
 }
 
 h3 {
   font-weight: 600;
   color: #333;
   margin-bottom: 1.5rem;
+}
+
+.quick-actions-title {
+  margin-bottom: 1rem;
+}
+
+.action-btn {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .action-btn {
+    width: auto;
+  }
 }

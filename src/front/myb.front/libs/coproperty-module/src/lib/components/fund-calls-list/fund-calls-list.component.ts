@@ -289,6 +289,7 @@ export class FundCallsListComponent implements OnInit {
         (fc) =>
           fc.description?.toLowerCase().includes(term) ||
           (fc as any).copropertyName?.toLowerCase().includes(term) ||
+          fc.ownerName?.toLowerCase().includes(term) ||
           fc.owner?.firstName?.toLowerCase().includes(term) ||
           fc.owner?.lastName?.toLowerCase().includes(term)
       );
@@ -534,10 +535,8 @@ export class FundCallsListComponent implements OnInit {
    * that has reached a non-deletable state.
    */
   canDelete(fc: FundCallExtended): boolean {
-    // Prefer the server flag; fall back to the legacy client-side heuristic
-    // for older API responses that do not yet expose the field.
-    if (typeof fc.deletable === 'boolean') return fc.deletable;
-    return !this.isPublished(fc);
+    // Deletion is intentionally disabled in favor of cancellation for every state.
+    return false;
   }
 
   /** True when the user can trigger the cancellation workflow on this row. */
@@ -585,31 +584,11 @@ export class FundCallsListComponent implements OnInit {
    * French reason (FRS-FCF-LCM-2026-001 §2.1 / §4.4 / AC-25).
    */
   deleteFundCall(fundCall: FundCallExtended): void {
-    if (!fundCall.id) {
-      this.toastService.show("Impossible de supprimer : identifiant manquant", { classname: 'bg-danger text-white', delay: 4000 });
-      return;
-    }
-    // Refuse to delete a non-draft: explain why, then offer the cancel path.
-    if (!this.canDelete(fundCall)) {
-      const blocker = this.deleteBlockerReason(fundCall)
-        ?? "Suppression impossible. Cet appel de fonds a déjà été publié ou comporte des versements. Utilisez l'annulation à la place.";
-      this.toastService.show(blocker, { classname: 'bg-warning text-dark', delay: 6000 });
-      this.promptCancelFundCall(fundCall);
-      return;
-    }
-
-    // Open the friction-check delete modal (FRS-FCF-LCM-2026-001 §4.2.1).
-    // The modal itself performs the typed-confirmation check and the actual
-    // deleteFundCall call to the service; on success it closes itself.
-    const ref = this.fundCallModalService.openActionModal(fundCall);
-    if (!ref) return;
-    ref.result
-      .then(() => {
-        this.toastService.show("Appel de fonds supprimé avec succès", { classname: 'bg-success text-white', delay: 4000 });
-        // Reload the list to reflect the removed row.
-        this.loadAllFundCalls();
-      })
-      .catch(() => { /* dismissed */ });
+    this.toastService.show(
+      "La suppression n'est plus autorisée. Utilisez l'annulation.",
+      { classname: 'bg-warning text-dark', delay: 5000 }
+    );
+    this.promptCancelFundCall(fundCall);
   }
 
   /**
@@ -830,7 +809,9 @@ export class FundCallsListComponent implements OnInit {
       { label: 'Date de facture',  value: fmtD(inv.invoiceDate) },
       inv.dueDate ? { label: 'Date d\'échéance', value: fmtD(inv.dueDate) } : null,
       fc ? { label: 'Copropriété',   value: this.getCopropertyName(fc) } : null,
-      fc?.owner ? { label: 'Copropriétaire', value: this.getOwnerName(fc) } : null,
+      fc && this.getOwnerName(fc) !== '-'
+        ? { label: 'Copropriétaire', value: this.getOwnerName(fc) }
+        : null,
     ].filter(Boolean).map(m => `
       <div class="meta-item">
         <span class="meta-label">${m!.label}</span>
@@ -1231,11 +1212,11 @@ export class FundCallsListComponent implements OnInit {
    */
   cancelSelectedPublished(): void {
     const blocked = this.filteredFundCalls.filter(
-      (fc) => this.isSelected(fc.id) && this.canCancel(fc) && !this.canDelete(fc)
+      (fc) => this.isSelected(fc.id) && this.canCancel(fc)
     );
     if (!blocked.length) {
       this.toastService.show(
-        'Aucun appel de fonds publié n\'est sélectionné. Sélectionnez des appels de fonds publiés (non supprimables) pour pouvoir les annuler.',
+        'Aucun appel de fonds annulable n\'est sélectionné.',
         { classname: 'bg-info text-white', delay: 4000 }
       );
       return;

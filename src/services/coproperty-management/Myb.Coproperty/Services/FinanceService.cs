@@ -510,13 +510,16 @@ public class FinanceService : IFinanceService
 
             var healthStatus = GetHealthStatus(daysOverdue, overdueInvoices.Count);
 
-            var unitNumbers = ownerInvoices.Select(i => i.Unit?.UnitNumber ?? "N/A").Distinct().ToList();
+            var unitNumbers = ownerInvoices
+                .Select(i => i.Unit?.UnitNumber ?? i.UnitNumberSnapshot ?? "N/A")
+                .Distinct()
+                .ToList();
 
             var invoiceDetails = ownerInvoices.Select(i => new OwnerInvoiceDetail
             {
                 InvoiceId = i.Id,
                 InvoiceNumber = i.InvoiceNumber,
-                UnitNumber = i.Unit?.UnitNumber ?? "N/A",
+                UnitNumber = i.Unit?.UnitNumber ?? i.UnitNumberSnapshot ?? "N/A",
                 ChargeName = i.Charge?.Name ?? "N/A",
                 Amount = i.TotalAmount,
                 PaidAmount = i.Payments.Sum(p => p.Amount),
@@ -530,7 +533,10 @@ public class FinanceService : IFinanceService
             ownerSummaries.Add(new OwnerPaymentSummary
             {
                 OwnerId = owner?.Id ?? group.Key,
-                OwnerName = owner != null ? $"{owner.FirstName} {owner.LastName}" : "Unknown",
+                OwnerName = owner != null
+                    ? $"{owner.FirstName} {owner.LastName}".Trim()
+                    : ownerInvoices.Select(i => i.OwnerNameSnapshot)
+                        .FirstOrDefault(name => !string.IsNullOrWhiteSpace(name)) ?? "Unknown",
                 Email = owner?.Email ?? "",
                 Phone = owner?.Phone,
                 UnitNumbers = unitNumbers,
@@ -606,7 +612,7 @@ public class FinanceService : IFinanceService
         {
             InvoiceId = i.Id,
             InvoiceNumber = i.InvoiceNumber,
-            UnitNumber = i.Unit?.UnitNumber ?? "N/A",
+            UnitNumber = i.Unit?.UnitNumber ?? i.UnitNumberSnapshot ?? "N/A",
             ChargeName = i.Charge?.Name ?? "N/A",
             Amount = i.TotalAmount,
             PaidAmount = i.Payments.Sum(p => p.Amount),
@@ -620,10 +626,16 @@ public class FinanceService : IFinanceService
         return new OwnerPaymentSummary
         {
             OwnerId = ownerId,
-            OwnerName = owner != null ? $"{owner.FirstName} {owner.LastName}" : "Unknown",
+            OwnerName = owner != null
+                ? $"{owner.FirstName} {owner.LastName}".Trim()
+                : invoices.Select(i => i.OwnerNameSnapshot)
+                    .FirstOrDefault(name => !string.IsNullOrWhiteSpace(name)) ?? "Unknown",
             Email = owner?.Email ?? "",
             Phone = owner?.Phone,
-            UnitNumbers = invoices.Select(i => i.Unit?.UnitNumber ?? "N/A").Distinct().ToList(),
+            UnitNumbers = invoices
+                .Select(i => i.Unit?.UnitNumber ?? i.UnitNumberSnapshot ?? "N/A")
+                .Distinct()
+                .ToList(),
             TotalDue = totalDue,
             TotalPaid = totalPaid,
             TotalOutstanding = totalOutstanding,

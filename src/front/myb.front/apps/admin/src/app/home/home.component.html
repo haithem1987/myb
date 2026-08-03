@@ -1,58 +1,63 @@
-<div class="container mt-5">
+<div class="container home-container py-4 py-md-5">
   <div class="row">
-    <div class="col-md-12">
-      <h1>Welcome to Coproperty Management System</h1>
-      <p class="lead">Manage your properties efficiently</p>
+    <div class="col-12 text-center text-md-start">
+      <h1 class="home-title">Welcome to Coproperty Management System</h1>
+      <p class="lead home-lead mb-0">Manage your properties efficiently</p>
     </div>
   </div>
 
-  <div class="row mt-5">
-    <div class="col-md-4">
+  <div class="row g-3 g-md-4 mt-4 mt-md-5">
+    <div class="col-12 col-md-4">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title">
-            <i class="fas fa-building"></i> Coproperties
+          <h5 class="card-title d-flex align-items-center gap-2">
+            <i class="bi bi-building"></i>
+            <span>Coproperties</span>
           </h5>
           <p class="card-text">Manage your coproperties, units, and owners.</p>
-          <a routerLink="/admin/coproperties" class="btn btn-primary">Go to Admin</a>
+          <a routerLink="/admin/coproperties" class="btn btn-primary action-btn">Go to Admin</a>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-12 col-md-4">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title">
-            <i class="fas fa-chart-line"></i> Dashboard
+          <h5 class="card-title d-flex align-items-center gap-2">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
           </h5>
           <p class="card-text">View KPIs, charts, and recent activities.</p>
-          <a routerLink="/admin/coproperties" class="btn btn-info">View Dashboard</a>
+          <a routerLink="/admin/coproperties" class="btn btn-info action-btn">View Dashboard</a>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-12 col-md-4">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title">
-            <i class="fas fa-info-circle"></i> About
+          <h5 class="card-title d-flex align-items-center gap-2">
+            <i class="bi bi-info-circle"></i>
+            <span>About</span>
           </h5>
           <p class="card-text">Learn more about this platform.</p>
-          <button class="btn btn-secondary" disabled>Coming Soon</button>
+          <button class="btn btn-secondary action-btn" disabled>Coming Soon</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="row mt-5">
+  <div class="row mt-4 mt-md-5">
     <div class="col-md-12">
-      <h3>Quick Actions</h3>
-      <a routerLink="/admin/coproperties" [queryParams]="{ action: 'createAssembly' }" class="btn btn-outline-primary me-2">
-        <i class="fas fa-calendar-alt"></i> Create Assembly
-      </a>
-      <a routerLink="/admin/coproperties" [queryParams]="{ action: 'createFundCall' }" class="btn btn-outline-success">
-        <i class="fas fa-plus"></i> Create Fund Call
-      </a>
+      <h3 class="quick-actions-title">Quick Actions</h3>
+      <div class="quick-actions d-grid d-md-flex gap-2">
+        <a routerLink="/admin/coproperties" [queryParams]="{ action: 'createAssembly' }" class="btn btn-outline-primary">
+          <i class="bi bi-calendar-event me-1"></i> Create Assembly
+        </a>
+        <a routerLink="/admin/coproperties" [queryParams]="{ action: 'createFundCall' }" class="btn btn-outline-success">
+          <i class="bi bi-plus-circle me-1"></i> Create Fund Call
+        </a>
+      </div>
     </div>
   </div>
 </div>

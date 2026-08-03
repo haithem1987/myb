@@ -1,5 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types;
+using Microsoft.EntityFrameworkCore;
 using Myb.Coproperty.Infrastructure.Data;
 using Myb.Coproperty.Models;
 
@@ -50,7 +51,8 @@ namespace Myb.Coproperty.GraphQL.Types
 
             // Navigation properties
             descriptor.Field(f => f.Coproperty)
-                .ResolveWith<FundCallResolvers>(r => r.GetCoproperty(default!, default!));
+                .ResolveWith<FundCallResolvers>(r => r.GetCoproperty(default!, default!))
+                .Type<CopropertyType>();
             descriptor.Field(f => f.Owner)
                 .ResolveWith<FundCallResolvers>(r => r.GetOwner(default!, default!))
                 .Type<OwnerType>();
@@ -74,12 +76,20 @@ namespace Myb.Coproperty.GraphQL.Types
 
         private class FundCallResolvers
         {
-            public Models.Coproperty GetCoproperty([Parent] FundCall fundCall, [Service] CopropertyDbContext context)
-                => context.Coproperties.FirstOrDefault(c => c.Id == fundCall.CopropertyId)!;
+            public Models.Coproperty? GetCoproperty([Parent] FundCall fundCall, [Service] CopropertyDbContext context)
+                // Deleted coproperties remain available only through historical
+                // records. Ignore the operational soft-delete filter here so a
+                // nested `coproperty` selection does not become null or fail the
+                // whole fund-call GraphQL result.
+                => context.Coproperties
+                    .IgnoreQueryFilters()
+                    .FirstOrDefault(c => c.Id == fundCall.CopropertyId);
 
             public Owner? GetOwner([Parent] FundCall fundCall, [Service] CopropertyDbContext context)
                 => fundCall.OwnerId.HasValue
-                    ? context.Owners.FirstOrDefault(o => o.Id == fundCall.OwnerId.Value)
+                    ? context.Owners
+                        .IgnoreQueryFilters()
+                        .FirstOrDefault(o => o.Id == fundCall.OwnerId.Value)
                     : null;
 
             public List<FundCallPayment> GetPayments([Parent] FundCall fundCall, [Service] CopropertyDbContext context)
@@ -87,23 +97,32 @@ namespace Myb.Coproperty.GraphQL.Types
 
             public Currency GetCurrency([Parent] FundCall fundCall, [Service] CopropertyDbContext context)
             {
-                var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == fundCall.CopropertyId);
+                var coproperty = context.Coproperties
+                    .IgnoreQueryFilters()
+                    .FirstOrDefault(c => c.Id == fundCall.CopropertyId);
                 return coproperty?.Currency ?? fundCall.CurrencySnapshot;
             }
 
             public string? GetCopropertyName([Parent] FundCall fundCall, [Service] CopropertyDbContext context)
             {
-                var coproperty = context.Coproperties.FirstOrDefault(c => c.Id == fundCall.CopropertyId);
-                return coproperty?.Name ?? fundCall.CopropertyNameSnapshot;
+                return fundCall.CopropertyNameSnapshot
+                    ?? context.Coproperties
+                        .IgnoreQueryFilters()
+                        .Where(c => c.Id == fundCall.CopropertyId)
+                        .Select(c => c.Name)
+                        .FirstOrDefault();
             }
 
             public string? GetOwnerName([Parent] FundCall fundCall, [Service] CopropertyDbContext context)
             {
                 if (fundCall.OwnerId.HasValue)
                 {
-                    var owner = context.Owners.FirstOrDefault(o => o.Id == fundCall.OwnerId.Value);
+                    var owner = context.Owners
+                        .IgnoreQueryFilters()
+                        .FirstOrDefault(o => o.Id == fundCall.OwnerId.Value);
                     if (owner != null)
-                        return $"{owner.FirstName} {owner.LastName}".Trim();
+                        return fundCall.OwnerNameSnapshot
+                            ?? $"{owner.FirstName} {owner.LastName}".Trim();
                 }
                 return fundCall.OwnerNameSnapshot;
             }

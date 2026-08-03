@@ -2,9 +2,9 @@
   <div class="page-header">
     <h1>
       <i class="bi bi-piggy-bank me-2"></i>
-      Appels de Fonds
+      {{ 'coproperty.fundCalls.title' | translate }}
     </h1>
-    <p class="text-muted">Gérez les appels de fonds pour vos copropriétés</p>
+    <p class="text-muted">{{ 'coproperty.fundCalls.subtitle' | translate }}</p>
   </div>
 
   <!-- Filter & Create Section -->
@@ -16,14 +16,14 @@
         <div class="col-md-3">
           <label for="copropertyFilter" class="form-label">
             <i class="bi bi-building me-1"></i>
-            Copropriété
+            {{ 'coproperty.fundCalls.filters.coproperty' | translate }}
           </label>
           <select
             id="copropertyFilter"
             class="form-select"
             [value]="selectedCopropertyId() || 'all'"
             (change)="onCopropertyChange($any($event.target).value)">
-            <option value="all">Toutes les copropriétés</option>
+            <option value="all">{{ 'coproperty.fundCalls.filters.allCoproperties' | translate }}</option>
             <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
               {{ coproperty.name }}
             </option>
@@ -34,14 +34,14 @@
         <div class="col-md-2">
           <label for="ownerFilter" class="form-label">
             <i class="bi bi-person me-1"></i>
-            Copropriétaire
+            {{ 'coproperty.fundCalls.filters.owner' | translate }}
           </label>
           <select
             id="ownerFilter"
             class="form-select"
             [value]="filterOwnerId()"
             (change)="onOwnerFilterChange($event)">
-            <option value="">Tous</option>
+            <option value="">{{ 'coproperty.fundCalls.filters.allOwners' | translate }}</option>
             <option *ngFor="let owner of uniqueOwnersForFilter" [value]="owner.id">
               {{ owner.firstName }} {{ owner.lastName }}
             </option>
@@ -52,14 +52,14 @@
         <div class="col-md-2">
           <label for="yearFilter" class="form-label">
             <i class="bi bi-calendar me-1"></i>
-            Année
+            {{ 'coproperty.fundCalls.filters.year' | translate }}
           </label>
           <select
             id="yearFilter"
             class="form-select"
             [value]="filterYear() ?? ''"
             (change)="onYearFilterChange($event)">
-            <option value="">Toutes</option>
+            <option value="">{{ 'coproperty.fundCalls.filters.allYears' | translate }}</option>
             <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
           </select>
         </div>
@@ -68,19 +68,19 @@
         <div class="col-md-2">
           <label for="statusFilter" class="form-label">
             <i class="bi bi-bookmark me-1"></i>
-            Statut
+            {{ 'coproperty.fundCalls.filters.status' | translate }}
           </label>
           <select
             id="statusFilter"
             class="form-select"
             [value]="filterStatus()"
             (change)="onStatusFilterChange($event)">
-            <option value="">Tous les statuts</option>
-            <option value="UNPAID">Impayés (À payer + En attente)</option>
-            <option value="TO_PAY">À payer</option>
-            <option value="PENDING_VALIDATION">En attente de validation</option>
-            <option value="PAID">Réglé</option>
-            <option value="CANCELLED">Annulé</option>
+            <option value="">{{ 'coproperty.fundCalls.filters.allStatuses' | translate }}</option>
+            <option value="UNPAID">{{ 'coproperty.fundCalls.filters.unpaid' | translate }}</option>
+            <option value="TO_PAY">{{ 'coproperty.fundCalls.filters.toPay' | translate }}</option>
+            <option value="PENDING_VALIDATION">{{ 'coproperty.fundCalls.filters.pendingValidation' | translate }}</option>
+            <option value="PAID">{{ 'coproperty.fundCalls.filters.paid' | translate }}</option>
+            <option value="CANCELLED">{{ 'coproperty.fundCalls.filters.cancelled' | translate }}</option>
           </select>
         </div>
 
@@ -88,7 +88,7 @@
         <div class="col-md-3">
           <label for="searchInput" class="form-label">
             <i class="bi bi-search me-1"></i>
-            Recherche
+            {{ 'coproperty.fundCalls.filters.search' | translate }}
           </label>
           <input
             type="text"
@@ -114,9 +114,9 @@
               <i class="bi bi-cash-stack"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Montant Appelé</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.fundCalls.stats.called' | translate }}</h6>
               <h3 class="mb-0">{{ getCalledAmountDisplay() }}</h3>
-              <small class="text-muted">{{ filteredFundCalls.length }} appel(s)</small>
+              <small class="text-muted">{{ filteredFundCalls.length }} {{ 'coproperty.fundCalls.stats.calls' | translate }}</small>
             </div>
           </div>
         </div>
@@ -131,9 +131,9 @@
               <i class="bi bi-check-circle"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Encaissé</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.fundCalls.stats.collected' | translate }}</h6>
               <h3 class="mb-0">{{ getPaidAmountDisplay() }}</h3>
-              <small class="text-muted">{{ getPaidCount() }} réglé(s)</small>
+              <small class="text-muted">{{ getPaidCount() }} {{ 'coproperty.fundCalls.stats.settled' | translate }}</small>
             </div>
           </div>
         </div>
@@ -148,9 +148,9 @@
               <i class="bi bi-hourglass-split"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Reste à percevoir</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.fundCalls.stats.remaining' | translate }}</h6>
               <h3 class="mb-0">{{ getRemainingAmountDisplay() }}</h3>
-              <small class="text-muted">{{ getToPayCount() }} en attente</small>
+              <small class="text-muted">{{ getToPayCount() }} {{ 'coproperty.fundCalls.stats.pending' | translate }}</small>
             </div>
           </div>
         </div>
@@ -165,7 +165,7 @@
               <i class="bi bi-pie-chart"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Recouvrement</h6>
+              <h6 class="text-muted mb-0">{{ 'coproperty.fundCalls.stats.recovery' | translate }}</h6>
               <h3 class="mb-0">
                 {{ getTotalAmount() > 0 ? ((getTotalPaidAmount() / getTotalAmount()) * 100 | number:'1.0-0') : 0 }}%
               </h3>
@@ -193,18 +193,18 @@
         <div>
           <h6 class="alert-heading mb-1">
             <i class="bi bi-bell-fill me-1"></i>
-            Relance requise &mdash; Impayés détectés
+            {{ 'coproperty.fundCalls.overdue.title' | translate }}
           </h6>
           <p class="mb-0 small">
-            <strong>{{ getOverdueCount() }}</strong> appel(s) de fonds en retard de paiement pour un montant total impayé de
+            <strong>{{ getOverdueCount() }}</strong> {{ 'coproperty.fundCalls.overdue.message' | translate }}
             <strong class="text-danger">{{ getOverdueAmountDisplay() }}</strong>.
-            Veuillez relancer les copropriétaires concernés.
+            {{ 'coproperty.fundCalls.overdue.cta' | translate }}
           </p>
         </div>
       </div>
       <div class="d-flex gap-2 flex-shrink-0 ms-3">
         <span class="badge bg-danger rounded-pill fs-6 px-3 py-2">
-          {{ getOverdueCount() }} impayé(s)
+          {{ getOverdueCount() }} {{ 'coproperty.fundCalls.overdue.badge' | translate }}
         </span>
       </div>
     </div>
@@ -212,7 +212,7 @@
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">
         <i class="bi bi-list-ul me-2"></i>
-        Liste des Appels de Fonds ({{ filteredFundCalls.length }})
+        {{ 'coproperty.fundCalls.table.title' | translate }} ({{ filteredFundCalls.length }})
       </h5>
     </div>
     <div class="card-body">
@@ -225,26 +225,26 @@
 
       <div *ngIf="!loading() && filteredFundCalls.length === 0" class="text-center py-5">
         <i class="bi bi-inbox display-1 text-muted"></i>
-        <p class="text-muted mt-3">Aucun appel de fonds trouvé</p>
-        <p class="text-muted">Les appels de fonds seront affichés ici une fois créés</p>
+        <p class="text-muted mt-3">{{ 'coproperty.fundCalls.noData' | translate }}</p>
+        <p class="text-muted">{{ 'coproperty.fundCalls.noDataMessage' | translate }}</p>
       </div>
 
       <!-- Bulk action bar — FRS-FCF-LCM-2026-001 §2.3 / §4.1 -->
       <div *ngIf="hasSelection" class="bulk-action-bar d-flex align-items-center gap-2 mb-3 px-3 py-2 rounded-3 border border-primary bg-primary bg-opacity-10">
         <span class="badge bg-primary rounded-pill">{{ selectedCount }}</span>
-        <span class="small text-primary fw-semibold">sélectionné(s)</span>
+        <span class="small text-primary fw-semibold">{{ 'coproperty.fundCalls.bulk.selected' | translate }}</span>
         <div class="vr mx-1"></div>
-        <button class="btn btn-sm btn-success" (click)="bulkChangeStatus('PAID')" title="Marquer comme Réglé">
-          <i class="bi bi-check-circle-fill me-1"></i>Réglé
+        <button class="btn btn-sm btn-success" (click)="bulkChangeStatus('PAID')" [title]="'coproperty.fundCalls.bulk.markPaid' | translate">
+          <i class="bi bi-check-circle-fill me-1"></i>{{ 'coproperty.fundCalls.bulk.markPaid' | translate }}
         </button>
-        <button class="btn btn-sm btn-warning" (click)="bulkChangeStatus('TO_PAY')" title="Remettre en À payer">
-          <i class="bi bi-arrow-counterclockwise me-1"></i>À payer
+        <button class="btn btn-sm btn-warning" (click)="bulkChangeStatus('TO_PAY')" [title]="'coproperty.fundCalls.bulk.markToPay' | translate">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>{{ 'coproperty.fundCalls.bulk.markToPay' | translate }}
         </button>
         <div class="ms-auto d-flex gap-2">
           <button class="btn btn-sm btn-warning text-white"
                   (click)="cancelSelectedPublished()"
-                  title="Annuler les appels de fonds sélectionnés (workflow non-destructif)">
-            <i class="bi bi-x-octagon me-1"></i>Annuler la sélection
+                  [title]="'coproperty.fundCalls.bulk.cancel' | translate">
+            <i class="bi bi-x-octagon me-1"></i>{{ 'coproperty.fundCalls.bulk.cancel' | translate }}
           </button>
         </div>
       </div>
@@ -259,14 +259,14 @@
                   (change)="toggleSelectAll()"
                   title="Sélectionner tout">
               </th>
-              <th>Copropriété</th>
-              <th>Copropriétaire</th>
-              <th>Description</th>
-              <th>Montant</th>
-              <th>Date Limite</th>
-              <th>Statut</th>
-              <th>Versements</th>
-              <th class="text-end">Actions</th>
+              <th>{{ 'coproperty.fundCalls.table.coproperty' | translate }}</th>
+              <th>{{ 'coproperty.fundCalls.table.owner' | translate }}</th>
+              <th>{{ 'coproperty.fundCalls.table.description' | translate }}</th>
+              <th>{{ 'coproperty.fundCalls.table.amount' | translate }}</th>
+              <th>{{ 'coproperty.fundCalls.table.dueDate' | translate }}</th>
+              <th>{{ 'coproperty.fundCalls.table.status' | translate }}</th>
+              <th>{{ 'coproperty.fundCalls.table.payments' | translate }}</th>
+              <th class="text-end">{{ 'coproperty.fundCalls.table.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -304,12 +304,12 @@
               <td>
                 <span class="badge d-inline-flex align-items-center gap-1"
                       [ngClass]="getStatusBadge(fundCall.status)"
-                      [attr.aria-label]="isCancelled(fundCall) ? 'Appel de fonds annulé (lecture seule)' : null">
+                      [attr.aria-label]="isCancelled(fundCall) ? ('coproperty.fundCalls.actions.cancel' | translate) : null">
                   <i *ngIf="isCancelled(fundCall)" class="bi bi-lock-fill" aria-hidden="true"></i>
                   {{ getStatusLabel(fundCall.status) }}
                 </span>
-                <span *ngIf="isOverdue(fundCall)" class="badge bg-danger ms-1" title="Relance nécessaire">
-                  <i class="bi bi-bell-fill me-1"></i>Relance
+                <span *ngIf="isOverdue(fundCall)" class="badge bg-danger ms-1" [title]="'coproperty.fundCalls.overdueBadge' | translate">
+                  <i class="bi bi-bell-fill me-1"></i>{{ 'coproperty.fundCalls.overdueBadge' | translate }}
                 </span>
               </td>
               <td style="min-width:120px">
@@ -346,29 +346,23 @@
                             (click)="editFundCall(fundCall)"
                             [disabled]="isCancelled(fundCall)">
                       <i class="bi bi-pencil-fill me-2"></i>
-                      {{ isCancelled(fundCall) ? 'Voir (lecture seule)' : 'Modifier / Paiement' }}
+                      {{ isCancelled(fundCall) ? ('coproperty.fundCalls.actions.view' | translate) : ('coproperty.fundCalls.actions.edit' | translate) }}
                     </button>
                     <button ngbDropdownItem
                             (click)="previewInvoice(fundCall)"
                             [disabled]="isCancelled(fundCall)">
-                      <i class="bi bi-file-earmark-text me-2"></i>Prévisualiser facture
+                      <i class="bi bi-file-earmark-text me-2"></i>{{ 'coproperty.fundCalls.actions.previewInvoice' | translate }}
                     </button>
-                    <div class="dropdown-divider" *ngIf="canDelete(fundCall) || canCancel(fundCall)"></div>
-
-                    <!-- Delete option: ONLY for true drafts (FRS-FCF-LCM-2026-001 §4.1).
-                         Server-side `deletable` flag is the source of truth. -->
-                    <button *ngIf="canDelete(fundCall)" ngbDropdownItem class="text-danger" (click)="deleteFundCall(fundCall)">
-                      <i class="bi bi-trash me-2"></i>Supprimer
-                    </button>
+                    <div class="dropdown-divider" *ngIf="canCancel(fundCall)"></div>
 
                     <!-- Cancel option: for any non-terminal record that is not
                          a true draft. Triggers the cancellation modal with a
                          mandatory reason. -->
-                    <button *ngIf="canCancel(fundCall) && !canDelete(fundCall)"
+                    <button *ngIf="canCancel(fundCall)"
                             ngbDropdownItem
                             class="text-warning"
                             (click)="promptCancelFundCall(fundCall)">
-                      <i class="bi bi-x-octagon me-2"></i>Annuler l'appel de fonds
+                      <i class="bi bi-x-octagon me-2"></i>{{ 'coproperty.fundCalls.actions.cancel' | translate }}
                     </button>
                   </div>
                 </div>
@@ -389,7 +383,7 @@
   <div class="edit-panel-header">
     <h5 class="mb-0">
       <i class="bi bi-pencil-square me-2"></i>
-      Modifier l'appel de fonds
+      {{ 'coproperty.fundCalls.editPanel.title' | translate }}
     </h5>
     <button type="button" class="btn-close" (click)="closeEditPanel()"></button>
   </div>
@@ -402,7 +396,7 @@
         <!-- Status badge -->
         <div class="col-6">
           <div class="small text-muted mb-1">
-            <i class="bi bi-bookmark me-1"></i>Statut
+            <i class="bi bi-bookmark me-1"></i>{{ 'coproperty.fundCalls.editPanel.status' | translate }}
           </div>
           <span class="badge fs-6 px-3 py-2" [ngClass]="getStatusBadge(editingFundCall()!.status)">
             {{ getStatusLabel(editingFundCall()!.status) }}
@@ -411,7 +405,7 @@
         <!-- Payment progress -->
         <div class="col-6">
           <div class="small text-muted mb-1">
-            <i class="bi bi-cash-coin me-1"></i>Versements
+            <i class="bi bi-cash-coin me-1"></i>{{ 'coproperty.fundCalls.payments.title' | translate }}
           </div>
           <div class="d-flex justify-content-between small fw-semibold mb-1">
             <span [class.text-success]="getRemainingAmount(editingFundCall()!) === 0"
@@ -432,10 +426,10 @@
             [class.text-danger]="getRemainingAmount(editingFundCall()!) > 0"
             [class.text-success]="getRemainingAmount(editingFundCall()!) === 0">
             <ng-container *ngIf="getRemainingAmount(editingFundCall()!) > 0">
-              Reste : {{ formatAmount(getRemainingAmount(editingFundCall()!), editingFundCall()!.currency) }}
+              {{ 'coproperty.fundCalls.editPanel.remaining' | translate }} : {{ formatAmount(getRemainingAmount(editingFundCall()!), editingFundCall()!.currency) }}
             </ng-container>
             <ng-container *ngIf="getRemainingAmount(editingFundCall()!) === 0">
-              <i class="bi bi-check-circle-fill me-1"></i>Soldé
+              <i class="bi bi-check-circle-fill me-1"></i>{{ 'coproperty.fundCalls.editPanel.settled' | translate }}
             </ng-container>
           </div>
         </div>
@@ -446,11 +440,11 @@
     <div class="payments-section mb-3">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h6 class="mb-0">
-          <i class="bi bi-cash-coin me-1"></i>Historique des versements
+          <i class="bi bi-cash-coin me-1"></i>{{ 'coproperty.fundCalls.payments.title' | translate }}
         </h6>
         <button type="button" class="btn btn-sm btn-outline-primary" (click)="togglePaymentForm()">
           <i class="bi" [ngClass]="showPaymentForm() ? 'bi-x-lg' : 'bi-plus-lg'"></i>
-          {{ showPaymentForm() ? 'Annuler' : 'Ajouter' }}
+          {{ showPaymentForm() ? ('coproperty.fundCalls.payments.cancel' | translate) : ('coproperty.fundCalls.payments.add' | translate) }}
         </button>
       </div>
 
@@ -484,23 +478,23 @@
                 [class.text-dark]="payment.validationStatus === 'Pending'"
                 [class.bg-success]="payment.validationStatus === 'Approved'"
                 [class.bg-danger]="payment.validationStatus === 'Rejected'">
-                <ng-container *ngIf="payment.validationStatus === 'Pending'"><i class="bi bi-clock me-1"></i>En attente</ng-container>
-                <ng-container *ngIf="payment.validationStatus === 'Approved'"><i class="bi bi-check2 me-1"></i>Validé</ng-container>
-                <ng-container *ngIf="payment.validationStatus === 'Rejected'"><i class="bi bi-x-lg me-1"></i>Refusé</ng-container>
+                <ng-container *ngIf="payment.validationStatus === 'Pending'"><i class="bi bi-clock me-1"></i>{{ 'coproperty.fundCalls.payments.pending' | translate }}</ng-container>
+                <ng-container *ngIf="payment.validationStatus === 'Approved'"><i class="bi bi-check2 me-1"></i>{{ 'coproperty.fundCalls.payments.approved' | translate }}</ng-container>
+                <ng-container *ngIf="payment.validationStatus === 'Rejected'"><i class="bi bi-x-lg me-1"></i>{{ 'coproperty.fundCalls.payments.rejected' | translate }}</ng-container>
               </span>
               <!-- Review buttons for pending payments -->
               <ng-container *ngIf="payment.validationStatus === 'Pending'">
                 <button type="button" class="btn btn-sm btn-success mt-1" style="font-size:0.7rem;padding:2px 8px"
                   [disabled]="reviewingPaymentId() === payment.id"
                   (click)="approvePayment(payment.id)"
-                  title="Valider ce paiement">
-                  <i class="bi bi-check-circle-fill me-1"></i>Valider
+                  [title]="'coproperty.fundCalls.payments.validate' | translate">
+                  <i class="bi bi-check-circle-fill me-1"></i>{{ 'coproperty.fundCalls.payments.validate' | translate }}
                 </button>
                 <button type="button" class="btn btn-sm btn-outline-danger mt-1" style="font-size:0.7rem;padding:2px 8px"
                   [disabled]="reviewingPaymentId() === payment.id"
                   (click)="openRejectDialog(payment.id)"
-                  title="Refuser ce paiement">
-                  <i class="bi bi-x-circle me-1"></i>Refuser
+                  [title]="'coproperty.fundCalls.payments.reject' | translate">
+                  <i class="bi bi-x-circle me-1"></i>{{ 'coproperty.fundCalls.payments.reject' | translate }}
                 </button>
               </ng-container>
             </div>
@@ -510,7 +504,7 @@
 
       <div *ngIf="!editingFundCall()!.payments || editingFundCall()!.payments!.length === 0"
            class="text-center text-muted small py-2 mb-2">
-        <i class="bi bi-inbox me-1"></i>Aucun versement enregistré
+        <i class="bi bi-inbox me-1"></i>{{ 'coproperty.fundCalls.payments.none' | translate }}
       </div>
 
       <!-- Add payment form -->
@@ -518,26 +512,26 @@
         <form [formGroup]="paymentForm" (ngSubmit)="addPayment()">
           <div class="mb-2">
             <label class="form-label small">
-              <i class="bi bi-cash me-1"></i>Montant <span class="text-danger">*</span>
+              <i class="bi bi-cash me-1"></i>{{ 'coproperty.fundCalls.payments.amount' | translate }} <span class="text-danger">*</span>
             </label>
             <input type="number" class="form-control form-control-sm" step="0.01" min="0.01"
               formControlName="amount"
-              [placeholder]="'Montant du versement'"
+              [placeholder]="'coproperty.fundCalls.payments.amount' | translate"
               [class.is-invalid]="paymentForm.get('amount')?.invalid && paymentForm.get('amount')?.touched">
-            <div class="invalid-feedback">Montant invalide</div>
+            <div class="invalid-feedback">{{ 'coproperty.fundCalls.payments.invalidAmount' | translate }}</div>
           </div>
           <div class="mb-2">
             <label class="form-label small">
-              <i class="bi bi-calendar-event me-1"></i>Date <span class="text-danger">*</span>
+              <i class="bi bi-calendar-event me-1"></i>{{ 'coproperty.fundCalls.payments.date' | translate }} <span class="text-danger">*</span>
             </label>
             <input type="date" class="form-control form-control-sm"
               formControlName="paymentDate"
               [class.is-invalid]="paymentForm.get('paymentDate')?.invalid && paymentForm.get('paymentDate')?.touched">
-            <div class="invalid-feedback">Date requise</div>
+            <div class="invalid-feedback">{{ 'coproperty.fundCalls.payments.dateRequired' | translate }}</div>
           </div>
           <div class="mb-3">
             <label class="form-label small">
-              <i class="bi bi-paperclip me-1"></i>Justificatif
+              <i class="bi bi-paperclip me-1"></i>{{ 'coproperty.fundCalls.payments.justificatif' | translate }}
             </label>
             <!-- Hidden real file input -->
             <input type="file"
@@ -548,12 +542,12 @@
             <!-- Styled trigger button + file name preview -->
             <div class="input-group input-group-sm">
               <label for="justificatifFileInput" class="btn btn-outline-secondary mb-0" style="cursor:pointer">
-                <i class="bi bi-upload me-1"></i>Choisir un fichier
+                <i class="bi bi-upload me-1"></i>{{ 'coproperty.fundCalls.payments.chooseFile' | translate }}
               </label>
               <span class="form-control text-truncate"
                 [class.text-muted]="!selectedJustificatifFile()"
                 [title]="selectedJustificatifFile()?.name || ''">
-                {{ selectedJustificatifFile()?.name || 'Aucun fichier sélectionné' }}
+                {{ selectedJustificatifFile()?.name || ('coproperty.fundCalls.payments.noFile' | translate) }}
               </span>
               <button *ngIf="selectedJustificatifFile()" type="button"
                 class="btn btn-outline-danger btn-sm"
@@ -562,16 +556,16 @@
                 <i class="bi bi-x-lg"></i>
               </button>
             </div>
-            <div class="form-text">PDF, image, Word ou Excel (facultatif)</div>
+            <div class="form-text">{{ 'coproperty.fundCalls.payments.fileHelp' | translate }}</div>
           </div>
           <button type="submit" class="btn btn-sm btn-success w-100"
             [disabled]="paymentForm.invalid || addingPayment()">
             <span *ngIf="!addingPayment()">
-              <i class="bi bi-plus-circle me-1"></i>Enregistrer le versement
+              <i class="bi bi-plus-circle me-1"></i>{{ 'coproperty.fundCalls.payments.save' | translate }}
             </span>
             <span *ngIf="addingPayment()">
               <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-              Ajout...
+              {{ 'coproperty.fundCalls.payments.saving' | translate }}
             </span>
           </button>
         </form>
@@ -586,7 +580,7 @@
       <!-- Status -->
       <div class="mb-3">
         <label class="form-label fw-semibold">
-          <i class="bi bi-bookmark-fill me-1"></i>Statut
+          <i class="bi bi-bookmark-fill me-1"></i>{{ 'coproperty.fundCalls.editPanel.statusLabel' | translate }}
         </label>
         <select class="form-select" formControlName="status">
           <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
@@ -596,7 +590,7 @@
       <!-- Coproperty (read-only in edit) -->
       <div class="mb-3">
         <label class="form-label">
-          <i class="bi bi-building me-1"></i>Copropriété
+          <i class="bi bi-building me-1"></i>{{ 'coproperty.fundCalls.editPanel.coproperty' | translate }}
         </label>
         <input type="text" class="form-control" readonly
           [value]="getCopropertyName(editingFundCall()!)">
@@ -605,7 +599,7 @@
       <!-- Owner -->
       <div class="mb-3">
         <label class="form-label">
-          <i class="bi bi-person me-1"></i>Copropriétaire
+          <i class="bi bi-person me-1"></i>{{ 'coproperty.fundCalls.editPanel.owner' | translate }}
         </label>
         <div class="form-control" role="textbox" aria-readonly="true">
           {{ getEditingOwnerDisplayName() }}
@@ -615,35 +609,35 @@
       <!-- Amount -->
       <div class="mb-3">
         <label class="form-label">
-          <i class="bi bi-cash-stack me-1"></i>Montant <span class="text-danger">*</span>
+          <i class="bi bi-cash-stack me-1"></i>{{ 'coproperty.fundCalls.editPanel.amount' | translate }} <span class="text-danger">*</span>
         </label>
         <input type="number" class="form-control" step="0.01" min="0.01"
           formControlName="amount"
           [readonly]="isAmountLocked()"
           [class.is-invalid]="editForm.get('amount')?.invalid && editForm.get('amount')?.touched">
-        <div class="invalid-feedback">Montant invalide</div>
+        <div class="invalid-feedback">{{ 'coproperty.fundCalls.payments.invalidAmount' | translate }}</div>
         <small *ngIf="isAmountLocked()" class="form-text text-muted">
-          <i class="bi bi-lock-fill me-1"></i>Le montant ne peut être modifié qu'en attente de validation.
+          <i class="bi bi-lock-fill me-1"></i>{{ 'coproperty.fundCalls.editPanel.amountLockedHint' | translate }}
         </small>
       </div>
 
       <!-- Due Date -->
       <div class="mb-3">
         <label class="form-label">
-          <i class="bi bi-calendar-event me-1"></i>Date limite <span class="text-danger">*</span>
+          <i class="bi bi-calendar-event me-1"></i>{{ 'coproperty.fundCalls.editPanel.dueDate' | translate }} <span class="text-danger">*</span>
         </label>
         <input type="date" class="form-control"
           formControlName="dueDate"
           [class.is-invalid]="editForm.get('dueDate')?.invalid && editForm.get('dueDate')?.touched">
-        <div class="invalid-feedback">Date requise</div>
+        <div class="invalid-feedback">{{ 'coproperty.fundCalls.payments.dateRequired' | translate }}</div>
       </div>
 
       <!-- Description -->
       <div class="mb-4">
         <label class="form-label">
-          <i class="bi bi-pencil me-1"></i>Description
+          <i class="bi bi-pencil me-1"></i>{{ 'coproperty.fundCalls.editPanel.description' | translate }}
         </label>
-        <input type="text" class="form-control" placeholder="Description"
+        <input type="text" class="form-control" [placeholder]="'coproperty.fundCalls.editPanel.description' | translate"
           formControlName="description">
       </div>
 
@@ -652,15 +646,15 @@
         <button type="submit" class="btn btn-primary flex-fill"
           [disabled]="editForm.invalid || savingEdit()">
           <span *ngIf="!savingEdit()">
-            <i class="bi bi-check-circle me-1"></i>Enregistrer
+            <i class="bi bi-check-circle me-1"></i>{{ 'coproperty.fundCalls.editPanel.save' | translate }}
           </span>
           <span *ngIf="savingEdit()">
             <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-            Sauvegarde...
+            {{ 'coproperty.fundCalls.editPanel.saving' | translate }}
           </span>
         </button>
         <button type="button" class="btn btn-outline-secondary" (click)="closeEditPanel()" [disabled]="savingEdit()">
-          <i class="bi bi-x-circle me-1"></i>Annuler
+          <i class="bi bi-x-circle me-1"></i>{{ 'common.cancel' | translate }}
         </button>
       </div>
 
@@ -677,7 +671,7 @@
   <div class="invoice-modal-header no-print">
     <h5 class="mb-0">
       <i class="bi bi-file-earmark-text me-2"></i>
-      Prévisualisation de la facture
+      {{ 'coproperty.fundCalls.invoice.preview' | translate }}
     </h5>
     <button type="button" class="btn-close" (click)="closeInvoiceModal()"></button>
   </div>
@@ -702,7 +696,7 @@
           <h4 class="inv-title">FACTURE</h4>
           <div class="inv-num"># {{ pendingInvoice()!.invoiceNum }}</div>
           <span class="badge" [ngClass]="createdInvoice() ? 'bg-success' : 'bg-warning text-dark'">
-            {{ createdInvoice() ? 'Générée' : 'Brouillon' }}
+            {{ createdInvoice() ? ('coproperty.fundCalls.invoice.generated' | translate) : ('coproperty.fundCalls.invoice.draft' | translate) }}
           </span>
         </div>
       </div>
@@ -712,19 +706,19 @@
       <!-- Dates row -->
       <div class="inv-dates">
         <div class="inv-date-item">
-          <span class="inv-date-label">Date de facture</span>
+          <span class="inv-date-label">{{ 'coproperty.fundCalls.invoice.invoiceDate' | translate }}</span>
           <span class="inv-date-value">{{ formatDate(pendingInvoice()!.invoiceDate ?? undefined) }}</span>
         </div>
         <div class="inv-date-item" *ngIf="pendingInvoice()!.dueDate">
-          <span class="inv-date-label">Date d'échéance</span>
+          <span class="inv-date-label">{{ 'coproperty.fundCalls.invoice.dueDate' | translate }}</span>
           <span class="inv-date-value">{{ formatDate(pendingInvoice()!.dueDate ?? undefined) }}</span>
         </div>
         <div class="inv-date-item" *ngIf="pendingFundCall()">
-          <span class="inv-date-label">Copropriété</span>
+          <span class="inv-date-label">{{ 'coproperty.fundCalls.invoice.coproperty' | translate }}</span>
           <span class="inv-date-value">{{ getCopropertyName(pendingFundCall()!) }}</span>
         </div>
-        <div class="inv-date-item" *ngIf="pendingFundCall()?.owner">
-          <span class="inv-date-label">Copropriétaire</span>
+        <div class="inv-date-item" *ngIf="pendingFundCall() && getOwnerName(pendingFundCall()!) !== '-'">
+          <span class="inv-date-label">{{ 'coproperty.fundCalls.invoice.owner' | translate }}</span>
           <span class="inv-date-value">{{ getOwnerName(pendingFundCall()!) }}</span>
         </div>
       </div>
@@ -735,10 +729,10 @@
       <table class="inv-table">
         <thead>
           <tr>
-            <th>Description</th>
-            <th class="text-center">Qté</th>
-            <th class="text-end">Prix unit.</th>
-            <th class="text-end">Total HT</th>
+            <th>{{ 'coproperty.fundCalls.invoice.description' | translate }}</th>
+            <th class="text-center">{{ 'coproperty.fundCalls.invoice.qty' | translate }}</th>
+            <th class="text-end">{{ 'coproperty.fundCalls.invoice.unitPrice' | translate }}</th>
+            <th class="text-end">{{ 'coproperty.fundCalls.invoice.totalHT' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -753,11 +747,11 @@
         </tbody>
         <tfoot>
           <tr class="inv-subtotal">
-            <td colspan="3" class="text-end">Sous-total HT</td>
+            <td colspan="3" class="text-end">{{ 'coproperty.fundCalls.invoice.subtotalHT' | translate }}</td>
             <td class="text-end">{{ formatAmount(pendingInvoice()!.subTotal) }}</td>
           </tr>
           <tr class="inv-total">
-            <td colspan="3" class="text-end"><strong>TOTAL TTC</strong></td>
+            <td colspan="3" class="text-end"><strong>{{ 'coproperty.fundCalls.invoice.totalTTC' | translate }}</strong></td>
             <td class="text-end"><strong>{{ formatAmount(pendingInvoice()!.totalAmount) }}</strong></td>
           </tr>
         </tfoot>
@@ -766,7 +760,7 @@
       <!-- Footer note -->
       <div class="inv-footer-note">
         <i class="bi bi-info-circle me-1"></i>
-        Appel de fonds généré par MYB Syndic • Payable à réception
+        {{ 'coproperty.fundCalls.invoice.footerNote' | translate }}
       </div>
     </div>
 
@@ -775,7 +769,7 @@
   <!-- Action bar -->
   <div class="invoice-modal-footer no-print" *ngIf="pendingInvoice()">
     <button type="button" class="btn btn-secondary" (click)="closeInvoiceModal()">
-      <i class="bi bi-x-circle me-1"></i>Fermer
+      <i class="bi bi-x-circle me-1"></i>{{ 'coproperty.fundCalls.invoice.close' | translate }}
     </button>
 
     <ng-container *ngIf="!createdInvoice()">
@@ -783,18 +777,18 @@
         [disabled]="generatingInvoice()"
         (click)="confirmAndCreateInvoice()">
         <span *ngIf="!generatingInvoice()">
-          <i class="bi bi-check-circle me-1"></i>Confirmer &amp; Générer
+          <i class="bi bi-check-circle me-1"></i>{{ 'coproperty.fundCalls.invoice.confirm' | translate }}
         </span>
         <span *ngIf="generatingInvoice()">
           <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-          Génération...
+          {{ 'coproperty.fundCalls.invoice.generating' | translate }}
         </span>
       </button>
     </ng-container>
 
     <ng-container *ngIf="createdInvoice()">
       <button type="button" class="btn btn-success" (click)="downloadInvoice()">
-        <i class="bi bi-download me-1"></i>Télécharger PDF
+        <i class="bi bi-download me-1"></i>{{ 'coproperty.fundCalls.invoice.download' | translate }}
       </button>
     </ng-container>
   </div>
@@ -805,29 +799,26 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Refuser le paiement</h5>
+        <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>{{ 'coproperty.fundCalls.rejectModal.title' | translate }}</h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeRejectDialog()"></button>
       </div>
       <div class="modal-body">
-        <p class="text-muted small mb-3">
-          Indiquez le motif du refus. L'application de fonds sera remise à l'état <strong>À payer</strong>
-          et le propriétaire sera notifié par email.
-        </p>
-        <label class="form-label fw-semibold">Motif du refus <span class="text-danger">*</span></label>
+        <p class="text-muted small mb-3">{{ 'coproperty.fundCalls.rejectModal.hint' | translate }}</p>
+        <label class="form-label fw-semibold">{{ 'coproperty.fundCalls.rejectModal.reason' | translate }} <span class="text-danger">*</span></label>
         <textarea class="form-control" rows="3" maxlength="500"
           [(ngModel)]="rejectReason"
-          placeholder="Ex : justificatif illisible, date incorrecte, montant erroné...">
+          [placeholder]="'coproperty.fundCalls.rejectModal.reasonPlaceholder' | translate">
         </textarea>
         <div class="form-text text-end">{{ rejectReason.length }}/500</div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeRejectDialog()">Annuler</button>
+        <button type="button" class="btn btn-secondary" (click)="closeRejectDialog()">{{ 'coproperty.fundCalls.rejectModal.cancel' | translate }}</button>
         <button type="button" class="btn btn-danger"
           [disabled]="!rejectReason.trim() || reviewingPaymentId() !== null"
           (click)="confirmReject()">
-          <span *ngIf="reviewingPaymentId() === null"><i class="bi bi-x-circle me-1"></i>Confirmer le refus</span>
+          <span *ngIf="reviewingPaymentId() === null"><i class="bi bi-x-circle me-1"></i>{{ 'coproperty.fundCalls.rejectModal.confirm' | translate }}</span>
           <span *ngIf="reviewingPaymentId() !== null">
-            <span class="spinner-border spinner-border-sm me-1" role="status"></span>En cours...
+            <span class="spinner-border spinner-border-sm me-1" role="status"></span>{{ 'coproperty.fundCalls.rejectModal.inProgress' | translate }}
           </span>
         </button>
       </div>

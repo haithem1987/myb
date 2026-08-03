@@ -9,6 +9,7 @@ namespace Myb.Coproperty.GraphQL.Queries
     [ExtendObjectType("Query")]
     public class UnitQueries
     {
+        [GraphQLName("allUnitsBySyndic")]
         public async Task<IEnumerable<Unit>> GetAllUnitsBySyndic(
             ClaimsPrincipal? user,
             [Service] IUnitService unitService,
@@ -27,13 +28,39 @@ namespace Myb.Coproperty.GraphQL.Queries
             return await unitService.GetByManagerIdAsync(effectiveManagerId.Value);
         }
 
-        public async Task<IEnumerable<Unit>> GetUnits(Guid copropertyId, [Service] IUnitService unitService) =>
-            await unitService.GetByCopropertyIdAsync(copropertyId);
+        public async Task<IEnumerable<Unit>> GetUnits(
+            Guid copropertyId,
+            ClaimsPrincipal? user,
+            [Service] IUnitService unitService,
+            [Service] ICopropertyService copropertyService)
+        {
+            await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, copropertyId, copropertyService);
+            return await unitService.GetByCopropertyIdAsync(copropertyId);
+        }
 
-        public async Task<Unit> GetUnitById(Guid id, [Service] IUnitService unitService) =>
-            await unitService.GetByIdAsync(id);
+        public async Task<Unit> GetUnitById(
+            Guid id,
+            ClaimsPrincipal? user,
+            [Service] IUnitService unitService,
+            [Service] ICopropertyService copropertyService)
+        {
+            var unit = await unitService.GetByIdAsync(id);
+            await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, unit.CopropertyId, copropertyService);
+            return unit;
+        }
 
-        public async Task<IEnumerable<Unit>> GetUnitsByOwner(Guid ownerId, [Service] IUnitService unitService) =>
-            await unitService.GetByOwnerIdAsync(ownerId);
+        public async Task<IEnumerable<Unit>> GetUnitsByOwner(
+            Guid ownerId,
+            ClaimsPrincipal? user,
+            [Service] IUnitService unitService,
+            [Service] ICopropertyService copropertyService)
+        {
+            var units = await unitService.GetByOwnerIdAsync(ownerId);
+            var scopedIds = await CopropertyAccessControl.GetScopedCopropertyIdsAsync(user, copropertyService);
+            if (scopedIds == null)
+                return units;
+
+            return units.Where(unit => scopedIds.Contains(unit.CopropertyId)).ToList();
+        }
     }
 }

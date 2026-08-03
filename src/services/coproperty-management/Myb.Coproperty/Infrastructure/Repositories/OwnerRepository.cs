@@ -30,7 +30,8 @@ namespace Myb.Coproperty.Infrastructure.Repositories
         public async Task<IEnumerable<Owner>> GetByCopropertyIdAsync(Guid copropertyId)
         {
             return await GetAll()
-                .Include(o => o.OwnerUnits)
+                .Include(o => o.OwnerUnits
+                    .Where(ou => ou.EndDate == null && ou.Unit.CopropertyId == copropertyId))
                     .ThenInclude(ou => ou.Unit)
                 .Where(o => o.OwnerUnits.Any(ou =>
                     ou.Unit.CopropertyId == copropertyId && ou.EndDate == null))

@@ -219,6 +219,11 @@
     color: #991b1b;
   }
 
+  &.badge-cancelled {
+    background: #e5e7eb;
+    color: #374151;
+  }
+
   &.badge-failed {
     background: #fecaca;
     color: #7f1d1d;

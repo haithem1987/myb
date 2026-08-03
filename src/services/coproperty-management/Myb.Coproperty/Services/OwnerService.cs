@@ -71,7 +71,6 @@ namespace Myb.Coproperty.Services
         public async Task DeleteAsync(Guid id)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
-            await using var transaction = await context.Database.BeginTransactionAsync();
             var owner = await context.Owners
                 .Include(o => o.OwnerUnits)
                 .SingleOrDefaultAsync(o => o.Id == id);
@@ -89,7 +88,6 @@ namespace Myb.Coproperty.Services
             }
 
             await context.SaveChangesAsync();
-            await transaction.CommitAsync();
         }
 
         public async Task<Owner> GetByIdAsync(Guid id)

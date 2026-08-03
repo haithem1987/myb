@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import '@angular/localize/init';
-import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
+import { RouterModule } from '@angular/router';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { TranslateService } from '@ngx-translate/core';
-import { Location } from '@angular/common';
 import {
   NotificationService,
   ToastsContainerComponent,
@@ -23,19 +21,16 @@ export class AppComponent implements OnInit {
 
   private normalizeLanguage(language: string | null): string {
     const normalized = language?.trim().toLowerCase().split('-')[0] ?? '';
-    return AppComponent.SUPPORTED_LANGUAGES.includes(normalized) ? normalized : 'en';
+    return AppComponent.SUPPORTED_LANGUAGES.includes(normalized) ? normalized : 'fr';
   }
 
   constructor(
-    private keycloakService: KeycloakService,
-    private router: Router,
     private translate: TranslateService,
-    private location: Location,
     private notificationService: NotificationService,
     private languageService: LanguageService
   ) {
-    this.translate.addLangs(['en', 'fr']);
-    this.translate.setDefaultLang('en');
+    this.translate.addLangs(['fr', 'en']);
+    this.translate.setDefaultLang('fr');
   }
 
   private getLanguageFromRedirectParams(): string | null {
@@ -52,31 +47,14 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     const redirectLanguage = this.getLanguageFromRedirectParams();
     if (redirectLanguage) {
-      localStorage.setItem('language', redirectLanguage);
-      sessionStorage.setItem('language', redirectLanguage);
+      this.languageService.setLanguage(redirectLanguage);
+    } else {
+      const savedLanguage = this.normalizeLanguage(
+        localStorage.getItem('language') || sessionStorage.getItem('language') || 'fr'
+      );
+      this.languageService.setLanguage(savedLanguage);
     }
 
-    const savedLanguage = this.normalizeLanguage(
-      localStorage.getItem('language') || sessionStorage.getItem('language') || 'en'
-    );
-    this.translate.use(savedLanguage);
-    this.translate.onLangChange.subscribe((event) => {
-      localStorage.setItem('language', event.lang);
-      sessionStorage.setItem('language', event.lang);
-    });
-    this.languageService.language$.subscribe((lang) => {
-      if (lang && AppComponent.SUPPORTED_LANGUAGES.includes(lang) && lang !== this.translate.currentLang) {
-        this.translate.use(lang);
-      }
-    });
     this.notificationService.startConnection();
-  }
-  private removeQueryParamsFromUrl(): void {
-    const urlWithoutParams = this.location.path().split('?')[0];
-    this.location.replaceState(urlWithoutParams);
-  }
-  private logUserProfile(): void {
-    const profile = this.keycloakService.getProfile();
-    console.log('User Profile:', profile);
   }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { ActivatedRoute } from '@angular/router';
 import { CreateOwnerWithUnitsInput, OwnerUnitInput, OwnerWithUnits } from '../../models/owner.model';
 import { UnitService, UnitExtended } from '../../services/unit.service';
 import { CopropertyService } from '../../services/coproperty.service';
@@ -68,6 +69,9 @@ export class OwnerManagementComponent implements OnInit {
   private modalService = inject(ModalService);
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
+  private route = inject(ActivatedRoute);
+
+  private static readonly ACTIVE_COPROPERTY_STORAGE_KEY = 'activeCopropertyId';
   
   owners: Owner[] = [];
   availableUnits: Unit[] = [];
@@ -116,25 +120,52 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Load coproperty first if copropertyId is provided, otherwise load all owners
+    // Load coproperty first if copropertyId is provided, otherwise resolve from
+    // route/local storage and allow explicit user selection.
     if (this.copropertyId) {
       this.loadOwners();
       this.loadAvailableUnits();
     } else {
-      // Try to get first coproperty from the list
+      const requestedCopropertyId = this.route.snapshot.queryParamMap.get('copropertyId');
+      const storedCopropertyId = localStorage.getItem(OwnerManagementComponent.ACTIVE_COPROPERTY_STORAGE_KEY);
+      const preferredCopropertyId = requestedCopropertyId || storedCopropertyId || '';
+
       const managerId = this.keycloakService.getSyndicManagerId();
       this.copropertyService.getCoproperties(managerId)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (coproperties) => {
+            this.coproperties.set(coproperties.map((c) => ({ id: c.id, name: c.name })));
+
             if (coproperties.length > 0) {
-              this.copropertyId = coproperties[0].id;
+              const preferred = coproperties.find((c) => c.id === preferredCopropertyId);
+              this.copropertyId = preferred?.id ?? coproperties[0].id;
+              this.selectedCopropertyForFilter.set(this.copropertyId);
+              localStorage.setItem(OwnerManagementComponent.ACTIVE_COPROPERTY_STORAGE_KEY, this.copropertyId);
               this.loadOwners();
               this.loadAvailableUnits();
             }
           }
         });
     }
+  }
+
+  onCopropertySelectionChange(copropertyId: string): void {
+    if (!copropertyId || copropertyId === this.copropertyId) {
+      return;
+    }
+
+    this.copropertyId = copropertyId;
+    this.selectedCopropertyForFilter.set(copropertyId);
+    localStorage.setItem(OwnerManagementComponent.ACTIVE_COPROPERTY_STORAGE_KEY, copropertyId);
+
+    this.searchTerm = '';
+    this.showAddForm = false;
+    this.editingOwnerId = null;
+    this.owners = [];
+
+    this.loadOwners();
+    this.loadAvailableUnits();
   }
 
   loadAvailableUnits(): void {
@@ -222,7 +253,16 @@ export class OwnerManagementComponent implements OnInit {
           owners.forEach(o => {
             const key = o.userId || o.email.toLowerCase();
             const current = ownersByUser.get(key);
-            const activeLinks = (o.ownerUnits || []).filter(link => !link.endDate);
+            const activeLinks = (o.ownerUnits || []).filter(link => {
+              if (link.endDate) {
+                return false;
+              }
+
+              const linkCopropertyId = link.unit?.copropertyId;
+              return !this.copropertyId
+                || !linkCopropertyId
+                || linkCopropertyId === this.copropertyId;
+            });
             if (!current) {
               ownersByUser.set(key, {
                 id: o.id,
@@ -332,6 +372,7 @@ export class OwnerManagementComponent implements OnInit {
               if (success) {
                 // Remove from local list immediately for better UX
                 this.owners = this.owners.filter((o) => o.id !== owner.id);
+                this.loadAvailableUnits();
                 this.translateService.get('coproperty.messages.ownerDeleted').subscribe((msg) => {
                   this.showAlert('success', msg);
                 });

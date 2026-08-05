@@ -617,7 +617,10 @@
         "reject": "Refuser",
         "viewJustificatif": "Voir le justificatif",
         "downloadJustificatif": "Télécharger le justificatif",
-        "justificatifLoadError": "Impossible de charger le justificatif."
+        "justificatifLoadError": "Impossible de charger le justificatif.",
+        "justificatifReadError": "Impossible de lire le fichier sélectionné.",
+        "unsupportedFileType": "Format non pris en charge. Utilisez PDF, JPG, PNG ou WebP.",
+        "fileTooLarge": "Le justificatif ne doit pas dépasser 5 Mo."
       },
       "invoice": {
         "preview": "Prévisualisation de la facture",

@@ -45,6 +45,8 @@ spec:
             configMapKeyRef:
               name: app-config
               key: KEYCLOAK_AUTHORITY
+        - name: Keycloak__PublicAuthority
+          value: "https://myb-platform.com/auth/realms/MYB"
         - name: Keycloak__ClientId
           valueFrom:
             configMapKeyRef:
@@ -55,6 +57,11 @@ spec:
             configMapKeyRef:
               name: app-config
               key: RABBITMQ_HOST
+        - name: Cors__AllowedOrigins
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: FRONTEND_URL
         resources:
           requests:
             memory: "256Mi"
@@ -63,13 +70,15 @@ spec:
             memory: "512Mi"
             cpu: "250m"
         livenessProbe:
-          tcpSocket:
+          httpGet:
+            path: /health
             port: 8084
           initialDelaySeconds: 60
           periodSeconds: 30
           timeoutSeconds: 10
         readinessProbe:
-          tcpSocket:
+          httpGet:
+            path: /health
             port: 8084
           initialDelaySeconds: 15
           periodSeconds: 10

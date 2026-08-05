@@ -1045,21 +1045,61 @@ export class FundCallsListComponent implements OnInit {
   onJustificatifFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
+
+    if (file && !['application/pdf', 'image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      input.value = '';
+      this.selectedJustificatifFile.set(null);
+      this.paymentForm.patchValue({ justificatif: '' });
+      this.toastService.show(
+        this.translate.instant('coproperty.fundCalls.payments.unsupportedFileType'),
+        { classname: 'bg-danger text-white', delay: 5000 }
+      );
+      return;
+    }
+
+    if (file && file.size > 5 * 1024 * 1024) {
+      input.value = '';
+      this.selectedJustificatifFile.set(null);
+      this.paymentForm.patchValue({ justificatif: '' });
+      this.toastService.show(
+        this.translate.instant('coproperty.fundCalls.payments.fileTooLarge'),
+        { classname: 'bg-danger text-white', delay: 5000 }
+      );
+      return;
+    }
+
     this.selectedJustificatifFile.set(file);
     // Store the file name as the justificatif reference string
     this.paymentForm.patchValue({ justificatif: file ? file.name : '' });
   }
 
-  addPayment(): void {
+  async addPayment(): Promise<void> {
     const fc = this.editingFundCall();
     if (!fc || this.isCancelled(fc) || this.paymentForm.invalid) return;
 
     this.addingPayment.set(true);
     const raw = this.paymentForm.value;
+    const file = this.selectedJustificatifFile();
+    let justificatifFileBase64: string | undefined;
+
+    try {
+      justificatifFileBase64 = file ? await this.readFileAsBase64(file) : undefined;
+    } catch {
+      this.addingPayment.set(false);
+      this.toastService.show(
+        this.translate.instant('coproperty.fundCalls.payments.justificatifReadError'),
+        { classname: 'bg-danger text-white', delay: 5000 }
+      );
+      return;
+    }
+
     const input: AddFundCallPaymentInput = {
       amount: parseFloat(raw.amount),
       paymentDate: new Date(raw.paymentDate) as any,
       justificatif: raw.justificatif || undefined,
+      justificatifFileName: file?.name,
+      justificatifContentType: file?.type,
+      justificatifFileBase64,
     };
 
     this.fundCallService.addFundCallPayment(fc.id, input).subscribe({
@@ -1082,6 +1122,23 @@ export class FundCallsListComponent implements OnInit {
         const userError = this.errorMessageService.translateError(err);
         this.toastService.show(userError.message, { classname: `bg-${userError.severity === 'danger' ? 'danger' : 'warning'} text-white`, delay: 5000 });
       },
+    });
+  }
+
+  private readFileAsBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(reader.error);
+      reader.onload = () => {
+        const dataUrl = typeof reader.result === 'string' ? reader.result : '';
+        const separatorIndex = dataUrl.indexOf(',');
+        if (separatorIndex < 0) {
+          reject(new Error('Invalid file data URL'));
+          return;
+        }
+        resolve(dataUrl.slice(separatorIndex + 1));
+      };
+      reader.readAsDataURL(file);
     });
   }
 

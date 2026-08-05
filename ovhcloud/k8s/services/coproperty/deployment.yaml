@@ -48,6 +48,8 @@ spec:
             configMapKeyRef:
               name: app-config
               key: KEYCLOAK_AUTHORITY
+        - name: Keycloak__PublicAuthority
+          value: "https://myb-platform.com/auth/realms/MYB"
         - name: Keycloak__ClientId
           valueFrom:
             configMapKeyRef:
@@ -80,6 +82,8 @@ spec:
             configMapKeyRef:
               name: app-config
               key: FRONTEND_URL
+        - name: Services__NotificationUrl
+          value: "http://myb-notification:8084"
         - name: RabbitMq__Host
           valueFrom:
             configMapKeyRef:

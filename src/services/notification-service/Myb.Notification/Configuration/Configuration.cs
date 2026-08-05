@@ -14,15 +14,40 @@ public static class Configuration
 {
     public static void ConfigureNotificationModule(this WebApplicationBuilder builder)
     {
+        var notificationConnection = builder.Configuration.GetConnectionString("NotificationDBConnection");
+        var useInMemoryStore = string.IsNullOrWhiteSpace(notificationConnection) ||
+            notificationConnection.Contains("REPLACE_WITH", StringComparison.OrdinalIgnoreCase);
+
         builder.Services.AddPooledDbContextFactory<NotificationContext>(opts =>
-            opts.UseNpgsql(builder.Configuration.GetConnectionString("NotificationDBConnection")));
+        {
+            if (useInMemoryStore)
+                opts.UseInMemoryDatabase("myb-notifications");
+            else
+                opts.UseNpgsql(notificationConnection);
+        });
+
+        if (useInMemoryStore)
+            Console.Error.WriteLine(
+                "[Notification] No configured PostgreSQL database; using the in-memory staging store.");
 
         // Add CORS for SignalR and HTTP endpoints
+        var allowedOrigins = (builder.Configuration["Cors:AllowedOrigins"] ?? string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Concat(new[]
+            {
+                "http://localhost:4200",
+                "http://localhost:4201",
+                "https://myb-platform.com",
+                "https://www.myb-platform.com"
+            })
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowAll", policy =>
             {
-                policy.WithOrigins("http://localhost:4200", "http://localhost:4201")
+                policy.WithOrigins(allowedOrigins)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -41,10 +66,14 @@ public static class Configuration
                 {
                     ValidateIssuer = true,
                     ValidIssuers = new[]
-                    {
-                        keycloakSection["Authority"],
-                        "http://localhost:8080/realms/MYB"
-                    },
+                        {
+                            keycloakSection["Authority"],
+                            keycloakSection["PublicAuthority"],
+                            "http://localhost:8080/realms/MYB"
+                        }
+                        .Where(issuer => !string.IsNullOrWhiteSpace(issuer))
+                        .Select(issuer => issuer!.TrimEnd('/'))
+                        .Distinct(StringComparer.OrdinalIgnoreCase),
                     ValidateAudience = false,
                     ValidateIssuerSigningKey = true,
                 };
@@ -71,6 +100,7 @@ public static class Configuration
         builder.Services.AddScoped<INotificationService, NotificationService>();
         builder.Services.AddEmailPublisher();
         builder.Services.AddControllers();
+        builder.Services.AddHealthChecks();
     }
 
     public static void ConfigureNotificationModuleApp(this WebApplication app)
@@ -86,6 +116,7 @@ public static class Configuration
         app.UseCors("AllowAll");
         app.UseAuthentication();
         app.UseAuthorization();
+        app.MapHealthChecks("/health");
         app.MapControllers();
         app.MapHub<NotificationHub>("/notificationhub")
             .RequireAuthorization();  // protects the hub with JWT auth

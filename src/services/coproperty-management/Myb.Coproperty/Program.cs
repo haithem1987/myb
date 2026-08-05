@@ -71,7 +71,7 @@ builder.Services.Configure<Myb.Coproperty.Services.KeycloakOptions>(
 builder.Services.AddHttpClient("keycloak-admin");
 builder.Services.AddHttpClient("NotificationService", client =>
 {
-    var notifUrl = builder.Configuration["Services:NotificationUrl"] ?? "http://myb-notification:8080";
+    var notifUrl = builder.Configuration["Services:NotificationUrl"] ?? "http://myb-notification:8084";
     client.BaseAddress = new Uri(notifUrl);
 });
 builder.Services.AddScoped<Myb.Coproperty.Services.IKeycloakAdminService, Myb.Coproperty.Services.KeycloakAdminService>();

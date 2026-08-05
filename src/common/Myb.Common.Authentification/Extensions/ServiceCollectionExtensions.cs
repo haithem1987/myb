@@ -65,6 +65,10 @@ namespace Myb.Common.Authentification.Extensions
                 }
             }
 
+            var publicAuthority = keycloakSettings.GetSection("PublicAuthority").Value;
+            if (!string.IsNullOrWhiteSpace(publicAuthority))
+                validIssuers.Add(publicAuthority);
+
             validIssuers = validIssuers
                 .Where(i => !string.IsNullOrWhiteSpace(i))
                 .Select(i => i.TrimEnd('/'))

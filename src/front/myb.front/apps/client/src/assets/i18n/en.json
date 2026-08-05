@@ -559,7 +559,10 @@
         "reject": "Reject",
         "viewJustificatif": "View justification",
         "downloadJustificatif": "Download justification",
-        "justificatifLoadError": "Could not load the justification."
+        "justificatifLoadError": "Could not load the justification.",
+        "justificatifReadError": "Could not read the selected file.",
+        "unsupportedFileType": "Unsupported file type. Use PDF, JPG, PNG or WebP.",
+        "fileTooLarge": "The justification must not exceed 5 MB."
       },
       "invoice": {
         "preview": "Invoice Preview",

@@ -76,6 +76,19 @@ public class FundCallPaymentProofTests
         Assert.Equal(pdfBytes, persistedPayment.JustificatifFile!.FileData);
     }
 
+    [Fact]
+    public void PaymentProof_UsesApplicationOwnedTable()
+    {
+        var factory = new TestDbContextFactory(Guid.NewGuid().ToString());
+        using var context = factory.CreateDbContext();
+
+        var tableName = context.Model
+            .FindEntityType(typeof(FundCallPaymentJustificatifFile))!
+            .GetTableName();
+
+        Assert.Equal("FundCallPaymentProofs", tableName);
+    }
+
     private sealed class TestDbContextFactory(string databaseName)
         : IDbContextFactory<CopropertyDbContext>
     {

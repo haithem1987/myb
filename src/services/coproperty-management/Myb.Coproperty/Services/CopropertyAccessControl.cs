@@ -11,6 +11,7 @@ namespace Myb.Coproperty.Services
     public static class CopropertyAccessControl
     {
         public const string SyndicRole = "coproperty-syndic";
+        public const string OwnerRole = "coproperty-owner";
         public const string AdminRole = "coproperty-admin";
         public const string SystemAdminRole = "system-admin";
 
@@ -25,6 +26,22 @@ namespace Myb.Coproperty.Services
             var roles = user!.FindAll(ClaimTypes.Role).Select(c => c.Value);
             return roles.Contains(AdminRole) || roles.Contains(SystemAdminRole);
         }
+
+        public static bool IsOwner(ClaimsPrincipal? user)
+        {
+            if (!IsAuthenticated(user))
+                return false;
+
+            return user!.FindAll(ClaimTypes.Role)
+                .Any(claim => claim.Value == OwnerRole);
+        }
+
+        /// <summary>
+        /// Allows a dual-role syndic/owner to resolve their own owner profile.
+        /// Syndic scoping still applies when they query any other owner's id.
+        /// </summary>
+        public static bool IsSelfOwner(ClaimsPrincipal? user, Guid requestedUserId) =>
+            IsOwner(user) && GetUserId(user) == requestedUserId;
 
         /// <summary>
         /// True only for callers who hold the syndic role and no admin-level role —

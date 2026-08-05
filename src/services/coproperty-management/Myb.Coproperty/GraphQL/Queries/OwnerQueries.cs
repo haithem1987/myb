@@ -48,6 +48,13 @@ namespace Myb.Coproperty.GraphQL.Queries
             if (owner == null)
                 return null;
 
+            // A user who is both syndic and owner must be able to resolve their
+            // own owner profile. Without this exception IsSyndicOnly scopes the
+            // query as a manager lookup and the profile guard receives null,
+            // causing an incorrect redirect to complete-profile.
+            if (CopropertyAccessControl.IsSelfOwner(user, userId))
+                return owner;
+
             var scopedIds = await CopropertyAccessControl.GetScopedCopropertyIdsAsync(user, copropertyService);
             if (scopedIds == null)
                 return owner;

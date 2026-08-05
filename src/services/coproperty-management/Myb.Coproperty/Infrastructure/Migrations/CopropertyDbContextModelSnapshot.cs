@@ -756,7 +756,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.HasKey("FundCallPaymentId");
 
-                    b.ToTable("FundCallPaymentJustificatifFiles");
+                    b.ToTable("FundCallPaymentProofs");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.Intervention", b =>

@@ -236,21 +236,7 @@ public class FundCallService : IFundCallService
             existingFundCall.CurrencySnapshot = coproperty.Currency;
             if (ownerNameSnapshot != null)
                 existingFundCall.OwnerNameSnapshot = ownerNameSnapshot;
-        try
-        {
             await context.SaveChangesAsync();
-        }
-        catch (DbUpdateException ex)
-        {
-            // Surface the underlying constraint/foreign-key violation (e.g. duplicate
-            // InvoiceNumber, FK missing) as a clear French message instead of Hot
-            // Chocolate's generic "Unexpected Execution Error" with a stack trace.
-            var inner = ex.InnerException?.Message ?? ex.Message;
-            Console.Error.WriteLine($"[AddPaymentAsync] DbUpdateException: {inner}");
-            throw new InvalidOperationException(
-                "Impossible d'enregistrer le versement. Veuillez vérifier les informations saisies et réessayer.",
-                ex);
-        }
 
             // Also notify the owner that the fund call has been updated
             if (input.OwnerId.HasValue)
@@ -783,7 +769,20 @@ public class FundCallService : IFundCallService
         // those side effects made proof submission fail on unrelated invoice
         // constraints and incorrectly accounted unapproved payments.
 
-        await context.SaveChangesAsync();
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            // Keep database details in server logs while returning a stable,
+            // actionable message through GraphQL.
+            var inner = ex.InnerException?.Message ?? ex.Message;
+            Console.Error.WriteLine($"[AddPaymentAsync] DbUpdateException: {inner}");
+            throw new InvalidOperationException(
+                "Impossible d'enregistrer le versement. Le paiement n'a pas été créé; veuillez réessayer.",
+                ex);
+        }
 
         // Fire-and-forget: notification must never block or deadlock the mutation.
         // Capture only primitive values so the closed-over state is independent of the EF context.

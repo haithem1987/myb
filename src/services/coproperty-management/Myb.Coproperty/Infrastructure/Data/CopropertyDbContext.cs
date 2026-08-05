@@ -604,6 +604,7 @@ public class CopropertyDbContext : DbContext
 
         modelBuilder.Entity<FundCallPaymentJustificatifFile>(entity =>
         {
+            entity.ToTable("FundCallPaymentProofs");
             entity.HasKey(file => file.FundCallPaymentId);
             entity.Property(file => file.FileData)
                 .HasColumnType("bytea")

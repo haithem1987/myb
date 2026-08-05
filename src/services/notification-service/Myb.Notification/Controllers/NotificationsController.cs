@@ -35,6 +35,7 @@ public class NotificationsController : ControllerBase
     }
 
     [HttpPost("email")]
+    [Authorize]
     public async Task<IActionResult> SendEmail([FromBody] EmailNotificationRequest req)
     {
         await _notificationService.SendEmailNotificationAsync(req.ToEmail, req.Subject, req.HtmlBody);

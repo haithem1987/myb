@@ -818,6 +818,12 @@ public class CopropertyDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
 
+            // Audit entries are immutable. UpdatedAt only exists to satisfy the
+            // shared IEntity contract and is intentionally not persisted. This
+            // also keeps compatibility with the existing staging table, which
+            // is owned by the managed database administrator role.
+            entity.Ignore(e => e.UpdatedAt);
+
             entity.Property(e => e.Action)
                 .HasConversion<string>()
                 .HasMaxLength(30)

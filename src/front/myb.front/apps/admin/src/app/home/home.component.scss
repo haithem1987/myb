@@ -65,3 +65,39 @@ h3 {
     width: auto;
   }
 }
+
+@media (max-width: 767.98px) {
+  .home-container {
+    padding-inline: 0.75rem;
+  }
+
+  h1.home-title {
+    font-size: 1.4rem;
+  }
+
+  .card {
+    margin-bottom: 1rem;
+
+    &:hover {
+      transform: none;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  h3.quick-actions-title {
+    font-size: 1.1rem;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+      text-align: left;
+    }
+  }
+}

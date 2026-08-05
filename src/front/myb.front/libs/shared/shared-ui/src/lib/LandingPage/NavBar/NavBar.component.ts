@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { KeycloakService } from '../../../../../../auth/src/lib/keycloak.service';
 import { CounterService } from '../FeaturesSection/CounterService';
@@ -7,6 +7,7 @@ import { Subscription, filter } from 'rxjs';
 import { UserDropdownComponent } from '../../components/user-dropdown/user-dropdown.component';
 import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { AvatarComponent } from '../../components/avatar/avatar.component';
 
 /** Roles that grant access to the Admin Portal (excludes pure syndic) */
 const ADMIN_ROLES = ['system-admin', 'coproperty-admin'];
@@ -16,15 +17,20 @@ const ADMIN_ROLES = ['system-admin', 'coproperty-admin'];
   standalone: true,
   imports: [
     CommonModule,
+    AsyncPipe,
     RouterModule,
     UserDropdownComponent,
     LanguageSwitcherComponent,
     TranslateModule,
+    AvatarComponent,
   ],
   templateUrl: './NavBar.component.html',
   styleUrl: './NavBar.component.css',
 })
 export class NavBarComponent {
+  menuOpen = false;
+  profile$ = this.keycloakService.profile$;
+
   limitedCount$ = this.counterService.counter$.pipe(
     filter((value) => value.count < 3)
   );
@@ -34,6 +40,10 @@ export class NavBarComponent {
     public counterService: CounterService,
     private router: Router,
   ) {}
+
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
 
   /** Returns the admin app URL (same host, port 4201 in dev / /admin path in prod) */
   get adminPortalUrl(): string {

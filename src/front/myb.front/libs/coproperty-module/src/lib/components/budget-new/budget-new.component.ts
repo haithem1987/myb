@@ -78,7 +78,7 @@ export class BudgetNewComponent implements OnInit {
   }
 
   private initializeForm(): void {
-    const currentYear = new Date().getFullYear();
+    const currentYear = new Date().getFullYear().toString();
     this.budgetForm = this.formBuilder.group({
       copropertyId: ['', Validators.required],
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -221,10 +221,14 @@ export class BudgetNewComponent implements OnInit {
     
     const budgetData: ChargeExtended = {
       ...formValue,
+      frequency: String(formValue.frequency),
+      totalAmount: Number(formValue.totalAmount),
       startDate: this.convertToISODateTime(formValue.startDate),
       endDate: formValue.endDate ? this.convertToISODateTime(formValue.endDate) : null,
       id: this.budgetId || '00000000-0000-0000-0000-000000000000',
-      createdBy: '00000000-0000-0000-0000-000000000000'
+      createdBy: this.keycloakService.getUserId()
+        ?? this.keycloakService.getProfile()?.id
+        ?? '00000000-0000-0000-0000-000000000000'
     };
 
     const operation = this.isEditMode() && this.budgetId
@@ -257,7 +261,8 @@ export class BudgetNewComponent implements OnInit {
     
     this.translateService.get('coproperty.charges.deleteConfirm').subscribe((message) => {
       if (confirm(message)) {
-        this.chargeService.deleteCharge(this.budgetId!).subscribe({
+        const copropertyId = this.budgetForm.get('copropertyId')?.value || undefined;
+        this.chargeService.deleteCharge(this.budgetId!, copropertyId).subscribe({
           next: () => {
             this.router.navigate(['/coproperty/syndic/budgets']);
           },

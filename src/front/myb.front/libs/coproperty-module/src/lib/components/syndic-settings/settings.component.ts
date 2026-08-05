@@ -5,6 +5,7 @@ import { ToastService } from '@myb-front/shared-ui';
 import { CopropertyService, CurrencyService, Coproperty, Currency, ManagerUser } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
 import { take } from 'rxjs/operators';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 type ActiveTab = 'currency' | 'syndics';
 
@@ -23,7 +24,7 @@ const SYNDIC_ROLE = 'coproperty-syndic';
 @Component({
   selector: 'myb-coproperty-syndic-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="container-fluid py-4">
       <!-- Page Header -->
@@ -31,9 +32,9 @@ const SYNDIC_ROLE = 'coproperty-syndic';
         <div class="col">
           <h2 class="mb-1">
             <i class="bi bi-gear me-2"></i>
-            Paramètres
+            {{ 'coproperty.syndicSettings.title' | translate }}
           </h2>
-          <p class="text-muted">Configuration et gestion des accès</p>
+          <p class="text-muted">{{ 'coproperty.syndicSettings.subtitle' | translate }}</p>
         </div>
       </div>
 
@@ -42,12 +43,12 @@ const SYNDIC_ROLE = 'coproperty-syndic';
         <button class="settings-tab"
                 [class.active]="activeTab() === 'currency'"
                 (click)="setTab('currency')">
-          <i class="bi bi-currency-exchange me-2"></i>Devise
+          <i class="bi bi-currency-exchange me-2"></i>{{ 'coproperty.syndicSettings.currencyTab' | translate }}
         </button>
         <button class="settings-tab"
                 [class.active]="activeTab() === 'syndics'"
                 (click)="setTab('syndics')">
-          <i class="bi bi-shield-person me-2"></i>Gestion des Syndics
+          <i class="bi bi-shield-person me-2"></i>{{ 'coproperty.syndicSettings.syndicsTab' | translate }}
           <span class="tab-badge" *ngIf="currentSyndics().length > 0">
             {{ currentSyndics().length }}
           </span>
@@ -57,9 +58,9 @@ const SYNDIC_ROLE = 'coproperty-syndic';
       <!-- Loading Overlay -->
       <div *ngIf="loading()" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Chargement...</span>
+          <span class="visually-hidden">{{ 'coproperty.syndicSettings.loading' | translate }}</span>
         </div>
-        <p class="text-muted mt-2">Chargement des paramètres...</p>
+        <p class="text-muted mt-2">{{ 'coproperty.syndicSettings.loadingSettings' | translate }}</p>
       </div>
 
       <!-- ─── TAB: Currency ───────────────────────────────────────────────── -->
@@ -72,33 +73,33 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                 <i class="bi bi-currency-exchange"></i>
               </div>
               <div>
-                <h5 class="mb-0">Devise</h5>
-                <small class="text-muted">Monnaie utilisée pour tous les montants</small>
+                <h5 class="mb-0">{{ 'coproperty.syndicSettings.currency' | translate }}</h5>
+                <small class="text-muted">{{ 'coproperty.syndicSettings.currencyDescription' | translate }}</small>
               </div>
             </div>
             <div class="settings-card-body">
               <div class="mb-3">
-                <label class="form-label fw-semibold">Copropriété</label>
+                <label class="form-label fw-semibold">{{ 'coproperty.syndicSettings.coproperty' | translate }}</label>
                 <select class="form-select" [(ngModel)]="selectedCopropertyId" (change)="onCopropertyChange()">
                   <option *ngFor="let c of coproperties()" [value]="c.id">{{ c.name }}</option>
                 </select>
               </div>
               <div class="mb-3">
-                <label class="form-label fw-semibold">Devise</label>
+                <label class="form-label fw-semibold">{{ 'coproperty.syndicSettings.currency' | translate }}</label>
                 <select class="form-select" [(ngModel)]="selectedCurrency">
                   <option *ngFor="let c of currencies" [value]="c.code">
-                    {{ c.symbol }} - {{ c.label }}
+                    {{ c.symbol }} - {{ c.labelKey | translate }}
                   </option>
                 </select>
               </div>
               <div class="currency-preview" *ngIf="selectedCurrency">
-                <span class="preview-label">Aperçu :</span>
+                <span class="preview-label">{{ 'coproperty.syndicSettings.preview' | translate }}</span>
                 <span class="preview-value">{{ previewAmount() }}</span>
               </div>
               <button class="btn btn-primary mt-3" (click)="saveCurrency()" [disabled]="saving()">
                 <span *ngIf="saving()" class="spinner-border spinner-border-sm me-1"></span>
                 <i *ngIf="!saving()" class="bi bi-check-lg me-1"></i>
-                {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+                {{ saving() ? ('coproperty.syndicSettings.saving' | translate) : ('coproperty.syndicSettings.save' | translate) }}
               </button>
             </div>
           </div>
@@ -112,27 +113,27 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                 <i class="bi bi-info-circle"></i>
               </div>
               <div>
-                <h5 class="mb-0">À propos de la devise</h5>
-                <small class="text-muted">Impact du changement de devise</small>
+                <h5 class="mb-0">{{ 'coproperty.syndicSettings.aboutCurrency' | translate }}</h5>
+                <small class="text-muted">{{ 'coproperty.syndicSettings.currencyImpact' | translate }}</small>
               </div>
             </div>
             <div class="settings-card-body">
               <ul class="info-list">
                 <li>
                   <i class="bi bi-check-circle text-success me-2"></i>
-                  Tous les montants affichés utiliseront la nouvelle devise
+                  {{ 'coproperty.syndicSettings.amountsUseCurrency' | translate }}
                 </li>
                 <li>
                   <i class="bi bi-check-circle text-success me-2"></i>
-                  Les factures et reçus seront générés avec le bon symbole
+                  {{ 'coproperty.syndicSettings.documentsUseSymbol' | translate }}
                 </li>
                 <li>
                   <i class="bi bi-check-circle text-success me-2"></i>
-                  Les appels de fonds et charges seront mis à jour
+                  {{ 'coproperty.syndicSettings.fundCallsUpdated' | translate }}
                 </li>
                 <li>
                   <i class="bi bi-exclamation-triangle text-warning me-2"></i>
-                  Les montants existants ne sont pas convertis automatiquement
+                  {{ 'coproperty.syndicSettings.amountsNotConverted' | translate }}
                 </li>
               </ul>
             </div>
@@ -151,13 +152,13 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                 <i class="bi bi-shield-person"></i>
               </div>
               <div class="flex-grow-1">
-                <h5 class="mb-0">Syndics actifs</h5>
-                <small class="text-muted">Utilisateurs ayant le rôle <code>coproperty-syndic</code></small>
+                <h5 class="mb-0">{{ 'coproperty.syndicSettings.activeSyndics' | translate }}</h5>
+                <small class="text-muted">{{ 'coproperty.syndicSettings.syndicRoleUsers' | translate }}</small>
               </div>
               <button class="btn btn-sm btn-outline-secondary"
                       (click)="loadCurrentSyndics()"
                       [disabled]="loadingSyndics()"
-                      title="Actualiser">
+                      [title]="'coproperty.syndicSettings.refresh' | translate">
                 <i class="bi" [class.bi-arrow-clockwise]="!loadingSyndics()"
                    [class.bi-hourglass-split]="loadingSyndics()"></i>
               </button>
@@ -167,14 +168,14 @@ const SYNDIC_ROLE = 'coproperty-syndic';
               <!-- Loading syndics -->
               <div *ngIf="loadingSyndics()" class="text-center py-4">
                 <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                <span class="text-muted">Chargement des syndics...</span>
+                <span class="text-muted">{{ 'coproperty.syndicSettings.loadingSyndics' | translate }}</span>
               </div>
 
               <!-- Empty state -->
               <div *ngIf="!loadingSyndics() && currentSyndics().length === 0"
                    class="empty-state py-4">
                 <i class="bi bi-person-slash text-muted"></i>
-                <p class="text-muted mt-2 mb-0">Aucun syndic actif trouvé</p>
+                <p class="text-muted mt-2 mb-0">{{ 'coproperty.syndicSettings.noSyndics' | translate }}</p>
               </div>
 
               <!-- Syndics list -->
@@ -182,9 +183,9 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
                     <tr>
-                      <th scope="col">Utilisateur</th>
-                      <th scope="col">Email</th>
-                      <th scope="col" class="text-end">Actions</th>
+                      <th scope="col">{{ 'coproperty.syndicSettings.user' | translate }}</th>
+                      <th scope="col">{{ 'coproperty.syndicSettings.email' | translate }}</th>
+                      <th scope="col" class="text-end">{{ 'coproperty.syndicSettings.actions' | translate }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -205,7 +206,7 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                           <span *ngIf="isProcessing(syndic.id)"
                                 class="spinner-border spinner-border-sm me-1"></span>
                           <i *ngIf="!isProcessing(syndic.id)" class="bi bi-shield-x me-1"></i>
-                          Révoquer
+                          {{ 'coproperty.syndicSettings.revoke' | translate }}
                         </button>
                       </td>
                     </tr>
@@ -224,22 +225,22 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                 <i class="bi bi-person-plus"></i>
               </div>
               <div>
-                <h5 class="mb-0">Attribuer le rôle Syndic</h5>
-                <small class="text-muted">Rechercher un utilisateur Keycloak et lui attribuer le rôle syndic</small>
+                <h5 class="mb-0">{{ 'coproperty.syndicSettings.grantTitle' | translate }}</h5>
+                <small class="text-muted">{{ 'coproperty.syndicSettings.grantDescription' | translate }}</small>
               </div>
             </div>
             <div class="settings-card-body">
 
               <!-- Search Form -->
               <div class="search-form mb-4">
-                <label class="form-label fw-semibold">Rechercher par email</label>
+                <label class="form-label fw-semibold">{{ 'coproperty.syndicSettings.searchByEmail' | translate }}</label>
                 <div class="input-group">
                   <span class="input-group-text bg-white">
                     <i class="bi bi-search text-muted"></i>
                   </span>
                   <input type="email"
                          class="form-control"
-                         placeholder="ex: utilisateur@example.com"
+                         [placeholder]="'coproperty.syndicSettings.emailPlaceholder' | translate"
                          [(ngModel)]="searchEmail"
                          (keyup.enter)="searchUsers()"
                          [disabled]="searching()">
@@ -248,12 +249,12 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                           [disabled]="searching() || !searchEmail.trim()">
                     <span *ngIf="searching()" class="spinner-border spinner-border-sm me-1"></span>
                     <i *ngIf="!searching()" class="bi bi-search me-1"></i>
-                    {{ searching() ? 'Recherche...' : 'Rechercher' }}
+                    {{ searching() ? ('coproperty.syndicSettings.searching' | translate) : ('coproperty.syndicSettings.search' | translate) }}
                   </button>
                 </div>
                 <div class="form-text">
                   <i class="bi bi-info-circle me-1"></i>
-                  La recherche supporte les correspondances partielles (ex : "dupont")
+                  {{ 'coproperty.syndicSettings.partialSearchHelp' | translate }}
                 </div>
               </div>
 
@@ -263,23 +264,23 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                 <!-- No results -->
                 <div *ngIf="searchResults().length === 0" class="alert alert-info d-flex align-items-center gap-2">
                   <i class="bi bi-info-circle-fill"></i>
-                  <span>Aucun utilisateur trouvé pour "<strong>{{ searchEmail }}</strong>"</span>
+                  <span>{{ 'coproperty.syndicSettings.noUserFound' | translate }} "<strong>{{ searchEmail }}</strong>"</span>
                 </div>
 
                 <!-- Results table -->
                 <div *ngIf="searchResults().length > 0">
                   <p class="text-muted small mb-2">
                     <i class="bi bi-check2-circle me-1 text-success"></i>
-                    {{ searchResults().length }} utilisateur(s) trouvé(s)
+                    {{ searchResults().length }} {{ 'coproperty.syndicSettings.usersFound' | translate }}
                   </p>
                   <table class="table table-hover table-bordered">
                     <thead class="table-light">
                       <tr>
-                        <th scope="col">Utilisateur</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Statut</th>
-                        <th scope="col">Rôle Syndic</th>
-                        <th scope="col" class="text-center">Action</th>
+                        <th scope="col">{{ 'coproperty.syndicSettings.user' | translate }}</th>
+                        <th scope="col">{{ 'coproperty.syndicSettings.email' | translate }}</th>
+                        <th scope="col">{{ 'coproperty.syndicSettings.status' | translate }}</th>
+                        <th scope="col">{{ 'coproperty.syndicSettings.syndicRole' | translate }}</th>
+                        <th scope="col" class="text-center">{{ 'coproperty.syndicSettings.action' | translate }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -295,7 +296,7 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                               </div>
                               <div *ngIf="!user.emailVerified"
                                    class="badge bg-warning-subtle text-warning small">
-                                <i class="bi bi-exclamation-triangle me-1"></i>Email non vérifié
+                                <i class="bi bi-exclamation-triangle me-1"></i>{{ 'coproperty.syndicSettings.emailNotVerified' | translate }}
                               </div>
                             </div>
                           </div>
@@ -305,13 +306,13 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                           <span class="badge"
                                 [class.bg-success]="user.enabled"
                                 [class.bg-secondary]="!user.enabled">
-                            {{ user.enabled ? 'Actif' : 'Inactif' }}
+                            {{ user.enabled ? ('coproperty.syndicSettings.active' | translate) : ('coproperty.syndicSettings.inactive' | translate) }}
                           </span>
                         </td>
                         <td class="align-middle">
                           <span *ngIf="hasSyndicRole(user)"
                                 class="badge bg-primary-subtle text-primary">
-                            <i class="bi bi-shield-check me-1"></i>Syndic
+                            <i class="bi bi-shield-check me-1"></i>{{ 'coproperty.syndicSettings.syndic' | translate }}
                           </span>
                           <span *ngIf="!hasSyndicRole(user)" class="text-muted small">—</span>
                         </td>
@@ -324,7 +325,7 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                             <span *ngIf="isProcessing(user.id)"
                                   class="spinner-border spinner-border-sm me-1"></span>
                             <i *ngIf="!isProcessing(user.id)" class="bi bi-shield-plus me-1"></i>
-                            Attribuer
+                            {{ 'coproperty.syndicSettings.grant' | translate }}
                           </button>
                           <!-- Revoke role from search result -->
                           <button *ngIf="hasSyndicRole(user)"
@@ -334,7 +335,7 @@ const SYNDIC_ROLE = 'coproperty-syndic';
                             <span *ngIf="isProcessing(user.id)"
                                   class="spinner-border spinner-border-sm me-1"></span>
                             <i *ngIf="!isProcessing(user.id)" class="bi bi-shield-x me-1"></i>
-                            Révoquer
+                            {{ 'coproperty.syndicSettings.revoke' | translate }}
                           </button>
                         </td>
                       </tr>
@@ -518,6 +519,7 @@ export class SyndicSettingsComponent implements OnInit {
   private currencyService = inject(CurrencyService);
   private toastService = inject(ToastService);
   private keycloakService = inject(KeycloakService);
+  private translate = inject(TranslateService);
 
   // ── State signals ──────────────────────────────────────────────────────────
   activeTab = signal<ActiveTab>('currency');
@@ -540,14 +542,14 @@ export class SyndicSettingsComponent implements OnInit {
   private processingIds = signal<Set<string>>(new Set());
 
   readonly currencies = [
-    { code: 'EUR', symbol: '€',   label: 'Euro' },
-    { code: 'USD', symbol: '$',   label: 'Dollar US' },
-    { code: 'TND', symbol: 'DT',  label: 'Dinar Tunisien' },
-    { code: 'GBP', symbol: '£',   label: 'Livre Sterling' },
-    { code: 'CHF', symbol: 'CHF', label: 'Franc Suisse' },
-    { code: 'CAD', symbol: 'CA$', label: 'Dollar Canadien' },
-    { code: 'AED', symbol: 'AED', label: 'Dirham EAU' },
-    { code: 'MAD', symbol: 'MAD', label: 'Dirham Marocain' },
+    { code: 'EUR', symbol: '€',   labelKey: 'coproperty.syndicSettings.currencies.EUR' },
+    { code: 'USD', symbol: '$',   labelKey: 'coproperty.syndicSettings.currencies.USD' },
+    { code: 'TND', symbol: 'DT',  labelKey: 'coproperty.syndicSettings.currencies.TND' },
+    { code: 'GBP', symbol: '£',   labelKey: 'coproperty.syndicSettings.currencies.GBP' },
+    { code: 'CHF', symbol: 'CHF', labelKey: 'coproperty.syndicSettings.currencies.CHF' },
+    { code: 'CAD', symbol: 'CA$', labelKey: 'coproperty.syndicSettings.currencies.CAD' },
+    { code: 'AED', symbol: 'AED', labelKey: 'coproperty.syndicSettings.currencies.AED' },
+    { code: 'MAD', symbol: 'MAD', labelKey: 'coproperty.syndicSettings.currencies.MAD' },
   ];
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -623,12 +625,12 @@ export class SyndicSettingsComponent implements OnInit {
         );
         this.coproperties.set(updated);
         this.saving.set(false);
-        this.toastService.show('Devise mise à jour avec succès', { classname: 'toast-success' });
+        this.toastService.show(this.translate.instant('coproperty.syndicSettings.currencySaved'), { classname: 'toast-success' });
       },
       error: (err: unknown) => {
         console.error('Error saving currency:', err);
         this.saving.set(false);
-        this.toastService.show('Erreur lors de la mise à jour', { classname: 'toast-danger' });
+        this.toastService.show(this.translate.instant('coproperty.syndicSettings.currencySaveError'), { classname: 'toast-danger' });
       },
     });
   }
@@ -646,7 +648,7 @@ export class SyndicSettingsComponent implements OnInit {
       error: (err: unknown) => {
         console.error('Error loading syndics:', err);
         this.loadingSyndics.set(false);
-        this.toastService.show('Impossible de charger la liste des syndics', { classname: 'toast-danger' });
+        this.toastService.show(this.translate.instant('coproperty.syndicSettings.syndicsLoadError'), { classname: 'toast-danger' });
       },
     });
   }
@@ -666,7 +668,7 @@ export class SyndicSettingsComponent implements OnInit {
       this.searchPerformed.set(true);
     } catch (err) {
       console.error('Error searching users:', err);
-      this.toastService.show("Erreur lors de la recherche d'utilisateurs", { classname: 'toast-danger' });
+      this.toastService.show(this.translate.instant('coproperty.syndicSettings.userSearchError'), { classname: 'toast-danger' });
     } finally {
       this.searching.set(false);
     }
@@ -695,14 +697,16 @@ export class SyndicSettingsComponent implements OnInit {
         )
       );
       this.toastService.show(
-        `Rôle syndic attribué à ${user.firstName} ${user.lastName}`,
+        this.translate.instant('coproperty.syndicSettings.roleGranted', {
+          name: `${user.firstName} ${user.lastName}`.trim()
+        }),
         { classname: 'toast-success' }
       );
       // Refresh the syndics list
       this.loadCurrentSyndics();
     } catch (err) {
       console.error('Error granting syndic role:', err);
-      this.toastService.show("Erreur lors de l'attribution du rôle", { classname: 'toast-danger' });
+      this.toastService.show(this.translate.instant('coproperty.syndicSettings.roleGrantError'), { classname: 'toast-danger' });
     } finally {
       this.removeProcessing(user.id);
     }
@@ -722,12 +726,12 @@ export class SyndicSettingsComponent implements OnInit {
         )
       );
       this.toastService.show(
-        `Rôle syndic révoqué pour ${syndic.fullName}`,
+        this.translate.instant('coproperty.syndicSettings.roleRevoked', { name: syndic.fullName }),
         { classname: 'toast-success' }
       );
     } catch (err) {
       console.error('Error revoking syndic role:', err);
-      this.toastService.show("Erreur lors de la révocation du rôle", { classname: 'toast-danger' });
+      this.toastService.show(this.translate.instant('coproperty.syndicSettings.roleRevokeError'), { classname: 'toast-danger' });
     } finally {
       this.removeProcessing(syndic.id);
     }
@@ -745,13 +749,15 @@ export class SyndicSettingsComponent implements OnInit {
         )
       );
       this.toastService.show(
-        `Rôle syndic révoqué pour ${user.firstName} ${user.lastName}`,
+        this.translate.instant('coproperty.syndicSettings.roleRevoked', {
+          name: `${user.firstName} ${user.lastName}`.trim()
+        }),
         { classname: 'toast-success' }
       );
       this.loadCurrentSyndics();
     } catch (err) {
       console.error('Error revoking syndic role from search result:', err);
-      this.toastService.show("Erreur lors de la révocation du rôle", { classname: 'toast-danger' });
+      this.toastService.show(this.translate.instant('coproperty.syndicSettings.roleRevokeError'), { classname: 'toast-danger' });
     } finally {
       this.removeProcessing(user.id);
     }

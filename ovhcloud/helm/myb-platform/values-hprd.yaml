@@ -9,14 +9,12 @@ global:
 
 namespace: myb-hprd
 
-# MailHog enabled – intercepts all emails, accessible via /mailhog
+# Staging uses the real Gmail SMTP secret so verification emails can be tested.
 mailhog:
-  enabled: true
+  enabled: false
 
 smtp:
-  useMailhog: true
-  host: "mailhog"
-  port: 1025
+  useMailhog: false
 
 # HPRD: 1 replica everywhere – cost efficient
 services:

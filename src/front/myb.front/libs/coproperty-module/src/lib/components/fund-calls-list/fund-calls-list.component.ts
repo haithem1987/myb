@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FundCallService, FundCallExtended } from '../../services/fund-call.service';
@@ -49,6 +49,7 @@ export class FundCallsListComponent implements OnInit {
   private fb = inject(FormBuilder);
   private errorMessageService = inject(ErrorMessageService);
   private fundCallModalService = inject(FundCallModalService);
+  private translate = inject(TranslateService);
 
   fundCalls = signal<FundCallExtended[]>([]);
   coproperties = signal<Coproperty[]>([]);
@@ -85,6 +86,7 @@ export class FundCallsListComponent implements OnInit {
 
   // ── Payment review state ──────────────────────────────────────────────────
   reviewingPaymentId = signal<string | null>(null);
+  justificatifActionPaymentId = signal<string | null>(null);
   showRejectModal = signal<boolean>(false);
   rejectReason = '';
   private _pendingRejectPaymentId: string | null = null;
@@ -307,9 +309,9 @@ export class FundCallsListComponent implements OnInit {
   }
 
   /**
-   * True when the fund call is in the terminal CANCELLED state.
-   * The row is then read-only — no edit / payment / status-change affordance.
-   * (FRS-FCF-LCM-2026-001 §4.3)
+   * True when the fund call is currently cancelled. The edit panel remains
+   * available so a syndic can correct the status, while payment actions stay
+   * disabled until the record has been reactivated and saved.
    */
   isCancelled(fc: FundCallExtended): boolean {
     return fc?.status === 'CANCELLED';
@@ -500,17 +502,91 @@ export class FundCallsListComponent implements OnInit {
       status: raw.status as FundCallStatus,
     };
     this.fundCallService.updateFundCall(this.editingFundCall()!.id, input).subscribe({
-      next: () => {
+      next: (updatedFundCall) => {
         this.savingEdit.set(false);
+        // Keep the list stable after an edit. Re-querying immediately used to
+        // race with Apollo's mutation refetches and could replace the visible
+        // rows with an empty response until the browser was refreshed.
+        this.applyFundCallUpdate(updatedFundCall);
         this.toastService.show('Appel de fonds mis à jour avec succès', { classname: 'bg-success text-white', delay: 3000 });
         this.closeEditPanel();
-        this.loadAllFundCalls();
       },
       error: (err) => {
         this.savingEdit.set(false);
         const msg = err?.graphQLErrors?.[0]?.message || "Erreur lors de la mise à jour.";
         this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
       },
+    });
+  }
+
+  /** Merge a partial mutation response into the fully enriched list row. */
+  private applyFundCallUpdate(updatedFundCall: FundCallExtended): void {
+    const lifecycleState = {
+      isActive: updatedFundCall.status !== 'CANCELLED',
+      cancellable: updatedFundCall.status !== 'CANCELLED',
+    };
+    this.fundCalls.update((fundCalls) =>
+      fundCalls.map((fundCall) =>
+        fundCall.id === updatedFundCall.id
+          ? { ...fundCall, ...updatedFundCall, ...lifecycleState }
+          : fundCall
+      )
+    );
+
+    const editing = this.editingFundCall();
+    if (editing?.id === updatedFundCall.id) {
+      this.editingFundCall.set({ ...editing, ...updatedFundCall, ...lifecycleState });
+    }
+  }
+
+  viewPaymentJustificatif(payment: FundCallPayment): void {
+    const previewWindow = window.open('', '_blank');
+    this.loadPaymentJustificatif(payment, false, previewWindow);
+  }
+
+  downloadPaymentJustificatif(payment: FundCallPayment): void {
+    this.loadPaymentJustificatif(payment, true, null);
+  }
+
+  private loadPaymentJustificatif(
+    payment: FundCallPayment,
+    download: boolean,
+    previewWindow: Window | null
+  ): void {
+    if (!payment.justificatifFileName || this.justificatifActionPaymentId()) {
+      previewWindow?.close();
+      return;
+    }
+
+    this.justificatifActionPaymentId.set(payment.id);
+    this.fundCallService.getPaymentJustificatif(payment.id).subscribe({
+      next: payload => {
+        const binary = atob(payload.base64Data);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index++) {
+          bytes[index] = binary.charCodeAt(index);
+        }
+        const objectUrl = URL.createObjectURL(new Blob([bytes], { type: payload.contentType }));
+
+        if (download) {
+          const anchor = document.createElement('a');
+          anchor.href = objectUrl;
+          anchor.download = payload.fileName;
+          anchor.click();
+        } else if (previewWindow) {
+          previewWindow.location.href = objectUrl;
+        }
+
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+        this.justificatifActionPaymentId.set(null);
+      },
+      error: err => {
+        previewWindow?.close();
+        this.justificatifActionPaymentId.set(null);
+        const message = err?.graphQLErrors?.[0]?.message
+          || this.translate.instant('coproperty.fundCalls.payments.justificatifLoadError');
+        this.toastService.show(message, { classname: 'bg-danger text-white', delay: 5000 });
+      }
     });
   }
 
@@ -643,17 +719,16 @@ export class FundCallsListComponent implements OnInit {
 
     fundCalls.forEach((fc) => {
       this.fundCallService.cancelFundCall(fc.id, reason.detail).subscribe({
-        next: () => {
+        next: (updatedFundCall) => {
+          this.applyFundCallUpdate(updatedFundCall);
           remaining--;
           if (remaining === 0 && failed.length === 0) {
             this.toastService.show(
               `${fundCalls.length} appel(s) annulé(s) avec succès. Les copropriétaires ont été notifiés.`,
               { classname: 'bg-success text-white', delay: 4000 }
             );
-            this.loadAllFundCalls();
             this.selectedIds.set(new Set());
           } else if (remaining === 0 && failed.length > 0) {
-            this.loadAllFundCalls();
             this.toastService.show(
               `${failed.length} appel(s) n'ont pas pu être annulés. Voir le détail dans la console.`,
               { classname: 'bg-danger text-white', delay: 6000 }
@@ -690,14 +765,9 @@ export class FundCallsListComponent implements OnInit {
   cancelFundCall(fundCall: FundCallExtended, reason: CancellationReason): void {
     if (!fundCall.id) return;
     this.fundCallService.cancelFundCall(fundCall.id, reason.detail).subscribe({
-      next: () => {
+      next: (updatedFundCall) => {
+        this.applyFundCallUpdate(updatedFundCall);
         this.toastService.show('Appel de fonds annulé avec succès. Les copropriétaires ont été notifiés.', { classname: 'bg-success text-white', delay: 4000 });
-        this.loadAllFundCalls();
-        // If the fund call is currently open in the edit panel, refresh it.
-        const editing = this.editingFundCall();
-        if (editing && editing.id === fundCall.id) {
-          this.reloadEditingFundCall();
-        }
       },
       error: (err: any) => {
         const userError = this.errorMessageService.translateError(err);
@@ -959,6 +1029,9 @@ export class FundCallsListComponent implements OnInit {
   // ── Payment helpers ─────────────────────────────────────────────────────
 
   togglePaymentForm(): void {
+    if (this.editingFundCall() && this.isCancelled(this.editingFundCall()!)) {
+      return;
+    }
     this.showPaymentForm.update((v) => !v);
     if (!this.showPaymentForm()) {
       this.paymentForm.reset({ paymentDate: this.getTodayDateString() });
@@ -979,7 +1052,7 @@ export class FundCallsListComponent implements OnInit {
 
   addPayment(): void {
     const fc = this.editingFundCall();
-    if (!fc || this.paymentForm.invalid) return;
+    if (!fc || this.isCancelled(fc) || this.paymentForm.invalid) return;
 
     this.addingPayment.set(true);
     const raw = this.paymentForm.value;

@@ -9,6 +9,7 @@ import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { take, timeout, catchError } from 'rxjs/operators';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface DashboardStats {
   totalCoproperties: number;
@@ -32,7 +33,7 @@ interface RecentActivity {
 @Component({
   selector: 'myb-coproperty-syndic-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   templateUrl: './syndic-dashboard.component.html',
   styleUrls: ['./syndic-dashboard.component.scss']
 })
@@ -43,6 +44,7 @@ export class SyndicDashboardComponent implements OnInit {
   private currencyService = inject(CurrencyService);
   private keycloakService = inject(KeycloakService);
   private destroyRef = inject(DestroyRef);
+  private translate = inject(TranslateService);
   
   stats = signal<DashboardStats>({
     totalCoproperties: 0,
@@ -133,12 +135,12 @@ export class SyndicDashboardComponent implements OnInit {
         
         sortedCharges.forEach(charge => {
           const coproperty = coproperties.find(c => c.id === charge.copropertyId);
-          const copropertyName = coproperty?.name || 'Copropriété inconnue';
+          const copropertyName = coproperty?.name || this.translate.instant('coproperty.syndicDashboard.unknownCoproperty');
           
           activities.push({
             id: charge.id || '',
             type: 'budget',
-            title: 'Nouvelle ligne budgétaire créée',
+            title: 'coproperty.syndicDashboard.activity.budgetCreated',
             description: `${charge.name} - ${this.formatAmount(charge.totalAmount)}`,
             timestamp: charge.createdAt ? new Date(charge.createdAt) : new Date(),
             coproperty: copropertyName
@@ -174,8 +176,12 @@ export class SyndicDashboardComponent implements OnInit {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
     
-    if (minutes < 60) return `Il y a ${minutes} min`;
-    if (hours < 24) return `Il y a ${hours}h`;
-    return `Il y a ${days}j`;
+    if (minutes < 60) {
+      return this.translate.instant('coproperty.syndicDashboard.activity.minutesAgo', { count: minutes });
+    }
+    if (hours < 24) {
+      return this.translate.instant('coproperty.syndicDashboard.activity.hoursAgo', { count: hours });
+    }
+    return this.translate.instant('coproperty.syndicDashboard.activity.daysAgo', { count: days });
   }
 }

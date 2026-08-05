@@ -16,6 +16,10 @@ export const GET_ALL_UNITS_BY_SYNDIC = gql`
       createdAt
       updatedAt
       currency
+      ownerUnits {
+        ownerId
+        endDate
+      }
     }
   }
 `;

@@ -23,31 +23,56 @@
     </button>
   </div>
 
-  <!-- Search Bar -->
-  <div class="search-section">
-    <div class="mb-3" *ngIf="coproperties().length > 0">
-      <label for="ownerCopropertyFilter" class="form-label fw-semibold">
-        <i class="bi bi-building me-1"></i>
-        {{ 'coproperty.charge.coproperty' | translate }}
-      </label>
-      <select
-        id="ownerCopropertyFilter"
-        class="form-select"
-        [ngModel]="copropertyId"
-        (ngModelChange)="onCopropertySelectionChange($event)"
-      >
-        <option *ngFor="let coproperty of coproperties()" [ngValue]="coproperty.id">
-          {{ coproperty.name }}
-        </option>
-      </select>
-    </div>
+  <!-- Inline owner filters -->
+  <div class="card owner-filters mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4" *ngIf="coproperties().length > 0">
+          <label for="ownerCopropertyFilter" class="form-label fw-semibold">
+            <i class="bi bi-building me-1"></i>
+            {{ 'coproperty.charge.coproperty' | translate }}
+          </label>
+          <select
+            id="ownerCopropertyFilter"
+            class="form-select"
+            [ngModel]="copropertyId"
+          (ngModelChange)="onCopropertySelectionChange($event)"
+          >
+            <option value="all">{{ 'coproperty.charge.allCoproperties' | translate }}</option>
+            <option *ngFor="let coproperty of coproperties()" [ngValue]="coproperty.id">
+              {{ coproperty.name }}
+            </option>
+          </select>
+        </div>
 
-    <input
-      type="text"
-      class="form-control"
-      [placeholder]="'common.searchOwners' | translate"
-      [(ngModel)]="searchTerm"
-    />
+        <div class="col-md-4">
+          <label for="ownerUnitFilter" class="form-label fw-semibold">
+            <i class="bi bi-building-check me-1"></i>
+            {{ 'coproperty.owner.units' | translate }}
+          </label>
+          <select id="ownerUnitFilter" class="form-select" [(ngModel)]="ownerUnitFilter">
+            <option value="">{{ 'coproperty.owner.allUnits' | translate }}</option>
+            <option *ngFor="let unit of ownerUnitFilterOptions" [value]="unit.id">
+              {{ unit.unitNumber }} — {{ unit.copropertyName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="ownerSearchFilter" class="form-label fw-semibold">
+            <i class="bi bi-search me-1"></i>
+            {{ 'coproperty.owner.name' | translate }}
+          </label>
+          <input
+            id="ownerSearchFilter"
+            type="text"
+            class="form-control"
+            [placeholder]="'common.searchOwners' | translate"
+            [(ngModel)]="searchTerm"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Add/Edit Form -->
@@ -207,7 +232,6 @@
                       type="checkbox" 
                       [id]="'unit-' + unit.id"
                       [checked]="isUnitSelected(unit.id)"
-                      [disabled]="!!editingOwnerId"
                       (change)="toggleUnitSelection(unit.id)"
                     />
                     <label class="form-check-label" [for]="'unit-' + unit.id">
@@ -223,10 +247,7 @@
                   </div>
                 </div>
               </div>
-              <small class="text-muted" *ngIf="!editingOwnerId">{{ 'coproperty.unit.selectUnitsHelp' | translate }}</small>
-              <small class="text-muted" *ngIf="editingOwnerId">
-                <i class="bi bi-lock-fill me-1"></i>{{ 'coproperty.owner.unitsLockedHelp' | translate }}
-              </small>
+              <small class="text-muted">{{ 'coproperty.unit.selectUnitsHelp' | translate }}</small>
             </div>
           </div>
         </div>

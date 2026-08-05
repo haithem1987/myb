@@ -20,7 +20,7 @@
 #   KEYCLOAK_ADMIN_PASSWORD=admin \
 #   SMTP_USER=benmaadnidhal96@gmail.com \
 #   SMTP_FROM=benmaadnidhal96@gmail.com \
-#   SMTP_PASSWORD=jfqrysgrmshbqkfy \
+#   SMTP_PASSWORD=your-gmail-app-password \
 #   ./scripts/fix-email-verification.sh --smtp
 
 set -euo pipefail
@@ -135,7 +135,7 @@ elif [[ "$MODE" == "--smtp" ]]; then
     echo "  Example:"
     echo "    SMTP_FROM=benmaadnidhal96@gmail.com \\"
     echo "    SMTP_USER=benmaadnidhal96@gmail.com \\"
-    echo "    SMTP_PASSWORD=jfqrysgrmshbqkfy \\"
+    echo "    SMTP_PASSWORD=your-gmail-app-password \\"
     echo "    KEYCLOAK_URL=http://54.38.0.191:8080 \\"
     echo "    KEYCLOAK_ADMIN_PASSWORD=admin \\"
     echo "    $0 --smtp"

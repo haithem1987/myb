@@ -60,6 +60,7 @@ export class OwnerDashboardComponent implements OnInit {
   totalPaid = signal(0);
   overdueCount = signal(0);
   totalCharges = signal(0);
+  cancelledFundCallsCount = signal(0);
   loading = signal(true);
 
   totalShares = computed(() => this.myUnits().reduce((sum, u) => sum + u.shares, 0));
@@ -139,6 +140,7 @@ export class OwnerDashboardComponent implements OnInit {
         const toPayFundCalls = fundCalls.filter(fc => fc.status === 'TO_PAY');
         const overdueFundCalls = toPayFundCalls.filter(fc => new Date() > new Date(fc.dueDate));
         this.overdueCount.set(overdueFundCalls.length);
+        this.cancelledFundCallsCount.set(fundCalls.filter(fc => fc.status === 'CANCELLED').length);
 
         this.pendingInvoices.set(toPayFundCalls.map(fc => ({
           id: fc.id,

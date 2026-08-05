@@ -715,6 +715,14 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
+                    b.Property<string>("JustificatifContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("JustificatifFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -738,6 +746,20 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                     b.HasIndex("FundCallId");
 
                     b.ToTable("FundCallPayments");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.FundCallPaymentJustificatifFile", b =>
+                {
+                    b.Property<Guid>("FundCallPaymentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<byte[]>("FileData")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.HasKey("FundCallPaymentId");
+
+                    b.ToTable("FundCallPaymentJustificatifFiles");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.Intervention", b =>
@@ -1418,6 +1440,19 @@ namespace Myb.Coproperty.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("FundCall");
+
+                    b.Navigation("JustificatifFile");
+                });
+
+            modelBuilder.Entity("Myb.Coproperty.Models.FundCallPaymentJustificatifFile", b =>
+                {
+                    b.HasOne("Myb.Coproperty.Models.FundCallPayment", "Payment")
+                        .WithOne("JustificatifFile")
+                        .HasForeignKey("Myb.Coproperty.Models.FundCallPaymentJustificatifFile", "FundCallPaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.Intervention", b =>

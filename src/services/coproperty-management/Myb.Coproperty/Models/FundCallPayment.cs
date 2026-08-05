@@ -21,6 +21,12 @@ public class FundCallPayment : IEntity<Guid>
     /// <summary>Reference / justificatif (e.g. receipt number, file path)</summary>
     public string? Justificatif { get; set; }
 
+    /// <summary>Original name of the payment-proof attachment.</summary>
+    public string? JustificatifFileName { get; set; }
+
+    /// <summary>MIME type of the payment-proof attachment.</summary>
+    public string? JustificatifContentType { get; set; }
+
     /// <summary>Payment method (Espèces, Chèque, Virement, Mandat postal, etc.)</summary>
     public string? PaymentMethod { get; set; }
 
@@ -36,4 +42,16 @@ public class FundCallPayment : IEntity<Guid>
 
     // Navigation
     public FundCall FundCall { get; set; } = null!;
+    public FundCallPaymentJustificatifFile? JustificatifFile { get; set; }
+}
+
+/// <summary>
+/// Binary content is kept in a separate one-to-one table so ordinary fund-call
+/// list queries never load multi-megabyte attachments.
+/// </summary>
+public class FundCallPaymentJustificatifFile
+{
+    public Guid FundCallPaymentId { get; set; }
+    public byte[] FileData { get; set; } = Array.Empty<byte>();
+    public FundCallPayment Payment { get; set; } = null!;
 }

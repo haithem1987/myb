@@ -1,7 +1,7 @@
 <div class="syndic-dashboard">
   <div class="dashboard-header">
-    <h1>Tableau de Bord Syndic</h1>
-    <p class="subtitle">Vue d'ensemble de vos copropriétés</p>
+    <h1>{{ 'coproperty.syndicDashboard.title' | translate }}</h1>
+    <p class="subtitle">{{ 'coproperty.syndicDashboard.subtitle' | translate }}</p>
   </div>
   
   <!-- Primary Statistics Cards -->
@@ -12,7 +12,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ stats().totalCoproperties }}</div>
-        <div class="stat-label">Copropriétés gérées</div>
+        <div class="stat-label">{{ 'coproperty.syndicDashboard.managedCoproperties' | translate }}</div>
       </div>
       <span class="card-arrow"><i class="bi bi-arrow-right-circle"></i></span>
     </a>
@@ -23,7 +23,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ stats().activeUnits }}<span class="stat-sub">/{{ stats().totalUnits }}</span></div>
-        <div class="stat-label">Lots occupés / total</div>
+        <div class="stat-label">{{ 'coproperty.syndicDashboard.occupiedUnits' | translate }}</div>
       </div>
       <span class="card-arrow"><i class="bi bi-arrow-right-circle"></i></span>
     </a>
@@ -34,7 +34,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ formatAmount(stats().totalBudget) }}</div>
-        <div class="stat-label">Paiements Charges</div>
+        <div class="stat-label">{{ 'coproperty.syndicDashboard.chargePayments' | translate }}</div>
       </div>
       <span class="card-arrow"><i class="bi bi-arrow-right-circle"></i></span>
     </a>
@@ -45,7 +45,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ stats().totalOwners }}</div>
-        <div class="stat-label">Copropriétaires</div>
+        <div class="stat-label">{{ 'coproperty.syndicDashboard.owners' | translate }}</div>
       </div>
       <span class="card-arrow"><i class="bi bi-arrow-right-circle"></i></span>
     </a>
@@ -57,7 +57,7 @@
       <i class="bi bi-graph-up"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ stats().occupancyRate }}%</span>
-        <span class="indicator-label">Taux d'occupation</span>
+        <span class="indicator-label">{{ 'coproperty.syndicDashboard.occupancyRate' | translate }}</span>
       </div>
       <div class="indicator-bar">
         <div class="indicator-fill" [style.width.%]="stats().occupancyRate"></div>
@@ -67,40 +67,40 @@
       <i class="bi bi-clipboard-check"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ stats().activeCharges }}</span>
-        <span class="indicator-label">Charges actives</span>
+        <span class="indicator-label">{{ 'coproperty.syndicDashboard.activeCharges' | translate }}</span>
       </div>
     </a>
   </div>
   
   <!-- Quick Actions -->
   <div class="quick-actions">
-    <h2>Actions Rapides</h2>
+    <h2>{{ 'coproperty.syndicDashboard.quickActions' | translate }}</h2>
     <div class="actions-grid">
       <a routerLink="/coproperty/syndic/coproperties/new" class="action-card">
         <i class="bi bi-building"></i>
-        <span>Ajouter une copropriété</span>
+        <span>{{ 'coproperty.syndicDashboard.addCoproperty' | translate }}</span>
       </a>
       
       <a routerLink="/coproperty/syndic/units" class="action-card">
         <i class="bi bi-house-door"></i>
-        <span>Ajouter un lot</span>
+        <span>{{ 'coproperty.syndicDashboard.addUnit' | translate }}</span>
       </a>
       
       <a routerLink="/coproperty/syndic/budgets/new" class="action-card">
         <i class="bi bi-plus-circle"></i>
-        <span>Ajouter une ligne budgétaire</span>
+        <span>{{ 'coproperty.syndicDashboard.addBudgetLine' | translate }}</span>
       </a>
       
       <a routerLink="/coproperty/syndic/owners" class="action-card">
         <i class="bi bi-person-plus"></i>
-        <span>Ajouter un copropriétaire</span>
+        <span>{{ 'coproperty.syndicDashboard.addOwner' | translate }}</span>
       </a>
     </div>
   </div>
   
   <!-- Recent Activity -->
   <div class="recent-activity">
-    <h2>Activité Récente</h2>
+    <h2>{{ 'coproperty.syndicDashboard.recentActivity' | translate }}</h2>
     
     <div class="activity-list" *ngIf="!loading(); else loadingTemplate">
       <div class="activity-item" *ngFor="let activity of recentActivities()">
@@ -108,7 +108,7 @@
           <i class="bi" [class]="getActivityIcon(activity.type)"></i>
         </div>
         <div class="activity-content">
-          <div class="activity-title">{{ activity.title }}</div>
+          <div class="activity-title">{{ activity.title | translate }}</div>
           <div class="activity-description">{{ activity.description }}</div>
           <div class="activity-meta">
             <span class="coproperty">{{ activity.coproperty }}</span>
@@ -119,14 +119,14 @@
       
       <div class="empty-state" *ngIf="recentActivities().length === 0">
         <i class="bi bi-inbox"></i>
-        <p>Aucune activité récente</p>
+        <p>{{ 'coproperty.syndicDashboard.noRecentActivity' | translate }}</p>
       </div>
     </div>
     
     <ng-template #loadingTemplate>
       <div class="loading-state">
         <div class="spinner"></div>
-        <p>Chargement...</p>
+        <p>{{ 'coproperty.syndicDashboard.loading' | translate }}</p>
       </div>
     </ng-template>
   </div>

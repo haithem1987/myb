@@ -32,6 +32,8 @@ export const FUND_CALL_FRAGMENT = gql`
       amount
       paymentDate
       justificatif
+      justificatifFileName
+      justificatifContentType
       paymentMethod
       validationStatus
       rejectionReason
@@ -67,6 +69,16 @@ export const GET_FUND_CALL_BY_ID = gql`
   ${FUND_CALL_FRAGMENT}
 `;
 
+export const GET_FUND_CALL_PAYMENT_JUSTIFICATIF = gql`
+  query GetFundCallPaymentJustificatif($paymentId: UUID!) {
+    fundCallPaymentJustificatif(paymentId: $paymentId) {
+      fileName
+      contentType
+      base64Data
+    }
+  }
+`;
+
 export const GET_FUND_CALLS_BY_OWNER = gql`
   query GetFundCallsByOwner($ownerId: UUID!) {
     fundCallsByOwner(ownerId: $ownerId) {
@@ -98,6 +110,8 @@ export const GET_FUND_CALL_PAYMENTS_BY_OWNER = gql`
       paymentDate
       paymentMethod
       justificatif
+      justificatifFileName
+      justificatifContentType
       validationStatus
       rejectionReason
       createdAt

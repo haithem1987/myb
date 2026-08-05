@@ -271,6 +271,7 @@
             <th class="text-end">Montant</th>
             <th>Échéance</th>
             <th>Statut</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -286,6 +287,11 @@
                 {{ getStatusLabel(fc.status) }}
               </span>
             </td>
+            <td>
+              <button class="btn btn-sm btn-outline-secondary" (click)="viewFundCallDetails(fc)">
+                <i class="bi bi-eye me-1"></i>Voir les détails
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -298,10 +304,126 @@
     <p class="text-muted mt-3">Aucun appel de fonds ne correspond à vos critères de recherche.</p>
   </div>
 
-  <!-- All Paid State -->
+  <!-- All Paid State (only when non-cancelled fund calls are all settled) -->
   <div *ngIf="!loading() && !error() && allFundCallsPaid" class="all-paid-banner">
     <i class="bi bi-check-circle-fill"></i>
     <span>Tous vos appels de fonds sont réglés!</span>
+  </div>
+
+  <!-- Cancelled-only notice (shown when every fund call is cancelled and none is paid) -->
+  <div *ngIf="!loading() && !error() && !allFundCallsPaid && hasCancelledFundCalls && unpaidFundCalls.length === 0 && paidFundCalls.length === 0" class="alert alert-secondary d-flex align-items-center mt-3" role="alert">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    <div>Vos appels de fonds ont été annulés par le syndic. L'historique ci-dessous est conservé à titre de référence.</div>
+  </div>
+</div>
+
+<!-- Fund Call Detail Modal (read-only, for cancelled fund calls) -->
+<div class="modal-backdrop" *ngIf="showDetailModal()" (click)="closeDetailModal()"></div>
+<div class="payment-modal" *ngIf="showDetailModal() && selectedDetailFundCall() as fc">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#f3f4f6">
+        <h5 class="modal-title">
+          <i class="bi bi-file-earmark-text me-2"></i>
+          Détails de l'appel de fonds
+        </h5>
+        <button type="button" class="btn-close" (click)="closeDetailModal()"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Cancelled banner -->
+        <div class="alert alert-secondary d-flex align-items-center mb-3" role="alert">
+          <i class="bi bi-lock-fill me-2"></i>
+          <div>Cet appel de fonds a été <strong>annulé</strong> par le syndic. Aucune action n'est disponible.</div>
+        </div>
+
+        <!-- Details -->
+        <div class="mb-3">
+          <div class="row g-2">
+            <div class="col-6">
+              <small class="text-muted d-block">Description</small>
+              <strong>{{ fc.description || 'Appel de fonds' }}</strong>
+            </div>
+            <div class="col-6">
+              <small class="text-muted d-block">Copropriété</small>
+              <span>{{ fc.copropertyName || '-' }}</span>
+            </div>
+            <div class="col-6 mt-2">
+              <small class="text-muted d-block">Montant</small>
+              <strong>{{ formatAmount(fc.amount, fc.currency) }}</strong>
+            </div>
+            <div class="col-6 mt-2">
+              <small class="text-muted d-block">Échéance</small>
+              <span>{{ formatDate(fc.dueDate) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment history -->
+        <div *ngIf="fc.payments && fc.payments.length > 0">
+          <hr>
+          <h6 class="mb-2">
+            <i class="bi bi-clock-history me-1"></i>Historique des versements
+          </h6>
+          <div *ngFor="let p of fc.payments"
+               class="border rounded p-2 mb-2"
+               [class.border-success]="p.validationStatus === 'Approved'"
+               [class.border-danger]="p.validationStatus === 'Rejected'">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="fw-semibold">{{ formatAmount(p.amount, fc.currency) }}</div>
+                <div class="small text-muted">
+                  <i class="bi bi-calendar2 me-1"></i>{{ formatDate(p.paymentDate) }}
+                </div>
+                <div *ngIf="p.paymentMethod" class="small text-muted">
+                  <i class="bi" [ngClass]="getPaymentMethodIcon(p.paymentMethod)"></i>
+                  {{ p.paymentMethod }}
+                </div>
+                <!-- Justificatif toggle -->
+                <div *ngIf="p.justificatif" class="mt-1">
+                  <button type="button"
+                    class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                    style="font-size:0.7rem;padding:2px 8px"
+                    (click)="$any($event.currentTarget).nextElementSibling.classList.toggle('d-none')">
+                    <i class="bi bi-file-earmark-text me-1"></i>Voir le justificatif
+                  </button>
+                  <div class="d-none mt-1 p-2 rounded border bg-light" style="font-size:0.75rem;word-break:break-word">
+                    {{ p.justificatif }}
+                    <!-- Filename badge if present -->
+                    <div *ngIf="getJustificatifFileName(p.justificatif) as fname" class="mt-1">
+                      <span class="badge bg-light text-dark border" style="font-size:0.7rem">
+                        <i class="bi bi-file-earmark-pdf me-1 text-danger"></i>{{ fname }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="p.validationStatus === 'Rejected' && p.rejectionReason"
+                     class="small text-danger mt-1">
+                  <i class="bi bi-x-circle me-1"></i><em>{{ p.rejectionReason }}</em>
+                </div>
+              </div>
+              <span class="badge"
+                [class.bg-warning]="p.validationStatus === 'Pending'"
+                [class.text-dark]="p.validationStatus === 'Pending'"
+                [class.bg-success]="p.validationStatus === 'Approved'"
+                [class.bg-danger]="p.validationStatus === 'Rejected'">
+                <ng-container *ngIf="p.validationStatus === 'Pending'"><i class="bi bi-clock me-1"></i>En attente</ng-container>
+                <ng-container *ngIf="p.validationStatus === 'Approved'"><i class="bi bi-check2 me-1"></i>Validé</ng-container>
+                <ng-container *ngIf="p.validationStatus === 'Rejected'"><i class="bi bi-x-lg me-1"></i>Refusé</ng-container>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!fc.payments || fc.payments.length === 0" class="text-muted small mt-2">
+          <i class="bi bi-info-circle me-1"></i>Aucun versement enregistré pour cet appel de fonds.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeDetailModal()">
+          <i class="bi bi-x-circle me-1"></i>Fermer
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 

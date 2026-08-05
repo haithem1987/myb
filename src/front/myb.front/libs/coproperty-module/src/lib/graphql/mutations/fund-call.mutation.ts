@@ -53,6 +53,8 @@ export const ADD_FUND_CALL_PAYMENT = gql`
       amount
       paymentDate
       justificatif
+      justificatifFileName
+      justificatifContentType
       paymentMethod
       validationStatus
       rejectionReason

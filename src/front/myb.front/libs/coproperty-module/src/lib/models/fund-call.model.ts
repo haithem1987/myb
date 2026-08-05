@@ -36,6 +36,8 @@ export interface FundCallPayment {
   amount: number;
   paymentDate: Date;
   justificatif?: string;
+  justificatifFileName?: string;
+  justificatifContentType?: string;
   paymentMethod?: string;
   /** Pending | Approved | Rejected */
   validationStatus: string;
@@ -115,6 +117,15 @@ export interface AddFundCallPaymentInput {
   paymentDate: Date;
   justificatif?: string;
   paymentMethod?: string;
+  justificatifFileName?: string;
+  justificatifContentType?: string;
+  justificatifFileBase64?: string;
+}
+
+export interface PaymentJustificatifPayload {
+  fileName: string;
+  contentType: string;
+  base64Data: string;
 }
 
 export interface ReviewFundCallPaymentInput {
@@ -129,4 +140,3 @@ export interface FundCallPaymentWithContext extends FundCallPayment {
     coproperty?: { id: string; name: string };
   };
 }
-

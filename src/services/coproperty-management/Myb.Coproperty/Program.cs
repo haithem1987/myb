@@ -209,6 +209,7 @@ if (app.Environment.IsDevelopment())
             if (retryCount >= maxRetries)
             {
                 app.Logger.LogError(ex, "Failed to migrate database after {retries} retries", maxRetries);
+                throw;
             }
             else
             {

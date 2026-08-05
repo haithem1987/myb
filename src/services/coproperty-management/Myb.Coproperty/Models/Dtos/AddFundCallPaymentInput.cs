@@ -16,4 +16,15 @@ public class AddFundCallPaymentInput
 
     /// <summary>Payment method (Espèces, Chèque, Virement, Mandat postal, etc.)</summary>
     public string? PaymentMethod { get; set; }
+
+    public string? JustificatifFileName { get; set; }
+    public string? JustificatifContentType { get; set; }
+    public string? JustificatifFileBase64 { get; set; }
+}
+
+public class PaymentJustificatifPayload
+{
+    public string FileName { get; set; } = string.Empty;
+    public string ContentType { get; set; } = string.Empty;
+    public string Base64Data { get; set; } = string.Empty;
 }

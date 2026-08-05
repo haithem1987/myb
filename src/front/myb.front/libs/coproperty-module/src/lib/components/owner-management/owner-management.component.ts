@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { ActivatedRoute } from '@angular/router';
 import { CreateOwnerWithUnitsInput, OwnerUnitInput, OwnerWithUnits } from '../../models/owner.model';
 import { UnitService, UnitExtended } from '../../services/unit.service';
 import { CopropertyService } from '../../services/coproperty.service';
@@ -11,7 +10,7 @@ import { OwnerService } from '../../services/owner.service';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { ModalService } from '@myb-front/shared-ui';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { of, from, Subject } from 'rxjs';
+import { of, from, Subject, forkJoin } from 'rxjs';
 import { map, finalize, switchMap, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 
 interface Unit {
@@ -19,6 +18,10 @@ interface Unit {
   unitNumber: string;
   copropertyId?: string;
   copropertyName?: string;
+  ownerUnits?: Array<{
+    ownerId: string;
+    endDate?: Date | null;
+  }>;
 }
 
 interface Owner {
@@ -69,7 +72,6 @@ export class OwnerManagementComponent implements OnInit {
   private modalService = inject(ModalService);
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
-  private route = inject(ActivatedRoute);
 
   private static readonly ACTIVE_COPROPERTY_STORAGE_KEY = 'activeCopropertyId';
   
@@ -80,6 +82,7 @@ export class OwnerManagementComponent implements OnInit {
   selectedCopropertyForFilter = signal<string>('');
   displayedColumns: string[] = ['name', 'email', 'phone', 'units', 'role', 'actions'];
   searchTerm: string = '';
+  ownerUnitFilter: string = '';
   unitSearchTerm: string = '';
   showAddForm: boolean = false;
   ownerForm: FormGroup;
@@ -120,16 +123,12 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Load coproperty first if copropertyId is provided, otherwise resolve from
-    // route/local storage and allow explicit user selection.
+    // Keep an explicitly supplied coproperty scope (embedded usage). The owners
+    // screen itself defaults to the aggregate "all coproperties" view.
     if (this.copropertyId) {
       this.loadOwners();
       this.loadAvailableUnits();
     } else {
-      const requestedCopropertyId = this.route.snapshot.queryParamMap.get('copropertyId');
-      const storedCopropertyId = localStorage.getItem(OwnerManagementComponent.ACTIVE_COPROPERTY_STORAGE_KEY);
-      const preferredCopropertyId = requestedCopropertyId || storedCopropertyId || '';
-
       const managerId = this.keycloakService.getSyndicManagerId();
       this.copropertyService.getCoproperties(managerId)
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -138,8 +137,7 @@ export class OwnerManagementComponent implements OnInit {
             this.coproperties.set(coproperties.map((c) => ({ id: c.id, name: c.name })));
 
             if (coproperties.length > 0) {
-              const preferred = coproperties.find((c) => c.id === preferredCopropertyId);
-              this.copropertyId = preferred?.id ?? coproperties[0].id;
+              this.copropertyId = 'all';
               this.selectedCopropertyForFilter.set(this.copropertyId);
               localStorage.setItem(OwnerManagementComponent.ACTIVE_COPROPERTY_STORAGE_KEY, this.copropertyId);
               this.loadOwners();
@@ -160,6 +158,7 @@ export class OwnerManagementComponent implements OnInit {
     localStorage.setItem(OwnerManagementComponent.ACTIVE_COPROPERTY_STORAGE_KEY, copropertyId);
 
     this.searchTerm = '';
+    this.ownerUnitFilter = '';
     this.showAddForm = false;
     this.editingOwnerId = null;
     this.owners = [];
@@ -169,18 +168,14 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   loadAvailableUnits(): void {
-    if (!this.copropertyId) {
-      console.warn('[Owner Management] No coproperty ID available for unit loading');
-      this.availableUnits = [];
-      this.allUnits = [];
-      return;
-    }
-
     this.loading.set(true);
-    console.log('[Owner Management] Loading units started');
+    console.log('[Owner Management] Loading syndic units started');
     
-    // Load only units belonging to the active coproperty to keep owner links consistent.
-    this.unitService.getUnitsByCoproperty(this.copropertyId).pipe(
+    // A syndic can assign any available lot from any coproperty they manage.
+    // Active ownership links are returned with the units so already assigned
+    // lots can be excluded before the form reaches the backend validation.
+    const managerId = this.keycloakService.getSyndicManagerId();
+    this.unitService.getAllUnitsBySyndic(managerId).pipe(
       takeUntilDestroyed(this.destroyRef),
       finalize(() => {
         console.log('[Owner Management] Loading units finalized');
@@ -194,7 +189,8 @@ export class OwnerManagementComponent implements OnInit {
           id: u.id!,
           unitNumber: u.unitNumber,
           copropertyId: u.copropertyId,
-          copropertyName: u.copropertyName || this.translateService.instant('common.unknown')
+          copropertyName: u.copropertyName || this.translateService.instant('common.unknown'),
+          ownerUnits: u.ownerUnits
         }));
         this.availableUnits = [...this.allUnits];
         this.unitSearchTerm = '';
@@ -211,6 +207,8 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   get filteredAvailableUnits(): Unit[] {
+    // Fallback to the loaded owner list for older API deployments that do not
+    // yet return ownerUnits on allUnitsBySyndic.
     const activeOwnerByUnit = new Map<string, string>();
     this.owners.forEach(owner =>
       (owner.ownerUnits || [])
@@ -218,7 +216,8 @@ export class OwnerManagementComponent implements OnInit {
         .forEach(link => activeOwnerByUnit.set(link.unitId, owner.id))
     );
     const selectable = this.availableUnits.filter(unit => {
-      const assignedOwnerId = activeOwnerByUnit.get(unit.id);
+      const assignedOwnerId = unit.ownerUnits?.find(link => !link.endDate)?.ownerId
+        ?? activeOwnerByUnit.get(unit.id);
       return !assignedOwnerId || assignedOwnerId === this.editingOwnerId;
     });
     if (!this.unitSearchTerm.trim()) return selectable;
@@ -236,9 +235,17 @@ export class OwnerManagementComponent implements OnInit {
     }
 
     this.loading.set(true);
-    console.log('[Owner Management] Loading owners for coproperty:', this.copropertyId);
-    
-    this.ownerService.getAllOwners(this.copropertyId)
+    console.log('[Owner Management] Loading owners for coproperty scope:', this.copropertyId);
+
+    const ownersRequest = this.copropertyId === 'all'
+      ? (this.coproperties().length > 0
+          ? forkJoin(this.coproperties().map(coproperty =>
+              this.ownerService.getAllOwners(coproperty.id)
+            )).pipe(map(ownerGroups => ownerGroups.flat()))
+          : of([] as OwnerWithUnits[]))
+      : this.ownerService.getAllOwners(this.copropertyId);
+
+    ownersRequest
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loading.set(false))
@@ -259,7 +266,8 @@ export class OwnerManagementComponent implements OnInit {
               }
 
               const linkCopropertyId = link.unit?.copropertyId;
-              return !this.copropertyId
+              return this.copropertyId === 'all'
+                || !this.copropertyId
                 || !linkCopropertyId
                 || linkCopropertyId === this.copropertyId;
             });
@@ -307,16 +315,51 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   get filteredOwners(): Owner[] {
-    if (!this.searchTerm) {
-      return this.owners;
+    let filtered = this.owners;
+
+    if (this.ownerUnitFilter) {
+      filtered = filtered.filter(owner =>
+        (owner.ownerUnits || []).some(link =>
+          !link.endDate && link.unitId === this.ownerUnitFilter
+        )
+      );
     }
-    const term = this.searchTerm.toLowerCase();
-    return this.owners.filter(
-      (owner) =>
+
+    const term = this.searchTerm.trim().toLowerCase();
+    if (term) {
+      filtered = filtered.filter(owner =>
         owner.firstName.toLowerCase().includes(term) ||
         owner.lastName.toLowerCase().includes(term) ||
         owner.email.toLowerCase().includes(term)
+      );
+    }
+
+    return filtered;
+  }
+
+  get ownerUnitFilterOptions(): Unit[] {
+    const unitIds = new Set(
+      this.owners.flatMap(owner =>
+        (owner.ownerUnits || [])
+          .filter(link => !link.endDate)
+          .map(link => link.unitId)
+      )
     );
+
+    return this.allUnits
+      .filter(unit => unitIds.has(unit.id))
+      .sort((left, right) => {
+        const copropertyComparison = (left.copropertyName || '')
+          .localeCompare(right.copropertyName || '');
+        return copropertyComparison || left.unitNumber.localeCompare(right.unitNumber);
+      });
+  }
+
+  /** Apollo refetches require a real coproperty UUID, never `all`. */
+  private get selectedCopropertyIdForRefetch(): string | undefined {
+    return this.copropertyId && this.copropertyId !== 'all'
+      ? this.copropertyId
+      : undefined;
   }
 
   openAddForm(): void {
@@ -336,7 +379,13 @@ export class OwnerManagementComponent implements OnInit {
     this.editingOwnerId = owner.id;
     this.showAddForm = true;
     
-    const selectedUnitIds = owner.ownerUnits?.map(ou => ou.unitId) || [];
+    // allUnits is authoritative here: it includes every active assignment for
+    // every coproperty managed by this syndic. This prevents an assignment in
+    // another coproperty from appearing unchecked and being removed by mistake.
+    const selectedUnitIds = this.allUnits
+      .filter(unit => unit.ownerUnits?.some(link => !link.endDate && link.ownerId === owner.id))
+      .map(unit => unit.id);
+    const fallbackSelectedUnitIds = owner.ownerUnits?.map(ou => ou.unitId) || [];
     
     // Set selected Keycloak user from owner data
     this.selectedKeycloakUser.set({
@@ -354,7 +403,7 @@ export class OwnerManagementComponent implements OnInit {
       lastName: owner.lastName,
       email: owner.email,
       phone: owner.phone,
-      selectedUnits: selectedUnitIds,
+      selectedUnits: selectedUnitIds.length > 0 ? selectedUnitIds : fallbackSelectedUnitIds,
     });
   }
 
@@ -362,7 +411,7 @@ export class OwnerManagementComponent implements OnInit {
     this.translateService.get('coproperty.owner.deleteConfirm').subscribe((confirmMsg) => {
       if (confirm(confirmMsg)) {
         this.loading.set(true);
-        this.ownerService.deleteOwner(owner.id, this.copropertyId)
+        this.ownerService.deleteOwner(owner.id, this.selectedCopropertyIdForRefetch)
           .pipe(
             takeUntilDestroyed(this.destroyRef),
             finalize(() => this.loading.set(false))
@@ -393,15 +442,16 @@ export class OwnerManagementComponent implements OnInit {
     const formValue = this.ownerForm.getRawValue(); // getRawValue to include disabled fields
     const selectedUnitIds: string[] = formValue.selectedUnits || [];
     
-    // Validate that at least one unit is selected
-    if (selectedUnitIds.length === 0) {
+    // A new owner needs an initial unit. An existing owner may have every unit
+    // unchecked, which cleanly unassigns those units while retaining history.
+    if (!this.editingOwnerId && selectedUnitIds.length === 0) {
       this.translateService.get('coproperty.owner.unitRequired').subscribe((msg) => {
         this.showAlert('warning', msg || this.translateService.instant('validation.required'));
       });
       return;
     }
 
-    // Prevent creating an owner with units outside of the active coproperty scope.
+    // Accept only units returned in the authenticated syndic's managed scope.
     const validUnitIds = new Set(this.allUnits.map(unit => unit.id));
     const hasInvalidUnits = selectedUnitIds.some(unitId => !validUnitIds.has(unitId));
     if (hasInvalidUnits) {
@@ -448,8 +498,8 @@ export class OwnerManagementComponent implements OnInit {
         };
         
         return this.editingOwnerId 
-          ? this.ownerService.updateOwner(this.editingOwnerId, input, this.copropertyId)
-          : this.ownerService.createOwner(input, this.copropertyId);
+          ? this.ownerService.updateOwner(this.editingOwnerId, input, this.selectedCopropertyIdForRefetch)
+          : this.ownerService.createOwner(input, this.selectedCopropertyIdForRefetch);
       }),
       takeUntilDestroyed(this.destroyRef),
       finalize(() => this.loading.set(false))
@@ -463,6 +513,7 @@ export class OwnerManagementComponent implements OnInit {
         
         // Reload the owners list to get fresh data
         this.loadOwners();
+        this.loadAvailableUnits();
         
         // Reset form
         this.showAddForm = false;
@@ -569,7 +620,7 @@ export class OwnerManagementComponent implements OnInit {
         await this.keycloakService.unassignRoleFromUser(owner.userId, 'coproperty-owner');
         // Remove the owner record from this coproperty so the user is no longer linked to this syndic
         await new Promise<void>((resolve, reject) => {
-          this.ownerService.deleteOwner(owner.id, this.copropertyId).subscribe({
+          this.ownerService.deleteOwner(owner.id, this.selectedCopropertyIdForRefetch).subscribe({
             next: () => resolve(),
             error: reject
           });
@@ -622,10 +673,6 @@ export class OwnerManagementComponent implements OnInit {
   }
   
   toggleUnitSelection(unitId: string): void {
-    if (this.editingOwnerId) {
-      this.showAlert('info', this.translateService.instant('coproperty.owner.useChangeOwnerAction'));
-      return;
-    }
     const selectedUnits = this.ownerForm.get('selectedUnits')?.value || [];
     const index = selectedUnits.indexOf(unitId);
     
@@ -678,7 +725,7 @@ export class OwnerManagementComponent implements OnInit {
     if (!confirmed) return;
 
     this.loading.set(true);
-    this.ownerService.changeUnitOwner(transfer.unitId, newOwner.id, this.copropertyId)
+    this.ownerService.changeUnitOwner(transfer.unitId, newOwner.id, this.selectedCopropertyIdForRefetch)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loading.set(false))

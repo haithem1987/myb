@@ -3,6 +3,7 @@ using HotChocolate.Types;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Services;
 using Myb.Coproperty.GraphQL.Types;
+using System.Security.Claims;
 
 namespace Myb.Coproperty.GraphQL.Mutations
 {
@@ -15,12 +16,16 @@ namespace Myb.Coproperty.GraphQL.Mutations
         /// </summary>
         public async Task<Charge> CreateChargeWithDates(
             CreateChargeInput chargeInput,
-            [Service] IChargeService chargeService)
+            ClaimsPrincipal? user,
+            [Service] IChargeService chargeService,
+            [Service] ICopropertyService copropertyService)
         {
             try
             {
                 Console.WriteLine($"CreateChargeWithDates called with: Name={chargeInput.Name}, CopropertyId={chargeInput.CopropertyId}");
+                await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, chargeInput.CopropertyId, copropertyService);
                 var chargeEntity = chargeInput.ToCharge();
+                chargeEntity.CreatedBy = CopropertyAccessControl.GetUserId(user) ?? chargeEntity.CreatedBy;
                 Console.WriteLine($"Charge entity created: Id={chargeEntity.Id}, CreatedAt={chargeEntity.CreatedAt}, UpdatedAt={chargeEntity.UpdatedAt}");
                 var result = await chargeService.CreateAsync(chargeEntity);
                 Console.WriteLine($"Charge created successfully: Id={result.Id}");
@@ -44,12 +49,21 @@ namespace Myb.Coproperty.GraphQL.Mutations
         /// </summary>
         public async Task<Charge> UpdateChargeWithDates(
             UpdateChargeInput chargeInput,
-            [Service] IChargeService chargeService)
+            ClaimsPrincipal? user,
+            [Service] IChargeService chargeService,
+            [Service] ICopropertyService copropertyService)
         {
             try
             {
                 Console.WriteLine($"UpdateChargeWithDates called with: Id={chargeInput.Id}, Name={chargeInput.Name}");
+                var existingCharge = await chargeService.GetByIdAsync(chargeInput.Id);
+                await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, existingCharge.CopropertyId, copropertyService);
+                await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, chargeInput.CopropertyId, copropertyService);
                 var chargeEntity = chargeInput.ToCharge();
+                // Audit fields belong to the original record and must never be
+                // replaced by client input during an edit.
+                chargeEntity.CreatedAt = existingCharge.CreatedAt;
+                chargeEntity.CreatedBy = existingCharge.CreatedBy;
                 Console.WriteLine($"Charge entity updated: Id={chargeEntity.Id}, UpdatedAt={chargeEntity.UpdatedAt}");
                 await chargeService.UpdateAsync(chargeEntity);
                 var result = await chargeService.GetByIdAsync(chargeEntity.Id);
@@ -75,8 +89,14 @@ namespace Myb.Coproperty.GraphQL.Mutations
             return charge;
         }
 
-        public async Task<bool> DeleteCharge(Guid id, [Service] IChargeService chargeService)
+        public async Task<bool> DeleteCharge(
+            Guid id,
+            ClaimsPrincipal? user,
+            [Service] IChargeService chargeService,
+            [Service] ICopropertyService copropertyService)
         {
+            var charge = await chargeService.GetByIdAsync(id);
+            await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, charge.CopropertyId, copropertyService);
             await chargeService.DeleteAsync(id);
             return true;
         }

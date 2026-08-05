@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const CREATE_CHARGE = gql`
   mutation CreateCharge($item: CreateChargeInput!) {
-    createChargeWithDates(chargeInput: $item) {
+    createCharge: createChargeWithDates(chargeInput: $item) {
       id
       copropertyId
       name
@@ -24,7 +24,7 @@ export const CREATE_CHARGE = gql`
 
 export const UPDATE_CHARGE = gql`
   mutation UpdateCharge($item: UpdateChargeInput!) {
-    updateChargeWithDates(chargeInput: $item) {
+    updateCharge: updateChargeWithDates(chargeInput: $item) {
       id
       copropertyId
       name

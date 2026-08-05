@@ -23,11 +23,12 @@ export interface ChargeExtended {
   name: string;
   description?: string;
   chargeType: 'CLEANING' | 'SECURITY' | 'MAINTENANCE' | 'ELECTRICITY' | 'WATER' | 'INSURANCE' | 'OTHER';
-  frequency: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL' | 'EXCEPTIONAL';
+  /** Budget year serialized as a GraphQL String (for example, "2026"). */
+  frequency: string;
   totalAmount: number;
   distributionMethod: 'BY_SHARES' | 'BY_AREA' | 'EQUAL' | 'CUSTOM';
-  startDate: Date;
-  endDate?: Date;
+  startDate: Date | string;
+  endDate?: Date | string | null;
   isActive: boolean;
   isContribution: boolean;
   createdBy: string;

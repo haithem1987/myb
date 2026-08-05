@@ -89,10 +89,9 @@
           <select 
             id="frequencyFilter" 
             class="form-select"
-            [value]="filterFrequency()"
             (change)="filterFrequency.set($any($event.target).value)">
-            <option value="">{{ 'coproperty.charge.allYears' | translate }}</option>
-            <option *ngFor="let freq of frequencies" [value]="freq">
+            <option value="" [selected]="filterFrequency() === ''">{{ 'coproperty.charge.allYears' | translate }}</option>
+            <option *ngFor="let freq of frequencies" [value]="freq" [selected]="filterFrequency() === freq">
               {{ freq }}
             </option>
           </select>

@@ -174,6 +174,9 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(p => p.Amount).Type<NonNullType<FloatType>>();
             descriptor.Field(p => p.PaymentDate).Type<NonNullType<DateTimeType>>();
             descriptor.Field(p => p.Justificatif).Type<StringType>();
+            descriptor.Field(p => p.JustificatifFileName).Type<StringType>();
+            descriptor.Field(p => p.JustificatifContentType).Type<StringType>();
+            descriptor.Ignore(p => p.JustificatifFile);
             descriptor.Field(p => p.PaymentMethod).Type<StringType>();
             descriptor.Field(p => p.ValidationStatus).Type<NonNullType<StringType>>();
             descriptor.Field(p => p.RejectionReason).Type<StringType>();

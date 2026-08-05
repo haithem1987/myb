@@ -3,6 +3,8 @@ using HotChocolate.Types;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Models.Dtos;
 using Myb.Coproperty.Services;
+using Microsoft.EntityFrameworkCore;
+using Myb.Coproperty.Infrastructure.Data;
 using System.Collections.Generic;
 using System.Security.Claims;
 
@@ -16,6 +18,62 @@ namespace Myb.Coproperty.GraphQL.Queries
             [Service] ICopropertyService copropertyService,
             Guid? managerId = null) =>
             await copropertyService.GetAllAsync(CopropertyAccessControl.ResolveEffectiveManagerId(user, managerId));
+
+        /// <summary>
+        /// Return all syndic sidebar counts in one request. Keeping this aggregation
+        /// server-side avoids issuing one GraphQL request per coproperty and menu item.
+        /// </summary>
+        public async Task<SyndicMenuCounts> GetSyndicMenuCounts(
+            ClaimsPrincipal? user,
+            [Service] ICopropertyService copropertyService,
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
+        {
+            if (!CopropertyAccessControl.IsSyndicOnly(user) &&
+                !CopropertyAccessControl.IsAdmin(user))
+                throw new InvalidOperationException(
+                    "Accès refusé : seuls les syndics et administrateurs peuvent consulter ces statistiques.");
+
+            var scopedIds = await CopropertyAccessControl.GetScopedCopropertyIdsAsync(user, copropertyService);
+            await using var context = await contextFactory.CreateDbContextAsync();
+
+            var coproperties = context.Coproperties.AsNoTracking();
+            var charges = context.Charges.AsNoTracking();
+            var units = context.Units.AsNoTracking();
+            var owners = context.Owners.AsNoTracking();
+            var tenants = context.Tenants.AsNoTracking();
+            var fundCalls = context.FundCalls.AsNoTracking();
+            var interventions = context.Interventions.AsNoTracking();
+            var signalements = context.Signalements.AsNoTracking();
+            var discussions = context.Discussions.AsNoTracking();
+
+            if (scopedIds != null)
+            {
+                coproperties = coproperties.Where(item => scopedIds.Contains(item.Id));
+                charges = charges.Where(item => scopedIds.Contains(item.CopropertyId));
+                units = units.Where(item => scopedIds.Contains(item.CopropertyId));
+                owners = owners.Where(item => item.OwnerUnits.Any(link =>
+                    link.EndDate == null && scopedIds.Contains(link.Unit.CopropertyId)));
+                tenants = tenants.Where(item => scopedIds.Contains(item.Unit.CopropertyId));
+                fundCalls = fundCalls.Where(item => scopedIds.Contains(item.CopropertyId));
+                interventions = interventions.Where(item => scopedIds.Contains(item.CopropertyId));
+                signalements = signalements.Where(item => scopedIds.Contains(item.CopropertyId));
+                discussions = discussions.Where(item => scopedIds.Contains(item.CopropertyId));
+            }
+
+            return new SyndicMenuCounts
+            {
+                Coproperties = await coproperties.CountAsync(),
+                Budgets = await charges.CountAsync(),
+                Units = await units.CountAsync(),
+                Owners = await owners.CountAsync(),
+                Tenants = await tenants.CountAsync(),
+                FundCalls = await fundCalls.CountAsync(),
+                ChargePayments = await charges.CountAsync(item => item.Distributions.Any()),
+                Interventions = await interventions.CountAsync(),
+                Signalements = await signalements.CountAsync(),
+                Discussions = await discussions.CountAsync()
+            };
+        }
 
         public async Task<Models.Coproperty> GetCopropertyById(
             Guid id,

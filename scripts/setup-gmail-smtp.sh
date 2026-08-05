@@ -22,16 +22,16 @@ ADMIN="${KEYCLOAK_ADMIN:-admin}"
 ADMIN_PASS="${KEYCLOAK_ADMIN_PASSWORD:-admin}"
 REALM="${KEYCLOAK_REALM:-MYB}"
 KUBECONFIG_PATH="${KUBECONFIG:-/Volumes/NidhalSSD/Projects/myb/terraform/ovh/environments/hprd/kubeconfig-hprd.yml}"
-NAMESPACE="myb-platform"
+NAMESPACE="${K8S_NAMESPACE:-myb-platform}"
 
 GMAIL_USER="${GMAIL_USER:-myb.platform.contact@gmail.com}"
 GMAIL_APP_PASSWORD="${GMAIL_APP_PASSWORD:-}"
 SMTP_FROM="${SMTP_FROM:-myb.platform.contact@gmail.com}"
 SMTP_FROM_DISPLAY_NAME="${SMTP_FROM_DISPLAY_NAME:-MYB Platform}"
 SMTP_HOST="smtp.gmail.com"
-SMTP_PORT="465"
-SMTP_SSL="true"
-SMTP_STARTTLS="false"
+SMTP_PORT="587"
+SMTP_SSL="false"
+SMTP_STARTTLS="true"
 
 if [[ -z "$GMAIL_APP_PASSWORD" ]]; then
   echo "✗ GMAIL_APP_PASSWORD is required."
@@ -53,7 +53,7 @@ GMAIL_APP_PASSWORD="${GMAIL_APP_PASSWORD// /}"
 echo "═══════════════════════════════════════════════════════"
 echo "  MYB — Gmail SMTP Setup"
 echo "  From:  ${SMTP_FROM}"
-echo "  Host:  ${SMTP_HOST}:${SMTP_PORT} (SSL)"
+echo "  Host:  ${SMTP_HOST}:${SMTP_PORT} (STARTTLS)"
 echo "═══════════════════════════════════════════════════════"
 
 # ── 1. Update Keycloak SMTP ──────────────────────────────────────────────
@@ -118,8 +118,9 @@ kubectl create secret generic smtp-credentials \
   --from-literal=SMTP_PORT="$SMTP_PORT" \
   --from-literal=EMAIL_FROM_ADDRESS="$SMTP_FROM" \
   --from-literal=EMAIL_FROM_NAME="$SMTP_FROM_DISPLAY_NAME" \
-  --from-literal=SMTP_ENABLE_SSL="true" \
-  --from-literal=SMTP_STARTTLS="false" \
+  --from-literal=SMTP_ENABLE_SSL="$SMTP_SSL" \
+  --from-literal=SMTP_STARTTLS="$SMTP_STARTTLS" \
+  --from-literal=SMTP_AUTH="true" \
   --from-literal=SMTP_USERNAME="$GMAIL_USER" \
   --from-literal=SMTP_PASSWORD="$GMAIL_APP_PASSWORD" \
   --save-config \

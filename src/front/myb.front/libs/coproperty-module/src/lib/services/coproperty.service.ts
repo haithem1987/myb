@@ -19,6 +19,19 @@ import {
   OwnerPaymentSummary
 } from '../models';
 
+export interface SyndicMenuCounts {
+  coproperties: number;
+  budgets: number;
+  units: number;
+  owners: number;
+  tenants: number;
+  fundCalls: number;
+  chargePayments: number;
+  interventions: number;
+  signalements: number;
+  discussions: number;
+}
+
 const GET_COPROPERTIES = gql`
   query GetCoproperties($managerId: UUID) {
     coproperties(managerId: $managerId) {
@@ -38,6 +51,23 @@ const GET_COPROPERTIES = gql`
       isActive
       createdAt
       updatedAt
+    }
+  }
+`;
+
+const GET_SYNDIC_MENU_COUNTS = gql`
+  query GetSyndicMenuCounts {
+    syndicMenuCounts {
+      coproperties
+      budgets
+      units
+      owners
+      tenants
+      fundCalls
+      chargePayments
+      interventions
+      signalements
+      discussions
     }
   }
 `;
@@ -331,6 +361,16 @@ export class CopropertyService {
       .pipe(
         map(result => result.data.coproperties)
       );
+  }
+
+  getSyndicMenuCounts(): Observable<SyndicMenuCounts> {
+    return this.apollo
+      .query<{ syndicMenuCounts: SyndicMenuCounts }>({
+        query: GET_SYNDIC_MENU_COUNTS,
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' }
+      })
+      .pipe(map(result => result.data.syndicMenuCounts));
   }
 
   getCoproperty(id: string): Observable<Coproperty> {

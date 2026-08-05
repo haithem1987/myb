@@ -8,6 +8,7 @@ import {
   GET_FUND_CALLS_BY_OWNER,
   GET_EXISTING_FUND_CALL_TOTALS,
   GET_FUND_CALL_PAYMENTS_BY_OWNER,
+  GET_FUND_CALL_PAYMENT_JUSTIFICATIF,
 } from '../graphql/queries/fund-call.query';
 import {
   CREATE_FUND_CALL,
@@ -26,6 +27,7 @@ import {
   CreateFundCallInput,
   UpdateFundCallInput,
   AddFundCallPaymentInput,
+  PaymentJustificatifPayload,
 } from '../models/fund-call.model';
 
 export interface FundCallExtended extends FundCall {
@@ -162,6 +164,17 @@ export class FundCallService {
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.addFundCallPayment));
+  }
+
+  getPaymentJustificatif(paymentId: string): Observable<PaymentJustificatifPayload> {
+    return this.apollo
+      .query<{ fundCallPaymentJustificatif: PaymentJustificatifPayload }>({
+        query: GET_FUND_CALL_PAYMENT_JUSTIFICATIF,
+        variables: { paymentId },
+        fetchPolicy: 'no-cache',
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map(result => result.data.fundCallPaymentJustificatif));
   }
 
   deleteFundCall(id: string, copropertyId?: string): Observable<boolean> {

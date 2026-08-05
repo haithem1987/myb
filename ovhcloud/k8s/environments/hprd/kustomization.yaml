@@ -1,6 +1,6 @@
 ################################################################################
 # Kustomize overlay – HPRD (Hors Production / Pre-production)
-# Namespace: myb-hprd  |  Replicas: 1  |  MailHog enabled (no real emails)
+# Namespace: myb-hprd  |  Replicas: 1  |  Gmail SMTP secret provisioned separately
 ################################################################################
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -10,9 +10,7 @@ namespace: myb-hprd
 resources:
   - namespace.yaml
   - ../../base
-  # MailHog HPRD-only (fake SMTP – catches all outbound email)
-  - ../../services/mailhog
-  # Environment-specific ConfigMap (overrides SMTP to use MailHog)
+  # Environment-specific ConfigMap
   - configmap.yaml
 
 images:

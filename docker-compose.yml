@@ -23,10 +23,12 @@ services:
       - SMTP_HOST=${SMTP_HOST:-mailhog}
       - SMTP_PORT=${SMTP_PORT:-1025}
       - SMTP_FROM=${EMAIL_FROM_ADDRESS:-noreply@myb.com}
-      - SMTP_FROM_DISPLAY_NAME=${EMAIL_FROM_NAME:-MYB Platform}
-      - SMTP_SSL=${SMTP_SSL:-false}
+      - SMTP_FROM_DISPLAY_NAME=${SMTP_FROM_NAME:-MYB Platform}
+      - SMTP_SSL=${SMTP_ENABLE_SSL:-false}
       - SMTP_STARTTLS=${SMTP_STARTTLS:-false}
       - SMTP_AUTH=${SMTP_AUTH:-false}
+      - SMTP_USER=${SMTP_USERNAME:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM:-MYB}
     networks:
       - my-network

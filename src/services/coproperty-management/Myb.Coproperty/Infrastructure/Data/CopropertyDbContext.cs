@@ -569,6 +569,12 @@ public class CopropertyDbContext : DbContext
             entity.Property(e => e.Justificatif)
                 .HasMaxLength(1000);
 
+            entity.Property(e => e.JustificatifFileName)
+                .HasMaxLength(255);
+
+            entity.Property(e => e.JustificatifContentType)
+                .HasMaxLength(100);
+
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(100);
 
@@ -583,12 +589,25 @@ public class CopropertyDbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+            entity.HasOne(e => e.JustificatifFile)
+                .WithOne(file => file.Payment)
+                .HasForeignKey<FundCallPaymentJustificatifFile>(file => file.FundCallPaymentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             entity.HasOne(e => e.FundCall)
                 .WithMany(f => f.Payments)
                 .HasForeignKey(e => e.FundCallId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(e => e.FundCallId);
+        });
+
+        modelBuilder.Entity<FundCallPaymentJustificatifFile>(entity =>
+        {
+            entity.HasKey(file => file.FundCallPaymentId);
+            entity.Property(file => file.FileData)
+                .HasColumnType("bytea")
+                .IsRequired();
         });
 
         // Assembly Configuration

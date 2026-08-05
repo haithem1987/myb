@@ -151,20 +151,15 @@ public class FundCallService : IFundCallService
 
     /// <summary>
     /// Validates whether a fund call can transition to a given status.
-    /// Prevents invalid downgrades (e.g., VALIDATED → PAID) and blocks reactivation from CANCELLED.
+    /// Prevents invalid downgrades (e.g., VALIDATED → PAID). A syndic may
+    /// reactivate a cancelled fund call from the edit panel when cancellation
+    /// was entered by mistake.
     /// </summary>
     public bool CanTransitionTo(FundCall fundCall, FundCallStatus targetStatus)
     {
         // VALIDATED → PAID transition is not allowed (downgrade risk)
         if (fundCall.Status == FundCallStatus.Validated && 
             targetStatus == FundCallStatus.Paid)
-        {
-            return false;
-        }
-
-        // CANCELLED is terminal; no re-activation
-        if (fundCall.Status == FundCallStatus.Cancelled && 
-            targetStatus != FundCallStatus.Cancelled)
         {
             return false;
         }
@@ -320,7 +315,14 @@ public class FundCallService : IFundCallService
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {id} not found");
 
-        if (fundCall.Status != FundCallStatus.PendingValidation &&
+        var targetStatus = input.Status ?? fundCall.Status;
+        if (!CanTransitionTo(fundCall, targetStatus))
+        {
+            throw new InvalidOperationException(
+                $"La transition de statut de '{fundCall.Status}' vers '{targetStatus}' n'est pas autorisée.");
+        }
+
+        if (targetStatus != FundCallStatus.PendingValidation &&
             fundCall.Amount != input.Amount)
         {
             throw new InvalidOperationException(
@@ -331,7 +333,8 @@ public class FundCallService : IFundCallService
         fundCall.DueDate = input.DueDate;
         fundCall.Description = input.Description;
         fundCall.OwnerId = input.OwnerId;
-        fundCall.Status = input.Status ?? fundCall.Status;
+        fundCall.Status = targetStatus;
+        fundCall.IsActive = targetStatus != FundCallStatus.Cancelled;
         fundCall.UpdatedAt = DateTime.UtcNow;
 
         // Refresh historical snapshots so the displayed owner/coproperty name stays
@@ -378,6 +381,7 @@ public class FundCallService : IFundCallService
         }
 
         fundCall.Status = input.Status;
+        fundCall.IsActive = input.Status != FundCallStatus.Cancelled;
         fundCall.UpdatedAt = DateTime.UtcNow;
 
         await context.SaveChangesAsync();
@@ -687,6 +691,34 @@ public class FundCallService : IFundCallService
 
     public async Task<FundCallPayment> AddPaymentAsync(Guid fundCallId, AddFundCallPaymentInput input, string userId)
     {
+        const int maxJustificatifBytes = 5 * 1024 * 1024;
+        var allowedContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "application/pdf", "image/jpeg", "image/png", "image/webp"
+        };
+        byte[]? justificatifFileData = null;
+
+        if (!string.IsNullOrWhiteSpace(input.JustificatifFileBase64))
+        {
+            if (string.IsNullOrWhiteSpace(input.JustificatifFileName) ||
+                string.IsNullOrWhiteSpace(input.JustificatifContentType))
+                throw new InvalidOperationException("Le nom et le type du justificatif sont obligatoires.");
+            if (!allowedContentTypes.Contains(input.JustificatifContentType))
+                throw new InvalidOperationException("Format de justificatif non supporté. Utilisez PDF, JPG, PNG ou WebP.");
+
+            try
+            {
+                justificatifFileData = Convert.FromBase64String(input.JustificatifFileBase64);
+            }
+            catch (FormatException)
+            {
+                throw new InvalidOperationException("Le fichier justificatif transmis est invalide.");
+            }
+
+            if (justificatifFileData.Length > maxJustificatifBytes)
+                throw new InvalidOperationException("Le justificatif ne doit pas dépasser 5 Mo.");
+        }
+
         using var context = _contextFactory.CreateDbContext();
 
         var fundCall = await context.FundCalls
@@ -694,6 +726,10 @@ public class FundCallService : IFundCallService
             .FirstOrDefaultAsync(f => f.Id == fundCallId);
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {fundCallId} not found");
+
+        if (fundCall.Status == FundCallStatus.Cancelled || !fundCall.IsActive)
+            throw new InvalidOperationException(
+                "Impossible d'ajouter un versement à un appel de fonds annulé. Réactivez-le d'abord.");
 
         var payingUserGuid = Guid.TryParse(userId, out var userGuidParsed) ? userGuidParsed : Guid.Empty;
 
@@ -720,12 +756,22 @@ public class FundCallService : IFundCallService
             Amount = input.Amount,
             PaymentDate = input.PaymentDate,
             Justificatif = input.Justificatif,
+            JustificatifFileName = input.JustificatifFileName?.Trim(),
+            JustificatifContentType = input.JustificatifContentType?.Trim(),
             PaymentMethod = input.PaymentMethod,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = Guid.TryParse(userId, out var userGuid) ? userGuid : Guid.Empty
         };
 
         context.FundCallPayments.Add(payment);
+        if (justificatifFileData != null)
+        {
+            payment.JustificatifFile = new FundCallPaymentJustificatifFile
+            {
+                FundCallPaymentId = payment.Id,
+                FileData = justificatifFileData
+            };
+        }
 
         // Set status to PendingValidation — the syndic must review and approve the payment
         // before the fund call is marked as Paid.

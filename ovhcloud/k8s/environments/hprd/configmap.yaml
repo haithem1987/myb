@@ -20,10 +20,8 @@ data:
   RABBITMQ_PORT: "5672"
   RABBITMQ_MANAGEMENT_PORT: "15672"
 
-  # SMTP → MailHog in HPRD (no real emails sent)
-  SMTP_USE_MAILHOG: "true"
-  SMTP_HOST: "mailhog"
-  SMTP_PORT: "1025"
+  # SMTP → Gmail in staging (credentials come from smtp-credentials secret)
+  SMTP_USE_MAILHOG: "false"
 
   # Registry
   REGISTRY: "93pf2bi9.gra7.container-registry.ovh.net/myb"

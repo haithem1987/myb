@@ -1,7 +1,7 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { OwnerService, FundCallService, FundCallExtended, CurrencyService, FundCallPayment } from '../../../index';
 import { KeycloakService } from '@myb-front/auth';
 import { ToastService, ModalService } from '@myb-front/shared-ui';
@@ -44,6 +44,7 @@ export class OwnerChargesComponent implements OnInit {
   private modalService = inject(ModalService);
   private currencyService = inject(CurrencyService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   fundCalls = signal<FundCallExtended[]>([]);
   loading = signal(true);
@@ -144,13 +145,21 @@ export class OwnerChargesComponent implements OnInit {
     return !!this.searchTerm() || !!this.filterStatus() || !!this.filterYear();
   }
 
-  /** True once every fund call (ignoring active filters) has been settled. */
+  /** True once every non-cancelled fund call has been paid/validated. */
   get allFundCallsPaid(): boolean {
-    return this.fundCalls().length > 0 &&
-      this.fundCalls().every(fc => fc.status === 'PAID' || fc.status === 'VALIDATED' || fc.status === 'CANCELLED');
+    const nonCancelled = this.fundCalls().filter(fc => fc.status !== 'CANCELLED');
+    return nonCancelled.length > 0 && nonCancelled.every(fc => fc.status === 'PAID' || fc.status === 'VALIDATED');
+  }
+
+  get hasCancelledFundCalls(): boolean {
+    return this.fundCalls().some(fc => fc.status === 'CANCELLED');
   }
 
   ngOnInit(): void {
+    const statusParam = this.route.snapshot.queryParamMap.get('status');
+    if (statusParam) {
+      this.filterStatus.set(statusParam);
+    }
     this.loadOwnerData();
   }
 
@@ -242,6 +251,26 @@ export class OwnerChargesComponent implements OnInit {
     }
   }
 
+  // Read-only detail modal (for cancelled fund calls)
+  showDetailModal = signal(false);
+  selectedDetailFundCall = signal<FundCallExtended | null>(null);
+
+  viewFundCallDetails(fc: FundCallExtended): void {
+    this.selectedDetailFundCall.set(fc);
+    this.showDetailModal.set(true);
+  }
+
+  closeDetailModal(): void {
+    this.showDetailModal.set(false);
+    this.selectedDetailFundCall.set(null);
+  }
+
+  /** Extracts the filename from a justificatif string like "[Fichier: name.pdf]" */
+  getJustificatifFileName(justificatif: string): string | null {
+    const match = justificatif?.match(/\[Fichier:\s*([^\]]+)\]/);
+    return match ? match[1].trim() : null;
+  }
+
   // Payment justification modal
   openPaymentModal(fc: FundCallExtended): void {
     this.selectedFundCall.set(fc);
@@ -308,6 +337,8 @@ export class OwnerChargesComponent implements OnInit {
     this.submittingPayment.set(true);
 
     try {
+      const justificatifFileBase64 = await this.readFileAsBase64(this.justificatifFile);
+
       // Build justificatif text with bank info for Virement
       let justificatifText = this.paymentForm.justificatif.trim();
       if (this.paymentForm.paymentMethod === 'Virement') {
@@ -322,7 +353,10 @@ export class OwnerChargesComponent implements OnInit {
           amount: this.paymentForm.amount,
           paymentDate: new Date(this.paymentForm.paymentDate),
           justificatif: justificatifText,
-          paymentMethod: this.paymentForm.paymentMethod
+          paymentMethod: this.paymentForm.paymentMethod,
+          justificatifFileName: this.justificatifFile.name,
+          justificatifContentType: this.justificatifFile.type,
+          justificatifFileBase64
         })
       );
 
@@ -346,6 +380,23 @@ export class OwnerChargesComponent implements OnInit {
     } finally {
       this.submittingPayment.set(false);
     }
+  }
+
+  private readFileAsBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Impossible de lire le justificatif.'));
+      reader.onload = () => {
+        const dataUrl = String(reader.result ?? '');
+        const commaIndex = dataUrl.indexOf(',');
+        if (commaIndex < 0) {
+          reject(new Error('Format de justificatif invalide.'));
+          return;
+        }
+        resolve(dataUrl.substring(commaIndex + 1));
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
   getStatusClass(status: string): string {

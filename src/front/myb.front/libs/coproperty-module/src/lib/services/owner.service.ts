@@ -522,13 +522,13 @@ export class OwnerService {
    */
   getAllOwners(copropertyId: string): Observable<OwnerWithUnits[]> {
     return this.apollo
-      .watchQuery<{ owners: OwnerWithUnits[] }>({
+      .query<{ owners: OwnerWithUnits[] }>({
         query: GET_ALL_OWNERS,
         variables: { copropertyId },
         fetchPolicy: 'network-only',
         context: { service: 'copropertyService' }
       })
-      .valueChanges.pipe(
+      .pipe(
         map(result => result.data.owners)
       );
   }

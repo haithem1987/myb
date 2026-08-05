@@ -25,6 +25,10 @@ export interface UnitExtended {
   isOccupied: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  ownerUnits?: Array<{
+    ownerId: string;
+    endDate?: Date | null;
+  }>;
 }
 
 @Injectable({

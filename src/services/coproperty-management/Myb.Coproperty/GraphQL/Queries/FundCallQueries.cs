@@ -1,5 +1,7 @@
 using HotChocolate;
 using HotChocolate.Types;
+using Microsoft.EntityFrameworkCore;
+using Myb.Coproperty.Infrastructure.Data;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Models.Dtos;
 using Myb.Coproperty.Services;
@@ -13,6 +15,41 @@ namespace Myb.Coproperty.GraphQL.Queries;
 [ExtendObjectType("Query")]
 public class FundCallQueries
 {
+    /// <summary>Loads an uploaded payment proof only when a syndic requests it.</summary>
+    public async Task<PaymentJustificatifPayload> GetFundCallPaymentJustificatif(
+        Guid paymentId,
+        ClaimsPrincipal? user,
+        [Service] IDbContextFactory<CopropertyDbContext> contextFactory,
+        [Service] ICopropertyService copropertyService)
+    {
+        if (!CopropertyAccessControl.IsSyndicOnly(user) &&
+            !CopropertyAccessControl.IsAdmin(user))
+            throw new InvalidOperationException(
+                "Accès refusé : seuls les syndics et administrateurs peuvent consulter un justificatif.");
+
+        await using var context = await contextFactory.CreateDbContextAsync();
+        var payment = await context.FundCallPayments
+            .AsNoTracking()
+            .Include(item => item.FundCall)
+            .Include(item => item.JustificatifFile)
+            .FirstOrDefaultAsync(item => item.Id == paymentId)
+            ?? throw new InvalidOperationException("Versement introuvable.");
+
+        await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(
+            user, payment.FundCall.CopropertyId, copropertyService);
+
+        if (payment.JustificatifFile?.FileData == null ||
+            string.IsNullOrWhiteSpace(payment.JustificatifFileName))
+            throw new InvalidOperationException("Aucun fichier justificatif n'est disponible pour ce versement.");
+
+        return new PaymentJustificatifPayload
+        {
+            FileName = payment.JustificatifFileName,
+            ContentType = payment.JustificatifContentType ?? "application/octet-stream",
+            Base64Data = Convert.ToBase64String(payment.JustificatifFile.FileData)
+        };
+    }
+
     /// <summary>Get a fund call by ID</summary>
     public async Task<FundCall?> GetFundCall(
         Guid id,

@@ -40,6 +40,7 @@ src/front/myb.front/tmp/
 src/front/myb.front/.nx/
 src/front/myb.front/.angular/
 src/front/myb.front/coverage/
+src/services/mailer-service/Myb.Mailer/appsettings.Production.json
 .DS_Store
 *.sh
 *.ps1

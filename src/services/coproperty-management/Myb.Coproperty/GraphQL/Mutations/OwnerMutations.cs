@@ -110,32 +110,56 @@ namespace Myb.Coproperty.GraphQL.Mutations
         public async Task<Owner> UpdateOwnerWithUnits(
             Guid id,
             CreateOwnerWithUnitsInput input,
-            [Service] IOwnerService ownerService,
-            [Service] IOwnerUnitRepository ownerUnitRepository,
             [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
         {
             await EnsureUnitsAreAvailable(input.Units.Select(u => u.UnitId), id, contextFactory);
 
-            var owner = await ownerService.GetByIdAsync(id);
-            var existingOwnerUnits = (await ownerUnitRepository.GetByOwnerIdAsync(id))
-                .Where(ou => ou.EndDate == null)
-                .ToList();
-            var existingUnitIds = existingOwnerUnits.Select(ou => ou.UnitId).OrderBy(x => x).ToArray();
-            var requestedUnitIds = input.Units.Select(u => u.UnitId).Distinct().OrderBy(x => x).ToArray();
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var owner = await context.Owners
+                .FirstOrDefaultAsync(o => o.Id == id)
+                ?? throw new InvalidOperationException($"Owner with ID {id} not found");
+            var existingOwnerUnits = await context.OwnerUnits
+                .Where(ou => ou.OwnerId == id && ou.EndDate == null)
+                .ToListAsync();
+            var requestedUnits = input.Units
+                .GroupBy(unit => unit.UnitId)
+                .ToDictionary(group => group.Key, group => group.First());
+            var requestedUnitIds = requestedUnits.Keys.ToHashSet();
+            var existingUnitIds = existingOwnerUnits.Select(ou => ou.UnitId).ToHashSet();
+            var changedAt = DateTime.UtcNow;
 
-            if (!existingUnitIds.SequenceEqual(requestedUnitIds))
+            // Unchecking a lot closes the active ownership period instead of
+            // deleting it, preserving the complete assignment history.
+            foreach (var ownerUnit in existingOwnerUnits.Where(ou => !requestedUnitIds.Contains(ou.UnitId)))
             {
-                throw new InvalidOperationException(
-                    "Les lots d'un propriétaire ne peuvent pas être remplacés depuis la modification standard. Utilisez l'action « Changer de propriétaire ».");
+                ownerUnit.EndDate = changedAt;
+                ownerUnit.UpdatedAt = changedAt;
             }
 
-            // Update profile fields only after assignment validation succeeds.
+            // Checking an available lot creates a new active ownership period.
+            foreach (var unitId in requestedUnitIds.Where(unitId => !existingUnitIds.Contains(unitId)))
+            {
+                var unitInput = requestedUnits[unitId];
+                context.OwnerUnits.Add(new OwnerUnit
+                {
+                    Id = Guid.NewGuid(),
+                    OwnerId = id,
+                    UnitId = unitId,
+                    OwnershipPercentage = unitInput.OwnershipPercentage,
+                    StartDate = unitInput.StartDate,
+                    EndDate = null,
+                    IsMainOwner = unitInput.IsMainOwner,
+                    CreatedAt = changedAt,
+                    UpdatedAt = changedAt
+                });
+            }
+
             owner.FirstName = input.FirstName;
             owner.LastName = input.LastName;
             owner.Email = input.Email;
             owner.Phone = input.Phone;
-            owner.UpdatedAt = DateTime.UtcNow;
-            await ownerService.UpdateAsync(owner);
+            owner.UpdatedAt = changedAt;
+            await context.SaveChangesAsync();
             
             return owner;
         }
@@ -149,8 +173,7 @@ namespace Myb.Coproperty.GraphQL.Mutations
             Guid newOwnerId,
             [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
         {
-            await using var context = contextFactory.CreateDbContext();
-            await using var transaction = await context.Database.BeginTransactionAsync();
+            await using var context = await contextFactory.CreateDbContextAsync();
 
             var unit = await context.Units.FindAsync(unitId)
                 ?? throw new InvalidOperationException($"Unit with ID {unitId} not found");
@@ -183,8 +206,11 @@ namespace Myb.Coproperty.GraphQL.Mutations
             };
             context.OwnerUnits.Add(replacement);
 
+            // Hot Chocolate's default transaction-scope handler already wraps the
+            // mutation in an ambient transaction. Starting a second transaction on
+            // this connection causes Npgsql's "ambient transaction" exception.
+            // A single SaveChanges is atomic and participates in that outer scope.
             await context.SaveChangesAsync();
-            await transaction.CommitAsync();
             return replacement;
         }
 

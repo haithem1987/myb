@@ -59,7 +59,11 @@ namespace Myb.Coproperty.Services
 
         public async Task DeleteAsync(Guid id)
         {
-            await _chargeRepository.DeleteAsync(id);
+            var result = await _chargeRepository.DeleteAsync(id);
+            if (result.Errors != null && result.Errors.Any())
+            {
+                throw new InvalidOperationException($"Failed to delete charge: {string.Join(", ", result.Errors)}");
+            }
         }
 
         public async Task<IEnumerable<Charge>> GetAllAsync()
@@ -168,7 +172,11 @@ namespace Myb.Coproperty.Services
 
         public async Task UpdateAsync(Charge charge)
         {
-            await _chargeRepository.UpdateAsync(charge);
+            var result = await _chargeRepository.UpdateAsync(charge);
+            if (result.Errors != null && result.Errors.Any())
+            {
+                throw new InvalidOperationException($"Failed to update charge: {string.Join(", ", result.Errors)}");
+            }
         }
 
         public async Task<IEnumerable<ChargeDistribution>> GetDistributionsByOwnerAsync(Guid ownerId)

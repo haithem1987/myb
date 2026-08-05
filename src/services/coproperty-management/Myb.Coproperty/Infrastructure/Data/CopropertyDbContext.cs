@@ -816,6 +816,11 @@ public class CopropertyDbContext : DbContext
         // to maintain financial audit integrity for the Call for Funds lifecycle.
         modelBuilder.Entity<FundCallAuditLog>(entity =>
         {
+            // The legacy FundCallAuditLogs table in OVH is owned by avnadmin
+            // and grants the application role no access. Keep it untouched for
+            // retention and persist new application audit history separately.
+            entity.ToTable("FundCallAuditEvents");
+
             entity.HasKey(e => e.Id);
 
             // Audit entries are immutable. UpdatedAt only exists to satisfy the

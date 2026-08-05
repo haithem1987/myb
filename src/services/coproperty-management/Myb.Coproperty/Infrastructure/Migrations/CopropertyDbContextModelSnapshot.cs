@@ -684,7 +684,7 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
                     b.HasIndex("FundCallId", "CreatedAt");
 
-                    b.ToTable("FundCallAuditLogs");
+                    b.ToTable("FundCallAuditEvents");
                 });
 
             modelBuilder.Entity("Myb.Coproperty.Models.FundCallPayment", b =>

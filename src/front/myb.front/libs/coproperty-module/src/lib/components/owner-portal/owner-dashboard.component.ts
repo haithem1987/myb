@@ -173,7 +173,9 @@ export class OwnerDashboardComponent implements OnInit {
               : 'Appel de fonds',
             date: new Date(p.paymentDate),
             amount: p.amount,
-            status: p.validationStatus === 'Approved' ? 'paid' : 'pending',
+            status: p.validationStatus === 'Approved'
+              ? 'paid'
+              : p.validationStatus === 'Rejected' ? 'rejected' : 'pending',
             paymentMethod: p.paymentMethod ?? '',
           }));
         this.recentInvoices.set(recentReceipts);
@@ -202,6 +204,7 @@ export class OwnerDashboardComponent implements OnInit {
       case 'paid': return 'Payée';
       case 'overdue': return 'En retard';
       case 'pending': return 'En attente';
+      case 'rejected': return 'Rejeté';
       default: return status;
     }
   }

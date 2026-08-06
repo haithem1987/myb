@@ -262,7 +262,10 @@ export class FundCallsListComponent implements OnInit {
 
     // Owner filter (local)
     if (this.filterOwnerId()) {
-      filtered = filtered.filter((fc) => fc.ownerId === this.filterOwnerId());
+      const selectedOwnerId = this.filterOwnerId().toLowerCase();
+      filtered = filtered.filter((fc) =>
+        (fc.ownerId ?? fc.owner?.id ?? '').toLowerCase() === selectedOwnerId
+      );
     }
 
     // Year filter (local)
@@ -331,7 +334,9 @@ export class FundCallsListComponent implements OnInit {
   getTotalPaidAmount(): number {
     return this.filteredFundCalls.reduce((sum, fc) => {
       const payments = fc.payments ?? [];
-      const paid = payments.reduce((s, p) => {
+      const paid = payments
+        .filter((payment) => payment.validationStatus !== 'Rejected')
+        .reduce((s, p) => {
         const n = typeof (p as any).amount === 'string' ? parseFloat((p as any).amount) : ((p as any).amount || 0);
         return s + (isNaN(n) ? 0 : n);
       }, 0);
@@ -401,7 +406,9 @@ export class FundCallsListComponent implements OnInit {
   }
 
   getFundCallPaidAmount(fundCall: FundCallExtended): number {
-    return (fundCall.payments ?? []).reduce((sum, payment) => {
+    return (fundCall.payments ?? [])
+      .filter((payment) => payment.validationStatus !== 'Rejected')
+      .reduce((sum, payment) => {
       const rawAmount = payment.amount as number | string;
       const amount = typeof rawAmount === 'string'
         ? parseFloat(rawAmount)
@@ -428,12 +435,14 @@ export class FundCallsListComponent implements OnInit {
     const seen = new Set<string>();
     const result: { id: string; firstName: string; lastName: string }[] = [];
     for (const fc of source) {
-      if (fc.owner?.id && !seen.has(fc.owner.id)) {
-        seen.add(fc.owner.id);
+      const ownerId = fc.ownerId ?? fc.owner?.id;
+      if (ownerId && !seen.has(ownerId.toLowerCase())) {
+        seen.add(ownerId.toLowerCase());
+        const snapshotParts = (fc.ownerName ?? '').trim().split(/\s+/);
         result.push({
-          id: fc.owner.id,
-          firstName: (fc.owner as any).firstName ?? '',
-          lastName: (fc.owner as any).lastName ?? '',
+          id: ownerId,
+          firstName: fc.owner?.firstName ?? snapshotParts[0] ?? '',
+          lastName: fc.owner?.lastName ?? snapshotParts.slice(1).join(' '),
         });
       }
     }

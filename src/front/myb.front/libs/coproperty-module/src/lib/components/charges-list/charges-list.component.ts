@@ -286,6 +286,10 @@ export class ChargesListComponent implements OnInit {
     return typeMap[type] || 'bg-secondary';
   }
 
+  getChargeTypeTranslationKey(type: string): string {
+    return `coproperty.charges.types.${type.toLowerCase()}`;
+  }
+
   getFrequencyLabel(frequency: string): string {
     const labels: { [key: string]: string } = {
       'MONTHLY': 'Mensuel',

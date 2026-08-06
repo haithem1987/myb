@@ -2,7 +2,8 @@ import { Component, signal, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
-import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService, ChargeDistribution } from '../../../index';
+import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService, ChargeDistribution, FundCallService } from '../../../index';
+import { FundCallPaymentWithContext } from '../../../models/fund-call.model';
 import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take, switchMap } from 'rxjs/operators';
@@ -569,7 +570,7 @@ interface Invoice {
   `]
 })
 export class OwnerInvoicesComponent implements OnInit {
-  selectedYear = '2026';
+  selectedYear = new Date().getFullYear().toString();
 
   invoices = signal<Invoice[]>([]);
   filteredInvoices = signal<Invoice[]>(this.invoices());
@@ -591,6 +592,7 @@ export class OwnerInvoicesComponent implements OnInit {
   });
 
   private ownerService = inject(OwnerService);
+  private fundCallService = inject(FundCallService);
   private keycloakService = inject(KeycloakService);
   private currencyService = inject(CurrencyService);
   private unitsById = new Map<string, Unit>();
@@ -622,10 +624,12 @@ export class OwnerInvoicesComponent implements OnInit {
           distributions: ownerId
             ? this.ownerService.getOwnerChargeDistributions(ownerId).pipe(take(1), catchError(() => of([] as ChargeDistribution[])))
             : of([] as ChargeDistribution[]),
+          fundCallPayments: this.fundCallService.getFundCallPaymentsByOwner(userId)
+            .pipe(take(1), catchError(() => of([] as FundCallPaymentWithContext[]))),
         });
       })
     ).subscribe({
-      next: ({ units, invoices, distributions }) => {
+      next: ({ units, invoices, distributions, fundCallPayments }) => {
         // Store units for mapping
         units.forEach((unit) => this.unitsById.set(unit.id, unit));
 
@@ -639,8 +643,15 @@ export class OwnerInvoicesComponent implements OnInit {
         );
         const mappedDistributions = paidDistributions.map((dist) => this.mapChargeDistribution(dist));
 
+        // A validated fund-call payment is also a receipt. This source was
+        // previously omitted, leaving "Mes Reçus" empty for owners who paid
+        // through the call-for-funds workflow.
+        const mappedFundCallPayments = fundCallPayments
+          .filter(payment => payment.validationStatus === 'Approved')
+          .map(payment => this.mapFundCallPayment(payment));
+
         // Merge and sort by date (descending)
-        const allReceipts = [...mappedInvoices, ...mappedDistributions]
+        const allReceipts = [...mappedInvoices, ...mappedDistributions, ...mappedFundCallPayments]
           .sort((a, b) => {
             const dateA = a.paymentDate ?? a.date;
             const dateB = b.paymentDate ?? b.date;
@@ -737,6 +748,23 @@ export class OwnerInvoicesComponent implements OnInit {
       paymentMethod: dist.paymentMethod ?? 'Virement',
       status: 'paid',
       currency: dist.currency,
+    };
+  }
+
+  private mapFundCallPayment(payment: FundCallPaymentWithContext): Invoice {
+    const paymentDate = new Date(payment.paymentDate);
+    return {
+      id: payment.id,
+      number: `FC-${payment.id.substring(0, 8).toUpperCase()}`,
+      description: payment.fundCall?.description || 'Appel de fonds',
+      date: paymentDate,
+      amount: payment.amount,
+      period: this.getPeriodLabel(paymentDate),
+      unitNumber: '—',
+      paymentDate,
+      paymentMethod: payment.paymentMethod ?? '',
+      status: 'paid',
+      currency: payment.fundCall?.currency,
     };
   }
 

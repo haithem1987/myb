@@ -172,6 +172,7 @@
               <i class="bi" 
                  [class.bi-check-circle]="invoice.status === 'paid'"
                  [class.bi-clock]="invoice.status === 'pending'"
+                 [class.bi-x-circle]="invoice.status === 'rejected'"
                  [class.bi-exclamation-circle]="invoice.status === 'overdue'"></i>
             </div>
             <div class="recent-info">

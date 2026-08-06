@@ -122,6 +122,11 @@ public class FundCallQueries
         [Service] IFundCallService fundCallService,
         [Service] ICopropertyService copropertyService)
     {
+        if (CopropertyAccessControl.IsOwner(user) &&
+            CopropertyAccessControl.GetUserId(user) != ownerUserId)
+            throw new InvalidOperationException(
+                "Accès refusé : vous ne pouvez consulter que vos propres reçus.");
+
         var payments = await fundCallService.GetPaymentsByOwnerUserIdAsync(ownerUserId);
         var scopedIds = await CopropertyAccessControl.GetScopedCopropertyIdsAsync(user, copropertyService);
         if (scopedIds == null)

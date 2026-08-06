@@ -326,13 +326,16 @@ namespace Myb.Coproperty.Services
                         Amount = paidAmount,
                         PaymentDate = DateTime.UtcNow,
                         Justificatif = $"Paiement en ligne - {transactionId}",
+                        ValidationStatus = "Approved",
                         CreatedAt = DateTime.UtcNow,
                         CreatedBy = owner.UserId
                     };
                     context.FundCallPayments.Add(fundCallPayment);
 
                     // Update fund call status based on total payments
-                    var existingTotal = linkedFundCall.Payments?.Sum(p => p.Amount) ?? 0;
+                    var existingTotal = linkedFundCall.Payments?
+                        .Where(p => p.ValidationStatus != "Rejected")
+                        .Sum(p => p.Amount) ?? 0;
                     if (existingTotal + paidAmount >= linkedFundCall.Amount)
                         linkedFundCall.Status = FundCallStatus.Paid;
 
@@ -369,7 +372,7 @@ namespace Myb.Coproperty.Services
                                 <tr><td style='padding:8px;'><strong>Copropriétaire :</strong></td><td style='padding:8px;'>{ownerName}</td></tr>
                                 <tr><td style='padding:8px;'><strong>Lot :</strong></td><td style='padding:8px;'>{unitNumber}</td></tr>
                                 <tr><td style='padding:8px;'><strong>Charge :</strong></td><td style='padding:8px;'>{charge?.Name}</td></tr>
-                                <tr><td style='padding:8px;'><strong>Montant payé :</strong></td><td style='padding:8px;'>{paidAmount:N2} €</td></tr>
+                                <tr><td style='padding:8px;'><strong>Montant payé :</strong></td><td style='padding:8px;'>{FormatAmount(paidAmount, coproperty.Currency)}</td></tr>
                                 <tr><td style='padding:8px;'><strong>Statut :</strong></td><td style='padding:8px;'>{statusLabel}</td></tr>
                                 <tr><td style='padding:8px;'><strong>Référence :</strong></td><td style='padding:8px;'>{transactionId}</td></tr>
                                 <tr><td style='padding:8px;'><strong>Date :</strong></td><td style='padding:8px;'>{DateTime.UtcNow:dd/MM/yyyy HH:mm}</td></tr>
@@ -391,7 +394,7 @@ namespace Myb.Coproperty.Services
                         {
                             senderId = owner.UserId.ToString(),
                             receiverId = coproperty.ManagerId.Value.ToString(),
-                            message = $"💰 Paiement reçu : {ownerName} a payé {paidAmount:N2} € pour la charge \"{charge?.Name}\" (Lot {unitNumber})"
+                            message = $"💰 Paiement reçu : {ownerName} a payé {FormatAmount(paidAmount, coproperty.Currency)} pour la charge \"{charge?.Name}\" (Lot {unitNumber})"
                         };
                         var content = new StringContent(
                             JsonSerializer.Serialize(notificationPayload),
@@ -408,6 +411,23 @@ namespace Myb.Coproperty.Services
             }
 
             return distribution;
+        }
+
+        private static string FormatAmount(decimal amount, Currency currency)
+        {
+            var unit = currency switch
+            {
+                Currency.EUR => "€",
+                Currency.USD => "$",
+                Currency.TND => "DT",
+                Currency.GBP => "£",
+                Currency.CHF => "CHF",
+                Currency.CAD => "CAD",
+                Currency.AED => "AED",
+                Currency.MAD => "MAD",
+                _ => currency.ToString()
+            };
+            return $"{amount:N2} {unit}";
         }
     }
 }

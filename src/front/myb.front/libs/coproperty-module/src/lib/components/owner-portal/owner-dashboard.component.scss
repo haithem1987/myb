@@ -326,6 +326,7 @@
 
     &.paid { background: #10b981; }
     &.pending { background: #f59e0b; }
+    &.rejected { background: #ef4444; }
     &.overdue { background: #ef4444; }
   }
 
@@ -359,6 +360,7 @@
 
     &.paid { background: #d1fae5; color: #065f46; }
     &.pending { background: #fef3c7; color: #92400e; }
+    &.rejected { background: #fee2e2; color: #991b1b; }
     &.overdue { background: #fee2e2; color: #991b1b; }
   }
 

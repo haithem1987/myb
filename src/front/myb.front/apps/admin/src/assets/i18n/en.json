@@ -234,9 +234,12 @@
         "cleaning": "Cleaning",
         "security": "Security",
         "maintenance": "Maintenance",
+        "elevator": "Elevator",
+        "heating": "Heating",
         "electricity": "Electricity",
         "water": "Water",
         "insurance": "Insurance",
+        "gardening": "Gardening",
         "other": "Other"
       },
       "frequencies": {

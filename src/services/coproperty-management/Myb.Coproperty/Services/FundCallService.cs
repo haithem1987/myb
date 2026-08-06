@@ -247,7 +247,7 @@ public class FundCallService : IFundCallService
                 var snapshotDueDate = existingFundCall.DueDate;
                 _ = Task.Run(async () =>
                 {
-                    try { await SendFundCallEmailToOwner(snapshotOwnerId, snapshotAmount, snapshotDescription, snapshotDueDate); }
+                    try { await SendFundCallEmailToOwner(snapshotOwnerId, snapshotAmount, snapshotDescription, snapshotDueDate, coproperty.Currency); }
                     catch (Exception ex) { Console.Error.WriteLine($"[FundCallEmail] Background email failed: {ex.GetType().Name}: {ex.Message}"); }
                 });
             }
@@ -285,7 +285,7 @@ public class FundCallService : IFundCallService
             var snapshotDueDate = fundCall.DueDate;
             _ = Task.Run(async () =>
             {
-                try { await SendFundCallEmailToOwner(snapshotOwnerId, snapshotAmount, snapshotDescription, snapshotDueDate); }
+                try { await SendFundCallEmailToOwner(snapshotOwnerId, snapshotAmount, snapshotDescription, snapshotDueDate, coproperty.Currency); }
                 catch (Exception ex) { Console.Error.WriteLine($"[FundCallEmail] Background email failed: {ex.GetType().Name}: {ex.Message}"); }
             });
         }
@@ -516,7 +516,7 @@ public class FundCallService : IFundCallService
         var body =
             $"Bonjour,\n\n" +
             $"L'appel de fonds « {fundCall.Description ?? "sans description"} » d'un montant de " +
-            $"{fundCall.Amount:N3} a été annulé par votre syndic.\n\n" +
+            $"{FormatAmount(fundCall.Amount, fundCall.CurrencySnapshot)} a été annulé par votre syndic.\n\n" +
             $"Motif : {reason}\n\n" +
             $"Toute soumission de paiement en attente n'est plus applicable. Pour toute question, " +
             $"veuillez contacter votre gestionnaire.\n\n" +
@@ -662,7 +662,9 @@ public class FundCallService : IFundCallService
         foreach (var fc in fundCalls)
         {
             var ownerId = fc.OwnerId!.Value;
-            var paidTotal = fc.Payments.Sum(p => p.Amount);
+            var paidTotal = fc.Payments
+                .Where(p => p.ValidationStatus != "Rejected")
+                .Sum(p => p.Amount);
             var remaining = fc.Amount - paidTotal;
             if (remaining > 0)
             {
@@ -843,11 +845,13 @@ public class FundCallService : IFundCallService
 
             // Sum all payments already in the DB (the new payment is committed at this point)
             var totalPaid = await context.FundCallPayments
-                .Where(p => p.FundCallId == fundCallId)
+                .Where(p => p.FundCallId == fundCallId && p.ValidationStatus != "Rejected")
                 .SumAsync(p => p.Amount);
             var remaining = fundCallAmount - totalPaid;
             var isPaidInFull = remaining <= 0;
-            var statusText = isPaidInFull ? "ENTIÈREMENT RÉGLÉ" : $"Reste à payer : {remaining:N2}";
+            var statusText = isPaidInFull
+                ? "ENTIÈREMENT RÉGLÉ"
+                : $"Reste à payer : {FormatAmount(remaining, coproperty.Currency)}";
             var statusColor = isPaidInFull ? "#16a34a" : "#d97706";
             var statusBg = isPaidInFull ? "#dcfce7" : "#fef3c7";
             var fundCallUrl = $"{_frontendUrl}/admin/coproperty/syndic/fund-calls";
@@ -962,7 +966,7 @@ public class FundCallService : IFundCallService
                 </tr>
                 <tr>
                   <td style='padding:12px 16px;color:#6b7280;font-size:14px;border-bottom:1px solid #f3f4f6;'>Montant versé</td>
-                  <td style='padding:12px 16px;color:#16a34a;font-size:16px;font-weight:700;border-bottom:1px solid #f3f4f6;'>{paymentAmount:N2}</td>
+                  <td style='padding:12px 16px;color:#16a34a;font-size:16px;font-weight:700;border-bottom:1px solid #f3f4f6;'>{FormatAmount(paymentAmount, coproperty.Currency)}</td>
                 </tr>
                 <tr style='background:#fafafa;'>
                   <td style='padding:12px 16px;color:#6b7280;font-size:14px;border-bottom:1px solid #f3f4f6;'>Mode de paiement</td>
@@ -974,11 +978,11 @@ public class FundCallService : IFundCallService
                 </tr>
                 <tr style='background:#fafafa;'>
                   <td style='padding:12px 16px;color:#6b7280;font-size:14px;border-bottom:1px solid #f3f4f6;'>Montant total appel</td>
-                  <td style='padding:12px 16px;color:#111827;font-size:14px;border-bottom:1px solid #f3f4f6;'>{fundCallAmount:N2}</td>
+                  <td style='padding:12px 16px;color:#111827;font-size:14px;border-bottom:1px solid #f3f4f6;'>{FormatAmount(fundCallAmount, coproperty.Currency)}</td>
                 </tr>
                 <tr>
                   <td style='padding:12px 16px;color:#6b7280;font-size:14px;border-bottom:1px solid #f3f4f6;'>Total déjà payé</td>
-                  <td style='padding:12px 16px;color:#111827;font-size:14px;font-weight:600;border-bottom:1px solid #f3f4f6;'>{totalPaid:N2}</td>
+                  <td style='padding:12px 16px;color:#111827;font-size:14px;font-weight:600;border-bottom:1px solid #f3f4f6;'>{FormatAmount(totalPaid, coproperty.Currency)}</td>
                 </tr>
                 <tr style='background:{statusBg};'>
                   <td style='padding:12px 16px;color:#374151;font-size:14px;font-weight:600;'>Statut</td>
@@ -1027,7 +1031,7 @@ public class FundCallService : IFundCallService
                 await _emailPublisher.PublishAsync(new EmailMessage
                 {
                     To = syndicEmail,
-                    Subject = $"[MYB] Paiement reçu — {ownerName} | {coproperty.Name} ({paymentAmount:N2})",
+                    Subject = $"[MYB] Paiement reçu — {ownerName} | {coproperty.Name} ({FormatAmount(paymentAmount, coproperty.Currency)})",
                     HtmlBody = htmlBody,
                     Source = "coproperty-payment"
                 });
@@ -1043,7 +1047,7 @@ public class FundCallService : IFundCallService
                     {
                         senderId = owner.UserId.ToString(),
                         receiverId = syndicUserId.Value.ToString(),
-                        message = $"💰 Paiement reçu : {ownerName} a versé {paymentAmount:N2} ({paymentMethod ?? "Virement"}) pour \"{fundCallDescription ?? "Appel de fonds"}\". {statusText}"
+                        message = $"💰 Paiement reçu : {ownerName} a versé {FormatAmount(paymentAmount, coproperty.Currency)} ({paymentMethod ?? "Virement"}) pour \"{fundCallDescription ?? "Appel de fonds"}\". {statusText}"
                     };
                     var content = new System.Net.Http.StringContent(
                         System.Text.Json.JsonSerializer.Serialize(notificationPayload),
@@ -1080,9 +1084,10 @@ public class FundCallService : IFundCallService
             .IgnoreQueryFilters()
             .Include(p => p.FundCall)
                 .ThenInclude(f => f.Coproperty)
-            .Where(p => p.FundCall != null
-                        && p.FundCall.OwnerId.HasValue
-                        && ownerIds.Contains(p.FundCall.OwnerId.Value))
+            .Where(p => p.CreatedBy == ownerUserId
+                        || (p.FundCall != null
+                            && p.FundCall.OwnerId.HasValue
+                            && ownerIds.Contains(p.FundCall.OwnerId.Value)))
             .OrderByDescending(p => p.PaymentDate)
             .ToListAsync();
     }
@@ -1159,7 +1164,8 @@ public class FundCallService : IFundCallService
     /// <summary>
     /// Sends a fund call notification email to the owner (fire-and-forget helper).
     /// </summary>
-    private async Task SendFundCallEmailToOwner(Guid ownerId, decimal amount, string? description, DateTime dueDate)
+    private async Task SendFundCallEmailToOwner(
+        Guid ownerId, decimal amount, string? description, DateTime dueDate, Currency currency)
     {
         using var context = _contextFactory.CreateDbContext();
         var owner = await context.Owners.FindAsync(ownerId);
@@ -1181,7 +1187,7 @@ public class FundCallService : IFundCallService
                   <p>Un nouvel appel de fonds a été émis pour votre copropriété.</p>
                   <table style="border-collapse:collapse;margin:16px 0">
                     <tr><td style="padding:4px 12px 4px 0"><strong>Description :</strong></td><td>{description}</td></tr>
-                    <tr><td style="padding:4px 12px 4px 0"><strong>Montant :</strong></td><td>{amount:N2} €</td></tr>
+                    <tr><td style="padding:4px 12px 4px 0"><strong>Montant :</strong></td><td>{FormatAmount(amount, currency)}</td></tr>
                     <tr><td style="padding:4px 12px 4px 0"><strong>Date d'échéance :</strong></td><td>{dueDate:dd/MM/yyyy}</td></tr>
                   </table>
                   <p style="margin:24px 0">
@@ -1246,13 +1252,15 @@ public class FundCallService : IFundCallService
         var snapshotDueDate = payment.FundCall.DueDate;
         var snapshotApproved = approved;
         var snapshotRejectionReason = rejectionReason;
+        var snapshotCurrency = payment.FundCall.CurrencySnapshot;
         _ = Task.Run(async () =>
         {
             try
             {
                 await NotifyOwnerPaymentReview(
                     snapshotOwnerId, snapshotAmount, snapshotDescription,
-                    snapshotDueDate, snapshotApproved, snapshotRejectionReason);
+                    snapshotDueDate, snapshotApproved, snapshotRejectionReason,
+                    snapshotCurrency);
             }
             catch (Exception ex)
             {
@@ -1268,7 +1276,7 @@ public class FundCallService : IFundCallService
     /// </summary>
     private async Task NotifyOwnerPaymentReview(
         Guid? ownerId, decimal amount, string? description,
-        DateTime dueDate, bool approved, string? rejectionReason)
+        DateTime dueDate, bool approved, string? rejectionReason, Currency currency)
     {
         if (!ownerId.HasValue) return;
 
@@ -1283,7 +1291,7 @@ public class FundCallService : IFundCallService
         {
             subject = $"Paiement validé – {description}";
             statusBanner = """<td style="background:#22c55e;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">✅ Votre paiement a été validé</p></td>""";
-            bodyContent = $"""<p>Votre paiement de <strong>{amount:N2} €</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#16a34a">validé</strong> par le syndic.</p>""";
+            bodyContent = $"""<p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#16a34a">validé</strong> par le syndic.</p>""";
         }
         else
         {
@@ -1293,7 +1301,7 @@ public class FundCallService : IFundCallService
                 ? ""
                 : $"""<p style="margin:12px 0;padding:12px 16px;background:#fef2f2;border-left:4px solid #ef4444;border-radius:4px;color:#991b1b;"><strong>Motif :</strong> {System.Net.WebUtility.HtmlEncode(rejectionReason)}</p>""";
             bodyContent = $"""
-                <p>Votre paiement de <strong>{amount:N2} €</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#dc2626">refusé</strong> par le syndic.</p>
+                <p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#dc2626">refusé</strong> par le syndic.</p>
                 {reasonHtml}
                 <p>Veuillez soumettre un nouveau justificatif ou contacter votre syndic pour régulariser la situation.</p>
                 """;
@@ -1325,5 +1333,22 @@ public class FundCallService : IFundCallService
                 """,
             Source = "coproperty-service"
         });
+    }
+
+    private static string FormatAmount(decimal amount, Currency currency)
+    {
+        var unit = currency switch
+        {
+            Currency.EUR => "€",
+            Currency.USD => "$",
+            Currency.TND => "DT",
+            Currency.GBP => "£",
+            Currency.CHF => "CHF",
+            Currency.CAD => "CAD",
+            Currency.AED => "AED",
+            Currency.MAD => "MAD",
+            _ => currency.ToString()
+        };
+        return $"{amount:N2} {unit}";
     }
 }

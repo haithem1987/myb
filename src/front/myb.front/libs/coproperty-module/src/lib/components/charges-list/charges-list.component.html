@@ -75,7 +75,7 @@
             (change)="filterType.set($any($event.target).value)">
             <option value="">{{ 'coproperty.charge.allTypes' | translate }}</option>
             <option *ngFor="let type of chargeTypes" [value]="type">
-              {{ type }}
+              {{ getChargeTypeTranslationKey(type) | translate }}
             </option>
           </select>
         </div>
@@ -230,7 +230,7 @@
                 </td>
                 <td>
                   <span class="badge" [ngClass]="getChargeTypeBadgeClass(charge.chargeType)">
-                    {{ charge.chargeType }}
+                    {{ getChargeTypeTranslationKey(charge.chargeType) | translate }}
                   </span>
                 </td>
                 <td>

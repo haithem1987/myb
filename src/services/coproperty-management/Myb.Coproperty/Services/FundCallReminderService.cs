@@ -85,28 +85,35 @@ public class FundCallReminderService : BackgroundService
         {
             var owner = ownerGroup.First().Owner!;
             var fundCallRows = new System.Text.StringBuilder();
+            var remainingByCurrency = new Dictionary<Models.Currency, decimal>();
 
             foreach (var fc in ownerGroup)
             {
-                var paid = fc.Payments?.Sum(p => p.Amount) ?? 0;
+                var paid = fc.Payments?
+                    .Where(p => p.ValidationStatus != "Rejected")
+                    .Sum(p => p.Amount) ?? 0;
                 var remaining = fc.Amount - paid;
                 var monthsLeft = Math.Max(1, (int)Math.Ceiling((fc.DueDate - DateTime.UtcNow).TotalDays / 30));
                 var suggestedMonthly = Math.Ceiling(remaining / monthsLeft * 1000) / 1000;
                 var copropertyName = fc.Coproperty?.Name ?? "-";
+                var currency = fc.Coproperty?.Currency ?? fc.CurrencySnapshot;
+                remainingByCurrency[currency] = remainingByCurrency.GetValueOrDefault(currency) + remaining;
 
                 fundCallRows.AppendLine($@"
                     <tr>
                         <td style='padding:8px;border:1px solid #ddd;'>{copropertyName}</td>
                         <td style='padding:8px;border:1px solid #ddd;'>{fc.Description ?? "Appel de fonds"}</td>
-                        <td style='padding:8px;border:1px solid #ddd;text-align:right;'>{fc.Amount:N3} DT</td>
-                        <td style='padding:8px;border:1px solid #ddd;text-align:right;color:green;'>{paid:N3} DT</td>
-                        <td style='padding:8px;border:1px solid #ddd;text-align:right;color:red;font-weight:bold;'>{remaining:N3} DT</td>
-                        <td style='padding:8px;border:1px solid #ddd;text-align:right;'>{suggestedMonthly:N3} DT</td>
+                        <td style='padding:8px;border:1px solid #ddd;text-align:right;'>{FormatAmount(fc.Amount, currency)}</td>
+                        <td style='padding:8px;border:1px solid #ddd;text-align:right;color:green;'>{FormatAmount(paid, currency)}</td>
+                        <td style='padding:8px;border:1px solid #ddd;text-align:right;color:red;font-weight:bold;'>{FormatAmount(remaining, currency)}</td>
+                        <td style='padding:8px;border:1px solid #ddd;text-align:right;'>{FormatAmount(suggestedMonthly, currency)}</td>
                         <td style='padding:8px;border:1px solid #ddd;'>{fc.DueDate:dd/MM/yyyy}</td>
                     </tr>");
             }
 
-            var totalRemaining = ownerGroup.Sum(f => f.Amount - (f.Payments?.Sum(p => p.Amount) ?? 0));
+            var totalRemainingText = string.Join(" + ", remainingByCurrency
+                .OrderBy(entry => entry.Key)
+                .Select(entry => FormatAmount(entry.Value, entry.Key)));
 
             var htmlBody = $@"
                 <div style='font-family:Arial,sans-serif;max-width:700px;margin:0 auto;'>
@@ -133,7 +140,7 @@ public class FundCallReminderService : BackgroundService
                     </table>
 
                     <p style='font-size:18px;color:#e74c3c;font-weight:bold;'>
-                        Total restant à payer : {totalRemaining:N3} DT
+                        Total restant à payer : {totalRemainingText}
                     </p>
 
                     <p>Vous pouvez effectuer un paiement partiel (mensualité) ou régler le montant total
@@ -150,7 +157,7 @@ public class FundCallReminderService : BackgroundService
                 await _emailPublisher.PublishAsync(new EmailMessage
                 {
                     To = owner.Email,
-                    Subject = $"Rappel de paiement - {totalRemaining:N3} DT restant",
+                    Subject = $"Rappel de paiement - {totalRemainingText} restant",
                     HtmlBody = htmlBody,
                     Source = "coproperty-reminder"
                 });
@@ -163,5 +170,23 @@ public class FundCallReminderService : BackgroundService
         }
 
         _logger.LogInformation("Monthly reminders sent to {Count} owner(s).", sentCount);
+    }
+
+    private static string FormatAmount(decimal amount, Models.Currency currency)
+    {
+        var unit = currency switch
+        {
+            Models.Currency.EUR => "€",
+            Models.Currency.USD => "$",
+            Models.Currency.TND => "DT",
+            Models.Currency.GBP => "£",
+            Models.Currency.CHF => "CHF",
+            Models.Currency.CAD => "CA$",
+            Models.Currency.AED => "AED",
+            Models.Currency.MAD => "MAD",
+            _ => currency.ToString()
+        };
+
+        return $"{amount:N2} {unit}";
     }
 }

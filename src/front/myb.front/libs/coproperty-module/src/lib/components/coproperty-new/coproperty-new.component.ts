@@ -5,7 +5,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CreateCopropertyInput, Coproperty, Currency } from '../../models/coproperty.model';
-import { ManagerMultiSelectComponent } from '../manager-multi-select/manager-multi-select.component';
 import { KeycloakService } from '@myb-front/auth';
 import { Observable, of } from 'rxjs';
 import { map, catchError, debounceTime, first } from 'rxjs/operators';
@@ -18,8 +17,7 @@ import { ToastService } from '@myb-front/shared-ui';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    TranslateModule,
-    ManagerMultiSelectComponent
+    TranslateModule
   ],
   templateUrl: './coproperty-new.component.html',
   styleUrls: ['./coproperty-new.component.scss'],
@@ -40,6 +38,7 @@ export class CopropertyNewComponent implements OnInit {
   saving = signal<boolean>(false);
   saveSuccess = signal<boolean>(false);
   private currentIsActive = true;
+  private currentManagerName: string | undefined;
   // Currency is configured separately in Settings; preserve the existing value
   // (or default to EUR for a brand-new coproperty) instead of exposing it here.
   private currentCurrency: Currency = Currency.EUR;
@@ -97,8 +96,7 @@ export class CopropertyNewComponent implements OnInit {
       description: [''],
       totalUnits: [0, [Validators.required, Validators.min(1)]],
       totalShares: [0, [Validators.required, Validators.min(1)]],
-      commonAreas: [''],
-      managerName: ['']
+      commonAreas: ['']
     });
   }
 
@@ -114,9 +112,9 @@ export class CopropertyNewComponent implements OnInit {
           description: coproperty.description,
           totalUnits: coproperty.totalUnits,
           totalShares: coproperty.totalShares,
-          commonAreas: coproperty.commonAreas,
-          managerName: coproperty.managerName || ''
+          commonAreas: coproperty.commonAreas
         });
+        this.currentManagerName = coproperty.managerName || undefined;
         this.currentIsActive = coproperty.isActive;
         // Currency is managed via Settings, not this form — preserve the existing value.
         this.currentCurrency = coproperty.currency || Currency.EUR;
@@ -157,7 +155,7 @@ export class CopropertyNewComponent implements OnInit {
       totalShares: formData.totalShares,
       commonAreas: formData.commonAreas,
       managerId: this.keycloakService.getProfile()?.id || undefined,
-      managerName: formData.managerName?.trim() || undefined,
+      managerName: this.currentManagerName,
       isActive: this.currentIsActive
     };
 
@@ -182,12 +180,6 @@ export class CopropertyNewComponent implements OnInit {
         console.error('Failed to save coproperty', error);
       }
     });
-  }
-
-  onManagerSelected(selection: { name?: string }): void {
-    if (selection.name !== undefined) {
-      this.copropertyForm.get('managerName')?.setValue(selection.name);
-    }
   }
 
   cancel(): void {

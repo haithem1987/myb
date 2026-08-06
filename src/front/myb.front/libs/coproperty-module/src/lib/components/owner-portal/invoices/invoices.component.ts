@@ -634,7 +634,7 @@ export class OwnerInvoicesComponent implements OnInit {
         units.forEach((unit) => this.unitsById.set(unit.id, unit));
 
         // Map invoices (only PAID ones for receipts)
-        const paidInvoices = invoices.filter(inv => inv.status === InvoiceStatus.PAID);
+        const paidInvoices = invoices.filter(inv => this.isPaidInvoiceStatus(inv.status));
         const mappedInvoices = paidInvoices.map((inv) => this.mapInvoice(inv));
 
         // Map charge distributions (only PAID ones for receipts)
@@ -726,7 +726,7 @@ export class OwnerInvoicesComponent implements OnInit {
       unitNumber: inv.unitNumberSnapshot ?? unit?.unitNumber ?? '—',
       paymentDate: inv.paidDate ? new Date(inv.paidDate) : undefined,
       paymentMethod: inv.paymentMethod ?? '',
-      status: inv.status === InvoiceStatus.PAID ? 'paid' : 'pending',
+      status: this.isPaidInvoiceStatus(inv.status) ? 'paid' : 'pending',
       currency: inv.currency,
     };
   }
@@ -766,6 +766,11 @@ export class OwnerInvoicesComponent implements OnInit {
       status: 'paid',
       currency: payment.fundCall?.currency,
     };
+  }
+
+  /** GraphQL serializes .NET enum values as SCREAMING_SNAKE_CASE. */
+  private isPaidInvoiceStatus(status: InvoiceStatus | string | null | undefined): boolean {
+    return String(status ?? '').replace(/_/g, '').toUpperCase() === 'PAID';
   }
 
   private mapStatus(status: InvoiceStatus): 'paid' | 'pending' | 'overdue' {

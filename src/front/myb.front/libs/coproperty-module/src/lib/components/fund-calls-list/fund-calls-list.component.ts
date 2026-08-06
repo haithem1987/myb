@@ -224,21 +224,18 @@ export class FundCallsListComponent implements OnInit {
     // Filtering happens locally via filteredFundCalls getter — no re-fetch needed
   }
 
-  onOwnerFilterChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.filterOwnerId.set(select.value);
+  onOwnerFilterChange(ownerId: string): void {
+    this.filterOwnerId.set(ownerId);
     // Filtered locally via filteredFundCalls getter
   }
 
-  onYearFilterChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.filterYear.set(select.value ? +select.value : null);
+  onYearFilterChange(year: string | number | null): void {
+    this.filterYear.set(year !== null && year !== '' ? +year : null);
     // Filtered locally via filteredFundCalls getter
   }
 
-  onStatusFilterChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.filterStatus.set(select.value);
+  onStatusFilterChange(status: string): void {
+    this.filterStatus.set(status);
   }
 
   onSearchInput(event: Event): void {

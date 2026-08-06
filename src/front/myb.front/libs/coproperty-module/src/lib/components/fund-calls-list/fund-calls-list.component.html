@@ -21,8 +21,8 @@
           <select
             id="copropertyFilter"
             class="form-select"
-            [value]="selectedCopropertyId() || 'all'"
-            (change)="onCopropertyChange($any($event.target).value)">
+            [ngModel]="selectedCopropertyId() || 'all'"
+            (ngModelChange)="onCopropertyChange($event)">
             <option value="all">{{ 'coproperty.fundCalls.filters.allCoproperties' | translate }}</option>
             <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
               {{ coproperty.name }}
@@ -39,8 +39,8 @@
           <select
             id="ownerFilter"
             class="form-select"
-            [value]="filterOwnerId()"
-            (change)="onOwnerFilterChange($event)">
+            [ngModel]="filterOwnerId()"
+            (ngModelChange)="onOwnerFilterChange($event)">
             <option value="">{{ 'coproperty.fundCalls.filters.allOwners' | translate }}</option>
             <option *ngFor="let owner of uniqueOwnersForFilter" [value]="owner.id">
               {{ owner.firstName }} {{ owner.lastName }}
@@ -57,8 +57,8 @@
           <select
             id="yearFilter"
             class="form-select"
-            [value]="filterYear() ?? ''"
-            (change)="onYearFilterChange($event)">
+            [ngModel]="filterYear() ?? ''"
+            (ngModelChange)="onYearFilterChange($event)">
             <option value="">{{ 'coproperty.fundCalls.filters.allYears' | translate }}</option>
             <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
           </select>
@@ -73,8 +73,8 @@
           <select
             id="statusFilter"
             class="form-select"
-            [value]="filterStatus()"
-            (change)="onStatusFilterChange($event)">
+            [ngModel]="filterStatus()"
+            (ngModelChange)="onStatusFilterChange($event)">
             <option value="">{{ 'coproperty.fundCalls.filters.allStatuses' | translate }}</option>
             <option value="UNPAID">{{ 'coproperty.fundCalls.filters.unpaid' | translate }}</option>
             <option value="TO_PAY">{{ 'coproperty.fundCalls.filters.toPay' | translate }}</option>

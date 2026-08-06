@@ -173,17 +173,17 @@
                   {{ p.paymentMethod || '-' }} · {{ formatDate(p.paymentDate) }}
                 </span>
                 <!-- Validation status indicator -->
-                <span *ngIf="p.validationStatus === 'Pending'" class="badge bg-warning text-dark ms-1" style="font-size:0.65rem">
+                <span *ngIf="isPaymentPending(p.validationStatus)" class="badge bg-warning text-dark ms-1" style="font-size:0.65rem">
                   <i class="bi bi-clock me-1"></i>En attente de validation
                 </span>
-                <span *ngIf="p.validationStatus === 'Approved'" class="badge bg-success ms-1" style="font-size:0.65rem">
+                <span *ngIf="isPaymentApproved(p.validationStatus)" class="badge bg-success ms-1" style="font-size:0.65rem">
                   <i class="bi bi-check2 me-1"></i>Validé
                 </span>
-                <span *ngIf="p.validationStatus === 'Rejected'" class="badge bg-danger ms-1" style="font-size:0.65rem">
+                <span *ngIf="isPaymentRejected(p.validationStatus)" class="badge bg-danger ms-1" style="font-size:0.65rem">
                   <i class="bi bi-x-lg me-1"></i>Refusé
                 </span>
                 <!-- Rejection reason -->
-                <div *ngIf="p.validationStatus === 'Rejected' && p.rejectionReason"
+                <div *ngIf="isPaymentRejected(p.validationStatus) && p.rejectionReason"
                      class="mt-1 small text-danger" style="background:#fff5f5;padding:4px 8px;border-radius:4px;border-left:3px solid #ef4444">
                   <i class="bi bi-info-circle me-1"></i><strong>Motif :</strong> {{ p.rejectionReason }}
                 </div>
@@ -366,8 +366,8 @@
           </h6>
           <div *ngFor="let p of fc.payments"
                class="border rounded p-2 mb-2"
-               [class.border-success]="p.validationStatus === 'Approved'"
-               [class.border-danger]="p.validationStatus === 'Rejected'">
+               [class.border-success]="isPaymentApproved(p.validationStatus)"
+               [class.border-danger]="isPaymentRejected(p.validationStatus)">
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <div class="fw-semibold">{{ formatAmount(p.amount, fc.currency) }}</div>
@@ -396,19 +396,19 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="p.validationStatus === 'Rejected' && p.rejectionReason"
+                <div *ngIf="isPaymentRejected(p.validationStatus) && p.rejectionReason"
                      class="small text-danger mt-1">
                   <i class="bi bi-x-circle me-1"></i><em>{{ p.rejectionReason }}</em>
                 </div>
               </div>
               <span class="badge"
-                [class.bg-warning]="p.validationStatus === 'Pending'"
-                [class.text-dark]="p.validationStatus === 'Pending'"
-                [class.bg-success]="p.validationStatus === 'Approved'"
-                [class.bg-danger]="p.validationStatus === 'Rejected'">
-                <ng-container *ngIf="p.validationStatus === 'Pending'"><i class="bi bi-clock me-1"></i>En attente</ng-container>
-                <ng-container *ngIf="p.validationStatus === 'Approved'"><i class="bi bi-check2 me-1"></i>Validé</ng-container>
-                <ng-container *ngIf="p.validationStatus === 'Rejected'"><i class="bi bi-x-lg me-1"></i>Refusé</ng-container>
+                [class.bg-warning]="isPaymentPending(p.validationStatus)"
+                [class.text-dark]="isPaymentPending(p.validationStatus)"
+                [class.bg-success]="isPaymentApproved(p.validationStatus)"
+                [class.bg-danger]="isPaymentRejected(p.validationStatus)">
+                <ng-container *ngIf="isPaymentPending(p.validationStatus)"><i class="bi bi-clock me-1"></i>En attente</ng-container>
+                <ng-container *ngIf="isPaymentApproved(p.validationStatus)"><i class="bi bi-check2 me-1"></i>Validé</ng-container>
+                <ng-container *ngIf="isPaymentRejected(p.validationStatus)"><i class="bi bi-x-lg me-1"></i>Refusé</ng-container>
               </span>
             </div>
           </div>

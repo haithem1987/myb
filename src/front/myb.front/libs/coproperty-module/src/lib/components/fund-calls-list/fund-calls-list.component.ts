@@ -332,7 +332,7 @@ export class FundCallsListComponent implements OnInit {
     return this.filteredFundCalls.reduce((sum, fc) => {
       const payments = fc.payments ?? [];
       const paid = payments
-        .filter((payment) => payment.validationStatus !== 'Rejected')
+        .filter((payment) => !this.isPaymentRejected(payment.validationStatus))
         .reduce((s, p) => {
         const n = typeof (p as any).amount === 'string' ? parseFloat((p as any).amount) : ((p as any).amount || 0);
         return s + (isNaN(n) ? 0 : n);
@@ -404,7 +404,7 @@ export class FundCallsListComponent implements OnInit {
 
   getFundCallPaidAmount(fundCall: FundCallExtended): number {
     return (fundCall.payments ?? [])
-      .filter((payment) => payment.validationStatus !== 'Rejected')
+      .filter((payment) => !this.isPaymentRejected(payment.validationStatus))
       .reduce((sum, payment) => {
       const rawAmount = payment.amount as number | string;
       const amount = typeof rawAmount === 'string'
@@ -1150,6 +1150,9 @@ export class FundCallsListComponent implements OnInit {
 
   getTotalPayments(fc: FundCallExtended): number {
     return (fc.payments ?? []).reduce((sum, p) => {
+      if (this.isPaymentRejected(p.validationStatus)) {
+        return sum;
+      }
       const n = typeof p.amount === 'string' ? parseFloat(p.amount as any) : (p.amount ?? 0);
       return sum + (isNaN(n) ? 0 : n);
     }, 0);
@@ -1533,5 +1536,13 @@ export class FundCallsListComponent implements OnInit {
       },
       error: () => { /* non-critical */ },
     });
+  }
+
+  private normalizePaymentValidationStatus(status: string | null | undefined): string {
+    return String(status ?? '').replace(/[_\s-]/g, '').toUpperCase();
+  }
+
+  private isPaymentRejected(status: string | null | undefined): boolean {
+    return this.normalizePaymentValidationStatus(status) === 'REJECTED';
   }
 }

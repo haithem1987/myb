@@ -647,7 +647,7 @@ export class OwnerInvoicesComponent implements OnInit {
         // previously omitted, leaving "Mes Reçus" empty for owners who paid
         // through the call-for-funds workflow.
         const mappedFundCallPayments = fundCallPayments
-          .filter(payment => payment.validationStatus === 'Approved')
+          .filter((payment) => this.isPaymentApproved(payment.validationStatus))
           .map(payment => this.mapFundCallPayment(payment));
 
         // Merge and sort by date (descending)
@@ -771,6 +771,11 @@ export class OwnerInvoicesComponent implements OnInit {
   /** GraphQL serializes .NET enum values as SCREAMING_SNAKE_CASE. */
   private isPaidInvoiceStatus(status: InvoiceStatus | string | null | undefined): boolean {
     return String(status ?? '').replace(/_/g, '').toUpperCase() === 'PAID';
+  }
+
+  /** Accepts Approved/APPROVED/approved and underscore variants. */
+  private isPaymentApproved(status: string | null | undefined): boolean {
+    return String(status ?? '').replace(/[_\s-]/g, '').toUpperCase() === 'APPROVED';
   }
 
   private mapStatus(status: InvoiceStatus): 'paid' | 'pending' | 'overdue' {

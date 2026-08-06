@@ -80,7 +80,7 @@ export class OwnerChargesComponent implements OnInit {
   get totalPaid(): number {
     return this.fundCalls().reduce((sum, fc) => {
       const paid = (fc.payments || [])
-        .filter(p => p.validationStatus !== 'Rejected')
+        .filter((p) => !this.isPaymentRejected(p.validationStatus))
         .reduce((s, p) => s + p.amount, 0);
       return sum + paid;
     }, 0);
@@ -220,8 +220,24 @@ export class OwnerChargesComponent implements OnInit {
 
   getFundCallPaidAmount(fc: FundCallExtended): number {
     return (fc.payments || [])
-      .filter(p => p.validationStatus !== 'Rejected')
+      .filter((p) => !this.isPaymentRejected(p.validationStatus))
       .reduce((sum, p) => sum + p.amount, 0);
+  }
+
+  private normalizePaymentValidationStatus(status: string | null | undefined): string {
+    return String(status ?? '').replace(/[_\s-]/g, '').toUpperCase();
+  }
+
+  isPaymentRejected(status: string | null | undefined): boolean {
+    return this.normalizePaymentValidationStatus(status) === 'REJECTED';
+  }
+
+  isPaymentApproved(status: string | null | undefined): boolean {
+    return this.normalizePaymentValidationStatus(status) === 'APPROVED';
+  }
+
+  isPaymentPending(status: string | null | undefined): boolean {
+    return this.normalizePaymentValidationStatus(status) === 'PENDING';
   }
 
   getFundCallRemainingAmount(fc: FundCallExtended): number {

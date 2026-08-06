@@ -158,7 +158,7 @@ export class OwnerDashboardComponent implements OnInit {
         this.totalCharges.set(fundCalls.reduce((sum, fc) => sum + fc.amount, 0));
 
         // Total payé = paiements approuvés
-        const approvedPayments = payments.filter(p => p.validationStatus === 'Approved');
+        const approvedPayments = payments.filter((p) => this.isPaymentApproved(p.validationStatus));
         this.totalPaid.set(approvedPayments.reduce((sum, p) => sum + p.amount, 0));
 
         // Derniers reçus (5 max, triés par date de paiement)
@@ -173,9 +173,9 @@ export class OwnerDashboardComponent implements OnInit {
               : 'Appel de fonds',
             date: new Date(p.paymentDate),
             amount: p.amount,
-            status: p.validationStatus === 'Approved'
+            status: this.isPaymentApproved(p.validationStatus)
               ? 'paid'
-              : p.validationStatus === 'Rejected' ? 'rejected' : 'pending',
+              : this.isPaymentRejected(p.validationStatus) ? 'rejected' : 'pending',
             paymentMethod: p.paymentMethod ?? '',
           }));
         this.recentInvoices.set(recentReceipts);
@@ -207,5 +207,17 @@ export class OwnerDashboardComponent implements OnInit {
       case 'rejected': return 'Rejeté';
       default: return status;
     }
+  }
+
+  private normalizePaymentValidationStatus(status: string | null | undefined): string {
+    return String(status ?? '').replace(/[_\s-]/g, '').toUpperCase();
+  }
+
+  private isPaymentApproved(status: string | null | undefined): boolean {
+    return this.normalizePaymentValidationStatus(status) === 'APPROVED';
+  }
+
+  private isPaymentRejected(status: string | null | undefined): boolean {
+    return this.normalizePaymentValidationStatus(status) === 'REJECTED';
   }
 }

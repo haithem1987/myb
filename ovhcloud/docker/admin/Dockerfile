@@ -13,6 +13,7 @@ COPY src/front/myb.front/tsconfig.base.json ./
 COPY src/front/myb.front/jest.preset.js ./
 
 # Install dependencies
+ENV CYPRESS_INSTALL_BINARY=0
 RUN npm ci --legacy-peer-deps
 
 # Copy source files

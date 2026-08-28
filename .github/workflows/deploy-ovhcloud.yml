@@ -62,6 +62,8 @@ jobs:
 
       - name: Build admin frontend (if admin)
         if: matrix.service.name == 'admin'
+        env:
+          CYPRESS_INSTALL_BINARY: "0"
         run: |
           cd src/front/myb.front
           npm ci --legacy-peer-deps

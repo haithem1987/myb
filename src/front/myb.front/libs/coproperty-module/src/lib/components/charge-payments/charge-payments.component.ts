@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ChargeService, ChargeDistributionPayment } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
@@ -45,6 +45,7 @@ export class ChargePaymentsComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
   private toastService = inject(ToastService);
   private destroyRef = inject(DestroyRef);
+  private translate = inject(TranslateService);
 
   coproperties = signal<Coproperty[]>([]);
   selectedCopropertyId = signal<string>('');
@@ -234,7 +235,7 @@ export class ChargePaymentsComponent implements OnInit {
           const successCount = results.filter(r => r !== null).length;
           if (successCount > 0) {
             this.toastService.show(
-              `Paiement fournisseur enregistré pour "${charge.chargeName}"`,
+              this.translate.instant('chargePayments.messages.paymentRecorded', { charge: charge.chargeName }),
               { classname: 'bg-success text-white', delay: 4000 }
             );
           }
@@ -244,7 +245,7 @@ export class ChargePaymentsComponent implements OnInit {
         },
         error: () => {
           this.toastService.show(
-            'Erreur lors de l\'enregistrement du paiement',
+            this.translate.instant('chargePayments.messages.paymentError'),
             { classname: 'bg-danger text-white', delay: 4000 }
           );
           this.paying.set(null);
@@ -264,10 +265,10 @@ export class ChargePaymentsComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     switch (status) {
-      case 'PAID': return 'Payé';
-      case 'PARTIALLY_PAID': return 'Partiel';
-      case 'UNPAID': return 'Non payé';
-      default: return 'Non payé';
+      case 'PAID': return this.translate.instant('chargePayments.status.paid');
+      case 'PARTIALLY_PAID': return this.translate.instant('chargePayments.status.partial');
+      case 'UNPAID': return this.translate.instant('chargePayments.status.unpaid');
+      default: return this.translate.instant('chargePayments.status.unpaid');
     }
   }
 
@@ -285,14 +286,32 @@ export class ChargePaymentsComponent implements OnInit {
 
   getChargeTypeLabel(type: string): string {
     switch (type?.toUpperCase()) {
-      case 'CLEANING': return 'Nettoyage';
-      case 'SECURITY': return 'Sécurité';
-      case 'MAINTENANCE': return 'Entretien';
-      case 'ELECTRICITY': return 'Électricité';
-      case 'WATER': return 'Eau';
-      case 'INSURANCE': return 'Assurance';
-      default: return 'Autre';
+      case 'CLEANING': return this.translate.instant('chargePayments.types.cleaning');
+      case 'SECURITY': return this.translate.instant('chargePayments.types.security');
+      case 'MAINTENANCE': return this.translate.instant('chargePayments.types.maintenance');
+      case 'ELECTRICITY': return this.translate.instant('chargePayments.types.electricity');
+      case 'WATER': return this.translate.instant('chargePayments.types.water');
+      case 'INSURANCE': return this.translate.instant('chargePayments.types.insurance');
+      default: return this.translate.instant('chargePayments.types.other');
     }
+  }
+
+  getPaymentMethodLabel(method: string | null): string {
+    const normalized = method?.trim().toLowerCase() ?? '';
+    const keyByMethod: Record<string, string> = {
+      'virement': 'transfer',
+      'bank transfer': 'transfer',
+      'chèque': 'cheque',
+      'cheque': 'cheque',
+      'espèces': 'cash',
+      'cash': 'cash',
+      'carte': 'card',
+      'bank card': 'card',
+      'prélèvement': 'directDebit',
+      'direct debit': 'directDebit',
+    };
+    const key = keyByMethod[normalized];
+    return key ? this.translate.instant(`chargePayments.methods.${key}`) : (method ?? '—');
   }
 
   formatAmount(amount: number): string {
@@ -301,7 +320,7 @@ export class ChargePaymentsComponent implements OnInit {
 
   formatDate(date: string | null): string {
     if (!date) return '—';
-    return new Date(date).toLocaleDateString('fr-FR');
+    return new Date(date).toLocaleDateString(this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR');
   }
 
   onSearchInput(event: Event): void {

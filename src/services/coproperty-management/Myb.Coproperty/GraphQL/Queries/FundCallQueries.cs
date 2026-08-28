@@ -128,6 +128,13 @@ public class FundCallQueries
                 "Accès refusé : vous ne pouvez consulter que vos propres reçus.");
 
         var payments = await fundCallService.GetPaymentsByOwnerUserIdAsync(ownerUserId);
+
+        // A dual-role owner/syndic is still entitled to their own receipts. Do
+        // not apply syndic ManagerId scoping to a self-service owner query,
+        // otherwise payments for coproperties managed by another syndic vanish.
+        if (CopropertyAccessControl.IsSelfOwner(user, ownerUserId))
+            return payments;
+
         var scopedIds = await CopropertyAccessControl.GetScopedCopropertyIdsAsync(user, copropertyService);
         if (scopedIds == null)
             return payments;

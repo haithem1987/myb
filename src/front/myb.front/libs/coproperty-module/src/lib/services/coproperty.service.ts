@@ -148,8 +148,8 @@ const DELETE_COPROPERTY = gql`
 `;
 
 const CHECK_COPROPERTY_NAME_EXISTS = gql`
-  query CheckCopropertyNameExists($name: String!, $excludeId: UUID) {
-    copropertyByName(name: $name, excludeId: $excludeId) {
+  query CheckCopropertyNameExists($name: String!, $managerId: UUID, $excludeId: UUID) {
+    copropertyByName(name: $name, managerId: $managerId, excludeId: $excludeId) {
       id
       name
     }
@@ -444,10 +444,11 @@ export class CopropertyService {
   }
 
   checkCopropertyNameExists(name: string, excludeId?: string): Observable<boolean> {
+    const managerId = this.keycloakService.getSyndicManagerId();
     return this.apollo
       .query<{ copropertyByName: Coproperty | null }>({
         query: CHECK_COPROPERTY_NAME_EXISTS,
-        variables: { name, excludeId },
+        variables: { name, managerId: managerId || undefined, excludeId },
         context: { service: 'copropertyService' },
         fetchPolicy: 'network-only'
       })

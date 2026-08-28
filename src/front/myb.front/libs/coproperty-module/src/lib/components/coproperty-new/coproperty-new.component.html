@@ -192,6 +192,20 @@
               </div>
             </div>
 
+            <!-- Status -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">
+                  {{ 'coproperty.form.statusLabel' | translate }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" formControlName="isActive">
+                  <option [ngValue]="true">{{ 'coproperty.list.active' | translate }}</option>
+                  <option [ngValue]="false">{{ 'coproperty.list.inactive' | translate }}</option>
+                </select>
+              </div>
+            </div>
+
             <!-- Description -->
             <div class="col-md-12">
               <div class="form-group">

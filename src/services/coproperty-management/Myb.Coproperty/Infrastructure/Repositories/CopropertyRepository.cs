@@ -18,9 +18,12 @@ namespace Myb.Coproperty.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public Models.Coproperty GetByName(string name, Guid? excludeId = null)
+        public Models.Coproperty? GetByName(string name, Guid? managerId, Guid? excludeId = null)
         {
-            var query = GetAll().Where(c => c.Name.ToLower() == name.ToLower());
+            var normalizedName = name.Trim().ToLower();
+            var query = GetAll().Where(c =>
+                c.ManagerId == managerId &&
+                c.Name.Trim().ToLower() == normalizedName);
             
             if (excludeId.HasValue)
             {

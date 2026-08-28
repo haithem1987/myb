@@ -16,6 +16,8 @@ namespace Myb.Coproperty.Services
         {
             if (coproperty == null)
                 throw new ArgumentNullException(nameof(coproperty), "Coproperty cannot be null");
+
+            EnsureNameIsUniqueForManager(coproperty.Name, coproperty.ManagerId);
             
             // Reset timestamps to null so the database defaults apply
             coproperty.CreatedAt = null;
@@ -67,9 +69,9 @@ namespace Myb.Coproperty.Services
             return await Task.FromResult(_copropertyRepository.GetById(id)!);
         }
 
-        public async Task<Models.Coproperty> GetByNameAsync(string name, Guid? excludeId = null)
+        public async Task<Models.Coproperty?> GetByNameAsync(string name, Guid? managerId, Guid? excludeId = null)
         {
-            return await Task.FromResult(_copropertyRepository.GetByName(name, excludeId)!);
+            return await Task.FromResult(_copropertyRepository.GetByName(name, managerId, excludeId));
         }
 
         public async Task<IEnumerable<Models.Coproperty>> GetByManagerIdAsync(Guid managerId)
@@ -79,7 +81,15 @@ namespace Myb.Coproperty.Services
 
         public async Task UpdateAsync(Models.Coproperty coproperty)
         {
+            EnsureNameIsUniqueForManager(coproperty.Name, coproperty.ManagerId, coproperty.Id);
             await _copropertyRepository.UpdateAsync(coproperty);
+        }
+
+        private void EnsureNameIsUniqueForManager(string name, Guid? managerId, Guid? excludeId = null)
+        {
+            if (_copropertyRepository.GetByName(name, managerId, excludeId) != null)
+                throw new InvalidOperationException(
+                    "A coproperty with this name already exists for this syndic.");
         }
     }
 }

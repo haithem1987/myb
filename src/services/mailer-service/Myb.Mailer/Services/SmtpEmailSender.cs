@@ -32,7 +32,13 @@ public class SmtpEmailSender : ISmtpEmailSender
         if (!string.IsNullOrEmpty(email.ReplyTo))
             message.ReplyTo.Add(MailboxAddress.Parse(email.ReplyTo));
 
-        message.Body = new TextPart("html") { Text = email.HtmlBody };
+        var brandName = smtp["BrandName"] ?? "MYB";
+        var renderedHtml = EmailTemplateRenderer.Render(email, brandName);
+        message.Body = new BodyBuilder
+        {
+            HtmlBody = renderedHtml,
+            TextBody = EmailTemplateRenderer.ToPlainText(email.HtmlBody)
+        }.ToMessageBody();
 
         using var client = new SmtpClient();
         var port = int.Parse(smtp["Port"] ?? "1025");

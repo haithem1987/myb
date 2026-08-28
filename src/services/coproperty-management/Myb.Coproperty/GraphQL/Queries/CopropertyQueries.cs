@@ -100,11 +100,16 @@ namespace Myb.Coproperty.GraphQL.Queries
         /// <summary>
         /// Get a coproperty by name (for duplicate name checking)
         /// </summary>
-        public async Task<Models.Coproperty> GetCopropertyByName(
+        public async Task<Models.Coproperty?> GetCopropertyByName(
             string name,
+            Guid? managerId,
             Guid? excludeId,
-            [Service] ICopropertyService copropertyService) =>
-            await copropertyService.GetByNameAsync(name, excludeId);
+            ClaimsPrincipal? user,
+            [Service] ICopropertyService copropertyService)
+        {
+            var effectiveManagerId = CopropertyAccessControl.ResolveEffectiveManagerId(user, managerId);
+            return await copropertyService.GetByNameAsync(name, effectiveManagerId, excludeId);
+        }
 
         /// <summary>
         /// Get dashboard statistics for coproperties

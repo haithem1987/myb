@@ -50,6 +50,7 @@ builder.Services.AddScoped<Myb.Common.Repositories.IGenericRepository<Guid, Myb.
 builder.Services.AddScoped<Myb.Coproperty.Services.ICopropertyService, Myb.Coproperty.Services.CopropertyService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IUnitService, Myb.Coproperty.Services.UnitService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IOwnerService, Myb.Coproperty.Services.OwnerService>();
+builder.Services.AddScoped<Myb.Coproperty.Services.IOwnershipNotificationService, Myb.Coproperty.Services.OwnershipNotificationService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.ITenantService, Myb.Coproperty.Services.TenantService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IChargeService, Myb.Coproperty.Services.ChargeService>();
 builder.Services.AddScoped<Myb.Coproperty.Services.IMaintenanceService, Myb.Coproperty.Services.MaintenanceService>();

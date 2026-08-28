@@ -27,6 +27,7 @@ interface PendingInvoice {
   amount: number;
   dueDate: Date;
   description: string;
+  currency: string;
 }
 
 interface RecentInvoice {
@@ -37,6 +38,7 @@ interface RecentInvoice {
   amount: number;
   status: string;
   paymentMethod: string;
+  currency: string;
 }
 
 @Component({
@@ -60,6 +62,9 @@ export class OwnerDashboardComponent implements OnInit {
   totalPaid = signal(0);
   overdueCount = signal(0);
   totalCharges = signal(0);
+  totalDueDisplay = signal('');
+  totalPaidDisplay = signal('');
+  totalChargesDisplay = signal('');
   cancelledFundCallsCount = signal(0);
   loading = signal(true);
 
@@ -70,8 +75,20 @@ export class OwnerDashboardComponent implements OnInit {
     this.loadOwnerData();
   }
 
-  formatAmount(amount: number): string {
-    return this.currencyService.formatAmount(amount);
+  formatAmount(amount: number, currency?: string): string {
+    return this.currencyService.formatAmount(amount, currency);
+  }
+
+  private formatCurrencyGroups(values: Array<{ amount: number; currency?: string }>): string {
+    const totals = new Map<string, number>();
+    for (const value of values) {
+      const currency = value.currency ?? this.currencyService.current;
+      totals.set(currency, (totals.get(currency) ?? 0) + value.amount);
+    }
+    if (totals.size === 0) return this.currencyService.formatAmount(0);
+    return [...totals.entries()]
+      .map(([currency, amount]) => this.currencyService.formatAmount(amount, currency))
+      .join(' · ');
   }
 
   private getCurrentUserId(): string | null {
@@ -149,17 +166,27 @@ export class OwnerDashboardComponent implements OnInit {
           amount: fc.amount,
           dueDate: new Date(fc.dueDate),
           description: fc.description || 'Appel de fonds',
+          currency: fc.currency,
         })));
 
         // Total dû = somme des appels de fonds TO_PAY
         this.totalDue.set(toPayFundCalls.reduce((sum, fc) => sum + fc.amount, 0));
+        this.totalDueDisplay.set(this.formatCurrencyGroups(
+          toPayFundCalls.map(fc => ({ amount: fc.amount, currency: fc.currency }))
+        ));
 
         // Total charges = tous les appels de fonds du propriétaire
         this.totalCharges.set(fundCalls.reduce((sum, fc) => sum + fc.amount, 0));
+        this.totalChargesDisplay.set(this.formatCurrencyGroups(
+          fundCalls.map(fc => ({ amount: fc.amount, currency: fc.currency }))
+        ));
 
         // Total payé = paiements approuvés
         const approvedPayments = payments.filter((p) => this.isPaymentApproved(p.validationStatus));
         this.totalPaid.set(approvedPayments.reduce((sum, p) => sum + p.amount, 0));
+        this.totalPaidDisplay.set(this.formatCurrencyGroups(
+          approvedPayments.map(p => ({ amount: p.amount, currency: p.fundCall?.currency }))
+        ));
 
         // Derniers reçus (5 max, triés par date de paiement)
         const recentReceipts: RecentInvoice[] = payments
@@ -177,6 +204,7 @@ export class OwnerDashboardComponent implements OnInit {
               ? 'paid'
               : this.isPaymentRejected(p.validationStatus) ? 'rejected' : 'pending',
             paymentMethod: p.paymentMethod ?? '',
+            currency: p.fundCall?.currency ?? this.currencyService.current,
           }));
         this.recentInvoices.set(recentReceipts);
 

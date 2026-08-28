@@ -2,7 +2,7 @@ import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { SignalementService, CopropertyService } from '@myb-front/coproperty-module';
+import { SignalementService } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
 import { ToastService } from '@myb-front/shared-ui';
 import {
@@ -11,18 +11,17 @@ import {
   SIGNALEMENT_TYPE_LABELS,
   SIGNALEMENT_ZONE_LABELS,
   SIGNALEMENT_ZONE_ICONS,
-  SIGNALEMENT_TYPE_ICONS,
-  SIGNALEMENT_STATUS_LABELS,
 } from '@myb-front/coproperty-module';
 import { take, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 type Tab = 'en-cours' | 'resolus';
 
 @Component({
   selector: 'myb-coproperty-syndic-signalements',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule],
   template: `
     <div class="container-fluid py-4">
 
@@ -30,18 +29,18 @@ type Tab = 'en-cours' | 'resolus';
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 class="fw-bold mb-1">
-            <i class="bi bi-megaphone me-2 text-primary"></i>Signalements résidents
+            <i class="bi bi-megaphone me-2 text-primary"></i>{{ 'managerReports.title' | translate }}
           </h2>
-          <p class="text-muted mb-0">Gérez les signalements soumis par les habitants</p>
+          <p class="text-muted mb-0">{{ 'managerReports.subtitle' | translate }}</p>
         </div>
         <div class="d-flex gap-2">
           <select class="form-select" style="width:auto" [(ngModel)]="filterType" (ngModelChange)="applyFilters()">
-            <option value="">Tous les types</option>
-            <option *ngFor="let opt of typeOptions" [value]="opt.value">{{ opt.label }}</option>
+            <option value="">{{ 'managerReports.allTypes' | translate }}</option>
+            <option *ngFor="let opt of typeOptions" [value]="opt.value">{{ getTypeLabel(opt.value) }}</option>
           </select>
           <select class="form-select" style="width:auto" [(ngModel)]="filterZone" (ngModelChange)="applyFilters()">
-            <option value="">Toutes les zones</option>
-            <option *ngFor="let opt of zoneOptions" [value]="opt.value">{{ opt.label }}</option>
+            <option value="">{{ 'managerReports.allZones' | translate }}</option>
+            <option *ngFor="let opt of zoneOptions" [value]="opt.value">{{ getZoneLabel(opt.value) }}</option>
           </select>
         </div>
       </div>
@@ -51,25 +50,25 @@ type Tab = 'en-cours' | 'resolus';
         <div class="col-md-3">
           <div class="stat-card border-start border-warning border-4">
             <div class="stat-value text-warning">{{ countByStatus('EN_COURS') }}</div>
-            <div class="stat-label">En cours</div>
+            <div class="stat-label">{{ 'managerReports.status.inProgress' | translate }}</div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="stat-card border-start border-info border-4">
             <div class="stat-value text-info">{{ countByStatus('PRIS_EN_COMPTE') }}</div>
-            <div class="stat-label">Pris en compte</div>
+            <div class="stat-label">{{ 'managerReports.status.acknowledged' | translate }}</div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="stat-card border-start border-success border-4">
             <div class="stat-value text-success">{{ countByStatus('RESOLU') }}</div>
-            <div class="stat-label">Résolus</div>
+            <div class="stat-label">{{ 'managerReports.status.resolvedPlural' | translate }}</div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="stat-card border-start border-primary border-4">
             <div class="stat-value text-primary">{{ allSignalements().length }}</div>
-            <div class="stat-label">Total</div>
+            <div class="stat-label">{{ 'common.total' | translate }}</div>
           </div>
         </div>
       </div>
@@ -77,10 +76,10 @@ type Tab = 'en-cours' | 'resolus';
       <!-- Tabs -->
       <div class="tab-toggle mb-3">
         <button class="tab-btn" [class.active]="activeTab() === 'en-cours'" (click)="setTab('en-cours')">
-          En cours <span class="ms-1 badge bg-warning text-dark">{{ countByStatus('EN_COURS') + countByStatus('PRIS_EN_COMPTE') }}</span>
+          {{ 'managerReports.status.inProgress' | translate }} <span class="ms-1 badge bg-warning text-dark">{{ countByStatus('EN_COURS') + countByStatus('PRIS_EN_COMPTE') }}</span>
         </button>
         <button class="tab-btn" [class.active]="activeTab() === 'resolus'" (click)="setTab('resolus')">
-          Résolus <span class="ms-1 badge bg-success">{{ countByStatus('RESOLU') }}</span>
+          {{ 'managerReports.status.resolvedPlural' | translate }} <span class="ms-1 badge bg-success">{{ countByStatus('RESOLU') }}</span>
         </button>
       </div>
 
@@ -92,7 +91,7 @@ type Tab = 'en-cours' | 'resolus';
       <!-- Empty -->
       <div *ngIf="!loading() && filteredSignalements().length === 0" class="text-center py-5 text-muted">
         <i class="bi bi-clipboard-check fs-1"></i>
-        <p class="mt-3">Aucun signalement {{ activeTab() === 'en-cours' ? 'en cours' : 'résolu' }}</p>
+        <p class="mt-3">{{ (activeTab() === 'en-cours' ? 'managerReports.emptyOpen' : 'managerReports.emptyResolved') | translate }}</p>
       </div>
 
       <!-- Cards -->
@@ -148,12 +147,12 @@ type Tab = 'en-cours' | 'resolus';
                   <button class="btn btn-sm btn-outline-info"
                           [disabled]="updating() === s.id"
                           (click)="updateStatus(s, 'PRIS_EN_COMPTE')">
-                    <i class="bi bi-check2 me-1"></i>Prendre en compte
+                    <i class="bi bi-check2 me-1"></i>{{ 'managerReports.acknowledge' | translate }}
                   </button>
                   <button class="btn btn-sm btn-outline-success"
                           [disabled]="updating() === s.id"
                           (click)="openResolveDialog(s)">
-                    <i class="bi bi-check2-all me-1"></i>Marquer résolu
+                    <i class="bi bi-check2-all me-1"></i>{{ 'managerReports.markResolved' | translate }}
                   </button>
                 </div>
               </div>
@@ -165,19 +164,19 @@ type Tab = 'en-cours' | 'resolus';
       <!-- Resolve Dialog -->
       <div class="modal-overlay" *ngIf="resolveTarget()" (click)="closeResolveDialog()">
         <div class="resolve-modal" (click)="$event.stopPropagation()">
-          <h5 class="fw-bold mb-3"><i class="bi bi-check2-all me-2 text-success"></i>Résoudre le signalement</h5>
+          <h5 class="fw-bold mb-3"><i class="bi bi-check2-all me-2 text-success"></i>{{ 'managerReports.resolveTitle' | translate }}</h5>
           <p class="text-muted small mb-3">
             <strong>{{ getZoneLabel(resolveTarget()!.zone) }} — {{ getTypeLabel(resolveTarget()!.type) }}</strong><br>
             {{ resolveTarget()!.description }}
           </p>
-          <label class="form-label fw-semibold">Commentaire (optionnel)</label>
+          <label class="form-label fw-semibold">{{ 'managerReports.optionalComment' | translate }}</label>
           <textarea class="form-control mb-3" rows="3" [(ngModel)]="resolveComment"
-                    placeholder="Expliquez comment le problème a été résolu…"></textarea>
+                    [placeholder]="'managerReports.commentPlaceholder' | translate"></textarea>
           <div class="d-flex gap-2 justify-content-end">
-            <button class="btn btn-outline-secondary" (click)="closeResolveDialog()">Annuler</button>
+            <button class="btn btn-outline-secondary" (click)="closeResolveDialog()">{{ 'common.cancel' | translate }}</button>
             <button class="btn btn-success" [disabled]="updating() !== null" (click)="confirmResolve()">
               <span *ngIf="updating()" class="spinner-border spinner-border-sm me-1"></span>
-              Confirmer résolu
+              {{ 'managerReports.confirmResolved' | translate }}
             </button>
           </div>
         </div>
@@ -286,9 +285,9 @@ type Tab = 'en-cours' | 'resolus';
 })
 export class SyndicSignalementsComponent implements OnInit {
   private signalementService = inject(SignalementService);
-  private copropertyService = inject(CopropertyService);
   private keycloakService = inject(KeycloakService);
   private toastService = inject(ToastService);
+  private translate = inject(TranslateService);
 
   allSignalements = signal<Signalement[]>([]);
   loading = signal(true);
@@ -299,8 +298,8 @@ export class SyndicSignalementsComponent implements OnInit {
   filterType = '';
   filterZone = '';
 
-  typeOptions = Object.entries(SIGNALEMENT_TYPE_LABELS).map(([value, label]) => ({ value, label }));
-  zoneOptions = Object.entries(SIGNALEMENT_ZONE_LABELS).map(([value, label]) => ({ value, label }));
+  typeOptions = Object.keys(SIGNALEMENT_TYPE_LABELS).map(value => ({ value }));
+  zoneOptions = Object.keys(SIGNALEMENT_ZONE_LABELS).map(value => ({ value }));
 
   filteredSignalements = computed(() => {
     const tab = this.activeTab();
@@ -321,15 +320,12 @@ export class SyndicSignalementsComponent implements OnInit {
   private loadSignalements(): void {
     this.loading.set(true);
     const managerId = this.keycloakService.getSyndicManagerId();
-    this.copropertyService.getCoproperties(managerId).pipe(take(1), catchError(() => of([]))).subscribe(cops => {
-      if (!cops.length) { this.loading.set(false); return; }
-      this.signalementService.getSignalements(cops[0].id)
-        .pipe(take(1), catchError(() => of([])))
-        .subscribe(list => {
-          this.allSignalements.set(list);
-          this.loading.set(false);
-        });
-    });
+    this.signalementService.getSyndicSignalements(managerId)
+      .pipe(take(1), catchError(() => of([] as Signalement[])))
+      .subscribe(signalements => {
+        this.allSignalements.set(signalements);
+        this.loading.set(false);
+      });
   }
 
   applyFilters(): void { /* computed handles it */ }
@@ -350,7 +346,7 @@ export class SyndicSignalementsComponent implements OnInit {
           this.allSignalements.update(list =>
             list.map(item => item.id === s.id ? { ...item, status } : item)
           );
-          this.toastService.show('Statut mis à jour', { classname: 'bg-success text-light' });
+          this.toastService.show(this.translate.instant('managerReports.messages.statusUpdated'), { classname: 'bg-success text-light' });
         }
       });
   }
@@ -379,7 +375,7 @@ export class SyndicSignalementsComponent implements OnInit {
               ? { ...item, status: 'RESOLU' as SignalementStatus, syndicComment: this.resolveComment || item.syndicComment }
               : item)
           );
-          this.toastService.show('Signalement marqué résolu', { classname: 'bg-success text-light' });
+          this.toastService.show(this.translate.instant('managerReports.messages.resolved'), { classname: 'bg-success text-light' });
           this.closeResolveDialog();
         }
       });
@@ -387,10 +383,10 @@ export class SyndicSignalementsComponent implements OnInit {
 
   openPhoto(url: string): void { window.open(url, '_blank'); }
 
-  getTypeLabel(type: string): string { return SIGNALEMENT_TYPE_LABELS[type] ?? type; }
-  getZoneLabel(zone: string): string { return SIGNALEMENT_ZONE_LABELS[zone] ?? zone; }
+  getTypeLabel(type: string): string { return this.translate.instant(`managerReports.types.${type}`, { fallback: SIGNALEMENT_TYPE_LABELS[type] ?? type }); }
+  getZoneLabel(zone: string): string { return this.translate.instant(`managerReports.zones.${zone}`, { fallback: SIGNALEMENT_ZONE_LABELS[zone] ?? zone }); }
   getZoneIcon(zone: string): string { return SIGNALEMENT_ZONE_ICONS[zone] ?? 'bi-three-dots'; }
-  getStatusLabel(status: SignalementStatus): string { return SIGNALEMENT_STATUS_LABELS[status] ?? status; }
+  getStatusLabel(status: SignalementStatus): string { return this.translate.instant(`managerReports.statusLabels.${status}`); }
 
   statusClass(status: SignalementStatus): string {
     const map: Record<string, string> = {
@@ -406,10 +402,10 @@ export class SyndicSignalementsComponent implements OnInit {
   }
 
   formatDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    return new Date(iso).toLocaleDateString(this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   formatTime(iso: string): string {
-    return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    return new Date(iso).toLocaleTimeString(this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR', { hour: '2-digit', minute: '2-digit' });
   }
 }

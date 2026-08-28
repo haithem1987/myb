@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, signal, inject, DestroyRef, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -18,6 +18,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrls: ['./budget-new.component.scss'],
 })
 export class BudgetNewComponent implements OnInit {
+  @Input() embeddedCopropertyId: string | null = null;
+  @Input() embeddedBudgetId: string | null = null;
+  @Output() saved = new EventEmitter<ChargeExtended>();
+  @Output() cancelled = new EventEmitter<void>();
+  @Output() deleted = new EventEmitter<string>();
+
   private chargeService = inject(ChargeService);
   private copropertyService = inject(CopropertyService);
   private formBuilder = inject(FormBuilder);
@@ -59,11 +65,35 @@ export class BudgetNewComponent implements OnInit {
 
   distributionMethods = [
     { value: 'BY_SHARES', label: 'coproperty.charges.distributions.byShares', icon: 'bi-percent' },
+    { value: 'BY_AREA', label: 'coproperty.charges.distributions.byArea', icon: 'bi-bounding-box' },
+    { value: 'EQUAL', label: 'coproperty.charges.distributions.equal', icon: 'bi-distribute-horizontal' },
+    { value: 'CUSTOM', label: 'coproperty.charges.distributions.custom', icon: 'bi-sliders' },
   ];
+
+  get isEmbedded(): boolean {
+    return !!this.embeddedCopropertyId;
+  }
 
   ngOnInit(): void {
     this.initializeForm();
+    if (this.embeddedCopropertyId) {
+      this.copropertyIdFromUrl = this.embeddedCopropertyId;
+      this.budgetForm.patchValue({ copropertyId: this.embeddedCopropertyId });
+      this.budgetForm.get('copropertyId')?.disable({ emitEvent: false });
+    }
     this.loadCoproperties();
+
+    if (this.isEmbedded) {
+      if (this.embeddedBudgetId) {
+        this.budgetId = this.embeddedBudgetId;
+        this.isEditMode.set(true);
+        this.loadBudget(this.embeddedBudgetId);
+      } else {
+        this.loadCopropertyDetails(this.embeddedCopropertyId!);
+      }
+      return;
+    }
+
     this.checkEditMode();
     this.checkCopropertyFromUrl();
   }
@@ -86,7 +116,7 @@ export class BudgetNewComponent implements OnInit {
       chargeType: ['CLEANING', Validators.required],
       frequency: [currentYear, Validators.required],
       totalAmount: ['', [Validators.required, Validators.min(0.01)]],
-      distributionMethod: ['BY_SHARES'],
+      distributionMethod: ['BY_SHARES', Validators.required],
       startDate: ['', Validators.required],
       endDate: [''],
       isActive: [true],
@@ -175,9 +205,6 @@ export class BudgetNewComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (budget) => {
-          const startDate = new Date(budget.startDate);
-          const isoStartDate = startDate.toISOString().split('T')[0];
-          
           const formData: any = {
             copropertyId: budget.copropertyId,
             name: budget.name,
@@ -186,14 +213,13 @@ export class BudgetNewComponent implements OnInit {
             frequency: budget.frequency,
             totalAmount: budget.totalAmount,
             distributionMethod: budget.distributionMethod,
-            startDate: isoStartDate,
+            startDate: this.toDateInput(budget.startDate),
             isActive: budget.isActive,
             isContribution: budget.isContribution ?? false
           };
 
           if (budget.endDate) {
-            const endDate = new Date(budget.endDate);
-            formData.endDate = endDate.toISOString().split('T')[0];
+            formData.endDate = this.toDateInput(budget.endDate);
           }
           
           this.budgetForm.patchValue(formData);
@@ -217,7 +243,7 @@ export class BudgetNewComponent implements OnInit {
     }
 
     this.saving.set(true);
-    const formValue = this.budgetForm.value;
+    const formValue = this.budgetForm.getRawValue();
     
     const budgetData: ChargeExtended = {
       ...formValue,
@@ -242,6 +268,11 @@ export class BudgetNewComponent implements OnInit {
           this.saving.set(false);
           this.saveSuccess.set(true);
 
+          if (this.isEmbedded) {
+            this.saved.emit(result);
+            return;
+          }
+
           this.router.navigate(['/coproperty/syndic/budgets'], {
             queryParams: {
               refresh: Date.now(),
@@ -264,6 +295,10 @@ export class BudgetNewComponent implements OnInit {
         const copropertyId = this.budgetForm.get('copropertyId')?.value || undefined;
         this.chargeService.deleteCharge(this.budgetId!, copropertyId).subscribe({
           next: () => {
+            if (this.isEmbedded) {
+              this.deleted.emit(this.budgetId!);
+              return;
+            }
             this.router.navigate(['/coproperty/syndic/budgets']);
           },
           error: (error) => {
@@ -275,6 +310,11 @@ export class BudgetNewComponent implements OnInit {
   }
 
   goBack(): void {
+    if (this.isEmbedded) {
+      this.cancelled.emit();
+      return;
+    }
+
     if (this.copropertyIdFromUrl) {
       this.router.navigate(['/coproperty/syndic/budgets'], {
         queryParams: { copropertyId: this.copropertyIdFromUrl }
@@ -314,5 +354,11 @@ export class BudgetNewComponent implements OnInit {
   private convertToISODateTime(dateString: string | null): string | null {
     if (!dateString) return null;
     return `${dateString}T00:00:00`;
+  }
+
+  private toDateInput(value: Date | string): string {
+    return value instanceof Date
+      ? value.toISOString().slice(0, 10)
+      : value.slice(0, 10);
   }
 }

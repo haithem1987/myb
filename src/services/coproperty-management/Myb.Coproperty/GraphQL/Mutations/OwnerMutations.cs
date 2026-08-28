@@ -171,16 +171,20 @@ namespace Myb.Coproperty.GraphQL.Mutations
         public async Task<OwnerUnit> ChangeUnitOwner(
             Guid unitId,
             Guid newOwnerId,
-            [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory,
+            [Service] IOwnershipNotificationService ownershipNotificationService)
         {
             await using var context = await contextFactory.CreateDbContextAsync();
 
-            var unit = await context.Units.FindAsync(unitId)
+            var unit = await context.Units
+                .Include(u => u.Coproperty)
+                .SingleOrDefaultAsync(u => u.Id == unitId)
                 ?? throw new InvalidOperationException($"Unit with ID {unitId} not found");
             var newOwner = await context.Owners.FindAsync(newOwnerId)
                 ?? throw new InvalidOperationException($"Owner with ID {newOwnerId} not found");
 
             var current = await context.OwnerUnits
+                .Include(ou => ou.Owner)
                 .SingleOrDefaultAsync(ou => ou.UnitId == unitId && ou.EndDate == null);
 
             if (current == null)
@@ -211,6 +215,12 @@ namespace Myb.Coproperty.GraphQL.Mutations
             // this connection causes Npgsql's "ambient transaction" exception.
             // A single SaveChanges is atomic and participates in that outer scope.
             await context.SaveChangesAsync();
+
+            await ownershipNotificationService.NotifyOwnershipChangedAsync(
+                current.Owner,
+                newOwner,
+                unit);
+
             return replacement;
         }
 

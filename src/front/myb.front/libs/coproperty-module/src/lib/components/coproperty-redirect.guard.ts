@@ -17,10 +17,6 @@ export const copropertyRedirectGuard: CanActivateFn = () => {
     roles.includes('coproperty-syndic') || roles.includes('coproperty-admin');
   const hasOwner = roles.includes('coproperty-owner');
 
-  if (hasSyndic && hasOwner) {
-    return router.createUrlTree(['/home']);
-  }
-
   if (hasSyndic) {
     return router.createUrlTree(['/coproperty/syndic/dashboard']);
   }

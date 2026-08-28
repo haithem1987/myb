@@ -285,7 +285,10 @@
               [placeholder]="'coproperty.unit.sharesPlaceholder' | translate"
               [class.is-invalid]="unitForm.get('shares')?.touched && unitForm.get('shares')?.invalid" />
             <div class="invalid-feedback" *ngIf="unitForm.get('shares')?.touched && unitForm.get('shares')?.invalid">
-              {{ 'coproperty.unit.sharesMin' | translate }}
+              <ng-container *ngIf="unitForm.get('shares')?.hasError('sharesExceeded'); else sharesMinError">
+                {{ 'coproperty.messages.unitSharesExceeded' | translate:{ totalShares: getFormCopropertyTotalShares() } }}
+              </ng-container>
+              <ng-template #sharesMinError>{{ 'coproperty.unit.sharesMin' | translate }}</ng-template>
             </div>
           </div>
         </div>

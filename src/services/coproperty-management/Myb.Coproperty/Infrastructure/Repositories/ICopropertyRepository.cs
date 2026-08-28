@@ -6,6 +6,6 @@ namespace Myb.Coproperty.Infrastructure.Repositories
     public interface ICopropertyRepository : IGenericRepository<Guid, Models.Coproperty, Data.CopropertyDbContext>
     {
         Task<IEnumerable<Models.Coproperty>> GetByManagerIdAsync(Guid managerId);
-        Models.Coproperty GetByName(string name, Guid? excludeId = null);
+        Models.Coproperty? GetByName(string name, Guid? managerId, Guid? excludeId = null);
     }
 }

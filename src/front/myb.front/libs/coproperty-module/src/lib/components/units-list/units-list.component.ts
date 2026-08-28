@@ -227,6 +227,11 @@ export class UnitsListComponent implements OnInit {
     return this.filteredUnits.reduce((sum, unit) => sum + unit.shares, 0);
   }
 
+  getFormCopropertyTotalShares(): number | null {
+    const copropertyId = this.unitForm.get('copropertyId')?.value;
+    return this.coproperties().find(coproperty => coproperty.id === copropertyId)?.totalShares ?? null;
+  }
+
   viewUnit(unit: UnitExtended): void {
     // Navigate to coproperty detail with units tab
     this.router.navigate(['/coproperty/syndic/coproperties', unit.copropertyId], { 
@@ -339,11 +344,29 @@ export class UnitsListComponent implements OnInit {
 
   saveUnit(): void {
     if (this.unitForm.valid) {
-      this.loading.set(true);
       const unitData: UnitExtended = {
         ...this.unitForm.value,
         id: this.editingUnitId() || '00000000-0000-0000-0000-000000000000'
       };
+
+      const coproperty = this.coproperties().find(item => item.id === unitData.copropertyId);
+      const assignedShares = this.units()
+        .filter(unit =>
+          unit.copropertyId === unitData.copropertyId &&
+          unit.id !== this.editingUnitId())
+        .reduce((sum, unit) => sum + Number(unit.shares), 0);
+
+      if (coproperty && assignedShares + Number(unitData.shares) > coproperty.totalShares) {
+        const message = this.translateService.instant('coproperty.messages.unitSharesExceeded', {
+          totalShares: coproperty.totalShares,
+        });
+        this.showAlert('danger', message);
+        this.unitForm.get('shares')?.setErrors({ sharesExceeded: true });
+        this.unitForm.get('shares')?.markAsTouched();
+        return;
+      }
+
+      this.loading.set(true);
 
       const operation = this.editingUnitId() 
         ? this.unitService.updateUnit(unitData)

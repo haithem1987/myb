@@ -30,6 +30,9 @@ nupkg/
 *.userosscache
 *.sln.docstates
 
+# Local production credentials are injected by Kubernetes secrets.
+src/services/mailer-service/Myb.Mailer/appsettings.Production.json
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

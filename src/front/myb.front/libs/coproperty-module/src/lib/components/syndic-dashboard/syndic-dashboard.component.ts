@@ -15,7 +15,6 @@ interface DashboardStats {
   totalCoproperties: number;
   totalUnits: number;
   activeUnits: number;
-  totalBudget: number;
   totalOwners: number;
   activeCharges: number;
   occupancyRate: number;
@@ -50,21 +49,21 @@ export class SyndicDashboardComponent implements OnInit {
     totalCoproperties: 0,
     totalUnits: 0,
     activeUnits: 0,
-    totalBudget: 0,
     totalOwners: 0,
     activeCharges: 0,
     occupancyRate: 0
   });
   
   recentActivities = signal<RecentActivity[]>([]);
+  totalBudgetDisplay = signal('');
   loading = signal(true);
   
   ngOnInit(): void {
     this.loadDashboardData();
   }
 
-  formatAmount(amount: number): string {
-    return this.currencyService.formatAmount(amount);
+  formatAmount(amount: number, currency?: string): string {
+    return this.currencyService.formatAmount(amount, currency);
   }
   
   private loadDashboardData(): void {
@@ -107,7 +106,23 @@ export class SyndicDashboardComponent implements OnInit {
     .subscribe({
       next: ({ coproperties, units, charges }) => {
         const activeCharges = charges.filter(c => c.isActive);
-        const totalBudget = activeCharges.reduce((sum, charge) => sum + (charge.totalAmount || 0), 0);
+        const totalsByCurrency = new Map<string, number>();
+        for (const charge of activeCharges) {
+          const currency = charge.currency
+            ?? coproperties.find(coproperty => coproperty.id === charge.copropertyId)?.currency
+            ?? this.currencyService.current;
+          totalsByCurrency.set(
+            currency,
+            (totalsByCurrency.get(currency) ?? 0) + (charge.totalAmount || 0)
+          );
+        }
+        this.totalBudgetDisplay.set(
+          totalsByCurrency.size > 0
+            ? [...totalsByCurrency.entries()]
+                .map(([currency, amount]) => this.formatAmount(amount, currency))
+                .join(' · ')
+            : this.formatAmount(0)
+        );
         const totalOwners = units.filter(u => u.isOccupied).length;
         const totalUnits = units.length;
         const activeUnits = units.filter(u => u.isOccupied).length;
@@ -117,7 +132,6 @@ export class SyndicDashboardComponent implements OnInit {
           totalCoproperties: coproperties.length,
           totalUnits,
           activeUnits,
-          totalBudget,
           totalOwners,
           activeCharges: activeCharges.length,
           occupancyRate
@@ -141,7 +155,10 @@ export class SyndicDashboardComponent implements OnInit {
             id: charge.id || '',
             type: 'budget',
             title: 'coproperty.syndicDashboard.activity.budgetCreated',
-            description: `${charge.name} - ${this.formatAmount(charge.totalAmount)}`,
+            description: `${charge.name} - ${this.formatAmount(
+              charge.totalAmount,
+              charge.currency ?? coproperty?.currency
+            )}`,
             timestamp: charge.createdAt ? new Date(charge.createdAt) : new Date(),
             coproperty: copropertyName
           });

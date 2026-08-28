@@ -122,7 +122,11 @@ import { InterventionManagementComponent } from './intervention-management/inter
           </ul>
           <div class="tab-content mt-3">
             <div id="units" class="tab-pane fade show active">
-              <myb-unit-management [copropertyId]="coproperty?.id || null"></myb-unit-management>
+              <myb-unit-management
+                [copropertyId]="coproperty?.id || null"
+                [copropertyName]="coproperty?.name || ''"
+                [copropertyTotalShares]="coproperty?.totalShares ?? null">
+              </myb-unit-management>
             </div>
             <div id="charges" class="tab-pane fade">
               <myb-charge-management [copropertyId]="coproperty?.id || null"></myb-charge-management>

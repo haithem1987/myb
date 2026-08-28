@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { SignalementService, CopropertyService } from '@myb-front/coproperty-module';
+import { SignalementService } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
 import { ToastService } from '@myb-front/shared-ui';
 import {
@@ -113,7 +113,7 @@ type Tab = 'en-cours' | 'resolus';
 })
 export class OwnerSignalementsComponent implements OnInit {
   private signalementService = inject(SignalementService);
-  private copropertyService = inject(CopropertyService);
+  private keycloakService = inject(KeycloakService);
   private router = inject(Router);
 
   signalements = signal<Signalement[]>([]);
@@ -128,12 +128,19 @@ export class OwnerSignalementsComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([]))).subscribe(cops => {
-      if (!cops.length) { this.loading.set(false); return; }
-      this.signalementService.getSignalements(cops[0].id)
-        .pipe(take(1), catchError(() => of([])))
-        .subscribe(list => { this.signalements.set(list); this.loading.set(false); });
-    });
+    const userId = this.keycloakService.getUserId()
+      ?? this.keycloakService.getProfile()?.id;
+    if (!userId) {
+      this.loading.set(false);
+      return;
+    }
+
+    this.signalementService.getMySignalements(userId)
+      .pipe(take(1), catchError(() => of([] as Signalement[])))
+      .subscribe(list => {
+        this.signalements.set(list);
+        this.loading.set(false);
+      });
   }
 
   setTab(tab: Tab): void { this.activeTab.set(tab); }

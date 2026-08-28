@@ -5,11 +5,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChargeService, ChargeExtended, ChargeDistributionExtended } from '../../services/charge.service';
 import { CurrencyService } from '../../services/currency.service';
+import { BudgetNewComponent } from '../budget-new/budget-new.component';
 
 @Component({
   selector: 'myb-charge-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, BudgetNewComponent],
   templateUrl: './charge-management.component.html',
   styleUrls: ['./charge-management.component.scss'],
 })
@@ -49,7 +50,8 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
       distributionMethod: ['BY_SHARES', Validators.required],
       startDate: ['', Validators.required],
       endDate: [''],
-      isActive: [true]
+      isActive: [true],
+      isContribution: [false]
     });
   }
 
@@ -116,6 +118,7 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
       frequency: currentYear,
       distributionMethod: 'BY_SHARES',
       isActive: true,
+      isContribution: false,
       totalAmount: ''
     });
   }
@@ -124,7 +127,12 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
     this.isEditing.set(true);
     this.currentChargeId.set(charge.id || null);
     this.showForm.set(true);
-    this.chargeForm.patchValue(charge);
+    this.chargeForm.patchValue({
+      ...charge,
+      startDate: this.toDateInput(charge.startDate),
+      endDate: charge.endDate ? this.toDateInput(charge.endDate) : '',
+      isContribution: charge.isContribution ?? false
+    });
   }
 
   saveCharge() {
@@ -147,13 +155,21 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
         : this.chargeService.createCharge(chargeData);
 
       operation.subscribe({
-        next: () => {
+        next: (savedCharge) => {
+          this.charges.update(charges => {
+            const existingIndex = charges.findIndex(charge => charge.id === savedCharge.id);
+            if (existingIndex === -1) {
+              return [savedCharge, ...charges];
+            }
+
+            return charges.map(charge => charge.id === savedCharge.id ? savedCharge : charge);
+          });
           const messageKey = this.isEditing() ? 'coproperty.charge.budgetUpdated' : 'coproperty.charge.budgetCreated';
           this.translateService.get(messageKey).subscribe((message) => {
             this.showAlert('success', message);
           });
-          this.loadCharges();
           this.cancelEdit();
+          this.loading.set(false);
         },
         error: (error: any) => {
           console.error('Error saving charge:', error);
@@ -215,6 +231,24 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
     this.isEditing.set(false);
     this.currentChargeId.set(null);
     this.chargeForm.reset();
+  }
+
+  onBudgetSaved(savedCharge: ChargeExtended): void {
+    this.charges.update(charges => {
+      const exists = charges.some(charge => charge.id === savedCharge.id);
+      return exists
+        ? charges.map(charge => charge.id === savedCharge.id ? savedCharge : charge)
+        : [savedCharge, ...charges];
+    });
+    const messageKey = this.isEditing() ? 'coproperty.charge.budgetUpdated' : 'coproperty.charge.budgetCreated';
+    this.showAlert('success', this.translateService.instant(messageKey));
+    this.cancelEdit();
+  }
+
+  onBudgetDeleted(chargeId: string): void {
+    this.charges.update(charges => charges.filter(charge => charge.id !== chargeId));
+    this.showAlert('success', this.translateService.instant('coproperty.messages.deleted'));
+    this.cancelEdit();
   }
 
   closeDistribution() {
@@ -286,6 +320,16 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
     if (!dateString) return null;
     // Convert YYYY-MM-DD to ISO DateTime (YYYY-MM-DDTHH:mm:ss)
     return `${dateString}T00:00:00`;
+  }
+
+  private toDateInput(value: Date | string): string {
+    if (value instanceof Date) {
+      return value.toISOString().slice(0, 10);
+    }
+
+    // GraphQL returns an ISO timestamp, while an HTML date input only accepts
+    // YYYY-MM-DD. Slicing also avoids shifting the date through the local zone.
+    return value.slice(0, 10);
   }
 
   private showAlert(type: 'success' | 'danger' | 'warning', message: string) {

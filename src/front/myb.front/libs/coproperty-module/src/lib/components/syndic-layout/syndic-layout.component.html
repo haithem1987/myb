@@ -187,6 +187,14 @@
       </button>
     </div>
   </aside>
+
+  <button
+    *ngIf="!isSidebarCollapsed()"
+    type="button"
+    class="sidebar-backdrop"
+    [attr.aria-label]="'navigation.closeMenu' | translate"
+    (click)="toggleSidebar()">
+  </button>
   
   <!-- Main Content -->
   <div class="main-content">

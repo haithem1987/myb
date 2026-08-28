@@ -89,6 +89,15 @@ public class FundCallAuditLogService : IFundCallAuditLogService
 /// </summary>
 public class FundCallService : IFundCallService
 {
+    private const string PaidFundCallReadOnlyMessage =
+        "Un appel de fonds réglé est en lecture seule et ne peut plus être modifié.";
+
+    private static void EnsureNotPaid(FundCall fundCall)
+    {
+        if (fundCall.Status == FundCallStatus.Paid)
+            throw new InvalidOperationException(PaidFundCallReadOnlyMessage);
+    }
+
     private readonly IDbContextFactory<CopropertyDbContext> _contextFactory;
     private readonly IEmailPublisher _emailPublisher;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -228,6 +237,7 @@ public class FundCallService : IFundCallService
         // If a fund call already exists, update its amount and description instead of rejecting
         if (existingFundCall != null)
         {
+            EnsureNotPaid(existingFundCall);
             existingFundCall.Amount = input.Amount;
             existingFundCall.Description = input.Description;
             existingFundCall.Status = input.Status ?? existingFundCall.Status;
@@ -301,6 +311,8 @@ public class FundCallService : IFundCallService
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {id} not found");
 
+        EnsureNotPaid(fundCall);
+
         var targetStatus = input.Status ?? fundCall.Status;
         if (!CanTransitionTo(fundCall, targetStatus))
         {
@@ -358,6 +370,8 @@ public class FundCallService : IFundCallService
 
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {id} not found");
+
+        EnsureNotPaid(fundCall);
 
         // Validate the status transition
         if (!CanTransitionTo(fundCall, input.Status))
@@ -442,6 +456,8 @@ public class FundCallService : IFundCallService
         // (FRS-FCF-LCM-2026-001 AC-06).
         if (fundCall.Status == FundCallStatus.Cancelled)
             return fundCall;
+
+        EnsureNotPaid(fundCall);
 
         var previousStatus = fundCall.Status;
         var actorUserGuid = Guid.TryParse(userId, out var uid) ? uid : Guid.Empty;
@@ -714,6 +730,8 @@ public class FundCallService : IFundCallService
             .FirstOrDefaultAsync(f => f.Id == fundCallId);
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {fundCallId} not found");
+
+        EnsureNotPaid(fundCall);
 
         if (fundCall.Status == FundCallStatus.Cancelled || !fundCall.IsActive)
             throw new InvalidOperationException(
@@ -1078,14 +1096,13 @@ public class FundCallService : IFundCallService
             .Select(o => o.Id)
             .ToListAsync();
 
-        if (!ownerIds.Any()) return new List<FundCallPayment>();
-
         return await context.FundCallPayments
             .IgnoreQueryFilters()
             .Include(p => p.FundCall)
                 .ThenInclude(f => f.Coproperty)
             .Where(p => p.CreatedBy == ownerUserId
-                        || (p.FundCall != null
+                        || (ownerIds.Count > 0
+                            && p.FundCall != null
                             && p.FundCall.OwnerId.HasValue
                             && ownerIds.Contains(p.FundCall.OwnerId.Value)))
             .OrderByDescending(p => p.PaymentDate)
@@ -1102,6 +1119,8 @@ public class FundCallService : IFundCallService
 
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {fundCallId} not found");
+
+        EnsureNotPaid(fundCall);
 
         var coproperty = await context.Coproperties
             .Include(c => c.Units)
@@ -1217,6 +1236,8 @@ public class FundCallService : IFundCallService
 
         if (payment == null)
             throw new InvalidOperationException($"Payment with ID {paymentId} not found");
+
+        EnsureNotPaid(payment.FundCall);
 
         if (approved)
         {

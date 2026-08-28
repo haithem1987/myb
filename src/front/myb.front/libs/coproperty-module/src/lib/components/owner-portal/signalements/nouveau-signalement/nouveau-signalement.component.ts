@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SignalementService } from '../../../../services/signalement.service';
 import { CopropertyService } from '../../../../services/coproperty.service';
+import { OwnerService } from '../../../../services/owner.service';
+import { Coproperty } from '../../../../models/coproperty.models';
 import { KeycloakService } from '@myb-front/auth';
 import { ToastService } from '@myb-front/shared-ui';
 import {
@@ -12,8 +14,8 @@ import {
   SIGNALEMENT_TYPE_ICONS,
   SIGNALEMENT_ZONE_ICONS,
 } from '../../../../models/signalement.model';
-import { take, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { take, catchError, map, switchMap } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
 
 interface DropdownOption { value: string; label: string; icon: string; }
 
@@ -42,6 +44,22 @@ interface DropdownOption { value: string; label: string; icon: string; }
       </div>
 
       <!-- Type -->
+      <div class="mb-3" *ngIf="assignedCoproperties().length > 0">
+        <label class="form-label fw-semibold">Copropriété</label>
+        <select
+          class="form-select"
+          [ngModel]="selectedCopropertyId()"
+          (ngModelChange)="selectedCopropertyId.set($event)">
+          <option *ngFor="let coproperty of assignedCoproperties()" [value]="coproperty.id">
+            {{ coproperty.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="alert alert-warning" *ngIf="!contextLoading() && assignedCoproperties().length === 0">
+        Aucun lot actif ne vous est attribué. Contactez votre syndic avant de créer un signalement.
+      </div>
+
       <div class="mb-3">
         <label class="form-label fw-semibold">Type</label>
         <div class="custom-select-wrapper" [class.open]="typeDropOpen()">
@@ -102,7 +120,7 @@ interface DropdownOption { value: string; label: string; icon: string; }
       <!-- Actions -->
       <button
         class="btn btn-primary w-100 mb-3 py-3 fw-bold"
-        [disabled]="sending() || !isValid()"
+        [disabled]="sending() || contextLoading() || !isValid()"
         (click)="submit()">
         <span *ngIf="sending()" class="spinner-border spinner-border-sm me-2"></span>
         {{ sending() ? 'Envoi en cours…' : 'Envoyer' }}
@@ -166,6 +184,7 @@ interface DropdownOption { value: string; label: string; icon: string; }
 export class NouveauSignalementComponent implements OnInit {
   private signalementService = inject(SignalementService);
   private copropertyService = inject(CopropertyService);
+  private ownerService = inject(OwnerService);
   private keycloakService = inject(KeycloakService);
   private toastService = inject(ToastService);
   private router = inject(Router);
@@ -180,7 +199,9 @@ export class NouveauSignalementComponent implements OnInit {
   zoneDropOpen = signal(false);
   sending = signal(false);
 
-  private copropertyId = '';
+  assignedCoproperties = signal<Coproperty[]>([]);
+  selectedCopropertyId = signal('');
+  contextLoading = signal(true);
   private userId = '';
   private reporterName = '';
 
@@ -201,21 +222,37 @@ export class NouveauSignalementComponent implements OnInit {
   }
 
   private loadContext(): void {
-    try {
-      const profile = this.keycloakService.getProfile();
-      const firstName = profile?.firstName ?? '';
-      const lastName = profile?.lastName ?? '';
-      this.reporterName = `${firstName} ${lastName}`.trim() || 'Résident';
+    const profile = this.keycloakService.getProfile();
+    const firstName = profile?.firstName ?? '';
+    const lastName = profile?.lastName ?? '';
+    this.reporterName = `${firstName} ${lastName}`.trim() || 'Résident';
+    this.userId = this.keycloakService.getUserId() ?? profile?.id ?? '';
 
-      const token = this.keycloakService.getToken();
-      if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        this.userId = payload.sub ?? '';
-      }
-    } catch { /* noop */ }
+    if (!this.userId) {
+      this.contextLoading.set(false);
+      return;
+    }
 
-    this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([]))).subscribe(cops => {
-      if (cops.length) this.copropertyId = cops[0].id;
+    this.ownerService.getMyUnits(this.userId).pipe(
+      take(1),
+      map(units => [...new Set(units.map(unit => unit.copropertyId))]),
+      switchMap(copropertyIds => copropertyIds.length === 0
+        ? of([] as Coproperty[])
+        : forkJoin(copropertyIds.map(id =>
+            this.copropertyService.getCoproperty(id).pipe(
+              take(1),
+              catchError(() => of(null))
+            )
+          )).pipe(
+            map(coproperties => coproperties.filter(
+              (coproperty): coproperty is Coproperty => coproperty !== null
+            ))
+          )),
+      catchError(() => of([] as Coproperty[]))
+    ).subscribe(coproperties => {
+      this.assignedCoproperties.set(coproperties);
+      this.selectedCopropertyId.set(coproperties[0]?.id ?? '');
+      this.contextLoading.set(false);
     });
   }
 
@@ -243,7 +280,10 @@ export class NouveauSignalementComponent implements OnInit {
   toggleZoneDropdown(): void { this.zoneDropOpen.update(v => !v); }
 
   isValid(): boolean {
-    return !!this.selectedType() && !!this.selectedZone() && this.description.trim().length > 0;
+    return !!this.selectedCopropertyId() &&
+      !!this.selectedType() &&
+      !!this.selectedZone() &&
+      this.description.trim().length > 0;
   }
 
   submit(): void {
@@ -251,7 +291,7 @@ export class NouveauSignalementComponent implements OnInit {
     this.sending.set(true);
 
     this.signalementService.createSignalement({
-      copropertyId: this.copropertyId,
+      copropertyId: this.selectedCopropertyId(),
       reportedBy: this.userId,
       reporterName: this.reporterName,
       type: this.selectedType() ?? '',

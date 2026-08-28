@@ -24,6 +24,8 @@
 
     &.stats-card {
       transition: box-shadow 0.3s ease;
+      margin-bottom: 0;
+      min-height: 148px;
 
       &:hover {
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -42,6 +44,24 @@
         justify-content: center;
         color: white;
         font-size: 1.5rem;
+        flex: 0 0 48px;
+      }
+
+      .stat-content {
+        min-width: 0;
+        flex: 1;
+
+        h6 {
+          min-height: 2.5rem;
+          display: flex;
+          align-items: center;
+          line-height: 1.2;
+        }
+
+        h3 {
+          white-space: nowrap;
+          font-size: clamp(1.35rem, 2vw, 1.75rem);
+        }
       }
     }
 
@@ -510,6 +530,27 @@
   .inv-meta { text-align: left; }
   .inv-title { font-size: 1.2rem; }
   .inv-dates { grid-template-columns: 1fr 1fr; }
+
+  .overdue-alert {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+
+    > .d-flex:first-child {
+      align-items: flex-start !important;
+      min-width: 0;
+
+      > .me-3 {
+        margin-right: 0.75rem !important;
+      }
+    }
+
+    > .d-flex:last-child {
+      align-self: flex-start;
+      margin-left: 0 !important;
+    }
+  }
 }
 
 // ── Overdue row styling ──────────────────────────────────────────────

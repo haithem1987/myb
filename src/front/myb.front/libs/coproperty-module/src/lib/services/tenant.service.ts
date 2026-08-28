@@ -51,6 +51,15 @@ const GET_TENANTS_BY_UNIT = gql`
   }
 `;
 
+const GET_TENANT_BY_ID = gql`
+  ${TENANT_FIELDS}
+  query GetTenantById($id: UUID!) {
+    tenantById(id: $id) {
+      ...TenantFields
+    }
+  }
+`;
+
 const CREATE_TENANT = gql`
   ${TENANT_FIELDS}
   mutation CreateTenant($input: TenantInput!) {
@@ -83,24 +92,38 @@ export class TenantService {
 
   getTenants(copropertyId: string): Observable<Tenant[]> {
     return this.apollo
-      .watchQuery<{ tenants: Tenant[] }>({
+      .query<{ tenants: Tenant[] }>({
         query: GET_TENANTS,
         variables: { copropertyId },
-        fetchPolicy: 'network-only',
+        // Tenant rows must always come from the complete server response. The
+        // shared Apollo cache has no __typename metadata and can otherwise
+        // reuse a partial entity written by a mutation.
+        fetchPolicy: 'no-cache',
         context: { service: 'copropertyService' },
       })
-      .valueChanges.pipe(map((result) => result.data.tenants));
+      .pipe(map((result) => result.data.tenants));
   }
 
   getTenantsByUnit(unitId: string): Observable<Tenant[]> {
     return this.apollo
-      .watchQuery<{ tenantsByUnit: Tenant[] }>({
+      .query<{ tenantsByUnit: Tenant[] }>({
         query: GET_TENANTS_BY_UNIT,
         variables: { unitId },
+        fetchPolicy: 'no-cache',
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data.tenantsByUnit));
+  }
+
+  getTenantById(id: string): Observable<Tenant> {
+    return this.apollo
+      .query<{ tenantById: Tenant }>({
+        query: GET_TENANT_BY_ID,
+        variables: { id },
         fetchPolicy: 'network-only',
         context: { service: 'copropertyService' },
       })
-      .valueChanges.pipe(map((result) => result.data.tenantsByUnit));
+      .pipe(map((result) => result.data.tenantById));
   }
 
   createTenant(input: TenantInput, copropertyId?: string): Observable<Tenant> {

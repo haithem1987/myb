@@ -56,6 +56,10 @@ namespace Myb.Coproperty.GraphQL.Queries
             [Service] ICopropertyService copropertyService)
         {
             var units = await unitService.GetByOwnerIdAsync(ownerId);
+
+            if (CopropertyAccessControl.IsSelfOwner(user, ownerId))
+                return units;
+
             var scopedIds = await CopropertyAccessControl.GetScopedCopropertyIdsAsync(user, copropertyService);
             if (scopedIds == null)
                 return units;

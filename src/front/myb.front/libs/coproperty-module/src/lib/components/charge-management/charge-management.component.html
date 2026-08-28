@@ -28,150 +28,16 @@
       </button>
     </div>
 
-  <!-- Add/Edit Form -->
-  <div *ngIf="showForm()" class="card form-card">
-    <div class="card-header">
-      <h5>{{ isEditing() ? ('coproperty.charges.editCharge' | translate) : ('coproperty.charges.addCharge' | translate) }}</h5>
-    </div>
-    <div class="card-body">
-      <form [formGroup]="chargeForm" (ngSubmit)="saveCharge()">
-        <div class="row g-3">
-          <!-- Charge Name -->
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">{{ 'coproperty.charges.name' | translate }}</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                formControlName="name"
-                [class.is-invalid]="chargeForm.get('name')?.invalid && chargeForm.get('name')?.touched"
-              />
-            </div>
-          </div>
-
-          <!-- Total Amount -->
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">{{ 'coproperty.charges.totalAmount' | translate }}</label>
-              <div class="input-group">
-                <span class="input-group-text">{{ currencySymbol }}</span>
-                <input 
-                  type="number" 
-                  step="0.01" 
-                  class="form-control" 
-                  formControlName="totalAmount"
-                  [class.is-invalid]="chargeForm.get('totalAmount')?.invalid && chargeForm.get('totalAmount')?.touched"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Charge Type -->
-          <div class="col-md-4">
-            <div class="form-group">
-              <label class="form-label">{{ 'coproperty.charges.type' | translate }}</label>
-              <select class="form-select" formControlName="chargeType">
-                <option value="CLEANING">{{ 'coproperty.charges.types.cleaning' | translate }}</option>
-                <option value="SECURITY">{{ 'coproperty.charges.types.security' | translate }}</option>
-                <option value="MAINTENANCE">{{ 'coproperty.charges.types.maintenance' | translate }}</option>
-                <option value="ELECTRICITY">{{ 'coproperty.charges.types.electricity' | translate }}</option>
-                <option value="WATER">{{ 'coproperty.charges.types.water' | translate }}</option>
-                <option value="INSURANCE">{{ 'coproperty.charges.types.insurance' | translate }}</option>
-                <option value="OTHER">{{ 'coproperty.charges.types.other' | translate }}</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Year -->
-          <div class="col-md-4">
-            <div class="form-group">
-              <label class="form-label">{{ 'coproperty.charges.frequency' | translate }}</label>
-              <select class="form-select" formControlName="frequency">
-                <option *ngFor="let year of years" [value]="year">{{ year }}</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Distribution Method -->
-          <div class="col-md-4">
-            <div class="form-group">
-              <label class="form-label">{{ 'coproperty.charges.distributionMethod' | translate }}</label>
-              <select class="form-select" formControlName="distributionMethod">
-                <option value="BY_SHARES">{{ 'coproperty.charges.distributions.byShares' | translate }}</option>
-                <option value="BY_AREA">{{ 'coproperty.charges.distributions.byArea' | translate }}</option>
-                <option value="EQUAL">{{ 'coproperty.charges.distributions.equal' | translate }}</option>
-                <option value="CUSTOM">{{ 'coproperty.charges.distributions.custom' | translate }}</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Dates -->
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">{{ 'coproperty.charges.startDate' | translate }}</label>
-              <input type="date" class="form-control" formControlName="startDate" />
-            </div>
-          </div>
-
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">{{ 'coproperty.charges.endDate' | translate }}</label>
-              <input type="date" class="form-control" formControlName="endDate" />
-            </div>
-          </div>
-
-          <!-- Description -->
-          <div class="col-md-12">
-            <div class="form-group">
-              <label class="form-label">{{ 'coproperty.charges.description' | translate }}</label>
-              <textarea 
-                class="form-control" 
-                formControlName="description"
-                rows="3"
-              ></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-actions mt-4">
-          <button type="submit" class="btn btn-success" [disabled]="chargeForm.invalid">
-            <i class="bi bi-save"></i>
-            {{ 'common.save' | translate }}
-          </button>
-          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
-            <i class="bi bi-x"></i>
-            {{ 'common.cancel' | translate }}
-          </button>
-        </div>
-
-        <!-- Show validation errors for debugging -->
-        <div *ngIf="chargeForm.invalid && chargeForm.touched" class="alert alert-warning mt-3 small">
-          <i class="bi bi-exclamation-triangle me-2"></i>
-          <strong>{{ 'common.validationErrors' | translate }}:</strong>
-          <ul class="mb-0 mt-2 ms-3">
-            <li *ngIf="chargeForm.get('name')?.invalid && chargeForm.get('name')?.touched">
-              {{ 'coproperty.charges.name' | translate }} {{ 'validation.required' | translate }}
-            </li>
-            <li *ngIf="chargeForm.get('totalAmount')?.invalid && chargeForm.get('totalAmount')?.touched">
-              {{ 'coproperty.charges.totalAmount' | translate }} {{ 'validation.required' | translate }} ({{ 'validation.min' | translate }} 0.01 {{ currencySymbol }})
-            </li>
-            <li *ngIf="chargeForm.get('startDate')?.invalid && chargeForm.get('startDate')?.touched">
-              {{ 'coproperty.charges.startDate' | translate }} {{ 'validation.required' | translate }}
-            </li>
-            <li *ngIf="chargeForm.get('chargeType')?.invalid">
-              {{ 'coproperty.charges.type' | translate }} {{ 'validation.required' | translate }}
-            </li>
-            <li *ngIf="chargeForm.get('frequency')?.invalid">
-              {{ 'coproperty.charges.frequency' | translate }} {{ 'validation.required' | translate }}
-            </li>
-            <li *ngIf="chargeForm.get('distributionMethod')?.invalid">
-              {{ 'coproperty.charges.distributionMethod' | translate }} {{ 'validation.required' | translate }}
-            </li>
-          </ul>
-        </div>
-      </form>
-    </div>
-  </div>
+  <!-- The detail view renders the same component used by Budget Management,
+       keeping fields, validation, and layout in one place. -->
+  <myb-budget-new
+    *ngIf="showForm()"
+    [embeddedCopropertyId]="resolvedCopropertyId()"
+    [embeddedBudgetId]="currentChargeId()"
+    (saved)="onBudgetSaved($event)"
+    (deleted)="onBudgetDeleted($event)"
+    (cancelled)="cancelEdit()">
+  </myb-budget-new>
 
   <!-- Charges Table -->
   <div class="card mt-4">

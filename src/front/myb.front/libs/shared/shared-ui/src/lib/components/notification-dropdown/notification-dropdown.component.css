@@ -47,7 +47,8 @@
 
 /* Dropdown Panel */
 .notification-panel {
-  min-width: 360px;
+  width: 360px;
+  min-width: 0;
   max-width: 400px;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -166,4 +167,25 @@
   background: #3b82f6;
   flex-shrink: 0;
   margin-top: 6px;
+}
+
+@media (max-width: 576px) {
+  .notification-panel {
+    position: fixed !important;
+    top: 56px !important;
+    right: 8px !important;
+    left: 8px !important;
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 64px);
+    transform: none !important;
+  }
+
+  .notification-header {
+    padding: 12px;
+  }
+
+  .notification-list {
+    max-height: calc(100dvh - 126px);
+  }
 }

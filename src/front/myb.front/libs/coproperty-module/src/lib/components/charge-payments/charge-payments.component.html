@@ -2,9 +2,9 @@
   <div class="page-header">
     <h1>
       <i class="bi bi-receipt me-2"></i>
-      Règlement des Charges Fournisseurs
+      {{ 'chargePayments.title' | translate }}
     </h1>
-    <p class="text-muted">Enregistrez les paiements effectués par le syndic aux fournisseurs (eau, électricité, entretien, etc.)</p>
+    <p class="text-muted">{{ 'chargePayments.subtitle' | translate }}</p>
   </div>
 
   <!-- Filters -->
@@ -13,50 +13,50 @@
       <div class="row g-3 align-items-end">
         <div class="col-md-4">
           <label for="copropertyFilter" class="form-label">
-            <i class="bi bi-building me-1"></i> Copropriété
+            <i class="bi bi-building me-1"></i> {{ 'chargePayments.coproperty' | translate }}
           </label>
           <select
             id="copropertyFilter"
             class="form-select"
             [value]="selectedCopropertyId()"
             (change)="onCopropertyChange($any($event.target).value)">
-            <option value="">Sélectionner une copropriété</option>
+            <option value="">{{ 'chargePayments.selectCoproperty' | translate }}</option>
             <option *ngFor="let c of coproperties()" [value]="c.id">{{ c.name }}</option>
           </select>
         </div>
 
         <div class="col-md-3">
           <label for="statusFilter" class="form-label">
-            <i class="bi bi-funnel me-1"></i> Statut
+            <i class="bi bi-funnel me-1"></i> {{ 'common.status' | translate }}
           </label>
           <select
             id="statusFilter"
             class="form-select"
             [value]="filterStatus()"
             (change)="onStatusFilterChange($event)">
-            <option value="">Tous les statuts</option>
-            <option value="PAID">Payé</option>
-            <option value="PARTIALLY_PAID">Partiellement payé</option>
-            <option value="UNPAID">Non payé</option>
+            <option value="">{{ 'chargePayments.allStatuses' | translate }}</option>
+            <option value="PAID">{{ 'chargePayments.status.paid' | translate }}</option>
+            <option value="PARTIALLY_PAID">{{ 'chargePayments.status.partiallyPaid' | translate }}</option>
+            <option value="UNPAID">{{ 'chargePayments.status.unpaid' | translate }}</option>
           </select>
         </div>
 
         <div class="col-md-3">
           <label for="search" class="form-label">
-            <i class="bi bi-search me-1"></i> Recherche
+            <i class="bi bi-search me-1"></i> {{ 'common.search' | translate }}
           </label>
           <input
             id="search"
             type="text"
             class="form-control"
-            placeholder="Nom de charge, type, référence..."
+            [placeholder]="'chargePayments.searchPlaceholder' | translate"
             [value]="searchTerm()"
             (input)="onSearchInput($event)" />
         </div>
 
         <div class="col-md-2">
           <button class="btn btn-outline-primary w-100" (click)="refreshData()">
-            <i class="bi bi-arrow-clockwise me-1"></i> Actualiser
+            <i class="bi bi-arrow-clockwise me-1"></i> {{ 'chargePayments.refresh' | translate }}
           </button>
         </div>
       </div>
@@ -73,9 +73,9 @@
               <i class="bi bi-cash-stack"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Total des Charges</h6>
+              <h6 class="text-muted mb-0">{{ 'chargePayments.totalCharges' | translate }}</h6>
               <h3 class="mb-0">{{ formatAmount(totalAmount) }}</h3>
-              <small class="text-muted">{{ filteredSummaries.length }} charge(s)</small>
+              <small class="text-muted">{{ 'chargePayments.chargeCount' | translate:{ count: filteredSummaries.length } }}</small>
             </div>
           </div>
         </div>
@@ -90,9 +90,9 @@
               <i class="bi bi-check-circle"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Payé aux Fournisseurs</h6>
+              <h6 class="text-muted mb-0">{{ 'chargePayments.paidToSuppliers' | translate }}</h6>
               <h3 class="mb-0">{{ formatAmount(totalPaid) }}</h3>
-              <small class="text-muted">{{ paidCount }} réglé(s)</small>
+              <small class="text-muted">{{ 'chargePayments.settledCount' | translate:{ count: paidCount } }}</small>
             </div>
           </div>
         </div>
@@ -107,9 +107,9 @@
               <i class="bi bi-exclamation-circle"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Reste à Régler</h6>
+              <h6 class="text-muted mb-0">{{ 'chargePayments.remainingToPay' | translate }}</h6>
               <h3 class="mb-0">{{ formatAmount(totalRemaining) }}</h3>
-              <small class="text-muted">{{ unpaidCount }} en attente</small>
+              <small class="text-muted">{{ 'chargePayments.pendingCount' | translate:{ count: unpaidCount } }}</small>
             </div>
           </div>
         </div>
@@ -124,7 +124,7 @@
               <i class="bi bi-pie-chart"></i>
             </div>
             <div class="ms-3">
-              <h6 class="text-muted mb-0">Taux de Règlement</h6>
+              <h6 class="text-muted mb-0">{{ 'chargePayments.settlementRate' | translate }}</h6>
               <h3 class="mb-0">{{ collectionRate | number:'1.0-0' }}%</h3>
               <div class="progress mt-1" style="height:4px;width:80px">
                 <div class="progress-bar bg-info" [style.width.%]="collectionRate"></div>
@@ -141,36 +141,36 @@
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">
         <i class="bi bi-table me-2"></i>
-        Détail des Charges ({{ filteredSummaries.length }})
+        {{ 'chargePayments.details' | translate:{ count: filteredSummaries.length } }}
       </h5>
     </div>
     <div class="card-body">
 
       <div *ngIf="loading()" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Chargement...</span>
+          <span class="visually-hidden">{{ 'common.loading' | translate }}</span>
         </div>
       </div>
 
       <div *ngIf="!loading() && filteredSummaries.length === 0" class="text-center py-5">
         <i class="bi bi-inbox display-1 text-muted"></i>
-        <p class="text-muted mt-3">Aucune charge distribuée trouvée</p>
+        <p class="text-muted mt-3">{{ 'chargePayments.empty' | translate }}</p>
       </div>
 
       <div *ngIf="!loading() && filteredSummaries.length > 0" class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-light">
             <tr>
-              <th>Charge</th>
-              <th>Type</th>
-              <th class="text-end">Montant Total</th>
-              <th class="text-end">Payé</th>
-              <th class="text-end">Reste</th>
-              <th>Date Règlement</th>
-              <th>Méthode</th>
-              <th>Référence</th>
-              <th>Statut</th>
-              <th class="text-center">Action</th>
+              <th>{{ 'chargePayments.charge' | translate }}</th>
+              <th>{{ 'chargePayments.type' | translate }}</th>
+              <th class="text-end">{{ 'chargePayments.totalAmount' | translate }}</th>
+              <th class="text-end">{{ 'chargePayments.paid' | translate }}</th>
+              <th class="text-end">{{ 'chargePayments.remaining' | translate }}</th>
+              <th>{{ 'chargePayments.paymentDate' | translate }}</th>
+              <th>{{ 'chargePayments.method' | translate }}</th>
+              <th>{{ 'chargePayments.reference' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th class="text-center">{{ 'chargePayments.action' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -209,7 +209,7 @@
               <td>{{ formatDate(s.paidAt) }}</td>
               <td>
                 <span *ngIf="s.paymentMethod" class="badge bg-light text-dark border">
-                  <i class="bi bi-credit-card me-1"></i>{{ s.paymentMethod }}
+                  <i class="bi bi-credit-card me-1"></i>{{ getPaymentMethodLabel(s.paymentMethod) }}
                 </span>
                 <span *ngIf="!s.paymentMethod" class="text-muted">—</span>
               </td>
@@ -230,7 +230,7 @@
                         [disabled]="paying() === s.chargeId"
                         (click)="openPaymentModal(s)">
                   <i class="bi bi-wallet2 me-1"></i>
-                  <span *ngIf="paying() !== s.chargeId">Régler</span>
+                  <span *ngIf="paying() !== s.chargeId">{{ 'chargePayments.pay' | translate }}</span>
                   <span *ngIf="paying() === s.chargeId">
                     <span class="spinner-border spinner-border-sm" role="status"></span>
                   </span>
@@ -243,7 +243,7 @@
           </tbody>
           <tfoot>
             <tr class="fw-bold">
-              <td colspan="2">Total</td>
+              <td colspan="2">{{ 'common.total' | translate }}</td>
               <td class="text-end">{{ formatAmount(totalAmount) }}</td>
               <td class="text-end text-success">{{ formatAmount(totalPaid) }}</td>
               <td class="text-end text-danger">{{ formatAmount(totalRemaining) }}</td>
@@ -263,7 +263,7 @@
         <div class="modal-header bg-success text-white">
           <h5 class="modal-title">
             <i class="bi bi-wallet2 me-2"></i>
-            Enregistrer un Paiement Fournisseur
+            {{ 'chargePayments.modalTitle' | translate }}
           </h5>
           <button type="button" class="btn-close btn-close-white" (click)="closePaymentModal()"></button>
         </div>
@@ -278,18 +278,18 @@
             </div>
             <hr class="my-2">
             <div class="d-flex justify-content-between">
-              <span>Montant total :</span>
+              <span>{{ 'chargePayments.totalAmount' | translate }}:</span>
               <strong>{{ formatAmount(charge.totalAmount) }}</strong>
             </div>
             <div class="d-flex justify-content-between text-danger">
-              <span>Reste à régler :</span>
+              <span>{{ 'chargePayments.remainingToPay' | translate }}:</span>
               <strong>{{ formatAmount(charge.remaining) }}</strong>
             </div>
           </div>
 
           <div class="mb-3">
             <label for="paymentAmount" class="form-label fw-semibold">
-              <i class="bi bi-cash me-1"></i> Montant du paiement
+              <i class="bi bi-cash me-1"></i> {{ 'chargePayments.paymentAmount' | translate }}
             </label>
             <div class="input-group">
               <input
@@ -306,38 +306,38 @@
 
           <div class="mb-3">
             <label for="paymentMethod" class="form-label fw-semibold">
-              <i class="bi bi-credit-card me-1"></i> Méthode de paiement
+              <i class="bi bi-credit-card me-1"></i> {{ 'chargePayments.paymentMethod' | translate }}
             </label>
             <select id="paymentMethod" class="form-select" [(ngModel)]="paymentForm.paymentMethod">
-              <option value="Virement">Virement bancaire</option>
-              <option value="Chèque">Chèque</option>
-              <option value="Espèces">Espèces</option>
-              <option value="Carte">Carte bancaire</option>
-              <option value="Prélèvement">Prélèvement</option>
+              <option value="Virement">{{ 'chargePayments.methods.transfer' | translate }}</option>
+              <option value="Chèque">{{ 'chargePayments.methods.cheque' | translate }}</option>
+              <option value="Espèces">{{ 'chargePayments.methods.cash' | translate }}</option>
+              <option value="Carte">{{ 'chargePayments.methods.card' | translate }}</option>
+              <option value="Prélèvement">{{ 'chargePayments.methods.directDebit' | translate }}</option>
             </select>
           </div>
 
           <div class="mb-3">
             <label for="transactionId" class="form-label fw-semibold">
-              <i class="bi bi-hash me-1"></i> Référence de paiement
+              <i class="bi bi-hash me-1"></i> {{ 'chargePayments.paymentReference' | translate }}
             </label>
             <input
               id="transactionId"
               type="text"
               class="form-control"
               [(ngModel)]="paymentForm.transactionId"
-              placeholder="N° de virement, chèque, etc." />
+              [placeholder]="'chargePayments.referencePlaceholder' | translate" />
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="closePaymentModal()">
-            Annuler
+            {{ 'common.cancel' | translate }}
           </button>
           <button type="button" class="btn btn-success"
                   [disabled]="paying() !== null || paymentForm.amount <= 0"
                   (click)="confirmPayment()">
             <i class="bi bi-check-circle me-1"></i>
-            Confirmer le Paiement
+            {{ 'chargePayments.confirmPayment' | translate }}
           </button>
         </div>
       </div>

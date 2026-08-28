@@ -434,42 +434,6 @@ export class AdminHomeComponent implements OnInit {
   ngOnInit() {
     this.loadUserInfo();
     this.checkServiceAccess();
-    this.autoRedirectByRole();
-  }
-
-  /**
-   * Auto-redirect users to their dashboard based on Keycloak role.
-   * If a user has exactly one coproperty role, go straight there.
-   * If multiple roles → show the service selection screen.
-   */
-  private autoRedirectByRole() {
-    const roles = this.userRoles();
-    const syndicRoles = ['coproperty-syndic', 'coproperty-admin'];
-    const copropertyRoles = roles.filter(r =>
-      ['coproperty-syndic', 'coproperty-owner', 'coproperty-council', 'coproperty-accountant'].includes(r)
-    );
-    const hasSyndic = roles.some(r => syndicRoles.includes(r));
-    const hasOwner = roles.includes('coproperty-owner');
-
-    // If user has BOTH syndic and owner roles, stay on home to let them choose
-    if (hasSyndic && hasOwner) return;
-
-    if (copropertyRoles.length === 1) {
-      const roleRouteMap: Record<string, string> = {
-        'coproperty-syndic': '/coproperty/syndic/dashboard',
-        'coproperty-owner': '/coproperty/owner/dashboard',
-        'coproperty-council': '/coproperty/council/dashboard',
-        'coproperty-accountant': '/coproperty/accountant/dashboard',
-      };
-      const target = roleRouteMap[copropertyRoles[0]];
-      if (target) {
-        this.router.navigate([target]);
-        return;
-      }
-    }
-
-    // system-admin with no coproperty role → stay on home
-    // multiple roles → stay on home (service selection)
   }
 
   private loadUserInfo() {

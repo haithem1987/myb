@@ -427,3 +427,69 @@
     border: 1px solid #fca5a5;
   }
 }
+
+@media (max-width: 600px) {
+  .profile-navbar {
+    padding: 8px 10px;
+
+    .container-fluid {
+      min-width: 0;
+      padding: 0;
+    }
+  }
+
+  .profile-page {
+    padding: 20px 10px;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-size: 22px;
+  }
+
+  .avatar-card {
+    padding: 24px 18px;
+  }
+
+  .card-header {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .card-header-left {
+    min-width: 0;
+  }
+
+  .card-title {
+    line-height: 1.25;
+  }
+
+  .info-card .form-grid {
+    padding: 18px 16px;
+  }
+
+  .form-value,
+  .account-value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .account-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+  }
+
+  .form-actions {
+    padding: 14px 16px;
+
+    > button {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+}

@@ -8,11 +8,12 @@ import { TenantService } from '../../services/tenant.service';
 import { UnitExtended, UnitService } from '../../services/unit.service';
 import { Tenant, TenantInput } from '../../models/tenant.model';
 import { KeycloakService } from '@myb-front/auth';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'myb-tenant-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './tenant-management.component.html',
   styleUrls: ['./tenant-management.component.scss'],
 })
@@ -23,6 +24,7 @@ export class TenantManagementComponent implements OnInit {
   private tenantService = inject(TenantService);
   private unitService = inject(UnitService);
   private keycloakService = inject(KeycloakService);
+  private translate = inject(TranslateService);
 
   tenants: Tenant[] = [];
   units: UnitExtended[] = [];
@@ -92,7 +94,7 @@ export class TenantManagementComponent implements OnInit {
             this.loadData();
           }
         },
-        error: () => this.showAlert('danger', 'Impossible de charger les coproprietes.'),
+        error: () => this.showAlert('danger', this.t('tenantManagement.messages.loadCopropertiesError')),
       });
   }
 
@@ -111,7 +113,7 @@ export class TenantManagementComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (units) => this.units = units,
-        error: () => this.showAlert('danger', 'Impossible de charger les lots.'),
+        error: () => this.showAlert('danger', this.t('tenantManagement.messages.loadUnitsError')),
       });
 
     this.tenantService.getTenants(this.selectedCopropertyId)
@@ -121,7 +123,7 @@ export class TenantManagementComponent implements OnInit {
       )
       .subscribe({
         next: (tenants) => this.tenants = tenants,
-        error: () => this.showAlert('danger', 'Impossible de charger les locataires.'),
+        error: () => this.showAlert('danger', this.t('tenantManagement.messages.loadTenantsError')),
       });
   }
 
@@ -145,20 +147,34 @@ export class TenantManagementComponent implements OnInit {
 
   editTenant(tenant: Tenant): void {
     this.editingTenantId = tenant.id;
-    this.showForm = true;
-    this.tenantForm.reset({
-      unitId: tenant.unitId,
-      firstName: tenant.firstName,
-      lastName: tenant.lastName,
-      email: tenant.email,
-      phone: tenant.phone || '',
-      leaseStartDate: this.toDateInput(tenant.leaseStartDate),
-      leaseEndDate: tenant.leaseEndDate ? this.toDateInput(tenant.leaseEndDate) : '',
-      monthlyRent: tenant.monthlyRent ?? null,
-      depositAmount: tenant.depositAmount ?? null,
-      isActive: tenant.isActive,
-      notes: tenant.notes || '',
-    });
+    this.loading.set(true);
+    this.tenantService.getTenantById(tenant.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false))
+      )
+      .subscribe({
+        next: (tenantDetails) => {
+          this.showForm = true;
+          this.tenantForm.reset({
+            unitId: tenantDetails.unitId,
+            firstName: tenantDetails.firstName,
+            lastName: tenantDetails.lastName,
+            email: tenantDetails.email,
+            phone: tenantDetails.phone || '',
+            leaseStartDate: this.toDateInput(tenantDetails.leaseStartDate),
+            leaseEndDate: tenantDetails.leaseEndDate ? this.toDateInput(tenantDetails.leaseEndDate) : '',
+            monthlyRent: tenantDetails.monthlyRent ?? null,
+            depositAmount: tenantDetails.depositAmount ?? null,
+            isActive: tenantDetails.isActive,
+            notes: tenantDetails.notes || '',
+          });
+        },
+        error: () => {
+          this.editingTenantId = null;
+          this.showAlert('danger', this.t('tenantManagement.messages.loadTenantError'));
+        },
+      });
   }
 
   saveTenant(): void {
@@ -181,11 +197,19 @@ export class TenantManagementComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.showAlert('success', this.editingTenantId ? 'Locataire mis a jour.' : 'Locataire ajoute.');
+          this.showAlert(
+            'success',
+            this.t(this.editingTenantId
+              ? 'tenantManagement.messages.updated'
+              : 'tenantManagement.messages.created')
+          );
           this.cancelForm();
           this.loadData();
         },
-        error: (error) => this.showAlert('danger', error?.message || 'Impossible d enregistrer le locataire.'),
+        error: (error) => this.showAlert(
+          'danger',
+          error?.message || this.t('tenantManagement.messages.saveError')
+        ),
       });
   }
 
@@ -195,15 +219,17 @@ export class TenantManagementComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.showAlert('success', 'Locataire desactive.');
+          this.showAlert('success', this.t('tenantManagement.messages.deactivated'));
           this.loadData();
         },
-        error: () => this.showAlert('danger', 'Impossible de desactiver le locataire.'),
+        error: () => this.showAlert('danger', this.t('tenantManagement.messages.deactivateError')),
       });
   }
 
   removeTenant(tenant: Tenant): void {
-    if (!confirm(`Supprimer ${tenant.firstName} ${tenant.lastName} ?`)) {
+    if (!confirm(this.t('tenantManagement.messages.deleteConfirm', {
+      name: `${tenant.firstName} ${tenant.lastName}`,
+    }))) {
       return;
     }
 
@@ -211,10 +237,10 @@ export class TenantManagementComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.showAlert('success', 'Locataire supprime.');
+          this.showAlert('success', this.t('tenantManagement.messages.deleted'));
           this.loadData();
         },
-        error: () => this.showAlert('danger', 'Impossible de supprimer le locataire.'),
+        error: () => this.showAlert('danger', this.t('tenantManagement.messages.deleteError')),
       });
   }
 
@@ -226,14 +252,17 @@ export class TenantManagementComponent implements OnInit {
 
   unitLabel(unitId: string): string {
     const unit = this.units.find(u => u.id === unitId);
-    return unit ? `${unit.unitNumber}${unit.floor != null ? ` - etage ${unit.floor}` : ''}` : '-';
+    return unit
+      ? `${unit.unitNumber}${unit.floor != null ? ` - ${this.t('tenantManagement.floor', { floor: unit.floor })}` : ''}`
+      : '-';
   }
 
   formatCurrency(value?: number | null): string {
     if (value == null) {
       return '-';
     }
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value);
+    const locale = this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR';
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(value);
   }
 
   private toTenantInput(source?: Tenant, activeOverride?: boolean): TenantInput {
@@ -277,5 +306,9 @@ export class TenantManagementComponent implements OnInit {
   private showAlert(type: 'success' | 'danger' | 'info', message: string): void {
     this.alert.set({ type, message });
     setTimeout(() => this.alert.set({ type: null, message: '' }), 5000);
+  }
+
+  private t(key: string, params?: Record<string, unknown>): string {
+    return this.translate.instant(key, params);
   }
 }

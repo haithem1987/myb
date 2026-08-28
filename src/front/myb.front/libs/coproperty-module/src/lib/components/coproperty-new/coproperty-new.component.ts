@@ -37,7 +37,6 @@ export class CopropertyNewComponent implements OnInit {
   copropertyId = signal<string | null>(null);
   saving = signal<boolean>(false);
   saveSuccess = signal<boolean>(false);
-  private currentIsActive = true;
   private currentManagerName: string | undefined;
   // Currency is configured separately in Settings; preserve the existing value
   // (or default to EUR for a brand-new coproperty) instead of exposing it here.
@@ -96,6 +95,7 @@ export class CopropertyNewComponent implements OnInit {
       description: [''],
       totalUnits: [0, [Validators.required, Validators.min(1)]],
       totalShares: [0, [Validators.required, Validators.min(1)]],
+      isActive: [true, [Validators.required]],
       commonAreas: ['']
     });
   }
@@ -112,10 +112,10 @@ export class CopropertyNewComponent implements OnInit {
           description: coproperty.description,
           totalUnits: coproperty.totalUnits,
           totalShares: coproperty.totalShares,
+          isActive: coproperty.isActive,
           commonAreas: coproperty.commonAreas
         });
         this.currentManagerName = coproperty.managerName || undefined;
-        this.currentIsActive = coproperty.isActive;
         // Currency is managed via Settings, not this form — preserve the existing value.
         this.currentCurrency = coproperty.currency || Currency.EUR;
       },
@@ -156,7 +156,7 @@ export class CopropertyNewComponent implements OnInit {
       commonAreas: formData.commonAreas,
       managerId: this.keycloakService.getProfile()?.id || undefined,
       managerName: this.currentManagerName,
-      isActive: this.currentIsActive
+      isActive: formData.isActive
     };
 
     const save$ = this.isEditMode() && this.copropertyId()

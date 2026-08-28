@@ -699,17 +699,9 @@ export class OwnerInvoicesComponent implements OnInit {
   private toastService = inject(ToastService);
 
   private getCurrentUserId(): string | null {
-    const token = this.keycloakService.getToken();
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.sub || null;
-      } catch (error) {
-        console.error('Error parsing Keycloak token in OwnerInvoicesComponent:', error);
-        return null;
-      }
-    }
-    return null;
+    return this.keycloakService.getUserId()
+      ?? this.keycloakService.getProfile()?.id
+      ?? null;
   }
 
   private mapInvoice(inv: CopropertyInvoice): Invoice {

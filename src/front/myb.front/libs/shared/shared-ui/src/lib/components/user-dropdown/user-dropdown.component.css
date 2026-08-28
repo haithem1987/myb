@@ -10,3 +10,31 @@
   background-color: transparent;
   color: #6c757d;
 }
+
+.nav-link {
+  min-width: 0;
+}
+
+.nav-link .ms-2 {
+  display: block;
+  max-width: min(220px, 32vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+  .navbar-nav,
+  .nav-item {
+    min-width: 0;
+  }
+
+  .nav-link {
+    padding-right: 0;
+  }
+
+  .nav-link .ms-2 {
+    max-width: 46vw;
+    font-size: 0.875rem;
+  }
+}

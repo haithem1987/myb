@@ -6,6 +6,7 @@ import { Apollo, gql } from 'apollo-angular';
 import { KeycloakService } from '@myb-front/auth';
 import { CopropertyService } from '@myb-front/coproperty-module';
 import { firstValueFrom } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 type ConversationKind = 'discussion' | 'annonce';
 interface ChatMessage { id: string; authorId: string; author: string; role: 'syndic' | 'owner'; body: string; sentAt: string; }
@@ -17,13 +18,14 @@ const SEND_MESSAGE = gql`mutation SendDiscussionMessage($input: SendDiscussionMe
 const TOGGLE_PIN = gql`mutation ToggleDiscussionPin($id: UUID!) { toggleDiscussionPin(id: $id) }`;
 
 @Component({
-  selector: 'myb-coproperty-discussions', standalone: true, imports: [CommonModule, FormsModule],
+  selector: 'myb-coproperty-discussions', standalone: true, imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './discussions.component.html', styleUrls: ['./discussions.component.scss']
 })
 export class DiscussionsComponent implements OnInit {
   private apollo = inject(Apollo);
   private keycloak = inject(KeycloakService);
   private copropertyService = inject(CopropertyService);
+  private translate = inject(TranslateService);
   readonly isSyndic: boolean;
   readonly currentUserId: string;
   readonly currentUserName: string;
@@ -54,7 +56,7 @@ export class DiscussionsComponent implements OnInit {
     this.isSyndic = router.url.includes('/syndic/');
     const profile = this.keycloak.getProfile();
     this.currentUserId = this.keycloak.getUserId() || profile?.id || '';
-    this.currentUserName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') || profile?.username || 'Utilisateur';
+    this.currentUserName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') || profile?.username || this.translate.instant('discussions.user');
   }
 
   async ngOnInit(): Promise<void> {
@@ -64,7 +66,7 @@ export class DiscussionsComponent implements OnInit {
       this.coproperties.set(items.map(c => ({ id: c.id, name: c.name })));
       this.newCoproperty = items[0]?.id || '';
       if (this.newCoproperty) await this.loadDiscussions(this.newCoproperty);
-    } catch { this.error.set('Impossible de charger les discussions.'); }
+    } catch { this.error.set(this.translate.instant('discussions.errors.load')); }
     finally { this.loading.set(false); }
   }
 
@@ -92,7 +94,7 @@ export class DiscussionsComponent implements OnInit {
       const message: ChatMessage = { id: m.id, authorId: m.authorId, author: m.authorName, role: m.authorRole, body: m.body, sentAt: m.createdAt };
       this.conversations.update(items => items.map(c => c.id === this.selectedId() ? { ...c, messages: [...c.messages, message] } : c));
       setTimeout(() => document.querySelector('.messages')?.scrollTo({ top: 999999, behavior: 'smooth' }));
-    } catch { this.draft = body; this.error.set("Le message n'a pas pu être envoyé."); }
+    } catch { this.draft = body; this.error.set(this.translate.instant('discussions.errors.send')); }
   }
 
   onComposerKeydown(event: KeyboardEvent): void { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); void this.send(); } }
@@ -106,18 +108,18 @@ export class DiscussionsComponent implements OnInit {
       const name = this.coproperties().find(c => c.id === this.newCoproperty)?.name || '';
       this.conversations.update(items => [{ id: row.id, copropertyId: row.copropertyId, title, coproperty: name, kind: this.newKind, participants: 0, unread: 0, messages: [] }, ...items]);
       this.selectedId.set(row.id); this.newTitle = ''; this.showNewConversation.set(false);
-    } catch { this.error.set("La discussion n'a pas pu être créée."); }
+    } catch { this.error.set(this.translate.instant('discussions.errors.create')); }
   }
 
   async togglePin(): Promise<void> {
     try {       await firstValueFrom(this.apollo.mutate({ mutation: TOGGLE_PIN, variables: { id: this.selectedId() }, context: { service: 'copropertyService' } })); this.conversations.update(items => items.map(c => c.id === this.selectedId() ? { ...c, pinned: !c.pinned } : c)); }
-    catch { this.error.set("Impossible de modifier l'épinglage."); }
+    catch { this.error.set(this.translate.instant('discussions.errors.pin')); }
   }
 
   isMine(message: ChatMessage): boolean { return !!this.currentUserId && message.authorId === this.currentUserId; }
-  displayAuthor(message: ChatMessage): string { return this.isMine(message) ? 'Moi' : message.author; }
+  displayAuthor(message: ChatMessage): string { return this.isMine(message) ? this.translate.instant('discussions.me') : message.author; }
   initials(name: string): string { return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase(); }
-  time(value: string): string { return new Date(value).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); }
-  lastMessage(c: Conversation): string { return c.messages[c.messages.length - 1]?.body || 'Aucun message pour le moment'; }
+  time(value: string): string { return new Date(value).toLocaleTimeString(this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR', { hour: '2-digit', minute: '2-digit' }); }
+  lastMessage(c: Conversation): string { return c.messages[c.messages.length - 1]?.body || this.translate.instant('discussions.noMessagesYet'); }
   trackById(_: number, item: { id: string }): string { return item.id; }
 }

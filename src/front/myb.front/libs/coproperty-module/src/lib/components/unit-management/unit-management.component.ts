@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
@@ -18,6 +18,8 @@ import { getUnitErrorTranslation } from '../../utils/unit-error.util';
 })
 export class UnitManagementComponent implements OnInit, OnChanges {
   @Input() copropertyId: string | null = null;
+  @Input() copropertyName = '';
+  @Input() copropertyTotalShares: number | null = null;
   
   private unitService = inject(UnitService);
   private route = inject(ActivatedRoute);
@@ -42,6 +44,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
 
   constructor() {
     this.unitForm = this.fb.group({
+      copropertyId: [{ value: '', disabled: true }, Validators.required],
       unitNumber: ['', [Validators.required, Validators.minLength(1)]],
       floor: [1, [Validators.required, Validators.min(0)]],
       area: [0, [Validators.required, Validators.min(1)]],
@@ -56,12 +59,14 @@ export class UnitManagementComponent implements OnInit, OnChanges {
     // Get coproperty ID from input or parent route params
     if (this.copropertyId) {
       this.resolvedCopropertyId = this.copropertyId;
+      this.unitForm.get('copropertyId')?.setValue(this.copropertyId);
       this.loadUnits();
     } else {
       this.route.parent?.params.subscribe(params => {
         const idFromRoute = params['id'];
         if (idFromRoute) {
           this.resolvedCopropertyId = idFromRoute;
+          this.unitForm.get('copropertyId')?.setValue(idFromRoute);
           this.loadUnits();
         }
       });
@@ -72,6 +77,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
     if (changes['copropertyId'] && !changes['copropertyId'].firstChange) {
       this.resolvedCopropertyId = this.copropertyId;
       if (this.copropertyId) {
+        this.unitForm.get('copropertyId')?.setValue(this.copropertyId);
         this.loadUnits();
       }
     }
@@ -109,14 +115,20 @@ export class UnitManagementComponent implements OnInit, OnChanges {
     );
   }
 
+  get occupiedControl(): FormControl {
+    return this.unitForm.get('isOccupied') as FormControl;
+  }
+
   openAddForm(): void {
     this.showAddForm = true;
     this.editingUnitId = null;
     this.unitForm.reset({ 
+      copropertyId: this.resolvedCopropertyId,
       unitType: 'APARTMENT', 
       isOccupied: true, 
       floor: 1,
-      copropertyId: this.resolvedCopropertyId
+      area: 0,
+      shares: 0
     });
   }
 
@@ -124,6 +136,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
     this.editingUnitId = unit.id || null;
     this.showAddForm = true;
     this.unitForm.patchValue({
+      copropertyId: this.resolvedCopropertyId,
       unitNumber: unit.unitNumber,
       floor: unit.floor,
       area: unit.area,
@@ -176,12 +189,27 @@ export class UnitManagementComponent implements OnInit, OnChanges {
 
   saveUnit(): void {
     if (this.unitForm.valid) {
-      this.loading.set(true);
       const unitData: UnitExtended = {
-        ...this.unitForm.value,
+        ...this.unitForm.getRawValue(),
         copropertyId: this.resolvedCopropertyId,
         id: this.editingUnitId || '00000000-0000-0000-0000-000000000000'
       };
+
+      const assignedShares = this.units()
+        .filter(unit => unit.id !== this.editingUnitId)
+        .reduce((sum, unit) => sum + Number(unit.shares), 0);
+      if (this.copropertyTotalShares !== null &&
+          assignedShares + Number(unitData.shares) > this.copropertyTotalShares) {
+        this.unitForm.get('shares')?.setErrors({ sharesExceeded: true });
+        this.unitForm.get('shares')?.markAsTouched();
+        this.showAlert('danger', this.translateService.instant(
+          'coproperty.messages.unitSharesExceeded',
+          { totalShares: this.copropertyTotalShares }
+        ));
+        return;
+      }
+
+      this.loading.set(true);
 
       const operation = this.editingUnitId 
         ? this.unitService.updateUnit(unitData)

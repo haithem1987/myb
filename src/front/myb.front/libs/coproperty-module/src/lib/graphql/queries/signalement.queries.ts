@@ -20,6 +20,26 @@ export const GET_SIGNALEMENTS = gql`
   }
 `;
 
+export const GET_SYNDIC_SIGNALEMENTS = gql`
+  query GetSyndicSignalements($managerId: UUID) {
+    syndicSignalements(managerId: $managerId) {
+      id
+      copropertyId
+      reportedBy
+      reporterName
+      type
+      zone
+      description
+      photoUrl
+      status
+      viewsCount
+      syndicComment
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const GET_SIGNALEMENTS_BY_STATUS = gql`
   query GetSignalementsByStatus($copropertyId: UUID!, $status: SignalementStatus!) {
     signalementsByStatus(copropertyId: $copropertyId, status: $status) {

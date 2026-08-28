@@ -40,68 +40,135 @@
       />
     </div>
 
-  <!-- Add/Edit Form -->
+  <!-- Add/Edit Unit Form: same fields, validation and layout as Unit Management -->
   <div *ngIf="showAddForm" class="card form-card">
     <div class="card-header">
-      <h5>{{ editingUnitId ? ('coproperty.unit.editUnit' | translate) : ('coproperty.unit.addUnit' | translate) }}</h5>
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          <i class="bi bi-plus-circle me-2"></i>
+          {{ editingUnitId ? ('coproperty.unit.editUnit' | translate) : ('coproperty.unit.addUnit' | translate) }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cancelForm()"></button>
+      </div>
     </div>
     <div class="card-body">
       <form [formGroup]="unitForm" (ngSubmit)="saveUnit()">
         <div class="row">
-          <div class="col-md-6">
-            <div class="mb-3">
-              <label for="unitNumber" class="form-label">{{ 'coproperty.unit.number' | translate }}</label>
-              <input type="text" class="form-control" id="unitNumber" formControlName="unitNumber" />
-            </div>
+          <div class="col-md-6 mb-3">
+            <label for="detailFormCopropertyId" class="form-label">
+              <i class="bi bi-building me-1"></i>{{ 'coproperty.charge.coproperty' | translate }} *
+            </label>
+            <select class="form-select" id="detailFormCopropertyId" formControlName="copropertyId">
+              <option [value]="resolvedCopropertyId">{{ copropertyName }}</option>
+            </select>
           </div>
-          <div class="col-md-6">
-            <div class="mb-3">
-              <label for="unitType" class="form-label">{{ 'coproperty.unit.type' | translate }}</label>
-              <select class="form-select" id="unitType" formControlName="unitType">
-                <option *ngFor="let type of unitTypes" [value]="type">{{ type }}</option>
-              </select>
+
+          <div class="col-md-6 mb-3">
+            <label for="detailFormUnitNumber" class="form-label">
+              <i class="bi bi-hash me-1"></i>{{ 'coproperty.unit.number' | translate }} *
+            </label>
+            <input type="text" class="form-control" id="detailFormUnitNumber" formControlName="unitNumber"
+              [placeholder]="'coproperty.unit.numberPlaceholder' | translate"
+              [class.is-invalid]="unitForm.get('unitNumber')?.touched && unitForm.get('unitNumber')?.invalid" />
+            <div class="invalid-feedback" *ngIf="unitForm.get('unitNumber')?.touched && unitForm.get('unitNumber')?.invalid">
+              {{ 'coproperty.unit.number' | translate }} {{ 'validation.required' | translate }}
             </div>
           </div>
         </div>
 
         <div class="row">
-          <div class="col-md-4">
-            <div class="mb-3">
-              <label for="floor" class="form-label">{{ 'coproperty.unit.floor' | translate }}</label>
-              <input type="number" class="form-control" id="floor" formControlName="floor" />
+          <div class="col-md-4 mb-3">
+            <label for="detailFormUnitType" class="form-label">
+              <i class="bi bi-tag me-1"></i>{{ 'coproperty.unit.type' | translate }} *
+            </label>
+            <select class="form-select" id="detailFormUnitType" formControlName="unitType">
+              <option value="APARTMENT">{{ 'coproperty.unit.types.apartment' | translate }}</option>
+              <option value="PARKING">{{ 'coproperty.unit.types.parking' | translate }}</option>
+              <option value="CAVE">{{ 'coproperty.unit.types.cave' | translate }}</option>
+              <option value="COMMERCIAL">{{ 'coproperty.unit.types.commercial' | translate }}</option>
+              <option value="OTHER">{{ 'coproperty.unit.types.other' | translate }}</option>
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="detailFormFloor" class="form-label">
+              <i class="bi bi-layers me-1"></i>{{ 'coproperty.unit.floor' | translate }} *
+            </label>
+            <input type="number" class="form-control" id="detailFormFloor" formControlName="floor" min="0"
+              [class.is-invalid]="unitForm.get('floor')?.touched && unitForm.get('floor')?.invalid" />
+            <div class="invalid-feedback" *ngIf="unitForm.get('floor')?.touched && unitForm.get('floor')?.invalid">
+              {{ 'coproperty.unit.floorMin' | translate }}
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="mb-3">
-              <label for="area" class="form-label">{{ 'coproperty.unit.area' | translate }} (m²)</label>
-              <input type="number" class="form-control" id="area" formControlName="area" step="0.1" />
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="mb-3">
-              <label for="shares" class="form-label">{{ 'coproperty.unit.shares' | translate }}</label>
-              <input type="number" class="form-control" id="shares" formControlName="shares" />
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label d-block">
+              <i class="bi bi-people me-1"></i>{{ 'coproperty.unit.status' | translate }}
+            </label>
+            <div class="btn-group w-100 mt-2" role="group">
+              <input type="radio" class="btn-check" id="detailOccupiedYes" name="detailIsOccupied"
+                [value]="true" [formControl]="occupiedControl"
+                (change)="unitForm.get('isOccupied')?.setValue(true)">
+              <label class="btn btn-outline-success" for="detailOccupiedYes">
+                <i class="bi bi-check-circle me-1"></i>{{ 'coproperty.unit.occupied' | translate }}
+              </label>
+              <input type="radio" class="btn-check" id="detailOccupiedNo" name="detailIsOccupied"
+                [value]="false" [formControl]="occupiedControl"
+                (change)="unitForm.get('isOccupied')?.setValue(false)">
+              <label class="btn btn-outline-warning" for="detailOccupiedNo">
+                <i class="bi bi-x-circle me-1"></i>{{ 'coproperty.unit.vacant' | translate }}
+              </label>
             </div>
           </div>
         </div>
 
-        <div class="mb-3">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="isOccupied" formControlName="isOccupied" />
-            <label class="form-check-label" for="isOccupied">
-              {{ 'coproperty.unit.occupied' | translate }}
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="detailFormArea" class="form-label">
+              <i class="bi bi-rulers me-1"></i>{{ 'coproperty.unit.area' | translate }} (m²) *
             </label>
+            <input type="number" class="form-control" id="detailFormArea" formControlName="area" step="0.1" min="1"
+              [placeholder]="'coproperty.unit.areaPlaceholder' | translate"
+              [class.is-invalid]="unitForm.get('area')?.touched && unitForm.get('area')?.invalid" />
+            <div class="invalid-feedback" *ngIf="unitForm.get('area')?.touched && unitForm.get('area')?.invalid">
+              {{ 'coproperty.unit.areaMin' | translate }}
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="detailFormShares" class="form-label">
+              <i class="bi bi-pie-chart me-1"></i>{{ 'coproperty.unit.shares' | translate }} *
+            </label>
+            <input type="number" class="form-control" id="detailFormShares" formControlName="shares" min="1"
+              [placeholder]="'coproperty.unit.sharesPlaceholder' | translate"
+              [class.is-invalid]="unitForm.get('shares')?.touched && unitForm.get('shares')?.invalid" />
+            <div class="invalid-feedback" *ngIf="unitForm.get('shares')?.touched && unitForm.get('shares')?.invalid">
+              <ng-container *ngIf="unitForm.get('shares')?.hasError('sharesExceeded'); else detailSharesMinError">
+                {{ 'coproperty.messages.unitSharesExceeded' | translate:{ totalShares: copropertyTotalShares } }}
+              </ng-container>
+              <ng-template #detailSharesMinError>{{ 'coproperty.unit.sharesMin' | translate }}</ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="detailFormDescription" class="form-label">
+              <i class="bi bi-file-text me-1"></i>
+              {{ 'coproperty.charges.description' | translate }} ({{ 'coproperty.unit.optional' | translate }})
+            </label>
+            <textarea class="form-control" id="detailFormDescription" formControlName="description" rows="2"
+              [placeholder]="'coproperty.unit.descriptionPlaceholder' | translate"></textarea>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-success" [disabled]="!unitForm.valid">
-            <i class="bi bi-save"></i>
-            {{ 'common.save' | translate }}
+          <button type="submit" class="btn btn-success" [disabled]="!unitForm.valid || loading()">
+            <i class="bi bi-save me-2"></i>
+            {{ editingUnitId ? ('common.update' | translate) : ('common.save' | translate) }}
           </button>
-          <button type="button" class="btn btn-secondary" (click)="cancelForm()">
-            <i class="bi bi-x"></i>
-            {{ 'common.cancel' | translate }}
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()" [disabled]="loading()">
+            <i class="bi bi-x me-2"></i>{{ 'common.cancel' | translate }}
           </button>
         </div>
       </form>

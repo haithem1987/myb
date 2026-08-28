@@ -90,6 +90,30 @@ export class OwnerChargesComponent implements OnInit {
     return this.totalCharges - this.totalPaid;
   }
 
+  get totalChargesDisplay(): string {
+    return this.formatFundCallTotals(fc => fc.amount);
+  }
+
+  get totalPaidDisplay(): string {
+    return this.formatFundCallTotals(fc => this.getFundCallPaidAmount(fc));
+  }
+
+  get totalDueDisplay(): string {
+    return this.formatFundCallTotals(fc => this.getFundCallRemainingAmount(fc));
+  }
+
+  private formatFundCallTotals(amountSelector: (fundCall: FundCallExtended) => number): string {
+    const totals = new Map<string, number>();
+    for (const fundCall of this.fundCalls()) {
+      const currency = fundCall.currency ?? this.currencyService.current;
+      totals.set(currency, (totals.get(currency) ?? 0) + amountSelector(fundCall));
+    }
+    if (totals.size === 0) return this.currencyService.formatAmount(0);
+    return [...totals.entries()]
+      .map(([currency, amount]) => this.currencyService.formatAmount(amount, currency))
+      .join(' · ');
+  }
+
   get unpaidFundCalls(): FundCallExtended[] {
     if (this.filterStatus() === 'paid') return [];
     return this.fundCalls().filter(

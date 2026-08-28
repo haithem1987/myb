@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { Signalement, CreateSignalementInput, SignalementStatus } from '../models/signalement.model';
 import {
   GET_SIGNALEMENTS,
+  GET_SYNDIC_SIGNALEMENTS,
   GET_SIGNALEMENTS_BY_STATUS,
   GET_MY_SIGNALEMENTS,
   GET_SIGNALEMENT_BY_ID,
@@ -28,6 +29,17 @@ export class SignalementService {
         context: { service: 'copropertyService' },
       })
       .pipe(map((r) => r.data.signalements));
+  }
+
+  getSyndicSignalements(managerId?: string): Observable<Signalement[]> {
+    return this.apollo
+      .query<{ syndicSignalements: Signalement[] }>({
+        query: GET_SYNDIC_SIGNALEMENTS,
+        variables: { managerId: managerId || undefined },
+        fetchPolicy: 'network-only',
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data.syndicSignalements));
   }
 
   getSignalementsByStatus(copropertyId: string, status: SignalementStatus): Observable<Signalement[]> {

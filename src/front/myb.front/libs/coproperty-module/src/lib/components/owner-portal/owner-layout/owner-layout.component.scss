@@ -20,6 +20,7 @@
     display: flex;
     align-items: center;
     gap: 32px;
+    min-width: 0;
   }
   
   .logo {
@@ -93,6 +94,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    min-width: 0;
     
     .user-info {
       display: flex;
@@ -251,6 +253,8 @@
 
 .main-content {
   flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
   
   .content-wrapper {
     max-width: 1400px;
@@ -335,6 +339,7 @@
 
     .user-section {
       gap: 6px;
+      margin-left: auto;
 
       .user-avatar {
         width: 32px;
@@ -373,7 +378,8 @@
   }
   
   .main-content .content-wrapper {
-    padding: 16px 12px;
+    width: 100%;
+    padding: 16px 10px;
   }
   
   .footer .footer-content {
@@ -390,5 +396,11 @@
       gap: 12px;
       a { font-size: 13px; }
     }
+  }
+}
+
+@media (max-width: 420px) {
+  .header .logo .app-name {
+    display: none;
   }
 }

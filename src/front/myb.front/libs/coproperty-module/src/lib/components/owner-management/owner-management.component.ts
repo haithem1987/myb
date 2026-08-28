@@ -407,35 +407,54 @@ export class OwnerManagementComponent implements OnInit {
     });
   }
 
-  deleteOwner(owner: Owner): void {
-    this.translateService.get('coproperty.owner.deleteConfirm').subscribe((confirmMsg) => {
-      if (confirm(confirmMsg)) {
-        this.loading.set(true);
-        this.ownerService.deleteOwner(owner.id, this.selectedCopropertyIdForRefetch)
-          .pipe(
-            takeUntilDestroyed(this.destroyRef),
-            finalize(() => this.loading.set(false))
-          )
-          .subscribe({
-            next: (success) => {
-              if (success) {
-                // Remove from local list immediately for better UX
-                this.owners = this.owners.filter((o) => o.id !== owner.id);
-                this.loadAvailableUnits();
-                this.translateService.get('coproperty.messages.ownerDeleted').subscribe((msg) => {
-                  this.showAlert('success', msg);
-                });
-              }
-            },
-            error: (err) => {
-              console.error('[Owner Management] Error deleting owner:', err);
-              this.translateService.get('coproperty.messages.error').subscribe((msg) => {
-                this.showAlert('danger', msg);
-              });
-            }
-          });
-      }
+  async deleteOwner(owner: Owner): Promise<void> {
+    const activeUnits = (owner.ownerUnits ?? [])
+      .filter(ownerUnit => !ownerUnit.endDate)
+      .map(ownerUnit => ownerUnit.unit?.unitNumber)
+      .filter((unitNumber): unitNumber is string => !!unitNumber);
+    const ownerName = this.escapeHtml(this.getOwnerFullName(owner));
+    const unitSummary = activeUnits.length > 0
+      ? `<br><br><strong>${this.translateService.instant('coproperty.owner.deleteAssignedUnits')}:</strong> ${activeUnits.map(unit => this.escapeHtml(unit)).join(', ')}`
+      : '';
+
+    const confirmed = await this.modalService.confirm({
+      title: this.translateService.instant('coproperty.owner.deleteConfirmTitle'),
+      message: `${this.translateService.instant('coproperty.owner.deleteConfirmMessage', { owner: ownerName })}${unitSummary}<br><br><span class="text-muted">${this.translateService.instant('coproperty.owner.deleteHistoryNotice')}</span>`,
+      confirmButtonText: this.translateService.instant('common.deleteAction'),
+      confirmButtonClass: 'btn-danger',
+      cancelButtonText: this.translateService.instant('common.cancel')
     });
+    if (!confirmed) return;
+
+    this.loading.set(true);
+    this.ownerService.deleteOwner(owner.id, this.selectedCopropertyIdForRefetch)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false))
+      )
+      .subscribe({
+        next: (success) => {
+          if (success) {
+            this.owners = this.owners.filter((item) => item.id !== owner.id);
+            this.loadAvailableUnits();
+            this.translateService.get('coproperty.messages.ownerDeleted').subscribe((msg) => {
+              this.showAlert('success', msg);
+            });
+          }
+        },
+        error: (err) => {
+          console.error('[Owner Management] Error deleting owner:', err);
+          this.translateService.get('coproperty.messages.error').subscribe((msg) => {
+            this.showAlert('danger', msg);
+          });
+        }
+      });
+  }
+
+  private escapeHtml(value: string): string {
+    return value.replace(/[&<>'"]/g, character => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[character] ?? character);
   }
 
   saveOwner(): void {

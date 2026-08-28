@@ -6,10 +6,14 @@ namespace Myb.Coproperty.Services
     public class UnitService : IUnitService
     {
         private readonly IUnitRepository _unitRepository;
+        private readonly ICopropertyRepository _copropertyRepository;
 
-        public UnitService(IUnitRepository unitRepository)
+        public UnitService(
+            IUnitRepository unitRepository,
+            ICopropertyRepository copropertyRepository)
         {
             _unitRepository = unitRepository;
+            _copropertyRepository = copropertyRepository;
         }
 
         public async Task<Unit> CreateAsync(Unit unit)
@@ -24,6 +28,8 @@ namespace Myb.Coproperty.Services
             {
                 throw new InvalidOperationException("A unit with this number already exists in this coproperty.");
             }
+
+            EnsureSharesWithinCopropertyTotal(unit);
 
             var result = await _unitRepository.InsertAsync(unit);
             
@@ -102,10 +108,33 @@ namespace Myb.Coproperty.Services
                 throw new InvalidOperationException("A unit with this number already exists in this coproperty.");
             }
 
+            EnsureSharesWithinCopropertyTotal(unit, unit.Id);
+
             var result = await _unitRepository.UpdateAsync(unit);
             if (result.Errors != null && result.Errors.Any())
             {
                 throw new InvalidOperationException($"Failed to update unit: {string.Join(", ", result.Errors)}");
+            }
+        }
+
+        private void EnsureSharesWithinCopropertyTotal(Unit unit, Guid? excludedUnitId = null)
+        {
+            var coproperty = _copropertyRepository.GetById(unit.CopropertyId);
+            if (coproperty == null)
+            {
+                throw new InvalidOperationException($"Coproperty with ID {unit.CopropertyId} not found");
+            }
+
+            var assignedShares = _unitRepository.GetAll()
+                .Where(existing =>
+                    existing.CopropertyId == unit.CopropertyId &&
+                    (!excludedUnitId.HasValue || existing.Id != excludedUnitId.Value))
+                .Sum(existing => existing.Shares);
+
+            if (assignedShares + unit.Shares > coproperty.TotalShares)
+            {
+                throw new InvalidOperationException(
+                    $"Total unit shares cannot exceed coproperty total shares ({coproperty.TotalShares}).");
             }
         }
     }

@@ -456,6 +456,11 @@ export class FundCallsListComponent implements OnInit {
 
   editFundCall(fundCall: FundCallExtended): void {
     this.editingFundCall.set(fundCall);
+    if (this.isPaid(fundCall)) {
+      this.editForm.disable({ emitEvent: false });
+    } else {
+      this.editForm.enable({ emitEvent: false });
+    }
     const isoDate = fundCall.dueDate
       ? new Date(fundCall.dueDate as any).toISOString().split('T')[0]
       : '';
@@ -490,13 +495,14 @@ export class FundCallsListComponent implements OnInit {
     this.showEditPanel.set(false);
     this.editingFundCall.set(null);
     this.editForm.reset({ status: 'TO_PAY' });
+    this.editForm.enable({ emitEvent: false });
     this.paymentForm.reset();
     this.selectedJustificatifFile.set(null);
     this.showPaymentForm.set(false);
   }
 
   saveEdit(): void {
-    if (this.editForm.invalid || !this.editingFundCall()) return;
+    if (this.editForm.invalid || !this.editingFundCall() || this.isPaid(this.editingFundCall()!)) return;
     this.savingEdit.set(true);
     const raw = this.editForm.value;
     const input: CreateFundCallInput = {
@@ -623,8 +629,17 @@ export class FundCallsListComponent implements OnInit {
 
   /** True when the user can trigger the cancellation workflow on this row. */
   canCancel(fc: FundCallExtended): boolean {
+    if (this.isPaid(fc)) return false;
     if (typeof fc.cancellable === 'boolean') return fc.cancellable;
     return !!fc && fc.status !== 'CANCELLED';
+  }
+
+  isPaid(fc: FundCallExtended | null | undefined): boolean {
+    return !!fc && String(fc.status).toUpperCase() === 'PAID';
+  }
+
+  canModify(fc: FundCallExtended): boolean {
+    return !this.isPaid(fc);
   }
 
   /**
@@ -1035,7 +1050,8 @@ export class FundCallsListComponent implements OnInit {
   // ── Payment helpers ─────────────────────────────────────────────────────
 
   togglePaymentForm(): void {
-    if (this.editingFundCall() && this.isCancelled(this.editingFundCall()!)) {
+    if (this.editingFundCall() &&
+        (this.isCancelled(this.editingFundCall()!) || this.isPaid(this.editingFundCall()!))) {
       return;
     }
     this.showPaymentForm.update((v) => !v);
@@ -1185,7 +1201,7 @@ export class FundCallsListComponent implements OnInit {
   }
 
   get isAllSelected(): boolean {
-    const filtered = this.filteredFundCalls;
+    const filtered = this.filteredFundCalls.filter((fc) => this.canModify(fc));
     return filtered.length > 0 && filtered.every((fc) => this.selectedIds().has(fc.id));
   }
 
@@ -1194,6 +1210,8 @@ export class FundCallsListComponent implements OnInit {
   }
 
   toggleSelect(id: string): void {
+    const fundCall = this.fundCalls().find((fc) => fc.id === id);
+    if (!fundCall || !this.canModify(fundCall)) return;
     this.selectedIds.update((s) => {
       const next = new Set(s);
       if (next.has(id)) next.delete(id); else next.add(id);
@@ -1205,7 +1223,9 @@ export class FundCallsListComponent implements OnInit {
     if (this.isAllSelected) {
       this.selectedIds.set(new Set());
     } else {
-      this.selectedIds.set(new Set(this.filteredFundCalls.map((fc) => fc.id)));
+      this.selectedIds.set(new Set(
+        this.filteredFundCalls.filter((fc) => this.canModify(fc)).map((fc) => fc.id)
+      ));
     }
   }
 

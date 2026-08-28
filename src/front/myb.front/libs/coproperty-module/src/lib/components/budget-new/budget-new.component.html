@@ -1,7 +1,7 @@
 <div class="budget-new-container">
   <!-- Breadcrumb & Coproperty Context -->
   <div class="page-header mb-3">
-    <button 
+    <button *ngIf="!isEmbedded"
       type="button" 
       class="btn btn-link text-decoration-none mb-2 p-0"
       (click)="goBack()">
@@ -146,6 +146,26 @@
               formControlName="frequency">
               <option *ngFor="let year of years" [value]="year">{{ year }}</option>
             </select>
+          </div>
+
+          <!-- Distribution Method -->
+          <div class="col-md-6">
+            <label for="distributionMethod" class="form-label fw-semibold">
+              <i class="bi bi-diagram-3 me-1"></i>
+              {{ 'coproperty.charges.distributionMethod' | translate }} <span class="text-danger">*</span>
+            </label>
+            <select
+              id="distributionMethod"
+              class="form-select"
+              formControlName="distributionMethod"
+              [class.is-invalid]="budgetForm.get('distributionMethod')?.invalid && budgetForm.get('distributionMethod')?.touched">
+              <option *ngFor="let method of distributionMethods" [value]="method.value">
+                {{ method.label | translate }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="budgetForm.get('distributionMethod')?.invalid && budgetForm.get('distributionMethod')?.touched">
+              {{ 'validation.required' | translate }}
+            </div>
           </div>
 
           <!-- Description -->

@@ -1,4 +1,4 @@
-import { Route } from '@angular/router';
+import { CanActivateFn, Route, Router } from '@angular/router';
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home/home.component';
@@ -8,6 +8,37 @@ import { environment } from '../environments/environment';
 import { KeycloakService } from '@myb-front/auth';
 
 import { noProfileGuard, completeProfileGuard } from '@myb-front/coproperty-module';
+
+/**
+ * Resolve the authenticated user's landing page before rendering the service
+ * picker. This avoids the visible `/ -> /home -> dashboard` navigation chain
+ * after Keycloak returns to the application.
+ */
+const roleLandingGuard: CanActivateFn = () => {
+  const keycloakService = inject(KeycloakService);
+  const router = inject(Router);
+  const roles = keycloakService.getUserRoles();
+
+  if (
+    roles.includes('coproperty-syndic') ||
+    roles.includes('coproperty-admin') ||
+    roles.includes('system-admin')
+  ) {
+    return router.createUrlTree(['/coproperty/syndic/dashboard']);
+  }
+  if (roles.includes('coproperty-council')) {
+    return router.createUrlTree(['/coproperty/council/dashboard']);
+  }
+  if (roles.includes('coproperty-accountant')) {
+    return router.createUrlTree(['/coproperty/accountant/dashboard']);
+  }
+  if (roles.includes('coproperty-owner') || roles.includes('coproperty-tenant')) {
+    return router.createUrlTree(['/coproperty/owner/dashboard']);
+  }
+
+  // Users without a recognized application role retain the service picker.
+  return true;
+};
 
 @Component({
   standalone: true,
@@ -68,13 +99,13 @@ export class AccessDeniedComponent {
 export const appRoutes: Route[] = [
   {
     path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
+    component: AdminHomeComponent,
+    canActivate: [authGuard, roleLandingGuard],
   },
   {
     path: 'home',
     component: AdminHomeComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleLandingGuard],
   },
   // ─── Owner Self-Registration Flow (works on admin app too) ──────────────────
   {

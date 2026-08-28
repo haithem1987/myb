@@ -290,10 +290,12 @@
   justify-content: center;
   z-index: 1050;
   padding: 1rem;
+  box-sizing: border-box;
 
   .modal-dialog {
     width: 100%;
     max-width: 540px;
+    margin: 0;
   }
 
   .modal-content {
@@ -664,17 +666,19 @@
     align-items: flex-end;
 
     .modal-dialog {
+      width: 100%;
       max-width: 100%;
       margin: 0;
     }
 
     .modal-content {
+      width: 100%;
       border-radius: 16px 16px 0 0;
-      max-height: 95vh;
+      max-height: 95dvh;
     }
 
     .modal-body {
-      max-height: 75vh;
+      max-height: calc(95dvh - 132px);
       padding: 1rem;
     }
 
@@ -694,6 +698,34 @@
     .payment-method-option {
       padding: 0.625rem 0.875rem;
       font-size: 0.85rem;
+    }
+  }
+
+  .installment-suggestion > .d-flex {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+
+    .small {
+      flex: 1 1 calc(100% - 32px);
+      min-width: 0;
+    }
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  .fc-summary .summary-row {
+    gap: 12px;
+
+    > span {
+      flex: 0 0 38%;
+    }
+
+    > strong {
+      min-width: 0;
+      text-align: right;
+      overflow-wrap: anywhere;
     }
   }
 

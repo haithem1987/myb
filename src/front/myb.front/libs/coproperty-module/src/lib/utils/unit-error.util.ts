@@ -2,7 +2,7 @@ export type UnitAction = 'create' | 'update' | 'delete';
 
 export interface UnitErrorTranslation {
   key: string;
-  params?: Record<string, string>;
+  params?: Record<string, string | number>;
 }
 
 /**
@@ -36,6 +36,14 @@ export function getUnitErrorTranslation(
 
   if (messages.includes('already exists') || messages.includes('duplicate')) {
     return { key: 'coproperty.messages.unitDuplicate', params };
+  }
+
+  if (messages.includes('total unit shares cannot exceed coproperty total shares')) {
+    const totalShares = messages.match(/total shares \((\d+)\)/)?.[1];
+    return {
+      key: 'coproperty.messages.unitSharesExceeded',
+      params: { ...params, totalShares: totalShares ? Number(totalShares) : '' },
+    };
   }
 
   if (messages.includes('associated with one or more owners')) {

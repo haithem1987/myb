@@ -33,6 +33,7 @@ DEPLOYMENTS=(
     "myb-coproperty:1"
     "myb-invoice:1"
     "myb-mailer:1"
+    "myb-notification:1"
     "myb-admin:1"
     "myb-client:1"
 )
@@ -48,13 +49,22 @@ for deployment_spec in "${DEPLOYMENTS[@]}"; do
     fi
 done
 
-echo -e "\n${YELLOW}Waiting for services to become ready...${NC}"
-sleep 15
+echo -e "\n${YELLOW}Waiting for every deployment to become ready...${NC}"
+FAILED_DEPLOYMENTS=()
+for deployment_spec in "${DEPLOYMENTS[@]}"; do
+    IFS=':' read -r deployment _ <<< "$deployment_spec"
+    if ! kubectl rollout status deployment/"$deployment" -n "$NAMESPACE" --timeout=300s; then
+        FAILED_DEPLOYMENTS+=("$deployment")
+    fi
+done
 
-# Wait for critical services
-echo -e "\n${YELLOW}Checking deployment status:${NC}"
-kubectl rollout status deployment/keycloak -n "$NAMESPACE" --timeout=180s || true
-kubectl rollout status deployment/myb-coproperty -n "$NAMESPACE" --timeout=180s || true
+if [ ${#FAILED_DEPLOYMENTS[@]} -gt 0 ]; then
+    echo -e "\n${RED}Scale-up failed. These deployments are not ready:${NC}"
+    printf '  - %s\n' "${FAILED_DEPLOYMENTS[@]}"
+    echo -e "\n${BLUE}Current pods:${NC}"
+    kubectl get pods -n "$NAMESPACE"
+    exit 1
+fi
 
 echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}Scale-up complete!${NC}"

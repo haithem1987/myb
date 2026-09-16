@@ -24,6 +24,8 @@ namespace Myb.Coproperty.Services
             string temporaryPassword,
             string? activationNotificationRecipientId = null);
 
+        Task<bool> IsEmailVerifiedAsync(string userId);
+
         Task<string?> GetActivationNotificationRecipientAsync(string userId);
 
         Task<string?> ConsumeActivationNotificationRecipientAsync(string userId);

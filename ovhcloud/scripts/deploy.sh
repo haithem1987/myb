@@ -233,6 +233,15 @@ echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}Step 5: Deploying Keycloak${NC}"
 echo -e "${GREEN}========================================${NC}"
 
+# The theme must exist before Keycloak mounts it.
+if [[ "$DRY_RUN" != "true" ]]; then
+  kubectl -n "$NAMESPACE" create configmap myb-keycloak-email-theme \
+    --from-file=theme.properties="$PROJECT_ROOT/keycloak-theme/myb/email/theme.properties" \
+    --from-file=messages_en.properties="$PROJECT_ROOT/keycloak-theme/myb/email/messages/messages_en.properties" \
+    --from-file=messages_fr.properties="$PROJECT_ROOT/keycloak-theme/myb/email/messages/messages_fr.properties" \
+    --dry-run=client -o yaml | kubectl apply -f -
+fi
+
 kubectl apply -f "$K8S_DIR/services/keycloak/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
 [[ "$DRY_RUN" != "true" ]] && wait_for_resource "deployment/keycloak" 300
 

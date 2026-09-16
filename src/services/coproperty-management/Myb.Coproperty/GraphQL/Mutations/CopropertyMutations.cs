@@ -1,3 +1,6 @@
+using Myb.Common.Messaging;
+using Myb.Common.Messaging.Models;
+using System.Net;
 using HotChocolate;
 using HotChocolate.Types;
 using Myb.Coproperty.Models;
@@ -80,25 +83,46 @@ namespace Myb.Coproperty.GraphQL.Mutations
             string email,
             string temporaryPassword,
             bool notifyOnActivation,
+            string? language,
             ClaimsPrincipal? user,
-            [Service] IKeycloakAdminService keycloakAdminService)
+            [Service] IKeycloakAdminService keycloakAdminService,
+            [Service] IEmailPublisher emailPublisher,
+            [Service] Microsoft.Extensions.Options.IOptions<KeycloakOptions> options)
         {
             if (!CopropertyAccessControl.IsSyndicOnly(user) && !CopropertyAccessControl.IsAdmin(user))
                 throw new InvalidOperationException("Accès refusé : seuls les syndics peuvent créer un compte propriétaire.");
 
             var creatorId = CopropertyAccessControl.GetUserId(user)?.ToString();
-            return await keycloakAdminService.CreateUserAsync(
+            var created = await keycloakAdminService.CreateUserAsync(
                 firstName, lastName, email, temporaryPassword,
                 notifyOnActivation ? creatorId : null);
+            language = language?.StartsWith("en", StringComparison.OrdinalIgnoreCase) == true ? "en" : "fr";
+            await keycloakAdminService.SetPreferredLanguageAsync(created.Id, language);
+            var english = language == "en";
+            var safeName = WebUtility.HtmlEncode(firstName);
+            var safeEmail = WebUtility.HtmlEncode(created.Email);
+            var safePassword = WebUtility.HtmlEncode(temporaryPassword);
+            var url = WebUtility.HtmlEncode(options.Value.OwnerPortalUrl);
+            await emailPublisher.PublishAsync(new EmailMessage
+            {
+                To = created.Email,
+                Subject = english ? "Welcome to your MYB account" : "Bienvenue dans votre compte MYB",
+                HtmlBody = english
+                    ? $"<h2>Welcome to MYB, {safeName}!</h2><p>Your account is ready.</p><p>Email: <strong>{safeEmail}</strong><br>Temporary password: <strong>{safePassword}</strong></p><p><a href=\"{url}\">Access your account</a></p><p>At first login, verify your email and choose a new password.</p>"
+                    : $"<h2>Bienvenue sur MYB, {safeName} !</h2><p>Votre compte est prêt.</p><p>E-mail : <strong>{safeEmail}</strong><br>Mot de passe temporaire : <strong>{safePassword}</strong></p><p><a href=\"{url}\">Accéder à votre compte</a></p><p>À la première connexion, vérifiez votre adresse e-mail et choisissez un nouveau mot de passe.</p>"
+            });
+            return created;
         }
 
         public async Task<bool> ConfirmCurrentUserActivation(
             ClaimsPrincipal? user,
             [Service] IKeycloakAdminService keycloakAdminService,
-            [Service] IHttpClientFactory httpClientFactory)
+            [Service] IHttpClientFactory httpClientFactory,
+            [Service] IEmailPublisher emailPublisher)
         {
             var userId = CopropertyAccessControl.GetUserId(user)
                 ?? throw new InvalidOperationException("Authentification requise.");
+            if (!await keycloakAdminService.IsEmailVerifiedAsync(userId.ToString())) return false;
             // Read without clearing first. If the notification service is temporarily
             // unavailable, the pending activation alert remains for the next login.
             var recipientId = await keycloakAdminService
@@ -108,12 +132,26 @@ namespace Myb.Coproperty.GraphQL.Mutations
             var displayName = user?.FindFirst("name")?.Value
                 ?? user?.FindFirst("preferred_username")?.Value
                 ?? "Le nouvel utilisateur";
+            var recipient = await keycloakAdminService.GetUserByIdAsync(recipientId)
+                ?? throw new InvalidOperationException("Activation notification recipient unavailable.");
+            if (string.IsNullOrWhiteSpace(recipient.Email))
+                throw new InvalidOperationException("Activation notification recipient has no email.");
+            var english = await keycloakAdminService.GetPreferredLanguageAsync(recipientId) == "en";
+            var message = english
+                ? $"{displayName} verified their email and accessed their MYB account."
+                : $"{displayName} a vérifié son adresse e-mail et accédé à son compte MYB.";
+            await emailPublisher.PublishAsync(new EmailMessage
+            {
+                To = recipient.Email,
+                Subject = english ? "MYB account activated" : "Compte MYB activé",
+                HtmlBody = $"<p>{WebUtility.HtmlEncode(message)}</p>"
+            });
             var client = httpClientFactory.CreateClient("NotificationService");
             var response = await client.PostAsJsonAsync("/api/Notifications", new
             {
                 SenderId = userId.ToString(),
                 ReceiverId = recipientId,
-                Message = $"{displayName} a ouvert et activé son compte MYB."
+                Message = message
             });
             response.EnsureSuccessStatusCode();
 

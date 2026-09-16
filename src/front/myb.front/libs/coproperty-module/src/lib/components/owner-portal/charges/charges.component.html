@@ -133,7 +133,7 @@
         </div>
 
         <div class="charge-body">
-          <h5 class="charge-name">{{ fc.description || 'Appel de fonds' }}</h5>
+          <h5 class="charge-name">{{ getFundCallDescription(fc.description) }}</h5>
           <div *ngIf="fc.copropertyName" class="charge-desc">
             <i class="bi bi-building me-1"></i>{{ fc.copropertyName }}
           </div>
@@ -205,7 +205,7 @@
             <div class="monthly-hint" *ngIf="getMonthsUntilDue(fc) > 1">
               <small class="text-info">
                 <i class="bi bi-calendar2-week me-1"></i>
-                ~{{ formatAmount(getSuggestedMonthlyAmount(fc), fc.currency) }}/mois
+                ~{{ formatAmount(getSuggestedMonthlyAmount(fc), fc.currency) }}/{{ 'ownerFixes.month' | translate }}
               </small>
             </div>
           </div>
@@ -243,7 +243,7 @@
         <tbody>
           <tr *ngFor="let fc of paidFundCalls">
             <td>
-              <strong>{{ fc.description || 'Appel de fonds' }}</strong>
+              <strong>{{ getFundCallDescription(fc.description) }}</strong>
             </td>
             <td>{{ fc.copropertyName || '-' }}</td>
             <td class="text-end">{{ formatAmount(fc.amount, fc.currency) }}</td>
@@ -285,7 +285,7 @@
         <tbody>
           <tr *ngFor="let fc of cancelledFundCalls">
             <td>
-              <strong>{{ fc.description || 'Appel de fonds' }}</strong>
+              <strong>{{ getFundCallDescription(fc.description) }}</strong>
             </td>
             <td>{{ fc.copropertyName || '-' }}</td>
             <td class="text-end">{{ formatAmount(fc.amount, fc.currency) }}</td>
@@ -349,7 +349,7 @@
           <div class="row g-2">
             <div class="col-6">
               <small class="text-muted d-block">{{ 'ownerPortal.charges.description' | translate }}</small>
-              <strong>{{ fc.description || 'Appel de fonds' }}</strong>
+              <strong>{{ getFundCallDescription(fc.description) }}</strong>
             </div>
             <div class="col-6">
               <small class="text-muted d-block">{{ 'ownerPortal.charges.coproperty' | translate }}</small>
@@ -360,7 +360,7 @@
               <strong>{{ formatAmount(fc.amount, fc.currency) }}</strong>
             </div>
             <div class="col-6 mt-2">
-              <small class="text-muted d-block">Échéance</small>
+              <small class="text-muted d-block">{{ 'ownerFixes.dueDate' | translate }}</small>
               <span>{{ formatDate(fc.dueDate) }}</span>
             </div>
           </div>
@@ -384,7 +384,7 @@
                 </div>
                 <div *ngIf="p.paymentMethod" class="small text-muted">
                   <i class="bi" [ngClass]="getPaymentMethodIcon(p.paymentMethod)"></i>
-                  {{ p.paymentMethod }}
+                  {{ getPaymentMethodLabel(p.paymentMethod) }}
                 </div>
                 <!-- Justificatif toggle -->
                 <div *ngIf="p.justificatif" class="mt-1">
@@ -415,20 +415,20 @@
                 [class.bg-success]="isPaymentApproved(p.validationStatus)"
                 [class.bg-danger]="isPaymentRejected(p.validationStatus)">
                 <ng-container *ngIf="isPaymentPending(p.validationStatus)"><i class="bi bi-clock me-1"></i>En attente</ng-container>
-                <ng-container *ngIf="isPaymentApproved(p.validationStatus)"><i class="bi bi-check2 me-1"></i>Validé</ng-container>
-                <ng-container *ngIf="isPaymentRejected(p.validationStatus)"><i class="bi bi-x-lg me-1"></i>Refusé</ng-container>
+                <ng-container *ngIf="isPaymentApproved(p.validationStatus)"><i class="bi bi-check2 me-1"></i>{{ 'ownerFixes.approved' | translate }}</ng-container>
+                <ng-container *ngIf="isPaymentRejected(p.validationStatus)"><i class="bi bi-x-lg me-1"></i>{{ 'ownerFixes.rejected' | translate }}</ng-container>
               </span>
             </div>
           </div>
         </div>
 
         <div *ngIf="!fc.payments || fc.payments.length === 0" class="text-muted small mt-2">
-          <i class="bi bi-info-circle me-1"></i>Aucun versement enregistré pour cet appel de fonds.
+          <i class="bi bi-info-circle me-1"></i>{{ 'ownerFixes.noPayments' | translate }}
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" (click)="closeDetailModal()">
-          <i class="bi bi-x-circle me-1"></i>Fermer
+          <i class="bi bi-x-circle me-1"></i>{{ 'ownerFixes.close' | translate }}
         </button>
       </div>
     </div>
@@ -446,7 +446,7 @@
         <div class="modal-header receipt-success-header">
           <h5 class="modal-title text-success">
             <i class="bi bi-patch-check-fill me-2"></i>
-            Paiement enregistré
+            {{ 'ownerFixes.paymentSubmitted' | translate }}
           </h5>
           <button type="button" class="btn-close" (click)="closePaymentModal()"></button>
         </div>
@@ -455,7 +455,7 @@
             <div class="receipt-check">
               <i class="bi bi-check-circle-fill"></i>
             </div>
-            <p class="receipt-headline">Votre justificatif a été envoyé avec succès!</p>
+            <p class="receipt-headline">{{ 'ownerFixes.yourPaymentProofWasSubmittedSuccessfully' | translate }}</p>
 
             <div class="receipt-document">
               <div class="receipt-doc-header">
@@ -464,10 +464,10 @@
                 </div>
                 <div>
                   <div class="receipt-company">MYB Syndic</div>
-                  <div class="receipt-sub">Reçu de paiement</div>
+                  <div class="receipt-sub">{{ 'ownerFixes.paymentReceipt' | translate }}</div>
                 </div>
                 <div class="receipt-num ms-auto">
-                  <span class="badge bg-success">VALIDÉ</span>
+                  <span class="badge bg-success">{{ 'ownerFixes.pendingApproval' | translate }}</span>
                   <div class="small text-muted mt-1">#{{ receipt.receiptNumber }}</div>
                 </div>
               </div>
@@ -476,40 +476,40 @@
 
               <div class="receipt-rows">
                 <div class="receipt-row">
-                  <span class="receipt-label"><i class="bi bi-file-text me-1"></i>Appel de fonds</span>
-                  <span class="receipt-value">{{ receipt.fundCallDescription }}</span>
+                  <span class="receipt-label"><i class="bi bi-file-text me-1"></i>{{ 'ownerFixes.callForFunds' | translate }}</span>
+                  <span class="receipt-value">{{ getFundCallDescription(receipt.fundCallDescription) }}</span>
                 </div>
                 <div class="receipt-row highlight">
-                  <span class="receipt-label"><i class="bi bi-cash-stack me-1"></i>Montant versé</span>
+                  <span class="receipt-label"><i class="bi bi-cash-stack me-1"></i>{{ 'ownerFixes.amountPaid' | translate }}</span>
                   <span class="receipt-value text-success fw-bold">{{ formatAmount(receipt.amount) }}</span>
                 </div>
                 <div class="receipt-row">
-                  <span class="receipt-label"><i class="bi bi-credit-card me-1"></i>Méthode</span>
-                  <span class="receipt-value">{{ receipt.paymentMethod }}</span>
+                  <span class="receipt-label"><i class="bi bi-credit-card me-1"></i>{{ 'ownerFixes.method' | translate }}</span>
+                  <span class="receipt-value">{{ getPaymentMethodLabel(receipt.paymentMethod) }}</span>
                 </div>
                 <div class="receipt-row">
-                  <span class="receipt-label"><i class="bi bi-calendar me-1"></i>Date</span>
+                  <span class="receipt-label"><i class="bi bi-calendar me-1"></i>{{ 'ownerFixes.date' | translate }}</span>
                   <span class="receipt-value">{{ receipt.paymentDate | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="receipt-row" *ngIf="receipt.reference">
-                  <span class="receipt-label"><i class="bi bi-hash me-1"></i>Référence</span>
+                  <span class="receipt-label"><i class="bi bi-hash me-1"></i>{{ 'ownerFixes.reference' | translate }}</span>
                   <span class="receipt-value text-muted small">{{ receipt.reference }}</span>
                 </div>
               </div>
 
               <div class="receipt-footer-note">
                 <i class="bi bi-info-circle me-1"></i>
-                Ce reçu sera disponible dans <strong>Mes Reçus</strong> une fois validé par le syndic.
+                {{ 'ownerFixes.thisReceiptWillBeAvailableIn' | translate }} <strong>{{ 'ownerFixes.myReceipts' | translate }}</strong> {{ 'ownerFixes.onceApprovedByYourPropertyManager' | translate }}
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" (click)="closePaymentModal()">
-            <i class="bi bi-x-circle me-1"></i>Fermer
+            <i class="bi bi-x-circle me-1"></i>{{ 'ownerFixes.close' | translate }}
           </button>
           <a routerLink="/coproperty/owner/invoices" class="btn btn-primary" (click)="closePaymentModal()">
-            <i class="bi bi-receipt me-1"></i>Mes Reçus
+            <i class="bi bi-receipt me-1"></i>{{ 'ownerFixes.myReceipts' | translate }}
           </a>
         </div>
       </ng-container>
@@ -519,7 +519,7 @@
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="bi bi-file-earmark-check me-2"></i>
-          Justificatif de paiement
+          {{ 'ownerFixes.paymentProof' | translate }}
         </h5>
         <button type="button" class="btn-close" (click)="closePaymentModal()"></button>
       </div>
@@ -527,27 +527,27 @@
         <!-- Fund call summary -->
         <div class="fc-summary mb-3" *ngIf="selectedFundCall() as fc">
           <div class="summary-row">
-            <span>Appel de fonds:</span>
-            <strong>{{ fc.description || 'Appel de fonds' }}</strong>
+            <span>{{ 'ownerFixes.callForFundsLabel' | translate }}</span>
+            <strong>{{ getFundCallDescription(fc.description) }}</strong>
           </div>
           <div class="summary-row">
-            <span>Montant total:</span>
+            <span>{{ 'ownerFixes.totalAmount' | translate }}</span>
             <strong>{{ formatAmount(fc.amount, fc.currency) }}</strong>
           </div>
           <div class="summary-row" *ngIf="getFundCallPaidAmount(fc) > 0">
-            <span>Déjà payé:</span>
+            <span>{{ 'ownerFixes.alreadyPaid' | translate }}</span>
             <strong class="text-success">{{ formatAmount(getFundCallPaidAmount(fc), fc.currency) }}</strong>
           </div>
           <div class="summary-row highlight">
-            <span>Reste à payer:</span>
+            <span>{{ 'ownerFixes.remainingToPay' | translate }}</span>
             <strong class="text-danger">{{ formatAmount(getFundCallRemainingAmount(fc), fc.currency) }}</strong>
           </div>
           <div class="summary-row" *ngIf="getFundCallPendingAmount(fc) > 0">
-            <span>Déjà soumis, en attente:</span>
+            <span>{{ 'ownerFixes.alreadySubmittedPending' | translate }}</span>
             <strong class="text-warning">{{ formatAmount(getFundCallPendingAmount(fc), fc.currency) }}</strong>
           </div>
           <div class="summary-row">
-            <span>Encore disponible au paiement:</span>
+            <span>{{ 'ownerFixes.availableToPay' | translate }}</span>
             <strong>{{ formatAmount(getFundCallPayableAmount(fc), fc.currency) }}</strong>
           </div>
         </div>
@@ -557,42 +557,42 @@
         <!-- Payment form -->
         <div class="mb-3">
           <label class="form-label fw-bold">
-            <i class="bi bi-cash me-1"></i> Montant du versement ({{ currencySymbol }}) *
+            <i class="bi bi-cash me-1"></i> {{ 'ownerFixes.paymentAmount' | translate }} ({{ currencySymbol }}) *
           </label>
           <input type="number" class="form-control" [(ngModel)]="paymentForm.amount"
                  [max]="selectedFundCall() ? getFundCallPayableAmount(selectedFundCall()!) : 0"
                  min="0.001" step="0.001">
-          <small class="text-muted">Vous pouvez effectuer un paiement partiel (mensualité)</small>
+          <small class="text-muted">{{ 'ownerFixes.youCanMakeAPartialPaymentMonthlyInstallment' | translate }}</small>
           <!-- Monthly installment suggestion -->
           <div class="installment-suggestion mt-2" *ngIf="selectedFundCall() as fc">
             <div *ngIf="getMonthsUntilDue(fc) > 1" class="d-flex align-items-center gap-2">
               <i class="bi bi-calendar2-week text-info"></i>
               <span class="small">
-                Mensualité suggérée:
+                {{ 'ownerFixes.suggestedMonthlyInstallment' | translate }}
                 <strong class="text-info">{{ formatAmount(getSuggestedMonthlyAmount(fc), fc.currency) }}</strong>
-                /mois ({{ getMonthsUntilDue(fc) }} mois restants)
+                /{{ 'ownerFixes.month' | translate }} ({{ getMonthsUntilDue(fc) }} {{ 'ownerFixes.monthsRemaining' | translate }})
               </span>
               <button type="button" class="btn btn-outline-info btn-sm" (click)="setMonthlyAmount()">
-                <i class="bi bi-arrow-down-circle me-1"></i>Appliquer
+                <i class="bi bi-arrow-down-circle me-1"></i>{{ 'ownerFixes.apply' | translate }}
               </button>
             </div>
             <div *ngIf="getMonthsUntilDue(fc) <= 1" class="small text-warning">
               <i class="bi bi-exclamation-triangle me-1"></i>
-              Échéance imminente — paiement du solde recommandé
+              {{ 'ownerFixes.dueSoonPaymentOfTheBalanceIsRecommended' | translate }}
             </div>
           </div>
         </div>
 
         <div class="mb-3">
           <label class="form-label fw-bold">
-            <i class="bi bi-credit-card me-1"></i> Mode de paiement *
+            <i class="bi bi-credit-card me-1"></i> {{ 'ownerFixes.paymentMethod' | translate }}
           </label>
           <div class="payment-methods">
             <div class="payment-method-option" *ngFor="let method of paymentMethods"
                  [class.selected]="paymentForm.paymentMethod === method"
                  (click)="paymentForm.paymentMethod = method">
               <i class="bi" [ngClass]="getPaymentMethodIcon(method)"></i>
-              <span>{{ method }}</span>
+              <span>{{ getPaymentMethodLabel(method) }}</span>
             </div>
           </div>
         </div>
@@ -601,53 +601,53 @@
         <div *ngIf="paymentForm.paymentMethod === 'Virement'" class="virement-details mb-3">
           <div class="virement-header mb-2">
             <i class="bi bi-bank2 me-1 text-primary"></i>
-            <span class="fw-bold">Informations bancaires</span>
+            <span class="fw-bold">{{ 'ownerFixes.bankDetails' | translate }}</span>
           </div>
           <div class="row g-2">
             <div class="col-12">
-              <label class="form-label small">Nom de la banque *</label>
+              <label class="form-label small">{{ 'ownerFixes.bankName' | translate }}</label>
               <input type="text" class="form-control" [(ngModel)]="paymentForm.bankName"
-                     placeholder="Ex: BIAT, STB, Attijari Bank...">
+                     [placeholder]="'ownerFixes.eGBiatStbAttijariBank' | translate">
             </div>
             <div class="col-12">
-              <label class="form-label small">RIB (Relevé d'Identité Bancaire) *</label>
+              <label class="form-label small">{{ 'ownerFixes.bankAccountNumberRib' | translate }}</label>
               <input type="text" class="form-control" [(ngModel)]="paymentForm.rib"
                      placeholder="XX XXX XXXXX XXXXXXXXXXXX XX" maxlength="30">
             </div>
             <div class="col-12">
-              <label class="form-label small">Nom de l'émetteur *</label>
+              <label class="form-label small">{{ 'ownerFixes.senderName' | translate }}</label>
               <input type="text" class="form-control" [(ngModel)]="paymentForm.senderName"
-                     placeholder="Nom complet du titulaire du compte">
+                     [placeholder]="'ownerFixes.accountHolderSFullName' | translate">
             </div>
           </div>
         </div>
 
         <div class="mb-3">
           <label class="form-label fw-bold">
-            <i class="bi bi-calendar me-1"></i> Date de paiement *
+            <i class="bi bi-calendar me-1"></i> {{ 'ownerFixes.paymentDate' | translate }}
           </label>
           <input type="date" class="form-control" [(ngModel)]="paymentForm.paymentDate">
         </div>
 
         <div class="mb-3">
           <label class="form-label fw-bold">
-            <i class="bi bi-file-text me-1"></i> Référence / Justificatif <small class="text-muted fw-normal">(optionnel)</small>
+            <i class="bi bi-file-text me-1"></i> {{ 'ownerFixes.referencePaymentProof' | translate }} <small class="text-muted fw-normal">{{ 'ownerFixes.optional' | translate }}</small>
           </label>
           <textarea class="form-control" rows="3" [(ngModel)]="paymentForm.justificatif"
-                    placeholder="N° de chèque, référence de virement, reçu d'espèces, N° mandat postal..."></textarea>
-          <small class="text-muted">Saisissez la référence de votre paiement (N° chèque, référence virement, etc.)</small>
+                    [placeholder]="'ownerFixes.checkNumberTransferReferenceCashReceiptPostalOrderNumber' | translate"></textarea>
+          <small class="text-muted">{{ 'ownerFixes.enterYourPaymentReferenceCheckNumberTransferReferenceEtc' | translate }}</small>
         </div>
 
         <!-- File upload for justification -->
         <div class="mb-3">
           <label class="form-label fw-bold">
-            <i class="bi bi-paperclip me-1"></i> Pièce jointe (justificatif) *
+            <i class="bi bi-paperclip me-1"></i> {{ 'ownerFixes.attachmentPaymentProof' | translate }}
           </label>
           <div *ngIf="!justificatifFileName()" class="file-upload-zone" (click)="fileInput.click()">
             <input #fileInput type="file" class="d-none" accept=".pdf,.jpg,.jpeg,.png,.webp" (change)="onFileSelected($event)">
             <i class="bi bi-cloud-arrow-up"></i>
-            <span>Cliquez pour joindre un fichier</span>
-            <small>PDF, JPG, PNG ou WebP — 5 Mo max</small>
+            <span>{{ 'ownerFixes.clickToAttachAFile' | translate }}</span>
+            <small>{{ 'ownerFixes.pdfJpgPngOrWebpMaxMb' | translate }}</small>
           </div>
           <div *ngIf="justificatifFileName()" class="file-attached">
             <i class="bi bi-file-earmark-check text-success me-2"></i>
@@ -660,13 +660,13 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closePaymentModal()" [disabled]="submittingPayment()">
-          Annuler
+          {{ 'ownerFixes.cancel' | translate }}
         </button>
         <button type="button" class="btn btn-success" (click)="submitPaymentJustification()"
                 [disabled]="submittingPayment() || !selectedFundCall() || getFundCallPayableAmount(selectedFundCall()!) <= 0">
           <span *ngIf="submittingPayment()" class="spinner-border spinner-border-sm me-1"></span>
           <i *ngIf="!submittingPayment()" class="bi bi-check-lg me-1"></i>
-          {{ submittingPayment() ? 'Envoi...' : 'Envoyer le justificatif' }}
+          {{ (submittingPayment() ? 'ownerFixes.sendingLabel' : 'ownerFixes.submitPaymentProof') | translate }}
         </button>
       </div>
       </ng-container><!-- end payment form -->

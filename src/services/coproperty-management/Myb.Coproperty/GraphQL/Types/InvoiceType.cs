@@ -36,6 +36,8 @@ public class InvoiceType : ObjectType<CopropertyInvoice>
         descriptor.Field(x => x.UpdatedAt).Description("Last update date");
         descriptor.Field("currency").ResolveWith<InvoiceResolvers>(r => r.GetCurrency(default!, default!)).Type<NonNullType<CurrencyType>>().Description("Currency from the associated charge's coproperty");
 
+        descriptor.Field(x => x.CopropertyId).Type<NonNullType<UuidType>>();
+
         // The FundCall navigation on CopropertyInvoice exists in the EF model
         // (for the optional FundCall ↔ CopropertyInvoice relationship) but is
         // NOT exposed in the GraphQL schema. Exposing it would create a

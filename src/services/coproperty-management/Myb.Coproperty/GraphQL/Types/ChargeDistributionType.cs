@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using HotChocolate;
 using HotChocolate.Types;
 using Myb.Coproperty.Infrastructure.Data;
@@ -37,6 +38,16 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor
                 .Field(d => d.CalculatedAt)
                 .Description("When this distribution was calculated");
+
+        descriptor.Field("copropertyId").Type<UuidType>().Resolve(ctx =>
+            ctx.Service<CopropertyDbContext>().Charges.IgnoreQueryFilters()
+                .Where(c => c.Id == ctx.Parent<ChargeDistribution>().ChargeId)
+                .Select(c => (Guid?)c.CopropertyId).FirstOrDefault());
+        descriptor.Field("copropertyName").Type<StringType>().Resolve(ctx =>
+            ctx.Service<CopropertyDbContext>().Charges.IgnoreQueryFilters()
+                .Where(c => c.Id == ctx.Parent<ChargeDistribution>().ChargeId)
+                .Join(ctx.Service<CopropertyDbContext>().Coproperties.IgnoreQueryFilters(),
+                    c => c.CopropertyId, p => p.Id, (c, p) => p.Name).FirstOrDefault());
 
             // Add computed fields from Unit navigation property
             descriptor

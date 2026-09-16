@@ -9,6 +9,7 @@ export enum InvoiceStatus {
 }
 
 export interface CopropertyInvoice {
+  copropertyId?: string;
   id: string;
   invoiceNumber: string;
   chargeId: string;

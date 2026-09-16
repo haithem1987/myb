@@ -23,7 +23,7 @@ function readTranslation(path, key) {
   }, JSON.parse(readFileSync(path, 'utf8')));
 }
 
-const literalPattern = /['"]((?:coproperty|ownerPortal|common)\.[A-Za-z0-9_.-]+)['"]/g;
+const literalPattern = /['"]((?:coproperty|ownerPortal|ownerFixes|common)\.[A-Za-z0-9_.-]+)['"]/g;
 const referencedKeys = new Set();
 
 for (const path of sourceFiles(sharedSourceRoot)) {

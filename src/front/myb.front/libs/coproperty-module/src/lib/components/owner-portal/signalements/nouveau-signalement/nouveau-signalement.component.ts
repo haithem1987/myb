@@ -1,3 +1,4 @@
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -22,7 +23,7 @@ interface DropdownOption { value: string; label: string; icon: string; }
 @Component({
   selector: 'app-nouveau-signalement',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="container py-4" style="max-width: 600px;">
       <!-- Header -->
@@ -30,14 +31,14 @@ interface DropdownOption { value: string; label: string; icon: string; }
         <button class="btn btn-link text-dark p-0 me-3" (click)="cancel()">
           <i class="bi bi-arrow-left fs-5"></i>
         </button>
-        <h2 class="mb-0 fw-bold">Nouveau signalement</h2>
+        <h2 class="mb-0 fw-bold">{{ 'ownerFixes.newReport' | translate }}</h2>
       </div>
 
       <!-- Photo -->
       <div class="photo-upload mb-4" (click)="fileInput.click()">
         <div *ngIf="!photoPreview()" class="photo-placeholder">
           <i class="bi bi-camera fs-2 text-muted"></i>
-          <span class="d-block mt-1 text-muted small">Ajouter une photo</span>
+          <span class="d-block mt-1 text-muted small">{{ 'ownerFixes.addAPhoto' | translate }}</span>
         </div>
         <img *ngIf="photoPreview()" [src]="photoPreview() ?? ''" class="photo-preview" alt="Photo signalement">
         <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)">
@@ -45,7 +46,7 @@ interface DropdownOption { value: string; label: string; icon: string; }
 
       <!-- Type -->
       <div class="mb-3" *ngIf="assignedCoproperties().length > 0">
-        <label class="form-label fw-semibold">Copropriété</label>
+        <label class="form-label fw-semibold">{{ 'ownerFixes.coproperty' | translate }}</label>
         <select
           class="form-select"
           [ngModel]="selectedCopropertyId()"
@@ -57,17 +58,17 @@ interface DropdownOption { value: string; label: string; icon: string; }
       </div>
 
       <div class="alert alert-warning" *ngIf="!contextLoading() && assignedCoproperties().length === 0">
-        Aucun lot actif ne vous est attribué. Contactez votre syndic avant de créer un signalement.
+        {{ 'ownerFixes.noActiveUnitIsAssignedToYouContactYour' | translate }}
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-semibold">Type</label>
+        <label class="form-label fw-semibold">{{ 'ownerFixes.type' | translate }}</label>
         <div class="custom-select-wrapper" [class.open]="typeDropOpen()">
           <div class="custom-select-trigger" (click)="toggleTypeDropdown()">
-            <span *ngIf="!selectedType()">Indiquez le type</span>
+            <span *ngIf="!selectedType()">{{ 'ownerFixes.selectAType' | translate }}</span>
             <span *ngIf="selectedType()" class="d-flex align-items-center gap-2">
               <i class="bi" [ngClass]="getTypeIcon(selectedType() ?? '')"></i>
-              {{ getTypeLabel(selectedType() ?? '') }}
+              {{ ('managerReports.types.' + selectedType()) | translate }}
             </span>
             <i class="bi bi-chevron-down ms-auto"></i>
           </div>
@@ -75,7 +76,7 @@ interface DropdownOption { value: string; label: string; icon: string; }
             <div class="dropdown-item-row" *ngFor="let opt of typeOptions"
                  (click)="selectType(opt.value)">
               <i class="bi me-2" [ngClass]="opt.icon" style="color: #e07a2f;"></i>
-              {{ opt.label }}
+              {{ ('managerReports.types.' + opt.value) | translate }}
             </div>
           </div>
         </div>
@@ -83,13 +84,13 @@ interface DropdownOption { value: string; label: string; icon: string; }
 
       <!-- Zone -->
       <div class="mb-3">
-        <label class="form-label fw-semibold">Zone</label>
+        <label class="form-label fw-semibold">{{ 'ownerFixes.area' | translate }}</label>
         <div class="custom-select-wrapper" [class.open]="zoneDropOpen()">
           <div class="custom-select-trigger" (click)="toggleZoneDropdown()">
-            <span *ngIf="!selectedZone()">Indiquez la zone</span>
+            <span *ngIf="!selectedZone()">{{ 'ownerFixes.selectAnArea' | translate }}</span>
             <span *ngIf="selectedZone()" class="d-flex align-items-center gap-2">
               <i class="bi" [ngClass]="getZoneIcon(selectedZone() ?? '')"></i>
-              {{ getZoneLabel(selectedZone() ?? '') }}
+              {{ ('managerReports.zones.' + selectedZone()) | translate }}
             </span>
             <i class="bi bi-chevron-down ms-auto"></i>
           </div>
@@ -97,7 +98,7 @@ interface DropdownOption { value: string; label: string; icon: string; }
             <div class="dropdown-item-row" *ngFor="let opt of zoneOptions"
                  (click)="selectZone(opt.value)">
               <i class="bi me-2" [ngClass]="opt.icon"></i>
-              {{ opt.label }}
+              {{ ('managerReports.zones.' + opt.value) | translate }}
             </div>
           </div>
         </div>
@@ -105,12 +106,12 @@ interface DropdownOption { value: string; label: string; icon: string; }
 
       <!-- Description -->
       <div class="mb-4">
-        <label class="form-label fw-semibold">Description</label>
-        <p class="text-muted small mb-1">Décrivez la situation qui sera envoyé à Sergic et informez votre communauté</p>
+        <label class="form-label fw-semibold">{{ 'ownerFixes.description' | translate }}</label>
+        <p class="text-muted small mb-1">{{ 'ownerFixes.describeTheSituationToYourPropertyManagerAndInform' | translate }}</p>
         <textarea
           class="form-control"
           rows="4"
-          placeholder="Écrivez votre message ici"
+          [placeholder]="'ownerFixes.writeYourMessageHere' | translate"
           [(ngModel)]="description"
           maxlength="2000">
         </textarea>
@@ -123,11 +124,11 @@ interface DropdownOption { value: string; label: string; icon: string; }
         [disabled]="sending() || contextLoading() || !isValid()"
         (click)="submit()">
         <span *ngIf="sending()" class="spinner-border spinner-border-sm me-2"></span>
-        {{ sending() ? 'Envoi en cours…' : 'Envoyer' }}
+        {{ (sending() ? 'ownerFixes.sending' : 'ownerFixes.send') | translate }}
       </button>
 
       <button class="btn btn-link w-100 text-primary fw-semibold" (click)="cancel()">
-        Annuler
+        {{ 'ownerFixes.cancel' | translate }}
       </button>
     </div>
   `,
@@ -187,6 +188,7 @@ export class NouveauSignalementComponent implements OnInit {
   private ownerService = inject(OwnerService);
   private keycloakService = inject(KeycloakService);
   private toastService = inject(ToastService);
+  private translate = inject(TranslateService);
   private router = inject(Router);
 
   selectedType = signal<string | null>(null);
@@ -302,14 +304,14 @@ export class NouveauSignalementComponent implements OnInit {
       take(1),
       catchError((err) => {
         console.error('Signalement error', err);
-        this.toastService.show('Erreur lors de l\'envoi du signalement', { classname: 'bg-danger text-light' });
+        this.toastService.show(this.translate.instant('ownerFixes.reportError'), { classname: 'bg-danger text-light' });
         this.sending.set(false);
         return of(null);
       })
     ).subscribe(result => {
       this.sending.set(false);
       if (result) {
-        this.toastService.show('Signalement envoyé avec succès', { classname: 'bg-success text-light' });
+        this.toastService.show(this.translate.instant('ownerFixes.reportSent'), { classname: 'bg-success text-light' });
         this.router.navigate(['../'], { relativeTo: undefined });
         this.router.navigate(['/coproperty/owner/signalements']);
       }

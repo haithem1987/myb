@@ -99,9 +99,22 @@ spec:
           timeoutSeconds: 10
           failureThreshold: 10
         volumeMounts:
+        - name: myb-email-theme
+          mountPath: /opt/keycloak/themes/myb/email
+          readOnly: true
         - name: keycloak-data
           mountPath: /opt/keycloak/data
       volumes:
+      - name: myb-email-theme
+        configMap:
+          name: myb-keycloak-email-theme
+          items:
+          - key: theme.properties
+            path: theme.properties
+          - key: messages_en.properties
+            path: messages/messages_en.properties
+          - key: messages_fr.properties
+            path: messages/messages_fr.properties
       - name: keycloak-data
         persistentVolumeClaim:
           claimName: keycloak-pvc

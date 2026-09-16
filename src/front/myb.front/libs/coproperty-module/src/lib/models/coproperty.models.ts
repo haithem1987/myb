@@ -64,6 +64,8 @@ export interface Charge {
 }
 
 export interface ChargeDistribution {
+  copropertyId?: string;
+  copropertyName?: string;
   id: string;
   chargeId: string;
   unitId: string;
@@ -87,6 +89,7 @@ export interface ChargeDistribution {
 }
 
 export interface CopropertyInvoice {
+  copropertyId?: string;
   id: string;
   invoiceNumber: string;
   chargeId: string;

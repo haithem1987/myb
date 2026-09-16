@@ -135,6 +135,7 @@ const GET_MY_INVOICES = gql`
       description
       notes
       ownerNameSnapshot
+      copropertyId
       copropertyNameSnapshot
       unitNumberSnapshot
       currency
@@ -316,6 +317,8 @@ const GET_OWNER_CHARGE_DISTRIBUTIONS = gql`
       chargeDescription
       chargeType
       chargeFrequency
+      copropertyId
+      copropertyName
       currency
     }
   }

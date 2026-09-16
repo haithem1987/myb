@@ -83,6 +83,12 @@ public class RequestedFixesTests
                 OwnerNameSnapshot = "Old Name", Amount = 100, Description = "Historical",
                 DueDate = DateTime.UtcNow.AddDays(30)
             });
+            context.CopropertyInvoices.Add(new CopropertyInvoice
+            {
+                Id = Guid.NewGuid(), CopropertyId = copropertyId, OwnerId = ownerId,
+                OwnerNameSnapshot = "Old Name", InvoiceNumber = "HISTORY-1",
+                InvoiceDate = DateTime.UtcNow, DueDate = DateTime.UtcNow.AddDays(30)
+            });
             await context.SaveChangesAsync();
         }
 
@@ -98,6 +104,7 @@ public class RequestedFixesTests
         Assert.Equal("new@example.com", owner.Email);
         Assert.Equal("+216 555", owner.Phone);
         Assert.Equal("Old Name", (await verify.FundCalls.SingleAsync()).OwnerNameSnapshot);
+        Assert.Equal("Old Name", (await verify.CopropertyInvoices.SingleAsync()).OwnerNameSnapshot);
     }
 
     [Fact]

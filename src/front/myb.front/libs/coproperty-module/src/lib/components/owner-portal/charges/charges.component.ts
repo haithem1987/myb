@@ -7,7 +7,7 @@ import { KeycloakService } from '@myb-front/auth';
 import { ToastService, ModalService, NotificationService } from '@myb-front/shared-ui';
 import { firstValueFrom, catchError, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 export interface PaymentReceipt {
   fundCallDescription: string;
@@ -39,6 +39,7 @@ export interface PaymentJustificationForm {
   styleUrls: ['./charges.component.scss']
 })
 export class OwnerChargesComponent implements OnInit {
+  private translate = inject(TranslateService);
   private ownerService = inject(OwnerService);
   private fundCallService = inject(FundCallService);
   private keycloakService = inject(KeycloakService);
@@ -368,33 +369,33 @@ export class OwnerChargesComponent implements OnInit {
 
     // Validation
     if (this.paymentForm.amount <= 0) {
-      this.toastService.show('Le montant doit être supérieur à 0', { classname: 'toast-danger' });
+      this.toastService.show(this.translate.instant('ownerFixes.positiveAmount'), { classname: 'toast-danger' });
       return;
     }
     if (this.paymentForm.amount > remaining) {
-      this.toastService.show(`Le montant ne peut pas dépasser ${this.formatAmount(remaining)}`, { classname: 'toast-danger' });
+      this.toastService.show(this.translate.instant('ownerFixes.amountExceeded', { amount: this.formatAmount(remaining) }), { classname: 'toast-danger' });
       return;
     }
     if (!this.justificatifFile) {
-      this.toastService.show('Veuillez joindre un justificatif (fichier obligatoire)', { classname: 'toast-danger' });
+      this.toastService.show(this.translate.instant('ownerFixes.proofRequired'), { classname: 'toast-danger' });
       return;
     }
     if (!this.paymentForm.paymentDate) {
-      this.toastService.show('Veuillez sélectionner la date de paiement', { classname: 'toast-danger' });
+      this.toastService.show(this.translate.instant('ownerFixes.dateRequired'), { classname: 'toast-danger' });
       return;
     }
     // Virement-specific validation
     if (this.paymentForm.paymentMethod === 'Virement') {
       if (!this.paymentForm.bankName.trim()) {
-        this.toastService.show('Veuillez saisir le nom de la banque', { classname: 'toast-danger' });
+        this.toastService.show(this.translate.instant('ownerFixes.bankRequired'), { classname: 'toast-danger' });
         return;
       }
       if (!this.paymentForm.rib.trim()) {
-        this.toastService.show('Veuillez saisir le RIB', { classname: 'toast-danger' });
+        this.toastService.show(this.translate.instant('ownerFixes.ribRequired'), { classname: 'toast-danger' });
         return;
       }
       if (!this.paymentForm.senderName.trim()) {
-        this.toastService.show('Veuillez saisir le nom de l\'émetteur', { classname: 'toast-danger' });
+        this.toastService.show(this.translate.instant('ownerFixes.senderRequired'), { classname: 'toast-danger' });
         return;
       }
     }
@@ -425,7 +426,7 @@ export class OwnerChargesComponent implements OnInit {
         })
       );
 
-      this.toastService.show('Justificatif de paiement envoyé avec succès!', { classname: 'toast-success' });
+      this.toastService.show(this.translate.instant('ownerFixes.proofSent'), { classname: 'toast-success' });
 
       // Build and display receipt inside the modal
       const receiptNumber = 'REC-' + Date.now().toString(36).toUpperCase();
@@ -483,19 +484,22 @@ export class OwnerChargesComponent implements OnInit {
     }
   }
 
+  getFundCallDescription(description?: string): string {
+    if (!description) return this.translate.instant('ownerFixes.callForFunds');
+    // Translate the application-generated structure; preserve names and free text.
+    if (!/^Appel de fonds [–-] Répartition \d{4} [–-] .+ \(Lot .+\)$/.test(description)) return description;
+    return description.replace(/^Appel de fonds [–-] Répartition/, this.translate.instant('ownerFixes.generatedFundCall'))
+      .replace('(Lot ', '(' + this.translate.instant('ownerFixes.unit') + ' ');
+  }
+
   getStatusLabel(status: string): string {
-    switch (status) {
-      case 'PAID':
-        return 'Réglé';
-      case 'VALIDATED':
-        return 'Validé';
-      case 'TO_PAY':
-        return 'À payer';
-      case 'CANCELLED':
-        return 'Annulé';
-      default:
-        return status;
-    }
+    const keys: Record<string, string> = {"PAID": "ownerFixes.paid", "VALIDATED": "ownerFixes.approved", "TO_PAY": "ownerFixes.toPay", "CANCELLED": "ownerFixes.cancelled"};
+    return this.translate.instant(keys[status] ?? 'ownerFixes.pending');
+  }
+
+  getPaymentMethodLabel(method: string): string {
+    const keys: Record<string, string> = {"Cash": "ownerFixes.cash", "Esp\u00e8ces": "ownerFixes.cash", "Check": "ownerFixes.check", "Ch\u00e8que": "ownerFixes.check", "BankTransfer": "ownerFixes.bankTransfer", "Virement": "ownerFixes.bankTransfer", "Mandat postal": "ownerFixes.postalOrder"};
+    return keys[method] ? this.translate.instant(keys[method]) : method;
   }
 
   getPaymentMethodIcon(method: string): string {
@@ -516,12 +520,12 @@ export class OwnerChargesComponent implements OnInit {
       const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
       const inferredType = this.getSupportedFileType(file);
       if (!inferredType || !allowed.includes(inferredType)) {
-        this.toastService.show('Format non supporté. Utilisez PDF, JPG, PNG ou WebP.', { classname: 'toast-danger' });
+        this.toastService.show(this.translate.instant('ownerFixes.fileType'), { classname: 'toast-danger' });
         input.value = '';
         return;
       }
       if (file.size > maxSize) {
-        this.toastService.show('Le fichier ne doit pas dépasser 5 Mo.', { classname: 'toast-danger' });
+        this.toastService.show(this.translate.instant('ownerFixes.fileSize'), { classname: 'toast-danger' });
         input.value = '';
         return;
       }

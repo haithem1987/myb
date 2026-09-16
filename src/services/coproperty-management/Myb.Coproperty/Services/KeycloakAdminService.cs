@@ -134,7 +134,7 @@ namespace Myb.Coproperty.Services
                 throw new InvalidOperationException("Le prénom et le nom sont obligatoires.");
             if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
                 throw new InvalidOperationException("Une adresse e-mail valide est obligatoire.");
-            if (temporaryPassword?.Length < 8)
+            if (string.IsNullOrWhiteSpace(temporaryPassword) || temporaryPassword.Length < 8)
                 throw new InvalidOperationException("Le mot de passe temporaire doit contenir au moins 8 caractères.");
 
             var (adminBaseUrl, realm) = ParseAuthority();
@@ -170,7 +170,7 @@ namespace Myb.Coproperty.Services
                 {
                     new { type = "password", value = temporaryPassword, temporary = true }
                 },
-                requiredActions = new[] { "UPDATE_PASSWORD" }
+                requiredActions = new[] { "VERIFY_EMAIL", "UPDATE_PASSWORD" }
             };
             var response = await client.PostAsJsonAsync(
                 $"{adminBaseUrl}/admin/realms/{realm}/users", payload, JsonOptions);
@@ -202,6 +202,9 @@ namespace Myb.Coproperty.Services
             return new KeycloakUserSearchDto(
                 userId, email, firstName, lastName, null, true, false, new List<string>());
         }
+
+        public async Task<bool> IsEmailVerifiedAsync(string userId)
+            => (await GetKeycloakUserAsync(userId))?.EmailVerified == true;
 
         public async Task<string?> GetActivationNotificationRecipientAsync(string userId)
         {

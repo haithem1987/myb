@@ -122,7 +122,7 @@ export class OwnerManagementComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       temporaryPassword: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required, Validators.minLength(8)]],
-      notifyOnActivation: [false],
+      notifyOnActivation: [true],
     });
 
     // Debounced Keycloak user search

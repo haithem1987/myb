@@ -470,14 +470,14 @@ export class KeycloakService {
     });
     const body = {
       query: `mutation CreateOwnerUserAccount(
-        $firstName: String!, $lastName: String!, $email: String!, $temporaryPassword: String!, $notifyOnActivation: Boolean!
+        $firstName: String!, $lastName: String!, $email: String!, $temporaryPassword: String!, $notifyOnActivation: Boolean!, $language: String
       ) {
         createOwnerUserAccount(
           firstName: $firstName,
           lastName: $lastName,
           email: $email,
           temporaryPassword: $temporaryPassword
-          notifyOnActivation: $notifyOnActivation
+          notifyOnActivation: $notifyOnActivation, language: $language
         ) { id }
       }`,
       variables: {
@@ -486,6 +486,7 @@ export class KeycloakService {
         email: options.email,
         temporaryPassword: options.password,
         notifyOnActivation: options.notifyOnActivation ?? false,
+        language: this.getPreferredLanguage(),
       },
     };
     const response: any = await firstValueFrom(

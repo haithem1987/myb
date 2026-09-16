@@ -25,6 +25,8 @@ interface Invoice {
   currency?: string;
   ownerName?: string;
   rejectionReason?: string;
+  copropertyId?: string;
+  copropertyName?: string;
 }
 
 @Component({
@@ -50,6 +52,13 @@ interface Invoice {
         </div>
       </div>
 
+      <div class="mb-3">
+        <label for="receipt-coproperty" class="form-label">{{ 'ownerPortal.receipts.coproperty' | translate }}</label>
+        <select id="receipt-coproperty" class="form-select" [(ngModel)]="selectedCopropertyId" (ngModelChange)="filterInvoices()">
+          <option value="">{{ 'ownerPortal.receipts.selectCoproperty' | translate }}</option>
+          <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">{{ coproperty.name }}</option>
+        </select>
+      </div>
       <!-- Statistics -->
       <div class="row mb-4">
         <div class="col-md-4">
@@ -591,6 +600,10 @@ interface Invoice {
   `]
 })
 export class OwnerInvoicesComponent implements OnInit {
+  selectedCopropertyId = '';
+  coproperties = computed(() => Array.from(new Map(this.invoices()
+    .filter(i => !!i.copropertyId)
+    .map(i => [i.copropertyId!, { id: i.copropertyId!, name: i.copropertyName || i.copropertyId! }])).values()));
   selectedYear = new Date().getFullYear().toString();
 
   invoices = signal<Invoice[]>([]);
@@ -603,7 +616,7 @@ export class OwnerInvoicesComponent implements OnInit {
     const invoices = this.filteredInvoices();
     const total = invoices.length;
     const lastPayment = invoices
-      .filter(i => i.paymentDate)
+      .filter(i => i.paymentDate && i.status === 'paid')
       .sort((a, b) => (b.paymentDate?.getTime() ?? 0) - (a.paymentDate?.getTime() ?? 0))[0];
     const lastPaymentDate = lastPayment?.paymentDate
       ? lastPayment.paymentDate.toLocaleDateString('fr-FR') : '—';
@@ -613,12 +626,13 @@ export class OwnerInvoicesComponent implements OnInit {
 
   /** Never add monetary values expressed in different currencies. */
   totalPaidDisplay = computed(() => {
+    if (!this.filteredInvoices().length) return '—';
     const totals = new Map<string, number>();
     for (const invoice of this.filteredInvoices().filter(item => item.status === 'paid')) {
       const currency = invoice.currency ?? this.currencyService.current;
       totals.set(currency, (totals.get(currency) ?? 0) + invoice.amount);
     }
-    if (totals.size === 0) return this.currencyService.formatAmount(0);
+    if (totals.size === 0) return this.currencyService.formatAmount(0, this.filteredInvoices()[0]?.currency);
     return Array.from(totals.entries())
       .map(([currency, amount]) => this.currencyService.formatAmount(amount, currency))
       .join(' · ');
@@ -698,7 +712,7 @@ export class OwnerInvoicesComponent implements OnInit {
           });
 
         this.invoices.set(allReceipts);
-        this.filteredInvoices.set(allReceipts);
+        this.filterInvoices();
       },
       error: (error) => {
         console.error('Error loading owner receipts:', error);
@@ -707,7 +721,8 @@ export class OwnerInvoicesComponent implements OnInit {
   }
 
   filterInvoices() {
-    let filtered = this.invoices();
+    let filtered = this.invoices().filter(i => !!this.selectedCopropertyId && i.copropertyId === this.selectedCopropertyId);
+    this.closeInvoiceModal();
 
     if (this.selectedYear) {
       filtered = filtered.filter(i => {
@@ -748,6 +763,8 @@ export class OwnerInvoicesComponent implements OnInit {
     const unit = this.unitsById.get(inv.unitId);
 
     return {
+      copropertyId: inv.copropertyId ?? unit?.copropertyId,
+      copropertyName: inv.copropertyNameSnapshot,
       id: inv.id,
       number: inv.invoiceNumber,
       description: inv.description ?? '',
@@ -770,6 +787,8 @@ export class OwnerInvoicesComponent implements OnInit {
     const paymentDate = dist.paidAt ? new Date(dist.paidAt) : date;
 
     return {
+      copropertyId: dist.copropertyId ?? unit?.copropertyId,
+      copropertyName: dist.copropertyName,
       id: dist.id,
       number: dist.id.substring(0, 8).toUpperCase(),
       description: dist.chargeName || 'Appel de fonds',
@@ -788,6 +807,8 @@ export class OwnerInvoicesComponent implements OnInit {
   private mapFundCallPayment(payment: FundCallPaymentWithContext): Invoice {
     const paymentDate = new Date(payment.paymentDate);
     return {
+      copropertyId: payment.fundCall?.coproperty?.id,
+      copropertyName: payment.fundCall?.coproperty?.name,
       id: payment.id,
       number: `FC-${payment.id.substring(0, 8).toUpperCase()}`,
       description: payment.fundCall?.description || 'Appel de fonds',

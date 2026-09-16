@@ -1,3 +1,4 @@
+import { dateRangeValidator } from '../../utils/date-range.validator';
 import { Component, OnInit, signal, inject, DestroyRef, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -9,6 +10,7 @@ import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
 import { KeycloakService } from '@myb-front/auth';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ModalService } from '@myb-front/shared-ui';
 
 @Component({
   selector: 'myb-budget-new',
@@ -33,6 +35,7 @@ export class BudgetNewComponent implements OnInit {
   private translateService = inject(TranslateService);
   private currencyService = inject(CurrencyService);
   private keycloakService = inject(KeycloakService);
+  private modalService = inject(ModalService);
 
   get currencySymbol(): string {
     const currency =
@@ -62,13 +65,6 @@ export class BudgetNewComponent implements OnInit {
   ];
 
   years = this.generateYears();
-
-  distributionMethods = [
-    { value: 'BY_SHARES', label: 'coproperty.charges.distributions.byShares', icon: 'bi-percent' },
-    { value: 'BY_AREA', label: 'coproperty.charges.distributions.byArea', icon: 'bi-bounding-box' },
-    { value: 'EQUAL', label: 'coproperty.charges.distributions.equal', icon: 'bi-distribute-horizontal' },
-    { value: 'CUSTOM', label: 'coproperty.charges.distributions.custom', icon: 'bi-sliders' },
-  ];
 
   get isEmbedded(): boolean {
     return !!this.embeddedCopropertyId;
@@ -108,20 +104,22 @@ export class BudgetNewComponent implements OnInit {
   }
 
   private initializeForm(): void {
-    const currentYear = new Date().getFullYear().toString();
+    const currentYear = new Date().getFullYear();
     this.budgetForm = this.formBuilder.group({
       copropertyId: ['', Validators.required],
       name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
       chargeType: ['CLEANING', Validators.required],
-      frequency: [currentYear, Validators.required],
+      frequency: [currentYear.toString(), Validators.required],
       totalAmount: ['', [Validators.required, Validators.min(0.01)]],
+      // Distribution remains a backend property for compatibility, but is no
+      // longer user-configurable from the Budget Line create/edit form.
       distributionMethod: ['BY_SHARES', Validators.required],
-      startDate: ['', Validators.required],
-      endDate: [''],
+      startDate: [`${currentYear}-01-01`, Validators.required],
+      endDate: [`${currentYear}-12-31`],
       isActive: [true],
       isContribution: [false]
-    });
+    }, { validators: dateRangeValidator() });
   }
 
   private loadCoproperties(): void {
@@ -138,10 +136,10 @@ export class BudgetNewComponent implements OnInit {
               this.selectedCoproperty.set(coproperty);
               this.budgetForm.patchValue({ copropertyId: coproperty.id });
             }
-          } else if (data.length > 0 && !this.budgetForm.get('copropertyId')?.value) {
+          } else if (data.some(c => c.isActive) && !this.budgetForm.get('copropertyId')?.value) {
             // Auto-select first coproperty by default
             this.selectedCoproperty.set(data[0]);
-            this.budgetForm.patchValue({ copropertyId: data[0].id });
+            this.budgetForm.patchValue({ copropertyId: data.find(c => c.isActive)!.id });
           } else {
             const selected = data.find(c => c.id === this.budgetForm.get('copropertyId')?.value);
             if (selected) this.selectedCoproperty.set(selected);
@@ -235,6 +233,8 @@ export class BudgetNewComponent implements OnInit {
   }
 
   saveBudget(): void {
+    const selected = this.coproperties().find(c => c.id === this.budgetForm.getRawValue().copropertyId);
+    if (!this.budgetId && selected?.isActive === false) return;
     if (this.budgetForm.invalid) {
       Object.keys(this.budgetForm.controls).forEach(key => {
         this.budgetForm.get(key)?.markAsTouched();
@@ -287,24 +287,33 @@ export class BudgetNewComponent implements OnInit {
       });
   }
 
-  deleteBudget(): void {
+  async deleteBudget(): Promise<void> {
     if (!this.budgetId) return;
-    
-    this.translateService.get('coproperty.charges.deleteConfirm').subscribe((message) => {
-      if (confirm(message)) {
-        const copropertyId = this.budgetForm.get('copropertyId')?.value || undefined;
-        this.chargeService.deleteCharge(this.budgetId!, copropertyId).subscribe({
-          next: () => {
-            if (this.isEmbedded) {
-              this.deleted.emit(this.budgetId!);
-              return;
-            }
-            this.router.navigate(['/coproperty/syndic/budgets']);
-          },
-          error: (error) => {
-            console.error('Error deleting budget:', error);
-          }
-        });
+
+    const budgetName = this.budgetForm.get('name')?.value;
+    const confirmed = await this.modalService.confirm({
+      title: this.translateService.instant('coproperty.charges.deleteCharge'),
+      message: this.translateService.instant('coproperty.charges.deleteDetailedConfirm', {
+        name: budgetName,
+      }),
+      confirmButtonText: this.translateService.instant('common.delete'),
+      confirmButtonClass: 'btn-danger',
+      cancelButtonText: this.translateService.instant('common.cancel'),
+    });
+
+    if (!confirmed) return;
+
+    const copropertyId = this.budgetForm.get('copropertyId')?.value || undefined;
+    this.chargeService.deleteCharge(this.budgetId, copropertyId).subscribe({
+      next: () => {
+        if (this.isEmbedded) {
+          this.deleted.emit(this.budgetId!);
+          return;
+        }
+        this.router.navigate(['/coproperty/syndic/budgets']);
+      },
+      error: (error) => {
+        console.error('Error deleting budget:', error);
       }
     });
   }

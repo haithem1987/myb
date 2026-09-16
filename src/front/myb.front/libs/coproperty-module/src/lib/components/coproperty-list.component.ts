@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Observable, firstValueFrom, combineLatest, switchMap, of } from 'rxjs';
+import { Observable, ReplaySubject, firstValueFrom, combineLatest, of } from 'rxjs';
 import { catchError, map, debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { CopropertyService } from '../services/coproperty.service';
 import { Coproperty } from '../models/coproperty.models';
@@ -215,7 +215,9 @@ import { KeycloakService } from '@myb-front/auth';
   `]
 })
 export class CopropertyListComponent {
-  coproperties$: Observable<Coproperty[]>;
+  private readonly copropertiesSubject = new ReplaySubject<Coproperty[]>(1);
+  private currentCoproperties: Coproperty[] = [];
+  readonly coproperties$ = this.copropertiesSubject.asObservable();
   readonly loadError = signal<string | null>(null);
   
   // Form controls for search and filter
@@ -230,7 +232,6 @@ export class CopropertyListComponent {
   private keycloakService = inject(KeycloakService);
 
   constructor(private copropertyService: CopropertyService, private router: Router) {
-    this.coproperties$ = this.loadCoproperties();
     this.filteredCoproperties$ = combineLatest([
       this.coproperties$,
       this.searchControl.valueChanges.pipe(
@@ -275,6 +276,8 @@ export class CopropertyListComponent {
         return filtered;
       })
     );
+
+    this.reload();
   }
 
   
@@ -291,7 +294,10 @@ export class CopropertyListComponent {
   }
 
   reload(): void {
-    this.coproperties$ = this.loadCoproperties();
+    this.loadCoproperties().subscribe((coproperties) => {
+      this.currentCoproperties = coproperties;
+      this.copropertiesSubject.next(coproperties);
+    });
   }
 
   viewDetails(id: string): void {
@@ -350,6 +356,13 @@ export class CopropertyListComponent {
     if (confirmed) {
       try {
         await firstValueFrom(this.copropertyService.deleteCoproperty(coproperty.id));
+        // Publish the successful mutation immediately. The follow-up reload keeps
+        // the local list authoritative without making the UI wait for a second
+        // request before removing the card.
+        this.currentCoproperties = this.currentCoproperties.filter(
+          (item) => item.id !== coproperty.id
+        );
+        this.copropertiesSubject.next(this.currentCoproperties);
         this.toastService.show(
           `"${coproperty.name}" ${this.translateService.instant('coproperty.messages.deleted')}`,
           { classname: 'bg-success text-light' }

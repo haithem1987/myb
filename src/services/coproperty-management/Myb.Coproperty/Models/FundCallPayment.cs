@@ -30,6 +30,13 @@ public class FundCallPayment : IEntity<Guid>
     /// <summary>Payment method (Espèces, Chèque, Virement, Mandat postal, etc.)</summary>
     public string? PaymentMethod { get; set; }
 
+    /// <summary>
+    /// Unit number captured when the payment receipt is created. This must not
+    /// depend on the current Unit/OwnerUnit relationship because receipts are
+    /// historical accounting documents.
+    /// </summary>
+    public string? UnitNumberSnapshot { get; set; }
+
     /// <summary>Validation status set by the syndic: Pending, Approved, Rejected</summary>
     public string ValidationStatus { get; set; } = "Pending";
 

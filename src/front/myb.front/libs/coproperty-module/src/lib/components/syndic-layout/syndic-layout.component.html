@@ -102,26 +102,20 @@
         <span class="badge" *ngIf="totalFundCalls() > 0">{{ totalFundCalls() }}</span>
       </a>
 
-      <a routerLink="/coproperty/syndic/charge-payments" 
-         routerLinkActive="active" 
-         class="nav-item"
-         (click)="onNavItemClick()">
+      <span class="nav-item disabled" aria-disabled="true" title="Bientôt disponible">
         <i class="bi bi-credit-card-2-front"></i>
         <span class="nav-text">{{ 'navigation.chargePayments' | translate }}</span>
         <span class="badge" *ngIf="totalChargePayments() > 0">{{ totalChargePayments() }}</span>
-      </a>
+      </span>
 
-      <a routerLink="/coproperty/syndic/interventions" 
-         routerLinkActive="active" 
-         class="nav-item"
-         (click)="onNavItemClick()">
+      <span class="nav-item disabled" aria-disabled="true" title="Bientôt disponible">
         <i class="bi bi-wrench-adjustable"></i>
         <span class="nav-text">{{ 'navigation.interventions' | translate }}</span>
         <span class="badge" *ngIf="totalInterventions() > 0">{{ totalInterventions() }}</span>
-      </a>
+      </span>
 
-      <a routerLink="/coproperty/syndic/signalements" 
-         routerLinkActive="active" 
+      <a routerLink="/coproperty/syndic/signalements"
+         routerLinkActive="active"
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-megaphone"></i>
@@ -129,14 +123,11 @@
         <span class="badge" *ngIf="totalSignalements() > 0">{{ totalSignalements() }}</span>
       </a>
 
-      <a routerLink="/coproperty/syndic/discussions"
-         routerLinkActive="active"
-         class="nav-item"
-         (click)="onNavItemClick()">
+      <span class="nav-item disabled" aria-disabled="true" title="Bientôt disponible">
         <i class="bi bi-chat-square-text"></i>
         <span class="nav-text">{{ 'navigation.discussions' | translate }}</span>
         <span class="badge" *ngIf="totalDiscussions() > 0">{{ totalDiscussions() }}</span>
-      </a>
+      </span>
 
       <a routerLink="/coproperty/syndic/settings" 
          routerLinkActive="active" 

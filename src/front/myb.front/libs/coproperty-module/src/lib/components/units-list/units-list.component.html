@@ -151,8 +151,8 @@
               formControlName="copropertyId"
               [class.is-invalid]="unitForm.get('copropertyId')?.touched && unitForm.get('copropertyId')?.invalid">
               <option value="">{{ 'coproperty.charge.selectCoproperty' | translate }}</option>
-              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
-                {{ coproperty.name }}
+              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id" [disabled]="!coproperty.isActive">
+                {{ coproperty.name }}{{ coproperty.isActive ? '' : ' (Inactive)' }}
               </option>
             </select>
             <div class="invalid-feedback" *ngIf="unitForm.get('copropertyId')?.touched && unitForm.get('copropertyId')?.invalid">

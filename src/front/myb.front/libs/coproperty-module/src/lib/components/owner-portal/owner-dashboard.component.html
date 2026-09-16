@@ -1,7 +1,7 @@
 <div class="owner-dashboard">
   <div class="welcome-section">
-    <h1>Bienvenue dans votre espace copropriétaire</h1>
-    <p class="subtitle">Gérez vos lots et consultez vos documents en toute simplicité</p>
+    <h1>{{ 'ownerPortal.dashboard.welcome' | translate }}</h1>
+    <p class="subtitle">{{ 'ownerPortal.dashboard.subtitle' | translate }}</p>
   </div>
   
   <!-- Primary Stats -->
@@ -12,7 +12,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ myUnits().length }}</div>
-        <div class="stat-label">Mes lots</div>
+        <div class="stat-label">{{ 'ownerPortal.dashboard.myUnits' | translate }}</div>
       </div>
     </div>
     
@@ -22,7 +22,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ totalShares() }}</div>
-        <div class="stat-label">Tantièmes</div>
+        <div class="stat-label">{{ 'ownerPortal.dashboard.shares' | translate }}</div>
       </div>
     </div>
 
@@ -32,17 +32,17 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ pendingInvoices().length }}</div>
-        <div class="stat-label">Paiements en attente</div>
+        <div class="stat-label">{{ 'ownerPortal.dashboard.pendingPayments' | translate }}</div>
       </div>
     </div>
     
-    <div class="stat-card" [class.danger]="totalDue() > 0" [class.success]="totalDue() === 0">
+    <div class="stat-card amount-due-card" [class.danger]="totalDue() > 0" [class.success]="totalDue() === 0">
       <div class="stat-icon">
         <i class="bi bi-cash-coin"></i>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ totalDueDisplay() }}</div>
-        <div class="stat-label">Montant dû</div>
+        <div class="stat-value amount-due-value" [title]="totalDueDisplay()">{{ totalDueDisplay() }}</div>
+        <div class="stat-label">{{ 'ownerPortal.dashboard.amountDue' | translate }}</div>
       </div>
     </div>
   </div>
@@ -53,28 +53,28 @@
       <i class="bi bi-exclamation-triangle"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ overdueCount() }}</span>
-        <span class="indicator-label">Paiements en retard</span>
+        <span class="indicator-label">{{ 'ownerPortal.dashboard.overduePayments' | translate }}</span>
       </div>
     </div>
     <div class="indicator">
       <i class="bi bi-check2-circle"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ totalPaidDisplay() }}</span>
-        <span class="indicator-label">Total payé</span>
+        <span class="indicator-label">{{ 'ownerPortal.dashboard.totalPaid' | translate }}</span>
       </div>
     </div>
     <div class="indicator">
       <i class="bi bi-rulers"></i>
       <div class="indicator-info">
-        <span class="indicator-value">{{ totalSurface() }} m²</span>
-        <span class="indicator-label">Surface totale</span>
+        <span class="indicator-value">{{ formatNumber(totalSurface()) }} m²</span>
+        <span class="indicator-label">{{ 'ownerPortal.dashboard.totalSurface' | translate }}</span>
       </div>
     </div>
     <div class="indicator">
       <i class="bi bi-wallet2"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ totalChargesDisplay() }}</span>
-        <span class="indicator-label">Total charges</span>
+        <span class="indicator-label">{{ 'ownerPortal.dashboard.totalCharges' | translate }}</span>
       </div>
     </div>
   </div>
@@ -84,14 +84,14 @@
     <!-- My Units -->
     <div class="card">
       <div class="card-header">
-        <h2>Mes Lots</h2>
-        <a routerLink="/coproperty/owner/my-units" class="btn-link">Voir tout</a>
+        <h2>{{ 'ownerPortal.dashboard.myUnits' | translate }}</h2>
+        <a routerLink="/coproperty/owner/my-units" class="btn-link">{{ 'ownerPortal.dashboard.viewAll' | translate }}</a>
       </div>
       <div class="card-body">
         <div class="unit-list" *ngIf="!loading(); else loadingTemplate">
           <div *ngIf="myUnits().length === 0" class="empty-state">
             <i class="bi bi-building"></i>
-            <p>Aucun lot associé</p>
+            <p>{{ 'ownerPortal.dashboard.noUnits' | translate }}</p>
           </div>
           <div class="unit-item" *ngFor="let unit of myUnits()">
             <div class="unit-icon">
@@ -101,10 +101,10 @@
                  [class.bi-archive]="unit.type === 'Cave'"></i>
             </div>
             <div class="unit-info">
-              <div class="unit-name">Lot {{ unit.unitNumber }} <span class="text-muted" style="font-size: 0.9em;">• {{ unit.type }}</span></div>
-              <div class="unit-details">{{ unit.buildingName }} • {{ unit.surface }}m² • {{ unit.shares }} tantièmes</div>
+              <div class="unit-name">{{ 'ownerPortal.dashboard.unit' | translate }} {{ unit.unitNumber }} <span class="text-muted" style="font-size: 0.9em;">• {{ unit.type }}</span></div>
+              <div class="unit-details">{{ unit.buildingName }} • {{ formatNumber(unit.surface) }}m² • {{ formatNumber(unit.shares) }} {{ 'ownerPortal.dashboard.shares' | translate | lowercase }}</div>
             </div>
-            <button class="btn-icon" title="Voir les détails">
+            <button class="btn-icon" [title]="'ownerPortal.dashboard.viewDetails' | translate">
               <i class="bi bi-chevron-right"></i>
             </button>
           </div>
@@ -117,18 +117,18 @@
       <div class="card-body d-flex align-items-center gap-3 py-3">
         <i class="bi bi-x-circle-fill text-secondary fs-4"></i>
         <div>
-          <strong>{{ cancelledFundCallsCount() }} appel{{ cancelledFundCallsCount() > 1 ? 's' : '' }} de fonds annulé{{ cancelledFundCallsCount() > 1 ? 's' : '' }}</strong>
-          <p class="mb-0 small text-muted">Des appels de fonds ont été annulés par votre syndic. Consultez l'historique pour les détails.</p>
+          <strong>{{ 'ownerPortal.dashboard.cancelledFundCallsCount' | translate:{count: cancelledFundCallsCount()} }}</strong>
+          <p class="mb-0 small text-muted">{{ 'ownerPortal.dashboard.cancelledFundCallsNotice' | translate }}</p>
         </div>
-        <a routerLink="/coproperty/owner/charges" [queryParams]="{status: 'cancelled'}" class="btn btn-sm btn-outline-secondary ms-auto">Voir l'historique</a>
+        <a routerLink="/coproperty/owner/charges" [queryParams]="{status: 'cancelled'}" class="btn btn-sm btn-outline-secondary ms-auto">{{ 'ownerPortal.dashboard.viewHistory' | translate }}</a>
       </div>
     </div>
 
     <!-- Pending Invoices -->
     <div class="card">
       <div class="card-header">
-        <h2>Paiements en Attente</h2>
-        <a routerLink="/coproperty/owner/charges" class="btn-link">Voir tout</a>
+        <h2>{{ 'ownerPortal.dashboard.pendingPayments' | translate }}</h2>
+        <a routerLink="/coproperty/owner/charges" class="btn-link">{{ 'ownerPortal.dashboard.viewAll' | translate }}</a>
       </div>
       <div class="card-body">
         <div class="invoice-list" *ngIf="!loading(); else loadingTemplate">
@@ -139,21 +139,28 @@
                [class.overdue]="isOverdue(invoice.dueDate)">
             <div class="invoice-header">
               <div class="invoice-number">{{ invoice.number }}</div>
-              <div class="invoice-amount">{{ formatAmount(invoice.amount, invoice.currency) }}</div>
             </div>
             <div class="invoice-description">{{ invoice.description }}</div>
+            <div class="charge-amounts">
+              <div><span>{{ 'ownerPortal.dashboard.totalAmount' | translate }}</span><strong>{{ formatAmount(invoice.amount, invoice.currency) }}</strong></div>
+              <div class="pending"><span>{{ 'ownerPortal.dashboard.pendingAmount' | translate }}</span><strong>{{ formatAmount(invoice.pendingAmount, invoice.currency) }}</strong></div>
+              <div class="remaining"><span>{{ 'ownerPortal.dashboard.remainingAmount' | translate }}</span><strong>{{ formatAmount(invoice.remainingAmount, invoice.currency) }}</strong></div>
+            </div>
             <div class="invoice-footer">
               <span class="due-date" [class.overdue]="isOverdue(invoice.dueDate)">
                 <i class="bi bi-calendar"></i>
-                {{ isOverdue(invoice.dueDate) ? 'En retard' : 'Échéance ' + getDaysUntilDue(invoice.dueDate) + 'j' }}
+                {{ isOverdue(invoice.dueDate) ? ('ownerPortal.dashboard.overdue' | translate) : ('ownerPortal.dashboard.dueInDays' | translate:{days: getDaysUntilDue(invoice.dueDate)}) }}
               </span>
-              <button class="btn-pay">Payer</button>
+              <button class="btn-pay" [disabled]="invoice.payableAmount <= 0"
+                      [title]="invoice.payableAmount <= 0 ? ('ownerPortal.dashboard.pendingValidationCoverage' | translate) : ''">
+                {{ 'ownerPortal.dashboard.pay' | translate }} {{ formatAmount(invoice.payableAmount, invoice.currency) }}
+              </button>
             </div>
           </div>
           
           <div class="empty-state" *ngIf="pendingInvoices().length === 0">
             <i class="bi bi-check-circle"></i>
-            <p>Aucun paiement en attente</p>
+            <p>{{ 'ownerPortal.dashboard.noPendingPayments' | translate }}</p>
           </div>
         </div>
       </div>
@@ -162,8 +169,8 @@
     <!-- Recent Invoices -->
     <div class="card">
       <div class="card-header">
-        <h2>Derniers Reçus</h2>
-        <a routerLink="/coproperty/owner/invoices" class="btn-link">Voir tout</a>
+        <h2>{{ 'ownerPortal.dashboard.recentReceipts' | translate }}</h2>
+        <a routerLink="/coproperty/owner/invoices" class="btn-link">{{ 'ownerPortal.dashboard.viewAll' | translate }}</a>
       </div>
       <div class="card-body">
         <div class="recent-list" *ngIf="!loading(); else loadingTemplate">
@@ -187,42 +194,18 @@
 
           <div class="empty-state" *ngIf="recentInvoices().length === 0">
             <i class="bi bi-inbox"></i>
-            <p>Aucun reçu</p>
+            <p>{{ 'ownerPortal.dashboard.noReceipts' | translate }}</p>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Quick Actions -->
-    <div class="card">
-      <div class="card-header">
-        <h2>Actions Rapides</h2>
-      </div>
-      <div class="card-body">
-        <div class="actions-list">
-          <a routerLink="/coproperty/owner/my-units" class="action-item">
-            <i class="bi bi-building"></i>
-            <span>Voir mes lots</span>
-          </a>
-          
-          <a routerLink="/coproperty/owner/invoices" class="action-item">
-            <i class="bi bi-receipt"></i>
-            <span>Mes reçus de paiement</span>
-          </a>
-
-          <a routerLink="/coproperty/owner/charges" class="action-item">
-            <i class="bi bi-cash-stack"></i>
-            <span>Mes appels de fonds</span>
-          </a>
-        </div>
-      </div>
-    </div>
   </div>
   
   <ng-template #loadingTemplate>
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Chargement...</p>
+      <p>{{ 'ownerPortal.dashboard.loading' | translate }}</p>
     </div>
   </ng-template>
 </div>

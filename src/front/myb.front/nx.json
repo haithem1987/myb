@@ -28,7 +28,7 @@
     },
     "@angular-devkit/build-angular:browser": {
       "cache": true,
-      "dependsOn": ["^build"],
+      "dependsOn": ["i18n-check", "^build"],
       "inputs": ["production", "^production"]
     },
     "@nx/angular:ng-packagr-lite": {

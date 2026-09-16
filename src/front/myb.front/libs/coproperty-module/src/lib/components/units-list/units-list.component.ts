@@ -275,8 +275,8 @@ export class UnitsListComponent implements OnInit {
   formatArea(area: number | undefined): string {
     if (!area) return '-';
     return new Intl.NumberFormat('fr-FR', {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3
     }).format(area);
   }
 
@@ -343,6 +343,8 @@ export class UnitsListComponent implements OnInit {
   }
 
   saveUnit(): void {
+    const selected = this.coproperties().find(c => c.id === this.unitForm.get('copropertyId')?.value);
+    if (!this.editingUnitId() && selected?.isActive === false) return;
     if (this.unitForm.valid) {
       const unitData: UnitExtended = {
         ...this.unitForm.value,

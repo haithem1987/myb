@@ -27,6 +27,7 @@ export class UserDropdownComponent implements OnInit {
   hasSubscriptions = false;
   isProfilePage = false;
   isSubscriptionsPage = false;
+  isLoggingOut = false;
 
   constructor(
     private keycloakService: KeycloakService,
@@ -107,6 +108,8 @@ export class UserDropdownComponent implements OnInit {
   }
 
   logout(): void {
+    if (this.isLoggingOut) return;
+    this.isLoggingOut = true;
     // Redirect back to the current app's root after Keycloak logout.
     // Ensure this origin is added to the Keycloak client's "Valid post logout redirect URIs".
     this.keycloakService.logout(window.location.origin);

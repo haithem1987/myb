@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChargeService, ChargeExtended } from '../../services/charge.service';
@@ -13,6 +13,7 @@ import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, finalize, switchMap } from 'rxjs/operators';
 import { ChargeDistributionComponent } from '../charge-distribution/charge-distribution.component';
+import { ModalService, ToastService } from '@myb-front/shared-ui';
 
 @Component({
   selector: 'myb-charges-list',
@@ -29,6 +30,9 @@ export class ChargesListComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
+  private modalService = inject(ModalService);
+  private toastService = inject(ToastService);
+  private translateService = inject(TranslateService);
 
   charges = signal<ChargeExtended[]>([]);
   coproperties = signal<Coproperty[]>([]);
@@ -334,26 +338,39 @@ export class ChargesListComponent implements OnInit {
       .join(' · ');
   }
 
-  deleteCharge(charge: ChargeExtended): void {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer la charge "${charge.name}" ?
+  async deleteCharge(charge: ChargeExtended): Promise<void> {
+    if (!charge.id) return;
 
-Cette action est irréversible.`)) {
-      if (charge.id) {
-        this.loading.set(true);
-        this.chargeService.deleteCharge(charge.id, charge.copropertyId)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: () => {
-              this.loading.set(false);
-              this.loadAllCharges();
-            },
-            error: (err) => {
-              console.error('Error deleting charge:', err);
-              this.loading.set(false);
-              alert('Erreur lors de la suppression de la charge');
-            }
-          });
-      }
-    }
+    const confirmed = await this.modalService.confirm({
+      title: this.translateService.instant('coproperty.charges.deleteCharge'),
+      message: this.translateService.instant('coproperty.charges.deleteDetailedConfirm', {
+        name: charge.name,
+      }),
+      confirmButtonText: this.translateService.instant('common.delete'),
+      confirmButtonClass: 'btn-danger',
+      cancelButtonText: this.translateService.instant('common.cancel'),
+    });
+
+    if (!confirmed) return;
+
+    this.loading.set(true);
+    this.chargeService.deleteCharge(charge.id, charge.copropertyId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.charges.update((charges) =>
+            charges.filter((item) => item.id !== charge.id)
+          );
+          this.loading.set(false);
+        },
+        error: (err) => {
+          console.error('Error deleting charge:', err);
+          this.loading.set(false);
+          this.toastService.show(
+            this.translateService.instant('coproperty.messages.error'),
+            { classname: 'bg-danger text-light' }
+          );
+        }
+      });
   }
 }

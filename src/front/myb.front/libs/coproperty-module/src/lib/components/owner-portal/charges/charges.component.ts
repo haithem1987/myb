@@ -1,11 +1,13 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { OwnerService, FundCallService, FundCallExtended, CurrencyService, FundCallPayment } from '../../../index';
 import { KeycloakService } from '@myb-front/auth';
-import { ToastService, ModalService } from '@myb-front/shared-ui';
+import { ToastService, ModalService, NotificationService } from '@myb-front/shared-ui';
 import { firstValueFrom, catchError, of } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateModule } from '@ngx-translate/core';
 
 export interface PaymentReceipt {
   fundCallDescription: string;
@@ -32,7 +34,7 @@ export interface PaymentJustificationForm {
 @Component({
   selector: 'app-owner-charges',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
   templateUrl: './charges.component.html',
   styleUrls: ['./charges.component.scss']
 })
@@ -45,6 +47,8 @@ export class OwnerChargesComponent implements OnInit {
   private currencyService = inject(CurrencyService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private notificationService = inject(NotificationService);
+  private destroyRef = inject(DestroyRef);
 
   fundCalls = signal<FundCallExtended[]>([]);
   loading = signal(true);
@@ -80,7 +84,7 @@ export class OwnerChargesComponent implements OnInit {
   get totalPaid(): number {
     return this.fundCalls().reduce((sum, fc) => {
       const paid = (fc.payments || [])
-        .filter((p) => !this.isPaymentRejected(p.validationStatus))
+        .filter((p) => this.isPaymentApproved(p.validationStatus))
         .reduce((s, p) => s + p.amount, 0);
       return sum + paid;
     }, 0);
@@ -187,6 +191,9 @@ export class OwnerChargesComponent implements OnInit {
       this.filterStatus.set(statusParam);
     }
     this.loadOwnerData();
+    this.notificationService.dataChanges$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadOwnerData());
   }
 
   private getCurrentUserId(): string | null {
@@ -243,9 +250,15 @@ export class OwnerChargesComponent implements OnInit {
   }
 
   getFundCallPaidAmount(fc: FundCallExtended): number {
-    return (fc.payments || [])
-      .filter((p) => !this.isPaymentRejected(p.validationStatus))
-      .reduce((sum, p) => sum + p.amount, 0);
+    return this.currencyService.roundAmount((fc.payments || [])
+      .filter((p) => this.isPaymentApproved(p.validationStatus))
+      .reduce((sum, p) => sum + p.amount, 0));
+  }
+
+  getFundCallPendingAmount(fc: FundCallExtended): number {
+    return this.currencyService.roundAmount((fc.payments || [])
+      .filter((p) => this.isPaymentPending(p.validationStatus))
+      .reduce((sum, p) => sum + Number(p.amount || 0), 0));
   }
 
   private normalizePaymentValidationStatus(status: string | null | undefined): string {
@@ -265,12 +278,20 @@ export class OwnerChargesComponent implements OnInit {
   }
 
   getFundCallRemainingAmount(fc: FundCallExtended): number {
-    return fc.amount - this.getFundCallPaidAmount(fc);
+    return this.currencyService.roundAmount(Math.max(0, fc.amount - this.getFundCallPaidAmount(fc)));
+  }
+
+  /** Amount for which a new proof may still be submitted. Pending proofs
+   * reserve their amount until the syndic approves or rejects them. */
+  getFundCallPayableAmount(fc: FundCallExtended): number {
+    return this.currencyService.roundAmount(
+      Math.max(0, this.getFundCallRemainingAmount(fc) - this.getFundCallPendingAmount(fc))
+    );
   }
 
   /** Calculate suggested monthly installment based on remaining amount and months until due date */
   getSuggestedMonthlyAmount(fc: FundCallExtended): number {
-    const remaining = this.getFundCallRemainingAmount(fc);
+    const remaining = this.getFundCallPayableAmount(fc);
     if (remaining <= 0) return 0;
     const now = new Date();
     const due = new Date(fc.dueDate);
@@ -315,8 +336,9 @@ export class OwnerChargesComponent implements OnInit {
 
   // Payment justification modal
   openPaymentModal(fc: FundCallExtended): void {
+    const remaining = this.currencyService.roundAmount(this.getFundCallPayableAmount(fc));
+    if (remaining <= 0) return;
     this.selectedFundCall.set(fc);
-    const remaining = this.getFundCallRemainingAmount(fc);
     this.paymentForm = {
       amount: remaining,
       paymentMethod: 'Virement',
@@ -341,7 +363,8 @@ export class OwnerChargesComponent implements OnInit {
     const fc = this.selectedFundCall();
     if (!fc) return;
 
-    const remaining = this.getFundCallRemainingAmount(fc);
+    const remaining = this.currencyService.roundAmount(this.getFundCallPayableAmount(fc));
+    this.paymentForm.amount = this.currencyService.roundAmount(this.paymentForm.amount);
 
     // Validation
     if (this.paymentForm.amount <= 0) {
@@ -416,9 +439,14 @@ export class OwnerChargesComponent implements OnInit {
       });
 
       this.loadOwnerData();
-    } catch (err) {
+    } catch (err: any) {
       console.error('[OwnerCharges] Payment justification failed:', err);
-      this.toastService.show('L\'envoi du justificatif a échoué. Veuillez réessayer.', { classname: 'toast-danger' });
+      const message = err?.graphQLErrors?.[0]?.message
+        || err?.error?.errors?.[0]?.message
+        || 'L\'envoi du justificatif a échoué. Veuillez réessayer.';
+      this.toastService.show(message, { classname: 'toast-danger' });
+      // Re-sync amounts if another tab or request reserved the balance first.
+      this.loadOwnerData();
     } finally {
       this.submittingPayment.set(false);
     }
@@ -486,7 +514,8 @@ export class OwnerChargesComponent implements OnInit {
       const file = input.files[0];
       const maxSize = 5 * 1024 * 1024; // 5 MB
       const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
-      if (!allowed.includes(file.type)) {
+      const inferredType = this.getSupportedFileType(file);
+      if (!inferredType || !allowed.includes(inferredType)) {
         this.toastService.show('Format non supporté. Utilisez PDF, JPG, PNG ou WebP.', { classname: 'toast-danger' });
         input.value = '';
         return;
@@ -496,9 +525,24 @@ export class OwnerChargesComponent implements OnInit {
         input.value = '';
         return;
       }
-      this.justificatifFile = file;
+      // Some browsers provide an empty or non-standard MIME type for valid
+      // files. Re-wrap it with the extension-derived type before upload.
+      this.justificatifFile = file.type === inferredType
+        ? file
+        : new File([file], file.name, { type: inferredType, lastModified: file.lastModified });
       this.justificatifFileName.set(file.name);
     }
+  }
+
+  private getSupportedFileType(file: File): string | null {
+    if (file.type === 'image/jpg') return 'image/jpeg';
+    if (['application/pdf', 'image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return file.type;
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    const byExtension: Record<string, string> = {
+      pdf: 'application/pdf', jpg: 'image/jpeg', jpeg: 'image/jpeg',
+      png: 'image/png', webp: 'image/webp'
+    };
+    return extension ? byExtension[extension] ?? null : null;
   }
 
   removeFile(): void {

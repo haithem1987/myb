@@ -4,9 +4,9 @@
     <div class="col-md-8">
       <h2 class="mb-1">
         <i class="bi bi-cash-stack me-2"></i>
-        Mes Appels de Fonds
+        {{ 'ownerPortal.charges.title' | translate }}
       </h2>
-      <p class="text-muted">Consultez et payez vos appels de fonds de copropriété</p>
+      <p class="text-muted">{{ 'ownerPortal.charges.subtitle' | translate }}</p>
     </div>
   </div>
 
@@ -19,7 +19,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ totalChargesDisplay }}</div>
-          <div class="stat-label">Total des appels</div>
+          <div class="stat-label">{{ 'ownerPortal.charges.totalCalls' | translate }}</div>
         </div>
       </div>
     </div>
@@ -30,7 +30,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ totalPaidDisplay }}</div>
-          <div class="stat-label">Montant payé</div>
+          <div class="stat-label">{{ 'ownerPortal.charges.paidAmount' | translate }}</div>
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ totalDueDisplay }}</div>
-          <div class="stat-label">Reste à payer</div>
+          <div class="stat-label">{{ 'ownerPortal.charges.remainingAmount' | translate }}</div>
         </div>
       </div>
     </div>
@@ -50,9 +50,9 @@
   <!-- Loading -->
   <div *ngIf="loading()" class="text-center py-5">
     <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Chargement...</span>
+      <span class="visually-hidden">{{ 'ownerPortal.charges.loading' | translate }}</span>
     </div>
-    <p class="text-muted mt-3">Chargement de vos appels de fonds...</p>
+    <p class="text-muted mt-3">{{ 'ownerPortal.charges.loadingCalls' | translate }}</p>
   </div>
 
   <!-- Error State -->
@@ -61,7 +61,7 @@
     <div>
       {{ error() }}
       <button class="btn btn-link p-0 ms-2" (click)="loadOwnerData()">
-        <i class="bi bi-arrow-clockwise me-1"></i>Réessayer
+        <i class="bi bi-arrow-clockwise me-1"></i>{{ 'ownerPortal.charges.retry' | translate }}
       </button>
     </div>
   </div>
@@ -69,9 +69,9 @@
   <!-- Empty State -->
   <div *ngIf="!loading() && !error() && fundCalls().length === 0" class="empty-state text-center py-5">
     <i class="bi bi-inbox display-1 text-muted"></i>
-    <h4 class="mt-3">Aucun appel de fonds</h4>
-    <p class="text-muted" *ngIf="ownerId()">Aucun appel de fonds n'a été émis pour le moment.</p>
-    <p class="text-muted" *ngIf="!ownerId()">Votre compte propriétaire n'a pas été trouvé. Contactez votre syndic.</p>
+    <h4 class="mt-3">{{ 'ownerPortal.charges.emptyTitle' | translate }}</h4>
+    <p class="text-muted" *ngIf="ownerId()">{{ 'ownerPortal.charges.emptyText' | translate }}</p>
+    <p class="text-muted" *ngIf="!ownerId()">{{ 'ownerPortal.charges.ownerMissing' | translate }}</p>
   </div>
 
   <!-- Filters & Search -->
@@ -80,33 +80,33 @@
       <div class="row g-3 align-items-end">
         <div class="col-md-5">
           <label for="ownerFundCallSearch" class="form-label">
-            <i class="bi bi-search me-1"></i>Recherche
+            <i class="bi bi-search me-1"></i>{{ 'ownerPortal.charges.search' | translate }}
           </label>
           <input
             type="text"
             id="ownerFundCallSearch"
             class="form-control"
-            placeholder="Rechercher par description ou copropriété..."
+            [placeholder]="'ownerPortal.charges.searchPlaceholder' | translate"
             [value]="searchTerm()"
             (input)="onSearchInput($event)">
         </div>
         <div class="col-md-4">
           <label for="ownerFundCallStatus" class="form-label">
-            <i class="bi bi-bookmark me-1"></i>Statut
+            <i class="bi bi-bookmark me-1"></i>{{ 'ownerPortal.charges.status' | translate }}
           </label>
           <select id="ownerFundCallStatus" class="form-select" [value]="filterStatus()" (change)="onStatusFilterChange($event)">
-            <option value="">Tous les statuts</option>
-            <option value="unpaid">À payer</option>
-            <option value="paid">Réglés</option>
-            <option value="cancelled">Annulés</option>
+            <option value="">{{ 'ownerPortal.charges.allStatuses' | translate }}</option>
+            <option value="unpaid">{{ 'ownerPortal.charges.unpaid' | translate }}</option>
+            <option value="paid">{{ 'ownerPortal.charges.paid' | translate }}</option>
+            <option value="cancelled">{{ 'ownerPortal.charges.cancelled' | translate }}</option>
           </select>
         </div>
         <div class="col-md-3">
           <label for="ownerFundCallYear" class="form-label">
-            <i class="bi bi-calendar me-1"></i>Année
+            <i class="bi bi-calendar me-1"></i>{{ 'ownerPortal.charges.year' | translate }}
           </label>
           <select id="ownerFundCallYear" class="form-select" [value]="filterYear()" (change)="onYearFilterChange($event)">
-            <option value="">Toutes</option>
+            <option value="">{{ 'ownerPortal.charges.allYears' | translate }}</option>
             <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
           </select>
         </div>
@@ -118,14 +118,14 @@
   <div *ngIf="!loading() && unpaidFundCalls.length > 0" class="mb-4">
     <h4 class="section-title">
       <i class="bi bi-clock-history text-warning me-2"></i>
-      Appels de fonds à payer ({{ unpaidFundCalls.length }})
+      {{ 'ownerPortal.charges.unpaidCalls' | translate:{count: unpaidFundCalls.length} }}
     </h4>
     <div class="charges-grid">
       <div class="charge-card unpaid" *ngFor="let fc of unpaidFundCalls" [class.overdue]="isOverdue(fc)">
         <div class="charge-header">
           <div class="charge-type">
             <i class="bi bi-receipt-cutoff"></i>
-            <span class="type-label">Appel de fonds</span>
+            <span class="type-label">{{ 'ownerPortal.charges.callForFunds' | translate }}</span>
           </div>
           <span class="status-badge" [ngClass]="getStatusClass(fc.status)">
             {{ getStatusLabel(fc.status) }}
@@ -141,19 +141,25 @@
           <div class="charge-details">
             <div class="detail-row">
               <span class="detail-label">
-                <i class="bi bi-cash me-1"></i> Montant total
+                <i class="bi bi-cash me-1"></i> {{ 'ownerPortal.charges.totalAmount' | translate }}
               </span>
               <span class="detail-value">{{ formatAmount(fc.amount, fc.currency) }}</span>
             </div>
             <div class="detail-row" *ngIf="getFundCallPaidAmount(fc) > 0">
               <span class="detail-label">
-                <i class="bi bi-check2 me-1"></i> Déjà payé
+                <i class="bi bi-check2 me-1"></i> {{ 'ownerPortal.charges.alreadyPaid' | translate }}
               </span>
               <span class="detail-value text-success">{{ formatAmount(getFundCallPaidAmount(fc), fc.currency) }}</span>
             </div>
+            <div class="detail-row" *ngIf="getFundCallPendingAmount(fc) > 0">
+              <span class="detail-label">
+                <i class="bi bi-clock me-1"></i> {{ 'ownerPortal.charges.pendingValidation' | translate }}
+              </span>
+              <span class="detail-value text-warning">{{ formatAmount(getFundCallPendingAmount(fc), fc.currency) }}</span>
+            </div>
             <div class="detail-row">
               <span class="detail-label">
-                <i class="bi bi-calendar me-1"></i> Échéance
+                <i class="bi bi-calendar me-1"></i> {{ 'ownerPortal.charges.dueDate' | translate }}
               </span>
               <span class="detail-value" [class.text-danger]="isOverdue(fc)">
                 {{ formatDate(fc.dueDate) }}
@@ -164,7 +170,7 @@
 
           <!-- Previous payments list -->
           <div *ngIf="fc.payments && fc.payments.length > 0" class="mt-2">
-            <small class="text-muted fw-bold">Versements effectués:</small>
+            <small class="text-muted fw-bold">{{ 'ownerPortal.charges.paymentsMade' | translate }}:</small>
             <div class="payments-list">
               <div class="payment-item" *ngFor="let p of fc.payments">
                 <span class="payment-amount">{{ formatAmount(p.amount, fc.currency) }}</span>
@@ -174,18 +180,18 @@
                 </span>
                 <!-- Validation status indicator -->
                 <span *ngIf="isPaymentPending(p.validationStatus)" class="badge bg-warning text-dark ms-1" style="font-size:0.65rem">
-                  <i class="bi bi-clock me-1"></i>En attente de validation
+                  <i class="bi bi-clock me-1"></i>{{ 'ownerPortal.charges.pendingValidation' | translate }}
                 </span>
                 <span *ngIf="isPaymentApproved(p.validationStatus)" class="badge bg-success ms-1" style="font-size:0.65rem">
-                  <i class="bi bi-check2 me-1"></i>Validé
+                  <i class="bi bi-check2 me-1"></i>{{ 'ownerPortal.charges.approved' | translate }}
                 </span>
                 <span *ngIf="isPaymentRejected(p.validationStatus)" class="badge bg-danger ms-1" style="font-size:0.65rem">
-                  <i class="bi bi-x-lg me-1"></i>Refusé
+                  <i class="bi bi-x-lg me-1"></i>{{ 'ownerPortal.charges.rejected' | translate }}
                 </span>
                 <!-- Rejection reason -->
                 <div *ngIf="isPaymentRejected(p.validationStatus) && p.rejectionReason"
                      class="mt-1 small text-danger" style="background:#fff5f5;padding:4px 8px;border-radius:4px;border-left:3px solid #ef4444">
-                  <i class="bi bi-info-circle me-1"></i><strong>Motif :</strong> {{ p.rejectionReason }}
+                  <i class="bi bi-info-circle me-1"></i><strong>{{ 'ownerPortal.charges.reason' | translate }}:</strong> {{ p.rejectionReason }}
                 </div>
               </div>
             </div>
@@ -194,7 +200,7 @@
 
         <div class="charge-footer">
           <div class="amount-section">
-            <div class="amount-label">RESTE À PAYER</div>
+            <div class="amount-label">{{ 'ownerPortal.charges.remainingAmount' | translate }}</div>
             <div class="amount-value">{{ formatAmount(getFundCallRemainingAmount(fc), fc.currency) }}</div>
             <div class="monthly-hint" *ngIf="getMonthsUntilDue(fc) > 1">
               <small class="text-info">
@@ -205,9 +211,11 @@
           </div>
           <button
             class="btn btn-success btn-pay"
+            [disabled]="getFundCallPayableAmount(fc) <= 0"
+            [title]="getFundCallPayableAmount(fc) <= 0 ? ('ownerPortal.charges.pendingCoverage' | translate) : ''"
             (click)="openPaymentModal(fc)">
             <i class="bi bi-file-earmark-check me-1"></i>
-            Payer
+            {{ 'ownerPortal.charges.pay' | translate }}
           </button>
         </div>
       </div>
@@ -218,18 +226,18 @@
   <div *ngIf="!loading() && paidFundCalls.length > 0">
     <h4 class="section-title">
       <i class="bi bi-check-circle text-success me-2"></i>
-      Appels de fonds réglés ({{ paidFundCalls.length }})
+      {{ 'ownerPortal.charges.paidCalls' | translate:{count: paidFundCalls.length} }}
     </h4>
     <div class="table-responsive">
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Description</th>
-            <th>Copropriété</th>
-            <th class="text-end">Montant</th>
-            <th>Échéance</th>
-            <th>Versements</th>
-            <th>Statut</th>
+            <th>{{ 'ownerPortal.charges.description' | translate }}</th>
+            <th>{{ 'ownerPortal.charges.coproperty' | translate }}</th>
+            <th class="text-end">{{ 'ownerPortal.charges.amount' | translate }}</th>
+            <th>{{ 'ownerPortal.charges.dueDate' | translate }}</th>
+            <th>{{ 'ownerPortal.charges.paymentsMade' | translate }}</th>
+            <th>{{ 'ownerPortal.charges.status' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -260,17 +268,17 @@
   <div *ngIf="!loading() && cancelledFundCalls.length > 0" class="mt-4">
     <h4 class="section-title">
       <i class="bi bi-x-circle text-secondary me-2"></i>
-      Appels de fonds annulés ({{ cancelledFundCalls.length }})
+      {{ 'ownerPortal.charges.cancelledCalls' | translate:{count: cancelledFundCalls.length} }}
     </h4>
     <div class="table-responsive">
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Description</th>
-            <th>Copropriété</th>
-            <th class="text-end">Montant</th>
-            <th>Échéance</th>
-            <th>Statut</th>
+            <th>{{ 'ownerPortal.charges.description' | translate }}</th>
+            <th>{{ 'ownerPortal.charges.coproperty' | translate }}</th>
+            <th class="text-end">{{ 'ownerPortal.charges.amount' | translate }}</th>
+            <th>{{ 'ownerPortal.charges.dueDate' | translate }}</th>
+            <th>{{ 'ownerPortal.charges.status' | translate }}</th>
             <th></th>
           </tr>
         </thead>
@@ -289,7 +297,7 @@
             </td>
             <td>
               <button class="btn btn-sm btn-outline-secondary" (click)="viewFundCallDetails(fc)">
-                <i class="bi bi-eye me-1"></i>Voir les détails
+                <i class="bi bi-eye me-1"></i>{{ 'ownerPortal.charges.viewDetails' | translate }}
               </button>
             </td>
           </tr>
@@ -301,19 +309,19 @@
   <!-- No results match active filters -->
   <div *ngIf="!loading() && !error() && fundCalls().length > 0 && unpaidFundCalls.length === 0 && paidFundCalls.length === 0 && cancelledFundCalls.length === 0 && hasActiveFilters" class="text-center py-5">
     <i class="bi bi-search display-1 text-muted"></i>
-    <p class="text-muted mt-3">Aucun appel de fonds ne correspond à vos critères de recherche.</p>
+    <p class="text-muted mt-3">{{ 'ownerPortal.charges.noResults' | translate }}</p>
   </div>
 
   <!-- All Paid State (only when non-cancelled fund calls are all settled) -->
   <div *ngIf="!loading() && !error() && allFundCallsPaid" class="all-paid-banner">
     <i class="bi bi-check-circle-fill"></i>
-    <span>Tous vos appels de fonds sont réglés!</span>
+    <span>{{ 'ownerPortal.charges.allPaid' | translate }}</span>
   </div>
 
   <!-- Cancelled-only notice (shown when every fund call is cancelled and none is paid) -->
   <div *ngIf="!loading() && !error() && !allFundCallsPaid && hasCancelledFundCalls && unpaidFundCalls.length === 0 && paidFundCalls.length === 0" class="alert alert-secondary d-flex align-items-center mt-3" role="alert">
     <i class="bi bi-info-circle-fill me-2"></i>
-    <div>Vos appels de fonds ont été annulés par le syndic. L'historique ci-dessous est conservé à titre de référence.</div>
+    <div>{{ 'ownerPortal.charges.cancelledNotice' | translate }}</div>
   </div>
 </div>
 
@@ -325,7 +333,7 @@
       <div class="modal-header" style="background:#f3f4f6">
         <h5 class="modal-title">
           <i class="bi bi-file-earmark-text me-2"></i>
-          Détails de l'appel de fonds
+          {{ 'ownerPortal.charges.detailsTitle' | translate }}
         </h5>
         <button type="button" class="btn-close" (click)="closeDetailModal()"></button>
       </div>
@@ -333,22 +341,22 @@
         <!-- Cancelled banner -->
         <div class="alert alert-secondary d-flex align-items-center mb-3" role="alert">
           <i class="bi bi-lock-fill me-2"></i>
-          <div>Cet appel de fonds a été <strong>annulé</strong> par le syndic. Aucune action n'est disponible.</div>
+          <div>{{ 'ownerPortal.charges.cancelledDetailNotice' | translate }}</div>
         </div>
 
         <!-- Details -->
         <div class="mb-3">
           <div class="row g-2">
             <div class="col-6">
-              <small class="text-muted d-block">Description</small>
+              <small class="text-muted d-block">{{ 'ownerPortal.charges.description' | translate }}</small>
               <strong>{{ fc.description || 'Appel de fonds' }}</strong>
             </div>
             <div class="col-6">
-              <small class="text-muted d-block">Copropriété</small>
+              <small class="text-muted d-block">{{ 'ownerPortal.charges.coproperty' | translate }}</small>
               <span>{{ fc.copropertyName || '-' }}</span>
             </div>
             <div class="col-6 mt-2">
-              <small class="text-muted d-block">Montant</small>
+              <small class="text-muted d-block">{{ 'ownerPortal.charges.amount' | translate }}</small>
               <strong>{{ formatAmount(fc.amount, fc.currency) }}</strong>
             </div>
             <div class="col-6 mt-2">
@@ -534,6 +542,14 @@
             <span>Reste à payer:</span>
             <strong class="text-danger">{{ formatAmount(getFundCallRemainingAmount(fc), fc.currency) }}</strong>
           </div>
+          <div class="summary-row" *ngIf="getFundCallPendingAmount(fc) > 0">
+            <span>Déjà soumis, en attente:</span>
+            <strong class="text-warning">{{ formatAmount(getFundCallPendingAmount(fc), fc.currency) }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Encore disponible au paiement:</span>
+            <strong>{{ formatAmount(getFundCallPayableAmount(fc), fc.currency) }}</strong>
+          </div>
         </div>
 
         <hr>
@@ -544,8 +560,8 @@
             <i class="bi bi-cash me-1"></i> Montant du versement ({{ currencySymbol }}) *
           </label>
           <input type="number" class="form-control" [(ngModel)]="paymentForm.amount"
-                 [max]="selectedFundCall() ? getFundCallRemainingAmount(selectedFundCall()!) : 0"
-                 min="0.01" step="0.001">
+                 [max]="selectedFundCall() ? getFundCallPayableAmount(selectedFundCall()!) : 0"
+                 min="0.001" step="0.001">
           <small class="text-muted">Vous pouvez effectuer un paiement partiel (mensualité)</small>
           <!-- Monthly installment suggestion -->
           <div class="installment-suggestion mt-2" *ngIf="selectedFundCall() as fc">
@@ -646,7 +662,8 @@
         <button type="button" class="btn btn-secondary" (click)="closePaymentModal()" [disabled]="submittingPayment()">
           Annuler
         </button>
-        <button type="button" class="btn btn-success" (click)="submitPaymentJustification()" [disabled]="submittingPayment()">
+        <button type="button" class="btn btn-success" (click)="submitPaymentJustification()"
+                [disabled]="submittingPayment() || !selectedFundCall() || getFundCallPayableAmount(selectedFundCall()!) <= 0">
           <span *ngIf="submittingPayment()" class="spinner-border spinner-border-sm me-1"></span>
           <i *ngIf="!submittingPayment()" class="bi bi-check-lg me-1"></i>
           {{ submittingPayment() ? 'Envoi...' : 'Envoyer le justificatif' }}

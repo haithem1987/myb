@@ -34,11 +34,11 @@ type Tab = 'en-cours' | 'resolus';
           <p class="text-muted mb-0">{{ 'managerReports.subtitle' | translate }}</p>
         </div>
         <div class="d-flex gap-2">
-          <select class="form-select" style="width:auto" [(ngModel)]="filterType" (ngModelChange)="applyFilters()">
+          <select class="form-select" style="width:auto" [ngModel]="filterType()" (ngModelChange)="filterType.set($event)">
             <option value="">{{ 'managerReports.allTypes' | translate }}</option>
             <option *ngFor="let opt of typeOptions" [value]="opt.value">{{ getTypeLabel(opt.value) }}</option>
           </select>
-          <select class="form-select" style="width:auto" [(ngModel)]="filterZone" (ngModelChange)="applyFilters()">
+          <select class="form-select" style="width:auto" [ngModel]="filterZone()" (ngModelChange)="filterZone.set($event)">
             <option value="">{{ 'managerReports.allZones' | translate }}</option>
             <option *ngFor="let opt of zoneOptions" [value]="opt.value">{{ getZoneLabel(opt.value) }}</option>
           </select>
@@ -182,6 +182,16 @@ type Tab = 'en-cours' | 'resolus';
         </div>
       </div>
 
+      <!-- Keep data-URL photos in-page. Opening a data URL in a new tab is
+           blocked by modern browsers and results in about:blank. -->
+      <div class="modal-overlay" *ngIf="photoPreviewUrl()" (click)="closePhoto()">
+        <div class="photo-modal" (click)="$event.stopPropagation()">
+          <button type="button" class="btn-close photo-close" (click)="closePhoto()"
+                  [attr.aria-label]="'common.close' | translate"></button>
+          <img [src]="photoPreviewUrl()!" alt="Photo du signalement">
+        </div>
+      </div>
+
     </div>
   `,
   styles: [`
@@ -281,6 +291,31 @@ type Tab = 'en-cours' | 'resolus';
       max-width: 95vw;
       box-shadow: 0 8px 40px rgba(0,0,0,.18);
     }
+    .photo-modal {
+      position: relative;
+      max-width: min(92vw, 1100px);
+      max-height: 90vh;
+      padding: 12px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 40px rgba(0,0,0,.28);
+    }
+    .photo-modal img {
+      display: block;
+      max-width: 100%;
+      max-height: calc(90vh - 24px);
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .photo-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,.9);
+      z-index: 1;
+    }
   `]
 })
 export class SyndicSignalementsComponent implements OnInit {
@@ -294,9 +329,10 @@ export class SyndicSignalementsComponent implements OnInit {
   updating = signal<string | null>(null);
   activeTab = signal<Tab>('en-cours');
   resolveTarget = signal<Signalement | null>(null);
+  photoPreviewUrl = signal<string | null>(null);
   resolveComment = '';
-  filterType = '';
-  filterZone = '';
+  filterType = signal('');
+  filterZone = signal('');
 
   typeOptions = Object.keys(SIGNALEMENT_TYPE_LABELS).map(value => ({ value }));
   zoneOptions = Object.keys(SIGNALEMENT_ZONE_LABELS).map(value => ({ value }));
@@ -308,8 +344,10 @@ export class SyndicSignalementsComponent implements OnInit {
         ? s.status === 'EN_COURS' || s.status === 'PRIS_EN_COMPTE'
         : s.status === 'RESOLU'
     );
-    if (this.filterType) list = list.filter(s => s.type === this.filterType);
-    if (this.filterZone) list = list.filter(s => s.zone === this.filterZone);
+    const type = this.filterType();
+    const zone = this.filterZone();
+    if (type) list = list.filter(s => s.type === type);
+    if (zone) list = list.filter(s => s.zone === zone);
     return list;
   });
 
@@ -327,8 +365,6 @@ export class SyndicSignalementsComponent implements OnInit {
         this.loading.set(false);
       });
   }
-
-  applyFilters(): void { /* computed handles it */ }
 
   setTab(tab: Tab): void { this.activeTab.set(tab); }
 
@@ -381,7 +417,9 @@ export class SyndicSignalementsComponent implements OnInit {
       });
   }
 
-  openPhoto(url: string): void { window.open(url, '_blank'); }
+  openPhoto(url: string): void { this.photoPreviewUrl.set(url); }
+
+  closePhoto(): void { this.photoPreviewUrl.set(null); }
 
   getTypeLabel(type: string): string { return this.translate.instant(`managerReports.types.${type}`, { fallback: SIGNALEMENT_TYPE_LABELS[type] ?? type }); }
   getZoneLabel(zone: string): string { return this.translate.instant(`managerReports.zones.${zone}`, { fallback: SIGNALEMENT_ZONE_LABELS[zone] ?? zone }); }

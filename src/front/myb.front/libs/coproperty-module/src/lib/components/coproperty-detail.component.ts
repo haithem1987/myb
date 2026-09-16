@@ -6,8 +6,6 @@ import { CopropertyService } from '../services/coproperty.service';
 import { Coproperty } from '../models/coproperty.models';
 import { UnitManagementComponent } from './unit-management/unit-management.component';
 import { ChargeManagementComponent } from './charge-management/charge-management.component';
-import { MaintenanceRequestsComponent } from './maintenance-requests/maintenance-requests.component';
-import { InterventionManagementComponent } from './intervention-management/intervention-management.component';
 
 @Component({
   selector: 'myb-coproperty-detail',
@@ -16,9 +14,7 @@ import { InterventionManagementComponent } from './intervention-management/inter
     CommonModule,
     TranslateModule,
     UnitManagementComponent,
-    ChargeManagementComponent,
-    MaintenanceRequestsComponent,
-    InterventionManagementComponent
+    ChargeManagementComponent
   ],
   template: `
     <div class="container-fluid mt-4">
@@ -109,33 +105,21 @@ import { InterventionManagementComponent } from './intervention-management/inter
                 {{ 'coproperty.charges.title' | translate }}
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#maintenance" data-bs-toggle="tab">
-                {{ 'coproperty.maintenance.title' | translate }}
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#interventions" data-bs-toggle="tab">
-                {{ 'intervention.list.title' | translate }}
-              </a>
-            </li>
           </ul>
           <div class="tab-content mt-3">
             <div id="units" class="tab-pane fade show active">
               <myb-unit-management
                 [copropertyId]="coproperty?.id || null"
                 [copropertyName]="coproperty?.name || ''"
+                [copropertyIsActive]="coproperty?.isActive !== false"
                 [copropertyTotalShares]="coproperty?.totalShares ?? null">
               </myb-unit-management>
             </div>
             <div id="charges" class="tab-pane fade">
-              <myb-charge-management [copropertyId]="coproperty?.id || null"></myb-charge-management>
-            </div>
-            <div id="maintenance" class="tab-pane fade">
-              <myb-maintenance-requests [copropertyId]="coproperty?.id || null"></myb-maintenance-requests>
-            </div>
-            <div id="interventions" class="tab-pane fade">
-              <myb-intervention-management [copropertyId]="coproperty?.id || null"></myb-intervention-management>
+              <myb-charge-management
+                [copropertyId]="coproperty?.id || null"
+                [copropertyIsActive]="coproperty?.isActive !== false">
+              </myb-charge-management>
             </div>
           </div>
         </div>

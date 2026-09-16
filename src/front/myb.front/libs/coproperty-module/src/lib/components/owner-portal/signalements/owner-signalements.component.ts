@@ -14,37 +14,38 @@ import {
 } from '@myb-front/coproperty-module';
 import { take, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 
 type Tab = 'en-cours' | 'resolus';
 
 @Component({
   selector: 'myb-coproperty-owner-signalements',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 class="mb-1 fw-bold">Signalements</h2>
-          <p class="text-muted mb-0">Incidents signalés dans votre copropriété</p>
+          <h2 class="mb-1 fw-bold">{{ 'ownerPortal.reports.title' | translate }}</h2>
+          <p class="text-muted mb-0">{{ 'ownerPortal.reports.subtitle' | translate }}</p>
         </div>
         <button class="btn btn-primary" (click)="goToNew()">
-          <i class="bi bi-plus-lg me-2"></i>Je signale
+          <i class="bi bi-plus-lg me-2"></i>{{ 'ownerPortal.reports.create' | translate }}
         </button>
       </div>
 
       <!-- Tabs -->
       <div class="tab-toggle mb-3">
-        <button class="tab-btn" [class.active]="activeTab() === 'en-cours'" (click)="setTab('en-cours')">En cours</button>
-        <button class="tab-btn" [class.active]="activeTab() === 'resolus'" (click)="setTab('resolus')">Résolus</button>
+        <button class="tab-btn" [class.active]="activeTab() === 'en-cours'" (click)="setTab('en-cours')">{{ 'ownerPortal.reports.inProgress' | translate }}</button>
+        <button class="tab-btn" [class.active]="activeTab() === 'resolus'" (click)="setTab('resolus')">{{ 'ownerPortal.reports.resolved' | translate }}</button>
       </div>
 
       <!-- Count -->
       <div class="count-banner mb-3" *ngIf="!loading()">
         <span class="count-badge">{{ displayedSignalements().length }}</span>
         <span class="ms-2 text-muted">
-          {{ activeTab() === 'en-cours' ? 'Signalements en cours' : 'Signalements résolus' }}
+          {{ (activeTab() === 'en-cours' ? 'ownerPortal.reports.inProgressCount' : 'ownerPortal.reports.resolvedCount') | translate }}
         </span>
       </div>
 
@@ -56,7 +57,7 @@ type Tab = 'en-cours' | 'resolus';
       <!-- Empty -->
       <div *ngIf="!loading() && displayedSignalements().length === 0" class="text-center py-5 text-muted">
         <i class="bi bi-clipboard-check fs-1"></i>
-        <p class="mt-3">Aucun signalement {{ activeTab() === 'en-cours' ? 'en cours' : 'résolu' }}</p>
+        <p class="mt-3">{{ (activeTab() === 'en-cours' ? 'ownerPortal.reports.noneInProgress' : 'ownerPortal.reports.noneResolved') | translate }}</p>
       </div>
 
       <!-- Cards -->

@@ -1,0 +1,6 @@
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+USER $APP_UID
+WORKDIR /app
+COPY . .
+EXPOSE 8088
+ENTRYPOINT ["dotnet", "Myb.Coproperty.dll"]

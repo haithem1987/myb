@@ -17,6 +17,7 @@ NC='\033[0m'
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}MYB Platform - Scale UP (Morning)${NC}"
 echo -e "${GREEN}========================================${NC}"
+echo -e "${YELLOW}This command only restores existing replicas; it does not build, push, or deploy images.${NC}"
 
 # Check if kubectl is configured
 if ! kubectl cluster-info > /dev/null 2>&1; then
@@ -25,6 +26,36 @@ if ! kubectl cluster-info > /dev/null 2>&1; then
 fi
 
 echo -e "${BLUE}Scaling workloads back up in namespace: $NAMESPACE${NC}\n"
+
+# Fail fast when Keycloak cannot possibly start. The repository contains
+# placeholder-only secret templates, so scaling replicas cannot repair this.
+validate_keycloak_secret_key() {
+    local key_name=$1
+    local encoded_value
+    local decoded_value
+
+    if ! encoded_value=$(kubectl get secret database-credentials -n "$NAMESPACE" \
+        -o "jsonpath={.data.${key_name}}" 2>/dev/null) || [[ -z "$encoded_value" ]]; then
+        echo -e "${RED}Error: database-credentials/${key_name} is missing in namespace ${NAMESPACE}${NC}"
+        return 1
+    fi
+
+    if ! decoded_value=$(printf '%s' "$encoded_value" | base64 --decode 2>/dev/null); then
+        echo -e "${RED}Error: database-credentials/${key_name} is invalid${NC}"
+        return 1
+    fi
+
+    if [[ -z "$decoded_value" || "$decoded_value" == REPLACE_WITH* ]]; then
+        echo -e "${RED}Error: database-credentials/${key_name} still contains a placeholder${NC}"
+        return 1
+    fi
+}
+
+echo -e "${YELLOW}Validating Keycloak database credentials...${NC}"
+validate_keycloak_secret_key "KEYCLOAK_DB_URL"
+validate_keycloak_secret_key "KEYCLOAK_DB_USER"
+validate_keycloak_secret_key "KEYCLOAK_DB_PASSWORD"
+echo -e "${GREEN}✓ Keycloak database credentials are present${NC}\n"
 
 # List of deployments to scale up (in dependency order)
 DEPLOYMENTS=(
@@ -72,6 +103,10 @@ echo -e "${GREEN}========================================${NC}"
 
 echo -e "\n${BLUE}Current status:${NC}"
 kubectl get deployments -n "$NAMESPACE"
+
+echo -e "\n${BLUE}Currently deployed images:${NC}"
+kubectl get deployments -n "$NAMESPACE" \
+    -o custom-columns='DEPLOYMENT:.metadata.name,IMAGE:.spec.template.spec.containers[*].image'
 
 echo -e "\n${BLUE}Pods:${NC}"
 kubectl get pods -n "$NAMESPACE"

@@ -1,3 +1,4 @@
+import { dateRangeValidator } from '../../utils/date-range.validator';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -9,6 +10,7 @@ import { UnitExtended, UnitService } from '../../services/unit.service';
 import { Tenant, TenantInput } from '../../models/tenant.model';
 import { KeycloakService } from '@myb-front/auth';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { CurrencyService } from '../../services/currency.service';
 
 @Component({
   selector: 'myb-tenant-management',
@@ -25,10 +27,11 @@ export class TenantManagementComponent implements OnInit {
   private unitService = inject(UnitService);
   private keycloakService = inject(KeycloakService);
   private translate = inject(TranslateService);
+  private currencyService = inject(CurrencyService);
 
   tenants: Tenant[] = [];
   units: UnitExtended[] = [];
-  coproperties = signal<Array<{ id: string; name: string }>>([]);
+  coproperties = signal<Array<{ id: string; name: string; isActive: boolean }>>([]);
   loading = signal(false);
   saving = signal(false);
   alert = signal<{ type: 'success' | 'danger' | 'info' | null; message: string }>({ type: null, message: '' });
@@ -50,7 +53,7 @@ export class TenantManagementComponent implements OnInit {
     depositAmount: [null, [Validators.min(0)]],
     isActive: [true],
     notes: ['', Validators.maxLength(2000)],
-  });
+  }, { validators: dateRangeValidator('leaseStartDate', 'leaseEndDate') });
 
   ngOnInit(): void {
     this.loadCoproperties();
@@ -88,9 +91,10 @@ export class TenantManagementComponent implements OnInit {
       )
       .subscribe({
         next: (coproperties) => {
-          this.coproperties.set(coproperties.map(c => ({ id: c.id, name: c.name })));
-          if (!this.selectedCopropertyId && coproperties.length > 0) {
-            this.selectedCopropertyId = coproperties[0].id;
+          this.coproperties.set(coproperties.map(c => ({ id: c.id, name: c.name, isActive: c.isActive })));
+          const firstActive = coproperties.find(c => c.isActive);
+          if (!this.selectedCopropertyId && firstActive) {
+            this.selectedCopropertyId = firstActive.id;
             this.loadData();
           }
         },
@@ -128,6 +132,7 @@ export class TenantManagementComponent implements OnInit {
   }
 
   openAddForm(): void {
+    if (!this.isSelectedCopropertyActive()) return;
     this.editingTenantId = null;
     this.showForm = true;
     this.tenantForm.reset({
@@ -147,6 +152,10 @@ export class TenantManagementComponent implements OnInit {
 
   editTenant(tenant: Tenant): void {
     this.editingTenantId = tenant.id;
+    // Populate immediately from the list row. The detail request below refreshes
+    // the values, but a slow or unavailable request must never show an empty form.
+    this.showForm = true;
+    this.populateTenantForm(tenant);
     this.loading.set(true);
     this.tenantService.getTenantById(tenant.id)
       .pipe(
@@ -155,29 +164,16 @@ export class TenantManagementComponent implements OnInit {
       )
       .subscribe({
         next: (tenantDetails) => {
-          this.showForm = true;
-          this.tenantForm.reset({
-            unitId: tenantDetails.unitId,
-            firstName: tenantDetails.firstName,
-            lastName: tenantDetails.lastName,
-            email: tenantDetails.email,
-            phone: tenantDetails.phone || '',
-            leaseStartDate: this.toDateInput(tenantDetails.leaseStartDate),
-            leaseEndDate: tenantDetails.leaseEndDate ? this.toDateInput(tenantDetails.leaseEndDate) : '',
-            monthlyRent: tenantDetails.monthlyRent ?? null,
-            depositAmount: tenantDetails.depositAmount ?? null,
-            isActive: tenantDetails.isActive,
-            notes: tenantDetails.notes || '',
-          });
+          this.populateTenantForm(tenantDetails);
         },
         error: () => {
-          this.editingTenantId = null;
-          this.showAlert('danger', this.t('tenantManagement.messages.loadTenantError'));
+          this.showAlert('info', this.t('tenantManagement.messages.loadTenantError'));
         },
       });
   }
 
   saveTenant(): void {
+    if (!this.editingTenantId && !this.isSelectedCopropertyActive()) return;
     if (this.tenantForm.invalid || !this.selectedCopropertyId) {
       this.tenantForm.markAllAsTouched();
       return;
@@ -211,6 +207,10 @@ export class TenantManagementComponent implements OnInit {
           error?.message || this.t('tenantManagement.messages.saveError')
         ),
       });
+  }
+
+  isSelectedCopropertyActive(): boolean {
+    return this.coproperties().find(c => c.id === this.selectedCopropertyId)?.isActive === true;
   }
 
   deactivateTenant(tenant: Tenant): void {
@@ -261,8 +261,23 @@ export class TenantManagementComponent implements OnInit {
     if (value == null) {
       return '-';
     }
-    const locale = this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR';
-    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(value);
+    return this.currencyService.formatAmount(value);
+  }
+
+  private populateTenantForm(tenant: Tenant): void {
+    this.tenantForm.reset({
+      unitId: tenant.unitId,
+      firstName: tenant.firstName,
+      lastName: tenant.lastName,
+      email: tenant.email,
+      phone: tenant.phone || '',
+      leaseStartDate: this.toDateInput(tenant.leaseStartDate),
+      leaseEndDate: tenant.leaseEndDate ? this.toDateInput(tenant.leaseEndDate) : '',
+      monthlyRent: tenant.monthlyRent ?? null,
+      depositAmount: tenant.depositAmount ?? null,
+      isActive: tenant.isActive,
+      notes: tenant.notes || '',
+    });
   }
 
   private toTenantInput(source?: Tenant, activeOverride?: boolean): TenantInput {

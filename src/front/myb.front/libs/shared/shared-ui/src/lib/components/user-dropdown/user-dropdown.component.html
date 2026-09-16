@@ -64,12 +64,12 @@
       </li>
       <li><hr class="dropdown-divider" /></li>
       <li>
-        <a
+        <button
+          type="button"
           class="dropdown-item"
-          href="#"
-          (click)="$event.stopPropagation(); logout()"
-          >{{ 'navigation.logout' | translate }}</a
-        >
+          [disabled]="isLoggingOut"
+          (click)="$event.preventDefault(); $event.stopPropagation(); logout()"
+          >{{ 'navigation.logout' | translate }}</button>
       </li>
     </ul>
   </li>

@@ -24,7 +24,7 @@
   <div *ngIf="resolvedCopropertyId">
     <div class="management-header">
       <h2>{{ 'coproperty.unit.management' | translate }}</h2>
-      <button class="btn btn-primary" (click)="openAddForm()">
+      <button class="btn btn-primary" (click)="openAddForm()" [disabled]="!copropertyIsActive">
         <i class="bi bi-plus"></i>
         {{ 'coproperty.unit.addUnit' | translate }}
       </button>

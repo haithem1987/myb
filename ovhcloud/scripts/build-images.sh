@@ -6,8 +6,10 @@ set -e  # Exit on error
 
 # Configuration
 REGISTRY="${DOCKER_REGISTRY:-93pf2bi9.gra7.container-registry.ovh.net/myb}"  # OVHCloud Harbor Registry
-TAG="${IMAGE_TAG:-latest}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+GIT_BRANCH="$(git -C "$PROJECT_ROOT" rev-parse --abbrev-ref HEAD | tr '/[:upper:]' '-[:lower:]')"
+GIT_SHA="$(git -C "$PROJECT_ROOT" rev-parse --short HEAD)"
+TAG="${IMAGE_TAG:-${GIT_BRANCH}-${GIT_SHA}}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -18,6 +20,7 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}MYB Platform - Docker Image Builder${NC}"
 echo -e "${GREEN}========================================${NC}"
+echo -e "${YELLOW}Registry tag: ${TAG}${NC}"
 
 # Check if docker is running
 if ! docker info > /dev/null 2>&1; then
@@ -106,5 +109,6 @@ echo -e "  - ${REGISTRY}/myb-client:${TAG}"
 echo -e "\n${GREEN}All images ready for deployment!${NC}"
 
 echo -e "\n${GREEN}Next steps:${NC}"
-echo -e "1. Update secrets in ovhcloud/k8s/secrets/"
-echo -e "2. Run: ./ovhcloud/scripts/deploy.sh"
+echo -e "1. Keep live Kubernetes secrets unchanged."
+echo -e "2. Deploy all immutable ${TAG} images with:"
+echo -e "   IMAGE_TAG=${TAG} ./ovhcloud/scripts/deploy.sh --yes --confirm-secrets"

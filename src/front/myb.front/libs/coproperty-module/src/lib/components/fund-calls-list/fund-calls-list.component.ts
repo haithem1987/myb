@@ -21,7 +21,7 @@ import {
 } from '../../models/fund-call.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, finalize } from 'rxjs/operators';
-import { ToastService, ModalService, ErrorMessageService } from '@myb-front/shared-ui';
+import { ToastService, ModalService, ErrorMessageService, NotificationService } from '@myb-front/shared-ui';
 import { InvoiceService } from 'libs/invoice-module/src/lib/services/invoice.service';
 import { Invoice } from 'libs/invoice-module/src/lib/models/invoice.model';
 import { InvoiceDetails } from 'libs/invoice-module/src/lib/models/invoiceDetails.model';
@@ -50,6 +50,7 @@ export class FundCallsListComponent implements OnInit {
   private errorMessageService = inject(ErrorMessageService);
   private fundCallModalService = inject(FundCallModalService);
   private translate = inject(TranslateService);
+  private notificationService = inject(NotificationService);
 
   fundCalls = signal<FundCallExtended[]>([]);
   coproperties = signal<Coproperty[]>([]);
@@ -148,6 +149,9 @@ export class FundCallsListComponent implements OnInit {
       justificatif: [''],
     });
     this.loadCopropertiesAndFundCalls();
+    this.notificationService.dataChanges$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadAllFundCalls());
   }
 
   /** Load coproperties first, then load all fund calls in one coordinated flow */
@@ -301,11 +305,25 @@ export class FundCallsListComponent implements OnInit {
   }
 
   getStatusLabel(status: FundCallStatus | string): string {
-    return FUND_CALL_STATUS_LABELS[status as FundCallStatus] ?? status;
+    const normalized = this.normalizeFundCallStatus(status);
+    return FUND_CALL_STATUS_LABELS[normalized] ?? status;
   }
 
   getStatusBadge(status: FundCallStatus | string): string {
-    return FUND_CALL_STATUS_BADGE[status as FundCallStatus] ?? 'bg-secondary';
+    return FUND_CALL_STATUS_BADGE[this.normalizeFundCallStatus(status)] ?? 'bg-secondary';
+  }
+
+  private normalizeFundCallStatus(status: FundCallStatus | string): FundCallStatus {
+    const compact = String(status ?? '').replace(/[_\s-]/g, '').toUpperCase();
+    const statuses: Record<string, FundCallStatus> = {
+      TOPAY: 'TO_PAY',
+      PENDINGVALIDATION: 'PENDING_VALIDATION',
+      PAID: 'PAID',
+      VALIDATED: 'VALIDATED',
+      CANCELLED: 'CANCELLED',
+      CANCELED: 'CANCELLED',
+    };
+    return statuses[compact] ?? status as FundCallStatus;
   }
 
   /**
@@ -314,7 +332,7 @@ export class FundCallsListComponent implements OnInit {
    * disabled until the record has been reactivated and saved.
    */
   isCancelled(fc: FundCallExtended): boolean {
-    return fc?.status === 'CANCELLED';
+    return !!fc && this.normalizeFundCallStatus(fc.status) === 'CANCELLED';
   }
 
   getActiveFundCallsCount(): number {
@@ -533,21 +551,24 @@ export class FundCallsListComponent implements OnInit {
 
   /** Merge a partial mutation response into the fully enriched list row. */
   private applyFundCallUpdate(updatedFundCall: FundCallExtended): void {
+    const status = this.normalizeFundCallStatus(updatedFundCall.status);
+    const normalizedUpdate = { ...updatedFundCall, status };
     const lifecycleState = {
-      isActive: updatedFundCall.status !== 'CANCELLED',
-      cancellable: updatedFundCall.status !== 'CANCELLED',
+      isActive: status !== 'CANCELLED',
+      cancellable: status !== 'CANCELLED' && status !== 'PAID',
+      deletable: false,
     };
     this.fundCalls.update((fundCalls) =>
       fundCalls.map((fundCall) =>
         fundCall.id === updatedFundCall.id
-          ? { ...fundCall, ...updatedFundCall, ...lifecycleState }
+          ? { ...fundCall, ...normalizedUpdate, ...lifecycleState }
           : fundCall
       )
     );
 
     const editing = this.editingFundCall();
     if (editing?.id === updatedFundCall.id) {
-      this.editingFundCall.set({ ...editing, ...updatedFundCall, ...lifecycleState });
+      this.editingFundCall.set({ ...editing, ...normalizedUpdate, ...lifecycleState });
     }
   }
 
@@ -635,7 +656,7 @@ export class FundCallsListComponent implements OnInit {
   }
 
   isPaid(fc: FundCallExtended | null | undefined): boolean {
-    return !!fc && String(fc.status).toUpperCase() === 'PAID';
+    return !!fc && this.normalizeFundCallStatus(fc.status) === 'PAID';
   }
 
   canModify(fc: FundCallExtended): boolean {
@@ -1381,6 +1402,11 @@ export class FundCallsListComponent implements OnInit {
       return;
     }
     this.bulkCancel(blocked);
+  }
+
+  /** Clear the table selection without changing any fund-call business state. */
+  clearSelection(): void {
+    this.selectedIds.set(new Set());
   }
 
   /**

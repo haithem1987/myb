@@ -134,8 +134,8 @@ export class FundCallNewComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.coproperties.set(data);
-          if (data.length > 0 && !this.fundCallForm.get('copropertyId')?.value) {
-            this.fundCallForm.patchValue({ copropertyId: data[0].id });
+          if (data.some(c => c.isActive) && !this.fundCallForm.get('copropertyId')?.value) {
+            this.fundCallForm.patchValue({ copropertyId: data.find(c => c.isActive)!.id });
           }
         },
         error: (err) => console.error('Error loading coproperties:', err),
@@ -192,6 +192,8 @@ export class FundCallNewComponent implements OnInit {
   }
 
   saveFundCall(): void {
+    const selected = this.coproperties().find(c => c.id === this.fundCallForm.getRawValue().copropertyId);
+    if (!this.isEditMode() && selected?.isActive === false) return;
     if (this.fundCallForm.invalid) {
       this.toastService.show('Veuillez remplir tous les champs obligatoires', { classname: 'bg-warning text-dark', delay: 4000 });
       return;

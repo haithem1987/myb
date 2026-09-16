@@ -103,6 +103,7 @@ public class CopropertyDbContext : DbContext
         modelBuilder.Entity<Unit>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
             
             entity.Property(e => e.UnitNumber)
                 .IsRequired()
@@ -126,6 +127,7 @@ public class CopropertyDbContext : DbContext
                 .IsUnique();
             
             entity.HasIndex(e => e.CopropertyId);
+            entity.HasIndex(e => e.IsDeleted);
             
             // Ignore deprecated properties
             entity.Ignore(e => e.Owners);
@@ -321,6 +323,9 @@ public class CopropertyDbContext : DbContext
                 .HasMaxLength(500);
 
             entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50);
+
+            entity.Property(e => e.UnitNumberSnapshot)
                 .HasMaxLength(50);
             
             entity.HasOne(e => e.Charge)
@@ -577,6 +582,9 @@ public class CopropertyDbContext : DbContext
 
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(100);
+
+            entity.Property(e => e.UnitNumberSnapshot)
+                .HasMaxLength(50);
 
             entity.Property(e => e.ValidationStatus)
                 .HasMaxLength(20)

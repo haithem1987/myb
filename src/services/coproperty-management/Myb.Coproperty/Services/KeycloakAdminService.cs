@@ -104,6 +104,7 @@ namespace Myb.Coproperty.Services
                         user.Email ?? "",
                         user.FirstName ?? "",
                         user.LastName ?? "",
+                        GetPhone(user.Attributes),
                         user.Enabled,
                         user.EmailVerified,
                         roles));
@@ -116,6 +117,161 @@ namespace Myb.Coproperty.Services
                 _logger.LogError(ex, "Failed to search Keycloak users by email '{Email}'", email);
                 return Enumerable.Empty<KeycloakUserSearchDto>();
             }
+        }
+
+        public async Task<KeycloakUserSearchDto> CreateUserAsync(
+            string firstName,
+            string lastName,
+            string email,
+            string temporaryPassword,
+            string? activationNotificationRecipientId = null)
+        {
+            firstName = firstName?.Trim() ?? string.Empty;
+            lastName = lastName?.Trim() ?? string.Empty;
+            email = email?.Trim().ToLowerInvariant() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+                throw new InvalidOperationException("Le prénom et le nom sont obligatoires.");
+            if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
+                throw new InvalidOperationException("Une adresse e-mail valide est obligatoire.");
+            if (temporaryPassword?.Length < 8)
+                throw new InvalidOperationException("Le mot de passe temporaire doit contenir au moins 8 caractères.");
+
+            var (adminBaseUrl, realm) = ParseAuthority();
+            var token = await GetAccessTokenAsync(adminBaseUrl, realm);
+            using var client = CreateAuthorizedClient(token);
+
+            var exactEmail = Uri.EscapeDataString(email);
+            var existingResponse = await client.GetAsync(
+                $"{adminBaseUrl}/admin/realms/{realm}/users?email={exactEmail}&exact=true&max=1");
+            if (existingResponse.IsSuccessStatusCode)
+            {
+                var existingUsers = await existingResponse.Content
+                    .ReadFromJsonAsync<List<KeycloakUserDto>>(JsonOptions);
+                if (existingUsers?.Any(user =>
+                        string.Equals(user.Email, email, StringComparison.OrdinalIgnoreCase)) == true)
+                    throw new InvalidOperationException("Un compte utilisateur existe déjà avec cette adresse e-mail.");
+            }
+
+            var attributes = new Dictionary<string, string[]>();
+            if (!string.IsNullOrWhiteSpace(activationNotificationRecipientId))
+                attributes["mybActivationNotifyUserId"] = new[] { activationNotificationRecipientId };
+
+            var payload = new
+            {
+                username = email,
+                email,
+                firstName,
+                lastName,
+                enabled = true,
+                emailVerified = false,
+                attributes,
+                credentials = new[]
+                {
+                    new { type = "password", value = temporaryPassword, temporary = true }
+                },
+                requiredActions = new[] { "UPDATE_PASSWORD" }
+            };
+            var response = await client.PostAsJsonAsync(
+                $"{adminBaseUrl}/admin/realms/{realm}/users", payload, JsonOptions);
+
+            if (response.StatusCode == HttpStatusCode.Conflict)
+                throw new InvalidOperationException("Un compte utilisateur existe déjà avec cette adresse e-mail.");
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Could not create Keycloak user {Email}: {Status} {Body}",
+                    email, response.StatusCode, responseBody);
+                throw new InvalidOperationException("Impossible de créer le compte utilisateur.");
+            }
+
+            var userId = response.Headers.Location?.Segments.LastOrDefault()?.Trim('/');
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                var lookupResponse = await client.GetAsync(
+                    $"{adminBaseUrl}/admin/realms/{realm}/users?email={exactEmail}&exact=true&max=1");
+                var createdUsers = lookupResponse.IsSuccessStatusCode
+                    ? await lookupResponse.Content.ReadFromJsonAsync<List<KeycloakUserDto>>(JsonOptions)
+                    : null;
+                userId = createdUsers?.FirstOrDefault()?.Id;
+            }
+
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new InvalidOperationException("Le compte a été créé mais son identifiant n'a pas pu être récupéré.");
+
+            return new KeycloakUserSearchDto(
+                userId, email, firstName, lastName, null, true, false, new List<string>());
+        }
+
+        public async Task<string?> GetActivationNotificationRecipientAsync(string userId)
+        {
+            var user = await GetKeycloakUserAsync(userId);
+            if (user?.Attributes == null) return null;
+
+            var match = user.Attributes.FirstOrDefault(pair =>
+                string.Equals(pair.Key, "mybActivationNotifyUserId", StringComparison.OrdinalIgnoreCase));
+            return match.Value?.FirstOrDefault();
+        }
+
+        public async Task<string?> ConsumeActivationNotificationRecipientAsync(string userId)
+        {
+            var user = await GetKeycloakUserAsync(userId);
+            if (user?.Attributes == null) return null;
+
+            var match = user.Attributes.FirstOrDefault(pair =>
+                string.Equals(pair.Key, "mybActivationNotifyUserId", StringComparison.OrdinalIgnoreCase));
+            var recipientId = match.Value?.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(recipientId)) return null;
+
+            user.Attributes.Remove(match.Key);
+            return await UpdateKeycloakUserAsync(userId, user) ? recipientId : null;
+        }
+
+        public async Task<bool> SetPreferredLanguageAsync(string userId, string language)
+        {
+            language = language?.Trim().ToLowerInvariant().Split('-')[0] ?? "en";
+            if (language is not ("en" or "fr")) language = "en";
+            var user = await GetKeycloakUserAsync(userId);
+            if (user == null) return false;
+            user.Attributes ??= new Dictionary<string, List<string>>();
+            user.Attributes["locale"] = new List<string> { language };
+            user.Attributes["preferredLanguage"] = new List<string> { language };
+            return await UpdateKeycloakUserAsync(userId, user);
+        }
+
+        public async Task<string> GetPreferredLanguageAsync(string userId)
+        {
+            var user = await GetKeycloakUserAsync(userId);
+            if (user?.Attributes == null) return "fr";
+            foreach (var key in new[] { "preferredLanguage", "locale" })
+            {
+                var value = user.Attributes.FirstOrDefault(pair =>
+                    string.Equals(pair.Key, key, StringComparison.OrdinalIgnoreCase)).Value?.FirstOrDefault();
+                if (value?.StartsWith("en", StringComparison.OrdinalIgnoreCase) == true) return "en";
+                if (value?.StartsWith("fr", StringComparison.OrdinalIgnoreCase) == true) return "fr";
+            }
+            return "fr";
+        }
+
+        private async Task<KeycloakUserDto?> GetKeycloakUserAsync(string userId)
+        {
+            var (adminBaseUrl, realm) = ParseAuthority();
+            var token = await GetAccessTokenAsync(adminBaseUrl, realm);
+            using var client = CreateAuthorizedClient(token);
+            var response = await client.GetAsync($"{adminBaseUrl}/admin/realms/{realm}/users/{Uri.EscapeDataString(userId)}");
+            return response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<KeycloakUserDto>(JsonOptions)
+                : null;
+        }
+
+        private async Task<bool> UpdateKeycloakUserAsync(string userId, KeycloakUserDto user)
+        {
+            var (adminBaseUrl, realm) = ParseAuthority();
+            var token = await GetAccessTokenAsync(adminBaseUrl, realm);
+            using var client = CreateAuthorizedClient(token);
+            var response = await client.PutAsJsonAsync(
+                $"{adminBaseUrl}/admin/realms/{realm}/users/{Uri.EscapeDataString(userId)}", user, JsonOptions);
+            return response.IsSuccessStatusCode;
         }
 
         public async Task<IEnumerable<string>> GetUserClientRolesAsync(string userId)
@@ -532,6 +688,20 @@ namespace Myb.Coproperty.Services
             [JsonPropertyName("email")] public string? Email { get; set; }
             [JsonPropertyName("enabled")] public bool Enabled { get; set; }
             [JsonPropertyName("emailVerified")] public bool EmailVerified { get; set; }
+            [JsonPropertyName("attributes")] public Dictionary<string, List<string>>? Attributes { get; set; }
+        }
+
+        private static string? GetPhone(Dictionary<string, List<string>>? attributes)
+        {
+            if (attributes == null) return null;
+            foreach (var key in new[] { "phone", "phoneNumber", "mobile", "mobilePhone" })
+            {
+                var match = attributes.FirstOrDefault(pair =>
+                    string.Equals(pair.Key, key, StringComparison.OrdinalIgnoreCase));
+                var value = match.Value?.FirstOrDefault(item => !string.IsNullOrWhiteSpace(item));
+                if (!string.IsNullOrWhiteSpace(value)) return value.Trim();
+            }
+            return null;
         }
 
         private sealed class KeycloakRoleDto

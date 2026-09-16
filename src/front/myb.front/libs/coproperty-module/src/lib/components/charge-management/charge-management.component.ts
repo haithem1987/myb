@@ -1,3 +1,4 @@
+import { dateRangeValidator } from '../../utils/date-range.validator';
 import { Component, OnInit, inject, signal, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -16,6 +17,7 @@ import { BudgetNewComponent } from '../budget-new/budget-new.component';
 })
 export class ChargeManagementComponent implements OnInit, OnChanges {
   @Input() copropertyId: string | null = null;
+  @Input() copropertyIsActive = true;
   
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
@@ -52,7 +54,7 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
       endDate: [''],
       isActive: [true],
       isContribution: [false]
-    });
+    }, { validators: dateRangeValidator() });
   }
 
   private generateYears(): number[] {
@@ -109,6 +111,7 @@ export class ChargeManagementComponent implements OnInit, OnChanges {
   }
 
   showAddForm() {
+    if (!this.copropertyIsActive) return;
     this.isEditing.set(false);
     this.showForm.set(true);
     this.currentChargeId.set(null);

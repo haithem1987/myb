@@ -46,7 +46,7 @@ namespace Myb.Coproperty.GraphQL.Types
                 .Resolve(context =>
                 {
                     var distribution = context.Parent<ChargeDistribution>();
-                    return distribution.Unit?.UnitNumber ?? "N/A";
+                    return distribution.UnitNumberSnapshot ?? distribution.Unit?.UnitNumber ?? "N/A";
                 });
 
             descriptor

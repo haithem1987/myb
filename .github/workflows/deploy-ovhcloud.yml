@@ -31,9 +31,15 @@ jobs:
           - name: mailer
             dockerfile: ./src/services/mailer-service/Myb.Mailer/Dockerfile
             context: .
+          - name: notification
+            dockerfile: ./src/services/notification-service/Myb.Notification/Dockerfile
+            context: .
           - name: admin
             dockerfile: ./ovhcloud/docker/admin/Dockerfile
-            context: ./src/front/myb.front
+            context: .
+          - name: client
+            dockerfile: ./ovhcloud/docker/client/Dockerfile
+            context: .
     
     steps:
       - name: Checkout code
@@ -60,15 +66,6 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build admin frontend (if admin)
-        if: matrix.service.name == 'admin'
-        env:
-          CYPRESS_INSTALL_BINARY: "0"
-        run: |
-          cd src/front/myb.front
-          npm ci --legacy-peer-deps
-          npx nx build admin --configuration=production
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -87,7 +84,7 @@ jobs:
     if: github.ref == 'refs/heads/staging'
     environment:
       name: staging
-      url: https://staging.myb.yourdomain.com  # TODO: replace with your domain
+      url: https://myb-platform.com
 
     steps:
       - name: Checkout code
@@ -104,21 +101,31 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
+          IMAGE_TAG="staging-${GITHUB_SHA::7}"
+
           # Update image tags
           kubectl set image deployment/myb-coproperty \
-            coproperty=${{ env.REGISTRY }}/myb-coproperty:staging-${{ github.sha }} \
+            coproperty=${{ env.REGISTRY }}/myb-coproperty:$IMAGE_TAG \
             -n ${{ env.NAMESPACE }}
           
           kubectl set image deployment/myb-invoice \
-            invoice=${{ env.REGISTRY }}/myb-invoice:staging-${{ github.sha }} \
+            invoice=${{ env.REGISTRY }}/myb-invoice:$IMAGE_TAG \
             -n ${{ env.NAMESPACE }}
           
           kubectl set image deployment/myb-mailer \
-            mailer=${{ env.REGISTRY }}/myb-mailer:staging-${{ github.sha }} \
+            mailer=${{ env.REGISTRY }}/myb-mailer:$IMAGE_TAG \
+            -n ${{ env.NAMESPACE }}
+
+          kubectl set image deployment/myb-notification \
+            notification=${{ env.REGISTRY }}/myb-notification:$IMAGE_TAG \
             -n ${{ env.NAMESPACE }}
           
           kubectl set image deployment/myb-admin \
-            admin-frontend=${{ env.REGISTRY }}/myb-admin:staging-${{ github.sha }} \
+            admin-frontend=${{ env.REGISTRY }}/myb-admin:$IMAGE_TAG \
+            -n ${{ env.NAMESPACE }}
+
+          kubectl set image deployment/myb-client \
+            client-frontend=${{ env.REGISTRY }}/myb-client:$IMAGE_TAG \
             -n ${{ env.NAMESPACE }}
 
       - name: Wait for rollout
@@ -126,7 +133,9 @@ jobs:
           kubectl rollout status deployment/myb-coproperty -n ${{ env.NAMESPACE }} --timeout=5m
           kubectl rollout status deployment/myb-invoice -n ${{ env.NAMESPACE }} --timeout=5m
           kubectl rollout status deployment/myb-mailer -n ${{ env.NAMESPACE }} --timeout=5m
+          kubectl rollout status deployment/myb-notification -n ${{ env.NAMESPACE }} --timeout=5m
           kubectl rollout status deployment/myb-admin -n ${{ env.NAMESPACE }} --timeout=5m
+          kubectl rollout status deployment/myb-client -n ${{ env.NAMESPACE }} --timeout=5m
 
       - name: Verify deployment
         run: |
@@ -168,9 +177,17 @@ jobs:
           kubectl set image deployment/myb-mailer \
             mailer=${{ env.REGISTRY }}/myb-mailer:latest \
             -n ${{ env.NAMESPACE }}
+
+          kubectl set image deployment/myb-notification \
+            notification=${{ env.REGISTRY }}/myb-notification:latest \
+            -n ${{ env.NAMESPACE }}
           
           kubectl set image deployment/myb-admin \
             admin-frontend=${{ env.REGISTRY }}/myb-admin:latest \
+            -n ${{ env.NAMESPACE }}
+
+          kubectl set image deployment/myb-client \
+            client-frontend=${{ env.REGISTRY }}/myb-client:latest \
             -n ${{ env.NAMESPACE }}
 
       - name: Wait for rollout
@@ -178,7 +195,9 @@ jobs:
           kubectl rollout status deployment/myb-coproperty -n ${{ env.NAMESPACE }} --timeout=10m
           kubectl rollout status deployment/myb-invoice -n ${{ env.NAMESPACE }} --timeout=10m
           kubectl rollout status deployment/myb-mailer -n ${{ env.NAMESPACE }} --timeout=10m
+          kubectl rollout status deployment/myb-notification -n ${{ env.NAMESPACE }} --timeout=10m
           kubectl rollout status deployment/myb-admin -n ${{ env.NAMESPACE }} --timeout=10m
+          kubectl rollout status deployment/myb-client -n ${{ env.NAMESPACE }} --timeout=10m
 
       - name: Run smoke tests
         run: |
@@ -197,7 +216,9 @@ jobs:
           kubectl rollout undo deployment/myb-coproperty -n ${{ env.NAMESPACE }}
           kubectl rollout undo deployment/myb-invoice -n ${{ env.NAMESPACE }}
           kubectl rollout undo deployment/myb-mailer -n ${{ env.NAMESPACE }}
+          kubectl rollout undo deployment/myb-notification -n ${{ env.NAMESPACE }}
           kubectl rollout undo deployment/myb-admin -n ${{ env.NAMESPACE }}
+          kubectl rollout undo deployment/myb-client -n ${{ env.NAMESPACE }}
 
   run-tests:
     name: Run Tests

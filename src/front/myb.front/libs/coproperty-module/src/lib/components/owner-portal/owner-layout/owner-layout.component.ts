@@ -3,14 +3,17 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
 import { OwnerService, InvoiceStatus, CopropertyService, CurrencyService, Currency } from '../../../index';
-import { ToastsContainerComponent, ModalContainerComponent, UserDropdownComponent } from '@myb-front/shared-ui';
+import { ToastsContainerComponent, ModalContainerComponent, NotificationService, UserDropdownComponent } from '@myb-front/shared-ui';
 import { take, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DestroyRef } from '@angular/core';
 
 @Component({
   selector: 'app-owner-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ToastsContainerComponent, ModalContainerComponent, UserDropdownComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ToastsContainerComponent, ModalContainerComponent, UserDropdownComponent],
   templateUrl: './owner-layout.component.html',
   styleUrls: ['./owner-layout.component.scss']
 })
@@ -20,6 +23,8 @@ export class OwnerLayoutComponent implements OnInit {
   private copropertyService = inject(CopropertyService);
   private currencyService = inject(CurrencyService);
   private router = inject(Router);
+  private notificationService = inject(NotificationService);
+  private destroyRef = inject(DestroyRef);
   
   // State signals
   pendingInvoices = signal(0);
@@ -35,6 +40,14 @@ export class OwnerLayoutComponent implements OnInit {
     this.loadUserFromKeycloak();
     this.loadOwnerData();
     this.initCurrency();
+    this.initRealtimeUpdates();
+  }
+
+  private async initRealtimeUpdates(): Promise<void> {
+    this.notificationService.dataChanges$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadOwnerData());
+    await this.notificationService.startConnection();
   }
 
   private initCurrency(): void {

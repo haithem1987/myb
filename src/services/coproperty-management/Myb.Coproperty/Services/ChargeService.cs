@@ -42,6 +42,15 @@ namespace Myb.Coproperty.Services
 
         public async Task<Charge> CreateAsync(Charge charge)
         {
+            if (charge.EndDate.HasValue && charge.EndDate.Value <= charge.StartDate)
+                throw new ArgumentException("La date de fin doit être postérieure à la date de début.");
+
+            using var context = _dbContextFactory.CreateDbContext();
+            var copropertyIsActive = await context.Coproperties
+                .AnyAsync(c => c.Id == charge.CopropertyId && c.IsActive);
+            if (!copropertyIsActive)
+                throw new InvalidOperationException("New operations are not allowed for an inactive coproperty.");
+
             var result = await _chargeRepository.InsertAsync(charge);
             
             if (result.Errors != null && result.Errors.Any())
@@ -100,6 +109,7 @@ namespace Myb.Coproperty.Services
                         {
                             ChargeId = chargeId,
                             UnitId = unit.Id,
+                            UnitNumberSnapshot = unit.UnitNumber,
                             Amount = (charge.TotalAmount * unit.Shares) / totalShares,
                         });
                     }
@@ -112,6 +122,7 @@ namespace Myb.Coproperty.Services
                         {
                             ChargeId = chargeId,
                             UnitId = unit.Id,
+                            UnitNumberSnapshot = unit.UnitNumber,
                             Amount = (charge.TotalAmount * (unit.Area ?? 0)) / totalArea,
                         });
                     }
@@ -124,6 +135,7 @@ namespace Myb.Coproperty.Services
                         {
                             ChargeId = chargeId,
                             UnitId = unit.Id,
+                            UnitNumberSnapshot = unit.UnitNumber,
                             Amount = amountPerUnit,
                         });
                     }
@@ -172,6 +184,9 @@ namespace Myb.Coproperty.Services
 
         public async Task UpdateAsync(Charge charge)
         {
+            if (charge.EndDate.HasValue && charge.EndDate.Value <= charge.StartDate)
+                throw new ArgumentException("La date de fin doit être postérieure à la date de début.");
+
             var result = await _chargeRepository.UpdateAsync(charge);
             if (result.Errors != null && result.Errors.Any())
             {
@@ -194,6 +209,7 @@ namespace Myb.Coproperty.Services
 
             // Get all charge distributions for these units, including Charge and Unit data
             return await context.ChargeDistributions
+                .IgnoreQueryFilters()
                 .Include(cd => cd.Charge)
                 .Include(cd => cd.Unit)
                 .Where(cd => unitIds.Contains(cd.UnitId))
@@ -326,6 +342,7 @@ namespace Myb.Coproperty.Services
                         Amount = paidAmount,
                         PaymentDate = DateTime.UtcNow,
                         Justificatif = $"Paiement en ligne - {transactionId}",
+                        UnitNumberSnapshot = distribution.UnitNumberSnapshot ?? distribution.Unit?.UnitNumber,
                         ValidationStatus = "Approved",
                         CreatedAt = DateTime.UtcNow,
                         CreatedBy = owner.UserId

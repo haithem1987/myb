@@ -18,6 +18,7 @@ namespace Myb.Coproperty.Services
 
         public async Task<Unit> CreateAsync(Unit unit)
         {
+            EnsureCopropertyIsActive(unit.CopropertyId);
             unit.UnitNumber = unit.UnitNumber?.Trim() ?? string.Empty;
 
             var duplicateExists = _unitRepository.GetAll().Any(u =>
@@ -62,7 +63,12 @@ namespace Myb.Coproperty.Services
                     $"Cannot delete unit '{unit.UnitNumber}' because it is associated with one or more owners. Remove owner associations first.");
             }
 
-            var result = await _unitRepository.DeleteAsync(id);
+            // Preserve this historical dimension for invoices and paid
+            // distributions while removing it from operational queries.
+            unit.IsDeleted = true;
+            unit.DeletedAt = DateTime.UtcNow;
+            unit.UpdatedAt = DateTime.UtcNow;
+            var result = await _unitRepository.UpdateAsync(unit);
             if (result.Errors != null && result.Errors.Any())
             {
                 throw new InvalidOperationException($"Failed to delete unit: {string.Join(", ", result.Errors)}");
@@ -136,6 +142,15 @@ namespace Myb.Coproperty.Services
                 throw new InvalidOperationException(
                     $"Total unit shares cannot exceed coproperty total shares ({coproperty.TotalShares}).");
             }
+        }
+
+        private void EnsureCopropertyIsActive(Guid copropertyId)
+        {
+            var coproperty = _copropertyRepository.GetById(copropertyId);
+            if (coproperty == null)
+                throw new InvalidOperationException($"Coproperty with ID {copropertyId} not found");
+            if (!coproperty.IsActive)
+                throw new InvalidOperationException("New operations are not allowed for an inactive coproperty.");
         }
     }
 }

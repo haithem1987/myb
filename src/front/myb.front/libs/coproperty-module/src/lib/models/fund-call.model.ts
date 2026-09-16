@@ -39,6 +39,7 @@ export interface FundCallPayment {
   justificatifFileName?: string;
   justificatifContentType?: string;
   paymentMethod?: string;
+  unitNumberSnapshot?: string;
   /** Pending | Approved | Rejected */
   validationStatus: string;
   rejectionReason?: string;
@@ -136,7 +137,7 @@ export interface ReviewFundCallPaymentInput {
 
 /** Payment enriched with its parent fund call info – used in the receipts page */
 export interface FundCallPaymentWithContext extends FundCallPayment {
-  fundCall: Pick<FundCall, 'id' | 'description' | 'amount' | 'dueDate' | 'currency'> & {
+  fundCall: Pick<FundCall, 'id' | 'description' | 'amount' | 'dueDate' | 'currency' | 'ownerName'> & {
     coproperty?: { id: string; name: string };
   };
 }

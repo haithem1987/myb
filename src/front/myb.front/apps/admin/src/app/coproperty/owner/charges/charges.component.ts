@@ -78,7 +78,7 @@ export class OwnerChargesComponent implements OnInit {
 
   get totalPaid(): number {
     return this.fundCalls().reduce((sum, fc) => {
-      const paid = (fc.payments || []).reduce((s, p) => s + p.amount, 0);
+      const paid = this.getFundCallPaidAmount(fc);
       return sum + paid;
     }, 0);
   }
@@ -166,7 +166,7 @@ export class OwnerChargesComponent implements OnInit {
 
   getFundCallPaidAmount(fc: FundCallExtended): number {
     return (fc.payments || [])
-      .filter(p => p.validationStatus !== 'Rejected')
+      .filter(p => String(p.validationStatus ?? '').toUpperCase() === 'APPROVED')
       .reduce((sum, p) => sum + p.amount, 0);
   }
 

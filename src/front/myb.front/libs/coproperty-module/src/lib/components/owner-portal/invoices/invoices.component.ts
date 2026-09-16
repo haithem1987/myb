@@ -1,12 +1,14 @@
-import { Component, signal, inject, computed, OnInit } from '@angular/core';
+import { Component, signal, inject, computed, OnInit, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalService, FileDownloadService, ToastService } from '@myb-front/shared-ui';
+import { ModalService, FileDownloadService, ToastService, NotificationService } from '@myb-front/shared-ui';
 import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService, ChargeDistribution, FundCallService } from '../../../index';
 import { FundCallPaymentWithContext } from '../../../models/fund-call.model';
 import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take, switchMap } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface Invoice {
   id: string;
@@ -19,13 +21,16 @@ interface Invoice {
   paymentDate?: Date;
   paymentMethod: string;
   status: string;
+  downloadable: boolean;
   currency?: string;
+  ownerName?: string;
+  rejectionReason?: string;
 }
 
 @Component({
   selector: 'app-owner-invoices',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
@@ -33,14 +38,14 @@ interface Invoice {
         <div class="col-md-8">
           <h2 class="mb-1">
             <i class="bi bi-receipt me-2"></i>
-            Mes Reçus
+            {{ 'ownerPortal.receipts.title' | translate }}
           </h2>
-          <p class="text-muted">Historique de vos paiements et reçus de charges</p>
+          <p class="text-muted">{{ 'ownerPortal.receipts.subtitle' | translate }}</p>
         </div>
         <div class="col-md-4 text-end">
           <button class="btn btn-outline-primary" (click)="downloadAll()">
             <i class="bi bi-download me-2"></i>
-            Télécharger tout
+            {{ 'ownerPortal.receipts.downloadAll' | translate }}
           </button>
         </div>
       </div>
@@ -54,7 +59,7 @@ interface Invoice {
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stats().total }}</div>
-              <div class="stat-label">Total reçus</div>
+              <div class="stat-label">{{ 'ownerPortal.receipts.total' | translate }}</div>
             </div>
           </div>
         </div>
@@ -64,8 +69,8 @@ interface Invoice {
               <i class="bi bi-cash-stack"></i>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ formatAmount(stats().totalPaid) }}</div>
-              <div class="stat-label">Total payé</div>
+              <div class="stat-value">{{ totalPaidDisplay() }}</div>
+              <div class="stat-label">{{ 'ownerPortal.receipts.totalPaid' | translate }}</div>
             </div>
           </div>
         </div>
@@ -76,7 +81,7 @@ interface Invoice {
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stats().lastPaymentDate }}</div>
-              <div class="stat-label">Dernier paiement</div>
+              <div class="stat-label">{{ 'ownerPortal.receipts.lastPayment' | translate }}</div>
             </div>
           </div>
         </div>
@@ -100,13 +105,14 @@ interface Invoice {
             <table class="table invoice-table">
               <thead>
                 <tr>
-                  <th>Reçu</th>
-                  <th>Description</th>
-                  <th>Lot</th>
-                  <th>Date</th>
-                  <th>Montant</th>
-                  <th>Méthode</th>
-                  <th>Actions</th>
+                  <th>{{ 'ownerPortal.receipts.receipt' | translate }}</th>
+                  <th>{{ 'ownerPortal.receipts.description' | translate }}</th>
+                  <th>{{ 'ownerPortal.receipts.unit' | translate }}</th>
+                  <th>{{ 'ownerPortal.receipts.date' | translate }}</th>
+                  <th>{{ 'ownerPortal.receipts.amount' | translate }}</th>
+                  <th>{{ 'ownerPortal.receipts.method' | translate }}</th>
+                  <th>{{ 'ownerPortal.receipts.status' | translate }}</th>
+                  <th>{{ 'ownerPortal.receipts.actions' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,11 +135,21 @@ interface Invoice {
                     </span>
                   </td>
                   <td>
+                    <span class="badge" [ngClass]="invoice.status === 'paid' ? 'bg-success' : invoice.status === 'rejected' ? 'bg-danger' : 'bg-warning text-dark'">
+                      <i class="bi me-1" [ngClass]="invoice.status === 'paid' ? 'bi-check-circle' : invoice.status === 'rejected' ? 'bi-x-circle' : 'bi-clock'"></i>
+                      {{ ('ownerPortal.receipts.statuses.' + invoice.status) | translate }}
+                    </span>
+                    <div *ngIf="invoice.status === 'rejected' && invoice.rejectionReason" class="small text-danger mt-1">
+                      <strong>{{ 'ownerPortal.receipts.rejectionReason' | translate }}:</strong> {{ invoice.rejectionReason }}
+                    </div>
+                  </td>
+                  <td>
                     <div class="action-buttons">
-                      <button class="btn btn-sm btn-outline-primary me-1" (click)="viewInvoice(invoice.id)" title="Voir">
+                      <button class="btn btn-sm btn-outline-primary me-1" (click)="viewInvoice(invoice.id)" [title]="'ownerPortal.receipts.view' | translate">
                         <i class="bi bi-eye"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-secondary" (click)="downloadInvoice(invoice.id)" title="Télécharger">
+                      <button *ngIf="invoice.downloadable" class="btn btn-sm btn-outline-secondary"
+                              (click)="downloadInvoice(invoice.id)" [title]="'ownerPortal.receipts.download' | translate">
                         <i class="bi bi-download"></i>
                       </button>
                     </div>
@@ -153,7 +169,7 @@ interface Invoice {
       <div class="invoice-modal-header">
         <h5 class="mb-0">
           <i class="bi bi-file-earmark-text me-2"></i>
-          Détail du reçu
+          {{ 'ownerPortal.receipts.detail' | translate }}
         </h5>
         <button type="button" class="btn-close" (click)="closeInvoiceModal()"></button>
       </div>
@@ -169,36 +185,40 @@ interface Invoice {
               </div>
               <div>
                 <div class="inv-company">MYB Syndic</div>
-                <div class="text-muted small">Gestion de copropriété</div>
+                <div class="text-muted small">{{ 'ownerPortal.receipts.copropertyManagement' | translate }}</div>
               </div>
             </div>
             <div class="inv-meta">
-              <h4 class="inv-title">REÇU DE PAIEMENT</h4>
+              <h4 class="inv-title">{{ 'ownerPortal.receipts.paymentReceipt' | translate }}</h4>
               <div class="inv-num"># {{ selectedInvoice()!.number }}</div>
-              <span class="badge" [ngClass]="selectedInvoice()!.status === 'paid' ? 'bg-success' : 'bg-warning text-dark'">
-                {{ selectedInvoice()!.status === 'paid' ? 'Payée' : 'En attente' }}
+              <span class="badge" [ngClass]="selectedInvoice()!.status === 'paid' ? 'bg-success' : selectedInvoice()!.status === 'rejected' ? 'bg-danger' : 'bg-warning text-dark'">
+                {{ ('ownerPortal.receipts.statuses.' + selectedInvoice()!.status) | translate }}
               </span>
             </div>
           </div>
 
           <hr class="inv-divider">
 
+          <div *ngIf="selectedInvoice()!.status === 'rejected' && selectedInvoice()!.rejectionReason" class="alert alert-danger">
+            <strong>{{ 'ownerPortal.receipts.rejectionReason' | translate }}:</strong> {{ selectedInvoice()!.rejectionReason }}
+          </div>
+
           <!-- Dates row -->
           <div class="inv-dates">
             <div class="inv-date-item">
-              <span class="inv-date-label">Date d'émission</span>
+              <span class="inv-date-label">{{ 'ownerPortal.receipts.issueDate' | translate }}</span>
               <span class="inv-date-value">{{ selectedInvoice()!.date | date:'dd/MM/yyyy' }}</span>
             </div>
             <div class="inv-date-item" *ngIf="selectedInvoice()!.paymentDate">
-              <span class="inv-date-label">Date de paiement</span>
+              <span class="inv-date-label">{{ 'ownerPortal.receipts.paymentDate' | translate }}</span>
               <span class="inv-date-value">{{ selectedInvoice()!.paymentDate | date:'dd/MM/yyyy' }}</span>
             </div>
             <div class="inv-date-item">
-              <span class="inv-date-label">Lot</span>
+              <span class="inv-date-label">{{ 'ownerPortal.receipts.unit' | translate }}</span>
               <span class="inv-date-value">{{ selectedInvoice()!.unitNumber }}</span>
             </div>
             <div class="inv-date-item">
-              <span class="inv-date-label">Période</span>
+              <span class="inv-date-label">{{ 'ownerPortal.receipts.period' | translate }}</span>
               <span class="inv-date-value">{{ selectedInvoice()!.period }}</span>
             </div>
           </div>
@@ -208,11 +228,11 @@ interface Invoice {
           <!-- Copropriétaire -->
           <div class="inv-dates" style="margin-bottom: 0.5rem;">
             <div class="inv-date-item">
-              <span class="inv-date-label">Copropriétaire</span>
-              <span class="inv-date-value">{{ ownerName() }}</span>
+              <span class="inv-date-label">{{ 'ownerPortal.receipts.owner' | translate }}</span>
+              <span class="inv-date-value">{{ selectedInvoice()!.ownerName || ownerName() }}</span>
             </div>
             <div class="inv-date-item" *ngIf="selectedInvoice()!.paymentMethod">
-              <span class="inv-date-label">Méthode de paiement</span>
+              <span class="inv-date-label">{{ 'ownerPortal.receipts.paymentMethod' | translate }}</span>
               <span class="inv-date-value">{{ getPaymentMethodLabel(selectedInvoice()!.paymentMethod) }}</span>
             </div>
           </div>
@@ -223,10 +243,10 @@ interface Invoice {
           <table class="inv-table">
             <thead>
               <tr>
-                <th>Description</th>
-                <th class="text-center">Qté</th>
-                <th class="text-end">Prix unit.</th>
-                <th class="text-end">Total HT</th>
+                <th>{{ 'ownerPortal.receipts.description' | translate }}</th>
+                <th class="text-center">{{ 'ownerPortal.receipts.quantity' | translate }}</th>
+                <th class="text-end">{{ 'ownerPortal.receipts.unitPrice' | translate }}</th>
+                <th class="text-end">{{ 'ownerPortal.receipts.subtotal' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -239,11 +259,11 @@ interface Invoice {
             </tbody>
             <tfoot>
               <tr class="inv-subtotal">
-                <td colspan="3" class="text-end">Sous-total HT</td>
+                <td colspan="3" class="text-end">{{ 'ownerPortal.receipts.subtotal' | translate }}</td>
                 <td class="text-end">{{ formatAmount(selectedInvoice()!.amount, selectedInvoice()!.currency) }}</td>
               </tr>
               <tr class="inv-total">
-                <td colspan="3" class="text-end"><strong>TOTAL TTC</strong></td>
+                <td colspan="3" class="text-end"><strong>{{ 'ownerPortal.receipts.totalIncludingTax' | translate }}</strong></td>
                 <td class="text-end"><strong>{{ formatAmount(selectedInvoice()!.amount, selectedInvoice()!.currency) }}</strong></td>
               </tr>
             </tfoot>
@@ -252,7 +272,7 @@ interface Invoice {
           <!-- Footer note -->
           <div class="inv-footer-note">
             <i class="bi bi-info-circle me-1"></i>
-            Reçu de paiement généré par MYB Syndic
+            {{ 'ownerPortal.receipts.generatedBy' | translate }}
           </div>
         </div>
       </div>
@@ -260,10 +280,11 @@ interface Invoice {
       <!-- Action bar -->
       <div class="invoice-modal-footer" *ngIf="selectedInvoice()">
         <button type="button" class="btn btn-secondary" (click)="closeInvoiceModal()">
-          <i class="bi bi-x-circle me-1"></i>Fermer
+          <i class="bi bi-x-circle me-1"></i>{{ 'ownerPortal.receipts.close' | translate }}
         </button>
-        <button type="button" class="btn btn-primary" (click)="downloadInvoice(selectedInvoice()!.id)">
-          <i class="bi bi-download me-1"></i>Télécharger PDF
+        <button *ngIf="selectedInvoice()!.downloadable" type="button" class="btn btn-primary"
+                (click)="downloadInvoice(selectedInvoice()!.id)">
+          <i class="bi bi-download me-1"></i>{{ 'ownerPortal.receipts.downloadPdf' | translate }}
         </button>
       </div>
     </div>
@@ -581,23 +602,45 @@ export class OwnerInvoicesComponent implements OnInit {
   stats = computed(() => {
     const invoices = this.filteredInvoices();
     const total = invoices.length;
-    const totalPaid = invoices.reduce((sum, i) => sum + i.amount, 0);
     const lastPayment = invoices
       .filter(i => i.paymentDate)
       .sort((a, b) => (b.paymentDate?.getTime() ?? 0) - (a.paymentDate?.getTime() ?? 0))[0];
     const lastPaymentDate = lastPayment?.paymentDate
       ? lastPayment.paymentDate.toLocaleDateString('fr-FR') : '—';
 
-    return { total, totalPaid, lastPaymentDate };
+    return { total, lastPaymentDate };
+  });
+
+  /** Never add monetary values expressed in different currencies. */
+  totalPaidDisplay = computed(() => {
+    const totals = new Map<string, number>();
+    for (const invoice of this.filteredInvoices().filter(item => item.status === 'paid')) {
+      const currency = invoice.currency ?? this.currencyService.current;
+      totals.set(currency, (totals.get(currency) ?? 0) + invoice.amount);
+    }
+    if (totals.size === 0) return this.currencyService.formatAmount(0);
+    return Array.from(totals.entries())
+      .map(([currency, amount]) => this.currencyService.formatAmount(amount, currency))
+      .join(' · ');
   });
 
   private ownerService = inject(OwnerService);
   private fundCallService = inject(FundCallService);
   private keycloakService = inject(KeycloakService);
   private currencyService = inject(CurrencyService);
+  private translate = inject(TranslateService);
+  private notificationService = inject(NotificationService);
+  private destroyRef = inject(DestroyRef);
   private unitsById = new Map<string, Unit>();
 
   ngOnInit(): void {
+    this.loadReceipts();
+    this.notificationService.dataChanges$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadReceipts());
+  }
+
+  private loadReceipts(): void {
     const userId = this.getCurrentUserId();
 
     // Get owner name from Keycloak profile
@@ -643,12 +686,8 @@ export class OwnerInvoicesComponent implements OnInit {
         );
         const mappedDistributions = paidDistributions.map((dist) => this.mapChargeDistribution(dist));
 
-        // A validated fund-call payment is also a receipt. This source was
-        // previously omitted, leaving "Mes Reçus" empty for owners who paid
-        // through the call-for-funds workflow.
-        const mappedFundCallPayments = fundCallPayments
-          .filter((payment) => this.isPaymentApproved(payment.validationStatus))
-          .map(payment => this.mapFundCallPayment(payment));
+        // Keep pending, approved, and rejected proofs for a complete audit trail.
+        const mappedFundCallPayments = fundCallPayments.map(payment => this.mapFundCallPayment(payment));
 
         // Merge and sort by date (descending)
         const allReceipts = [...mappedInvoices, ...mappedDistributions, ...mappedFundCallPayments]
@@ -681,13 +720,13 @@ export class OwnerInvoicesComponent implements OnInit {
   }
 
   getPaymentMethodLabel(method: string): string {
-    const labels: Record<string, string> = {
-      Card: 'Carte',
-      BankTransfer: 'Virement',
-      Cash: 'Espèces',
-      Check: 'Chèque'
+    const keys: Record<string, string> = {
+      Card: 'ownerPortal.receipts.paymentMethods.card',
+      BankTransfer: 'ownerPortal.receipts.paymentMethods.bankTransfer',
+      Cash: 'ownerPortal.receipts.paymentMethods.cash',
+      Check: 'ownerPortal.receipts.paymentMethods.check'
     };
-    return labels[method] || method || '—';
+    return keys[method] ? this.translate.instant(keys[method]) : method || '—';
   }
 
   formatAmount(amount: number | string | undefined | null, currency?: string): string {
@@ -715,11 +754,13 @@ export class OwnerInvoicesComponent implements OnInit {
       date,
       amount: inv.totalAmount,
       period: this.getPeriodLabel(date),
-      unitNumber: inv.unitNumberSnapshot ?? unit?.unitNumber ?? '—',
+      unitNumber: inv.unitNumberSnapshot ?? unit?.unitNumber ?? this.extractUnitNumber(inv.description) ?? '—',
       paymentDate: inv.paidDate ? new Date(inv.paidDate) : undefined,
       paymentMethod: inv.paymentMethod ?? '',
       status: this.isPaidInvoiceStatus(inv.status) ? 'paid' : 'pending',
+      downloadable: true,
       currency: inv.currency,
+      ownerName: inv.ownerNameSnapshot,
     };
   }
 
@@ -735,10 +776,11 @@ export class OwnerInvoicesComponent implements OnInit {
       date,
       amount: dist.amount,
       period: this.getPeriodLabel(paymentDate),
-      unitNumber: unit?.unitNumber ?? '—',
+      unitNumber: dist.unitNumber ?? unit?.unitNumber ?? this.extractUnitNumber(dist.chargeName) ?? '—',
       paymentDate,
       paymentMethod: dist.paymentMethod ?? 'Virement',
       status: 'paid',
+      downloadable: true,
       currency: dist.currency,
     };
   }
@@ -752,12 +794,22 @@ export class OwnerInvoicesComponent implements OnInit {
       date: paymentDate,
       amount: payment.amount,
       period: this.getPeriodLabel(paymentDate),
-      unitNumber: '—',
+      unitNumber: payment.unitNumberSnapshot ?? this.extractUnitNumber(payment.fundCall?.description) ?? '—',
       paymentDate,
       paymentMethod: payment.paymentMethod ?? '',
-      status: 'paid',
+      status: this.isPaymentApproved(payment.validationStatus)
+        ? 'paid'
+        : this.isPaymentRejected(payment.validationStatus) ? 'rejected' : 'pending',
+      downloadable: this.isPaymentApproved(payment.validationStatus),
       currency: payment.fundCall?.currency,
+      ownerName: payment.fundCall?.ownerName,
+      rejectionReason: payment.rejectionReason,
     };
+  }
+
+  /** Compatibility fallback for receipts created before unit snapshots existed. */
+  private extractUnitNumber(description: string | null | undefined): string | undefined {
+    return description?.match(/\bLot\s+([^),;]+)/i)?.[1]?.trim() || undefined;
   }
 
   /** GraphQL serializes .NET enum values as SCREAMING_SNAKE_CASE. */
@@ -768,6 +820,10 @@ export class OwnerInvoicesComponent implements OnInit {
   /** Accepts Approved/APPROVED/approved and underscore variants. */
   private isPaymentApproved(status: string | null | undefined): boolean {
     return String(status ?? '').replace(/[_\s-]/g, '').toUpperCase() === 'APPROVED';
+  }
+
+  private isPaymentRejected(status: string | null | undefined): boolean {
+    return String(status ?? '').replace(/[_\s-]/g, '').toUpperCase() === 'REJECTED';
   }
 
   private mapStatus(status: InvoiceStatus): 'paid' | 'pending' | 'overdue' {
@@ -805,11 +861,11 @@ export class OwnerInvoicesComponent implements OnInit {
 
   downloadInvoice(id: string): void {
     const invoice = this.invoices().find(inv => inv.id === id);
-    if (!invoice) return;
+    if (!invoice || !invoice.downloadable) return;
 
     const fmt = (v: number) => this.currencyService.formatAmount(v, invoice.currency);
     const fmtD = (d: Date | undefined) => d ? d.toLocaleDateString('fr-FR') : '-';
-    const owner = this.ownerName() || '—';
+    const owner = invoice.ownerName || this.ownerName() || '—';
 
     const statusBadge = invoice.status === 'paid'
       ? '<span class="badge badge-success">Payée</span>'
@@ -933,7 +989,7 @@ export class OwnerInvoicesComponent implements OnInit {
   }
 
   downloadAll(): void {
-    const invoices = this.filteredInvoices();
+    const invoices = this.filteredInvoices().filter(invoice => invoice.downloadable);
     if (invoices.length === 0) {
       this.toastService.show(
         'Aucune facture à télécharger',

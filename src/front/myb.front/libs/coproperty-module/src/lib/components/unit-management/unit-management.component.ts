@@ -19,6 +19,7 @@ import { getUnitErrorTranslation } from '../../utils/unit-error.util';
 export class UnitManagementComponent implements OnInit, OnChanges {
   @Input() copropertyId: string | null = null;
   @Input() copropertyName = '';
+  @Input() copropertyIsActive = true;
   @Input() copropertyTotalShares: number | null = null;
   
   private unitService = inject(UnitService);
@@ -120,6 +121,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
   }
 
   openAddForm(): void {
+    if (!this.copropertyIsActive) return;
     this.showAddForm = true;
     this.editingUnitId = null;
     this.unitForm.reset({ 
@@ -188,6 +190,7 @@ export class UnitManagementComponent implements OnInit, OnChanges {
   }
 
   saveUnit(): void {
+    if (!this.editingUnitId && !this.copropertyIsActive) return;
     if (this.unitForm.valid) {
       const unitData: UnitExtended = {
         ...this.unitForm.getRawValue(),

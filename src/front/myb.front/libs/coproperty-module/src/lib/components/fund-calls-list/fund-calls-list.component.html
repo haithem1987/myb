@@ -1,7 +1,7 @@
 <div class="fund-calls-list-container">
   <div class="page-header">
     <h1>
-      <i class="bi bi-cash-coin me-2" aria-hidden="true"></i>
+      <i class="bi bi-megaphone-fill me-2" aria-hidden="true"></i>
       {{ 'coproperty.fundCalls.title' | translate }}
     </h1>
     <p class="text-muted">{{ 'coproperty.fundCalls.subtitle' | translate }}</p>
@@ -111,7 +111,7 @@
         <div class="card-body">
           <div class="d-flex align-items-center h-100">
             <div class="stat-icon bg-primary">
-              <i class="bi bi-megaphone-fill" aria-hidden="true"></i>
+              <i class="bi bi-cash-stack" aria-hidden="true"></i>
             </div>
             <div class="stat-content ms-3">
               <h6 class="text-muted mb-0">{{ 'coproperty.fundCalls.stats.called' | translate }}</h6>
@@ -145,7 +145,7 @@
         <div class="card-body">
           <div class="d-flex align-items-center h-100">
             <div class="stat-icon bg-warning">
-              <i class="bi bi-hourglass-bottom" aria-hidden="true"></i>
+              <i class="bi bi-hourglass-split" aria-hidden="true"></i>
             </div>
             <div class="stat-content ms-3">
               <h6 class="text-muted mb-0">{{ 'coproperty.fundCalls.stats.remaining' | translate }}</h6>
@@ -162,7 +162,7 @@
         <div class="card-body">
           <div class="d-flex align-items-center h-100">
             <div class="stat-icon bg-info">
-              <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+              <i class="bi bi-pie-chart-fill" aria-hidden="true"></i>
             </div>
             <div class="stat-content ms-3">
               <h6 class="text-muted mb-0">{{ 'coproperty.fundCalls.stats.recovery' | translate }}</h6>
@@ -242,9 +242,9 @@
         </button>
         <div class="ms-auto d-flex gap-2">
           <button class="btn btn-sm btn-warning text-white"
-                  (click)="cancelSelectedPublished()"
+                  (click)="clearSelection()"
                   [title]="'coproperty.fundCalls.bulk.cancel' | translate">
-            <i class="bi bi-x-octagon me-1"></i>{{ 'coproperty.fundCalls.bulk.cancel' | translate }}
+            <i class="bi bi-x-circle me-1"></i>{{ 'coproperty.fundCalls.bulk.cancel' | translate }}
           </button>
         </div>
       </div>
@@ -382,8 +382,8 @@
 <div class="edit-panel" [class.edit-panel--open]="showEditPanel()">
   <div class="edit-panel-header">
     <h5 class="mb-0">
-      <i class="bi bi-pencil-square me-2"></i>
-      {{ 'coproperty.fundCalls.editPanel.title' | translate }}
+      <i class="bi me-2" [ngClass]="isPaid(editingFundCall()) ? 'bi-eye-fill' : 'bi-pencil-square'"></i>
+      {{ (isPaid(editingFundCall()) ? 'coproperty.fundCalls.editPanel.viewTitle' : 'coproperty.fundCalls.editPanel.title') | translate }}
     </h5>
     <button type="button" class="btn-close" (click)="closeEditPanel()"></button>
   </div>
@@ -397,18 +397,18 @@
 
     <!-- ── Status + Versements at a glance (TOP) ─────────────────── -->
     <div class="status-versement-card mb-3 p-3 rounded-3 border">
-      <div class="row g-3">
+      <div class="status-versement-grid">
         <!-- Status badge -->
-        <div class="col-6">
+        <div class="status-summary">
           <div class="small text-muted mb-1">
             <i class="bi bi-bookmark me-1"></i>{{ 'coproperty.fundCalls.editPanel.status' | translate }}
           </div>
-          <span class="badge fs-6 px-3 py-2" [ngClass]="getStatusBadge(editingFundCall()!.status)">
+          <span class="status-badge badge fs-6 px-3 py-2" [ngClass]="getStatusBadge(editingFundCall()!.status)">
             {{ getStatusLabel(editingFundCall()!.status) }}
           </span>
         </div>
         <!-- Payment progress -->
-        <div class="col-6">
+        <div class="payment-progress-summary">
           <div class="small text-muted mb-1">
             <i class="bi bi-cash-coin me-1"></i>{{ 'coproperty.fundCalls.payments.title' | translate }}
           </div>

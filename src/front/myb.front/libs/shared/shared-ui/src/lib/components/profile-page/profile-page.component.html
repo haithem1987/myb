@@ -146,6 +146,15 @@
               </div>
             </div>
 
+            <!-- Mobile phone stored on the owner profile -->
+            <div class="form-group full-width">
+              <label class="form-label">
+                <i class="bi bi-telephone me-1"></i>Téléphone mobile
+              </label>
+              <input *ngIf="editMode()" type="tel" class="form-control" formControlName="phone" maxlength="50" autocomplete="tel" aria-label="Téléphone mobile">
+              <div *ngIf="!editMode()" class="form-value">{{ phone.value || '—' }}</div>
+            </div>
+
           </div>
 
           <!-- Edit actions -->

@@ -592,6 +592,8 @@ export class SyndicSettingsComponent implements OnInit {
     return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: this.selectedCurrency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
     }).format(1234.56);
   }
 

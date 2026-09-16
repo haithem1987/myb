@@ -2,6 +2,7 @@ import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileDownloadService, ToastService } from '@myb-front/shared-ui';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface Document {
   id: string;
@@ -16,7 +17,7 @@ interface Document {
 @Component({
   selector: 'app-owner-documents',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
@@ -24,9 +25,9 @@ interface Document {
         <div class="col-12">
           <h2 class="mb-1">
             <i class="bi bi-file-text me-2"></i>
-            Mes Documents
+            {{ 'ownerPortal.documents.title' | translate }}
           </h2>
-          <p class="text-muted">Accédez à tous les documents de votre copropriété</p>
+          <p class="text-muted">{{ 'ownerPortal.documents.subtitle' | translate }}</p>
         </div>
       </div>
 
@@ -39,7 +40,7 @@ interface Document {
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stats().regulation }}</div>
-              <div class="stat-label">Règlements</div>
+              <div class="stat-label">{{ 'ownerPortal.documents.types.regulation' | translate }}</div>
             </div>
           </div>
         </div>
@@ -50,7 +51,7 @@ interface Document {
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stats().agMinutes }}</div>
-              <div class="stat-label">PV d'AG</div>
+              <div class="stat-label">{{ 'ownerPortal.documents.types.agMinutes' | translate }}</div>
             </div>
           </div>
         </div>
@@ -61,7 +62,7 @@ interface Document {
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stats().contracts }}</div>
-              <div class="stat-label">Contrats</div>
+              <div class="stat-label">{{ 'ownerPortal.documents.types.contract' | translate }}</div>
             </div>
           </div>
         </div>
@@ -72,7 +73,7 @@ interface Document {
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stats().financial }}</div>
-              <div class="stat-label">Financiers</div>
+              <div class="stat-label">{{ 'ownerPortal.documents.financialShort' | translate }}</div>
             </div>
           </div>
         </div>
@@ -83,7 +84,7 @@ interface Document {
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stats().total }}</div>
-              <div class="stat-label">Total</div>
+              <div class="stat-label">{{ 'ownerPortal.documents.total' | translate }}</div>
             </div>
           </div>
         </div>
@@ -93,17 +94,17 @@ interface Document {
       <div class="row mb-4">
         <div class="col-md-3">
           <select class="form-select" [(ngModel)]="selectedType" (change)="filterDocuments()">
-            <option value="all">Tous les types</option>
-            <option value="regulation">Règlements</option>
-            <option value="ag-minutes">PV d'AG</option>
-            <option value="contract">Contrats</option>
-            <option value="technical">Documents techniques</option>
-            <option value="financial">Documents financiers</option>
-            <option value="other">Autres</option>
+            <option value="all">{{ 'ownerPortal.documents.allTypes' | translate }}</option>
+            <option value="regulation">{{ 'ownerPortal.documents.types.regulation' | translate }}</option>
+            <option value="ag-minutes">{{ 'ownerPortal.documents.types.agMinutes' | translate }}</option>
+            <option value="contract">{{ 'ownerPortal.documents.types.contract' | translate }}</option>
+            <option value="technical">{{ 'ownerPortal.documents.types.technical' | translate }}</option>
+            <option value="financial">{{ 'ownerPortal.documents.types.financial' | translate }}</option>
+            <option value="other">{{ 'ownerPortal.documents.types.other' | translate }}</option>
           </select>
         </div>
         <div class="col-md-3">
-          <input type="text" class="form-control" placeholder="Rechercher..." 
+          <input type="text" class="form-control" [placeholder]="'ownerPortal.documents.search' | translate"
                  [(ngModel)]="searchTerm" (input)="filterDocuments()">
         </div>
       </div>
@@ -304,6 +305,7 @@ interface Document {
   `]
 })
 export class OwnerDocumentsComponent {
+  private translate = inject(TranslateService);
   selectedType = 'all';
   searchTerm = '';
 
@@ -393,15 +395,15 @@ export class OwnerDocumentsComponent {
   }
 
   getCategoryLabel(type: string): string {
-    const labels: Record<string, string> = {
-      regulation: 'Règlement',
-      'ag-minutes': 'PV d\'AG',
-      contract: 'Contrat',
-      technical: 'Technique',
-      financial: 'Financier',
-      other: 'Autre'
+    const keys: Record<string, string> = {
+      regulation: 'ownerPortal.documents.types.regulation',
+      'ag-minutes': 'ownerPortal.documents.types.agMinutes',
+      contract: 'ownerPortal.documents.types.contract',
+      technical: 'ownerPortal.documents.types.technical',
+      financial: 'ownerPortal.documents.types.financial',
+      other: 'ownerPortal.documents.types.other'
     };
-    return labels[type] || type;
+    return keys[type] ? this.translate.instant(keys[type]) : type;
   }
 
   getTypeIcon(type: string): string {

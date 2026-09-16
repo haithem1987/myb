@@ -92,6 +92,8 @@ export class DeleteFundCallModalComponent implements OnInit {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: this.fundCall?.currency || 'EUR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
     }).format(value || 0);
   }
 }

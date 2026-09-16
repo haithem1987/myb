@@ -40,7 +40,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field("cancellable")
                 .Resolve(ctx => FundCallLifecycleHelpers.IsCancellable(ctx.Parent<FundCall>()))
                 .Type<NonNullType<BooleanType>>()
-                .Description("True when the fund call is in any state except the terminal CANCELLED state.");
+                .Description("True when the fund call is neither PAID nor CANCELLED.");
 
             // French reason why a delete is blocked, surfaced by the UI to
             // explain why the Supprimer button is not shown.
@@ -143,7 +143,9 @@ namespace Myb.Coproperty.GraphQL.Types
             => GetDeleteBlockerReason(fundCall) == null;
 
         public static bool IsCancellable(FundCall fundCall)
-            => fundCall?.Status != FundCallStatus.Cancelled;
+            => fundCall != null &&
+               fundCall.Status != FundCallStatus.Cancelled &&
+               fundCall.Status != FundCallStatus.Paid;
 
         public static string? GetDeleteBlockerReason(FundCall fundCall)
         {
@@ -178,6 +180,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(p => p.JustificatifContentType).Type<StringType>();
             descriptor.Ignore(p => p.JustificatifFile);
             descriptor.Field(p => p.PaymentMethod).Type<StringType>();
+            descriptor.Field(p => p.UnitNumberSnapshot).Type<StringType>();
             descriptor.Field(p => p.ValidationStatus).Type<NonNullType<StringType>>();
             descriptor.Field(p => p.RejectionReason).Type<StringType>();
             descriptor.Field(p => p.CreatedAt).Type<NonNullType<DateTimeType>>();

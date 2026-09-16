@@ -10,7 +10,7 @@ import { FundCallService } from '../../services/fund-call.service';
 import { OwnerService } from '../../services/owner.service';
 import { UnitService } from '../../services/unit.service';
 import { OwnerWithUnits } from '../../models/owner.model';
-import { AddFundCallPaymentInput, CreateFundCallInput } from '../../models/fund-call.model';
+import { CreateFundCallInput } from '../../models/fund-call.model';
 import { Coproperty } from '../../models/coproperty.models';
 import { KeycloakService } from '@myb-front/auth';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -35,9 +35,6 @@ interface DistributionPreview {
   shares: number;
   amount: number;
   percentage: number;
-  /** Optional: record an immediate payment when saving */
-  paymentDate?: string;
-  paymentAmount?: number;
 }
 
 enum DistributionMethod {
@@ -139,9 +136,9 @@ export class ChargeDistributionComponent implements OnInit {
             const cop = data.find(c => c.id === currentId);
             if (cop) this.selectedCoproperty.set(cop);
             this.loadChargesForCoproperty(currentId);
-          } else if (data.length > 0) {
+          } else if (data.some(c => c.isActive)) {
             // Auto-select first coproperty by default
-            this.onCopropertyChange(data[0].id);
+            this.onCopropertyChange(data.find(c => c.isActive)!.id);
           }
         },
         error: (err) => {
@@ -506,6 +503,7 @@ export class ChargeDistributionComponent implements OnInit {
   }
 
   saveDistribution(): void {
+    if (this.selectedCoproperty()?.isActive === false) return;
     if (!this.repartitionForm.valid || this.distributionPreview.length === 0) return;
 
     this.saving.set(true);
@@ -597,30 +595,6 @@ export class ChargeDistributionComponent implements OnInit {
         .subscribe((results: any[]) => {
           const errors = results.filter((r) => r?.__error).map((r) => r.__error as string);
           const created = results.filter((r) => !r?.__error);
-
-          // For fund calls that have a paymentDate set, record an immediate payment
-          const paymentRequests = created
-            .map((fundCall, idx) => {
-              const preview = fundCallEntries[idx]?.preview;
-              if (preview?.paymentDate && preview.paymentAmount && preview.paymentAmount > 0) {
-                const paymentInput: AddFundCallPaymentInput = {
-                  amount: preview.paymentAmount,
-                  paymentDate: new Date(preview.paymentDate),
-                  justificatif: `Paiement initial - ${preview.ownerName}`,
-                };
-                return this.fundCallService.addFundCallPayment(fundCall.id, paymentInput).pipe(
-                  catchError(() => of(null))
-                );
-              }
-              return of(null);
-            })
-            .filter((req) => req !== null);
-
-          if (paymentRequests.length > 0) {
-            forkJoin(paymentRequests)
-              .pipe(takeUntilDestroyed(this.destroyRef))
-              .subscribe();
-          }
 
           this.saving.set(false);
 

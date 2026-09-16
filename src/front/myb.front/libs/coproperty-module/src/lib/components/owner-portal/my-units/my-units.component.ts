@@ -5,6 +5,8 @@ import { OwnerService, Unit, CopropertyService, Coproperty } from '../../../inde
 import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { CurrencyService } from '../../../services/currency.service';
 
 interface UnitView {
   id: string;
@@ -21,7 +23,7 @@ interface UnitView {
 @Component({
   selector: 'app-owner-my-units',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
@@ -29,29 +31,29 @@ interface UnitView {
         <div class="col-12">
           <h2 class="mb-1">
             <i class="bi bi-building me-2"></i>
-            Mes Lots
+            {{ 'ownerPortal.myUnits.title' | translate }}
           </h2>
-          <p class="text-muted">Consultez vos biens et vos charges</p>
+          <p class="text-muted">{{ 'ownerPortal.myUnits.subtitle' | translate }}</p>
         </div>
       </div>
 
       <!-- Loading state -->
       <div *ngIf="loading()" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Chargement...</span>
+          <span class="visually-hidden">{{ 'ownerPortal.myUnits.loading' | translate }}</span>
         </div>
-        <p class="text-muted mt-3">Chargement de vos lots...</p>
+        <p class="text-muted mt-3">{{ 'ownerPortal.myUnits.loading' | translate }}</p>
       </div>
 
       <!-- Error state -->
       <div *ngIf="!loading() && error()" class="alert alert-danger d-flex align-items-center gap-2">
         <i class="bi bi-exclamation-triangle-fill fs-5"></i>
         <div>
-          <strong>Impossible de charger vos lots.</strong>
+          <strong>{{ 'ownerPortal.myUnits.loadError' | translate }}</strong>
           <div class="small">{{ error() }}</div>
         </div>
         <button class="btn btn-sm btn-outline-danger ms-auto" (click)="reload()">
-          <i class="bi bi-arrow-clockwise me-1"></i>Réessayer
+          <i class="bi bi-arrow-clockwise me-1"></i>{{ 'ownerPortal.myUnits.retry' | translate }}
         </button>
       </div>
 
@@ -66,7 +68,7 @@ interface UnitView {
               </div>
               <div class="stat-content">
                 <div class="stat-value">{{ stats().totalUnits }}</div>
-                <div class="stat-label">Lots détenus</div>
+                <div class="stat-label">{{ 'ownerPortal.myUnits.ownedUnits' | translate }}</div>
               </div>
             </div>
           </div>
@@ -77,9 +79,9 @@ interface UnitView {
               </div>
               <div class="stat-content">
                 <div class="stat-value">
-                  {{ stats().totalSurface > 0 ? stats().totalSurface + ' m²' : '—' }}
+                  {{ stats().totalSurface > 0 ? formatNumber(stats().totalSurface) + ' m²' : '—' }}
                 </div>
-                <div class="stat-label">Surface totale</div>
+                <div class="stat-label">{{ 'ownerPortal.myUnits.totalArea' | translate }}</div>
               </div>
             </div>
           </div>
@@ -90,7 +92,7 @@ interface UnitView {
               </div>
               <div class="stat-content">
                 <div class="stat-value">{{ stats().totalShares }}</div>
-                <div class="stat-label">Tantièmes totaux</div>
+                <div class="stat-label">{{ 'ownerPortal.myUnits.totalShares' | translate }}</div>
               </div>
             </div>
           </div>
@@ -101,7 +103,7 @@ interface UnitView {
               </div>
               <div class="stat-content">
                 <div class="stat-value">{{ stats().copropertiesCount }}</div>
-                <div class="stat-label">Copropriété(s)</div>
+                <div class="stat-label">{{ 'ownerPortal.myUnits.coproperties' | translate }}</div>
               </div>
             </div>
           </div>
@@ -110,8 +112,8 @@ interface UnitView {
         <!-- Empty state -->
         <div *ngIf="units().length === 0" class="text-center py-5">
           <i class="bi bi-building display-1 text-muted"></i>
-          <p class="text-muted mt-3 mb-1 fs-5">Aucun lot trouvé</p>
-          <p class="text-muted small">Aucun lot n'est associé à votre compte.</p>
+          <p class="text-muted mt-3 mb-1 fs-5">{{ 'ownerPortal.myUnits.emptyTitle' | translate }}</p>
+          <p class="text-muted small">{{ 'ownerPortal.myUnits.emptyText' | translate }}</p>
         </div>
 
         <!-- Units List -->
@@ -131,14 +133,14 @@ interface UnitView {
                      [class.bi-grid]="unit.type === 'other'"></i>
                   {{ getUnitTypeLabel(unit.type) }}
                 </div>
-                <h5 class="unit-number">Lot {{ unit.number }}</h5>
+                <h5 class="unit-number">{{ 'ownerPortal.myUnits.unit' | translate }} {{ unit.number }}</h5>
               </div>
 
               <div class="unit-body">
                 <div class="info-row">
                   <i class="bi bi-building text-primary"></i>
                   <div>
-                    <div class="info-label">Copropriété</div>
+                    <div class="info-label">{{ 'ownerPortal.myUnits.coproperty' | translate }}</div>
                     <div class="info-value">{{ unit.copropertyName }}</div>
                   </div>
                 </div>
@@ -146,33 +148,31 @@ interface UnitView {
                 <div class="info-row" *ngIf="unit.floor !== null">
                   <i class="bi bi-layers text-secondary"></i>
                   <div>
-                    <div class="info-label">Étage</div>
-                    <div class="info-value">
-                      {{ unit.floor === 0 ? 'RDC' : unit.floor + (unit.floor === 1 ? 'er' : 'ème') + ' étage' }}
-                    </div>
+                    <div class="info-label">{{ 'ownerPortal.myUnits.floor' | translate }}</div>
+                    <div class="info-value">{{ formatFloor(unit.floor) }}</div>
                   </div>
                 </div>
 
                 <div class="info-row" *ngIf="unit.surface !== null">
                   <i class="bi bi-rulers text-success"></i>
                   <div>
-                    <div class="info-label">Surface</div>
-                    <div class="info-value">{{ unit.surface }} m²</div>
+                    <div class="info-label">{{ 'ownerPortal.myUnits.area' | translate }}</div>
+                    <div class="info-value">{{ formatNumber(unit.surface) }} m²</div>
                   </div>
                 </div>
 
                 <div class="info-row">
                   <i class="bi bi-pie-chart text-warning"></i>
                   <div>
-                    <div class="info-label">Tantièmes</div>
-                    <div class="info-value">{{ unit.shares }}</div>
+                    <div class="info-label">{{ 'ownerPortal.myUnits.shares' | translate }}</div>
+                    <div class="info-value">{{ formatNumber(unit.shares) }}</div>
                   </div>
                 </div>
 
                 <div class="info-row" *ngIf="unit.description">
                   <i class="bi bi-card-text text-muted"></i>
                   <div>
-                    <div class="info-label">Description</div>
+                    <div class="info-label">{{ 'ownerPortal.myUnits.description' | translate }}</div>
                     <div class="info-value">{{ unit.description }}</div>
                   </div>
                 </div>
@@ -180,7 +180,7 @@ interface UnitView {
                 <div class="ownership-info mt-3">
                   <i class="bi bi-calendar-check me-2"></i>
                   <small class="text-muted">
-                    Propriétaire depuis le {{ unit.ownershipStart | date:'dd/MM/yyyy' }}
+                    {{ 'ownerPortal.myUnits.ownerSince' | translate:{date: (unit.ownershipStart | date:'dd/MM/yyyy')} }}
                   </small>
                 </div>
               </div>
@@ -349,6 +349,8 @@ export class OwnerMyUnitsComponent implements OnInit {
   private ownerService = inject(OwnerService);
   private copropertyService = inject(CopropertyService);
   private keycloakService = inject(KeycloakService);
+  private translate = inject(TranslateService);
+  private currencyService = inject(CurrencyService);
 
   units = signal<UnitView[]>([]);
   loading = signal<boolean>(true);
@@ -392,7 +394,7 @@ export class OwnerMyUnitsComponent implements OnInit {
     const userId = this.getCurrentUserId();
     if (!userId) {
       this.loading.set(false);
-      this.error.set('Utilisateur non identifié. Veuillez vous reconnecter.');
+      this.error.set(this.translate.instant('ownerPortal.myUnits.unauthenticated'));
       return;
     }
 
@@ -412,7 +414,7 @@ export class OwnerMyUnitsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading owner units:', err);
-        this.error.set(err?.graphQLErrors?.[0]?.message || 'Erreur lors du chargement des lots.');
+        this.error.set(err?.graphQLErrors?.[0]?.message || this.translate.instant('ownerPortal.myUnits.loadError'));
         this.loading.set(false);
       },
     });
@@ -433,7 +435,7 @@ export class OwnerMyUnitsComponent implements OnInit {
       id: u.id,
       number: u.unitNumber,
       type,
-      copropertyName: copropertyMap.get(u.copropertyId) ?? `Copropriété (${u.copropertyId.substring(0, 8)}…)`,
+      copropertyName: copropertyMap.get(u.copropertyId) ?? `${this.translate.instant('ownerPortal.myUnits.coproperty')} (${u.copropertyId.substring(0, 8)}…)`,
       floor: u.floor ?? null,
       surface: u.area ?? null,
       shares: u.shares,
@@ -444,12 +446,21 @@ export class OwnerMyUnitsComponent implements OnInit {
 
   getUnitTypeLabel(type: string): string {
     const labels: Record<string, string> = {
-      apartment: 'Appartement',
-      parking: 'Parking',
-      cellar: 'Cave',
-      other: 'Autre',
+      apartment: this.translate.instant('ownerPortal.myUnits.types.apartment'),
+      parking: this.translate.instant('ownerPortal.myUnits.types.parking'),
+      cellar: this.translate.instant('ownerPortal.myUnits.types.cellar'),
+      other: this.translate.instant('ownerPortal.myUnits.types.other'),
     };
     return labels[type] || type;
+  }
+
+  formatNumber(value: number | null): string {
+    return this.currencyService.formatNumber(value);
+  }
+
+  formatFloor(floor: number | null): string {
+    if (floor === 0) return this.translate.instant('ownerPortal.myUnits.groundFloor');
+    return this.translate.instant('ownerPortal.myUnits.floorValue', { floor });
   }
 
   viewChargeDetails(_unit: UnitView): void { /* removed */ }

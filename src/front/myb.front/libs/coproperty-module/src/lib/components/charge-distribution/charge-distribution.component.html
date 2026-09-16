@@ -37,8 +37,8 @@
                 formControlName="copropertyId"
                 (change)="onCopropertyChange($any($event.target).value)">
                 <option value="">{{ 'coproperty.charge.selectCoproperty' | translate }}</option>
-                <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
-                  {{ coproperty.name }} - {{ coproperty.city }}
+                <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id" [disabled]="!coproperty.isActive">
+                  {{ coproperty.name }} - {{ coproperty.city }}{{ coproperty.isActive ? '' : ' (Inactive)' }}
                 </option>
               </select>
             </div>
@@ -274,12 +274,6 @@
               <th *ngIf="selectedMethod === DistributionMethod.Custom">
                 <i class="bi bi-pencil me-1"></i>{{ 'common.edit' | translate }}
               </th>
-              <th>
-                <i class="bi bi-credit-card me-1"></i>{{ 'coproperty.fundCall.paymentDate' | translate }}
-              </th>
-              <th>
-                <i class="bi bi-cash-coin me-1"></i>{{ 'coproperty.fundCall.paymentAmount' | translate }}
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -306,25 +300,6 @@
                   <div class="percentage-bar" [style.width.%]="item.percentage"></div>
                   <span>{{ item.percentage.toFixed(2) }}%</span>
                 </div>
-              </td>
-              <td>
-                <input
-                  type="date"
-                  class="form-control form-control-sm"
-                  [(ngModel)]="item.paymentDate"
-                  [title]="'coproperty.fundCall.paymentDate' | translate"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  class="form-control form-control-sm"
-                  [(ngModel)]="item.paymentAmount"
-                  [placeholder]="item.amount"
-                  step="0.01"
-                  min="0"
-                  [title]="'coproperty.fundCall.paymentAmount' | translate"
-                />
               </td>
             </tr>
           </tbody>

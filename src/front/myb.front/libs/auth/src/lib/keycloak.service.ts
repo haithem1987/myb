@@ -8,6 +8,7 @@ import { ENVIRONMENT } from './environment.token';
   providedIn: 'root',
 })
 export class KeycloakService {
+  private static readonly LOGOUT_MARKER = 'myb_logout_pending';
   private keycloak!: Keycloak;
   private profileSubject: BehaviorSubject<KeycloakProfile | null> =
     new BehaviorSubject<KeycloakProfile | null>(null);
@@ -92,6 +93,14 @@ export class KeycloakService {
     }
 
     return new Promise((resolve, reject) => {
+      // After returning from Keycloak's logout endpoint, do not immediately run
+      // check-sso on the landing page. This guarantees a visibly logged-out home
+      // even while the browser finishes invalidating the remote SSO session.
+      const completingLogout = sessionStorage.getItem(KeycloakService.LOGOUT_MARKER) === '1';
+      if (completingLogout) {
+        sessionStorage.removeItem(KeycloakService.LOGOUT_MARKER);
+        this.clearLocalAuthenticationState();
+      }
       this.keycloak = new Keycloak({
         url: this.environment.services.keycloak.url,
         realm: this.environment.services.keycloak.realm,
@@ -100,7 +109,7 @@ export class KeycloakService {
 
       this.keycloak
         .init({
-          onLoad: 'check-sso',
+          ...(completingLogout ? {} : { onLoad: 'check-sso' as const }),
           checkLoginIframe: false,
           pkceMethod: 'S256',
         })
@@ -110,12 +119,14 @@ export class KeycloakService {
             this.loadUserProfile()
               .then(() => {
                 this.initialized = true;
+                void this.syncAuthenticatedUserPreferences();
                 console.log('User profile loaded successfully');
                 resolve(true);
               })
               .catch((err) => {
                 console.error('Failed to load user profile:', err);
                 this.initialized = true;
+                void this.syncAuthenticatedUserPreferences();
                 resolve(true); // Still resolve as authenticated
               });
           } else {
@@ -201,7 +212,25 @@ export class KeycloakService {
   }
 
   logout(redirectUri?: string): void {
-    this.keycloak.logout({ redirectUri: redirectUri ?? window.location.origin });
+    const target = redirectUri ?? window.location.origin;
+    // Build the RP-initiated logout URL while the ID token is still available,
+    // then clear all local authentication state before leaving this app. This
+    // prevents the client space from briefly reusing the previous session if
+    // navigation or the remote logout request is delayed.
+    const logoutUrl = this.keycloak.createLogoutUrl({ redirectUri: target });
+    sessionStorage.setItem(KeycloakService.LOGOUT_MARKER, '1');
+    this.clearLocalAuthenticationState();
+    window.location.replace(logoutUrl);
+  }
+
+  private clearLocalAuthenticationState(): void {
+    this.profileSubject.next(null);
+    this.userIdSubject.next(null);
+    this.clientIdCache = null;
+    localStorage.removeItem('currentUser');
+    sessionStorage.removeItem('currentUser');
+    sessionStorage.removeItem('redirect_url');
+    this.keycloak?.clearToken();
   }
 
   getToken(): string | undefined {
@@ -432,73 +461,83 @@ export class KeycloakService {
     password?: string;
     role?: string;
     enabled?: boolean;
+    notifyOnActivation?: boolean;
   }): Promise<string> {
+    if (!options.password) throw new Error('A temporary password is required');
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.currentUserToken}`,
       'Content-Type': 'application/json',
     });
-
-    const keycloakUrl = this.keycloakAdminUrl;
-
-    // Build the user representation
-    const userPayload: any = {
-      username: options.email,
-      email: options.email,
-      firstName: options.firstName,
-      lastName: options.lastName,
-      enabled: options.enabled !== false,
-      emailVerified: true,
+    const body = {
+      query: `mutation CreateOwnerUserAccount(
+        $firstName: String!, $lastName: String!, $email: String!, $temporaryPassword: String!, $notifyOnActivation: Boolean!
+      ) {
+        createOwnerUserAccount(
+          firstName: $firstName,
+          lastName: $lastName,
+          email: $email,
+          temporaryPassword: $temporaryPassword
+          notifyOnActivation: $notifyOnActivation
+        ) { id }
+      }`,
+      variables: {
+        firstName: options.firstName,
+        lastName: options.lastName,
+        email: options.email,
+        temporaryPassword: options.password,
+        notifyOnActivation: options.notifyOnActivation ?? false,
+      },
     };
-
-    // If a password is provided, set it as a temporary credential
-    if (options.password) {
-      userPayload.credentials = [
-        {
-          type: 'password',
-          value: options.password,
-          temporary: true,
-        },
-      ];
-    }
-
-    // Create the user (returns 201 with Location header)
-    const response = await firstValueFrom(
-      this.http.post(
-        `${keycloakUrl}/admin/realms/MYB/users`,
-        userPayload,
-        { headers, observe: 'response' }
-      )
+    const response: any = await firstValueFrom(
+      this.http.post(this.getGraphqlUrl(), body, { headers })
     );
-
-    // Extract the user ID from the Location header
-    const location = response.headers.get('Location') || '';
-    const userId = location.substring(location.lastIndexOf('/') + 1);
-
-    if (!userId) {
-      // Fallback: query by email to get the ID
-      const users: any[] = await firstValueFrom(
-        this.http.get<any[]>(
-          `${keycloakUrl}/admin/realms/MYB/users?email=${encodeURIComponent(options.email)}&exact=true`,
-          { headers }
-        )
-      );
-      if (users && users.length > 0) {
-        const createdUserId = users[0].id;
-        if (options.role) {
-          await this.assignRoleToUser(createdUserId, options.role);
-        }
-        return createdUserId;
-      }
-      throw new Error('Failed to retrieve created Keycloak user ID');
-    }
-
-    // Assign role if requested
-    if (options.role) {
-      await this.assignRoleToUser(userId, options.role);
-    }
-
-    console.log(`Keycloak user created: ${userId} (${options.email})`);
+    if (response?.errors?.length) throw new Error(response.errors[0].message);
+    const userId = response?.data?.createOwnerUserAccount?.id;
+    if (!userId) throw new Error('Failed to retrieve created Keycloak user ID');
+    if (options.role) await this.assignRoleToUser(userId, options.role);
     return userId;
+  }
+
+  private async syncAuthenticatedUserPreferences(): Promise<void> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.currentUserToken}`,
+      'Content-Type': 'application/json',
+    });
+    const body = {
+      query: `mutation CompleteLogin($language: String!) {
+        syncPreferredLanguage(language: $language)
+        confirmCurrentUserActivation
+      }`,
+      variables: { language: this.getPreferredLanguage() },
+    };
+    try {
+      await firstValueFrom(this.http.post(this.getGraphqlUrl(), body, { headers }));
+    } catch (error) {
+      // Authentication must remain usable if the preference/notification hook
+      // is temporarily unavailable during a rolling deployment.
+      console.warn('Could not synchronize login preferences', error);
+    }
+  }
+
+  /** Search the global directory specifically for the Add Owner workflow. */
+  async searchOwnerCandidates(emailSearch: string): Promise<any[]> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.currentUserToken}`,
+      'Content-Type': 'application/json',
+    });
+    const body = {
+      query: `query SearchOwnerCandidates($email: String!, $max: Int) {
+        searchOwnerCandidates(email: $email, max: $max) {
+          id email firstName lastName phone enabled emailVerified roles
+        }
+      }`,
+      variables: { email: emailSearch, max: 20 },
+    };
+    const response: any = await firstValueFrom(
+      this.http.post(this.getGraphqlUrl(), body, { headers })
+    );
+    if (response?.errors?.length) throw new Error(response.errors[0].message);
+    return response?.data?.searchOwnerCandidates ?? [];
   }
 
   /**
@@ -600,6 +639,7 @@ export class KeycloakService {
             email
             firstName
             lastName
+            phone
             enabled
             emailVerified
             roles
@@ -676,6 +716,42 @@ export class KeycloakService {
 
     // Reload the local profile cache
     await this.loadUserProfile();
+  }
+
+  async updateMyOwnerProfile(data: { firstName: string; lastName: string; email: string; phone: string }): Promise<void> {
+    if (!this.currentUserToken) throw new Error('Not authenticated');
+    const response: any = await firstValueFrom(this.http.post(this.getGraphqlUrl(), {
+      query: `mutation UpdateMyOwnerProfile($firstName: String!, $lastName: String!, $email: String!, $phone: String!) {
+        updateMyOwnerProfile(firstName: $firstName, lastName: $lastName, email: $email, phone: $phone) {
+          firstName lastName email phone
+        }
+      }`,
+      variables: data,
+    }, { headers: new HttpHeaders({ Authorization: `Bearer ${this.currentUserToken}` }) }));
+    if (response?.errors?.length) throw new Error(response.errors[0].message);
+    if (!response?.data?.updateMyOwnerProfile) throw new Error('Owner profile update failed');
+  }
+
+  /** Return the phone stored on the authenticated user's owner profile. */
+  async getMyOwnerPhone(): Promise<string> {
+    const userId = this.getUserId();
+    if (!userId || !this.currentUserToken) return '';
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.currentUserToken}`,
+      'Content-Type': 'application/json',
+    });
+    const body = {
+      query: `query MyOwnerPhone($userId: UUID!) {
+        ownerByUserId(userId: $userId) { phone }
+      }`,
+      variables: { userId: this.normalizeUuid(userId) },
+    };
+    const response: any = await firstValueFrom(
+      this.http.post(this.getGraphqlUrl(), body, { headers })
+    );
+    if (response?.errors?.length) throw new Error(response.errors[0].message);
+    return response?.data?.ownerByUserId?.phone ?? '';
   }
 
   async changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Promise<void> {

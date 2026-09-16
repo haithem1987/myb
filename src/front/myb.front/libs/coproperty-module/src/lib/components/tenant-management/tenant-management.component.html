@@ -18,7 +18,7 @@
       <h2>{{ 'tenantManagement.title' | translate }}</h2>
       <p>{{ 'tenantManagement.subtitle' | translate }}</p>
     </div>
-    <button class="btn btn-primary" type="button" (click)="openAddForm()" [disabled]="!selectedCopropertyId">
+    <button class="btn btn-primary" type="button" (click)="openAddForm()" [disabled]="!selectedCopropertyId || !isSelectedCopropertyActive()">
       <i class="bi bi-person-plus"></i>
       {{ 'common.add' | translate }}
     </button>
@@ -29,7 +29,7 @@
       <label for="coproperty">{{ 'tenantManagement.coproperty' | translate }}</label>
       <select id="coproperty" class="form-select" [(ngModel)]="selectedCopropertyId" (change)="onCopropertyChange()">
         <option value="">{{ 'tenantManagement.selectCoproperty' | translate }}</option>
-        <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">{{ coproperty.name }}</option>
+        <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id" [disabled]="!coproperty.isActive">{{ coproperty.name }}{{ coproperty.isActive ? '' : ' (Inactive)' }}</option>
       </select>
     </div>
 
@@ -99,6 +99,7 @@
           <div class="col-md-3 mb-3">
             <label class="form-label" for="leaseEndDate">{{ 'tenantManagement.leaseEnd' | translate }}</label>
             <input id="leaseEndDate" class="form-control" type="date" formControlName="leaseEndDate" />
+            <div class="text-danger small" role="alert" *ngIf="tenantForm.hasError('dateRange')">La date de fin doit être postérieure à la date de début.</div>
           </div>
 
           <div class="col-md-3 mb-3">

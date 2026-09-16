@@ -40,6 +40,7 @@ export class ProfilePageComponent implements OnInit {
     firstName: ['', [Validators.required, Validators.minLength(2)]],
     lastName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
+    phone: ['', Validators.maxLength(50)],
   });
 
   passwordForm = this.fb.group({
@@ -85,11 +86,15 @@ export class ProfilePageComponent implements OnInit {
     this.joinedDate.set(iat);
 
     this.profileForm.patchValue({ firstName, lastName, email });
+    this.keycloakService.getMyOwnerPhone()
+      .then(phone => this.profileForm.patchValue({ phone }))
+      .catch(() => this.profileForm.patchValue({ phone: '' }));
   }
 
   get firstName(): AbstractControl { return this.profileForm.get('firstName')!; }
   get lastName(): AbstractControl { return this.profileForm.get('lastName')!; }
   get email(): AbstractControl { return this.profileForm.get('email')!; }
+  get phone(): AbstractControl { return this.profileForm.get('phone')!; }
 
   enableEdit(): void {
     this.editMode.set(true);
@@ -98,6 +103,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   cancelEdit(): void {
+    this.phone.markAsPristine();
     this.editMode.set(false);
     this.loadProfile();
     this.saveError.set(null);
@@ -115,6 +121,15 @@ export class ProfilePageComponent implements OnInit {
         lastName: this.lastName.value,
         email: this.email.value,
       });
+      if (this.keycloakService.getUserRoles().includes('coproperty-owner')) {
+        await this.keycloakService.updateMyOwnerProfile({
+          firstName: this.firstName.value,
+          lastName: this.lastName.value,
+          email: this.email.value,
+          phone: this.phone.value ?? '',
+        });
+      }
+      this.phone.markAsPristine();
       this.saveSuccess.set(true);
       this.editMode.set(false);
       this.loadProfile();

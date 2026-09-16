@@ -23,6 +23,7 @@ COPY src/front/myb.front/libs ./libs
 # shared libs also reference apps/client/src/assets/images via CSS
 COPY src/front/myb.front/apps/client/src/environments ./apps/client/src/environments
 COPY src/front/myb.front/apps/client/src/assets ./apps/client/src/assets
+COPY src/front/myb.front/tools ./tools
 
 # Build the admin app
 ENV NX_NO_CLOUD=true

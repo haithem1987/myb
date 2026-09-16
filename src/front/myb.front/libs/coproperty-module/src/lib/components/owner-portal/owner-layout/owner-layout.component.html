@@ -12,21 +12,21 @@
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-house-door"></i>
-          <span>Mon Espace</span>
+          <span>{{ 'ownerPortal.navigation.dashboard' | translate }}</span>
         </a>
         
         <a routerLink="/coproperty/owner/my-units" 
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-building"></i>
-          <span>Mes Lots</span>
+          <span>{{ 'ownerPortal.navigation.units' | translate }}</span>
         </a>
         
         <a routerLink="/coproperty/owner/invoices" 
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-receipt"></i>
-          <span>Mes Reçus</span>
+          <span>{{ 'ownerPortal.navigation.receipts' | translate }}</span>
           <span class="badge" *ngIf="pendingInvoices() > 0">
             {{ pendingInvoices() }}
           </span>
@@ -36,22 +36,22 @@
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-cash-stack"></i>
-          <span>Mes Charges</span>
+          <span>{{ 'ownerPortal.navigation.charges' | translate }}</span>
         </a>
 
         <a routerLink="/coproperty/owner/signalements" 
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-megaphone"></i>
-          <span>Signalements</span>
+          <span>{{ 'ownerPortal.navigation.reports' | translate }}</span>
         </a>
       </nav>
       
       <div class="user-section">
         <!-- Switch to syndic space if user has dual role -->
-        <button class="btn-switch-role" *ngIf="isSyndic()" (click)="switchToSyndicSpace()" title="Espace Syndic">
+        <button class="btn-switch-role" *ngIf="isSyndic()" (click)="switchToSyndicSpace()" [title]="'ownerPortal.navigation.syndicSpace' | translate">
           <i class="bi bi-shield-check"></i>
-          <span>Espace Syndic</span>
+          <span>{{ 'ownerPortal.navigation.syndicSpace' | translate }}</span>
         </button>
 
         <myb-front-user-dropdown></myb-front-user-dropdown>
@@ -71,7 +71,7 @@
        class="nav-link"
        (click)="toggleMobileMenu()">
       <i class="bi bi-house-door"></i>
-      <span>Mon Espace</span>
+      <span>{{ 'ownerPortal.navigation.dashboard' | translate }}</span>
     </a>
     
     <a routerLink="/coproperty/owner/my-units" 
@@ -79,7 +79,7 @@
        class="nav-link"
        (click)="toggleMobileMenu()">
       <i class="bi bi-building"></i>
-      <span>Mes Lots</span>
+      <span>{{ 'ownerPortal.navigation.units' | translate }}</span>
     </a>
     
     <a routerLink="/coproperty/owner/invoices" 
@@ -87,7 +87,7 @@
        class="nav-link"
        (click)="toggleMobileMenu()">
       <i class="bi bi-receipt"></i>
-      <span>Mes Reçus</span>
+      <span>{{ 'ownerPortal.navigation.receipts' | translate }}</span>
       <span class="badge" *ngIf="pendingInvoices() > 0">
         {{ pendingInvoices() }}
       </span>
@@ -98,7 +98,7 @@
        class="nav-link"
        (click)="toggleMobileMenu()">
       <i class="bi bi-cash-stack"></i>
-      <span>Mes Charges</span>
+      <span>{{ 'ownerPortal.navigation.charges' | translate }}</span>
     </a>
 
     <a routerLink="/coproperty/owner/signalements" 
@@ -106,7 +106,7 @@
        class="nav-link"
        (click)="toggleMobileMenu()">
       <i class="bi bi-megaphone"></i>
-      <span>Signalements</span>
+      <span>{{ 'ownerPortal.navigation.reports' | translate }}</span>
     </a>
   </nav>
   
@@ -120,11 +120,11 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-content">
-      <p>&copy; 2026 MYB - Gestion de Copropriété</p>
+      <p>&copy; 2026 MYB - {{ 'ownerPortal.footer.product' | translate }}</p>
       <div class="footer-links">
-        <a href="#">Aide</a>
-        <a href="#">Contact</a>
-        <a href="#">Mentions légales</a>
+        <a routerLink="/contact">{{ 'ownerPortal.footer.help' | translate }}</a>
+        <a routerLink="/contact">{{ 'ownerPortal.footer.contact' | translate }}</a>
+        <a routerLink="/terms">{{ 'ownerPortal.footer.legal' | translate }}</a>
       </div>
     </div>
   </footer>

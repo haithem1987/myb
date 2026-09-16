@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject, computed } from '@angular/core';
+import { Component, signal, OnInit, inject, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OwnerService } from '../../services/owner.service';
@@ -10,6 +10,9 @@ import { Unit, Coproperty } from '../../models';
 import { FundCallPaymentWithContext } from '../../models/fund-call.model';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take, switchMap } from 'rxjs/operators';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NotificationService } from '@myb-front/shared-ui';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface OwnerUnit {
   id: string;
@@ -25,6 +28,9 @@ interface PendingInvoice {
   number: string;
   date: Date;
   amount: number;
+  pendingAmount: number;
+  remainingAmount: number;
+  payableAmount: number;
   dueDate: Date;
   description: string;
   currency: string;
@@ -44,7 +50,7 @@ interface RecentInvoice {
 @Component({
   selector: 'app-owner-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   templateUrl: './owner-dashboard.component.html',
   styleUrls: ['./owner-dashboard.component.scss']
 })
@@ -54,6 +60,9 @@ export class OwnerDashboardComponent implements OnInit {
   private fundCallService = inject(FundCallService);
   private keycloakService = inject(KeycloakService);
   private currencyService = inject(CurrencyService);
+  private translateService = inject(TranslateService);
+  private notificationService = inject(NotificationService);
+  private destroyRef = inject(DestroyRef);
 
   myUnits = signal<OwnerUnit[]>([]);
   pendingInvoices = signal<PendingInvoice[]>([]);
@@ -73,10 +82,17 @@ export class OwnerDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOwnerData();
+    this.notificationService.dataChanges$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadOwnerData());
   }
 
   formatAmount(amount: number, currency?: string): string {
     return this.currencyService.formatAmount(amount, currency);
+  }
+
+  formatNumber(value: number): string {
+    return this.currencyService.formatNumber(value);
   }
 
   private formatCurrencyGroups(values: Array<{ amount: number; currency?: string }>): string {
@@ -153,26 +169,34 @@ export class OwnerDashboardComponent implements OnInit {
           };
         }));
 
-        // Appels de fonds À PAYER = statut TO_PAY
-        const toPayFundCalls = fundCalls.filter(fc => fc.status === 'TO_PAY');
-        const overdueFundCalls = toPayFundCalls.filter(fc => new Date() > new Date(fc.dueDate));
+        // "My Charges" includes both untouched calls and calls with a proof
+        // awaiting validation, so owners can see the complete amount breakdown.
+        const chargeFundCalls = fundCalls.filter(fc =>
+          fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION'
+        );
+        const overdueFundCalls = chargeFundCalls.filter(fc =>
+          this.getRemainingAmount(fc) > 0 && new Date() > new Date(fc.dueDate)
+        );
         this.overdueCount.set(overdueFundCalls.length);
         this.cancelledFundCallsCount.set(fundCalls.filter(fc => fc.status === 'CANCELLED').length);
 
-        this.pendingInvoices.set(toPayFundCalls.map(fc => ({
+        this.pendingInvoices.set(chargeFundCalls.map(fc => ({
           id: fc.id,
           number: fc.id.substring(0, 8).toUpperCase(),
           date: new Date(fc.createdAt),
           amount: fc.amount,
+          pendingAmount: this.getPendingAmount(fc),
+          remainingAmount: this.getRemainingAmount(fc),
+          payableAmount: this.getPayableAmount(fc),
           dueDate: new Date(fc.dueDate),
           description: fc.description || 'Appel de fonds',
           currency: fc.currency,
         })));
 
-        // Total dû = somme des appels de fonds TO_PAY
-        this.totalDue.set(toPayFundCalls.reduce((sum, fc) => sum + fc.amount, 0));
+        // Total due reflects only the amount that remains available to pay.
+        this.totalDue.set(chargeFundCalls.reduce((sum, fc) => sum + this.getRemainingAmount(fc), 0));
         this.totalDueDisplay.set(this.formatCurrencyGroups(
-          toPayFundCalls.map(fc => ({ amount: fc.amount, currency: fc.currency }))
+          chargeFundCalls.map(fc => ({ amount: this.getRemainingAmount(fc), currency: fc.currency }))
         ));
 
         // Total charges = tous les appels de fonds du propriétaire
@@ -228,13 +252,9 @@ export class OwnerDashboardComponent implements OnInit {
   }
 
   getStatusLabel(status: string): string {
-    switch (status) {
-      case 'paid': return 'Payée';
-      case 'overdue': return 'En retard';
-      case 'pending': return 'En attente';
-      case 'rejected': return 'Rejeté';
-      default: return status;
-    }
+    const key = `ownerPortal.dashboard.status.${status}`;
+    const translated = this.translateService.instant(key);
+    return translated === key ? status : translated;
   }
 
   private normalizePaymentValidationStatus(status: string | null | undefined): string {
@@ -247,5 +267,22 @@ export class OwnerDashboardComponent implements OnInit {
 
   private isPaymentRejected(status: string | null | undefined): boolean {
     return this.normalizePaymentValidationStatus(status) === 'REJECTED';
+  }
+
+  private getPendingAmount(fundCall: FundCallExtended): number {
+    return (fundCall.payments ?? [])
+      .filter(payment => this.normalizePaymentValidationStatus(payment.validationStatus) === 'PENDING')
+      .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+  }
+
+  private getRemainingAmount(fundCall: FundCallExtended): number {
+    const approved = (fundCall.payments ?? [])
+      .filter(payment => this.isPaymentApproved(payment.validationStatus))
+      .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+    return Math.max(0, Number(fundCall.amount || 0) - approved);
+  }
+
+  private getPayableAmount(fundCall: FundCallExtended): number {
+    return Math.max(0, this.getRemainingAmount(fundCall) - this.getPendingAmount(fundCall));
   }
 }

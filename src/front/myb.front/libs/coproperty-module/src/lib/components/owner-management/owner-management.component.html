@@ -17,7 +17,7 @@
 
   <div class="management-header">
     <h2>{{ 'coproperty.owner.management' | translate }}</h2>
-    <button class="btn btn-primary btn-violet" (click)="openAddForm()">
+    <button class="btn btn-primary btn-violet" (click)="openAddForm()" [disabled]="!hasActiveCoproperties()">
       <i class="bi bi-plus"></i>
       {{ 'coproperty.owner.addOwner' | translate }}
     </button>
@@ -40,7 +40,7 @@
           >
             <option value="all">{{ 'coproperty.charge.allCoproperties' | translate }}</option>
             <option *ngFor="let coproperty of coproperties()" [ngValue]="coproperty.id">
-              {{ coproperty.name }}
+              {{ coproperty.name }}{{ coproperty.isActive ? '' : ' (Inactive)' }}
             </option>
           </select>
         </div>
@@ -117,7 +117,7 @@
         </div>
 
         <!-- Search input -->
-        <div *ngIf="!selectedKeycloakUser()" class="position-relative">
+        <div *ngIf="!selectedKeycloakUser() && !showCreateUserForm()" class="position-relative">
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-envelope"></i></span>
             <input
@@ -156,7 +156,70 @@
           <div *ngIf="keycloakSearchTerm.length >= 2 && !keycloakSearchLoading() && keycloakSearchResults().length === 0" class="text-muted small mt-2">
             <i class="bi bi-exclamation-circle me-1"></i>{{ 'common.userNotFound' | translate }}
           </div>
+
+          <button type="button" class="btn btn-outline-primary mt-3" (click)="openCreateUserForm()">
+            <i class="bi bi-person-plus me-1"></i>
+            {{ 'coproperty.owner.createUserAccount' | translate }}
+          </button>
         </div>
+
+        <form *ngIf="!selectedKeycloakUser() && showCreateUserForm()" [formGroup]="createUserForm" (ngSubmit)="createUserAccount()" class="border rounded p-3 bg-light">
+          <h6 class="mb-1">{{ 'coproperty.owner.createUserAccount' | translate }}</h6>
+          <p class="text-muted small">{{ 'coproperty.owner.createUserAccountHelp' | translate }}</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">{{ 'coproperty.owner.firstName' | translate }} *</label>
+              <input type="text" class="form-control" formControlName="firstName"
+                     [class.is-invalid]="createUserForm.get('firstName')?.touched && createUserForm.get('firstName')?.invalid">
+              <div class="invalid-feedback">{{ 'validation.required' | translate }}</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ 'coproperty.owner.lastName' | translate }} *</label>
+              <input type="text" class="form-control" formControlName="lastName"
+                     [class.is-invalid]="createUserForm.get('lastName')?.touched && createUserForm.get('lastName')?.invalid">
+              <div class="invalid-feedback">{{ 'validation.required' | translate }}</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ 'common.email' | translate }} *</label>
+              <input type="email" class="form-control" formControlName="email"
+                     [class.is-invalid]="createUserForm.get('email')?.touched && createUserForm.get('email')?.invalid">
+              <div class="invalid-feedback">{{ 'coproperty.owner.validEmailRequired' | translate }}</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ 'coproperty.owner.temporaryPassword' | translate }} *</label>
+              <input type="password" class="form-control" formControlName="temporaryPassword" autocomplete="new-password"
+                     [class.is-invalid]="createUserForm.get('temporaryPassword')?.touched && createUserForm.get('temporaryPassword')?.invalid">
+              <div class="invalid-feedback">{{ 'coproperty.owner.passwordMinLength' | translate }}</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ 'coproperty.owner.confirmPassword' | translate }} *</label>
+              <input type="password" class="form-control" formControlName="confirmPassword" autocomplete="new-password"
+                     [class.is-invalid]="createUserForm.get('confirmPassword')?.touched && (createUserForm.get('confirmPassword')?.invalid || createUserForm.get('temporaryPassword')?.value !== createUserForm.get('confirmPassword')?.value)">
+              <div class="invalid-feedback">{{ (createUserForm.get('confirmPassword')?.hasError('minlength') ? 'coproperty.owner.passwordMinLength' : 'coproperty.owner.passwordMismatch') | translate }}</div>
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input id="notifyOnActivation" type="checkbox" class="form-check-input" formControlName="notifyOnActivation">
+                <label for="notifyOnActivation" class="form-check-label">
+                  {{ 'coproperty.owner.notifyOnActivation' | translate }}
+                </label>
+                <div class="form-text">{{ 'coproperty.owner.notifyOnActivationHelp' | translate }}</div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="createUserError()" class="alert alert-danger mt-3 mb-0" role="alert">
+            <i class="bi bi-exclamation-triangle me-1"></i>{{ createUserError() }}
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary" [disabled]="creatingUser()">
+              <span *ngIf="creatingUser()" class="spinner-border spinner-border-sm me-1"></span>
+              {{ (creatingUser() ? 'coproperty.owner.creatingAccount' : 'coproperty.owner.createAccount') | translate }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancelCreateUser()" [disabled]="creatingUser()">
+              {{ 'common.cancel' | translate }}
+            </button>
+          </div>
+        </form>
       </div>
 
       <!-- Step 2: Owner form (shown when user is selected or editing) -->
@@ -232,6 +295,7 @@
                       type="checkbox" 
                       [id]="'unit-' + unit.id"
                       [checked]="isUnitSelected(unit.id)"
+                      [disabled]="!isUnitInActiveCoproperty(unit)"
                       (change)="toggleUnitSelection(unit.id)"
                     />
                     <label class="form-check-label" [for]="'unit-' + unit.id">

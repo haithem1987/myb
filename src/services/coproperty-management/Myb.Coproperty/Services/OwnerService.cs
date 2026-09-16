@@ -14,17 +14,20 @@ namespace Myb.Coproperty.Services
         private readonly IEmailPublisher _emailPublisher;
         private readonly KeycloakOptions _keycloakOptions;
         private readonly IDbContextFactory<CopropertyDbContext> _contextFactory;
+        private readonly IKeycloakAdminService _keycloakAdminService;
 
         public OwnerService(
             IOwnerRepository ownerRepository,
             IEmailPublisher emailPublisher,
             IOptions<KeycloakOptions> keycloakOptions,
-            IDbContextFactory<CopropertyDbContext> contextFactory)
+            IDbContextFactory<CopropertyDbContext> contextFactory,
+            IKeycloakAdminService keycloakAdminService)
         {
             _ownerRepository = ownerRepository;
             _emailPublisher = emailPublisher;
             _keycloakOptions = keycloakOptions.Value;
             _contextFactory = contextFactory;
+            _keycloakAdminService = keycloakAdminService;
         }
 
         public async Task<Owner> CreateAsync(Owner owner)
@@ -46,11 +49,23 @@ namespace Myb.Coproperty.Services
             if (!string.IsNullOrWhiteSpace(created.Email))
             {
                 var portalUrl = _keycloakOptions.OwnerPortalUrl;
+                var english = await _keycloakAdminService.GetPreferredLanguageAsync(created.UserId.ToString()) == "en";
+                var subject = english
+                    ? "Welcome to MYB – Your owner role has been assigned"
+                    : "Bienvenue sur MYB – Votre rôle propriétaire a été assigné";
                 await _emailPublisher.PublishAsync(new EmailMessage
                 {
                     To = created.Email,
-                    Subject = "Bienvenue sur MYB – Votre rôle propriétaire a été assigné",
-                    HtmlBody = $"""
+                    Subject = subject,
+                    HtmlBody = english ? $"""
+                        <html><body style="font-family:Arial,sans-serif;color:#333">
+                          <h2 style="color:#2c5282">Welcome to MYB, {created.FirstName}!</h2>
+                          <p>Your owner account is ready and the <strong>owner</strong> role has been assigned.</p>
+                          <p>You can now access your owner space to view charges, calls for funds, and coproperty information.</p>
+                          <p style="margin:24px 0"><a href="{portalUrl}" style="background:#2c5282;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">Open my owner space</a></p>
+                          <hr/><p style="font-size:12px;color:#888">MYB – Coproperty management</p>
+                        </body></html>
+                        """ : $"""
                         <html><body style="font-family:Arial,sans-serif;color:#333">
                           <h2 style="color:#2c5282">Bienvenue sur MYB, {created.FirstName} !</h2>
                           <p>Votre compte propriétaire a été créé avec succès et le rôle <strong>propriétaire</strong> vous a été assigné.</p>

@@ -5,6 +5,7 @@ namespace Myb.Coproperty.Models.Dtos
         string Email,
         string FirstName,
         string LastName,
+        string? Phone,
         bool Enabled,
         bool EmailVerified,
         List<string> Roles);

@@ -67,8 +67,8 @@
               (change)="onCopropertyChange($event)"
               [class.is-invalid]="budgetForm.get('copropertyId')?.invalid && budgetForm.get('copropertyId')?.touched">
               <option value="">{{ 'coproperty.charge.selectCoproperty' | translate }}</option>
-              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
-                {{ coproperty.name }} - {{ coproperty.city }}
+              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id" [disabled]="!coproperty.isActive">
+                {{ coproperty.name }} - {{ coproperty.city }}{{ coproperty.isActive ? '' : ' (Inactive)' }}
               </option>
             </select>
             <div class="invalid-feedback" *ngIf="budgetForm.get('copropertyId')?.invalid && budgetForm.get('copropertyId')?.touched">
@@ -148,26 +148,6 @@
             </select>
           </div>
 
-          <!-- Distribution Method -->
-          <div class="col-md-6">
-            <label for="distributionMethod" class="form-label fw-semibold">
-              <i class="bi bi-diagram-3 me-1"></i>
-              {{ 'coproperty.charges.distributionMethod' | translate }} <span class="text-danger">*</span>
-            </label>
-            <select
-              id="distributionMethod"
-              class="form-select"
-              formControlName="distributionMethod"
-              [class.is-invalid]="budgetForm.get('distributionMethod')?.invalid && budgetForm.get('distributionMethod')?.touched">
-              <option *ngFor="let method of distributionMethods" [value]="method.value">
-                {{ method.label | translate }}
-              </option>
-            </select>
-            <div class="invalid-feedback" *ngIf="budgetForm.get('distributionMethod')?.invalid && budgetForm.get('distributionMethod')?.touched">
-              {{ 'validation.required' | translate }}
-            </div>
-          </div>
-
           <!-- Description -->
           <div class="col-12">
             <label for="description" class="form-label">
@@ -229,6 +209,7 @@
               id="endDate" 
               class="form-control" 
               formControlName="endDate">
+            <div class="text-danger small" role="alert" *ngIf="budgetForm.hasError('dateRange')">La date de fin doit être postérieure à la date de début.</div>
             <small class="text-muted">Optionnel</small>
           </div>
 

@@ -140,6 +140,22 @@ export const appRoutes: Route[] = [
     component: AccessDeniedComponent,
   },
   {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((component) => component.ProfilePageComponent),
+  },
+  {
+    path: 'contact',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((component) => component.ContactPageComponent),
+  },
+  {
+    path: 'terms',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((component) => component.TermsPageComponent),
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },

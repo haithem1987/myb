@@ -13,11 +13,14 @@ COPY src/front/myb.front/tsconfig.base.json ./
 COPY src/front/myb.front/jest.preset.js ./
 
 # Install dependencies
+ENV CYPRESS_INSTALL_BINARY=0
 RUN npm ci --legacy-peer-deps
 
 # Copy source files
 COPY src/front/myb.front/apps/client ./apps/client
+COPY src/front/myb.front/apps/admin/src/assets/i18n ./apps/admin/src/assets/i18n
 COPY src/front/myb.front/libs ./libs
+COPY src/front/myb.front/tools ./tools
 
 # Build the client app
 ENV NX_NO_CLOUD=true

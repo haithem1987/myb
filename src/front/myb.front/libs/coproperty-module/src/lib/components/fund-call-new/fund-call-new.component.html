@@ -53,8 +53,8 @@
               formControlName="copropertyId"
               [class.is-invalid]="fundCallForm.get('copropertyId')?.invalid && fundCallForm.get('copropertyId')?.touched">
               <option value="">Sélectionner une copropriété</option>
-              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
-                {{ coproperty.name }}
+              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id" [disabled]="!coproperty.isActive">
+                {{ coproperty.name }}{{ coproperty.isActive ? '' : ' (Inactive)' }}
               </option>
             </select>
             <div class="invalid-feedback">Veuillez sélectionner une copropriété</div>

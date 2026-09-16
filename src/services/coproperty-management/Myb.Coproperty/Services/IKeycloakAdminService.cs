@@ -16,6 +16,22 @@ namespace Myb.Coproperty.Services
         /// </summary>
         Task<IEnumerable<KeycloakUserSearchDto>> SearchUsersByEmailAsync(string email, int max = 20);
 
+        /// <summary>Create an enabled Keycloak account with a temporary password.</summary>
+        Task<KeycloakUserSearchDto> CreateUserAsync(
+            string firstName,
+            string lastName,
+            string email,
+            string temporaryPassword,
+            string? activationNotificationRecipientId = null);
+
+        Task<string?> GetActivationNotificationRecipientAsync(string userId);
+
+        Task<string?> ConsumeActivationNotificationRecipientAsync(string userId);
+
+        Task<bool> SetPreferredLanguageAsync(string userId, string language);
+
+        Task<string> GetPreferredLanguageAsync(string userId);
+
         /// <summary>
         /// Fetch a single Keycloak user by their exact user ID.
         /// Returns null when the user does not exist or the call fails.

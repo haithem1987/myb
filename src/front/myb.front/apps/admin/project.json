@@ -75,6 +75,13 @@
       },
       "defaultConfiguration": "production"
     },
+    "i18n-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/check-shared-i18n.mjs",
+        "cwd": "."
+      }
+    },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
       "options": {

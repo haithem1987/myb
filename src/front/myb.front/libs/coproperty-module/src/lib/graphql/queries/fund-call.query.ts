@@ -109,6 +109,7 @@ export const GET_FUND_CALL_PAYMENTS_BY_OWNER = gql`
       amount
       paymentDate
       paymentMethod
+      unitNumberSnapshot
       justificatif
       justificatifFileName
       justificatifContentType
@@ -121,6 +122,7 @@ export const GET_FUND_CALL_PAYMENTS_BY_OWNER = gql`
         amount
         dueDate
         currency
+        ownerName
         coproperty {
           id
           name

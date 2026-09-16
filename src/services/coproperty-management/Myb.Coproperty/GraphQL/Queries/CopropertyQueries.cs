@@ -173,12 +173,98 @@ namespace Myb.Coproperty.GraphQL.Queries
 
         /// <summary>
         /// Search Keycloak users by partial email match (uses backend service account).
+        /// Syndics may only see residents attached to one of their managed
+        /// coproperties; administrators retain the global directory view.
         /// </summary>
         public async Task<IEnumerable<KeycloakUserSearchDto>> SearchKeycloakUsers(
             string email,
             int? max,
-            [Service] IKeycloakAdminService keycloakAdminService) =>
-            await keycloakAdminService.SearchUsersByEmailAsync(email, max ?? 20);
+            ClaimsPrincipal? user,
+            [Service] IKeycloakAdminService keycloakAdminService,
+            [Service] ICopropertyService copropertyService,
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
+        {
+            if (!CopropertyAccessControl.IsSyndicOnly(user) && !CopropertyAccessControl.IsAdmin(user))
+                throw new InvalidOperationException("Accès refusé.");
+            var users = (await keycloakAdminService.SearchUsersByEmailAsync(email, max ?? 20)).ToList();
+            if (!CopropertyAccessControl.IsSyndicOnly(user))
+                return users;
+
+            var managedIds = await CopropertyAccessControl.GetScopedCopropertyIdsAsync(user, copropertyService)
+                ?? new HashSet<Guid>();
+            if (managedIds.Count == 0)
+                return Enumerable.Empty<KeycloakUserSearchDto>();
+
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var relatedOwners = await context.Owners
+                .AsNoTracking()
+                .Where(owner => owner.OwnerUnits.Any(link =>
+                    link.EndDate == null && managedIds.Contains(link.Unit.CopropertyId)))
+                .Select(owner => new { owner.UserId, owner.Email })
+                .ToListAsync();
+            var relatedTenantEmails = await context.Tenants
+                .AsNoTracking()
+                .Where(tenant => tenant.IsActive && managedIds.Contains(tenant.Unit.CopropertyId))
+                .Select(tenant => tenant.Email)
+                .ToListAsync();
+
+            var relatedUserIds = relatedOwners.Select(owner => owner.UserId).ToHashSet();
+            var relatedEmails = relatedOwners.Select(owner => owner.Email)
+                .Concat(relatedTenantEmails)
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Select(value => value.Trim())
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            return users.Where(candidate =>
+                (Guid.TryParse(candidate.Id, out var candidateId) && relatedUserIds.Contains(candidateId)) ||
+                relatedEmails.Contains(candidate.Email?.Trim() ?? string.Empty));
+        }
+
+        /// <summary>
+        /// Search the application directory while adding an owner. Unlike the
+        /// Settings search, candidates are not already related to the syndic's
+        /// coproperties, so this operation has its own explicitly authorized query.
+        /// </summary>
+        public async Task<IEnumerable<KeycloakUserSearchDto>> SearchOwnerCandidates(
+            string email,
+            int? max,
+            ClaimsPrincipal? user,
+            [Service] IKeycloakAdminService keycloakAdminService,
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
+        {
+            if (!CopropertyAccessControl.IsSyndicOnly(user) && !CopropertyAccessControl.IsAdmin(user))
+                throw new InvalidOperationException("Accès refusé : seuls les syndics peuvent rechercher un propriétaire.");
+
+            var candidates = (await keycloakAdminService.SearchUsersByEmailAsync(email, max ?? 20)).ToList();
+            if (candidates.Count == 0) return candidates;
+
+            var candidateIds = candidates
+                .Select(candidate => Guid.TryParse(candidate.Id, out var id) ? id : (Guid?)null)
+                .Where(id => id.HasValue)
+                .Select(id => id!.Value)
+                .ToHashSet();
+            var candidateEmails = candidates
+                .Select(candidate => candidate.Email.Trim())
+                .Where(value => value.Length > 0)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var ownerProfiles = await context.Owners
+                .AsNoTracking()
+                .Where(owner => candidateIds.Contains(owner.UserId) || candidateEmails.Contains(owner.Email))
+                .Select(owner => new { owner.UserId, owner.Email, owner.Phone })
+                .ToListAsync();
+
+            return candidates.Select(candidate =>
+            {
+                var profile = ownerProfiles.FirstOrDefault(owner =>
+                    (Guid.TryParse(candidate.Id, out var id) && owner.UserId == id) ||
+                    string.Equals(owner.Email, candidate.Email, StringComparison.OrdinalIgnoreCase));
+                return string.IsNullOrWhiteSpace(candidate.Phone) && !string.IsNullOrWhiteSpace(profile?.Phone)
+                    ? candidate with { Phone = profile.Phone }
+                    : candidate;
+            }).ToList();
+        }
 
         /// <summary>
         /// Get client roles assigned to a Keycloak user (uses backend service account).

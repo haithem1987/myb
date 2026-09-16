@@ -8,7 +8,7 @@ import { UnitService, UnitExtended } from '../../services/unit.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { OwnerService } from '../../services/owner.service';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
-import { ModalService } from '@myb-front/shared-ui';
+import { ModalService, NotificationService } from '@myb-front/shared-ui';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { of, from, Subject, forkJoin } from 'rxjs';
 import { map, finalize, switchMap, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
@@ -49,6 +49,7 @@ interface KeycloakUser {
   email: string;
   firstName: string;
   lastName: string;
+  phone?: string;
   enabled: boolean;
   emailVerified: boolean;
   roles: string[];
@@ -70,6 +71,7 @@ export class OwnerManagementComponent implements OnInit {
   private ownerService = inject(OwnerService);
   private keycloakService = inject(KeycloakService);
   private modalService = inject(ModalService);
+  private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
 
@@ -78,7 +80,7 @@ export class OwnerManagementComponent implements OnInit {
   owners: Owner[] = [];
   availableUnits: Unit[] = [];
   allUnits: Unit[] = [];
-  coproperties = signal<Array<{id: string, name: string}>>([]);
+  coproperties = signal<Array<{id: string, name: string, isActive: boolean}>>([]);
   selectedCopropertyForFilter = signal<string>('');
   displayedColumns: string[] = ['name', 'email', 'phone', 'units', 'role', 'actions'];
   searchTerm: string = '';
@@ -95,6 +97,10 @@ export class OwnerManagementComponent implements OnInit {
   keycloakSearchResults = signal<KeycloakUser[]>([]);
   keycloakSearchLoading = signal<boolean>(false);
   selectedKeycloakUser = signal<KeycloakUser | null>(null);
+  showCreateUserForm = signal<boolean>(false);
+  creatingUser = signal<boolean>(false);
+  createUserError = signal<string | null>(null);
+  createUserForm: FormGroup;
   private keycloakSearch$ = new Subject<string>();
 
   // ── Role assignment state ──
@@ -110,6 +116,14 @@ export class OwnerManagementComponent implements OnInit {
       phone: [''],
       selectedUnits: [<string[]>[], Validators.required],
     });
+    this.createUserForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      temporaryPassword: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(8)]],
+      notifyOnActivation: [false],
+    });
 
     // Debounced Keycloak user search
     this.keycloakSearch$.pipe(
@@ -123,6 +137,12 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.notificationService.dataChanges$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.copropertyId) this.loadOwners();
+      });
+
     // Keep an explicitly supplied coproperty scope (embedded usage). The owners
     // screen itself defaults to the aggregate "all coproperties" view.
     if (this.copropertyId) {
@@ -134,7 +154,7 @@ export class OwnerManagementComponent implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (coproperties) => {
-            this.coproperties.set(coproperties.map((c) => ({ id: c.id, name: c.name })));
+            this.coproperties.set(coproperties.map((c) => ({ id: c.id, name: c.name, isActive: c.isActive })));
 
             if (coproperties.length > 0) {
               this.copropertyId = 'all';
@@ -373,6 +393,8 @@ export class OwnerManagementComponent implements OnInit {
     this.keycloakSearchTerm = '';
     this.keycloakSearchResults.set([]);
     this.selectedKeycloakUser.set(null);
+    this.showCreateUserForm.set(false);
+    this.createUserForm.reset();
   }
 
   editOwner(owner: Owner): void {
@@ -393,6 +415,7 @@ export class OwnerManagementComponent implements OnInit {
       email: owner.email,
       firstName: owner.firstName,
       lastName: owner.lastName,
+      phone: owner.phone,
       enabled: true,
       emailVerified: true,
       roles: owner.hasOwnerRole ? ['coproperty-owner'] : [],
@@ -460,6 +483,11 @@ export class OwnerManagementComponent implements OnInit {
   saveOwner(): void {
     const formValue = this.ownerForm.getRawValue(); // getRawValue to include disabled fields
     const selectedUnitIds: string[] = formValue.selectedUnits || [];
+    const activeCopropertyIds = new Set(this.coproperties().filter(c => c.isActive).map(c => c.id));
+    if (!this.editingOwnerId && selectedUnitIds.some(id => {
+      const unit = this.allUnits.find(item => item.id === id);
+      return !unit?.copropertyId || !activeCopropertyIds.has(unit.copropertyId);
+    })) return;
     
     // A new owner needs an initial unit. An existing owner may have every unit
     // unchecked, which cleanly unassigns those units while retaining history.
@@ -551,6 +579,14 @@ export class OwnerManagementComponent implements OnInit {
     });
   }
 
+  hasActiveCoproperties(): boolean {
+    return this.coproperties().some(c => c.isActive);
+  }
+
+  isUnitInActiveCoproperty(unit: Unit): boolean {
+    return !!unit.copropertyId && this.coproperties().some(c => c.id === unit.copropertyId && c.isActive);
+  }
+
   /**
    * Search Keycloak for registered users by email.
    * Only shows users who are not already owners in this coproperty.
@@ -558,14 +594,11 @@ export class OwnerManagementComponent implements OnInit {
   private async searchKeycloakUsers(email: string): Promise<void> {
     this.keycloakSearchLoading.set(true);
     try {
-      const users = await this.keycloakService.searchKeycloakUsers(email);
-      // Filter out users who are already owners
-      const existingOwnerUserIds = new Set(this.owners.map(o => o.userId).filter(Boolean));
-      const existingOwnerEmails = new Set(this.owners.map(o => o.email?.toLowerCase()).filter(Boolean));
-      const filtered = users.filter(u =>
-        !existingOwnerUserIds.has(u.id) && !existingOwnerEmails.has(u.email?.toLowerCase())
-      );
-      this.keycloakSearchResults.set(filtered);
+      const users = await this.keycloakService.searchOwnerCandidates(email);
+      // Existing owners must remain selectable so a syndic can assign the same
+      // person to an additional unit. The backend reuses the Owner record and
+      // validates unit conflicts when the form is saved.
+      this.keycloakSearchResults.set(users);
     } catch (err) {
       console.error('[Owner Management] Keycloak search error:', err);
       this.keycloakSearchResults.set([]);
@@ -597,6 +630,7 @@ export class OwnerManagementComponent implements OnInit {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      phone: user.phone || '',
     });
   }
 
@@ -611,6 +645,73 @@ export class OwnerManagementComponent implements OnInit {
       email: '',
       phone: '',
     });
+  }
+
+  openCreateUserForm(): void {
+    this.keycloakSearchResults.set([]);
+    this.createUserError.set(null);
+    this.createUserForm.reset({
+      email: this.keycloakSearchTerm.includes('@') ? this.keycloakSearchTerm.trim() : '',
+    });
+    this.showCreateUserForm.set(true);
+  }
+
+  cancelCreateUser(): void {
+    this.showCreateUserForm.set(false);
+    this.createUserError.set(null);
+    this.createUserForm.reset();
+  }
+
+  async createUserAccount(): Promise<void> {
+    this.createUserError.set(null);
+    if (this.createUserForm.invalid) {
+      this.createUserForm.markAllAsTouched();
+      const message = this.translateService.instant('coproperty.owner.accountFormInvalid');
+      this.createUserError.set(message);
+      this.showAlert('warning', message);
+      return;
+    }
+
+    const value = this.createUserForm.getRawValue();
+    if (value.temporaryPassword !== value.confirmPassword) {
+      const message = this.translateService.instant('coproperty.owner.passwordMismatch');
+      this.createUserError.set(message);
+      this.showAlert('warning', message);
+      return;
+    }
+
+    this.creatingUser.set(true);
+    try {
+      const id = await this.keycloakService.createUser({
+        firstName: value.firstName.trim(),
+        lastName: value.lastName.trim(),
+        email: value.email.trim(),
+        password: value.temporaryPassword,
+        notifyOnActivation: value.notifyOnActivation,
+      });
+      this.selectKeycloakUser({
+        id,
+        firstName: value.firstName.trim(),
+        lastName: value.lastName.trim(),
+        email: value.email.trim(),
+        enabled: true,
+        emailVerified: false,
+        roles: [],
+      });
+      this.showCreateUserForm.set(false);
+      this.createUserError.set(null);
+      this.createUserForm.reset();
+      this.showAlert('success', this.translateService.instant('coproperty.owner.accountCreated'));
+    } catch (error) {
+      console.error('[Owner Management] User account creation error:', error);
+      const message = error instanceof Error && error.message
+        ? error.message
+        : this.translateService.instant('coproperty.owner.accountCreateError');
+      this.createUserError.set(message);
+      this.showAlert('danger', message);
+    } finally {
+      this.creatingUser.set(false);
+    }
   }
 
   /**
@@ -673,6 +774,8 @@ export class OwnerManagementComponent implements OnInit {
     this.selectedKeycloakUser.set(null);
     this.keycloakSearchResults.set([]);
     this.keycloakSearchTerm = '';
+    this.showCreateUserForm.set(false);
+    this.createUserForm.reset();
   }
 
   getOwnerFullName(owner: Owner): string {

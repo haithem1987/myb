@@ -13,6 +13,99 @@ namespace Myb.Coproperty.GraphQL.Mutations
     [ExtendObjectType("Mutation")]
     public class OwnerMutations
     {
+        public async Task<Owner> UpdateMyOwnerProfile(
+            string firstName,
+            string lastName,
+            string email,
+            string phone,
+            System.Security.Claims.ClaimsPrincipal user,
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory,
+            [Service] IHttpClientFactory? httpClientFactory = null)
+        {
+            var userId = CopropertyAccessControl.GetUserId(user);
+            if (!CopropertyAccessControl.IsAuthenticated(user) || !userId.HasValue)
+                throw new InvalidOperationException("Authentification requise.");
+            firstName = firstName.Trim();
+            lastName = lastName.Trim();
+            email = email.Trim();
+            phone = phone.Trim();
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+                throw new ArgumentException("Le prénom et le nom sont obligatoires.");
+            if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
+                throw new ArgumentException("Une adresse e-mail valide est obligatoire.");
+            if (phone.Length > 50)
+                throw new ArgumentException("Le téléphone ne doit pas dépasser 50 caractères.");
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var owner = await context.Owners.FirstOrDefaultAsync(o => o.UserId == userId.Value)
+                ?? throw new InvalidOperationException("Profil propriétaire introuvable.");
+            var managerIds = await context.OwnerUnits
+                .Where(link => link.OwnerId == owner.Id && link.EndDate == null)
+                .Join(context.Units,
+                    link => link.UnitId,
+                    unit => unit.Id,
+                    (_, unit) => unit.CopropertyId)
+                .Join(context.Coproperties,
+                    copropertyId => copropertyId,
+                    coproperty => coproperty.Id,
+                    (_, coproperty) => coproperty.ManagerId)
+                .Where(managerId => managerId.HasValue)
+                .Select(managerId => managerId!.Value)
+                .Distinct()
+                .ToListAsync();
+            owner.FirstName = firstName;
+            owner.LastName = lastName;
+            owner.Email = email;
+            owner.Phone = phone;
+            owner.UpdatedAt = DateTime.UtcNow;
+            await context.SaveChangesAsync();
+
+            if (httpClientFactory != null)
+            {
+                var notificationClient = httpClientFactory.CreateClient("NotificationService");
+                foreach (var managerId in managerIds)
+                {
+                    try
+                    {
+                        var response = await notificationClient.PostAsJsonAsync("/api/Notifications", new
+                        {
+                            SenderId = owner.UserId.ToString(),
+                            ReceiverId = managerId.ToString(),
+                            Message = $"{owner.FirstName} {owner.LastName} a mis à jour son profil."
+                        });
+                        response.EnsureSuccessStatusCode();
+                    }
+                    catch (Exception ex)
+                    {
+                        // The profile update has already been saved. A temporary
+                        // notification outage must not report it as a failed update.
+                        Console.Error.WriteLine($"[OwnerProfileRealtime] Notification failed: {ex.Message}");
+                    }
+                }
+            }
+            return owner;
+        }
+
+        /// <summary>Backward-compatible phone-only profile update.</summary>
+        public async Task<Owner> UpdateMyOwnerPhone(
+            string phone,
+            System.Security.Claims.ClaimsPrincipal user,
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
+        {
+            var userId = CopropertyAccessControl.GetUserId(user);
+            if (!CopropertyAccessControl.IsAuthenticated(user) || !userId.HasValue)
+                throw new InvalidOperationException("Authentification requise.");
+            phone = phone.Trim();
+            if (phone.Length > 50)
+                throw new ArgumentException("Le téléphone ne doit pas dépasser 50 caractères.");
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var owner = await context.Owners.FirstOrDefaultAsync(o => o.UserId == userId.Value)
+                ?? throw new InvalidOperationException("Profil propriétaire introuvable.");
+            owner.Phone = phone;
+            owner.UpdatedAt = DateTime.UtcNow;
+            await context.SaveChangesAsync();
+            return owner;
+        }
+
         /// <summary>
         /// Create owner with multiple units (recommended)
         /// </summary>
@@ -56,7 +149,10 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 existingOwner.FirstName = input.FirstName;
                 existingOwner.LastName = input.LastName;
                 existingOwner.Email = input.Email;
-                existingOwner.Phone = input.Phone;
+                // Preserve the number captured during self-registration when a
+                // later lot assignment submits an empty phone field.
+                if (!string.IsNullOrWhiteSpace(input.Phone))
+                    existingOwner.Phone = input.Phone.Trim();
                 existingOwner.UpdatedAt = DateTime.UtcNow;
                 await ownerService.UpdateAsync(existingOwner);
                 createdOwner = existingOwner;
@@ -231,6 +327,17 @@ namespace Myb.Coproperty.GraphQL.Mutations
         {
             var ids = unitIds.Distinct().ToArray();
             await using var context = contextFactory.CreateDbContext();
+            var inactiveNewAssignments = await context.Units
+                .Include(unit => unit.Coproperty)
+                .Where(unit => ids.Contains(unit.Id) && !unit.Coproperty.IsActive)
+                .Where(unit => !currentOwnerId.HasValue || !unit.OwnerUnits.Any(link =>
+                    link.OwnerId == currentOwnerId.Value && link.EndDate == null))
+                .Select(unit => unit.UnitNumber)
+                .ToListAsync();
+            if (inactiveNewAssignments.Count > 0)
+                throw new InvalidOperationException(
+                    $"New operations are not allowed for inactive coproperties: {string.Join(", ", inactiveNewAssignments)}.");
+
             var conflicts = await context.OwnerUnits
                 .Include(ou => ou.Owner)
                 .Include(ou => ou.Unit)

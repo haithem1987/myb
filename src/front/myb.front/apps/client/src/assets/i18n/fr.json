@@ -400,6 +400,7 @@
       "distribute": "Distribuer",
       "distributionPreview": "Aperçu de la Distribution",
       "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette ligne budgétaire ?",
+      "deleteDetailedConfirm": "Vous êtes sur le point de supprimer définitivement la ligne budgétaire <strong>{{name}}</strong>.<br><br><strong class=\"text-danger\">Cette action est irréversible.</strong>",
       "saveFirst": "Veuillez d'abord enregistrer la copropriété avant de gérer les lignes budgétaires.",
       "types": {
         "cleaning": "Nettoyage",
@@ -521,6 +522,7 @@
       "readOnly": "lecture seule",
       "editPanel": {
         "title": "Modifier l'appel de fonds",
+        "viewTitle": "Détails de l'appel de fonds",
         "status": "Statut",
         "statusLabel": "Statut",
         "coproperty": "Copropriété",
@@ -531,6 +533,7 @@
         "save": "Enregistrer",
         "saving": "Sauvegarde...",
         "amountLockedHint": "Le montant ne peut être modifié qu'en attente de validation.",
+        "paidReadOnlyHint": "Cet appel de fonds réglé est en lecture seule. Vous pouvez uniquement consulter ses détails et l’historique des versements.",
         "settled": "Soldé",
         "remaining": "Reste"
       },
@@ -789,6 +792,7 @@
       "lastName": "Nom de famille",
       "units": "Lots Possédés",
       "allUnits": "Tous les lots",
+      "noOwner": "Aucun propriétaire",
       "unitRequired": "Veuillez sélectionner au moins un lot",
       "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce propriétaire ?",
       "deleteConfirmTitle": "Retirer le propriétaire ?",
@@ -797,9 +801,23 @@
       "deleteHistoryNotice": "Les périodes de propriété et les données financières existantes resteront disponibles dans l’historique.",
       "selectCopropertyHelp": "Sélectionnez d'abord la copropriété pour afficher les lots disponibles",
       "linkExistingUser": "Lier un utilisateur existant",
-      "searchUserByEmail": "Rechercher un utilisateur inscrit par email",
+      "searchUserByEmail": "Rechercher un utilisateur inscrit par nom ou email",
       "userFound": "Utilisateur trouvé",
-      "userNotRegistered": "Cet utilisateur n'est pas encore inscrit. Il doit d'abord créer un compte.",
+      "userNotRegistered": "Recherchez un compte existant ou créez-en un nouveau pour le propriétaire.",
+      "createUserAccount": "Créer un nouveau compte utilisateur",
+      "createUserAccountHelp": "Créez les identifiants de ce propriétaire. Il devra modifier le mot de passe temporaire lors de sa connexion.",
+      "temporaryPassword": "Mot de passe temporaire",
+      "confirmPassword": "Confirmer le mot de passe",
+      "createAccount": "Créer le compte",
+      "creatingAccount": "Création du compte...",
+      "accountCreated": "Compte utilisateur créé. Vous pouvez maintenant attribuer le propriétaire à un ou plusieurs lots.",
+      "notifyOnActivation": "Me notifier lorsque ce compte est activé",
+      "notifyOnActivationHelp": "Vous recevrez une notification dans l'application après la première connexion réussie de l'utilisateur.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "accountCreateError": "Le compte utilisateur n'a pas pu être créé.",
+      "accountFormInvalid": "Vérifiez les champs du formulaire. Le mot de passe doit contenir au moins 8 caractères.",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères.",
+      "validEmailRequired": "Veuillez saisir une adresse e-mail valide.",
       "selectUserRequired": "Veuillez sélectionner un utilisateur inscrit",
       "roleStatus": "Statut du rôle",
       "hasOwnerRole": "Rôle propriétaire actif",
@@ -951,10 +969,10 @@
     "unassignRole": "Retirer le rôle",
     "roleAssigned": "Rôle attribué avec succès",
     "roleUnassigned": "Rôle retiré avec succès",
-    "userNotFound": "Aucun utilisateur trouvé avec cet email",
+    "userNotFound": "Aucun utilisateur trouvé avec ce nom ou cet email",
     "keycloakUser": "Utilisateur Keycloak",
     "registeredUsers": "Utilisateurs inscrits",
-    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par email..."
+    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par nom ou email..."
   },
   "validation": {
     "NAME_REQUIRED": "est requis",
@@ -1162,6 +1180,65 @@
     "me": "Moi",
     "noMessagesYet": "Aucun message pour le moment",
     "errors": { "load": "Impossible de charger les discussions.", "send": "Le message n'a pas pu être envoyé.", "create": "La discussion n'a pas pu être créée.", "pin": "Impossible de modifier l'épinglage." }
+  },
+  "ownerPortal": {
+    "navigation": {
+      "dashboard": "Mon Espace",
+      "units": "Mes Lots",
+      "receipts": "Mes Reçus",
+      "charges": "Mes Charges",
+      "reports": "Signalements",
+      "syndicSpace": "Espace Syndic"
+    },
+    "footer": {
+      "product": "Gestion de Copropriété",
+      "help": "Aide",
+      "contact": "Contact",
+      "legal": "Mentions légales"
+    },
+    "myUnits": {
+      "title": "Mes Lots", "subtitle": "Consultez vos biens et vos charges", "loading": "Chargement de vos lots...", "loadError": "Impossible de charger vos lots.", "retry": "Réessayer", "ownedUnits": "Lots détenus", "totalArea": "Surface totale", "totalShares": "Tantièmes totaux", "coproperties": "Copropriété(s)", "emptyTitle": "Aucun lot trouvé", "emptyText": "Aucun lot n'est associé à votre compte.", "unit": "Lot", "coproperty": "Copropriété", "floor": "Étage", "area": "Surface", "shares": "Tantièmes", "description": "Description", "ownerSince": "Propriétaire depuis le {{date}}", "unauthenticated": "Utilisateur non identifié. Veuillez vous reconnecter.", "groundFloor": "RDC", "floorValue": "{{floor}}e étage", "types": { "apartment": "Appartement", "parking": "Parking", "cellar": "Cave", "other": "Autre" }
+    },
+    "receipts": { "title": "Mes Reçus", "subtitle": "Historique de vos paiements et reçus de charges", "downloadAll": "Télécharger tout", "total": "Total reçus", "totalPaid": "Total payé", "lastPayment": "Dernier paiement", "receipt": "Reçu", "description": "Description", "unit": "Lot", "date": "Date", "amount": "Montant", "method": "Méthode", "status": "Statut", "actions": "Actions", "rejectionReason": "Motif", "view": "Voir", "download": "Télécharger", "detail": "Détail du reçu", "copropertyManagement": "Gestion de copropriété", "paymentReceipt": "REÇU DE PAIEMENT", "issueDate": "Date d'émission", "paymentDate": "Date de paiement", "period": "Période", "owner": "Copropriétaire", "paymentMethod": "Méthode de paiement", "quantity": "Qté", "unitPrice": "Prix unit.", "subtotal": "Sous-total HT", "totalIncludingTax": "TOTAL TTC", "generatedBy": "Reçu de paiement généré par MYB Syndic", "downloadPdf": "Télécharger PDF", "close": "Fermer", "paymentMethods": { "card": "Carte", "bankTransfer": "Virement", "cash": "Espèces", "check": "Chèque" }, "statuses": { "paid": "Validé", "rejected": "Rejeté", "pending": "En attente" } },
+    "charges": { "title": "Mes Appels de Fonds", "subtitle": "Consultez et payez vos appels de fonds de copropriété", "totalCalls": "Total des appels", "paidAmount": "Montant payé", "remainingAmount": "Reste à payer", "loading": "Chargement...", "loadingCalls": "Chargement de vos appels de fonds...", "retry": "Réessayer", "emptyTitle": "Aucun appel de fonds", "emptyText": "Aucun appel de fonds n'a été émis pour le moment.", "ownerMissing": "Votre compte propriétaire n'a pas été trouvé. Contactez votre syndic.", "search": "Recherche", "searchPlaceholder": "Rechercher par description ou copropriété...", "status": "Statut", "allStatuses": "Tous les statuts", "unpaid": "À payer", "paid": "Réglés", "cancelled": "Annulés", "year": "Année", "allYears": "Toutes", "unpaidCalls": "Appels de fonds à payer ({{count}})", "paidCalls": "Appels de fonds réglés ({{count}})", "cancelledCalls": "Appels de fonds annulés ({{count}})", "callForFunds": "Appel de fonds", "totalAmount": "Montant total", "alreadyPaid": "Déjà payé", "pendingValidation": "En attente de validation", "dueDate": "Échéance", "paymentsMade": "Versements", "approved": "Validé", "rejected": "Refusé", "reason": "Motif", "pendingCoverage": "Le solde est déjà couvert par des versements en attente de validation.", "pay": "Payer", "description": "Description", "coproperty": "Copropriété", "amount": "Montant", "viewDetails": "Voir les détails", "noResults": "Aucun appel de fonds ne correspond à vos critères de recherche.", "allPaid": "Tous vos appels de fonds sont réglés !", "cancelledNotice": "Vos appels de fonds ont été annulés par le syndic. L'historique ci-dessous est conservé à titre de référence.", "detailsTitle": "Détails de l'appel de fonds", "cancelledDetailNotice": "Cet appel de fonds a été annulé par le syndic. Aucune action n'est disponible." },
+    "documents": { "title": "Mes Documents", "subtitle": "Accédez à tous les documents de votre copropriété", "total": "Total", "financialShort": "Financiers", "allTypes": "Tous les types", "search": "Rechercher...", "types": { "regulation": "Règlements", "agMinutes": "PV d'AG", "contract": "Contrats", "technical": "Documents techniques", "financial": "Documents financiers", "other": "Autres" } },
+    "reports": { "title": "Signalements", "subtitle": "Incidents signalés dans votre copropriété", "create": "Je signale", "inProgress": "En cours", "resolved": "Résolus", "inProgressCount": "Signalements en cours", "resolvedCount": "Signalements résolus", "noneInProgress": "Aucun signalement en cours", "noneResolved": "Aucun signalement résolu" },
+    "dashboard": {
+      "welcome": "Bienvenue dans votre espace copropriétaire",
+      "subtitle": "Gérez vos lots et consultez vos documents en toute simplicité",
+      "myUnits": "Mes Lots",
+      "shares": "Tantièmes",
+      "pendingPayments": "Mes Charges",
+      "totalAmount": "Montant total",
+      "pendingAmount": "Montant en attente",
+      "remainingAmount": "Montant restant",
+      "pendingValidationCoverage": "Le solde est déjà couvert par des versements en attente de validation.",
+      "amountDue": "Montant dû",
+      "overduePayments": "Paiements en retard",
+      "totalPaid": "Total payé",
+      "totalSurface": "Surface totale",
+      "totalCharges": "Total charges",
+      "viewAll": "Voir tout",
+      "noUnits": "Aucun lot associé",
+      "unit": "Lot",
+      "viewDetails": "Voir les détails",
+      "cancelledFundCallsCount": "{{count}} appel(s) de fonds annulé(s)",
+      "cancelledFundCallsNotice": "Des appels de fonds ont été annulés par votre syndic. Consultez l'historique pour les détails.",
+      "viewHistory": "Voir l'historique",
+      "overdue": "En retard",
+      "dueInDays": "Échéance dans {{days}} jour(s)",
+      "pay": "Payer",
+      "noPendingPayments": "Aucun paiement en attente",
+      "recentReceipts": "Derniers Reçus",
+      "noReceipts": "Aucun reçu",
+      "loading": "Chargement...",
+      "status": {
+        "paid": "Payée",
+        "overdue": "En retard",
+        "pending": "En attente",
+        "rejected": "Rejeté"
+      }
+    }
   },
   "navigation": {
     "adminSpace": "Espace Admin",

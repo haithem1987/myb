@@ -2,6 +2,7 @@ using HotChocolate;
 using HotChocolate.Types;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Services;
+using Myb.Coproperty.Models.Dtos;
 using System.Security.Claims;
 
 namespace Myb.Coproperty.GraphQL.Mutations
@@ -71,6 +72,67 @@ namespace Myb.Coproperty.GraphQL.Mutations
             string roleName,
             [Service] IKeycloakAdminService keycloakAdminService) =>
             await keycloakAdminService.UnassignClientRoleAsync(userId, roleName);
+
+        /// <summary>Create a login account that can immediately be selected in Add Owner.</summary>
+        public async Task<KeycloakUserSearchDto> CreateOwnerUserAccount(
+            string firstName,
+            string lastName,
+            string email,
+            string temporaryPassword,
+            bool notifyOnActivation,
+            ClaimsPrincipal? user,
+            [Service] IKeycloakAdminService keycloakAdminService)
+        {
+            if (!CopropertyAccessControl.IsSyndicOnly(user) && !CopropertyAccessControl.IsAdmin(user))
+                throw new InvalidOperationException("Accès refusé : seuls les syndics peuvent créer un compte propriétaire.");
+
+            var creatorId = CopropertyAccessControl.GetUserId(user)?.ToString();
+            return await keycloakAdminService.CreateUserAsync(
+                firstName, lastName, email, temporaryPassword,
+                notifyOnActivation ? creatorId : null);
+        }
+
+        public async Task<bool> ConfirmCurrentUserActivation(
+            ClaimsPrincipal? user,
+            [Service] IKeycloakAdminService keycloakAdminService,
+            [Service] IHttpClientFactory httpClientFactory)
+        {
+            var userId = CopropertyAccessControl.GetUserId(user)
+                ?? throw new InvalidOperationException("Authentification requise.");
+            // Read without clearing first. If the notification service is temporarily
+            // unavailable, the pending activation alert remains for the next login.
+            var recipientId = await keycloakAdminService
+                .GetActivationNotificationRecipientAsync(userId.ToString());
+            if (string.IsNullOrWhiteSpace(recipientId)) return false;
+
+            var displayName = user?.FindFirst("name")?.Value
+                ?? user?.FindFirst("preferred_username")?.Value
+                ?? "Le nouvel utilisateur";
+            var client = httpClientFactory.CreateClient("NotificationService");
+            var response = await client.PostAsJsonAsync("/api/Notifications", new
+            {
+                SenderId = userId.ToString(),
+                ReceiverId = recipientId,
+                Message = $"{displayName} a ouvert et activé son compte MYB."
+            });
+            response.EnsureSuccessStatusCode();
+
+            // Clear only after confirmed delivery. A failure here can produce a retry,
+            // which is safer than silently losing the Syndic's requested notification.
+            await keycloakAdminService
+                .ConsumeActivationNotificationRecipientAsync(userId.ToString());
+            return true;
+        }
+
+        public async Task<bool> SyncPreferredLanguage(
+            string language,
+            ClaimsPrincipal? user,
+            [Service] IKeycloakAdminService keycloakAdminService)
+        {
+            var userId = CopropertyAccessControl.GetUserId(user)
+                ?? throw new InvalidOperationException("Authentification requise.");
+            return await keycloakAdminService.SetPreferredLanguageAsync(userId.ToString(), language);
+        }
 
         /// <summary>Change current authenticated user's password without leaving the app.</summary>
         public async Task<bool> ChangeOwnPassword(

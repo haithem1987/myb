@@ -132,8 +132,12 @@ export class OwnerDashboardComponent implements OnInit {
           };
         }));
 
-        // Appels de fonds À PAYER = statut TO_PAY
-        const toPayFundCalls = fundCalls.filter(fc => fc.status === 'TO_PAY');
+        // Pending payments do not settle the owner's balance.
+        const remainingAmount = (fc: FundCallExtended) => fc.amount - (fc.payments ?? [])
+          .filter(p => String(p.validationStatus ?? '').toUpperCase() === 'APPROVED')
+          .reduce((sum, p) => sum + p.amount, 0);
+        const toPayFundCalls = fundCalls.filter(fc =>
+          (fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION') && remainingAmount(fc) > 0);
         const overdueFundCalls = toPayFundCalls.filter(fc => new Date() > new Date(fc.dueDate));
         this.overdueCount.set(overdueFundCalls.length);
 
@@ -141,14 +145,14 @@ export class OwnerDashboardComponent implements OnInit {
           id: fc.id,
           number: fc.id.substring(0, 8).toUpperCase(),
           date: new Date(fc.createdAt),
-          amount: fc.amount,
+          amount: remainingAmount(fc),
           dueDate: new Date(fc.dueDate),
           description: fc.description || 'Appel de fonds',
         }));
         this.pendingInvoices.set(pendingItems);
 
-        // Total dû = somme des appels de fonds TO_PAY
-        this.totalDue.set(toPayFundCalls.reduce((sum, fc) => sum + fc.amount, 0));
+        // Total dû après les seuls paiements validés
+        this.totalDue.set(toPayFundCalls.reduce((sum, fc) => sum + remainingAmount(fc), 0));
 
         // Total charges = tous les appels de fonds du propriétaire
         this.totalCharges.set(fundCalls.reduce((sum, fc) => sum + fc.amount, 0));

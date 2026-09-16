@@ -1,5 +1,6 @@
 using Myb.Coproperty.Infrastructure.Repositories;
 using Myb.Coproperty.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Myb.Coproperty.Services;
 
@@ -37,6 +38,15 @@ public class TenantService : ITenantService
 
     public async Task<Tenant> CreateAsync(Tenant tenant)
     {
+        if (tenant.LeaseEndDate.HasValue && tenant.LeaseEndDate.Value <= tenant.LeaseStartDate)
+            throw new ArgumentException("La date de fin doit être postérieure à la date de début.");
+
+        var unit = _unitRepository.GetAll()
+            .Include(candidate => candidate.Coproperty)
+            .FirstOrDefault(candidate => candidate.Id == tenant.UnitId);
+        if (unit?.Coproperty == null || !unit.Coproperty.IsActive)
+            throw new InvalidOperationException("New operations are not allowed for an inactive coproperty.");
+
         await EnsureUnitCanReceiveActiveTenant(tenant.UnitId, tenant.IsActive, null);
 
         tenant.Id = tenant.Id == Guid.Empty ? Guid.NewGuid() : tenant.Id;
@@ -60,6 +70,9 @@ public class TenantService : ITenantService
 
     public async Task<Tenant> UpdateAsync(Tenant tenant)
     {
+        if (tenant.LeaseEndDate.HasValue && tenant.LeaseEndDate.Value <= tenant.LeaseStartDate)
+            throw new ArgumentException("La date de fin doit être postérieure à la date de début.");
+
         var existingTenant = await GetByIdAsync(tenant.Id);
         var previousUnitId = existingTenant.UnitId;
 

@@ -61,7 +61,8 @@ export class FundCallsListComponent implements OnInit {
   searchTerm = signal<string>('');
   filterStatus = signal<string>('');
   filterOwnerId = signal<string>('');
-  filterYear = signal<number | null>(new Date().getFullYear());
+  filterYear = signal<number | null>(null);
+  private fundCallsRequestId = 0;
 
   // ── Inline edit panel state ──────────────────────────────────────────────
   showEditPanel = signal<boolean>(false);
@@ -203,12 +204,17 @@ export class FundCallsListComponent implements OnInit {
 
   private loadOwnersByCoproperty(copropertyId: string): void {
     this.ownerService.getAllOwners(copropertyId).subscribe({
-      next: (owners) => this.owners.set(owners),
-      error: () => this.owners.set([]),
+      next: (owners) => {
+        if (copropertyId === this.selectedCopropertyId()) this.owners.set(owners);
+      },
+      error: () => {
+        if (copropertyId === this.selectedCopropertyId()) this.owners.set([]);
+      },
     });
   }
 
   loadAllFundCalls(): void {
+    const requestId = ++this.fundCallsRequestId;
     const copropertyId = this.selectedCopropertyId();
     if (!copropertyId) {
       this.fundCalls.set([]);
@@ -221,10 +227,13 @@ export class FundCallsListComponent implements OnInit {
       .getFundCallsByCoproperty(copropertyId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.loading.set(false))
+        finalize(() => {
+          if (requestId === this.fundCallsRequestId) this.loading.set(false);
+        })
       )
       .subscribe({
         next: (fundCalls) => {
+          if (requestId !== this.fundCallsRequestId) return;
           // The server already resolves copropertyName (falling back to the historical
           // snapshot if the coproperty was deleted). Only fall back to a local lookup
           // if the server didn't return a value for some reason.
@@ -236,6 +245,8 @@ export class FundCallsListComponent implements OnInit {
           this.fundCalls.set(enriched);
         },
         error: (err) => {
+          if (requestId !== this.fundCallsRequestId) return;
+          this.fundCalls.set([]);
           console.error('Error loading fund calls:', err);
           const msg = err?.graphQLErrors?.[0]?.message || 'Erreur lors du chargement des appels de fonds';
           this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
@@ -245,13 +256,15 @@ export class FundCallsListComponent implements OnInit {
 
   onCopropertyChange(copropertyId: string): void {
     this.selectedCopropertyId.set(copropertyId || null);
+    this.fundCalls.set([]);
+    this.selectedIds.set(new Set());
     this.filterOwnerId.set('');
     this.owners.set([]);
     if (copropertyId) {
       this.loadOwnersByCoproperty(copropertyId);
       this.loadAllFundCalls();
     } else {
-      this.fundCalls.set([]);
+      this.loadAllFundCalls();
     }
   }
 

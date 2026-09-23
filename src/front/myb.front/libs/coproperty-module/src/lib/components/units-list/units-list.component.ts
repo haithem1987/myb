@@ -73,6 +73,9 @@ export class UnitsListComponent implements OnInit {
     this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
+        if (!data.some(c => c.id === this.selectedCopropertyId())) {
+          this.selectedCopropertyId.set((data.find(c => c.isActive) ?? data[0])?.id ?? null);
+        }
         // Load all units regardless of coproperties
         this.loadAllUnits();
       },

@@ -144,7 +144,7 @@ export class OwnerManagementComponent implements OnInit {
       });
 
     // Keep an explicitly supplied coproperty scope (embedded usage). The owners
-    // screen itself defaults to the aggregate "all coproperties" view.
+    // screen itself defaults to the first active coproperty.
     if (this.copropertyId) {
       this.loadOwners();
       this.loadAvailableUnits();
@@ -157,7 +157,7 @@ export class OwnerManagementComponent implements OnInit {
             this.coproperties.set(coproperties.map((c) => ({ id: c.id, name: c.name, isActive: c.isActive })));
 
             if (coproperties.length > 0) {
-              this.copropertyId = 'all';
+              this.copropertyId = (coproperties.find(c => c.isActive) ?? coproperties[0]).id;
               this.selectedCopropertyForFilter.set(this.copropertyId);
               localStorage.setItem(OwnerManagementComponent.ACTIVE_COPROPERTY_STORAGE_KEY, this.copropertyId);
               this.loadOwners();

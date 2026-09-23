@@ -716,6 +716,9 @@ export class OwnerInvoicesComponent implements OnInit {
           });
 
         this.invoices.set(allReceipts);
+        if (!this.coproperties().some(c => c.id === this.selectedCopropertyId)) {
+          this.selectedCopropertyId = this.coproperties()[0]?.id ?? '';
+        }
         this.filterInvoices();
       },
       error: (error) => {

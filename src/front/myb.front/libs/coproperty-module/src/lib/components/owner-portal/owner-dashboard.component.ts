@@ -1,4 +1,5 @@
 import { Component, signal, OnInit, inject, computed, DestroyRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { OwnerService } from '../../services/owner.service';
@@ -53,7 +54,7 @@ interface RecentInvoice {
 @Component({
   selector: 'app-owner-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule],
   templateUrl: './owner-dashboard.component.html',
   styleUrls: ['./owner-dashboard.component.scss']
 })

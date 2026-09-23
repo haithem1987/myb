@@ -7,11 +7,9 @@ import { environment } from './environments/environment';
 bootstrapApplication(AppComponent, appConfig)
   .then(() => {
     if (environment.production && 'serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js').catch(error =>
-          console.warn('MYB service worker registration failed', error)
-        );
-      });
+      navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' }).catch(error =>
+        console.warn('MYB service worker registration failed', error)
+      );
     }
   })
   .catch((err) => console.error(err));

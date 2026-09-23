@@ -54,8 +54,8 @@
         {{ 'requestedFixes.copropertyFilter' | translate }}
       </label>
       <select id="overdue-coproperty-filter" class="form-select"
-              [value]="selectedCopropertyId()"
-              (change)="onCopropertyChange($any($event.target).value)">
+              [ngModel]="selectedCopropertyId()"
+              (ngModelChange)="onCopropertyChange($event)">
         <option *ngFor="let coproperty of ownerCoproperties()" [value]="coproperty.id">
           {{ coproperty.name }}
         </option>

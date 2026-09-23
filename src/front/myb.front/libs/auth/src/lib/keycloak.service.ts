@@ -208,7 +208,7 @@ export class KeycloakService {
    * Returns the Keycloak user ID (sub) of the currently authenticated user.
    */
   getUserId(): string | null {
-    return this.userIdSubject.value;
+    return this.keycloak?.authenticated ? this.keycloak.tokenParsed?.sub ?? null : null;
   }
 
   logout(redirectUri?: string): void {
@@ -338,22 +338,34 @@ export class KeycloakService {
     return this.hasRole('manager_myb');
   }
 
-  private loadUserProfile(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.keycloak
-        .loadUserProfile()
-        .then((profile) => {
-          this.profileSubject.next(profile);
-          this.userIdSubject.next(profile?.id ?? null);
-          resolve();
-        })
-        .catch((err) => {
-          console.error('Error loading user profile:', err);
-          this.profileSubject.next(null);
-          this.userIdSubject.next(null);
-          reject(err);
-        });
-    });
+  private async loadUserProfile(): Promise<void> {
+    const subject = this.keycloak.tokenParsed?.sub;
+    if (!subject) return;
+    try {
+      const profile = await this.keycloak.loadUserProfile();
+      // A late response from a signed-out session must never restore its identity.
+      if (!this.keycloak.authenticated || this.keycloak.tokenParsed?.sub !== subject) return;
+      if (profile.id !== subject) {
+        throw new Error('Profile does not match the authenticated account');
+      }
+      this.profileSubject.next(profile);
+      this.userIdSubject.next(subject);
+    } catch (err) {
+      if (!this.keycloak.authenticated || this.keycloak.tokenParsed?.sub !== subject) return;
+      // Older service workers may have cached the previous account response.
+      // Use only claims from the current session until that cache is replaced.
+      const claims = this.keycloak.tokenParsed!;
+      this.profileSubject.next({
+        id: subject,
+        username: claims['preferred_username'],
+        firstName: claims['given_name'],
+        lastName: claims['family_name'],
+        email: claims['email'],
+        emailVerified: claims['email_verified'],
+      });
+      this.userIdSubject.next(subject);
+      console.error('Unable to load account profile:', err);
+    }
   }
 
   private async getClientId(): Promise<string | null> {

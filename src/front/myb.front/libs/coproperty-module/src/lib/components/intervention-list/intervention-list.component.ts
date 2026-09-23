@@ -74,6 +74,9 @@ export class InterventionListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (cops) => {
           this.coproperties.set(cops);
+          if (!cops.some(c => c.id === this.selectedCopropertyId)) {
+            this.selectedCopropertyId = (cops.find(c => c.isActive) ?? cops[0])?.id ?? '';
+          }
           this.loadAllInterventions(cops);
         },
         error: (err) => {

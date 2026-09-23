@@ -57,10 +57,24 @@ async function main() {
 
   const { FundCallsListComponent } = load('libs/coproperty-module/src/lib/components/fund-calls-list/fund-calls-list.component.ts');
   const calls = Object.create(FundCallsListComponent.prototype);
-  Object.assign(calls, { fundCallsRequestId: 0, selectedCopropertyId: signal('a'), fundCalls: signal([]), loading: signal(false), coproperties: () => [],
-    filterOwnerId: () => '', filterYear: () => null, filterStatus: () => '', searchTerm: () => '' });
+  Object.assign(calls, { fundCallsTrigger$: new rx.Subject(), selectedCopropertyId: signal('a'), fundCalls: signal([]), loading: signal(false), coproperties: () => [],
+    filterOwnerId: () => '', filterYear: () => null, filterStatus: () => '', searchTerm: () => '', toastService: { show: () => {} } });
   const a = new rx.Subject(), b = new rx.Subject();
   calls.fundCallService = { getFundCallsByCoproperty: id => id === 'a' ? a : b };
+  // switchMap unsubscribes the previous coproperty's in-flight request as soon as a
+  // newer one is triggered, so a late/stale response can never overwrite fresher data.
+  calls.fundCallsTrigger$.pipe(
+    rx.switchMap(copropertyId => {
+      if (!copropertyId) return rx.of([]);
+      calls.loading.set(true);
+      return calls.fundCallService.getFundCallsByCoproperty(copropertyId).pipe(
+        rx.catchError(() => rx.of([])),
+        rx.finalize(() => calls.loading.set(false))
+      );
+    })
+  ).subscribe(fundCalls => {
+    calls.fundCalls.set(fundCalls.map(fc => fc.copropertyName ? fc : { ...fc, copropertyName: '' }));
+  });
   calls.loadAllFundCalls();
   calls.selectedCopropertyId.set('b'); calls.loadAllFundCalls();
   b.next([{ id: 'b-call', copropertyId: 'b', dueDate: '2025-12-31', copropertyName: 'B' }]); b.complete();

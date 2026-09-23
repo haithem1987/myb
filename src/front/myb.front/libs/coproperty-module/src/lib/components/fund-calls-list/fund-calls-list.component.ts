@@ -20,7 +20,8 @@ import {
   AddFundCallPaymentInput,
 } from '../../models/fund-call.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map, finalize } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { map, finalize, switchMap, catchError } from 'rxjs/operators';
 import { ToastService, ModalService, ErrorMessageService, NotificationService } from '@myb-front/shared-ui';
 import { InvoiceService } from 'libs/invoice-module/src/lib/services/invoice.service';
 import { Invoice } from 'libs/invoice-module/src/lib/models/invoice.model';
@@ -62,7 +63,10 @@ export class FundCallsListComponent implements OnInit {
   filterStatus = signal<string>('');
   filterOwnerId = signal<string>('');
   filterYear = signal<number | null>(null);
-  private fundCallsRequestId = 0;
+  // switchMap guarantees a newer trigger always cancels/supersedes an older
+  // in-flight request, so a stale response can never overwrite fresher data.
+  private fundCallsTrigger$ = new Subject<string | null>();
+  private ownersTrigger$ = new Subject<string | null>();
 
   // ── Inline edit panel state ──────────────────────────────────────────────
   showEditPanel = signal<boolean>(false);
@@ -152,6 +156,47 @@ export class FundCallsListComponent implements OnInit {
       paymentDate: [this.getTodayDateString(), Validators.required],
       justificatif: [''],
     });
+    this.fundCallsTrigger$
+      .pipe(
+        switchMap((copropertyId) => {
+          if (!copropertyId) return of([] as FundCallExtended[]);
+          this.loading.set(true);
+          return this.fundCallService.getFundCallsByCoproperty(copropertyId).pipe(
+            catchError((err) => {
+              console.error('Error loading fund calls:', err);
+              const msg = err?.graphQLErrors?.[0]?.message || 'Erreur lors du chargement des appels de fonds';
+              this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
+              return of([] as FundCallExtended[]);
+            }),
+            finalize(() => this.loading.set(false))
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((fundCalls) => {
+        // The server already resolves copropertyName (falling back to the historical
+        // snapshot if the coproperty was deleted). Only fall back to a local lookup
+        // if the server didn't return a value for some reason.
+        const enriched = fundCalls.map((fc) => {
+          if (fc.copropertyName) return fc as FundCallExtended;
+          const coproperty = this.coproperties().find((c) => c.id === fc.copropertyId);
+          return { ...fc, copropertyName: coproperty?.name ?? '' } as FundCallExtended;
+        });
+        this.fundCalls.set(enriched);
+      });
+
+    this.ownersTrigger$
+      .pipe(
+        switchMap((copropertyId) => {
+          if (!copropertyId) return of([] as OwnerWithUnits[]);
+          return this.ownerService.getAllOwners(copropertyId).pipe(
+            catchError(() => of([] as OwnerWithUnits[]))
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((owners) => this.owners.set(owners));
+
     this.loadCopropertiesAndFundCalls();
     this.notificationService.dataChanges$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -203,55 +248,11 @@ export class FundCallsListComponent implements OnInit {
   }
 
   private loadOwnersByCoproperty(copropertyId: string): void {
-    this.ownerService.getAllOwners(copropertyId).subscribe({
-      next: (owners) => {
-        if (copropertyId === this.selectedCopropertyId()) this.owners.set(owners);
-      },
-      error: () => {
-        if (copropertyId === this.selectedCopropertyId()) this.owners.set([]);
-      },
-    });
+    this.ownersTrigger$.next(copropertyId);
   }
 
   loadAllFundCalls(): void {
-    const requestId = ++this.fundCallsRequestId;
-    const copropertyId = this.selectedCopropertyId();
-    if (!copropertyId) {
-      this.fundCalls.set([]);
-      this.loading.set(false);
-      return;
-    }
-
-    this.loading.set(true);
-    this.fundCallService
-      .getFundCallsByCoproperty(copropertyId)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => {
-          if (requestId === this.fundCallsRequestId) this.loading.set(false);
-        })
-      )
-      .subscribe({
-        next: (fundCalls) => {
-          if (requestId !== this.fundCallsRequestId) return;
-          // The server already resolves copropertyName (falling back to the historical
-          // snapshot if the coproperty was deleted). Only fall back to a local lookup
-          // if the server didn't return a value for some reason.
-          const enriched = fundCalls.map((fc) => {
-            if (fc.copropertyName) return fc as FundCallExtended;
-            const coproperty = this.coproperties().find((c) => c.id === fc.copropertyId);
-            return { ...fc, copropertyName: coproperty?.name ?? '' } as FundCallExtended;
-          });
-          this.fundCalls.set(enriched);
-        },
-        error: (err) => {
-          if (requestId !== this.fundCallsRequestId) return;
-          this.fundCalls.set([]);
-          console.error('Error loading fund calls:', err);
-          const msg = err?.graphQLErrors?.[0]?.message || 'Erreur lors du chargement des appels de fonds';
-          this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
-        },
-      });
+    this.fundCallsTrigger$.next(this.selectedCopropertyId());
   }
 
   onCopropertyChange(copropertyId: string): void {

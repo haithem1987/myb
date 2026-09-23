@@ -50,6 +50,7 @@ export class OwnerChargesComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
+  private requestedPaymentHandled = false;
 
   fundCalls = signal<FundCallExtended[]>([]);
   loading = signal(true);
@@ -241,7 +242,9 @@ export class OwnerChargesComponent implements OnInit {
         this.fundCallService.getFundCallsByOwner(owner.id)
       );
 
-      this.fundCalls.set(fundCalls || []);
+      const loadedFundCalls = fundCalls || [];
+      this.fundCalls.set(loadedFundCalls);
+      this.openRequestedPayment(loadedFundCalls);
     } catch (err: any) {
       console.error('[OwnerCharges] Error loading data:', err);
       this.error.set('Erreur lors du chargement de vos appels de fonds. Veuillez rafraîchir la page.');
@@ -352,6 +355,16 @@ export class OwnerChargesComponent implements OnInit {
     this.justificatifFile = null;
     this.justificatifFileName.set(null);
     this.showPaymentModal.set(true);
+  }
+
+  private openRequestedPayment(fundCalls: FundCallExtended[]): void {
+    if (this.requestedPaymentHandled) return;
+    const requestedId = this.route.snapshot.queryParamMap.get('pay');
+    if (!requestedId) return;
+
+    this.requestedPaymentHandled = true;
+    const fundCall = fundCalls.find(item => item.id === requestedId);
+    if (fundCall) this.openPaymentModal(fundCall);
   }
 
   closePaymentModal(): void {

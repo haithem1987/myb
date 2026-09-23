@@ -13,12 +13,14 @@ namespace Myb.Document.Services
     {
         private readonly IGenericRepository<int?, DocumentModel, DocumentContext> _documentRepository;
         private readonly ILogger _logger;
+        private readonly IDocumentUploadService _uploadService;
 
 
-        public DocumentService(IGenericRepository<int?, DocumentModel, DocumentContext> documentRepository , ILogger<DocumentModel> logger)
+        public DocumentService(IGenericRepository<int?, DocumentModel, DocumentContext> documentRepository, ILogger<DocumentModel> logger, IDocumentUploadService uploadService)
         {
             _documentRepository = documentRepository;
             _logger = logger;
+            _uploadService = uploadService;
 
         }
 
@@ -37,7 +39,7 @@ namespace Myb.Document.Services
         {
             try
             {
-                Console.WriteLine($"Document file: {document.file}");
+                ValidateDocument(document);
                 document.Id = null;
               var response=   await _documentRepository.InsertAsync(document);
                 return response.Entity; ;
@@ -52,9 +54,24 @@ namespace Myb.Document.Services
 
         public async Task<DocumentModel> UpdateDocumentAsync(DocumentModel document)
         {
-
+            ValidateDocument(document);
             await _documentRepository.UpdateAsync(document);
             return document;
+        }
+
+        private void ValidateDocument(DocumentModel document)
+        {
+            ArgumentNullException.ThrowIfNull(document);
+            if (string.IsNullOrWhiteSpace(document.DocumentName))
+                throw new ArgumentException("Document name is required.", nameof(document));
+            if (string.IsNullOrWhiteSpace(document.file))
+                throw new ArgumentException("Document content is required.", nameof(document));
+
+            var upload = _uploadService.Validate(document.DocumentName, document.file);
+            document.DocumentName = upload.OriginalFileName;
+            document.StoredFileName = upload.StorageFileName;
+            document.DocumentSize = upload.Size;
+            document.file = upload.NormalizedDataUrl;
         }
 
         public async Task<DocumentModel> UpdateDocumentVersionAsync(DocumentModel document, DocumentVersion version)

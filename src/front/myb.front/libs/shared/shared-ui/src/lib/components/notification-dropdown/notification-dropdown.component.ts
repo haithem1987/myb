@@ -1,10 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS } from 'date-fns/locale';
 import { Notification } from 'libs/shared/infra/models/notification.model';
+import { translateNotificationMessage } from 'libs/shared/infra/utils/notification-message';
 @Component({
   selector: 'myb-front-notification-dropdown',
   standalone: true,
@@ -18,8 +19,14 @@ export class NotificationDropdownComponent {
   @Output() markAsRead = new EventEmitter<string>();
   @Output() markAllAsRead = new EventEmitter<void>();
 
+  constructor(private translate: TranslateService) {}
+
+  getMessage(message: string): string {
+    return translateNotificationMessage(message, this.translate);
+  }
+
   getDuration(dateStr: string): string {
-    return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: fr });
+    return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: (this.translate.currentLang || this.translate.defaultLang || 'fr').startsWith('en') ? enUS : fr });
   }
 
   onNotificationClick(notification: Notification): void {

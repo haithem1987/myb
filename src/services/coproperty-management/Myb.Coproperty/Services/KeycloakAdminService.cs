@@ -216,17 +216,31 @@ namespace Myb.Coproperty.Services
             return match.Value?.FirstOrDefault();
         }
 
+        public async Task<bool> IsActivationNotificationSentAsync(string userId)
+        {
+            var user = await GetKeycloakUserAsync(userId);
+            if (user?.Attributes == null) return false;
+
+            var match = user.Attributes.FirstOrDefault(pair =>
+                string.Equals(pair.Key, "mybActivationNotificationSentAt", StringComparison.OrdinalIgnoreCase));
+            return !string.IsNullOrWhiteSpace(match.Value?.FirstOrDefault());
+        }
+
         public async Task<string?> ConsumeActivationNotificationRecipientAsync(string userId)
         {
             var user = await GetKeycloakUserAsync(userId);
-            if (user?.Attributes == null) return null;
+            if (user == null) return null;
+            user.Attributes ??= new Dictionary<string, List<string>>();
 
             var match = user.Attributes.FirstOrDefault(pair =>
                 string.Equals(pair.Key, "mybActivationNotifyUserId", StringComparison.OrdinalIgnoreCase));
             var recipientId = match.Value?.FirstOrDefault();
-            if (string.IsNullOrWhiteSpace(recipientId)) return null;
-
-            user.Attributes.Remove(match.Key);
+            if (!string.IsNullOrWhiteSpace(match.Key))
+                user.Attributes.Remove(match.Key);
+            user.Attributes["mybActivationNotificationSentAt"] = new List<string>
+            {
+                DateTimeOffset.UtcNow.ToString("O")
+            };
             return await UpdateKeycloakUserAsync(userId, user) ? recipientId : null;
         }
 

@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Myb.Coproperty.GraphQL.Mutations;
 using Myb.Coproperty.Infrastructure.Data;
@@ -94,8 +96,8 @@ public class RequestedFixesTests
 
         var principal = new ClaimsPrincipal(new ClaimsIdentity(
             new[] { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) }, "test"));
-        await new OwnerMutations().UpdateMyOwnerProfile(
-            "New", "Name", "new@example.com", "+216 555", principal, factory);
+        Assert.True(await new OwnerMutations().SynchronizeMyOwnerProfile(
+            "New", "Name", "new@example.com", "+216 555", principal, factory));
 
         await using var verify = factory.CreateDbContext();
         var owner = await verify.Owners.SingleAsync(o => o.UserId == userId);
@@ -105,6 +107,48 @@ public class RequestedFixesTests
         Assert.Equal("+216 555", owner.Phone);
         Assert.Equal("Old Name", (await verify.FundCalls.SingleAsync()).OwnerNameSnapshot);
         Assert.Equal("Old Name", (await verify.CopropertyInvoices.SingleAsync()).OwnerNameSnapshot);
+    }
+
+    [Fact]
+    public async Task EditingExistingFundCall_DoesNotRewriteHistoricalOwnerName()
+    {
+        var factory = new Factory();
+        var ownerId = Guid.NewGuid();
+        var copropertyId = Guid.NewGuid();
+        var fundCallId = Guid.NewGuid();
+        await using (var context = factory.CreateDbContext())
+        {
+            context.Coproperties.Add(new global::Myb.Coproperty.Models.Coproperty
+                { Id = copropertyId, Name = "Managed", IsActive = true });
+            context.Owners.Add(new Owner
+                { Id = ownerId, UserId = Guid.NewGuid(), FirstName = "Current", LastName = "Name" });
+            context.FundCalls.Add(new FundCall
+            {
+                Id = fundCallId, CopropertyId = copropertyId, OwnerId = ownerId,
+                OwnerNameSnapshot = "Historical Name", Amount = 100,
+                Description = "Original", DueDate = DateTime.UtcNow.AddDays(30),
+                Status = FundCallStatus.ToPay, IsActive = true
+            });
+            await context.SaveChangesAsync();
+        }
+
+        var service = new FundCallService(
+            factory, Mock.Of<Myb.Common.Messaging.IEmailPublisher>(),
+            Mock.Of<IHttpClientFactory>(), Mock.Of<IKeycloakAdminService>(),
+            Mock.Of<IConfiguration>());
+        await service.UpdateAsync(fundCallId, new Myb.Coproperty.Models.Dtos.CreateFundCallInput
+        {
+            CopropertyId = copropertyId,
+            OwnerId = ownerId,
+            Amount = 100,
+            Description = "Edited without reassignment",
+            DueDate = DateTime.UtcNow.AddDays(31),
+            Status = FundCallStatus.ToPay
+        }, Guid.NewGuid().ToString());
+
+        await using var verify = factory.CreateDbContext();
+        Assert.Equal("Historical Name",
+            (await verify.FundCalls.SingleAsync(fundCall => fundCall.Id == fundCallId)).OwnerNameSnapshot);
     }
 
     [Fact]
@@ -176,6 +220,48 @@ public class RequestedFixesTests
         var candidate = Assert.Single(results);
         Assert.Equal(ownerUserId.ToString(), candidate.Id);
         Assert.Equal("+21653867777", candidate.Phone);
+    }
+
+    [Theory]
+    [InlineData("en", "Unit assignment confirmed", "You are now registered")]
+    [InlineData("fr", "Confirmation d'affectation d'un lot", "Vous êtes désormais enregistré")]
+    public async Task OwnershipEmail_UsesRecipientsPreferredLanguage(
+        string language, string expectedSubject, string expectedBody)
+    {
+        var previousOwner = new Owner
+        {
+            Id = Guid.NewGuid(), UserId = Guid.NewGuid(), Email = "old@example.com", FirstName = "Old"
+        };
+        var newOwner = new Owner
+        {
+            Id = Guid.NewGuid(), UserId = Guid.NewGuid(), Email = "new@example.com", FirstName = "New"
+        };
+        var directory = new Mock<IKeycloakAdminService>();
+        directory.Setup(service => service.GetPreferredLanguageAsync(It.IsAny<string>())).ReturnsAsync(language);
+        var mail = new Mock<Myb.Common.Messaging.IEmailPublisher>();
+        var httpFactory = new Mock<IHttpClientFactory>();
+        httpFactory.Setup(factory => factory.CreateClient("NotificationService"))
+            .Returns(new HttpClient(new SuccessHandler()) { BaseAddress = new Uri("http://localhost") });
+        var service = new OwnershipNotificationService(
+            mail.Object, httpFactory.Object,
+            Mock.Of<ILogger<OwnershipNotificationService>>(), directory.Object);
+
+        await service.NotifyOwnershipChangedAsync(previousOwner, newOwner, new Unit
+        {
+            Id = Guid.NewGuid(), UnitNumber = "A1", CopropertyId = Guid.NewGuid(),
+            Coproperty = new global::Myb.Coproperty.Models.Coproperty { Name = "Residence" }
+        });
+
+        mail.Verify(publisher => publisher.PublishAsync(It.Is<Myb.Common.Messaging.Models.EmailMessage>(message =>
+            message.To == newOwner.Email && message.Subject == expectedSubject &&
+            message.HtmlBody.Contains(System.Net.WebUtility.HtmlEncode(expectedBody)))), Times.Once);
+    }
+
+    private sealed class SuccessHandler : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken)
+            => Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
     }
 
     private sealed class Factory : IDbContextFactory<CopropertyDbContext>

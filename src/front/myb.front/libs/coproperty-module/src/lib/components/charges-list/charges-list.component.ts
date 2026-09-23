@@ -9,9 +9,8 @@ import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
 import { Coproperty } from '../../models/coproperty.models';
 import { KeycloakService } from '@myb-front/auth';
-import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map, finalize, switchMap } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 import { ChargeDistributionComponent } from '../charge-distribution/charge-distribution.component';
 import { ModalService, ToastService } from '@myb-front/shared-ui';
 
@@ -52,7 +51,6 @@ export class ChargesListComponent implements OnInit {
     }
 
     this.loadCoproperties();
-    this.loadAllCharges();
     
     // Listen for navigation with refresh param to reload data
     this.route.queryParams
@@ -116,9 +114,19 @@ export class ChargesListComponent implements OnInit {
     this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
-        // Auto-select first coproperty by default
-        if (data.length > 0 && !this.selectedCopropertyId()) {
-          this.onCopropertyChange(data[0].id);
+        const selectedId = this.selectedCopropertyId();
+        const selectedStillExists = data.some(coproperty => coproperty.id === selectedId);
+        const defaultCoproperty = data.find(coproperty => coproperty.isActive) ?? data[0];
+
+        if (!selectedStillExists) {
+          this.selectedCopropertyId.set(defaultCoproperty?.id ?? null);
+        }
+
+        if (this.selectedCopropertyId()) {
+          this.loadAllCharges();
+        } else {
+          this.charges.set([]);
+          this.loading.set(false);
         }
       },
       error: (err) => {
@@ -128,80 +136,48 @@ export class ChargesListComponent implements OnInit {
   }
 
   loadAllCharges(): void {
+    const copropertyId = this.selectedCopropertyId();
+    if (!copropertyId) {
+      this.charges.set([]);
+      this.loading.set(false);
+      return;
+    }
+
+    this.loadChargesByCoproperty(copropertyId);
+  }
+
+  onCopropertyChange(copropertyId: string): void {
+    this.selectedCopropertyId.set(copropertyId || null);
+
+    if (!copropertyId) {
+      this.charges.set([]);
+      return;
+    }
+
+    this.loadChargesByCoproperty(copropertyId);
+  }
+
+  private loadChargesByCoproperty(copropertyId: string): void {
     this.loading.set(true);
-    const managerId = this.keycloakService.getSyndicManagerId();
-    this.copropertyService.getCoproperties(managerId)
+    this.chargeService.getChargesByCoproperty(copropertyId)
       .pipe(
-        switchMap((coproperties) => {
-          if (coproperties.length === 0) {
-            this.charges.set([]);
-            return of([]);
-          }
-
-          const chargeRequests = coproperties.map(coproperty =>
-            this.chargeService.getChargesByCoproperty(coproperty.id).pipe(
-              map(charges => ({
-                charges,
-                copropertyName: coproperty.name,
-                copropertyCurrency: coproperty.currency
-              }))
-            )
-          );
-
-          return forkJoin(chargeRequests).pipe(
-            map(results => results.flatMap(result =>
-              result.charges.map(charge => ({
-                ...charge,
-                copropertyName: result.copropertyName,
-                currency: charge.currency ?? result.copropertyCurrency
-              } as any))
-            ))
-          );
-        }),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loading.set(false))
       )
       .subscribe({
-        next: (allCharges) => {
-          this.charges.set(allCharges);
-          this.loading.set(false);
+        next: (charges) => {
+          const coproperty = this.coproperties().find(c => c.id === copropertyId);
+          this.charges.set(charges.map(charge => ({
+            ...charge,
+            copropertyName: coproperty?.name || '',
+            currency: charge.currency ?? coproperty?.currency
+          } as ChargeExtended)));
         },
         error: (err) => {
           console.error('Error loading charges:', err);
-          this.loading.set(false);
+          this.charges.set([]);
         }
       });
-  }
-
-  onCopropertyChange(copropertyId: string): void {
-    this.selectedCopropertyId.set(copropertyId);
-    
-    if (!copropertyId || copropertyId === 'all') {
-      this.loadAllCharges();
-    } else {
-      this.loading.set(true);
-      this.chargeService.getChargesByCoproperty(copropertyId)
-        .pipe(
-          takeUntilDestroyed(this.destroyRef),
-          finalize(() => this.loading.set(false))
-        )
-        .subscribe({
-          next: (charges) => {
-            const coproperty = this.coproperties().find(c => c.id === copropertyId);
-            const chargesWithCoproperty = charges.map(charge => ({
-              ...charge,
-              copropertyName: coproperty?.name || '',
-              currency: charge.currency ?? coproperty?.currency
-            } as any));
-            this.charges.set(chargesWithCoproperty);
-            this.loading.set(false);
-          },
-          error: (err) => {
-            console.error('Error loading charges:', err);
-            this.loading.set(false);
-          }
-        });
-    }
   }
 
   get filteredCharges(): ChargeExtended[] {

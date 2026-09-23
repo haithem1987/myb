@@ -1,3 +1,5 @@
+import { TranslateService } from '@ngx-translate/core';
+import { translateNotificationMessage } from '../utils/notification-message';
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, Optional } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
@@ -28,6 +30,7 @@ export class NotificationService {
     private http: HttpClient,
     private keycloakService: KeycloakService,
     private toastService: ToastService,
+    private translate: TranslateService,
     @Optional() @Inject(ENVIRONMENT) private environment: any
   ) {
     this.apiUrl = this.environment?.services?.notification?.baseUrl ?? 'http://localhost:8085';
@@ -63,7 +66,7 @@ export class NotificationService {
         .build();
 
       this.hubConnection.on('ReceiveNotification', (message: string) => {
-        this.toastService.show(message, {
+        this.toastService.show(translateNotificationMessage(message, this.translate), {
           classname: 'toast-success',
         });
         this.notifyDataChanged();

@@ -33,5 +33,7 @@ export const copropertyRedirectGuard: CanActivateFn = () => {
     return router.createUrlTree(['/coproperty/syndic/dashboard']);
   }
 
-  return router.createUrlTree(['/access-denied']);
+  // A Syndic may create the login before assigning a Unit and its Owner role.
+  // Keep that authenticated account usable while it is awaiting assignment.
+  return router.createUrlTree(['/profile']);
 };

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Myb.Common.Messaging;
+using Myb.Common.Authentification.Security;
 using Myb.Common.Repositories;
 using Myb.Notification.Hubs;
 using Myb.Notification.Providers;
@@ -30,29 +31,7 @@ public static class Configuration
             Console.Error.WriteLine(
                 "[Notification] No configured PostgreSQL database; using the in-memory staging store.");
 
-        // Add CORS for SignalR and HTTP endpoints
-        var allowedOrigins = (builder.Configuration["Cors:AllowedOrigins"] ?? string.Empty)
-            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Concat(new[]
-            {
-                "http://localhost:4200",
-                "http://localhost:4201",
-                "https://myb-platform.com",
-                "https://www.myb-platform.com"
-            })
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAll", policy =>
-            {
-                policy.WithOrigins(allowedOrigins)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials();
-            });
-        });
+        builder.AddMybApiSecurity();
 
         // JWT Bearer authentication for Keycloak
         var keycloakSection = builder.Configuration.GetSection("Keycloak");
@@ -93,7 +72,10 @@ public static class Configuration
                     }
                 };
             });
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthorization(options =>
+            options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build());
 
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<IUserIdProvider, KeycloakUserIdProvider>();
@@ -113,11 +95,11 @@ public static class Configuration
             context.Database.EnsureCreated();
         }
 
-        app.UseCors("AllowAll");
+        app.UseMybApiSecurity();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.MapHealthChecks("/health");
-        app.MapControllers();
+        app.MapHealthChecks("/health").AllowAnonymous();
+        app.MapControllers().RequireAuthorization();
         app.MapHub<NotificationHub>("/notificationhub")
             .RequireAuthorization();  // protects the hub with JWT auth
     }

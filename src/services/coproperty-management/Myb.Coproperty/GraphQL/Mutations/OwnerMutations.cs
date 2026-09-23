@@ -13,6 +13,21 @@ namespace Myb.Coproperty.GraphQL.Mutations
     [ExtendObjectType("Mutation")]
     public class OwnerMutations
     {
+        public async Task<bool> SynchronizeMyOwnerProfile(
+            string firstName,
+            string lastName,
+            string email,
+            string phone,
+            System.Security.Claims.ClaimsPrincipal user,
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory,
+            [Service] IHttpClientFactory? httpClientFactory = null)
+        {
+            var owner = await UpdateAuthenticatedOwnerProfile(
+                firstName, lastName, email, phone, user, contextFactory,
+                httpClientFactory, requireOwner: false);
+            return owner != null;
+        }
+
         public async Task<Owner> UpdateMyOwnerProfile(
             string firstName,
             string lastName,
@@ -21,6 +36,20 @@ namespace Myb.Coproperty.GraphQL.Mutations
             System.Security.Claims.ClaimsPrincipal user,
             [Service] IDbContextFactory<CopropertyDbContext> contextFactory,
             [Service] IHttpClientFactory? httpClientFactory = null)
+            => await UpdateAuthenticatedOwnerProfile(
+                firstName, lastName, email, phone, user, contextFactory,
+                httpClientFactory, requireOwner: true)
+                ?? throw new InvalidOperationException("Profil propriétaire introuvable.");
+
+        private static async Task<Owner?> UpdateAuthenticatedOwnerProfile(
+            string firstName,
+            string lastName,
+            string email,
+            string phone,
+            System.Security.Claims.ClaimsPrincipal user,
+            IDbContextFactory<CopropertyDbContext> contextFactory,
+            IHttpClientFactory? httpClientFactory,
+            bool requireOwner)
         {
             var userId = CopropertyAccessControl.GetUserId(user);
             if (!CopropertyAccessControl.IsAuthenticated(user) || !userId.HasValue)
@@ -36,8 +65,13 @@ namespace Myb.Coproperty.GraphQL.Mutations
             if (phone.Length > 50)
                 throw new ArgumentException("Le téléphone ne doit pas dépasser 50 caractères.");
             await using var context = await contextFactory.CreateDbContextAsync();
-            var owner = await context.Owners.FirstOrDefaultAsync(o => o.UserId == userId.Value)
-                ?? throw new InvalidOperationException("Profil propriétaire introuvable.");
+            var owner = await context.Owners.FirstOrDefaultAsync(o => o.UserId == userId.Value);
+            if (owner == null)
+            {
+                if (requireOwner)
+                    throw new InvalidOperationException("Profil propriétaire introuvable.");
+                return null;
+            }
             var managerIds = await context.OwnerUnits
                 .Where(link => link.OwnerId == owner.Id && link.EndDate == null)
                 .Join(context.Units,

@@ -2,7 +2,7 @@ import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FundCallService, FundCallExtended } from '../../services/fund-call.service';
 import { CopropertyService } from '../../services/coproperty.service';
@@ -43,6 +43,7 @@ export class FundCallsListComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
   private invoiceService = inject(InvoiceService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
   private toastService = inject(ToastService);
   private modalService = inject(ModalService);
@@ -135,6 +136,8 @@ export class FundCallsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const requestedStatus = this.route.snapshot.queryParamMap.get('status');
+    if (requestedStatus) this.filterStatus.set(requestedStatus.toUpperCase());
     this.editForm = this.fb.group({
       copropertyId: ['', Validators.required],
       ownerId: [''],
@@ -161,7 +164,22 @@ export class FundCallsListComponent implements OnInit {
     this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
-        this.loadAllFundCalls();
+        const selectedId = this.selectedCopropertyId();
+        const selectedStillExists = data.some(coproperty => coproperty.id === selectedId);
+        const defaultCoproperty = data.find(coproperty => coproperty.isActive) ?? data[0];
+
+        if (!selectedStillExists) {
+          this.selectedCopropertyId.set(defaultCoproperty?.id ?? null);
+        }
+
+        if (this.selectedCopropertyId()) {
+          this.loadOwnersByCoproperty(this.selectedCopropertyId()!);
+          this.loadAllFundCalls();
+        } else {
+          this.fundCalls.set([]);
+          this.owners.set([]);
+          this.loading.set(false);
+        }
       },
       error: (err) => {
         console.error('Error loading coproperties:', err);
@@ -191,9 +209,16 @@ export class FundCallsListComponent implements OnInit {
   }
 
   loadAllFundCalls(): void {
+    const copropertyId = this.selectedCopropertyId();
+    if (!copropertyId) {
+      this.fundCalls.set([]);
+      this.loading.set(false);
+      return;
+    }
+
     this.loading.set(true);
     this.fundCallService
-      .getAllFundCalls()
+      .getFundCallsByCoproperty(copropertyId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loading.set(false))
@@ -219,13 +244,15 @@ export class FundCallsListComponent implements OnInit {
   }
 
   onCopropertyChange(copropertyId: string): void {
-    this.selectedCopropertyId.set(copropertyId);
+    this.selectedCopropertyId.set(copropertyId || null);
     this.filterOwnerId.set('');
     this.owners.set([]);
-    if (copropertyId && copropertyId !== 'all') {
+    if (copropertyId) {
       this.loadOwnersByCoproperty(copropertyId);
+      this.loadAllFundCalls();
+    } else {
+      this.fundCalls.set([]);
     }
-    // Filtering happens locally via filteredFundCalls getter — no re-fetch needed
   }
 
   onOwnerFilterChange(ownerId: string): void {
@@ -257,7 +284,7 @@ export class FundCallsListComponent implements OnInit {
 
     // Coproperty filter (local)
     const copropertyId = this.selectedCopropertyId();
-    if (copropertyId && copropertyId !== 'all') {
+    if (copropertyId) {
       filtered = filtered.filter((fc) => fc.copropertyId === copropertyId);
     }
 
@@ -280,7 +307,9 @@ export class FundCallsListComponent implements OnInit {
     // fund call which has not yet been fully paid/validated, so syndics can
     // quickly surface owners with outstanding balances.
     const statusFilter = this.filterStatus();
-    if (statusFilter === 'UNPAID') {
+    if (statusFilter === 'OVERDUE') {
+      filtered = filtered.filter(fc => this.isFundCallOverdue(fc));
+    } else if (statusFilter === 'UNPAID') {
       filtered = filtered.filter(
         (fc) => fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION'
       );
@@ -302,6 +331,15 @@ export class FundCallsListComponent implements OnInit {
     }
 
     return filtered;
+  }
+
+  private isFundCallOverdue(fundCall: FundCallExtended): boolean {
+    if (fundCall.status !== 'TO_PAY' && fundCall.status !== 'PENDING_VALIDATION') return false;
+    const approvedAmount = (fundCall.payments ?? [])
+      .filter(payment => this.normalizePaymentValidationStatus(payment.validationStatus) === 'APPROVED')
+      .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+    return Number(fundCall.amount || 0) > approvedAmount &&
+      new Date(fundCall.dueDate).getTime() < Date.now();
   }
 
   getStatusLabel(status: FundCallStatus | string): string {
@@ -347,20 +385,13 @@ export class FundCallsListComponent implements OnInit {
   }
 
   getTotalPaidAmount(): number {
-    return this.filteredFundCalls.reduce((sum, fc) => {
-      const payments = fc.payments ?? [];
-      const paid = payments
-        .filter((payment) => !this.isPaymentRejected(payment.validationStatus))
-        .reduce((s, p) => {
-        const n = typeof (p as any).amount === 'string' ? parseFloat((p as any).amount) : ((p as any).amount || 0);
-        return s + (isNaN(n) ? 0 : n);
-      }, 0);
-      return sum + paid;
-    }, 0);
+    return this.filteredFundCalls.reduce(
+      (sum, fc) => sum + this.getFundCallPaidAmount(fc), 0
+    );
   }
 
   getTotalRemainingAmount(): number {
-    return Math.max(0, this.getTotalAmount() - this.getTotalPaidAmount());
+    return this.getTotalAmount() - this.getTotalPaidAmount();
   }
 
   private getTotalAmountDisplay(
@@ -406,10 +437,7 @@ export class FundCallsListComponent implements OnInit {
       const amount = typeof fundCall.amount === 'string'
         ? parseFloat(fundCall.amount as any)
         : fundCall.amount || 0;
-      return Math.max(
-        0,
-        (Number.isNaN(amount) ? 0 : amount) - this.getFundCallPaidAmount(fundCall)
-      );
+      return (Number.isNaN(amount) ? 0 : amount) - this.getFundCallPaidAmount(fundCall);
     });
   }
 
@@ -422,7 +450,7 @@ export class FundCallsListComponent implements OnInit {
 
   getFundCallPaidAmount(fundCall: FundCallExtended): number {
     return (fundCall.payments ?? [])
-      .filter((payment) => !this.isPaymentRejected(payment.validationStatus))
+      .filter((payment) => this.normalizePaymentValidationStatus(payment.validationStatus) === 'APPROVED')
       .reduce((sum, payment) => {
       const rawAmount = payment.amount as number | string;
       const amount = typeof rawAmount === 'string'
@@ -1045,10 +1073,11 @@ export class FundCallsListComponent implements OnInit {
   }
 
   getOwnerName(fundCall: FundCallExtended): string {
+    // Prefer the creation-time snapshot returned by the backend. The related
+    // Owner record is live data and may have changed after this document was issued.
+    if (fundCall.ownerName) return fundCall.ownerName;
     if (fundCall.owner) return `${fundCall.owner.firstName} ${fundCall.owner.lastName}`;
-    // Fall back to the historical snapshot preserved by the backend when the
-    // Owner record has since been deleted.
-    return fundCall.ownerName || '-';
+    return '-';
   }
 
   getEditingOwnerDisplayName(): string {
@@ -1186,13 +1215,7 @@ export class FundCallsListComponent implements OnInit {
   }
 
   getTotalPayments(fc: FundCallExtended): number {
-    return (fc.payments ?? []).reduce((sum, p) => {
-      if (this.isPaymentRejected(p.validationStatus)) {
-        return sum;
-      }
-      const n = typeof p.amount === 'string' ? parseFloat(p.amount as any) : (p.amount ?? 0);
-      return sum + (isNaN(n) ? 0 : n);
-    }, 0);
+    return this.getFundCallPaidAmount(fc);
   }
 
   getRemainingAmount(fc: FundCallExtended): number {
@@ -1506,14 +1529,14 @@ export class FundCallsListComponent implements OnInit {
     }
     this.fundCallService.reviewFundCallPayment(paymentId, true).subscribe({
       next: () => {
-        this.toastService.show('Paiement validé avec succès.', { classname: 'bg-success text-white', delay: 4000 });
+        this.toastService.show(this.translate.instant('notificationUi.paymentApprovedToast'), { classname: 'bg-success text-white', delay: 4000 });
         this.reviewingPaymentId.set(null);
         this.reloadEditingFundCall();
       },
       error: (err) => {
         // Revert optimistic update on failure
         if (previousFc) this.editingFundCall.set(previousFc);
-        const msg = err?.graphQLErrors?.[0]?.message || 'Erreur lors de la validation du paiement';
+        const msg = err?.graphQLErrors?.[0]?.message || this.translate.instant('notificationUi.paymentApprovalError');
         this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
         this.reviewingPaymentId.set(null);
       },
@@ -1549,7 +1572,7 @@ export class FundCallsListComponent implements OnInit {
     }
     this.fundCallService.reviewFundCallPayment(paymentId, false, reason).subscribe({
       next: () => {
-        this.toastService.show('Paiement refusé. Le propriétaire a été notifié.', { classname: 'bg-warning text-dark', delay: 4000 });
+        this.toastService.show(this.translate.instant('notificationUi.paymentRejectedToast'), { classname: 'bg-warning text-dark', delay: 4000 });
         this.reviewingPaymentId.set(null);
         this.closeRejectDialog();
         this.reloadEditingFundCall();
@@ -1557,7 +1580,7 @@ export class FundCallsListComponent implements OnInit {
       error: (err) => {
         // Revert optimistic update on failure
         if (previousFc) this.editingFundCall.set(previousFc);
-        const msg = err?.graphQLErrors?.[0]?.message || 'Erreur lors du refus du paiement';
+        const msg = err?.graphQLErrors?.[0]?.message || this.translate.instant('notificationUi.paymentRejectionError');
         this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 5000 });
         this.reviewingPaymentId.set(null);
       },
@@ -1588,7 +1611,4 @@ export class FundCallsListComponent implements OnInit {
     return String(status ?? '').replace(/[_\s-]/g, '').toUpperCase();
   }
 
-  private isPaymentRejected(status: string | null | undefined): boolean {
-    return this.normalizePaymentValidationStatus(status) === 'REJECTED';
-  }
 }

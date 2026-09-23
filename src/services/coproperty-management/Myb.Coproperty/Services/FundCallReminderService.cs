@@ -14,15 +14,18 @@ public class FundCallReminderService : BackgroundService
     private readonly IDbContextFactory<CopropertyDbContext> _contextFactory;
     private readonly IEmailPublisher _emailPublisher;
     private readonly ILogger<FundCallReminderService> _logger;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     public FundCallReminderService(
         IDbContextFactory<CopropertyDbContext> contextFactory,
         IEmailPublisher emailPublisher,
-        ILogger<FundCallReminderService> logger)
+        ILogger<FundCallReminderService> logger,
+        IServiceScopeFactory scopeFactory)
     {
         _contextFactory = contextFactory;
         _emailPublisher = emailPublisher;
         _logger = logger;
+        _scopeFactory = scopeFactory;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -65,6 +68,8 @@ public class FundCallReminderService : BackgroundService
         _logger.LogInformation("Sending monthly fund call reminders...");
 
         using var context = _contextFactory.CreateDbContext();
+        using var scope = _scopeFactory.CreateScope();
+        var keycloakAdminService = scope.ServiceProvider.GetRequiredService<IKeycloakAdminService>();
 
         // Get all active, unpaid fund calls with their owners and payments
         var unpaidFundCalls = await context.FundCalls
@@ -84,6 +89,7 @@ public class FundCallReminderService : BackgroundService
         foreach (var ownerGroup in byOwner)
         {
             var owner = ownerGroup.First().Owner!;
+            var english = await keycloakAdminService.GetPreferredLanguageAsync(owner.UserId.ToString()) == "en";
             var fundCallRows = new System.Text.StringBuilder();
             var remainingByCurrency = new Dictionary<Models.Currency, decimal>();
 
@@ -102,7 +108,7 @@ public class FundCallReminderService : BackgroundService
                 fundCallRows.AppendLine($@"
                     <tr>
                         <td style='padding:8px;border:1px solid #ddd;'>{copropertyName}</td>
-                        <td style='padding:8px;border:1px solid #ddd;'>{fc.Description ?? "Appel de fonds"}</td>
+                        <td style='padding:8px;border:1px solid #ddd;'>{fc.Description ?? (english ? "Call for funds" : "Appel de fonds")}</td>
                         <td style='padding:8px;border:1px solid #ddd;text-align:right;'>{FormatAmount(fc.Amount, currency)}</td>
                         <td style='padding:8px;border:1px solid #ddd;text-align:right;color:green;'>{FormatAmount(paid, currency)}</td>
                         <td style='padding:8px;border:1px solid #ddd;text-align:right;color:red;font-weight:bold;'>{FormatAmount(remaining, currency)}</td>
@@ -115,7 +121,26 @@ public class FundCallReminderService : BackgroundService
                 .OrderBy(entry => entry.Key)
                 .Select(entry => FormatAmount(entry.Value, entry.Key)));
 
-            var htmlBody = $@"
+            var htmlBody = english ? $@"
+                <div style='font-family:Arial,sans-serif;max-width:700px;margin:0 auto;'>
+                    <h2 style='color:#2c3e50;'>🔔 Monthly payment reminder</h2>
+                    <p>Hello {owner.FirstName} {owner.LastName},</p>
+                    <p>You have calls for funds awaiting payment. Here is your summary:</p>
+                    <table style='width:100%;border-collapse:collapse;margin:20px 0;'>
+                        <thead><tr style='background:#f8f9fa;'>
+                            <th style='padding:8px;border:1px solid #ddd;text-align:left;'>Coproperty</th>
+                            <th style='padding:8px;border:1px solid #ddd;text-align:left;'>Description</th>
+                            <th style='padding:8px;border:1px solid #ddd;text-align:right;'>Total</th>
+                            <th style='padding:8px;border:1px solid #ddd;text-align:right;'>Paid</th>
+                            <th style='padding:8px;border:1px solid #ddd;text-align:right;'>Remaining</th>
+                            <th style='padding:8px;border:1px solid #ddd;text-align:right;'>Suggested installment</th>
+                            <th style='padding:8px;border:1px solid #ddd;text-align:left;'>Due date</th>
+                        </tr></thead><tbody>{fundCallRows}</tbody>
+                    </table>
+                    <p style='font-size:18px;color:#e74c3c;font-weight:bold;'>Total remaining: {totalRemainingText}</p>
+                    <p>You can make a partial payment or pay the full amount from your owner space.</p>
+                    <p style='color:#7f8c8d;font-size:12px;margin-top:30px;'>This automatic reminder is sent on the first day of each month.<br/>Regards, the MYB team</p>
+                </div>" : $@"
                 <div style='font-family:Arial,sans-serif;max-width:700px;margin:0 auto;'>
                     <h2 style='color:#2c3e50;'>🔔 Rappel mensuel de paiement</h2>
                     <p>Bonjour {owner.FirstName} {owner.LastName},</p>
@@ -157,7 +182,9 @@ public class FundCallReminderService : BackgroundService
                 await _emailPublisher.PublishAsync(new EmailMessage
                 {
                     To = owner.Email,
-                    Subject = $"Rappel de paiement - {totalRemainingText} restant",
+                    Subject = english
+                        ? $"Payment reminder - {totalRemainingText} remaining"
+                        : $"Rappel de paiement - {totalRemainingText} restant",
                     HtmlBody = htmlBody,
                     Source = "coproperty-reminder"
                 });

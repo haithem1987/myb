@@ -1,6 +1,6 @@
 import { Component, signal, OnInit, inject, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { OwnerService } from '../../services/owner.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
@@ -16,6 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface OwnerUnit {
   id: string;
+  copropertyId: string;
   buildingName: string;
   unitNumber: string;
   type: string;
@@ -25,6 +26,7 @@ interface OwnerUnit {
 
 interface PendingInvoice {
   id: string;
+  copropertyId: string;
   number: string;
   date: Date;
   amount: number;
@@ -38,6 +40,7 @@ interface PendingInvoice {
 
 interface RecentInvoice {
   id: string;
+  copropertyId?: string;
   number: string;
   description: string;
   date: Date;
@@ -63,13 +66,16 @@ export class OwnerDashboardComponent implements OnInit {
   private translateService = inject(TranslateService);
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
 
   myUnits = signal<OwnerUnit[]>([]);
   pendingInvoices = signal<PendingInvoice[]>([]);
   recentInvoices = signal<RecentInvoice[]>([]);
   totalDue = signal(0);
   totalPaid = signal(0);
-  overdueCount = signal(0);
+  ownerFundCalls = signal<FundCallExtended[]>([]);
+  ownerCoproperties = signal<Array<{ id: string; name: string }>>([]);
+  selectedCopropertyId = signal('');
   totalCharges = signal(0);
   totalDueDisplay = signal('');
   totalPaidDisplay = signal('');
@@ -79,6 +85,19 @@ export class OwnerDashboardComponent implements OnInit {
 
   totalShares = computed(() => this.myUnits().reduce((sum, u) => sum + u.shares, 0));
   totalSurface = computed(() => this.myUnits().reduce((sum, u) => sum + u.surface, 0));
+  overdueFundCalls = computed(() => this.ownerFundCalls().filter(fc =>
+    (!this.selectedCopropertyId() || fc.copropertyId === this.selectedCopropertyId()) &&
+    (fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION') &&
+    this.getRemainingAmount(fc) > 0 &&
+    new Date(fc.dueDate).getTime() < Date.now()
+  ));
+  overdueCount = computed(() => this.overdueFundCalls().length);
+  totalOverdueDisplay = computed(() => this.formatCurrencyGroups(
+    this.overdueFundCalls().map(fc => ({
+      amount: this.getRemainingAmount(fc),
+      currency: fc.currency,
+    }))
+  ));
 
   ngOnInit(): void {
     this.loadOwnerData();
@@ -152,7 +171,28 @@ export class OwnerDashboardComponent implements OnInit {
           coproperties.map((c) => [c.id, c.name])
         );
 
-        this.myUnits.set(units.map(u => {
+        const associatedCopropertyIds = new Set(units.map(unit => unit.copropertyId));
+        const associatedCoproperties = coproperties
+          .filter(coproperty => associatedCopropertyIds.has(coproperty.id))
+          .map(coproperty => ({ id: coproperty.id, name: coproperty.name }));
+        this.ownerCoproperties.set(associatedCoproperties);
+
+        const selectedId = this.selectedCopropertyId();
+        if (!associatedCoproperties.some(coproperty => coproperty.id === selectedId)) {
+          this.selectedCopropertyId.set(associatedCoproperties[0]?.id ?? '');
+        }
+        const activeCopropertyId = this.selectedCopropertyId();
+        const scopedUnits = activeCopropertyId
+          ? units.filter(unit => unit.copropertyId === activeCopropertyId)
+          : units;
+        const scopedFundCalls = activeCopropertyId
+          ? fundCalls.filter(fundCall => fundCall.copropertyId === activeCopropertyId)
+          : fundCalls;
+        const scopedPayments = activeCopropertyId
+          ? payments.filter(payment => payment.fundCall?.coproperty?.id === activeCopropertyId)
+          : payments;
+
+        this.myUnits.set(scopedUnits.map(u => {
           const typeLower = (u.unitType ?? '').toLowerCase();
           let type = 'Autre';
           if (typeLower.includes('apart') || typeLower.includes('appartement')) type = 'Appartement';
@@ -161,6 +201,7 @@ export class OwnerDashboardComponent implements OnInit {
 
           return {
             id: u.id,
+            copropertyId: u.copropertyId,
             buildingName: copropertyMap.get(u.copropertyId) ?? 'Copropriété',
             unitNumber: u.unitNumber,
             type,
@@ -169,19 +210,18 @@ export class OwnerDashboardComponent implements OnInit {
           };
         }));
 
+        this.ownerFundCalls.set(scopedFundCalls);
+
         // "My Charges" includes both untouched calls and calls with a proof
         // awaiting validation, so owners can see the complete amount breakdown.
-        const chargeFundCalls = fundCalls.filter(fc =>
+        const chargeFundCalls = scopedFundCalls.filter(fc =>
           fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION'
         );
-        const overdueFundCalls = chargeFundCalls.filter(fc =>
-          this.getRemainingAmount(fc) > 0 && new Date() > new Date(fc.dueDate)
-        );
-        this.overdueCount.set(overdueFundCalls.length);
-        this.cancelledFundCallsCount.set(fundCalls.filter(fc => fc.status === 'CANCELLED').length);
+        this.cancelledFundCallsCount.set(scopedFundCalls.filter(fc => fc.status === 'CANCELLED').length);
 
         this.pendingInvoices.set(chargeFundCalls.map(fc => ({
           id: fc.id,
+          copropertyId: fc.copropertyId,
           number: fc.id.substring(0, 8).toUpperCase(),
           date: new Date(fc.createdAt),
           amount: fc.amount,
@@ -200,24 +240,25 @@ export class OwnerDashboardComponent implements OnInit {
         ));
 
         // Total charges = tous les appels de fonds du propriétaire
-        this.totalCharges.set(fundCalls.reduce((sum, fc) => sum + fc.amount, 0));
+        this.totalCharges.set(scopedFundCalls.reduce((sum, fc) => sum + fc.amount, 0));
         this.totalChargesDisplay.set(this.formatCurrencyGroups(
-          fundCalls.map(fc => ({ amount: fc.amount, currency: fc.currency }))
+          scopedFundCalls.map(fc => ({ amount: fc.amount, currency: fc.currency }))
         ));
 
         // Total payé = paiements approuvés
-        const approvedPayments = payments.filter((p) => this.isPaymentApproved(p.validationStatus));
+        const approvedPayments = scopedPayments.filter((p) => this.isPaymentApproved(p.validationStatus));
         this.totalPaid.set(approvedPayments.reduce((sum, p) => sum + p.amount, 0));
         this.totalPaidDisplay.set(this.formatCurrencyGroups(
           approvedPayments.map(p => ({ amount: p.amount, currency: p.fundCall?.currency }))
         ));
 
         // Derniers reçus (5 max, triés par date de paiement)
-        const recentReceipts: RecentInvoice[] = payments
+        const recentReceipts: RecentInvoice[] = scopedPayments
           .sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
           .slice(0, 5)
           .map(p => ({
             id: p.id,
+            copropertyId: p.fundCall?.coproperty?.id,
             number: `FC-${p.id.slice(0, 8).toUpperCase()}`,
             description: p.fundCall?.description
               ? `Appel de fonds : ${p.fundCall.description}`
@@ -241,6 +282,12 @@ export class OwnerDashboardComponent implements OnInit {
     });
   }
 
+  onCopropertyChange(copropertyId: string): void {
+    if (copropertyId === this.selectedCopropertyId()) return;
+    this.selectedCopropertyId.set(copropertyId);
+    this.loadOwnerData();
+  }
+
   isOverdue(dueDate: Date): boolean {
     return new Date() > new Date(dueDate);
   }
@@ -255,6 +302,13 @@ export class OwnerDashboardComponent implements OnInit {
     const key = `ownerPortal.dashboard.status.${status}`;
     const translated = this.translateService.instant(key);
     return translated === key ? status : translated;
+  }
+
+  payInvoice(event: Event, fundCallId: string): void {
+    event.stopPropagation();
+    void this.router.navigate(['/coproperty/owner/charges'], {
+      queryParams: { pay: fundCallId },
+    });
   }
 
   private normalizePaymentValidationStatus(status: string | null | undefined): string {

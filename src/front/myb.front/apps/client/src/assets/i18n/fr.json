@@ -1185,6 +1185,7 @@
     "navigation": {
       "dashboard": "Mon Espace",
       "units": "Mes Lots",
+      "residence": "Ma Résidence",
       "receipts": "Mes Reçus",
       "charges": "Mes Charges",
       "reports": "Signalements",
@@ -1195,6 +1196,29 @@
       "help": "Aide",
       "contact": "Contact",
       "legal": "Mentions légales"
+    },
+    "residence": {
+      "title": "Ma Résidence",
+      "subtitle": "Vue d'ensemble de votre copropriété et du budget qui vous est affecté",
+      "coproperty": "Copropriété",
+      "allCoproperties": "Toutes les copropriétés",
+      "loading": "Chargement de votre résidence...",
+      "loadError": "Impossible de charger les informations de votre résidence.",
+      "retry": "Réessayer",
+      "emptyTitle": "Aucune résidence trouvée",
+      "emptyText": "Aucune copropriété n'est actuellement associée à votre compte.",
+      "budgeted": "Montant budgété",
+      "paid": "Montant payé",
+      "unpaid": "Montant entièrement impayé",
+      "remaining": "Montant restant",
+      "overview": "Aperçu de la résidence",
+      "units": "Lots détenus",
+      "shares": "Total des tantièmes",
+      "openBudgetLines": "Lignes budgétaires ouvertes",
+      "budgetLines": "Détail du budget",
+      "noBudgetLines": "Aucune répartition budgétaire n'est disponible pour cette sélection.",
+      "description": "Description",
+      "unit": "Lot"
     },
     "myUnits": {
       "title": "Mes Lots", "subtitle": "Consultez vos biens et vos charges", "loading": "Chargement de vos lots...", "loadError": "Impossible de charger vos lots.", "retry": "Réessayer", "ownedUnits": "Lots détenus", "totalArea": "Surface totale", "totalShares": "Tantièmes totaux", "coproperties": "Copropriété(s)", "emptyTitle": "Aucun lot trouvé", "emptyText": "Aucun lot n'est associé à votre compte.", "unit": "Lot", "coproperty": "Copropriété", "floor": "Étage", "area": "Surface", "shares": "Tantièmes", "description": "Description", "ownerSince": "Propriétaire depuis le {{date}}", "unauthenticated": "Utilisateur non identifié. Veuillez vous reconnecter.", "groundFloor": "RDC", "floorValue": "{{floor}}e étage", "types": { "apartment": "Appartement", "parking": "Parking", "cellar": "Cave", "other": "Autre" }
@@ -1417,5 +1441,43 @@
     "noPayments": "Aucun versement enregistré pour cet appel de fonds.",
     "generatedFundCall": "Appel de fonds – Répartition",
     "unit": "Lot"
+  },
+  "requestedFixes": {
+    "selectCopropertyPrompt": "Veuillez sélectionner une copropriété pour consulter vos reçus.",
+    "selectCoproperty": "Sélectionner une copropriété",
+    "selectCopropertyForFundCalls": "Sélectionnez une copropriété pour consulter ses appels de fonds.",
+    "selectCopropertyForBudgetLines": "Sélectionnez une copropriété pour consulter ses lignes budgétaires.",
+    "copropertyFilter": "Copropriété",
+    "allCoproperties": "Toutes les copropriétés",
+    "totalOverdue": "Total en retard",
+    "overdue": "En retard",
+    "overdueFundCalls": "Appels de fonds en retard"
+  },
+  "notificationUi": {
+    "title": "Notifications",
+    "markAllRead": "Tout lire",
+    "empty": "Aucune notification",
+    "profileUpdated": "{{p1}} a mis à jour son profil.",
+    "accountActivated": "{{p1}} a vérifié son adresse e-mail et accédé à son compte MYB.",
+    "fundUpdated": "L'appel de fonds « {{p1}} » a été mis à jour.",
+    "fundStatusUpdated": "Le statut de l'appel de fonds « {{p1}} » a été mis à jour.",
+    "fundCancelled": "L'appel de fonds « {{p1}} » a été annulé. Motif : {{p2}}",
+    "paymentApproved": "Votre paiement de {{p1}} pour « {{p2}} » a été validé.",
+    "paymentRejected": "Votre paiement de {{p1}} pour « {{p2}} » a été rejeté.",
+    "paymentRejectedReason": "Votre paiement de {{p1}} pour « {{p2}} » a été rejeté. Motif : {{p3}}",
+    "fundPaymentReceived": "💰 Paiement soumis : {{p1}} a versé {{p2}} ({{p3}}) pour « {{p4}} ». {{p5}}",
+    "chargePaymentReceived": "💰 Paiement reçu : {{p1}} a payé {{p2}} pour la charge « {{p3}} » (Lot {{p4}})",
+    "ownershipRemoved": "Vous n'êtes plus enregistré comme propriétaire du lot {{p1}} de la copropriété {{p2}}. Vos données et documents historiques restent inchangés.",
+    "ownershipAssigned": "Vous êtes désormais enregistré comme propriétaire du lot {{p1}} de la copropriété {{p2}}.",
+    "timesheetUpdated": "Feuille de temps mise à jour par {{p1}}",
+    "timesheetApproved": "Votre feuille de temps a été approuvée.",
+    "timesheetRejected": "Votre feuille de temps a été rejetée.",
+    "bankTransfer": "Virement",
+    "fullySubmitted": "Montant intégral soumis ; validation requise.",
+    "remainingSubmitted": "Reste à verser : {{amount}}",
+    "paymentApprovedToast": "Paiement validé avec succès.",
+    "paymentRejectedToast": "Paiement refusé. Le propriétaire a été notifié.",
+    "paymentApprovalError": "Erreur lors de la validation du paiement",
+    "paymentRejectionError": "Erreur lors du refus du paiement"
   }
 }

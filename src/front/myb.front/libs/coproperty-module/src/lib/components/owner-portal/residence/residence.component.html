@@ -1,0 +1,95 @@
+<div class="container-fluid py-4 residence-page">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div>
+      <h2 class="mb-1"><i class="bi bi-buildings me-2"></i>{{ 'ownerPortal.residence.title' | translate }}</h2>
+      <p class="text-muted mb-0">{{ 'ownerPortal.residence.subtitle' | translate }}</p>
+    </div>
+    <div class="residence-filter" *ngIf="associatedCoproperties().length > 0">
+      <label for="residence-coproperty" class="form-label">{{ 'ownerPortal.residence.coproperty' | translate }}</label>
+      <select id="residence-coproperty" class="form-select" [ngModel]="selectedCopropertyId()"
+              (ngModelChange)="selectedCopropertyId.set($event)">
+        <option value="">{{ 'ownerPortal.residence.allCoproperties' | translate }}</option>
+        <option *ngFor="let coproperty of associatedCoproperties()" [value]="coproperty.id">{{ coproperty.name }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="text-muted mt-3">{{ 'ownerPortal.residence.loading' | translate }}</p>
+  </div>
+
+  <div *ngIf="!loading() && error()" class="alert alert-danger d-flex align-items-center gap-2">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span>{{ 'ownerPortal.residence.loadError' | translate }}</span>
+    <button class="btn btn-sm btn-outline-danger ms-auto" (click)="reload()">{{ 'ownerPortal.residence.retry' | translate }}</button>
+  </div>
+
+  <ng-container *ngIf="!loading() && !error()">
+    <div *ngIf="associatedCoproperties().length === 0" class="empty-state">
+      <i class="bi bi-building"></i>
+      <h4>{{ 'ownerPortal.residence.emptyTitle' | translate }}</h4>
+      <p>{{ 'ownerPortal.residence.emptyText' | translate }}</p>
+    </div>
+
+    <ng-container *ngIf="associatedCoproperties().length > 0">
+      <div class="summary-grid mb-4">
+        <article class="summary-card budgeted">
+          <i class="bi bi-calculator"></i>
+          <div><strong>{{ financialSummary().budgeted }}</strong><span>{{ 'ownerPortal.residence.budgeted' | translate }}</span></div>
+        </article>
+        <article class="summary-card paid">
+          <i class="bi bi-check-circle"></i>
+          <div><strong>{{ financialSummary().paid }}</strong><span>{{ 'ownerPortal.residence.paid' | translate }}</span></div>
+        </article>
+        <article class="summary-card unpaid">
+          <i class="bi bi-exclamation-circle"></i>
+          <div><strong>{{ financialSummary().unpaid }}</strong><span>{{ 'ownerPortal.residence.unpaid' | translate }}</span></div>
+        </article>
+        <article class="summary-card remaining">
+          <i class="bi bi-hourglass-split"></i>
+          <div><strong>{{ financialSummary().remaining }}</strong><span>{{ 'ownerPortal.residence.remaining' | translate }}</span></div>
+        </article>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <section class="residence-panel h-100">
+            <h5>{{ 'ownerPortal.residence.overview' | translate }}</h5>
+            <div class="overview-row"><span>{{ 'ownerPortal.residence.units' | translate }}</span><strong>{{ filteredUnits().length }}</strong></div>
+            <div class="overview-row"><span>{{ 'ownerPortal.residence.shares' | translate }}</span><strong>{{ financialSummary().totalShares }}</strong></div>
+            <div class="overview-row"><span>{{ 'ownerPortal.residence.openBudgetLines' | translate }}</span><strong>{{ financialSummary().activeBudgetLines }}</strong></div>
+          </section>
+        </div>
+        <div class="col-lg-8">
+          <section class="residence-panel">
+            <h5>{{ 'ownerPortal.residence.budgetLines' | translate }}</h5>
+            <div *ngIf="filteredDistributions().length === 0" class="text-muted py-4 text-center">
+              {{ 'ownerPortal.residence.noBudgetLines' | translate }}
+            </div>
+            <div class="table-responsive" *ngIf="filteredDistributions().length > 0">
+              <table class="table align-middle mb-0">
+                <thead><tr>
+                  <th>{{ 'ownerPortal.residence.description' | translate }}</th>
+                  <th>{{ 'ownerPortal.residence.unit' | translate }}</th>
+                  <th class="text-end">{{ 'ownerPortal.residence.budgeted' | translate }}</th>
+                  <th class="text-end">{{ 'ownerPortal.residence.paid' | translate }}</th>
+                  <th class="text-end">{{ 'ownerPortal.residence.remaining' | translate }}</th>
+                </tr></thead>
+                <tbody><tr *ngFor="let item of filteredDistributions()">
+                  <td>{{ item.chargeName || item.chargeDescription || '—' }}</td>
+                  <td>{{ item.unitNumber || '—' }}</td>
+                  <td class="text-end">{{ formatAmount(item.amount, item.currency) }}</td>
+                  <td class="text-end text-success">{{ formatAmount(getPaidAmount(item), item.currency) }}</td>
+                  <td class="text-end fw-semibold" [class.text-danger]="getRemainingAmount(item) > 0">
+                    {{ formatAmount(getRemainingAmount(item), item.currency) }}
+                  </td>
+                </tr></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>

@@ -26,15 +26,18 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
     private readonly IEmailPublisher _emailPublisher;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<OwnershipNotificationService> _logger;
+    private readonly IKeycloakAdminService _keycloakAdminService;
 
     public OwnershipNotificationService(
         IEmailPublisher emailPublisher,
         IHttpClientFactory httpClientFactory,
-        ILogger<OwnershipNotificationService> logger)
+        ILogger<OwnershipNotificationService> logger,
+        IKeycloakAdminService keycloakAdminService)
     {
         _emailPublisher = emailPublisher;
         _httpClientFactory = httpClientFactory;
         _logger = logger;
+        _keycloakAdminService = keycloakAdminService;
     }
 
     public async Task NotifyOwnershipChangedAsync(
@@ -50,6 +53,8 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
             previousOwner,
             "Modification de la propriété de votre lot",
             $"Vous n'êtes plus enregistré comme propriétaire du lot {unitNumber} de la copropriété {copropertyName}. Vos données et documents historiques restent inchangés.",
+            "Change to your unit ownership",
+            $"You are no longer registered as the owner of unit {unitNumber} in {copropertyName}. Your historical data and documents remain unchanged.",
             copropertyName,
             unitNumber,
             unit.Coproperty?.ManagerId,
@@ -59,6 +64,8 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
             newOwner,
             "Confirmation d'affectation d'un lot",
             $"Vous êtes désormais enregistré comme propriétaire du lot {unitNumber} de la copropriété {copropertyName}.",
+            "Unit assignment confirmed",
+            $"You are now registered as the owner of unit {unitNumber} in {copropertyName}.",
             copropertyName,
             unitNumber,
             unit.Coproperty?.ManagerId,
@@ -69,11 +76,16 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
         Owner owner,
         string subject,
         string message,
+        string englishSubject,
+        string englishMessage,
         string copropertyName,
         string unitNumber,
         Guid? managerId,
         CancellationToken cancellationToken)
     {
+        var english = await _keycloakAdminService.GetPreferredLanguageAsync(owner.UserId.ToString()) == "en";
+        subject = english ? englishSubject : subject;
+        message = english ? englishMessage : message;
         if (!string.IsNullOrWhiteSpace(owner.Email))
         {
             try
@@ -86,12 +98,12 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
                     HtmlBody = $"""
                         <html><body style="font-family:Arial,sans-serif;color:#333">
                           <h2 style="color:#2c5282">{WebUtility.HtmlEncode(subject)}</h2>
-                          <p>Bonjour {WebUtility.HtmlEncode(owner.FirstName)},</p>
+                          <p>{(english ? "Hello" : "Bonjour")} {WebUtility.HtmlEncode(owner.FirstName)},</p>
                           <p>{WebUtility.HtmlEncode(message)}</p>
-                          <p><strong>Copropriété :</strong> {WebUtility.HtmlEncode(copropertyName)}<br/>
-                             <strong>Lot :</strong> {WebUtility.HtmlEncode(unitNumber)}</p>
+                          <p><strong>{(english ? "Coproperty" : "Copropriété")}:</strong> {WebUtility.HtmlEncode(copropertyName)}<br/>
+                             <strong>{(english ? "Unit" : "Lot")}:</strong> {WebUtility.HtmlEncode(unitNumber)}</p>
                           <hr/>
-                          <p style="font-size:12px;color:#888">MYB – Gestion de copropriété</p>
+                          <p style="font-size:12px;color:#888">MYB – {(english ? "Coproperty management" : "Gestion de copropriété")}</p>
                         </body></html>
                         """
                 });

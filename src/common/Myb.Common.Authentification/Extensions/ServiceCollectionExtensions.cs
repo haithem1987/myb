@@ -100,7 +100,14 @@ namespace Myb.Common.Authentification.Extensions
                         }
                     };
                 });
-             builder.Services.AddAuthorization();
+             builder.Services.AddAuthorization(options =>
+             {
+                 // Secure by default: a newly added endpoint must explicitly opt out with
+                 // AllowAnonymous instead of accidentally becoming public.
+                 options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+                     .RequireAuthenticatedUser()
+                     .Build();
+             });
 
         } 
     }

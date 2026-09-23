@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Myb.Common.Authentification.Extensions;
+using Myb.Common.Authentification.Security;
 using Myb.Common.Messaging;
 using Myb.Coproperty.Infrastructure.Data;
 
@@ -29,6 +30,7 @@ builder.Services.AddHttpContextAccessor();
 // reject anonymous/unauthenticated requests by itself (no [Authorize] is applied here),
 // so existing callers that don't yet send a token are unaffected.
 builder.AddKeycloakAuthorization();
+builder.AddMybApiSecurity();
 builder.Services.AddTransient<IClaimsTransformation, Myb.Coproperty.Services.KeycloakRoleClaimsTransformation>();
 
 // Add Repositories
@@ -156,21 +158,10 @@ builder.Services
             Console.Error.WriteLine($"[GraphQL] Unexpected error: {error.Exception}");
         return error;
     })
-    .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true);
+    .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = false);
 
 
 builder.Services.AddControllers();
-
-// Add CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
-    {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    });
-});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -227,13 +218,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-app.UseCors("AllowAll");
+app.UseMybApiSecurity();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Health check endpoint for Railway
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
+    .AllowAnonymous();
 
 // GraphQL only - no REST controllers needed
 // app.MapControllers();

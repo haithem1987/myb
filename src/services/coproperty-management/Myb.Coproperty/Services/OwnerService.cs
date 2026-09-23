@@ -48,7 +48,9 @@ namespace Myb.Coproperty.Services
 
             if (!string.IsNullOrWhiteSpace(created.Email))
             {
-                var portalUrl = _keycloakOptions.OwnerPortalUrl;
+                var portalUrl = System.Net.WebUtility.HtmlEncode(_keycloakOptions.OwnerPortalUrl);
+                var loginEmail = System.Net.WebUtility.HtmlEncode(created.Email);
+                var firstName = System.Net.WebUtility.HtmlEncode(created.FirstName);
                 var english = await _keycloakAdminService.GetPreferredLanguageAsync(created.UserId.ToString()) == "en";
                 var subject = english
                     ? "Welcome to MYB – Your owner role has been assigned"
@@ -59,17 +61,23 @@ namespace Myb.Coproperty.Services
                     Subject = subject,
                     HtmlBody = english ? $"""
                         <html><body style="font-family:Arial,sans-serif;color:#333">
-                          <h2 style="color:#2c5282">Welcome to MYB, {created.FirstName}!</h2>
+                          <h2 style="color:#2c5282">Welcome to MYB, {firstName}!</h2>
                           <p>Your owner account is ready and the <strong>owner</strong> role has been assigned.</p>
                           <p>You can now access your owner space to view charges, calls for funds, and coproperty information.</p>
+                          <p>Sign in with this email address: <strong>{loginEmail}</strong>.</p>
+                          <p>Use the password provided by your syndic or in your account creation email. If it is temporary, you will be asked to choose a new password at first login.</p>
+                          <p>If you do not have your password, click <strong>Forgot password?</strong> on the login page and enter the email address above to reset it.</p>
                           <p style="margin:24px 0"><a href="{portalUrl}" style="background:#2c5282;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">Open my owner space</a></p>
                           <hr/><p style="font-size:12px;color:#888">MYB – Coproperty management</p>
                         </body></html>
                         """ : $"""
                         <html><body style="font-family:Arial,sans-serif;color:#333">
-                          <h2 style="color:#2c5282">Bienvenue sur MYB, {created.FirstName} !</h2>
+                          <h2 style="color:#2c5282">Bienvenue sur MYB, {firstName} !</h2>
                           <p>Votre compte propriétaire a été créé avec succès et le rôle <strong>propriétaire</strong> vous a été assigné.</p>
                           <p>Vous pouvez dès maintenant accéder à votre espace propriétaire pour consulter vos charges, appels de fonds et informations de copropriété.</p>
+                          <p>Connectez-vous avec cette adresse e-mail : <strong>{loginEmail}</strong>.</p>
+                          <p>Utilisez le mot de passe communiqué par votre syndic ou dans votre e-mail de création de compte. S'il est temporaire, vous devrez choisir un nouveau mot de passe à la première connexion.</p>
+                          <p>Si vous ne connaissez pas votre mot de passe, cliquez sur <strong>Mot de passe oublié ?</strong> sur la page de connexion et saisissez l'adresse e-mail ci-dessus pour le réinitialiser.</p>
                           <p style="margin:24px 0">
                             <a href="{portalUrl}" style="background:#2c5282;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">Accéder à mon espace propriétaire</a>
                           </p>

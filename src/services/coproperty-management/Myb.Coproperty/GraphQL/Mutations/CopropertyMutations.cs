@@ -7,6 +7,8 @@ using Myb.Coproperty.Models;
 using Myb.Coproperty.Services;
 using Myb.Coproperty.Models.Dtos;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using Myb.Coproperty.Infrastructure.Data;
 
 namespace Myb.Coproperty.GraphQL.Mutations
 {
@@ -87,7 +89,8 @@ namespace Myb.Coproperty.GraphQL.Mutations
             ClaimsPrincipal? user,
             [Service] IKeycloakAdminService keycloakAdminService,
             [Service] IEmailPublisher emailPublisher,
-            [Service] Microsoft.Extensions.Options.IOptions<KeycloakOptions> options)
+            [Service] Microsoft.Extensions.Options.IOptions<KeycloakOptions> options,
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
         {
             if (!CopropertyAccessControl.IsSyndicOnly(user) && !CopropertyAccessControl.IsAdmin(user))
                 throw new InvalidOperationException("Accès refusé : seuls les syndics peuvent créer un compte propriétaire.");
@@ -96,6 +99,19 @@ namespace Myb.Coproperty.GraphQL.Mutations
             var created = await keycloakAdminService.CreateUserAsync(
                 firstName, lastName, email, temporaryPassword,
                 notifyOnActivation ? creatorId : null);
+            if (notifyOnActivation
+                && Guid.TryParse(created.Id, out var createdUserId)
+                && Guid.TryParse(creatorId, out var recipientUserId))
+            {
+                await using var context = await contextFactory.CreateDbContextAsync();
+                context.AccountActivationNotifications.Add(new AccountActivationNotification
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = createdUserId,
+                    RecipientUserId = recipientUserId
+                });
+                await context.SaveChangesAsync();
+            }
             language = language?.StartsWith("en", StringComparison.OrdinalIgnoreCase) == true ? "en" : "fr";
             await keycloakAdminService.SetPreferredLanguageAsync(created.Id, language);
             var english = language == "en";
@@ -118,47 +134,83 @@ namespace Myb.Coproperty.GraphQL.Mutations
             ClaimsPrincipal? user,
             [Service] IKeycloakAdminService keycloakAdminService,
             [Service] IHttpClientFactory httpClientFactory,
-            [Service] IEmailPublisher emailPublisher)
+            [Service] IEmailPublisher emailPublisher,
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
         {
             var userId = CopropertyAccessControl.GetUserId(user)
                 ?? throw new InvalidOperationException("Authentification requise.");
             if (!await keycloakAdminService.IsEmailVerifiedAsync(userId.ToString())) return false;
-            // Read without clearing first. If the notification service is temporarily
-            // unavailable, the pending activation alert remains for the next login.
-            var recipientId = await keycloakAdminService
-                .GetActivationNotificationRecipientAsync(userId.ToString());
-            if (string.IsNullOrWhiteSpace(recipientId)) return false;
+
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var activationRecords = await context.AccountActivationNotifications
+                .Where(record => record.UserId == userId)
+                .ToListAsync();
+            if (activationRecords.Count > 0 && activationRecords.All(record => record.SentAt.HasValue))
+                return false;
+
+            // Recover accounts created before the durable mapping existed from the
+            // legacy Keycloak attribute or an active unit assignment, then persist
+            // the result so successful delivery remains idempotent.
+            if (activationRecords.Count == 0)
+            {
+                var recipientIds = new HashSet<Guid>();
+                var legacyRecipientId = await keycloakAdminService
+                    .GetActivationNotificationRecipientAsync(userId.ToString());
+                if (Guid.TryParse(legacyRecipientId, out var parsedRecipientId))
+                    recipientIds.Add(parsedRecipientId);
+                var relatedManagers = await context.Owners
+                    .Where(owner => owner.UserId == userId)
+                    .SelectMany(owner => owner.OwnerUnits)
+                    .Where(link => link.EndDate == null)
+                    .Select(link => link.Unit.Coproperty.ManagerId)
+                    .Where(managerId => managerId.HasValue)
+                    .Select(managerId => managerId!.Value)
+                    .Distinct()
+                    .ToListAsync();
+                recipientIds.UnionWith(relatedManagers);
+                if (recipientIds.Count == 0) return false;
+
+                activationRecords = recipientIds.Select(recipientId => new AccountActivationNotification
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    RecipientUserId = recipientId
+                }).ToList();
+                context.AccountActivationNotifications.AddRange(activationRecords);
+                await context.SaveChangesAsync();
+            }
 
             var displayName = user?.FindFirst("name")?.Value
                 ?? user?.FindFirst("preferred_username")?.Value
                 ?? "Le nouvel utilisateur";
-            var recipient = await keycloakAdminService.GetUserByIdAsync(recipientId)
-                ?? throw new InvalidOperationException("Activation notification recipient unavailable.");
-            if (string.IsNullOrWhiteSpace(recipient.Email))
-                throw new InvalidOperationException("Activation notification recipient has no email.");
-            var english = await keycloakAdminService.GetPreferredLanguageAsync(recipientId) == "en";
-            var message = english
-                ? $"{displayName} verified their email and accessed their MYB account."
-                : $"{displayName} a vérifié son adresse e-mail et accédé à son compte MYB.";
-            await emailPublisher.PublishAsync(new EmailMessage
+            foreach (var activationRecord in activationRecords.Where(record => !record.SentAt.HasValue))
             {
-                To = recipient.Email,
-                Subject = english ? "MYB account activated" : "Compte MYB activé",
-                HtmlBody = $"<p>{WebUtility.HtmlEncode(message)}</p>"
-            });
-            var client = httpClientFactory.CreateClient("NotificationService");
-            var response = await client.PostAsJsonAsync("/api/Notifications", new
-            {
-                SenderId = userId.ToString(),
-                ReceiverId = recipientId,
-                Message = message
-            });
-            response.EnsureSuccessStatusCode();
-
-            // Clear only after confirmed delivery. A failure here can produce a retry,
-            // which is safer than silently losing the Syndic's requested notification.
-            await keycloakAdminService
-                .ConsumeActivationNotificationRecipientAsync(userId.ToString());
+                var managerId = activationRecord.RecipientUserId.ToString();
+                var recipient = await keycloakAdminService.GetUserByIdAsync(managerId)
+                    ?? throw new InvalidOperationException("Activation notification recipient unavailable.");
+                if (string.IsNullOrWhiteSpace(recipient.Email))
+                    throw new InvalidOperationException("Activation notification recipient has no email.");
+                var english = await keycloakAdminService.GetPreferredLanguageAsync(managerId) == "en";
+                var message = english
+                    ? $"{displayName} verified their email and accessed their MYB account."
+                    : $"{displayName} a vérifié son adresse e-mail et accédé à son compte MYB.";
+                await emailPublisher.PublishAsync(new EmailMessage
+                {
+                    To = recipient.Email,
+                    Subject = english ? "MYB account activated" : "Compte MYB activé",
+                    HtmlBody = $"<p>{WebUtility.HtmlEncode(message)}</p>"
+                });
+                var client = httpClientFactory.CreateClient("NotificationService");
+                var response = await client.PostAsJsonAsync("/api/Notifications", new
+                {
+                    SenderId = userId.ToString(),
+                    ReceiverId = managerId,
+                    Message = message
+                });
+                response.EnsureSuccessStatusCode();
+                activationRecord.SentAt = DateTime.UtcNow;
+                await context.SaveChangesAsync();
+            }
             return true;
         }
 

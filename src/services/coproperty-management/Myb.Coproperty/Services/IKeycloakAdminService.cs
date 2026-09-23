@@ -28,6 +28,8 @@ namespace Myb.Coproperty.Services
 
         Task<string?> GetActivationNotificationRecipientAsync(string userId);
 
+        Task<bool> IsActivationNotificationSentAsync(string userId);
+
         Task<string?> ConsumeActivationNotificationRecipientAsync(string userId);
 
         Task<bool> SetPreferredLanguageAsync(string userId, string language);

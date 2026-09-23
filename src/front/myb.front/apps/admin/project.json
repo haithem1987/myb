@@ -35,10 +35,11 @@
             }
           ],
           "outputHashing": "all",
+          "baseHref": "/admin/",
           "fileReplacements": [
             {
               "replace": "apps/admin/src/environments/environment.ts",
-              "with": "apps/admin/src/environments/environment.prod.ts"
+              "with": "apps/admin/src/environments/environment.ovhcloud.ts"
             }
           ]
         },

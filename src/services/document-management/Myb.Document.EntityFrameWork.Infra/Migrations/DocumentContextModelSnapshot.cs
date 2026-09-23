@@ -57,6 +57,9 @@ namespace Myb.Document.EntityFrameWork.Infra.Migrations
                     b.Property<int?>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<string>("StoredFileName")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 

@@ -20,6 +20,7 @@ import { UnpaidPaymentsComponent } from './unpaid-payments/unpaid-payments.compo
 import { OwnerLayoutComponent } from './owner-portal/owner-layout/owner-layout.component';
 import { OwnerDashboardComponent } from './owner-portal/owner-dashboard.component';
 import { OwnerMyUnitsComponent } from './owner-portal/my-units/my-units.component';
+import { OwnerResidenceComponent } from './owner-portal/residence/residence.component';
 import { OwnerInvoicesComponent } from './owner-portal/invoices/invoices.component';
 import { OwnerChargesComponent } from './owner-portal/charges/charges.component';
 import { OwnerMaintenanceComponent } from './owner-portal/maintenance/maintenance.component';
@@ -111,6 +112,7 @@ export const COPROPERTY_ROUTES: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: OwnerDashboardComponent },
       { path: 'my-units', component: OwnerMyUnitsComponent },
+      { path: 'residence', component: OwnerResidenceComponent },
       { path: 'invoices', component: OwnerInvoicesComponent },
       { path: 'charges', component: OwnerChargesComponent },
       { path: 'maintenance', component: OwnerMaintenanceComponent },

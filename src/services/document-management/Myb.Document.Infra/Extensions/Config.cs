@@ -13,6 +13,7 @@ namespace Myb.Document.Infra.GraqhQl.Extensions
         public static void RegisterServices(this IServiceCollection services)
         {
             services.AddScoped<IDocumentService, DocumentService>();
+            services.AddSingleton<IDocumentUploadService, DocumentUploadService>();
             services.AddScoped<IFolderService, FolderService>();
             services.AddScoped<IRootFolderService, RootFolderService>();
         }

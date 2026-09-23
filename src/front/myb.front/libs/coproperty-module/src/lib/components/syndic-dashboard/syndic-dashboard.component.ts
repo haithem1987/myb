@@ -5,6 +5,7 @@ import { CopropertyService } from 'libs/coproperty-module/src/lib/services/copro
 import { UnitService } from 'libs/coproperty-module/src/lib/services/unit.service';
 import { ChargeService } from 'libs/coproperty-module/src/lib/services/charge.service';
 import { CurrencyService } from 'libs/coproperty-module/src/lib/services/currency.service';
+import { FundCallService, FundCallExtended } from 'libs/coproperty-module/src/lib/services/fund-call.service';
 import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -41,6 +42,7 @@ export class SyndicDashboardComponent implements OnInit {
   private unitService = inject(UnitService);
   private chargeService = inject(ChargeService);
   private currencyService = inject(CurrencyService);
+  private fundCallService = inject(FundCallService);
   private keycloakService = inject(KeycloakService);
   private destroyRef = inject(DestroyRef);
   private translate = inject(TranslateService);
@@ -56,6 +58,7 @@ export class SyndicDashboardComponent implements OnInit {
   
   recentActivities = signal<RecentActivity[]>([]);
   totalBudgetDisplay = signal('');
+  overdueFundCallsCount = signal(0);
   loading = signal(true);
   
   ngOnInit(): void {
@@ -96,15 +99,33 @@ export class SyndicDashboardComponent implements OnInit {
         return of([]);
       })
     );
+
+    const fundCalls$ = this.fundCallService.getAllFundCalls().pipe(
+      take(1),
+      timeout(10000),
+      catchError(err => {
+        console.error('[Dashboard] Error loading fund calls:', err);
+        return of([] as FundCallExtended[]);
+      })
+    );
     
     forkJoin({
       coproperties: coproperties$,
       units: units$,
-      charges: charges$
+      charges: charges$,
+      fundCalls: fundCalls$
     })
     .pipe(takeUntilDestroyed(this.destroyRef))
     .subscribe({
-      next: ({ coproperties, units, charges }) => {
+      next: ({ coproperties, units, charges, fundCalls }) => {
+        this.overdueFundCallsCount.set(fundCalls.filter(fundCall => {
+          if (fundCall.status !== 'TO_PAY' && fundCall.status !== 'PENDING_VALIDATION') return false;
+          const approved = (fundCall.payments ?? [])
+            .filter(payment => String(payment.validationStatus ?? '').replace(/[_\s-]/g, '').toUpperCase() === 'APPROVED')
+            .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+          return Number(fundCall.amount || 0) > approved &&
+            new Date(fundCall.dueDate).getTime() < Date.now();
+        }).length);
         const activeCharges = charges.filter(c => c.isActive);
         const totalsByCurrency = new Map<string, number>();
         for (const charge of activeCharges) {

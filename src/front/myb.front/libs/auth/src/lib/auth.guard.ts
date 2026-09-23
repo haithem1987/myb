@@ -44,6 +44,17 @@ export const authGuard: CanActivateFn = async (route, state) => {
       const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
       if (!hasRequiredRole) {
         console.warn('User does not have required roles:', requiredRoles, 'User roles:', userRoles);
+        const applicationRoles = [
+          'coproperty-owner',
+          'coproperty-syndic',
+          'coproperty-admin',
+          'coproperty-council',
+          'coproperty-accountant',
+          'system-admin',
+        ];
+        if (!userRoles.some(role => applicationRoles.includes(role))) {
+          return router.createUrlTree(['/profile']);
+        }
         return router.createUrlTree(['/coproperty']);
       }
     }

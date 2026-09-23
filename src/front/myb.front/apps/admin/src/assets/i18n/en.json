@@ -1375,6 +1375,7 @@
     "navigation": {
       "dashboard": "My Space",
       "units": "My Units",
+      "residence": "My Residence",
       "receipts": "My Receipts",
       "charges": "My Charges",
       "reports": "Reports",
@@ -1385,6 +1386,29 @@
       "help": "Help",
       "contact": "Contact",
       "legal": "Legal Notice"
+    },
+    "residence": {
+      "title": "My Residence",
+      "subtitle": "Overview of your coproperty and allocated budget",
+      "coproperty": "Coproperty",
+      "allCoproperties": "All coproperties",
+      "loading": "Loading your residence...",
+      "loadError": "Unable to load your residence information.",
+      "retry": "Retry",
+      "emptyTitle": "No residence found",
+      "emptyText": "No coproperty is currently associated with your account.",
+      "budgeted": "Budgeted amount",
+      "paid": "Paid amount",
+      "unpaid": "Fully unpaid amount",
+      "remaining": "Remaining amount",
+      "overview": "Residence overview",
+      "units": "Owned units",
+      "shares": "Total shares",
+      "openBudgetLines": "Open budget lines",
+      "budgetLines": "Budget details",
+      "noBudgetLines": "No budget allocation is available for this selection.",
+      "description": "Description",
+      "unit": "Unit"
     },
     "myUnits": {
       "title": "My Units", "subtitle": "View your properties and charges", "loading": "Loading your units...", "loadError": "Unable to load your units.", "retry": "Retry", "ownedUnits": "Units owned", "totalArea": "Total area", "totalShares": "Total shares", "coproperties": "Coproperties", "emptyTitle": "No units found", "emptyText": "No unit is associated with your account.", "unit": "Unit", "coproperty": "Coproperty", "floor": "Floor", "area": "Area", "shares": "Shares", "description": "Description", "ownerSince": "Owner since {{date}}", "unauthenticated": "User not identified. Please sign in again.", "groundFloor": "Ground floor", "floorValue": "Floor {{floor}}", "types": { "apartment": "Apartment", "parking": "Parking", "cellar": "Cellar", "other": "Other" }
@@ -1539,5 +1563,43 @@
     "noPayments": "No payments recorded for this call for funds.",
     "generatedFundCall": "Call for funds – Allocation",
     "unit": "Unit"
+  },
+  "requestedFixes": {
+    "selectCopropertyPrompt": "Please select a coproperty to view your receipts.",
+    "selectCoproperty": "Select a coproperty",
+    "selectCopropertyForFundCalls": "Select a coproperty to view its calls for funds.",
+    "selectCopropertyForBudgetLines": "Select a coproperty to view its budget lines.",
+    "copropertyFilter": "Coproperty",
+    "allCoproperties": "All coproperties",
+    "totalOverdue": "Total Overdue",
+    "overdue": "Overdue",
+    "overdueFundCalls": "Overdue calls for funds"
+  },
+  "notificationUi": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications",
+    "profileUpdated": "{{p1}} updated their profile.",
+    "accountActivated": "{{p1}} verified their email and accessed their MYB account.",
+    "fundUpdated": "The call for funds “{{p1}}” was updated.",
+    "fundStatusUpdated": "The status of the call for funds “{{p1}}” was updated.",
+    "fundCancelled": "The call for funds “{{p1}}” was cancelled. Reason: {{p2}}",
+    "paymentApproved": "Your payment of {{p1}} for “{{p2}}” was approved.",
+    "paymentRejected": "Your payment of {{p1}} for “{{p2}}” was rejected.",
+    "paymentRejectedReason": "Your payment of {{p1}} for “{{p2}}” was rejected. Reason: {{p3}}",
+    "fundPaymentReceived": "💰 Payment submitted: {{p1}} submitted {{p2}} ({{p3}}) for “{{p4}}”. {{p5}}",
+    "chargePaymentReceived": "💰 Payment received: {{p1}} paid {{p2}} for charge “{{p3}}” (Unit {{p4}})",
+    "ownershipRemoved": "You are no longer registered as the owner of unit {{p1}} in {{p2}}. Your historical data and documents remain unchanged.",
+    "ownershipAssigned": "You are now registered as the owner of unit {{p1}} in {{p2}}.",
+    "timesheetUpdated": "Timesheet updated by {{p1}}",
+    "timesheetApproved": "Your timesheet has been approved.",
+    "timesheetRejected": "Your timesheet has been rejected.",
+    "bankTransfer": "Bank transfer",
+    "fullySubmitted": "Full amount submitted; validation required.",
+    "remainingSubmitted": "Amount still to submit: {{amount}}",
+    "paymentApprovedToast": "Payment approved successfully.",
+    "paymentRejectedToast": "Payment rejected. The owner has been notified.",
+    "paymentApprovalError": "Could not approve the payment.",
+    "paymentRejectionError": "Could not reject the payment."
   }
 }

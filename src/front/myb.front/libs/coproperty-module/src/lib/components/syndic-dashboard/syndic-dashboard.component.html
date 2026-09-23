@@ -70,6 +70,14 @@
         <span class="indicator-label">{{ 'coproperty.syndicDashboard.activeCharges' | translate }}</span>
       </div>
     </a>
+    <a routerLink="/coproperty/syndic/fund-calls" [queryParams]="{status: 'overdue'}"
+       class="indicator clickable" [class.alert]="overdueFundCallsCount() > 0">
+      <i class="bi bi-exclamation-triangle"></i>
+      <div class="indicator-info">
+        <span class="indicator-value">{{ overdueFundCallsCount() }}</span>
+        <span class="indicator-label">{{ 'requestedFixes.overdueFundCalls' | translate }}</span>
+      </div>
+    </a>
   </div>
   
   <!-- Quick Actions -->

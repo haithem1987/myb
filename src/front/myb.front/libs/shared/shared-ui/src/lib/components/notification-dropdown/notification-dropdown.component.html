@@ -13,21 +13,21 @@
     <!-- Header -->
     <div class="notification-header">
       <h6 class="mb-0">
-        <i class="bi bi-bell me-1"></i> Notifications
+        <i class="bi bi-bell me-1"></i> {{ 'notificationUi.title' | translate }}
         <span class="badge bg-primary ms-1" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
       </h6>
       <button
         class="btn btn-sm btn-link text-decoration-none p-0"
         *ngIf="unreadCount > 0"
         (click)="onMarkAllAsRead()">
-        <i class="bi bi-check-all me-1"></i>Tout lire
+        <i class="bi bi-check-all me-1"></i>{{ 'notificationUi.markAllRead' | translate }}
       </button>
     </div>
 
     <!-- Empty State -->
     <div *ngIf="!notifications.length" class="notification-empty">
       <i class="bi bi-bell-slash"></i>
-      <p>Aucune notification</p>
+      <p>{{ 'notificationUi.empty' | translate }}</p>
     </div>
 
     <!-- Notification List -->
@@ -41,7 +41,7 @@
           <i class="bi" [ngClass]="notification.message.includes('Paiement') ? 'bi-cash-coin text-success' : 'bi-info-circle text-primary'"></i>
         </div>
         <div class="notification-content">
-          <div class="notification-message">{{ notification.message }}</div>
+          <div class="notification-message">{{ getMessage(notification.message) }}</div>
           <div class="notification-time">
             <i class="bi bi-clock me-1"></i>{{ getDuration(notification.createdAt) }}
           </div>

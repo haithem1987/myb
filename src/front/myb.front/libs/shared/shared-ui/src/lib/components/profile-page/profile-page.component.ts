@@ -121,14 +121,12 @@ export class ProfilePageComponent implements OnInit {
         lastName: this.lastName.value,
         email: this.email.value,
       });
-      if (this.keycloakService.getUserRoles().includes('coproperty-owner')) {
-        await this.keycloakService.updateMyOwnerProfile({
-          firstName: this.firstName.value,
-          lastName: this.lastName.value,
-          email: this.email.value,
-          phone: this.phone.value ?? '',
-        });
-      }
+      await this.keycloakService.synchronizeMyOwnerProfile({
+        firstName: this.firstName.value,
+        lastName: this.lastName.value,
+        email: this.email.value,
+        phone: this.phone.value ?? '',
+      });
       this.phone.markAsPristine();
       this.saveSuccess.set(true);
       this.editMode.set(false);

@@ -22,6 +22,36 @@ namespace Myb.Coproperty.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Myb.Coproperty.Models.AccountActivationNotification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("RecipientUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "RecipientUserId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId", "SentAt");
+
+                    b.ToTable("AccountActivationNotifications");
+                });
+
             modelBuilder.Entity("Myb.Coproperty.Models.Assembly", b =>
                 {
                     b.Property<Guid>("Id")

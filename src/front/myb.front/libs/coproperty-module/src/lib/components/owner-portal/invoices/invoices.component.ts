@@ -59,6 +59,10 @@ interface Invoice {
           <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">{{ coproperty.name }}</option>
         </select>
       </div>
+      <div *ngIf="!selectedCopropertyId" class="alert alert-info d-flex align-items-center gap-2" role="status">
+        <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+        <span>{{ 'requestedFixes.selectCopropertyPrompt' | translate }}</span>
+      </div>
       <!-- Statistics -->
       <div class="row mb-4">
         <div class="col-md-4">
@@ -108,7 +112,7 @@ interface Invoice {
       </div>
 
       <!-- Invoices List -->
-      <div class="row">
+      <div class="row" *ngIf="selectedCopropertyId">
         <div class="col-12">
           <div class="table-responsive">
             <table class="table invoice-table">

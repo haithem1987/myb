@@ -4,6 +4,7 @@ using Myb.UserManager.EntityFrameWork.Infra;
 using Myb.UserManager.Infra.GraphQl.Mutations;
 using Myb.UserManager.Infra.GraphQl.Querys;
 using Myb.Common.GraphQL.Infra;
+using Myb.Common.Authentification.Security;
 using Myb.UserManager.Infra.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,13 +22,14 @@ builder.Services.AddPooledDbContextFactory<UserContext>(options=>options.UseNpgs
 builder.Services.RegisterGraphQl<UserContext, UserQuery, UserMutation>("usermanager");
 builder.Services.RegisterServices();
 builder.AddKeycloakAuthorization();
+builder.AddMybApiSecurity();
 
 
 var app = builder.Build();
+app.UseMybApiSecurity();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapGraphQL();
 app.Run();
-
 

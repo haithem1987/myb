@@ -32,6 +32,7 @@ public class CopropertyDbContext : DbContext
     public DbSet<Discussion> Discussions { get; set; } = null!;
     public DbSet<DiscussionMessage> DiscussionMessages { get; set; } = null!;
     public DbSet<FundCallAuditLog> FundCallAuditLogs { get; set; } = null!;
+    public DbSet<AccountActivationNotification> AccountActivationNotifications { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -44,6 +45,16 @@ public class CopropertyDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<AccountActivationNotification>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.HasIndex(e => new { e.UserId, e.RecipientUserId })
+                .IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.SentAt });
+        });
 
         // Coproperty Configuration
         modelBuilder.Entity<Models.Coproperty>(entity =>

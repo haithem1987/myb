@@ -7,6 +7,7 @@ namespace Myb.document.Model
     {
         
         public string? DocumentName { get; set; }
+        public string? StoredFileName { get; set; }
        
         public string? CreatedBy { get; set; } 
         public string? EditedBy { get; set; } 

@@ -330,7 +330,7 @@ public class FundCallService : IFundCallService
             existingFundCall.UpdatedAt = DateTime.UtcNow;
             existingFundCall.CopropertyNameSnapshot = coproperty.Name;
             existingFundCall.CurrencySnapshot = coproperty.Currency;
-            if (ownerNameSnapshot != null)
+            if (existingFundCall.OwnerNameSnapshot == null && ownerNameSnapshot != null)
                 existingFundCall.OwnerNameSnapshot = ownerNameSnapshot;
             await context.SaveChangesAsync();
 
@@ -413,6 +413,7 @@ public class FundCallService : IFundCallService
                 "Le montant d'un appel de fonds ne peut être modifié que lorsqu'il est en attente de validation.");
         }
 
+        var previousOwnerId = fundCall.OwnerId;
         fundCall.Amount = input.Amount;
         fundCall.DueDate = input.DueDate;
         fundCall.Description = input.Description;
@@ -421,15 +422,17 @@ public class FundCallService : IFundCallService
         fundCall.IsActive = targetStatus != FundCallStatus.Cancelled;
         fundCall.UpdatedAt = DateTime.UtcNow;
 
-        // Refresh historical snapshots so the displayed owner/coproperty name stays
-        // accurate even if the related record is later deleted.
-        if (input.OwnerId.HasValue)
+        // A generated call for funds keeps the owner name captured at creation.
+        // Refresh it only when the document is explicitly reassigned, or when a
+        // legacy row has no snapshot yet.
+        if (input.OwnerId.HasValue &&
+            (previousOwnerId != input.OwnerId || string.IsNullOrWhiteSpace(fundCall.OwnerNameSnapshot)))
         {
             var owner = await context.Owners.FirstOrDefaultAsync(o => o.Id == input.OwnerId.Value);
             if (owner != null)
                 fundCall.OwnerNameSnapshot = $"{owner.FirstName} {owner.LastName}".Trim();
         }
-        else
+        else if (!input.OwnerId.HasValue && previousOwnerId != input.OwnerId)
         {
             fundCall.OwnerNameSnapshot = null;
         }
@@ -620,16 +623,15 @@ public class FundCallService : IFundCallService
         if (fundCall == null) return;
 
         var ownerEmail = fundCall.Owner?.Email;
-
-        var subject = $"Appel de fonds annulé – {fundCall.Description ?? "Appel de fonds"}";
-        var body =
-            $"Bonjour,\n\n" +
-            $"L'appel de fonds « {fundCall.Description ?? "sans description"} » d'un montant de " +
-            $"{FormatAmount(fundCall.Amount, fundCall.CurrencySnapshot)} a été annulé par votre syndic.\n\n" +
-            $"Motif : {reason}\n\n" +
-            $"Toute soumission de paiement en attente n'est plus applicable. Pour toute question, " +
-            $"veuillez contacter votre gestionnaire.\n\n" +
-            $"— MYB Plateforme";
+        var english = fundCall.Owner != null &&
+            await _keycloakAdminService.GetPreferredLanguageAsync(fundCall.Owner.UserId.ToString()) == "en";
+        var description = fundCall.Description ?? (english ? "Call for funds" : "Appel de fonds");
+        var subject = english
+            ? $"Call for funds cancelled – {description}"
+            : $"Appel de fonds annulé – {description}";
+        var body = english
+            ? $"Hello,\n\nThe call for funds “{description}” for {FormatAmount(fundCall.Amount, fundCall.CurrencySnapshot)} was cancelled by your property manager.\n\nReason: {reason}\n\nAny pending payment submission is no longer applicable. Please contact your property manager if you have questions.\n\n— MYB Platform"
+            : $"Bonjour,\n\nL'appel de fonds « {description} » d'un montant de {FormatAmount(fundCall.Amount, fundCall.CurrencySnapshot)} a été annulé par votre syndic.\n\nMotif : {reason}\n\nToute soumission de paiement en attente n'est plus applicable. Pour toute question, veuillez contacter votre gestionnaire.\n\n— MYB Plateforme";
 
         if (!string.IsNullOrWhiteSpace(ownerEmail))
         {
@@ -1472,26 +1474,31 @@ public class FundCallService : IFundCallService
         if (owner == null) return;
 
         var fundCallUrl = $"{_frontendUrl}/coproperty/owner/charges";
+        var english = await _keycloakAdminService.GetPreferredLanguageAsync(owner.UserId.ToString()) == "en";
         string subject, statusBanner, bodyContent;
 
         if (approved)
         {
-            subject = $"Paiement validé – {description}";
-            statusBanner = """<td style="background:#22c55e;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">✅ Votre paiement a été validé</p></td>""";
-            bodyContent = $"""<p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#16a34a">validé</strong> par le syndic.</p>""";
+            subject = english ? $"Payment approved – {description}" : $"Paiement validé – {description}";
+            statusBanner = english
+                ? """<td style="background:#22c55e;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">✅ Your payment was approved</p></td>"""
+                : """<td style="background:#22c55e;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">✅ Votre paiement a été validé</p></td>""";
+            bodyContent = english
+                ? $"""<p>Your payment of <strong>{FormatAmount(amount, currency)}</strong> for <strong>{description}</strong> was <strong style="color:#16a34a">approved</strong> by your property manager.</p>"""
+                : $"""<p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#16a34a">validé</strong> par le syndic.</p>""";
         }
         else
         {
-            subject = $"Paiement refusé – {description}";
-            statusBanner = """<td style="background:#ef4444;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">❌ Votre paiement a été refusé</p></td>""";
+            subject = english ? $"Payment rejected – {description}" : $"Paiement refusé – {description}";
+            statusBanner = english
+                ? """<td style="background:#ef4444;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">❌ Your payment was rejected</p></td>"""
+                : """<td style="background:#ef4444;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">❌ Votre paiement a été refusé</p></td>""";
             var reasonHtml = string.IsNullOrEmpty(rejectionReason)
                 ? ""
-                : $"""<p style="margin:12px 0;padding:12px 16px;background:#fef2f2;border-left:4px solid #ef4444;border-radius:4px;color:#991b1b;"><strong>Motif :</strong> {System.Net.WebUtility.HtmlEncode(rejectionReason)}</p>""";
-            bodyContent = $"""
-                <p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#dc2626">refusé</strong> par le syndic.</p>
-                {reasonHtml}
-                <p>Veuillez soumettre un nouveau justificatif ou contacter votre syndic pour régulariser la situation.</p>
-                """;
+                : $"""<p style="margin:12px 0;padding:12px 16px;background:#fef2f2;border-left:4px solid #ef4444;border-radius:4px;color:#991b1b;"><strong>{(english ? "Reason" : "Motif")}:</strong> {System.Net.WebUtility.HtmlEncode(rejectionReason)}</p>""";
+            bodyContent = english
+                ? $"""<p>Your payment of <strong>{FormatAmount(amount, currency)}</strong> for <strong>{description}</strong> was <strong style="color:#dc2626">rejected</strong> by your property manager.</p>{reasonHtml}<p>Please submit new supporting documentation or contact your property manager.</p>"""
+                : $"""<p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#dc2626">refusé</strong> par le syndic.</p>{reasonHtml}<p>Veuillez soumettre un nouveau justificatif ou contacter votre syndic pour régulariser la situation.</p>""";
         }
 
         if (!string.IsNullOrWhiteSpace(owner.Email))
@@ -1510,14 +1517,14 @@ public class FundCallService : IFundCallService
                     </td></tr>
                     <tr>{statusBanner}</tr>
                     <tr><td style="padding:32px 40px;">
-                      <p>Bonjour {owner.FirstName} {owner.LastName},</p>
+                      <p>{(english ? "Hello" : "Bonjour")} {owner.FirstName} {owner.LastName},</p>
                       {bodyContent}
                       <p style="margin:24px 0">
-                        <a href="{fundCallUrl}" style="background:#2c5282;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">Voir mes appels de fonds</a>
+                        <a href="{fundCallUrl}" style="background:#2c5282;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">{(english ? "View my calls for funds" : "Voir mes appels de fonds")}</a>
                       </p>
                     </td></tr>
                     <tr><td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 40px;text-align:center;">
-                      <p style="color:#9ca3af;font-size:12px;margin:0;">MYB – Gestion de copropriété</p>
+                      <p style="color:#9ca3af;font-size:12px;margin:0;">MYB – {(english ? "Coproperty management" : "Gestion de copropriété")}</p>
                     </td></tr>
                   </table>
                 </body></html>

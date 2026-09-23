@@ -25,7 +25,7 @@ namespace Myb.Common.GraphQL.Infra
 
             serviceCollection.AddGraphQLServer(schemaName)
                 .AddAuthorization()
-                .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true)
+                .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = false)
                 .AddSorting()
                 .AddFiltering()
                 .AddQueryType<TQuery>()
@@ -33,4 +33,3 @@ namespace Myb.Common.GraphQL.Infra
         }
     }
 }
-

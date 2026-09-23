@@ -1,3 +1,4 @@
+import { TranslateModule } from '@ngx-translate/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NotificationDropdownComponent } from './notification-dropdown.component';
 
@@ -7,7 +8,7 @@ describe('NotificationDropdownComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NotificationDropdownComponent],
+      imports: [NotificationDropdownComponent, TranslateModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(NotificationDropdownComponent);

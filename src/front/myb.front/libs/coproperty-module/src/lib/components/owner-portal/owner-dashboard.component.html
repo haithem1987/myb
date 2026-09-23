@@ -48,12 +48,33 @@
   </div>
 
   <!-- Secondary Indicators -->
+  <div class="row mb-3">
+    <div class="col-md-5 col-lg-4 ms-auto">
+      <label for="overdue-coproperty-filter" class="form-label">
+        {{ 'requestedFixes.copropertyFilter' | translate }}
+      </label>
+      <select id="overdue-coproperty-filter" class="form-select"
+              [value]="selectedCopropertyId()"
+              (change)="onCopropertyChange($any($event.target).value)">
+        <option *ngFor="let coproperty of ownerCoproperties()" [value]="coproperty.id">
+          {{ coproperty.name }}
+        </option>
+      </select>
+    </div>
+  </div>
   <div class="indicators-row">
     <div class="indicator" [class.alert]="overdueCount() > 0">
       <i class="bi bi-exclamation-triangle"></i>
       <div class="indicator-info">
         <span class="indicator-value">{{ overdueCount() }}</span>
         <span class="indicator-label">{{ 'ownerPortal.dashboard.overduePayments' | translate }}</span>
+      </div>
+    </div>
+    <div class="indicator" [class.alert]="overdueCount() > 0">
+      <i class="bi bi-cash-stack"></i>
+      <div class="indicator-info">
+        <span class="indicator-value">{{ totalOverdueDisplay() }}</span>
+        <span class="indicator-label">{{ 'requestedFixes.totalOverdue' | translate }}</span>
       </div>
     </div>
     <div class="indicator">
@@ -152,6 +173,7 @@
                 {{ isOverdue(invoice.dueDate) ? ('ownerPortal.dashboard.overdue' | translate) : ('ownerPortal.dashboard.dueInDays' | translate:{days: getDaysUntilDue(invoice.dueDate)}) }}
               </span>
               <button class="btn-pay" [disabled]="invoice.payableAmount <= 0"
+                      (click)="payInvoice($event, invoice.id)"
                       [title]="invoice.payableAmount <= 0 ? ('ownerPortal.dashboard.pendingValidationCoverage' | translate) : ''">
                 {{ 'ownerPortal.dashboard.pay' | translate }} {{ formatAmount(invoice.payableAmount, invoice.currency) }}
               </button>

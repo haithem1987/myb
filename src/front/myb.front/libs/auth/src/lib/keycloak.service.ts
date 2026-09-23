@@ -500,10 +500,6 @@ export class KeycloakService {
   }
 
   private async syncAuthenticatedUserPreferences(): Promise<void> {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.currentUserToken}`,
-      'Content-Type': 'application/json',
-    });
     const body = {
       query: `mutation CompleteLogin($language: String!) {
         syncPreferredLanguage(language: $language)
@@ -511,12 +507,31 @@ export class KeycloakService {
       }`,
       variables: { language: this.getPreferredLanguage() },
     };
-    try {
-      await firstValueFrom(this.http.post(this.getGraphqlUrl(), body, { headers }));
-    } catch (error) {
-      // Authentication must remain usable if the preference/notification hook
-      // is temporarily unavailable during a rolling deployment.
-      console.warn('Could not synchronize login preferences', error);
+
+    // Activation delivery is idempotent on the server. Retry transient failures
+    // because this hook also runs for users whose route guard sends them to the
+    // access-denied page immediately after their first verified login.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await this.updateToken();
+        const headers = new HttpHeaders({
+          Authorization: `Bearer ${this.currentUserToken}`,
+          'Content-Type': 'application/json',
+        });
+        const response: any = await firstValueFrom(
+          this.http.post(this.getGraphqlUrl(), body, { headers })
+        );
+        if (response?.errors?.length) throw new Error(response.errors[0].message);
+        return;
+      } catch (error) {
+        if (attempt === 2) {
+          // Authentication remains usable if the preference/notification hook
+          // is unavailable; the next authenticated app load retries it again.
+          console.warn('Could not synchronize login preferences', error);
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+      }
     }
   }
 
@@ -731,6 +746,20 @@ export class KeycloakService {
     }, { headers: new HttpHeaders({ Authorization: `Bearer ${this.currentUserToken}` }) }));
     if (response?.errors?.length) throw new Error(response.errors[0].message);
     if (!response?.data?.updateMyOwnerProfile) throw new Error('Owner profile update failed');
+  }
+
+  /** Keep the operational Owner record in sync when one exists, independently
+   * of potentially stale role claims in the current access token. */
+  async synchronizeMyOwnerProfile(data: { firstName: string; lastName: string; email: string; phone: string }): Promise<boolean> {
+    if (!this.currentUserToken) throw new Error('Not authenticated');
+    const response: any = await firstValueFrom(this.http.post(this.getGraphqlUrl(), {
+      query: `mutation SynchronizeMyOwnerProfile($firstName: String!, $lastName: String!, $email: String!, $phone: String!) {
+        synchronizeMyOwnerProfile(firstName: $firstName, lastName: $lastName, email: $email, phone: $phone)
+      }`,
+      variables: data,
+    }, { headers: new HttpHeaders({ Authorization: `Bearer ${this.currentUserToken}` }) }));
+    if (response?.errors?.length) throw new Error(response.errors[0].message);
+    return response?.data?.synchronizeMyOwnerProfile === true;
   }
 
   /** Return the phone stored on the authenticated user's owner profile. */

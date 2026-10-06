@@ -55,10 +55,15 @@ build_and_push() {
     fi
 }
 
-# Login to registry
-echo -e "\n${YELLOW}Logging in to container registry...${NC}"
-echo "Please enter your registry credentials:"
-docker login "$REGISTRY"
+# Login can be skipped in CI or on a workstation that already has a valid
+# Docker credential for Harbor.
+if [[ "${SKIP_REGISTRY_LOGIN:-false}" == "true" ]]; then
+    echo -e "\n${YELLOW}Using the existing container registry credentials${NC}"
+else
+    echo -e "\n${YELLOW}Logging in to container registry...${NC}"
+    echo "Please enter your registry credentials:"
+    docker login "$REGISTRY"
+fi
 
 # Build backend services
 echo -e "\n${GREEN}========================================${NC}"

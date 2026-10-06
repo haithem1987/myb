@@ -1,14 +1,22 @@
 import { Component, signal, inject, computed, OnInit, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalService, FileDownloadService, ToastService, NotificationService } from '@myb-front/shared-ui';
-import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService, ChargeDistribution, FundCallService } from '../../../index';
+import {
+  FileDownloadService,
+  LoadingIndicatorComponent,
+  ModalService,
+  NoResultComponent,
+  NotificationService,
+  ToastService,
+} from '@myb-front/shared-ui';
+import { OwnerService, CopropertyService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService, ChargeDistribution, FundCallService } from '../../../index';
 import { FundCallPaymentWithContext } from '../../../models/fund-call.model';
 import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ActiveCopropertyService } from '../../../services/active-coproperty.service';
 
 interface Invoice {
   id: string;
@@ -32,7 +40,7 @@ interface Invoice {
 @Component({
   selector: 'app-owner-invoices',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, LoadingIndicatorComponent, NoResultComponent],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
@@ -52,19 +60,20 @@ interface Invoice {
         </div>
       </div>
 
-      <div class="mb-3">
-        <label for="receipt-coproperty" class="form-label">{{ 'ownerPortal.receipts.coproperty' | translate }}</label>
-        <select id="receipt-coproperty" class="form-select" [(ngModel)]="selectedCopropertyId" (ngModelChange)="filterInvoices()">
-          <option value="">{{ 'ownerPortal.receipts.selectCoproperty' | translate }}</option>
-          <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">{{ coproperty.name }}</option>
-        </select>
+      <div class="mb-3" *ngIf="selectedCopropertyId">
+        <span class="badge bg-light text-dark border px-3 py-2">
+          <i class="bi bi-building me-1"></i>
+          {{ getSelectedCopropertyName() }}
+        </span>
       </div>
-      <div *ngIf="!selectedCopropertyId" class="alert alert-info d-flex align-items-center gap-2" role="status">
-        <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
-        <span>{{ 'requestedFixes.selectCopropertyPrompt' | translate }}</span>
-      </div>
+
+      <myb-front-loading-indicator
+        [isLoading]="loading()"
+        [message]="'ownerPortal.dashboard.loading' | translate">
+      </myb-front-loading-indicator>
+
       <!-- Statistics -->
-      <div class="row mb-4">
+      <div class="row mb-4" *ngIf="!loading()">
         <div class="col-md-4">
           <div class="stat-card">
             <div class="stat-icon bg-success">
@@ -101,7 +110,7 @@ interface Invoice {
       </div>
 
       <!-- Filters -->
-      <div class="row mb-4">
+      <div class="row mb-4" *ngIf="!loading()">
         <div class="col-md-3">
           <select class="form-select" [(ngModel)]="selectedYear" (change)="filterInvoices()">
             <option value="2026">2026</option>
@@ -112,7 +121,7 @@ interface Invoice {
       </div>
 
       <!-- Invoices List -->
-      <div class="row" *ngIf="selectedCopropertyId">
+      <div class="row" *ngIf="!loading() && selectedCopropertyId && filteredInvoices().length > 0">
         <div class="col-12">
           <div class="table-responsive">
             <table class="table invoice-table">
@@ -173,6 +182,13 @@ interface Invoice {
           </div>
         </div>
       </div>
+
+      <myb-front-no-result
+        *ngIf="!loading() && selectedCopropertyId && filteredInvoices().length === 0"
+        icon="bi-receipt"
+        [title]="'ownerPortal.dashboard.noReceipts' | translate"
+        [message]="'ownerPortal.receipts.subtitle' | translate">
+      </myb-front-no-result>
     </div>
 
     <!-- ── Invoice Preview Modal ── -->
@@ -605,9 +621,7 @@ interface Invoice {
 })
 export class OwnerInvoicesComponent implements OnInit {
   selectedCopropertyId = '';
-  coproperties = computed(() => Array.from(new Map(this.invoices()
-    .filter(i => !!i.copropertyId)
-    .map(i => [i.copropertyId!, { id: i.copropertyId!, name: i.copropertyName || i.copropertyId! }])).values()));
+  coproperties = signal<Array<{ id: string; name: string }>>([]);
   selectedYear = new Date().getFullYear().toString();
 
   invoices = signal<Invoice[]>([]);
@@ -615,6 +629,7 @@ export class OwnerInvoicesComponent implements OnInit {
   showInvoiceModal = signal(false);
   selectedInvoice = signal<Invoice | null>(null);
   ownerName = signal<string>('');
+  loading = signal<boolean>(true);
 
   stats = computed(() => {
     const invoices = this.filteredInvoices();
@@ -643,12 +658,14 @@ export class OwnerInvoicesComponent implements OnInit {
   });
 
   private ownerService = inject(OwnerService);
+  private copropertyService = inject(CopropertyService);
   private fundCallService = inject(FundCallService);
   private keycloakService = inject(KeycloakService);
   private currencyService = inject(CurrencyService);
   private translate = inject(TranslateService);
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
+  private activeCoproperty = inject(ActiveCopropertyService);
   private unitsById = new Map<string, Unit>();
 
   ngOnInit(): void {
@@ -659,6 +676,7 @@ export class OwnerInvoicesComponent implements OnInit {
   }
 
   private loadReceipts(): void {
+    this.loading.set(true);
     const userId = this.getCurrentUserId();
 
     // Get owner name from Keycloak profile
@@ -670,6 +688,7 @@ export class OwnerInvoicesComponent implements OnInit {
     if (!userId) {
       // If user ID is not available, do not attempt to load data
       console.error('OwnerInvoicesComponent: user ID not available');
+      this.loading.set(false);
       return;
     }
 
@@ -681,6 +700,7 @@ export class OwnerInvoicesComponent implements OnInit {
         const ownerId = owner?.id;
         return forkJoin({
           units: this.ownerService.getMyUnits(userId).pipe(take(1), catchError(() => of([] as Unit[]))),
+          coproperties: this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([]))),
           invoices: this.ownerService.getMyInvoices(userId).pipe(take(1), catchError(() => of([] as CopropertyInvoice[]))),
           distributions: ownerId
             ? this.ownerService.getOwnerChargeDistributions(ownerId).pipe(take(1), catchError(() => of([] as ChargeDistribution[])))
@@ -690,7 +710,7 @@ export class OwnerInvoicesComponent implements OnInit {
         });
       })
     ).subscribe({
-      next: ({ units, invoices, distributions, fundCallPayments }) => {
+      next: ({ units, coproperties, invoices, distributions, fundCallPayments }) => {
         // Store units for mapping
         units.forEach((unit) => this.unitsById.set(unit.id, unit));
 
@@ -716,13 +736,32 @@ export class OwnerInvoicesComponent implements OnInit {
           });
 
         this.invoices.set(allReceipts);
-        if (!this.coproperties().some(c => c.id === this.selectedCopropertyId)) {
-          this.selectedCopropertyId = this.coproperties()[0]?.id ?? '';
-        }
+        const copropertyById = new Map<string, { id: string; name: string }>();
+        const copropertyNames = new Map(coproperties.map(coproperty => [coproperty.id, coproperty.name]));
+        units.forEach(unit => copropertyById.set(unit.copropertyId, {
+          id: unit.copropertyId,
+          name: copropertyNames.get(unit.copropertyId) ||
+            (unit as Unit & { copropertyName?: string }).copropertyName || unit.copropertyId,
+        }));
+        allReceipts.forEach(receipt => {
+          if (!receipt.copropertyId) return;
+          const current = copropertyById.get(receipt.copropertyId);
+          copropertyById.set(receipt.copropertyId, {
+            id: receipt.copropertyId,
+            name: receipt.copropertyName || current?.name || receipt.copropertyId,
+          });
+        });
+        this.coproperties.set([...copropertyById.values()]);
+        this.selectedCopropertyId = this.activeCoproperty.selectAvailable(
+          this.coproperties(),
+          this.selectedCopropertyId
+        );
         this.filterInvoices();
+        this.loading.set(false);
       },
       error: (error) => {
         console.error('Error loading owner receipts:', error);
+        this.loading.set(false);
       }
     });
   }
@@ -739,6 +778,10 @@ export class OwnerInvoicesComponent implements OnInit {
     }
 
     this.filteredInvoices.set(filtered);
+  }
+
+  getSelectedCopropertyName(): string {
+    return this.coproperties().find(coproperty => coproperty.id === this.selectedCopropertyId)?.name ?? '';
   }
 
   getPaymentMethodLabel(method: string): string {

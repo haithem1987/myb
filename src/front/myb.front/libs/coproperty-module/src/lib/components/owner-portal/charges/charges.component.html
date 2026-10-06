@@ -67,18 +67,18 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!loading() && !error() && fundCalls().length === 0" class="empty-state text-center py-5">
-    <i class="bi bi-inbox display-1 text-muted"></i>
-    <h4 class="mt-3">{{ 'ownerPortal.charges.emptyTitle' | translate }}</h4>
-    <p class="text-muted" *ngIf="ownerId()">{{ 'ownerPortal.charges.emptyText' | translate }}</p>
-    <p class="text-muted" *ngIf="!ownerId()">{{ 'ownerPortal.charges.ownerMissing' | translate }}</p>
-  </div>
+  <myb-front-no-result
+    *ngIf="!loading() && !error() && fundCalls().length === 0"
+    icon="bi-wallet2"
+    [title]="'ownerPortal.charges.emptyTitle' | translate"
+    [message]="(ownerId() ? 'ownerPortal.charges.emptyText' : 'ownerPortal.charges.ownerMissing') | translate">
+  </myb-front-no-result>
 
   <!-- Filters & Search -->
   <div class="card mb-4" *ngIf="!loading() && !error() && fundCalls().length > 0">
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        <div class="col-md-5">
+        <div class="col-md-3">
           <label for="ownerFundCallSearch" class="form-label">
             <i class="bi bi-search me-1"></i>{{ 'ownerPortal.charges.search' | translate }}
           </label>
@@ -90,7 +90,7 @@
             [value]="searchTerm()"
             (input)="onSearchInput($event)">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <label for="ownerFundCallStatus" class="form-label">
             <i class="bi bi-bookmark me-1"></i>{{ 'ownerPortal.charges.status' | translate }}
           </label>
@@ -110,6 +110,16 @@
             <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
           </select>
         </div>
+      </div>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-3 border-top">
+        <small class="text-muted">
+          <i class="bi bi-funnel me-1"></i>
+          {{ unpaidFundCalls.length + paidFundCalls.length + cancelledFundCalls.length }} / {{ fundCalls().length }}
+          {{ 'requestedFixes.results' | translate }}
+        </small>
+        <button *ngIf="hasActiveFilters" type="button" class="btn btn-sm btn-outline-secondary" (click)="clearFilters()">
+          <i class="bi bi-x-circle me-1"></i>{{ 'requestedFixes.clearFilters' | translate }}
+        </button>
       </div>
     </div>
   </div>
@@ -307,10 +317,12 @@
   </div>
 
   <!-- No results match active filters -->
-  <div *ngIf="!loading() && !error() && fundCalls().length > 0 && unpaidFundCalls.length === 0 && paidFundCalls.length === 0 && cancelledFundCalls.length === 0 && hasActiveFilters" class="text-center py-5">
-    <i class="bi bi-search display-1 text-muted"></i>
-    <p class="text-muted mt-3">{{ 'ownerPortal.charges.noResults' | translate }}</p>
-  </div>
+  <myb-front-no-result
+    *ngIf="!loading() && !error() && fundCalls().length > 0 && unpaidFundCalls.length === 0 && paidFundCalls.length === 0 && cancelledFundCalls.length === 0 && hasActiveFilters"
+    icon="bi-search"
+    [title]="'ownerPortal.charges.noResults' | translate"
+    [message]="'ownerPortal.charges.searchPlaceholder' | translate">
+  </myb-front-no-result>
 
   <!-- All Paid State (only when non-cancelled fund calls are all settled) -->
   <div *ngIf="!loading() && !error() && allFundCallsPaid" class="all-paid-banner">

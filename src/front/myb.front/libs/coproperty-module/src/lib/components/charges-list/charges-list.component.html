@@ -46,26 +46,8 @@
     <div class="card mb-4">
       <div class="card-body">
         <div class="row g-3">
-        <!-- Coproperty Filter -->
-        <div class="col-md-4">
-          <label for="copropertyFilter" class="form-label">
-            <i class="bi bi-building me-1"></i>
-            {{ 'coproperty.charge.coproperty' | translate }}
-          </label>
-          <select 
-            id="copropertyFilter" 
-            class="form-select"
-            [value]="selectedCopropertyId() || ''"
-            (change)="onCopropertyChange($any($event.target).value)">
-            <option value="" disabled>{{ 'requestedFixes.selectCoproperty' | translate }}</option>
-            <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
-              {{ coproperty.name }}
-            </option>
-          </select>
-        </div>
-
         <!-- Type Filter -->
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="typeFilter" class="form-label">
             <i class="bi bi-tag me-1"></i>
             {{ 'coproperty.charge.chargeType' | translate }}
@@ -83,7 +65,7 @@
         </div>
 
         <!-- Frequency Filter -->
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="frequencyFilter" class="form-label">
             <i class="bi bi-calendar-event me-1"></i>
             {{ 'coproperty.charges.frequency' | translate }}
@@ -100,7 +82,7 @@
         </div>
 
         <!-- Search -->
-        <div class="col-md-2">
+        <div class="col-md-4">
           <label for="searchInput" class="form-label">
             <i class="bi bi-search me-1"></i>
             {{ 'coproperty.charge.search' | translate }}
@@ -117,14 +99,9 @@
       </div>
     </div>
 
-    <div *ngIf="!loading() && !selectedCopropertyId()" class="alert alert-info" role="status">
-      <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
-      {{ 'requestedFixes.selectCopropertyForBudgetLines' | translate }}
-    </div>
-
     <!-- Stats Cards -->
     <div *ngIf="selectedCopropertyId()" class="row mb-4">
-      <div class="col-md-3">
+      <div class="col-md-6">
         <div class="card stats-card">
           <div class="card-body">
             <div class="d-flex align-items-center">
@@ -139,7 +116,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-6">
         <div class="card stats-card">
           <div class="card-body">
             <div class="d-flex align-items-center">
@@ -149,36 +126,6 @@
               <div class="ms-3">
                 <h6 class="text-muted mb-0">{{ 'coproperty.charge.activeBudgets' | translate }}</h6>
                 <h3 class="mb-0">{{ getActiveChargesCount() }}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card stats-card">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div class="stat-icon bg-warning">
-                <i class="bi bi-calendar-event"></i>
-              </div>
-              <div class="ms-3">
-                <h6 class="text-muted mb-0">{{ 'coproperty.charge.currentYear' | translate }}</h6>
-                <h3 class="mb-0">{{ getCurrentYearCount() }}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card stats-card">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div class="stat-icon bg-info">
-                <i class="bi bi-building"></i>
-              </div>
-              <div class="ms-3">
-                <h6 class="text-muted mb-0">{{ 'coproperty.charge.coproperties' | translate }}</h6>
-                <h3 class="mb-0">{{ coproperties().length }}</h3>
               </div>
             </div>
           </div>
@@ -201,11 +148,13 @@
           </div>
         </div>
 
-        <div *ngIf="!loading() && filteredCharges.length === 0" class="text-center py-5">
-          <i class="bi bi-inbox display-1 text-muted"></i>
-          <p class="text-muted mt-3">{{ 'coproperty.charge.noChargesFound' | translate }}</p>
-          <p class="text-muted">{{ 'coproperty.charge.noChargesMessage' | translate }}</p>
-        </div>
+        <myb-front-no-result
+          *ngIf="!loading() && filteredCharges.length === 0"
+          icon="bi-wallet2"
+          [compact]="true"
+          [title]="'coproperty.charge.noChargesFound' | translate"
+          [message]="'coproperty.charge.noChargesMessage' | translate">
+        </myb-front-no-result>
 
         <div *ngIf="!loading() && filteredCharges.length > 0" class="table-responsive">
           <table class="table table-hover">

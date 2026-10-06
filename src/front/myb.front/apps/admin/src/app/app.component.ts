@@ -1,12 +1,14 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterModule } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { LanguageService } from 'libs/shared/infra/services/language.service';
 
 @Component({
   standalone: true,
-  imports: [NxWelcomeComponent, RouterModule],
+  imports: [CommonModule, NxWelcomeComponent, RouterModule, TranslateModule],
   selector: 'myb-front-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -15,8 +17,12 @@ export class AppComponent implements OnInit {
   title = 'admin';
   private translate = inject(TranslateService);
   private languageService = inject(LanguageService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+  routeLoading = signal(false);
 
   ngOnInit(): void {
+    this.watchRouteLoading();
     // Initialize supported languages
     this.translate.addLangs(['fr', 'en']);
     this.translate.setDefaultLang('fr');
@@ -32,6 +38,22 @@ export class AppComponent implements OnInit {
       );
       this.languageService.setLanguage(saved);
     }
+  }
+
+  private watchRouteLoading(): void {
+    this.router.events
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(event => {
+        if (event instanceof NavigationStart) {
+          this.routeLoading.set(true);
+        } else if (
+          event instanceof NavigationEnd ||
+          event instanceof NavigationCancel ||
+          event instanceof NavigationError
+        ) {
+          this.routeLoading.set(false);
+        }
+      });
   }
 
   private normalizeLanguage(lang: string | null): string {

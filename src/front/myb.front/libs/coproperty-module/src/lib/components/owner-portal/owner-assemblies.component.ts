@@ -7,6 +7,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
 import { AssemblyService } from '../../services/assembly.service';
 import { Assembly, AssemblyStatus } from '../../models/assembly.model';
+import { NoResultComponent } from '@myb-front/shared-ui';
 
 @Component({
   selector: 'app-owner-assemblies',
@@ -17,7 +18,8 @@ import { Assembly, AssemblyStatus } from '../../models/assembly.model';
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
-    MatTableModule
+    MatTableModule,
+    NoResultComponent
   ],
   template: `
     <div class="owner-assemblies">
@@ -28,12 +30,11 @@ import { Assembly, AssemblyStatus } from '../../models/assembly.model';
       @if (loading()) {
         <div class="loading">Loading assemblies...</div>
       } @else if (upcomingAssemblies().length === 0) {
-        <mat-card class="empty-state">
-          <mat-card-content>
-            <mat-icon>info</mat-icon>
-            <p>No upcoming meetings scheduled.</p>
-          </mat-card-content>
-        </mat-card>
+        <myb-front-no-result
+          icon="bi-calendar-event"
+          title="No upcoming meetings"
+          message="No upcoming meetings are scheduled.">
+        </myb-front-no-result>
       } @else {
         <div class="assemblies-grid">
           @for (assembly of upcomingAssemblies(); track assembly.id) {
@@ -93,12 +94,11 @@ import { Assembly, AssemblyStatus } from '../../models/assembly.model';
       </div>
 
       @if (pastAssemblies().length === 0) {
-        <mat-card class="empty-state">
-          <mat-card-content>
-            <mat-icon>info</mat-icon>
-            <p>No past meetings.</p>
-          </mat-card-content>
-        </mat-card>
+        <myb-front-no-result
+          icon="bi-calendar-check"
+          title="No past meetings"
+          message="Past meetings will appear here.">
+        </myb-front-no-result>
       } @else {
         <div class="past-assemblies-list">
           @for (assembly of pastAssemblies().slice(0, 5); track assembly.id) {
@@ -239,24 +239,6 @@ import { Assembly, AssemblyStatus } from '../../models/assembly.model';
           display: flex;
           gap: 8px;
         }
-      }
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-
-      mat-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
-        color: rgba(0, 0, 0, 0.3);
-        margin-bottom: 16px;
-      }
-
-      p {
-        margin: 0;
-        color: rgba(0, 0, 0, 0.6);
       }
     }
 

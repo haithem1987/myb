@@ -17,5 +17,7 @@ public class NotificationContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Models.Notification>().HasKey(n => n.Id);
+        modelBuilder.Entity<Models.Notification>()
+            .HasIndex(n => new { n.ReceiverId, n.CopropertyId, n.CreatedAt });
     }
 }

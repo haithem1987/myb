@@ -9,7 +9,7 @@
       <p class="text-muted">{{ 'intervention.list.subtitle' | translate }}</p>
     </div>
     <div class="col-md-4 text-end">
-      <button class="btn btn-primary btn-violet" (click)="createNew()" routerLink="/coproperty/syndic/interventions/new">
+      <button class="btn btn-primary btn-violet" (click)="createNew()" [disabled]="!isSelectedCopropertyActive()">
         <i class="bi bi-plus-circle me-2"></i>
         {{ 'intervention.list.add' | translate }}
       </button>
@@ -68,13 +68,6 @@
   <div class="card mb-4">
     <div class="card-body">
       <div class="row g-3">
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">{{ 'intervention.filter.coproperty' | translate }}</label>
-          <select class="form-select" [(ngModel)]="selectedCopropertyId" (ngModelChange)="onFilterChange()">
-            <option value="">{{ 'intervention.filter.allCoproperties' | translate }}</option>
-            <option *ngFor="let cop of coproperties()" [value]="cop.id">{{ cop.name }}</option>
-          </select>
-        </div>
         <div class="col-md-3">
           <label class="form-label fw-semibold">{{ 'intervention.filter.status' | translate }}</label>
           <select class="form-select" [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
@@ -153,11 +146,11 @@
                   <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <div ngbDropdownMenu>
-                  <button ngbDropdownItem (click)="editIntervention(item.id)">
+                  <button ngbDropdownItem (click)="editIntervention(item.id)" [disabled]="!isSelectedCopropertyActive()">
                     <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
                   </button>
                   <div class="dropdown-divider"></div>
-                  <button ngbDropdownItem class="text-danger" (click)="deleteIntervention(item)">
+                  <button ngbDropdownItem class="text-danger" (click)="deleteIntervention(item)" [disabled]="!isSelectedCopropertyActive()">
                     <i class="bi bi-trash me-2"></i>{{ 'common.deleteAction' | translate }}
                   </button>
                 </div>

@@ -6,10 +6,14 @@ namespace Myb.Coproperty.Services;
 public class InterventionService : IInterventionService
 {
     private readonly IInterventionRepository _interventionRepository;
+    private readonly ICopropertyRepository _copropertyRepository;
 
-    public InterventionService(IInterventionRepository interventionRepository)
+    public InterventionService(
+        IInterventionRepository interventionRepository,
+        ICopropertyRepository copropertyRepository)
     {
         _interventionRepository = interventionRepository;
+        _copropertyRepository = copropertyRepository;
     }
 
     public async Task<IEnumerable<Intervention>> GetAllAsync()
@@ -36,6 +40,7 @@ public class InterventionService : IInterventionService
     {
         if (intervention == null)
             throw new ArgumentNullException(nameof(intervention), "Intervention cannot be null");
+        EnsureCopropertyIsActive(intervention.CopropertyId);
 
         intervention.CreatedAt = null;
         intervention.UpdatedAt = null;
@@ -58,12 +63,23 @@ public class InterventionService : IInterventionService
 
     public async Task UpdateAsync(Intervention intervention)
     {
+        EnsureCopropertyIsActive(intervention.CopropertyId);
         intervention.UpdatedAt = DateTime.UtcNow;
         await _interventionRepository.UpdateAsync(intervention);
     }
 
     public async Task DeleteAsync(Guid id)
     {
+        var intervention = _interventionRepository.GetById(id)
+            ?? throw new InvalidOperationException($"Intervention with ID {id} not found");
+        EnsureCopropertyIsActive(intervention.CopropertyId);
         await _interventionRepository.DeleteAsync(id);
+    }
+
+    private void EnsureCopropertyIsActive(Guid copropertyId)
+    {
+        var coproperty = _copropertyRepository.GetById(copropertyId);
+        if (coproperty == null || !coproperty.IsActive)
+            throw new InvalidOperationException("New operations are not allowed for an inactive coproperty.");
     }
 }

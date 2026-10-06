@@ -6,6 +6,7 @@ import { CopropertyService, CurrencyService, Coproperty, Currency, ManagerUser }
 import { KeycloakService } from '@myb-front/auth';
 import { take } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 type ActiveTab = 'currency' | 'syndics';
 
@@ -78,12 +79,6 @@ const SYNDIC_ROLE = 'coproperty-syndic';
               </div>
             </div>
             <div class="settings-card-body">
-              <div class="mb-3">
-                <label class="form-label fw-semibold">{{ 'coproperty.syndicSettings.coproperty' | translate }}</label>
-                <select class="form-select" [(ngModel)]="selectedCopropertyId" (change)="onCopropertyChange()">
-                  <option *ngFor="let c of coproperties()" [value]="c.id">{{ c.name }}</option>
-                </select>
-              </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">{{ 'coproperty.syndicSettings.currency' | translate }}</label>
                 <select class="form-select" [(ngModel)]="selectedCurrency">
@@ -520,6 +515,7 @@ export class SyndicSettingsComponent implements OnInit {
   private toastService = inject(ToastService);
   private keycloakService = inject(KeycloakService);
   private translate = inject(TranslateService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   // ── State signals ──────────────────────────────────────────────────────────
   activeTab = signal<ActiveTab>('currency');
@@ -558,17 +554,17 @@ export class SyndicSettingsComponent implements OnInit {
     this.copropertyService.getCoproperties(managerId).pipe(take(1)).subscribe({
       next: (coproperties) => {
         this.coproperties.set(coproperties);
-        if (coproperties.length > 0) {
-          this.selectedCopropertyId = coproperties[0].id;
-          this.selectedCurrency = coproperties[0].currency ?? 'EUR';
+        const selectedId = this.activeCoproperty.selectAvailable(coproperties);
+        if (selectedId) {
+          this.selectedCopropertyId = selectedId;
+          this.selectedCurrency = coproperties.find(c => c.id === selectedId)?.currency ?? 'EUR';
         }
         this.loading.set(false);
+        this.loadCurrentSyndics();
       },
       error: () => this.loading.set(false),
     });
 
-    // Pre-fetch current syndics so the badge on the tab is populated
-    this.loadCurrentSyndics();
   }
 
   // ── Tab helpers ────────────────────────────────────────────────────────────
@@ -581,6 +577,7 @@ export class SyndicSettingsComponent implements OnInit {
 
   // ── Currency tab methods ───────────────────────────────────────────────────
   onCopropertyChange(): void {
+    this.activeCoproperty.setActive(this.selectedCopropertyId);
     const cop = this.coproperties().find(c => c.id === this.selectedCopropertyId);
     if (cop) {
       this.selectedCurrency = cop.currency ?? 'EUR';
@@ -644,7 +641,11 @@ export class SyndicSettingsComponent implements OnInit {
     this.loadingSyndics.set(true);
     this.copropertyService.reloadManagers().pipe(take(1)).subscribe({
       next: (syndics) => {
-        this.currentSyndics.set(syndics);
+        const managerId = this.coproperties()
+          .find(coproperty => coproperty.id === this.selectedCopropertyId)?.managerId;
+        this.currentSyndics.set(managerId
+          ? syndics.filter(syndic => syndic.id.toLowerCase() === managerId.toLowerCase())
+          : []);
         this.loadingSyndics.set(false);
       },
       error: (err: unknown) => {

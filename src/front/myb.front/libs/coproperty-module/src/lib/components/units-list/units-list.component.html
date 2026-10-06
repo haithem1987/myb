@@ -24,7 +24,7 @@
         </h1>
         <p class="text-muted">{{ 'coproperty.unit.manageAllUnits' | translate }}</p>
       </div>
-      <button class="btn btn-primary btn-add" (click)="openAddForm()">
+      <button class="btn btn-primary btn-add" (click)="openAddForm()" [disabled]="!isSelectedCopropertyActive()">
         <i class="bi bi-plus-circle me-2"></i>
         {{ 'coproperty.unit.addUnit' | translate }}
       </button>
@@ -35,26 +35,8 @@
   <div class="card mb-4">
     <div class="card-body">
       <div class="row g-3">
-        <!-- Coproperty Filter -->
-        <div class="col-md-3">
-          <label for="copropertyFilter" class="form-label">
-            <i class="bi bi-building me-1"></i>
-            {{ 'coproperty.charge.coproperty' | translate }}
-          </label>
-          <select 
-            id="copropertyFilter" 
-            class="form-select"
-            [value]="selectedCopropertyId() || 'all'"
-            (change)="onCopropertyFilterChange($event)">
-            <option value="all">{{ 'coproperty.charge.allCoproperties' | translate }}</option>
-            <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
-              {{ coproperty.name }}
-            </option>
-          </select>
-        </div>
-
         <!-- Type Filter -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="typeFilter" class="form-label">
             <i class="bi bi-tag me-1"></i>
             {{ 'coproperty.unit.type' | translate }}
@@ -72,7 +54,7 @@
         </div>
 
         <!-- Occupancy Filter -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="occupancyFilter" class="form-label">
             <i class="bi bi-people me-1"></i>
             {{ 'coproperty.unit.occupancyStatus' | translate }}
@@ -89,7 +71,7 @@
         </div>
 
         <!-- Sorting -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="sortFilter" class="form-label">
             <i class="bi bi-sort-down me-1"></i>
             {{ 'coproperty.unit.sortBy' | translate }}
@@ -139,24 +121,14 @@
     <div class="card-body">
       <form [formGroup]="unitForm" (ngSubmit)="saveUnit()">
         <div class="row">
-          <!-- Coproperty Selection -->
+          <!-- The active coproperty is the immutable context for create and edit. -->
           <div class="col-md-6 mb-3">
-            <label for="formCopropertyId" class="form-label">
+            <label class="form-label">
               <i class="bi bi-building me-1"></i>
               {{ 'coproperty.charge.coproperty' | translate }} *
             </label>
-            <select 
-              class="form-select" 
-              id="formCopropertyId" 
-              formControlName="copropertyId"
-              [class.is-invalid]="unitForm.get('copropertyId')?.touched && unitForm.get('copropertyId')?.invalid">
-              <option value="">{{ 'coproperty.charge.selectCoproperty' | translate }}</option>
-              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id" [disabled]="!coproperty.isActive">
-                {{ coproperty.name }}{{ coproperty.isActive ? '' : ' (Inactive)' }}
-              </option>
-            </select>
-            <div class="invalid-feedback" *ngIf="unitForm.get('copropertyId')?.touched && unitForm.get('copropertyId')?.invalid">
-              {{ 'coproperty.charge.coproperty' | translate }} {{ 'validation.required' | translate }}
+            <div class="form-control bg-light" aria-readonly="true">
+              {{ getSelectedCopropertyName() }}
             </div>
           </div>
 
@@ -462,11 +434,11 @@
                     <button ngbDropdownItem (click)="viewUnit(unit)">
                       <i class="bi bi-eye me-2"></i>{{ 'common.viewAction' | translate }}
                     </button>
-                    <button ngbDropdownItem (click)="editUnit(unit)">
+                    <button ngbDropdownItem (click)="editUnit(unit)" [disabled]="!isSelectedCopropertyActive()">
                       <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
                     </button>
                     <div class="dropdown-divider"></div>
-                    <button ngbDropdownItem class="text-danger" (click)="deleteUnit(unit)">
+                    <button ngbDropdownItem class="text-danger" (click)="deleteUnit(unit)" [disabled]="!isSelectedCopropertyActive()">
                       <i class="bi bi-trash me-2"></i>{{ 'common.deleteAction' | translate }}
                     </button>
                   </div>

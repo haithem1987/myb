@@ -11,6 +11,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, catchError } from 'rxjs/operators';
 import { forkJoin, of } from 'rxjs';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { NoResultComponent } from '@myb-front/shared-ui';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 /** A charge (budget) aggregated from its distributions for the syndic supplier payment view */
 export interface ChargePaymentSummary {
@@ -34,7 +36,7 @@ export interface ChargePaymentSummary {
 @Component({
   selector: 'myb-charge-payments',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, NoResultComponent],
   templateUrl: './charge-payments.component.html',
   styleUrls: ['./charge-payments.component.scss'],
 })
@@ -46,6 +48,7 @@ export class ChargePaymentsComponent implements OnInit {
   private toastService = inject(ToastService);
   private destroyRef = inject(DestroyRef);
   private translate = inject(TranslateService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   coproperties = signal<Coproperty[]>([]);
   selectedCopropertyId = signal<string>('');
@@ -75,9 +78,10 @@ export class ChargePaymentsComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.coproperties.set(data);
-          if (data.length > 0) {
-            this.selectedCopropertyId.set(data[0].id);
-            this.loadDistributions(data[0].id);
+          const selectedId = this.activeCoproperty.selectAvailable(data);
+          if (selectedId) {
+            this.selectedCopropertyId.set(selectedId);
+            this.loadDistributions(selectedId);
           }
         },
         error: (err) => console.error('Error loading coproperties:', err),
@@ -86,6 +90,7 @@ export class ChargePaymentsComponent implements OnInit {
 
   onCopropertyChange(copropertyId: string): void {
     this.selectedCopropertyId.set(copropertyId);
+    this.activeCoproperty.setActive(copropertyId);
     if (copropertyId) {
       this.loadDistributions(copropertyId);
     } else {
@@ -316,6 +321,12 @@ export class ChargePaymentsComponent implements OnInit {
 
   formatAmount(amount: number): string {
     return this.currencyService.formatAmount(amount);
+  }
+
+  getSelectedCopropertyName(): string {
+    const id = this.selectedCopropertyId();
+    if (!id) return '';
+    return this.coproperties().find(coproperty => coproperty.id === id)?.name ?? '';
   }
 
   formatDate(date: string | null): string {

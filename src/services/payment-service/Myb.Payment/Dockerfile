@@ -11,7 +11,9 @@ WORKDIR /src
 # Copy project files (payment project + its referenced projects) first to leverage layer caching
 COPY ["src/services/payment-service/Myb.Payment/Myb.Payment.csproj", "src/services/payment-service/Myb.Payment/"]
 COPY ["src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj", "src/common/Myb.Common.Authentification/"]
+COPY ["src/common/Myb.Common.Messaging/Myb.Common.Messaging.csproj", "src/common/Myb.Common.Messaging/"]
 COPY ["src/services/payment-service/Myb.Payment.EntityFrameWork.Infra/Myb.Payment.EntityFrameWork.Infra.csproj", "src/services/payment-service/Myb.Payment.EntityFrameWork.Infra/"]
+COPY ["src/services/payment-service/Myb.Payment.Models/Myb.Payment.Models.csproj", "src/services/payment-service/Myb.Payment.Models/"]
 
 RUN dotnet restore "src/services/payment-service/Myb.Payment/Myb.Payment.csproj"
 

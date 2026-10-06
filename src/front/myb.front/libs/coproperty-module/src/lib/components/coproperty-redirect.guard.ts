@@ -18,7 +18,7 @@ export const copropertyRedirectGuard: CanActivateFn = () => {
   const hasOwner = roles.includes('coproperty-owner');
 
   if (hasSyndic) {
-    return router.createUrlTree(['/coproperty/syndic/dashboard']);
+    return router.createUrlTree(['/coproperty/select'], { queryParams: { space: 'syndic' } });
   }
   if (roles.includes('coproperty-council')) {
     return router.createUrlTree(['/coproperty/council/dashboard']);
@@ -27,10 +27,10 @@ export const copropertyRedirectGuard: CanActivateFn = () => {
     return router.createUrlTree(['/coproperty/accountant/dashboard']);
   }
   if (hasOwner) {
-    return router.createUrlTree(['/coproperty/owner/dashboard']);
+    return router.createUrlTree(['/coproperty/select'], { queryParams: { space: 'owner' } });
   }
   if (roles.includes('system-admin')) {
-    return router.createUrlTree(['/coproperty/syndic/dashboard']);
+    return router.createUrlTree(['/coproperty/select'], { queryParams: { space: 'syndic' } });
   }
 
   // A Syndic may create the login before assigning a Unit and its Owner role.

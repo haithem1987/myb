@@ -55,7 +55,7 @@ public class FundCallPaymentProofTests
             {
                 Amount = 433m,
                 PaymentDate = new DateTime(2026, 8, 5, 0, 0, 0, DateTimeKind.Utc),
-                Justificatif = "proof.pdf",
+                Justificatif = "VIR-2026-001",
                 JustificatifFileName = "proof.pdf",
                 JustificatifContentType = "application/pdf",
                 JustificatifFileBase64 = Convert.ToBase64String(pdfBytes)
@@ -70,6 +70,8 @@ public class FundCallPaymentProofTests
             .SingleAsync(value => value.Id == fundCallId);
 
         Assert.Equal(FundCallStatus.PendingValidation, persistedFundCall.Status);
+        Assert.Equal("VIR-2026-001", persistedPayment.Justificatif);
+        Assert.DoesNotContain(persistedPayment.JustificatifFileName!, persistedPayment.Justificatif!);
         Assert.Equal("proof.pdf", persistedPayment.JustificatifFileName);
         Assert.Equal("application/pdf", persistedPayment.JustificatifContentType);
         Assert.NotNull(persistedPayment.JustificatifFile);

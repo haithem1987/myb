@@ -25,14 +25,6 @@
   </div>
 
   <div class="toolbar">
-    <div class="field">
-      <label for="coproperty">{{ 'tenantManagement.coproperty' | translate }}</label>
-      <select id="coproperty" class="form-select" [(ngModel)]="selectedCopropertyId" (change)="onCopropertyChange()">
-        <option value="">{{ 'tenantManagement.selectCoproperty' | translate }}</option>
-        <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id" [disabled]="!coproperty.isActive">{{ coproperty.name }}{{ coproperty.isActive ? '' : ' (Inactive)' }}</option>
-      </select>
-    </div>
-
     <div class="field search-field">
       <label for="tenantSearch">{{ 'common.search' | translate }}</label>
       <div class="input-group">
@@ -180,13 +172,13 @@
                 </span>
               </td>
               <td class="text-end">
-                <button class="btn btn-sm btn-outline-primary me-2" type="button" (click)="editTenant(tenant)" [title]="'common.edit' | translate">
+                <button class="btn btn-sm btn-outline-primary me-2" type="button" (click)="editTenant(tenant)" [disabled]="!isSelectedCopropertyActive()" [title]="'common.edit' | translate">
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button *ngIf="tenant.isActive" class="btn btn-sm btn-outline-warning me-2" type="button" (click)="deactivateTenant(tenant)" [title]="'tenantManagement.deactivate' | translate">
+                <button *ngIf="tenant.isActive" class="btn btn-sm btn-outline-warning me-2" type="button" (click)="deactivateTenant(tenant)" [disabled]="!isSelectedCopropertyActive()" [title]="'tenantManagement.deactivate' | translate">
                   <i class="bi bi-pause-circle"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" type="button" (click)="removeTenant(tenant)" [title]="'common.delete' | translate">
+                <button class="btn btn-sm btn-outline-danger" type="button" (click)="removeTenant(tenant)" [disabled]="!isSelectedCopropertyActive()" [title]="'common.delete' | translate">
                   <i class="bi bi-trash"></i>
                 </button>
               </td>

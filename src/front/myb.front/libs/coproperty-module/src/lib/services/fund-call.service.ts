@@ -3,6 +3,7 @@ import { Apollo } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
 import {
   GET_FUND_CALLS_BY_COPROPERTY,
+  GET_COPROPERTY_FUND_CALL_OVERDUE_TOTAL,
   GET_ALL_FUND_CALLS,
   GET_FUND_CALL_BY_ID,
   GET_FUND_CALLS_BY_OWNER,
@@ -68,10 +69,26 @@ export class FundCallService {
           ownerId: filters.ownerId ?? null,
           year: filters.year ?? null,
         },
-        fetchPolicy: 'network-only',
+        // The shared Apollo cache has addTypename disabled, while this query is
+        // composed from a typed fragment. A network-only query still writes the
+        // response to that cache before exposing it, so a perfectly valid HTTP
+        // response can be reduced to an empty list when the fragment cannot be
+        // matched. Bypass the cache and return the complete server payload.
+        fetchPolicy: 'no-cache',
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data.fundCallsByCoproperty));
+  }
+
+  getCopropertyOverdueTotal(copropertyId: string): Observable<number> {
+    return this.apollo
+      .query<{ copropertyFundCallOverdueTotal: number }>({
+        query: GET_COPROPERTY_FUND_CALL_OVERDUE_TOTAL,
+        variables: { copropertyId },
+        fetchPolicy: 'no-cache',
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map((result) => Number(result.data.copropertyFundCallOverdueTotal ?? 0)));
   }
 
   getFundCallById(id: string): Observable<FundCallExtended> {

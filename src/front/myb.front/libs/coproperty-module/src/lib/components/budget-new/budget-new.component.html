@@ -60,17 +60,11 @@
               <i class="bi bi-building me-1"></i>
               {{ 'coproperty.charge.coproperty' | translate }} <span class="text-danger">*</span>
             </label>
-            <select 
-              id="copropertyId" 
-              class="form-select form-select-lg" 
-              formControlName="copropertyId"
-              (change)="onCopropertyChange($event)"
-              [class.is-invalid]="budgetForm.get('copropertyId')?.invalid && budgetForm.get('copropertyId')?.touched">
-              <option value="">{{ 'coproperty.charge.selectCoproperty' | translate }}</option>
-              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id" [disabled]="!coproperty.isActive">
-                {{ coproperty.name }} - {{ coproperty.city }}{{ coproperty.isActive ? '' : ' (Inactive)' }}
-              </option>
-            </select>
+            <input type="hidden" formControlName="copropertyId" />
+            <div id="copropertyId" class="form-control form-control-lg bg-light d-flex align-items-center">
+              <i class="bi bi-building me-2 text-muted"></i>
+              {{ selectedCoproperty()?.name || ('coproperty.charge.selectCoproperty' | translate) }}
+            </div>
             <div class="invalid-feedback" *ngIf="budgetForm.get('copropertyId')?.invalid && budgetForm.get('copropertyId')?.touched">
               {{ 'validation.required' | translate }}
             </div>

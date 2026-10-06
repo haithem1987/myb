@@ -27,25 +27,7 @@
   <div class="card owner-filters mb-4">
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        <div class="col-md-4" *ngIf="coproperties().length > 0">
-          <label for="ownerCopropertyFilter" class="form-label fw-semibold">
-            <i class="bi bi-building me-1"></i>
-            {{ 'coproperty.charge.coproperty' | translate }}
-          </label>
-          <select
-            id="ownerCopropertyFilter"
-            class="form-select"
-            [ngModel]="copropertyId"
-          (ngModelChange)="onCopropertySelectionChange($event)"
-          >
-            <option value="all">{{ 'coproperty.charge.allCoproperties' | translate }}</option>
-            <option *ngFor="let coproperty of coproperties()" [ngValue]="coproperty.id">
-              {{ coproperty.name }}{{ coproperty.isActive ? '' : ' (Inactive)' }}
-            </option>
-          </select>
-        </div>
-
-        <div class="col-md-4">
+        <div class="col-md-6">
           <label for="ownerUnitFilter" class="form-label fw-semibold">
             <i class="bi bi-building-check me-1"></i>
             {{ 'coproperty.owner.units' | translate }}
@@ -58,7 +40,7 @@
           </select>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-6">
           <label for="ownerSearchFilter" class="form-label fw-semibold">
             <i class="bi bi-search me-1"></i>
             {{ 'coproperty.owner.name' | translate }}
@@ -394,6 +376,7 @@
                   <button *ngIf="ownerUnit.unit" type="button"
                     class="btn btn-link btn-sm text-white p-0 ms-1"
                     [title]="'coproperty.owner.changeOwner' | translate"
+                    [disabled]="!isUnitInActiveCoproperty(ownerUnit.unit)"
                     (click)="openOwnershipTransfer(owner, ownerUnit)">
                     <i class="bi bi-arrow-left-right"></i>
                   </button>
@@ -445,9 +428,12 @@
               </td>
             </tr>
             <tr *ngIf="filteredOwners.length === 0">
-              <td colspan="6" class="text-center text-muted py-4">
-                <i class="bi bi-people fs-3 d-block mb-2"></i>
-                {{ 'common.noData' | translate }}
+              <td colspan="6" class="p-0">
+                <myb-front-no-result
+                  icon="bi-people"
+                  [compact]="true"
+                  [title]="'common.noData' | translate">
+                </myb-front-no-result>
               </td>
             </tr>
           </tbody>

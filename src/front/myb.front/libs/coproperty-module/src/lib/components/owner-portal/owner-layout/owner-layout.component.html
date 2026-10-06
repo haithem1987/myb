@@ -6,7 +6,7 @@
         <img src="assets/MYB%20LOGO.png" alt="MYB" class="logo-image">
         <span class="app-name">MYB Copropriété</span>
       </div>
-      
+
       <nav class="main-nav">
         <a routerLink="/coproperty/owner/dashboard" 
            routerLinkActive="active" 
@@ -68,6 +68,25 @@
       </button>
     </div>
   </header>
+
+  <!-- Active coproperty context belongs below the primary navigation. -->
+  <section class="coproperty-context" *ngIf="activeCopropertyName()" aria-label="Copropriété active">
+    <div class="coproperty-context-content">
+      <button
+        *ngIf="canChangeCoproperty()"
+        type="button"
+        class="btn-change-coproperty"
+        (click)="changeCoproperty()"
+        [title]="'copropertySelection.change' | translate">
+        <i class="bi bi-arrow-left"></i>
+        <span>{{ 'copropertySelection.back' | translate }}</span>
+      </button>
+      <span class="active-coproperty-name" [title]="activeCopropertyName()">
+        <i class="bi bi-building"></i>
+        {{ activeCopropertyName() }}
+      </span>
+    </div>
+  </section>
   
   <!-- Mobile Navigation -->
   <nav class="mobile-nav" [class.open]="isMobileMenuOpen()">

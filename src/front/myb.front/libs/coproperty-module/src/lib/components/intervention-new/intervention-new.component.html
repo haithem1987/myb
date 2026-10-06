@@ -16,7 +16,7 @@
       <button class="btn btn-secondary me-2" (click)="cancel()">
         {{ 'intervention.form.cancel' | translate }}
       </button>
-      <button class="btn btn-primary btn-violet" (click)="save()" [disabled]="interventionForm.invalid || saving()">
+      <button class="btn btn-primary btn-violet" (click)="save()" [disabled]="interventionForm.invalid || saving() || !isSelectedCopropertyActive()">
         <span *ngIf="saving()" class="spinner-border spinner-border-sm me-1"></span>
         {{ (isEditMode() ? 'intervention.form.update' : 'intervention.form.create') | translate }}
       </button>
@@ -51,23 +51,7 @@
     </div>
     <div class="card-body">
       <form [formGroup]="interventionForm">
-        <!-- Coproperty Selection -->
-        <div class="row mb-4">
-          <div class="col-md-12">
-            <label class="form-label fw-semibold">
-              {{ 'intervention.form.coproperty' | translate }} *
-            </label>
-            <select class="form-select" formControlName="copropertyId" (change)="onCopropertyChange()">
-              <option value="">{{ 'intervention.form.selectCoproperty' | translate }}</option>
-              <option *ngFor="let cop of coproperties()" [value]="cop.id">
-                {{ cop.name }}
-              </option>
-            </select>
-            <div *ngIf="interventionForm.get('copropertyId')?.hasError('required') && interventionForm.get('copropertyId')?.touched" class="text-danger small mt-1">
-              {{ 'intervention.form.copropertyRequired' | translate }}
-            </div>
-          </div>
-        </div>
+        <input type="hidden" formControlName="copropertyId">
 
         <div class="row mb-4 gx-3">
           <!-- Title -->
@@ -213,7 +197,7 @@
             <button type="button" class="btn btn-secondary me-2" (click)="cancel()">
               {{ 'intervention.form.cancel' | translate }}
             </button>
-            <button type="button" class="btn btn-primary btn-violet" (click)="save()" [disabled]="interventionForm.invalid || saving()">
+            <button type="button" class="btn btn-primary btn-violet" (click)="save()" [disabled]="interventionForm.invalid || saving() || !isSelectedCopropertyActive()">
               <span *ngIf="saving()" class="spinner-border spinner-border-sm me-1"></span>
               {{ (isEditMode() ? 'intervention.form.update' : 'intervention.form.create') | translate }}
             </button>

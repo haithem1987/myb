@@ -51,6 +51,12 @@ export const GET_FUND_CALLS_BY_COPROPERTY = gql`
   ${FUND_CALL_FRAGMENT}
 `;
 
+export const GET_COPROPERTY_FUND_CALL_OVERDUE_TOTAL = gql`
+  query GetCopropertyFundCallOverdueTotal($copropertyId: UUID!) {
+    copropertyFundCallOverdueTotal(copropertyId: $copropertyId)
+  }
+`;
+
 export const GET_ALL_FUND_CALLS = gql`
   query GetAllFundCalls {
     allFundCalls {

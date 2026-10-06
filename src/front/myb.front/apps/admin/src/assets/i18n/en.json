@@ -663,6 +663,8 @@
       "noSharesForDistribution": "Cannot distribute by shares: total shares is zero",
       "noAreaForDistribution": "Cannot distribute by area: total area is zero",
       "fundCallCreated": "Allocation saved and fund calls created successfully",
+      "createSuccess": "{{count}} call(s) for funds created successfully",
+      "createError": "The allocation could not be created. No partial data was saved. Please try again.",
       "alreadyDistributed": "All budgets for this year have already been distributed",
       "roundingNote": "Rounding differences may apply"
     },
@@ -1280,6 +1282,7 @@
     }
   },
   "managerReports": {
+    "ownerLots": "Lot(s)",
     "title": "Resident Reports",
     "subtitle": "Manage reports submitted by residents",
     "allTypes": "All types",
@@ -1454,6 +1457,25 @@
       }
     }
   },
+  "copropertySelection": {
+    "eyebrow": "Coproperty space",
+    "title": "Choose a coproperty",
+    "ownerSubtitle": "Select the coproperty you want to open in your owner space.",
+    "syndicSubtitle": "Select the coproperty you want to manage in your property manager space.",
+    "loadError": "Unable to load your coproperties.",
+    "userNotFound": "The signed-in user could not be identified.",
+    "retry": "Try again",
+    "emptyTitle": "No coproperty available",
+    "emptyText": "Your account does not have access to a coproperty in this space yet.",
+    "continue": "Continue to the dashboard",
+    "units": "Units",
+    "myUnits": "My units",
+    "shares": "Shares",
+    "active": "Active",
+    "inactive": "Inactive",
+    "back": "Coproperties",
+    "change": "Change coproperty"
+  },
   "navigation": {
     "adminSpace": "Admin Space",
     "clientSpace": "Client Space",
@@ -1571,6 +1593,8 @@
     "selectCopropertyForBudgetLines": "Select a coproperty to view its budget lines.",
     "copropertyFilter": "Coproperty",
     "allCoproperties": "All coproperties",
+    "results": "results",
+    "clearFilters": "Clear filters",
     "totalOverdue": "Total Overdue",
     "overdue": "Overdue",
     "overdueFundCalls": "Overdue calls for funds"

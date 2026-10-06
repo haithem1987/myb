@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SignalementService } from '@myb-front/coproperty-module';
-import { KeycloakService } from '@myb-front/auth';
 import { ToastService } from '@myb-front/shared-ui';
 import {
   Signalement,
@@ -15,6 +14,7 @@ import {
 import { take, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 type Tab = 'en-cours' | 'resolus';
 
@@ -129,6 +129,25 @@ type Tab = 'en-cours' | 'resolus';
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <div class="reporter-avatar">{{ initials(s.reporterName) }}</div>
                   <span class="small fw-medium">{{ s.reporterName }}</span>
+                </div>
+
+                <!-- Owner identification details -->
+                <div class="reporter-details mb-3" *ngIf="s.reporterLots.length || s.reporterPhone || s.reporterEmail">
+                  <div class="reporter-detail reporter-lots" *ngIf="s.reporterLots.length">
+                    <i class="bi bi-building" aria-hidden="true"></i>
+                    <span class="detail-label">{{ 'managerReports.ownerLots' | translate }}</span>
+                    <span class="detail-value">{{ s.reporterLots.join(', ') }}</span>
+                  </div>
+                  <a class="reporter-detail" *ngIf="s.reporterPhone" [href]="'tel:' + s.reporterPhone">
+                    <i class="bi bi-telephone" aria-hidden="true"></i>
+                    <span class="detail-label">{{ 'common.phone' | translate }}</span>
+                    <span class="detail-value">{{ s.reporterPhone }}</span>
+                  </a>
+                  <a class="reporter-detail" *ngIf="s.reporterEmail" [href]="'mailto:' + s.reporterEmail">
+                    <i class="bi bi-envelope" aria-hidden="true"></i>
+                    <span class="detail-label">{{ 'common.email' | translate }}</span>
+                    <span class="detail-value">{{ s.reporterEmail }}</span>
+                  </a>
                 </div>
 
                 <!-- Syndic comment display -->
@@ -266,6 +285,33 @@ type Tab = 'en-cours' | 'resolus';
       font-size: 10px;
       font-weight: 700;
     }
+    .reporter-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .reporter-detail {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      padding: 6px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #374151;
+      font-size: 12px;
+      text-decoration: none;
+    }
+    a.reporter-detail:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+    .reporter-detail i { color: #2563eb; }
+    .detail-label { color: #6b7280; font-weight: 600; }
+    .detail-value { overflow-wrap: anywhere; font-weight: 600; }
+    .reporter-lots { flex-basis: 100%; }
     .syndic-comment {
       background: #f0f7ff;
       border-radius: 6px;
@@ -320,7 +366,7 @@ type Tab = 'en-cours' | 'resolus';
 })
 export class SyndicSignalementsComponent implements OnInit {
   private signalementService = inject(SignalementService);
-  private keycloakService = inject(KeycloakService);
+  private activeCoproperty = inject(ActiveCopropertyService);
   private toastService = inject(ToastService);
   private translate = inject(TranslateService);
 
@@ -357,8 +403,14 @@ export class SyndicSignalementsComponent implements OnInit {
 
   private loadSignalements(): void {
     this.loading.set(true);
-    const managerId = this.keycloakService.getSyndicManagerId();
-    this.signalementService.getSyndicSignalements(managerId)
+    const copropertyId = this.activeCoproperty.activeId();
+    if (!copropertyId) {
+      this.allSignalements.set([]);
+      this.loading.set(false);
+      return;
+    }
+
+    this.signalementService.getSignalements(copropertyId)
       .pipe(take(1), catchError(() => of([] as Signalement[])))
       .subscribe(signalements => {
         this.allSignalements.set(signalements);

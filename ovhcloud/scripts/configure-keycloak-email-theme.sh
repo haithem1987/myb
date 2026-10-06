@@ -6,8 +6,10 @@ kubectl -n "$namespace" create configmap myb-keycloak-email-theme \
   --from-file=theme.properties="$root/keycloak-theme/myb/email/theme.properties" \
   --from-file=messages_en.properties="$root/keycloak-theme/myb/email/messages/messages_en.properties" \
   --from-file=messages_fr.properties="$root/keycloak-theme/myb/email/messages/messages_fr.properties" \
+  --from-file=email-verification-html.ftl="$root/keycloak-theme/myb/email/html/email-verification.ftl" \
+  --from-file=email-verification-text.ftl="$root/keycloak-theme/myb/email/text/email-verification.ftl" \
   --dry-run=client -o yaml | kubectl apply -f -
-kubectl -n "$namespace" patch deployment keycloak --type=strategic --patch '{"spec":{"template":{"spec":{"volumes":[{"name":"myb-email-theme","configMap":{"name":"myb-keycloak-email-theme","items":[{"key":"theme.properties","path":"theme.properties"},{"key":"messages_en.properties","path":"messages/messages_en.properties"},{"key":"messages_fr.properties","path":"messages/messages_fr.properties"}]}}],"containers":[{"name":"keycloak","volumeMounts":[{"name":"myb-email-theme","mountPath":"/opt/keycloak/themes/myb/email","readOnly":true}]}]}}}}'
+kubectl -n "$namespace" patch deployment keycloak --type=strategic --patch '{"spec":{"template":{"spec":{"volumes":[{"name":"myb-email-theme","configMap":{"name":"myb-keycloak-email-theme","items":[{"key":"theme.properties","path":"theme.properties"},{"key":"messages_en.properties","path":"messages/messages_en.properties"},{"key":"messages_fr.properties","path":"messages/messages_fr.properties"},{"key":"email-verification-html.ftl","path":"html/email-verification.ftl"},{"key":"email-verification-text.ftl","path":"text/email-verification.ftl"}]}}],"containers":[{"name":"keycloak","volumeMounts":[{"name":"myb-email-theme","mountPath":"/opt/keycloak/themes/myb/email","readOnly":true}]}]}}}}'
 # Restart even when the mount is unchanged: Keycloak caches theme messages.
 kubectl -n "$namespace" rollout restart deployment/keycloak
 kubectl -n "$namespace" rollout status deployment/keycloak --timeout=300s

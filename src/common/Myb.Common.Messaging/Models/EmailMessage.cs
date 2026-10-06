@@ -8,4 +8,6 @@ public class EmailMessage
     public string? Cc { get; set; }
     public string? ReplyTo { get; set; }
     public string Source { get; set; } = string.Empty;
+    /// <summary>Recipient language used by the shared email envelope ("fr" or "en").</summary>
+    public string? Language { get; set; }
 }

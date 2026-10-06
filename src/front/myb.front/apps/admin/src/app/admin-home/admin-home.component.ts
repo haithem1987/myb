@@ -346,7 +346,7 @@ export class AdminHomeComponent implements OnInit {
       title: 'Espace Syndic',
       description: 'Gérez les copropriétés, lots, budgets, appels de fonds et copropriétaires.',
       icon: 'bi bi-building-gear',
-      route: '/coproperty/syndic/dashboard',
+      route: '/coproperty/select?space=syndic',
       requiredRoles: ['coproperty-syndic', 'coproperty-admin', 'system-admin'],
       color: '#1e40af',
       available: false
@@ -356,7 +356,7 @@ export class AdminHomeComponent implements OnInit {
       title: 'Espace Copropriétaire',
       description: 'Consultez vos lots, factures, demandes de travaux et assemblées générales.',
       icon: 'bi bi-person-badge',
-      route: '/coproperty/owner/dashboard',
+      route: '/coproperty/select?space=owner',
       requiredRoles: ['coproperty-owner'],
       color: '#0891b2',
       available: false
@@ -471,7 +471,7 @@ export class AdminHomeComponent implements OnInit {
 
   navigateToService(service: ServiceCard) {
     if (service.available) {
-      this.router.navigate([service.route]);
+      this.router.navigateByUrl(service.route);
     }
   }
 

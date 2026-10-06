@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices.JavaScript;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -7,23 +6,24 @@ namespace Myb.Notification.Hubs;
 [Authorize]
 public class NotificationHub : Hub
 {
-    public override Task OnConnectedAsync()
+    private readonly ILogger<NotificationHub> _logger;
+
+    public NotificationHub(ILogger<NotificationHub> logger)
+    {
+        _logger = logger;
+    }
+
+    public override async Task OnConnectedAsync()
     {
         if (Context.User?.Identity?.IsAuthenticated != true)
         {
-            Console.WriteLine("User is not authenticated");
-             return Task.CompletedTask;;
-        }
-        Console.WriteLine($"Context user: {Context.User}");
-        foreach (var claim in Context.User.Claims)
-        {
-            Console.WriteLine($"Claim: {claim.Type} = {claim.Value}");
+            _logger.LogWarning("Rejected unauthenticated notification hub connection");
+            Context.Abort();
+            return;
         }
 
-        // Optionally log user connection
-        var userId = Context.UserIdentifier;
-        Console.WriteLine($"User connected >dsf>>>>>: {userId}");
-        return base.OnConnectedAsync();
+        _logger.LogInformation("Notification hub client connected for user {UserId}", Context.UserIdentifier);
+        await base.OnConnectedAsync();
     }
     public async Task SendToUser(string userId, string message)
     {

@@ -12,12 +12,13 @@ import { KeycloakService } from '@myb-front/auth';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs/operators';
 import { ChargeDistributionComponent } from '../charge-distribution/charge-distribution.component';
-import { ModalService, ToastService } from '@myb-front/shared-ui';
+import { ModalService, ToastService, NoResultComponent } from '@myb-front/shared-ui';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 @Component({
   selector: 'myb-charges-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, NgbDropdownModule, ChargeDistributionComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, NgbDropdownModule, ChargeDistributionComponent, NoResultComponent],
   templateUrl: './charges-list.component.html',
   styleUrls: ['./charges-list.component.scss'],
 })
@@ -32,6 +33,7 @@ export class ChargesListComponent implements OnInit {
   private modalService = inject(ModalService);
   private toastService = inject(ToastService);
   private translateService = inject(TranslateService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   charges = signal<ChargeExtended[]>([]);
   coproperties = signal<Coproperty[]>([]);
@@ -114,13 +116,11 @@ export class ChargesListComponent implements OnInit {
     this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
-        const selectedId = this.selectedCopropertyId();
-        const selectedStillExists = data.some(coproperty => coproperty.id === selectedId);
-        const defaultCoproperty = data.find(coproperty => coproperty.isActive) ?? data[0];
-
-        if (!selectedStillExists) {
-          this.selectedCopropertyId.set(defaultCoproperty?.id ?? null);
-        }
+        const selectedId = this.activeCoproperty.selectAvailable(
+          data,
+          this.route.snapshot.queryParamMap.get('copropertyId') || this.selectedCopropertyId()
+        );
+        this.selectedCopropertyId.set(selectedId || null);
 
         if (this.selectedCopropertyId()) {
           this.loadAllCharges();
@@ -148,6 +148,7 @@ export class ChargesListComponent implements OnInit {
 
   onCopropertyChange(copropertyId: string): void {
     this.selectedCopropertyId.set(copropertyId || null);
+    this.activeCoproperty.setActive(copropertyId);
 
     if (!copropertyId) {
       this.charges.set([]);
@@ -223,14 +224,15 @@ export class ChargesListComponent implements OnInit {
     return this.filteredCharges.filter(charge => charge.isActive).length;
   }
 
-  getCurrentYearCount(): number {
-    const currentYear = new Date().getFullYear().toString();
-    return this.filteredCharges.filter(charge => charge.frequency === currentYear).length;
-  }
-
   get selectedCurrency(): string | undefined {
     const selectedId = this.selectedCopropertyId();
     return this.coproperties().find(c => c.id === selectedId)?.currency;
+  }
+
+  getSelectedCopropertyName(): string {
+    const selectedId = this.selectedCopropertyId();
+    if (!selectedId) return '';
+    return this.coproperties().find(coproperty => coproperty.id === selectedId)?.name ?? '';
   }
 
   getTotalBudgetDisplay(): string {

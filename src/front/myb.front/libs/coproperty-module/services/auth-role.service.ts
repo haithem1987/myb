@@ -222,9 +222,9 @@ export class AuthRoleService {
     
     switch (role) {
       case CopropertyRole.SYNDIC:
-        return '/coproperty/syndic/dashboard';
+        return '/coproperty/select?space=syndic';
       case CopropertyRole.OWNER:
-        return '/coproperty/owner/dashboard';
+        return '/coproperty/select?space=owner';
       case CopropertyRole.COUNCIL:
         return '/coproperty/council/dashboard';
       case CopropertyRole.ACCOUNTANT:
@@ -241,7 +241,7 @@ export class AuthRoleService {
    */
   navigateToDefaultRoute(): void {
     const route = this.getDefaultRoute();
-    this.router.navigate([route]);
+    this.router.navigateByUrl(route);
   }
   
   /**

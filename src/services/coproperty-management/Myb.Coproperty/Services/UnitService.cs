@@ -54,6 +54,7 @@ namespace Myb.Coproperty.Services
             {
                 throw new InvalidOperationException($"Unit with ID {id} not found");
             }
+            EnsureCopropertyIsActive(unit.CopropertyId);
 
             var hasOwners = _unitRepository.GetAll()
                 .Any(u => u.Id == id && u.OwnerUnits.Any(ou => ou.EndDate == null));
@@ -102,6 +103,7 @@ namespace Myb.Coproperty.Services
 
         public async Task UpdateAsync(Unit unit)
         {
+            EnsureCopropertyIsActive(unit.CopropertyId);
             unit.UnitNumber = unit.UnitNumber?.Trim() ?? string.Empty;
 
             var duplicateExists = _unitRepository.GetAll().Any(u =>

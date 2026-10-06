@@ -14,6 +14,7 @@ import { map, finalize } from 'rxjs/operators';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { ModalService } from '@myb-front/shared-ui';
 import { getUnitErrorTranslation } from '../../utils/unit-error.util';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 @Component({
   selector: 'myb-units-list',
@@ -32,6 +33,7 @@ export class UnitsListComponent implements OnInit {
   private toastService = inject(ToastService);
   private translateService = inject(TranslateService);
   private modalService = inject(ModalService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   units = signal<UnitExtended[]>([]);
   coproperties = signal<Coproperty[]>([]);
@@ -73,28 +75,27 @@ export class UnitsListComponent implements OnInit {
     this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
-        if (!data.some(c => c.id === this.selectedCopropertyId())) {
-          this.selectedCopropertyId.set((data.find(c => c.isActive) ?? data[0])?.id ?? null);
-        }
-        // Load all units regardless of coproperties
+        this.selectedCopropertyId.set(this.activeCoproperty.selectAvailable(data));
         this.loadAllUnits();
       },
       error: (err) => {
         console.error('Error loading coproperties:', err);
-        // Still try to load units even if coproperties fail
-        this.loadAllUnits();
+        this.units.set([]);
       }
     });
   }
 
   loadAllUnits(): void {
+    const copropertyId = this.selectedCopropertyId();
+    if (!copropertyId) {
+      this.units.set([]);
+      this.loading.set(false);
+      return;
+    }
+
     this.loading.set(true);
 
-    // The backend derives/enforces the authenticated syndic scope. The
-    // managerId is also supplied for compatibility with deployments where
-    // authentication claims are not yet available to the GraphQL resolver.
-    const managerId = this.keycloakService.getSyndicManagerId();
-    this.unitService.getAllUnitsBySyndic(managerId).pipe(
+    this.unitService.getUnitsByCoproperty(copropertyId).pipe(
       finalize(() => this.loading.set(false)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
@@ -108,16 +109,6 @@ export class UnitsListComponent implements OnInit {
         this.loading.set(false);
       }
     });
-  }
-
-  onCopropertyChange(copropertyId: string): void {
-    this.selectedCopropertyId.set(copropertyId);
-    // Filter happens automatically through the filteredUnits getter
-  }
-
-  onCopropertyFilterChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.onCopropertyChange(select.value);
   }
 
   onTypeFilterChange(event: Event): void {
@@ -145,7 +136,7 @@ export class UnitsListComponent implements OnInit {
 
     // Filter by coproperty
     const selectedCoproperty = this.selectedCopropertyId();
-    if (selectedCoproperty && selectedCoproperty !== 'all') {
+    if (selectedCoproperty) {
       filtered = filtered.filter(unit => unit.copropertyId === selectedCoproperty);
     }
 
@@ -275,6 +266,18 @@ export class UnitsListComponent implements OnInit {
     return (unit as any).copropertyName || '';
   }
 
+  getSelectedCopropertyName(): string {
+    const selectedId = this.selectedCopropertyId();
+    if (!selectedId) return '';
+    return this.coproperties().find(coproperty => coproperty.id === selectedId)?.name ?? '';
+  }
+
+  isSelectedCopropertyActive(): boolean {
+    const selectedId = this.selectedCopropertyId();
+    return !!selectedId && this.coproperties().some(coproperty =>
+      coproperty.id === selectedId && coproperty.isActive !== false);
+  }
+
   formatArea(area: number | undefined): string {
     if (!area) return '-';
     return new Intl.NumberFormat('fr-FR', {
@@ -284,6 +287,7 @@ export class UnitsListComponent implements OnInit {
   }
 
   openAddForm(): void {
+    if (!this.isSelectedCopropertyActive()) return;
     this.showAddForm.set(true);
     this.editingUnitId.set(null);
     this.unitForm.reset({ 
@@ -297,6 +301,7 @@ export class UnitsListComponent implements OnInit {
   }
 
   editUnit(unit: UnitExtended): void {
+    if (!this.isSelectedCopropertyActive()) return;
     this.editingUnitId.set(unit.id || null);
     this.showAddForm.set(true);
     this.unitForm.patchValue({
@@ -312,6 +317,7 @@ export class UnitsListComponent implements OnInit {
   }
 
   async deleteUnit(unit: UnitExtended): Promise<void> {
+    if (!this.isSelectedCopropertyActive()) return;
     const confirmed = await this.modalService.confirm({
       title: this.translateService.instant('coproperty.unit.deleteConfirm'),
       message: `${this.translateService.instant('common.deleteMessage')}<br/>"<strong>${unit.unitNumber}</strong>"?<br/><br/><strong class="text-danger">${this.translateService.instant('coproperty.unit.deleteWarning')}</strong>`,
@@ -346,8 +352,9 @@ export class UnitsListComponent implements OnInit {
   }
 
   saveUnit(): void {
-    const selected = this.coproperties().find(c => c.id === this.unitForm.get('copropertyId')?.value);
-    if (!this.editingUnitId() && selected?.isActive === false) return;
+    const selectedCopropertyId = this.selectedCopropertyId();
+    if (!selectedCopropertyId || !this.isSelectedCopropertyActive()) return;
+    this.unitForm.get('copropertyId')?.setValue(selectedCopropertyId);
     if (this.unitForm.valid) {
       const unitData: UnitExtended = {
         ...this.unitForm.value,

@@ -3,6 +3,7 @@ using HotChocolate.Types;
 using Myb.Coproperty.Models;
 using Myb.Coproperty.Services;
 using Myb.Coproperty.GraphQL.Types;
+using Myb.Coproperty.Models.Dtos;
 using System.Security.Claims;
 
 namespace Myb.Coproperty.GraphQL.Mutations
@@ -103,6 +104,41 @@ namespace Myb.Coproperty.GraphQL.Mutations
 
         public async Task<IEnumerable<ChargeDistribution>> DistributeCharge(Guid chargeId, [Service] IChargeService chargeService) =>
             await chargeService.DistributeChargeAsync(chargeId);
+
+        /// <summary>
+        /// Atomically creates all charge distributions and calls for funds.
+        /// The mutation either commits every record or commits nothing.
+        /// </summary>
+        public async Task<IReadOnlyList<FundCall>> CreateDistribution(
+            CreateDistributionInput input,
+            ClaimsPrincipal? user,
+            [Service] IChargeService chargeService,
+            [Service] ICopropertyService copropertyService,
+            [Service] ILogger<ChargeMutations> logger,
+            CancellationToken cancellationToken)
+        {
+            await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(
+                user,
+                input.CopropertyId,
+                copropertyService);
+            var userId = CopropertyAccessControl.GetUserId(user)?.ToString() ?? string.Empty;
+            try
+            {
+                return await chargeService.CreateDistributionAsync(input, userId, cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(
+                    exception,
+                    "Atomic distribution creation failed for coproperty {CopropertyId}",
+                    input.CopropertyId);
+                throw new GraphQLException(
+                    ErrorBuilder.New()
+                        .SetMessage("Distribution creation failed. No partial data was saved.")
+                        .SetCode("DISTRIBUTION_CREATE_FAILED")
+                        .Build());
+            }
+        }
 
         /// <summary>
         /// Mark a charge distribution as paid after successful payment through the payment service.

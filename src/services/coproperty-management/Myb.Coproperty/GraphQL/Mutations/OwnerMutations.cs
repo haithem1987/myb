@@ -20,11 +20,12 @@ namespace Myb.Coproperty.GraphQL.Mutations
             string phone,
             System.Security.Claims.ClaimsPrincipal user,
             [Service] IDbContextFactory<CopropertyDbContext> contextFactory,
+            [Service] IKeycloakAdminService keycloakAdminService,
             [Service] IHttpClientFactory? httpClientFactory = null)
         {
             var owner = await UpdateAuthenticatedOwnerProfile(
                 firstName, lastName, email, phone, user, contextFactory,
-                httpClientFactory, requireOwner: false);
+                keycloakAdminService, httpClientFactory, requireOwner: false);
             return owner != null;
         }
 
@@ -35,10 +36,11 @@ namespace Myb.Coproperty.GraphQL.Mutations
             string phone,
             System.Security.Claims.ClaimsPrincipal user,
             [Service] IDbContextFactory<CopropertyDbContext> contextFactory,
+            [Service] IKeycloakAdminService keycloakAdminService,
             [Service] IHttpClientFactory? httpClientFactory = null)
             => await UpdateAuthenticatedOwnerProfile(
                 firstName, lastName, email, phone, user, contextFactory,
-                httpClientFactory, requireOwner: true)
+                keycloakAdminService, httpClientFactory, requireOwner: true)
                 ?? throw new InvalidOperationException("Profil propriétaire introuvable.");
 
         private static async Task<Owner?> UpdateAuthenticatedOwnerProfile(
@@ -48,6 +50,7 @@ namespace Myb.Coproperty.GraphQL.Mutations
             string phone,
             System.Security.Claims.ClaimsPrincipal user,
             IDbContextFactory<CopropertyDbContext> contextFactory,
+            IKeycloakAdminService keycloakAdminService,
             IHttpClientFactory? httpClientFactory,
             bool requireOwner)
         {
@@ -72,7 +75,7 @@ namespace Myb.Coproperty.GraphQL.Mutations
                     throw new InvalidOperationException("Profil propriétaire introuvable.");
                 return null;
             }
-            var managerIds = await context.OwnerUnits
+            var managerCoproperties = await context.OwnerUnits
                 .Where(link => link.OwnerId == owner.Id && link.EndDate == null)
                 .Join(context.Units,
                     link => link.UnitId,
@@ -81,9 +84,9 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 .Join(context.Coproperties,
                     copropertyId => copropertyId,
                     coproperty => coproperty.Id,
-                    (_, coproperty) => coproperty.ManagerId)
-                .Where(managerId => managerId.HasValue)
-                .Select(managerId => managerId!.Value)
+                    (copropertyId, coproperty) => new { copropertyId, coproperty.ManagerId })
+                .Where(item => item.ManagerId.HasValue)
+                .Select(item => new { item.copropertyId, ManagerId = item.ManagerId!.Value })
                 .Distinct()
                 .ToListAsync();
             owner.FirstName = firstName;
@@ -96,14 +99,18 @@ namespace Myb.Coproperty.GraphQL.Mutations
             if (httpClientFactory != null)
             {
                 var notificationClient = httpClientFactory.CreateClient("NotificationService");
-                foreach (var managerId in managerIds)
+                var notificationToken = await keycloakAdminService.GetServiceAccessTokenAsync();
+                notificationClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", notificationToken);
+                foreach (var relation in managerCoproperties)
                 {
                     try
                     {
                         var response = await notificationClient.PostAsJsonAsync("/api/Notifications", new
                         {
                             SenderId = owner.UserId.ToString(),
-                            ReceiverId = managerId.ToString(),
+                            ReceiverId = relation.ManagerId.ToString(),
+                            CopropertyId = relation.copropertyId.ToString(),
                             Message = $"{owner.FirstName} {owner.LastName} a mis à jour son profil."
                         });
                         response.EnsureSuccessStatusCode();
@@ -196,6 +203,7 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 .Where(link => link.EndDate == null)
                 .Select(link => link.UnitId)
                 .ToHashSet();
+            var assignedNewUnit = false;
 
             // The mutation is idempotent: retrying the same assignment returns the
             // existing owner and creates only unit links that do not already exist.
@@ -215,6 +223,7 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 };
                 
                 await ownerUnitRepository.InsertAsync(ownerUnit);
+                assignedNewUnit = true;
             }
 
             // Assign the coproperty-owner Keycloak role so the user can access the owner portal
@@ -230,6 +239,13 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 // Role assignment failure is non-fatal — owner record is already created
                 logger.LogError(ex, "Failed to assign coproperty-owner role to user {UserId}", input.UserId);
             }
+
+            // Registered users can already have an owner profile before a syndic
+            // assigns their first lot. That path bypasses OwnerService.CreateAsync,
+            // so explicitly send the access email after a real new assignment.
+            // An idempotent retry adds no unit and therefore sends no duplicate.
+            if (existingOwner != null && assignedNewUnit)
+                await ownerService.SendOwnerAccessEmailAsync(createdOwner);
             
             return createdOwner;
         }
@@ -310,6 +326,10 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 .Include(u => u.Coproperty)
                 .SingleOrDefaultAsync(u => u.Id == unitId)
                 ?? throw new InvalidOperationException($"Unit with ID {unitId} not found");
+            if (!unit.Coproperty.IsActive)
+                throw new InvalidOperationException(
+                    "Le changement de propriétaire est impossible pour une copropriété inactive.");
+
             var newOwner = await context.Owners.FindAsync(newOwnerId)
                 ?? throw new InvalidOperationException($"Owner with ID {newOwnerId} not found");
 

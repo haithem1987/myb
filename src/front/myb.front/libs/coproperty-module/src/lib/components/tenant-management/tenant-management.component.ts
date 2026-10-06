@@ -11,6 +11,7 @@ import { Tenant, TenantInput } from '../../models/tenant.model';
 import { KeycloakService } from '@myb-front/auth';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CurrencyService } from '../../services/currency.service';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 @Component({
   selector: 'myb-tenant-management',
@@ -28,6 +29,7 @@ export class TenantManagementComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
   private translate = inject(TranslateService);
   private currencyService = inject(CurrencyService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   tenants: Tenant[] = [];
   units: UnitExtended[] = [];
@@ -92,9 +94,9 @@ export class TenantManagementComponent implements OnInit {
       .subscribe({
         next: (coproperties) => {
           this.coproperties.set(coproperties.map(c => ({ id: c.id, name: c.name, isActive: c.isActive })));
-          const firstActive = coproperties.find(c => c.isActive);
-          if (!this.selectedCopropertyId && firstActive) {
-            this.selectedCopropertyId = firstActive.id;
+          const selectedId = this.activeCoproperty.selectAvailable(coproperties, this.selectedCopropertyId);
+          if (selectedId) {
+            this.selectedCopropertyId = selectedId;
             this.loadData();
           }
         },
@@ -103,8 +105,13 @@ export class TenantManagementComponent implements OnInit {
   }
 
   onCopropertyChange(): void {
+    this.activeCoproperty.setActive(this.selectedCopropertyId);
     this.cancelForm();
     this.loadData();
+  }
+
+  getSelectedCopropertyName(): string {
+    return this.coproperties().find(coproperty => coproperty.id === this.selectedCopropertyId)?.name ?? '';
   }
 
   loadData(): void {
@@ -151,6 +158,7 @@ export class TenantManagementComponent implements OnInit {
   }
 
   editTenant(tenant: Tenant): void {
+    if (!this.isSelectedCopropertyActive()) return;
     this.editingTenantId = tenant.id;
     // Populate immediately from the list row. The detail request below refreshes
     // the values, but a slow or unavailable request must never show an empty form.
@@ -173,7 +181,7 @@ export class TenantManagementComponent implements OnInit {
   }
 
   saveTenant(): void {
-    if (!this.editingTenantId && !this.isSelectedCopropertyActive()) return;
+    if (!this.isSelectedCopropertyActive()) return;
     if (this.tenantForm.invalid || !this.selectedCopropertyId) {
       this.tenantForm.markAllAsTouched();
       return;
@@ -214,6 +222,7 @@ export class TenantManagementComponent implements OnInit {
   }
 
   deactivateTenant(tenant: Tenant): void {
+    if (!this.isSelectedCopropertyActive()) return;
     const input = this.toTenantInput(tenant, false);
     this.tenantService.updateTenant(tenant.id, input, this.selectedCopropertyId)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -227,6 +236,7 @@ export class TenantManagementComponent implements OnInit {
   }
 
   removeTenant(tenant: Tenant): void {
+    if (!this.isSelectedCopropertyActive()) return;
     if (!confirm(this.t('tenantManagement.messages.deleteConfirm', {
       name: `${tenant.firstName} ${tenant.lastName}`,
     }))) {

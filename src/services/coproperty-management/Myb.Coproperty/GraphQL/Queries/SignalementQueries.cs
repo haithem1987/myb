@@ -15,10 +15,13 @@ namespace Myb.Coproperty.GraphQL.Queries
             Guid copropertyId,
             ClaimsPrincipal? user,
             [Service] ISignalementService signalementService,
-            [Service] ICopropertyService copropertyService)
+            [Service] ICopropertyService copropertyService,
+            [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
         {
             await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, copropertyId, copropertyService);
-            return await signalementService.GetByCopropertyIdAsync(copropertyId);
+            var signalements = (await signalementService.GetByCopropertyIdAsync(copropertyId)).ToList();
+            await EnrichReporterDetailsAsync(signalements, contextFactory);
+            return signalements;
         }
 
         public async Task<IEnumerable<Signalement>> GetSignalementsByStatus(
@@ -105,6 +108,46 @@ namespace Myb.Coproperty.GraphQL.Queries
             if (signalement != null)
                 await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, signalement.CopropertyId, copropertyService);
             return signalement;
+        }
+
+        private static async Task EnrichReporterDetailsAsync(
+            IReadOnlyCollection<Signalement> signalements,
+            IDbContextFactory<CopropertyDbContext> contextFactory)
+        {
+            if (signalements.Count == 0)
+                return;
+
+            var reporterIds = signalements
+                .Select(signalement => signalement.ReportedBy)
+                .Distinct()
+                .ToArray();
+
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var ownersByUserId = await context.Owners
+                .AsNoTracking()
+                .Where(owner => !owner.IsDeleted && reporterIds.Contains(owner.UserId))
+                .Include(owner => owner.OwnerUnits)
+                    .ThenInclude(link => link.Unit)
+                .ToDictionaryAsync(owner => owner.UserId);
+
+            foreach (var signalement in signalements)
+            {
+                if (!ownersByUserId.TryGetValue(signalement.ReportedBy, out var owner))
+                    continue;
+
+                signalement.ReporterEmail = string.IsNullOrWhiteSpace(owner.Email) ? null : owner.Email;
+                signalement.ReporterPhone = string.IsNullOrWhiteSpace(owner.Phone) ? null : owner.Phone;
+                signalement.ReporterLots = owner.OwnerUnits
+                    .Where(link =>
+                        link.EndDate == null &&
+                        !link.Unit.IsDeleted &&
+                        link.Unit.CopropertyId == signalement.CopropertyId)
+                    .Select(link => link.Unit.UnitNumber)
+                    .Where(unitNumber => !string.IsNullOrWhiteSpace(unitNumber))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(unitNumber => unitNumber)
+                    .ToArray();
+            }
         }
     }
 }

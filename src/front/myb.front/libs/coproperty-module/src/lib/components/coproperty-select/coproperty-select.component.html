@@ -1,0 +1,149 @@
+<div class="select-page">
+  <header class="select-header">
+    <img src="assets/MYB-LOGO-dark.png" alt="MYB" class="logo-image">
+    <myb-front-user-dropdown></myb-front-user-dropdown>
+  </header>
+
+  <main class="container select-screen py-5">
+  <div class="d-flex justify-content-between align-items-end gap-3 flex-wrap mb-4">
+    <div>
+      <span class="eyebrow">{{ 'copropertySelection.eyebrow' | translate }}</span>
+      <h1 class="title mb-2">{{ 'copropertySelection.title' | translate }}</h1>
+      <p class="text-muted mb-0">
+        {{ (targetSpace() === 'owner' ? 'copropertySelection.ownerSubtitle' : 'copropertySelection.syndicSubtitle') | translate }}
+      </p>
+    </div>
+    <button
+      *ngIf="targetSpace() === 'syndic'"
+      type="button"
+      class="btn btn-primary btn-violet add-coproperty"
+      (click)="addCoproperty()">
+      <i class="bi bi-plus-circle me-2"></i>
+      {{ 'coproperty.list.addCoproperty' | translate }}
+    </button>
+  </div>
+
+  <div *ngIf="loading()" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ 'common.loading' | translate }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading() && error()" class="text-center py-5">
+    <i class="bi bi-exclamation-triangle-fill text-danger display-4 d-block mb-3"></i>
+    <p class="text-danger mb-3">{{ error()! | translate }}</p>
+    <button type="button" class="btn btn-outline-primary" (click)="retry()">
+      <i class="bi bi-arrow-clockwise me-2"></i>
+      {{ 'copropertySelection.retry' | translate }}
+    </button>
+  </div>
+
+  <div *ngIf="!loading() && !error() && coproperties().length === 0" class="card shadow-sm">
+    <div class="card-body text-center py-5">
+      <i class="bi bi-buildings text-muted display-4 d-block mb-3"></i>
+      <h5 class="mb-2">{{ 'copropertySelection.emptyTitle' | translate }}</h5>
+      <p class="text-muted mb-4">{{ 'copropertySelection.emptyText' | translate }}</p>
+      <button type="button" class="btn btn-violet" (click)="continueWithoutSelection()">
+        {{ 'copropertySelection.continue' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div
+    *ngIf="!loading() && !error() && coproperties().length > 0"
+    class="card management-toolbar mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-7">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input
+              type="search"
+              class="form-control"
+              [placeholder]="'coproperty.list.search' | translate"
+              [value]="searchTerm()"
+              (input)="searchTerm.set($any($event.target).value)">
+          </div>
+        </div>
+        <div class="col-md-5">
+          <select
+            class="form-select"
+            [value]="statusFilter()"
+            (change)="statusFilter.set($any($event.target).value)">
+            <option value="all">{{ 'coproperty.list.allCoproperties' | translate }}</option>
+            <option value="active">{{ 'coproperty.list.active' | translate }}</option>
+            <option value="inactive">{{ 'coproperty.list.inactive' | translate }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading() && !error() && filteredCoproperties().length > 0" class="row g-3">
+    <div class="col-md-6 col-xl-4" *ngFor="let coproperty of filteredCoproperties()">
+      <div
+        class="card h-100 shadow-sm coproperty-card text-start w-100"
+        role="button"
+        tabindex="0"
+        (click)="selectAndEnter(coproperty.id)"
+        (keydown)="onCardKeydown($event, coproperty.id)">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title mb-0 text-primary fw-bold">
+              <i class="bi bi-building me-2"></i>{{ coproperty.name }}
+            </h5>
+            <span class="badge" [ngClass]="coproperty.isActive ? 'bg-success' : 'bg-secondary'">
+              {{ (coproperty.isActive ? 'copropertySelection.active' : 'copropertySelection.inactive') | translate }}
+            </span>
+          </div>
+
+          <p class="text-muted mb-3">
+            <i class="bi bi-geo-alt-fill me-1"></i>
+            {{ coproperty.address }}, {{ coproperty.city }}
+          </p>
+
+          <div class="row g-2">
+            <div class="col-6">
+              <div class="stat-box">
+                <div class="stat-label">{{ 'copropertySelection.units' | translate }}</div>
+                <div class="stat-value">{{ coproperty.totalUnits }}</div>
+              </div>
+            </div>
+            <div class="col-6" *ngIf="targetSpace() === 'owner'">
+              <div class="stat-box">
+                <div class="stat-label">{{ 'copropertySelection.myUnits' | translate }}</div>
+                <div class="stat-value">{{ coproperty.ownedUnitsCount ?? 0 }}</div>
+              </div>
+            </div>
+            <div class="col-6" *ngIf="targetSpace() === 'syndic'">
+              <div class="stat-box">
+                <div class="stat-label">{{ 'copropertySelection.shares' | translate }}</div>
+                <div class="stat-value">{{ coproperty.totalShares }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="targetSpace() === 'syndic'" class="card-actions mt-3 pt-3 border-top">
+            <button
+              type="button"
+              class="btn btn-sm btn-violet w-100"
+              (click)="editCoproperty($event, coproperty.id)">
+              <i class="bi bi-pencil-square me-2"></i>
+              {{ 'coproperty.list.edit' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="!loading() && !error() && coproperties().length > 0 && filteredCoproperties().length === 0"
+    class="card shadow-sm">
+    <div class="card-body text-center py-5 text-muted">
+      <i class="bi bi-search display-5 d-block mb-3"></i>
+      {{ 'common.noData' | translate }}
+    </div>
+  </div>
+  </main>
+</div>

@@ -36,6 +36,12 @@ namespace Myb.Coproperty.Services
             _logger = logger;
         }
 
+        public async Task<string> GetServiceAccessTokenAsync()
+        {
+            var (adminBaseUrl, realm) = ParseAuthority();
+            return await GetAccessTokenAsync(adminBaseUrl, realm);
+        }
+
         public async Task<IEnumerable<ManagerDto>> GetManagersByRoleAsync()
         {
             try
@@ -254,6 +260,29 @@ namespace Myb.Coproperty.Services
             user.Attributes["locale"] = new List<string> { language };
             user.Attributes["preferredLanguage"] = new List<string> { language };
             return await UpdateKeycloakUserAsync(userId, user);
+        }
+
+        public async Task SendRequiredActionsEmailAsync(string userId)
+        {
+            var (adminBaseUrl, realm) = ParseAuthority();
+            var token = await GetAccessTokenAsync(adminBaseUrl, realm);
+            using var client = CreateAuthorizedClient(token);
+
+            var clientId = Uri.EscapeDataString(_options.ClientId);
+            var redirectUri = Uri.EscapeDataString(_options.OwnerPortalUrl);
+            var url = $"{adminBaseUrl}/admin/realms/{realm}/users/{Uri.EscapeDataString(userId)}" +
+                      $"/execute-actions-email?client_id={clientId}&redirect_uri={redirectUri}&lifespan=43200";
+            var response = await client.PutAsJsonAsync(
+                url,
+                new[] { "VERIFY_EMAIL", "UPDATE_PASSWORD" },
+                JsonOptions);
+            if (response.IsSuccessStatusCode) return;
+
+            var body = await response.Content.ReadAsStringAsync();
+            _logger.LogError(
+                "Keycloak could not send required-actions email for user {UserId}: {Status} {Body}",
+                userId, response.StatusCode, body);
+            throw new InvalidOperationException("Le compte a été créé, mais l'e-mail de vérification n'a pas pu être envoyé.");
         }
 
         public async Task<string> GetPreferredLanguageAsync(string userId)

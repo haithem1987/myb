@@ -38,11 +38,13 @@ public interface IFundCallService
     Task<List<FundCall>> GetByCopropertyIdAsync(Guid copropertyId, Guid? ownerId = null, int? year = null);
     Task<List<FundCall>> GetAllAsync();
     Task<List<FundCall>> GetByOwnerIdAsync(Guid ownerId);
+    Task<decimal> GetCopropertyOverdueTotalAsync(Guid copropertyId);
     Task<FundCallPayment> AddPaymentAsync(Guid fundCallId, AddFundCallPaymentInput input, string userId);
     Task<FundCallPayment> ReviewPaymentAsync(Guid paymentId, bool approved, string? rejectionReason, string userId);
     Task<List<FundCallPayment>> GetPaymentsByOwnerUserIdAsync(Guid ownerUserId);
     Task<List<CopropertyInvoice>> GenerateInvoicesFromFundCallAsync(Guid fundCallId, string userId);
     Task<Dictionary<Guid, decimal>> GetExistingFundCallTotalsByOwnerAsync(Guid copropertyId);
+    Task NotifyOwnerOfCreatedFundCallAsync(FundCall fundCall);
 
     /// <summary>List of audit-log entries for a given fund call, newest first.
     /// NOTE: this method is intentionally NOT exposed in the GraphQL schema
@@ -153,7 +155,7 @@ public class FundCallService : IFundCallService
     private readonly IKeycloakAdminService _keycloakAdminService;
     private readonly string _frontendUrl;
 
-    private async Task NotifyOwnerDataChangedAsync(Guid? ownerId, string message)
+    private async Task NotifyOwnerDataChangedAsync(Guid? ownerId, Guid copropertyId, string message)
     {
         if (!ownerId.HasValue) return;
 
@@ -165,20 +167,24 @@ public class FundCallService : IFundCallService
         if (!ownerUserId.HasValue) return;
 
         var client = _httpClientFactory.CreateClient("NotificationService");
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _keycloakAdminService.GetServiceAccessTokenAsync());
         var response = await client.PostAsJsonAsync("/api/Notifications", new
         {
             SenderId = SystemNotificationSenderId,
             ReceiverId = ownerUserId.Value.ToString(),
+            CopropertyId = copropertyId.ToString(),
             Message = message
         });
         response.EnsureSuccessStatusCode();
     }
 
-    private async Task BestEffortNotifyOwnerDataChangedAsync(Guid? ownerId, string message)
+    private async Task BestEffortNotifyOwnerDataChangedAsync(
+        Guid? ownerId, Guid copropertyId, string message)
     {
         try
         {
-            await NotifyOwnerDataChangedAsync(ownerId, message);
+            await NotifyOwnerDataChangedAsync(ownerId, copropertyId, message);
         }
         catch (Exception ex)
         {
@@ -341,11 +347,9 @@ public class FundCallService : IFundCallService
                 var snapshotAmount = existingFundCall.Amount;
                 var snapshotDescription = existingFundCall.Description;
                 var snapshotDueDate = existingFundCall.DueDate;
-                _ = Task.Run(async () =>
-                {
-                    try { await SendFundCallEmailToOwner(snapshotOwnerId, snapshotAmount, snapshotDescription, snapshotDueDate, coproperty.Currency); }
-                    catch (Exception ex) { Console.Error.WriteLine($"[FundCallEmail] Background email failed: {ex.GetType().Name}: {ex.Message}"); }
-                });
+                await BestEffortSendFundCallEmailToOwnerAsync(
+                    snapshotOwnerId, snapshotAmount, snapshotDescription,
+                    snapshotDueDate, coproperty.Currency, coproperty.Id);
             }
 
             return existingFundCall;
@@ -379,11 +383,9 @@ public class FundCallService : IFundCallService
             var snapshotAmount = fundCall.Amount;
             var snapshotDescription = fundCall.Description;
             var snapshotDueDate = fundCall.DueDate;
-            _ = Task.Run(async () =>
-            {
-                try { await SendFundCallEmailToOwner(snapshotOwnerId, snapshotAmount, snapshotDescription, snapshotDueDate, coproperty.Currency); }
-                catch (Exception ex) { Console.Error.WriteLine($"[FundCallEmail] Background email failed: {ex.GetType().Name}: {ex.Message}"); }
-            });
+            await BestEffortSendFundCallEmailToOwnerAsync(
+                snapshotOwnerId, snapshotAmount, snapshotDescription,
+                snapshotDueDate, coproperty.Currency, coproperty.Id);
         }
 
         return fundCall;
@@ -396,6 +398,7 @@ public class FundCallService : IFundCallService
         var fundCall = await context.FundCalls.FindAsync(id);
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {id} not found");
+        await EnsureCopropertyIsActiveAsync(context, fundCall.CopropertyId);
 
         EnsureNotPaid(fundCall);
 
@@ -448,6 +451,7 @@ public class FundCallService : IFundCallService
 
         await BestEffortNotifyOwnerDataChangedAsync(
             fundCall.OwnerId,
+            fundCall.CopropertyId,
             $"L'appel de fonds « {fundCall.Description ?? "Appel de fonds"} » a été mis à jour.");
 
         return fundCall;
@@ -463,6 +467,7 @@ public class FundCallService : IFundCallService
 
         if (fundCall == null)
             throw new InvalidOperationException($"FundCall with ID {id} not found");
+        await EnsureCopropertyIsActiveAsync(context, fundCall.CopropertyId);
 
         EnsureNotPaid(fundCall);
 
@@ -481,6 +486,7 @@ public class FundCallService : IFundCallService
 
         await BestEffortNotifyOwnerDataChangedAsync(
             fundCall.OwnerId,
+            fundCall.CopropertyId,
             $"Le statut de l'appel de fonds « {fundCall.Description ?? "Appel de fonds"} » a été mis à jour.");
 
         return fundCall;
@@ -498,6 +504,7 @@ public class FundCallService : IFundCallService
         if (fundCall == null)
             // Silently no-op: deleting a non-existent row is idempotent.
             return;
+        await EnsureCopropertyIsActiveAsync(context, fundCall.CopropertyId);
 
         // Single source of truth for the delete precondition (FRS-FCF-LCM-2026-001 §2.1).
         // EvaluateDeleteBlocker returns a French reason when the row cannot be deleted
@@ -548,6 +555,7 @@ public class FundCallService : IFundCallService
             // (re-exported by HotChocolate). System exception is the standard one
             // that ASP.NET surfaces as a 404.
             throw new System.Collections.Generic.KeyNotFoundException($"Appel de fonds {id} introuvable");
+        await EnsureCopropertyIsActiveAsync(context, fundCall.CopropertyId);
 
         // Idempotent: cancelling an already-cancelled fund call is a no-op
         // (FRS-FCF-LCM-2026-001 AC-06).
@@ -627,7 +635,7 @@ public class FundCallService : IFundCallService
             await _keycloakAdminService.GetPreferredLanguageAsync(fundCall.Owner.UserId.ToString()) == "en";
         var description = fundCall.Description ?? (english ? "Call for funds" : "Appel de fonds");
         var subject = english
-            ? $"Call for funds cancelled – {description}"
+            ? "Call for funds cancelled"
             : $"Appel de fonds annulé – {description}";
         var body = english
             ? $"Hello,\n\nThe call for funds “{description}” for {FormatAmount(fundCall.Amount, fundCall.CurrencySnapshot)} was cancelled by your property manager.\n\nReason: {reason}\n\nAny pending payment submission is no longer applicable. Please contact your property manager if you have questions.\n\n— MYB Platform"
@@ -641,6 +649,7 @@ public class FundCallService : IFundCallService
                 {
                     To = ownerEmail,
                     Subject = subject,
+                    Language = english ? "en" : "fr",
                     HtmlBody = body.Replace("\n", "<br>"),
                     Source = "Myb.Coproperty.CancelFundCall"
                 });
@@ -653,6 +662,7 @@ public class FundCallService : IFundCallService
 
         await BestEffortNotifyOwnerDataChangedAsync(
             fundCall.OwnerId,
+            fundCall.CopropertyId,
             $"L'appel de fonds « {fundCall.Description ?? "Appel de fonds"} » a été annulé. Motif : {reason}");
     }
 
@@ -760,6 +770,38 @@ public class FundCallService : IFundCallService
             .Include(f => f.Payments)
             .OrderByDescending(f => f.DueDate)
             .ToListAsync();
+    }
+
+    /// <summary>
+    /// Returns the outstanding balance of every active, overdue fund call in a
+    /// coproperty. Only approved payments reduce the accounting balance; a
+    /// pending proof must not make an overdue amount disappear before review.
+    /// </summary>
+    public async Task<decimal> GetCopropertyOverdueTotalAsync(Guid copropertyId)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        var today = DateTime.UtcNow.Date;
+
+        var overdueFundCalls = await context.FundCalls
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(fundCall =>
+                fundCall.CopropertyId == copropertyId &&
+                fundCall.IsActive &&
+                fundCall.Status != FundCallStatus.Cancelled &&
+                fundCall.Status != FundCallStatus.Paid &&
+                fundCall.Status != FundCallStatus.Validated &&
+                fundCall.DueDate < today)
+            .Include(fundCall => fundCall.Payments)
+            .ToListAsync();
+
+        return overdueFundCalls.Sum(fundCall =>
+        {
+            var approvedPayments = fundCall.Payments
+                .Where(payment => HasPaymentStatus(payment, "Approved"))
+                .Sum(payment => payment.Amount);
+            return Math.Max(0m, fundCall.Amount - approvedPayments);
+        });
     }
 
     /// <summary>
@@ -937,7 +979,10 @@ public class FundCallService : IFundCallService
         var snapshotPaymentAmount = input.Amount;
         var snapshotPaymentDate = paymentDate;
         var snapshotPaymentMethod = input.PaymentMethod;
-        var snapshotJustificatif = input.Justificatif;
+        // Notify with the persisted, normalized payment reference only. The
+        // proof filename is separate metadata and must not replace the value
+        // entered in the "Reference / Supporting document" field.
+        var snapshotJustificatif = payment.Justificatif;
         var snapshotRemaining = Math.Max(remaining - input.Amount, 0m);
 
         // Hot Chocolate wraps mutations in an ambient TransactionScope. Task.Run
@@ -1011,6 +1056,9 @@ public class FundCallService : IFundCallService
             var statusColor = isPaidInFull ? "#16a34a" : "#d97706";
             var statusBg = isPaidInFull ? "#dcfce7" : "#fef3c7";
             var fundCallUrl = $"{_frontendUrl}/admin/coproperty/syndic/fund-calls";
+            var paymentReference = string.IsNullOrWhiteSpace(justificatif)
+                ? "-"
+                : justificatif;
 
             // 1. Email notification to syndic
             // Resolution order (stop as soon as an email is found):
@@ -1062,8 +1110,15 @@ public class FundCallService : IFundCallService
 
             if (!string.IsNullOrEmpty(syndicEmail))
             {
-                var paymentDateStr = paymentDate.ToString("dd/MM/yyyy");
-                var htmlBody = $@"<!DOCTYPE html>
+                var english = syndicUserId.HasValue &&
+                    await _keycloakAdminService.GetPreferredLanguageAsync(syndicUserId.Value.ToString()) == "en";
+                var paymentDateStr = paymentDate.ToString(english ? "yyyy-MM-dd" : "dd/MM/yyyy");
+                statusText = isPaidInFull
+                    ? (english ? "PAID IN FULL" : "ENTIÈREMENT RÉGLÉ")
+                    : english
+                        ? $"Remaining: {FormatAmount(remainingAfterPayment, coproperty.Currency)}"
+                        : $"Reste à payer : {FormatAmount(remainingAfterPayment, coproperty.Currency)}";
+                var frenchHtmlBody = $@"<!DOCTYPE html>
 <html lang='fr'>
 <head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1.0'>
 <title>Paiement reçu</title></head>
@@ -1130,7 +1185,7 @@ public class FundCallService : IFundCallService
                 </tr>
                 <tr>
                   <td style='padding:12px 16px;color:#6b7280;font-size:14px;border-bottom:1px solid #f3f4f6;'>Référence / Justificatif</td>
-                  <td style='padding:12px 16px;color:#111827;font-size:14px;border-bottom:1px solid #f3f4f6;'>{System.Net.WebUtility.HtmlEncode(justificatif ?? "-")}</td>
+                  <td style='padding:12px 16px;color:#111827;font-size:14px;border-bottom:1px solid #f3f4f6;'>{System.Net.WebUtility.HtmlEncode(paymentReference)}</td>
                 </tr>
                 <tr style='background:#fafafa;'>
                   <td style='padding:12px 16px;color:#6b7280;font-size:14px;border-bottom:1px solid #f3f4f6;'>Montant total appel</td>
@@ -1184,10 +1239,54 @@ public class FundCallService : IFundCallService
   </table>
 </body></html>";
 
+                var htmlBody = english ? $@"<!DOCTYPE html>
+<html lang='en'>
+<head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1.0'>
+<title>Payment received</title></head>
+<body style='margin:0;padding:0;background:#f4f6f9;font-family:Arial,Helvetica,sans-serif;'>
+  <table width='100%' cellpadding='0' cellspacing='0' style='background:#f4f6f9;padding:32px 0;'>
+    <tr><td align='center'>
+      <table width='600' cellpadding='0' cellspacing='0' style='max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);'>
+        <tr><td style='background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 100%);padding:32px 40px;text-align:center;'>
+          <h1 style='color:#ffffff;margin:0;font-size:24px;font-weight:700;'>MYB Coproperty</h1>
+          <p style='color:#bfdbfe;margin:8px 0 0;font-size:14px;'>Manage your coproperty</p>
+        </td></tr>
+        <tr><td style='background:#22c55e;padding:14px 40px;text-align:center;'>
+          <p style='color:#ffffff;margin:0;font-size:18px;font-weight:700;'>💰 New payment received</p>
+        </td></tr>
+        <tr><td style='padding:32px 40px;'>
+          <p style='color:#374151;font-size:15px;margin:0 0 24px;'>A payment was submitted for a call for funds in <strong>{System.Net.WebUtility.HtmlEncode(coproperty.Name)}</strong>. Please review it in your property-manager space.</p>
+          <table width='100%' cellpadding='0' cellspacing='0' style='border-collapse:collapse;margin-bottom:24px;border:1px solid #e5e7eb;'>
+            <tr><td style='padding:10px 14px;'><strong>Coproperty</strong></td><td>{System.Net.WebUtility.HtmlEncode(coproperty.Name)}</td></tr>
+            <tr><td style='padding:10px 14px;'><strong>Owner</strong></td><td>{System.Net.WebUtility.HtmlEncode(ownerName)}</td></tr>
+            <tr><td style='padding:10px 14px;'><strong>Call for funds</strong></td><td>{System.Net.WebUtility.HtmlEncode(fundCallDescription ?? "Call for funds")}</td></tr>
+            <tr><td style='padding:10px 14px;'><strong>Payment date</strong></td><td>{paymentDateStr}</td></tr>
+            <tr><td style='padding:10px 14px;'><strong>Amount paid</strong></td><td>{FormatAmount(paymentAmount, coproperty.Currency)}</td></tr>
+            <tr><td style='padding:10px 14px;'><strong>Payment method</strong></td><td>{System.Net.WebUtility.HtmlEncode(paymentMethod ?? "-")}</td></tr>
+            <tr><td style='padding:10px 14px;'><strong>Reference / Supporting document</strong></td><td>{System.Net.WebUtility.HtmlEncode(paymentReference)}</td></tr>
+            <tr><td style='padding:10px 14px;'><strong>Total call amount</strong></td><td>{FormatAmount(fundCallAmount, coproperty.Currency)}</td></tr>
+            <tr><td style='padding:10px 14px;'><strong>Total submitted</strong></td><td>{FormatAmount(totalCommitted, coproperty.Currency)}</td></tr>
+            <tr style='background:{statusBg};'><td style='padding:10px 14px;'><strong>Status</strong></td><td style='color:{statusColor};font-weight:700;'>{statusText}</td></tr>
+          </table>
+          <p style='text-align:center;margin:28px 0;'><a href='{fundCallUrl}' style='display:inline-block;padding:14px 32px;background:#1d4ed8;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:700;'>View calls for funds</a></p>
+          <p style='color:#9ca3af;font-size:12px;text-align:center;'>Or copy this link: <a href='{fundCallUrl}'>{fundCallUrl}</a></p>
+        </td></tr>
+        <tr><td style='background:#f9fafb;border-top:1px solid #e5e7eb;padding:20px 40px;text-align:center;'>
+          <p style='color:#9ca3af;font-size:12px;margin:0 0 4px;'>This email was sent automatically by MYB Coproperty.</p>
+          <p style='color:#9ca3af;font-size:12px;margin:0;'>Please do not reply. Sign in to your property-manager space if you have questions.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>" : frenchHtmlBody;
+
                 await _emailPublisher.PublishAsync(new EmailMessage
                 {
                     To = syndicEmail,
-                    Subject = $"[MYB] Paiement reçu — {ownerName} | {coproperty.Name} ({FormatAmount(paymentAmount, coproperty.Currency)})",
+                    Subject = english
+                        ? $"[MYB] Payment received — {ownerName} | {coproperty.Name} ({FormatAmount(paymentAmount, coproperty.Currency)})"
+                        : $"[MYB] Paiement reçu — {ownerName} | {coproperty.Name} ({FormatAmount(paymentAmount, coproperty.Currency)})",
+                    Language = english ? "en" : "fr",
                     HtmlBody = htmlBody,
                     Source = "coproperty-payment"
                 });
@@ -1199,10 +1298,13 @@ public class FundCallService : IFundCallService
                 try
                 {
                     var httpClient = _httpClientFactory.CreateClient("NotificationService");
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _keycloakAdminService.GetServiceAccessTokenAsync());
                     var notificationPayload = new
                     {
                         senderId = owner.UserId.ToString(),
                         receiverId = syndicUserId.Value.ToString(),
+                        copropertyId = coproperty.Id.ToString(),
                         message = $"💰 Paiement reçu : {ownerName} a versé {FormatAmount(paymentAmount, coproperty.Currency)} ({paymentMethod ?? "Virement"}) pour \"{fundCallDescription ?? "Appel de fonds"}\". {statusText}"
                     };
                     var content = new System.Net.Http.StringContent(
@@ -1319,10 +1421,40 @@ public class FundCallService : IFundCallService
     }
 
     /// <summary>
-    /// Sends a fund call notification email to the owner (fire-and-forget helper).
+    /// Publishes a fund-call email before the mutation returns, while keeping the
+    /// already-persisted accounting operation authoritative if messaging is down.
     /// </summary>
+    private async Task BestEffortSendFundCallEmailToOwnerAsync(
+        Guid ownerId, decimal amount, string? description, DateTime dueDate,
+        Currency currency, Guid copropertyId)
+    {
+        try
+        {
+            await SendFundCallEmailToOwner(
+                ownerId, amount, description, dueDate, currency, copropertyId);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(
+                $"[FundCallEmail] Publish failed for owner {ownerId}: {ex.GetType().Name}: {ex.Message}");
+        }
+    }
+
+    public Task NotifyOwnerOfCreatedFundCallAsync(FundCall fundCall)
+    {
+        if (!fundCall.OwnerId.HasValue) return Task.CompletedTask;
+        return BestEffortSendFundCallEmailToOwnerAsync(
+            fundCall.OwnerId.Value,
+            fundCall.Amount,
+            fundCall.Description,
+            fundCall.DueDate,
+            fundCall.CurrencySnapshot,
+            fundCall.CopropertyId);
+    }
+
     private async Task SendFundCallEmailToOwner(
-        Guid ownerId, decimal amount, string? description, DateTime dueDate, Currency currency)
+        Guid ownerId, decimal amount, string? description, DateTime dueDate,
+        Currency currency, Guid copropertyId)
     {
         using var context = _contextFactory.CreateDbContext();
         var owner = await context.Owners.FindAsync(ownerId);
@@ -1341,7 +1473,8 @@ public class FundCallService : IFundCallService
                 await _emailPublisher.PublishAsync(new EmailMessage
                 {
                     To = owner.Email,
-                    Subject = english ? $"New call for funds – {description}" : $"Nouvel appel de fonds – {description}",
+                    Subject = english ? "New call for funds" : $"Nouvel appel de fonds – {description}",
+                    Language = english ? "en" : "fr",
                     HtmlBody = english ? $"""
                 <html><body style="font-family:Arial,sans-serif;color:#333">
                   <h2 style="color:#2c5282">New call for funds</h2>
@@ -1383,6 +1516,7 @@ public class FundCallService : IFundCallService
 
         await BestEffortNotifyOwnerDataChangedAsync(
             ownerId,
+            copropertyId,
             english
                 ? $"The call for funds “{description ?? "Call for funds"}” was updated."
                 : $"L'appel de fonds « {description ?? "Appel de fonds"} » a été mis à jour.");
@@ -1444,12 +1578,13 @@ public class FundCallService : IFundCallService
         var snapshotApproved = approved;
         var snapshotRejectionReason = rejectionReason;
         var snapshotCurrency = payment.FundCall.CurrencySnapshot;
+        var snapshotCopropertyId = payment.FundCall.CopropertyId;
         try
         {
             await NotifyOwnerPaymentReview(
                 snapshotOwnerId, snapshotAmount, snapshotDescription,
                 snapshotDueDate, snapshotApproved, snapshotRejectionReason,
-                snapshotCurrency);
+                snapshotCurrency, snapshotCopropertyId);
         }
         catch (Exception ex)
         {
@@ -1465,7 +1600,8 @@ public class FundCallService : IFundCallService
     /// </summary>
     private async Task NotifyOwnerPaymentReview(
         Guid? ownerId, decimal amount, string? description,
-        DateTime dueDate, bool approved, string? rejectionReason, Currency currency)
+        DateTime dueDate, bool approved, string? rejectionReason, Currency currency,
+        Guid copropertyId)
     {
         if (!ownerId.HasValue) return;
 
@@ -1479,17 +1615,17 @@ public class FundCallService : IFundCallService
 
         if (approved)
         {
-            subject = english ? $"Payment approved – {description}" : $"Paiement validé – {description}";
+            subject = english ? "Payment approved – Call for funds" : $"Paiement validé – {description}";
             statusBanner = english
                 ? """<td style="background:#22c55e;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">✅ Your payment was approved</p></td>"""
                 : """<td style="background:#22c55e;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">✅ Votre paiement a été validé</p></td>""";
             bodyContent = english
-                ? $"""<p>Your payment of <strong>{FormatAmount(amount, currency)}</strong> for <strong>{description}</strong> was <strong style="color:#16a34a">approved</strong> by your property manager.</p>"""
+                ? $"""<p>Your payment of <strong>{FormatAmount(amount, currency)}</strong> for your call for funds was <strong style="color:#16a34a">approved</strong> by your property manager.</p>"""
                 : $"""<p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#16a34a">validé</strong> par le syndic.</p>""";
         }
         else
         {
-            subject = english ? $"Payment rejected – {description}" : $"Paiement refusé – {description}";
+            subject = english ? "Payment rejected – Call for funds" : $"Paiement refusé – {description}";
             statusBanner = english
                 ? """<td style="background:#ef4444;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">❌ Your payment was rejected</p></td>"""
                 : """<td style="background:#ef4444;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">❌ Votre paiement a été refusé</p></td>""";
@@ -1497,7 +1633,7 @@ public class FundCallService : IFundCallService
                 ? ""
                 : $"""<p style="margin:12px 0;padding:12px 16px;background:#fef2f2;border-left:4px solid #ef4444;border-radius:4px;color:#991b1b;"><strong>{(english ? "Reason" : "Motif")}:</strong> {System.Net.WebUtility.HtmlEncode(rejectionReason)}</p>""";
             bodyContent = english
-                ? $"""<p>Your payment of <strong>{FormatAmount(amount, currency)}</strong> for <strong>{description}</strong> was <strong style="color:#dc2626">rejected</strong> by your property manager.</p>{reasonHtml}<p>Please submit new supporting documentation or contact your property manager.</p>"""
+                ? $"""<p>Your payment of <strong>{FormatAmount(amount, currency)}</strong> for your call for funds was <strong style="color:#dc2626">rejected</strong> by your property manager.</p>{reasonHtml}<p>Please submit new supporting documentation or contact your property manager.</p>"""
                 : $"""<p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#dc2626">refusé</strong> par le syndic.</p>{reasonHtml}<p>Veuillez soumettre un nouveau justificatif ou contacter votre syndic pour régulariser la situation.</p>""";
         }
 
@@ -1509,11 +1645,12 @@ public class FundCallService : IFundCallService
                 {
                     To = owner.Email,
                     Subject = $"[MYB] {subject}",
+                    Language = english ? "en" : "fr",
                     HtmlBody = $"""
                 <html><body style="font-family:Arial,sans-serif;color:#333;background:#f4f6f9;margin:0;padding:32px 0;">
                   <table width="600" style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);">
                     <tr><td style="background:linear-gradient(135deg,#1e3a8a,#1d4ed8);padding:32px 40px;text-align:center;">
-                      <h1 style="color:#fff;margin:0;font-size:24px;font-weight:700;">MYB Copropriété</h1>
+                      <h1 style="color:#fff;margin:0;font-size:24px;font-weight:700;">MYB {(english ? "Coproperty" : "Copropriété")}</h1>
                     </td></tr>
                     <tr>{statusBanner}</tr>
                     <tr><td style="padding:32px 40px;">
@@ -1542,6 +1679,8 @@ public class FundCallService : IFundCallService
         // frontend uses this SignalR event as a cache-invalidation signal and
         // reloads amounts, statuses, receipts, and the rejection reason.
         var httpClient = _httpClientFactory.CreateClient("NotificationService");
+        httpClient.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _keycloakAdminService.GetServiceAccessTokenAsync());
         var decision = approved ? "validé" : "rejeté";
         var reason = !approved && !string.IsNullOrWhiteSpace(rejectionReason)
             ? $" Motif : {rejectionReason.Trim()}"
@@ -1550,6 +1689,7 @@ public class FundCallService : IFundCallService
         {
             senderId = SystemNotificationSenderId,
             receiverId = owner.UserId.ToString(),
+            copropertyId = copropertyId.ToString(),
             message = $"Votre paiement de {FormatAmount(amount, currency)} pour « {description ?? "Appel de fonds"} » a été {decision}.{reason}"
         };
         using var content = new System.Net.Http.StringContent(
@@ -1561,6 +1701,17 @@ public class FundCallService : IFundCallService
     }
 
     private const string SystemNotificationSenderId = "system";
+
+    private static async Task EnsureCopropertyIsActiveAsync(
+        CopropertyDbContext context, Guid copropertyId)
+    {
+        if (!await context.Coproperties.AnyAsync(coproperty =>
+            coproperty.Id == copropertyId && coproperty.IsActive))
+        {
+            throw new InvalidOperationException(
+                "New operations are not allowed for an inactive coproperty.");
+        }
+    }
 
     private static string FormatAmount(decimal amount, Currency currency)
     {

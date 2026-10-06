@@ -1,7 +1,7 @@
 import { Component, signal, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalService, ToastService } from '@myb-front/shared-ui';
+import { ModalService, NoResultComponent, ToastService } from '@myb-front/shared-ui';
 import { OwnerService, MaintenanceRequest as BackendMaintenanceRequest, MaintenanceStatus, MaintenanceCategory, Priority, Unit, CurrencyService } from '../../../index';
 import { KeycloakService } from '@myb-front/auth';
 
@@ -24,7 +24,7 @@ interface MaintenanceRequest {
 @Component({
   selector: 'app-owner-maintenance',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NoResultComponent],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
@@ -204,15 +204,16 @@ interface MaintenanceRequest {
       </div>
 
       <!-- Empty State -->
-      <div class="empty-state" *ngIf="filteredRequests().length === 0">
-        <i class="bi bi-tools"></i>
-        <h4>Aucune demande de travaux</h4>
-        <p>Vous n'avez pas encore soumis de demande</p>
+      <myb-front-no-result
+        *ngIf="filteredRequests().length === 0"
+        icon="bi-tools"
+        title="Aucune demande de travaux"
+        message="Vous n'avez pas encore soumis de demande">
         <button class="btn btn-primary" (click)="createRequest()">
           <i class="bi bi-plus-lg me-2"></i>
           Créer une demande
         </button>
-      </div>
+      </myb-front-no-result>
     </div>
   `,
   styles: [`
@@ -402,29 +403,6 @@ interface MaintenanceRequest {
       align-items: center;
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      background: white;
-      border-radius: 12px;
-    }
-
-    .empty-state i {
-      font-size: 64px;
-      color: #dee2e6;
-      margin-bottom: 20px;
-    }
-
-    .empty-state h4 {
-      color: #495057;
-      margin-bottom: 8px;
-    }
-
-    .empty-state p {
-      color: #6c757d;
-      margin-bottom: 24px;
-    }
-
     @media (max-width: 992px) {
       .stat-card { padding: 16px; }
       .stat-icon { width: 44px; height: 44px; font-size: 20px; }
@@ -455,8 +433,6 @@ interface MaintenanceRequest {
       .request-footer .btn-group .btn { flex: 1; }
 
       .syndic-comments { padding: 10px; }
-      .empty-state { padding: 40px 16px; }
-      .empty-state i { font-size: 48px; }
     }
   `]
 })

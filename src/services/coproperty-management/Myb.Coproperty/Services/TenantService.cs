@@ -75,6 +75,7 @@ public class TenantService : ITenantService
 
         var existingTenant = await GetByIdAsync(tenant.Id);
         var previousUnitId = existingTenant.UnitId;
+        EnsureCopropertyIsActive(tenant.UnitId);
 
         await EnsureUnitCanReceiveActiveTenant(tenant.UnitId, tenant.IsActive, tenant.Id);
 
@@ -95,8 +96,18 @@ public class TenantService : ITenantService
     public async Task DeleteAsync(Guid id)
     {
         var tenant = await GetByIdAsync(id);
+        EnsureCopropertyIsActive(tenant.UnitId);
         await _tenantRepository.DeleteAsync(id);
         await SyncUnitOccupancyAsync(tenant.UnitId);
+    }
+
+    private void EnsureCopropertyIsActive(Guid unitId)
+    {
+        var unit = _unitRepository.GetAll()
+            .Include(candidate => candidate.Coproperty)
+            .FirstOrDefault(candidate => candidate.Id == unitId);
+        if (unit?.Coproperty == null || !unit.Coproperty.IsActive)
+            throw new InvalidOperationException("New operations are not allowed for an inactive coproperty.");
     }
 
     private async Task EnsureUnitCanReceiveActiveTenant(Guid unitId, bool isActive, Guid? currentTenantId)

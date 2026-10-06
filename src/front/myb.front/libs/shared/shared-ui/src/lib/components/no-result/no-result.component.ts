@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -9,4 +9,9 @@ import { TranslateModule } from '@ngx-translate/core';
   templateUrl: './no-result.component.html',
   styleUrl: './no-result.component.css',
 })
-export class NoResultComponent {}
+export class NoResultComponent {
+  @Input() title = '';
+  @Input() message = '';
+  @Input() icon = 'bi-inbox';
+  @Input() compact = false;
+}

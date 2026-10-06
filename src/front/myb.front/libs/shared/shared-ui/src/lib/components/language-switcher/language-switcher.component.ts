@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LanguageService } from 'libs/shared/infra/services/language.service';
+import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 @Component({
   selector: 'myb-front-language-switcher',
   standalone: true,
@@ -13,7 +14,10 @@ import { LanguageService } from 'libs/shared/infra/services/language.service';
 export class LanguageSwitcherComponent implements OnInit {
   selectedLanguage!: string;
 
-  constructor(private languageService: LanguageService) {}
+  constructor(
+    private languageService: LanguageService,
+    private keycloakService: KeycloakService
+  ) {}
 
   ngOnInit(): void {
     this.languageService.language$.subscribe((language) => {
@@ -23,5 +27,8 @@ export class LanguageSwitcherComponent implements OnInit {
 
   switchLanguage(language: string): void {
     this.languageService.setLanguage(language);
+    void this.keycloakService.syncPreferredLanguage(language).catch((error) => {
+      console.warn('Could not synchronize email language preference', error);
+    });
   }
 }

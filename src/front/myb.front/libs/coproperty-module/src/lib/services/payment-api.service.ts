@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface ChargePaymentRequest {
   userId: string;
@@ -11,6 +12,7 @@ export interface ChargePaymentRequest {
   currency?: string;
   receiptEmail?: string;
   paymentMethod?: string;
+  language?: string;
 }
 
 export interface ChargePaymentResponse {
@@ -35,6 +37,7 @@ export interface PaymentRecord {
 })
 export class PaymentApiService {
   private http = inject(HttpClient);
+  private translate = inject(TranslateService);
   private readonly baseUrl = '/api/payment';
 
   /**
@@ -44,7 +47,10 @@ export class PaymentApiService {
   payCharge(request: ChargePaymentRequest): Observable<ChargePaymentResponse> {
     return this.http.post<ChargePaymentResponse>(
       `${this.baseUrl}/pay-charge`,
-      request
+      {
+        ...request,
+        language: request.language || this.translate.currentLang || this.translate.defaultLang || 'fr',
+      }
     );
   }
 

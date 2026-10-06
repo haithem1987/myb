@@ -36,12 +36,12 @@
         their owner space regardless of the entry point.
       -->
       <li *ngIf="isCopropertyOwner">
-        <a class="dropdown-item" href="/coproperty/owner/dashboard">
+        <a class="dropdown-item" href="/coproperty/select?space=owner">
           <i class="bi bi-building me-2"></i>{{ 'navigation.ownerSpace' | translate }}
         </a>
       </li>
       <li *ngIf="isCopropertyMember && !isAdminApp">
-        <a class="dropdown-item" routerLink="/coproperty/syndic/dashboard">
+        <a class="dropdown-item" routerLink="/coproperty/select" [queryParams]="{ space: 'syndic' }">
           <i class="bi bi-buildings me-2"></i>{{ 'navigation.syndicSpace' | translate }}
         </a>
       </li>

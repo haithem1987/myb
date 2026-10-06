@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import '@angular/localize/init';
-import { RouterModule } from '@angular/router';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterModule } from '@angular/router';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { TranslateService } from '@ngx-translate/core';
 import {
@@ -8,15 +10,17 @@ import {
   ToastsContainerComponent,
 } from '@myb-front/shared-ui';
 import { LanguageService } from '@myb-front/shared-ui';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
   standalone: true,
-  imports: [NxWelcomeComponent, RouterModule, ToastsContainerComponent],
+  imports: [CommonModule, NxWelcomeComponent, RouterModule, ToastsContainerComponent, TranslateModule],
   selector: 'myb-front-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   title = 'client';
+  routeLoading = signal(false);
   private static readonly SUPPORTED_LANGUAGES = ['fr', 'en'];
 
   private normalizeLanguage(language: string | null): string {
@@ -27,7 +31,9 @@ export class AppComponent implements OnInit {
   constructor(
     private translate: TranslateService,
     private notificationService: NotificationService,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private router: Router,
+    private destroyRef: DestroyRef
   ) {
     this.translate.addLangs(['fr', 'en']);
     this.translate.setDefaultLang('fr');
@@ -45,6 +51,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.watchRouteLoading();
     const redirectLanguage = this.getLanguageFromRedirectParams();
     if (redirectLanguage) {
       this.languageService.setLanguage(redirectLanguage);
@@ -56,5 +63,21 @@ export class AppComponent implements OnInit {
     }
 
     this.notificationService.startConnection();
+  }
+
+  private watchRouteLoading(): void {
+    this.router.events
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(event => {
+        if (event instanceof NavigationStart) {
+          this.routeLoading.set(true);
+        } else if (
+          event instanceof NavigationEnd ||
+          event instanceof NavigationCancel ||
+          event instanceof NavigationError
+        ) {
+          this.routeLoading.set(false);
+        }
+      });
   }
 }

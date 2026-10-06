@@ -4,7 +4,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { Subject, forkJoin } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { InterventionService } from '../../services/intervention.service';
 import { CopropertyService } from '../../services/coproperty.service';
@@ -13,6 +13,7 @@ import { KeycloakService } from '@myb-front/auth';
 import { Intervention } from '../../models/intervention.model';
 import { Coproperty } from '../../models/coproperty.models';
 import { ToastService } from '@myb-front/shared-ui';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 @Component({
   selector: 'myb-intervention-list',
@@ -28,6 +29,7 @@ export class InterventionListComponent implements OnInit, OnDestroy {
   private keycloakService = inject(KeycloakService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   // Data
   readonly interventions = signal<Intervention[]>([]);
@@ -74,10 +76,8 @@ export class InterventionListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (cops) => {
           this.coproperties.set(cops);
-          if (!cops.some(c => c.id === this.selectedCopropertyId)) {
-            this.selectedCopropertyId = (cops.find(c => c.isActive) ?? cops[0])?.id ?? '';
-          }
-          this.loadAllInterventions(cops);
+          this.selectedCopropertyId = this.activeCoproperty.selectAvailable(cops, this.selectedCopropertyId);
+          this.loadSelectedInterventions();
         },
         error: (err) => {
           console.error('Error loading coproperties:', err);
@@ -86,23 +86,18 @@ export class InterventionListComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadAllInterventions(cops: Coproperty[]): void {
-    if (cops.length === 0) {
+  private loadSelectedInterventions(): void {
+    if (!this.selectedCopropertyId) {
       this.isLoading.set(false);
       return;
     }
 
-    const requests = cops.map((cop) =>
-      this.interventionService.getInterventionsByCoproperty(cop.id)
-    );
-
-    forkJoin(requests)
+    this.interventionService.getInterventionsByCoproperty(this.selectedCopropertyId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (results) => {
-          const allInterventions = results.flat();
-          this.interventions.set(allInterventions);
-          this.updateStats(allInterventions);
+        next: (interventions) => {
+          this.interventions.set(interventions);
+          this.updateStats(interventions);
           this.applyFilters();
           this.isLoading.set(false);
         },
@@ -149,18 +144,31 @@ export class InterventionListComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange(): void {
+    this.activeCoproperty.setActive(this.selectedCopropertyId);
     this.applyFilters();
   }
 
+  getSelectedCopropertyName(): string {
+    return this.coproperties().find(coproperty => coproperty.id === this.selectedCopropertyId)?.name ?? '';
+  }
+
+  isSelectedCopropertyActive(): boolean {
+    return this.coproperties().find(coproperty =>
+      coproperty.id === this.selectedCopropertyId)?.isActive !== false;
+  }
+
   createNew(): void {
+    if (!this.isSelectedCopropertyActive()) return;
     this.router.navigate(['/coproperty/syndic/interventions/new']);
   }
 
   editIntervention(id: string): void {
+    if (!this.isSelectedCopropertyActive()) return;
     this.router.navigate(['/coproperty/syndic/interventions', id, 'edit']);
   }
 
   deleteIntervention(intervention: Intervention): void {
+    if (!this.isSelectedCopropertyActive()) return;
     if (!confirm(`Delete intervention "${intervention.title}"?`)) return;
 
     this.interventionService.deleteIntervention(intervention.id)

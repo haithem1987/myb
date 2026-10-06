@@ -4,9 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Apollo, gql } from 'apollo-angular';
 import { KeycloakService } from '@myb-front/auth';
-import { CopropertyService } from '@myb-front/coproperty-module';
+import { CopropertyService, OwnerService } from '@myb-front/coproperty-module';
 import { firstValueFrom } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 type ConversationKind = 'discussion' | 'annonce';
 interface ChatMessage { id: string; authorId: string; author: string; role: 'syndic' | 'owner'; body: string; sentAt: string; }
@@ -26,6 +27,8 @@ export class DiscussionsComponent implements OnInit {
   private keycloak = inject(KeycloakService);
   private copropertyService = inject(CopropertyService);
   private translate = inject(TranslateService);
+  private ownerService = inject(OwnerService);
+  private activeCoproperty = inject(ActiveCopropertyService);
   readonly isSyndic: boolean;
   readonly currentUserId: string;
   readonly currentUserName: string;
@@ -63,8 +66,16 @@ export class DiscussionsComponent implements OnInit {
     try {
       const managerId = this.keycloak.getSyndicManagerId();
       const items = await firstValueFrom(this.copropertyService.getCoproperties(managerId));
-      this.coproperties.set(items.map(c => ({ id: c.id, name: c.name })));
-      this.newCoproperty = items[0]?.id || '';
+      let accessibleItems = items;
+      if (!this.isSyndic) {
+        const units = await firstValueFrom(this.ownerService.getMyUnits(this.currentUserId));
+        const accessibleIds = new Set(units.map(unit => unit.copropertyId));
+        accessibleItems = items.filter(coproperty => accessibleIds.has(coproperty.id));
+      }
+      const selectedId = this.activeCoproperty.selectAvailable(accessibleItems);
+      const selected = accessibleItems.find(coproperty => coproperty.id === selectedId);
+      this.coproperties.set(selected ? [{ id: selected.id, name: selected.name }] : []);
+      this.newCoproperty = selectedId;
       if (this.newCoproperty) await this.loadDiscussions(this.newCoproperty);
     } catch { this.error.set(this.translate.instant('discussions.errors.load')); }
     finally { this.loading.set(false); }

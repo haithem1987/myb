@@ -53,20 +53,30 @@ public class PaymentController : ControllerBase
             // Send payment confirmation email
             if (!string.IsNullOrEmpty(request.ReceiptEmail))
             {
+                var english = IsEnglish(request.Language);
+                var amount = request.Amount.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
                 await _emailPublisher.PublishAsync(new EmailMessage
                 {
                     To = request.ReceiptEmail,
-                    Subject = "Confirmation de paiement - MYB",
-                    HtmlBody = $@"<h1>Paiement confirmé</h1>
+                    Subject = english ? "Payment confirmation - MYB" : "Confirmation de paiement - MYB",
+                    Language = english ? "en" : "fr",
+                    HtmlBody = english ? $@"<h1>Payment confirmed</h1>
+                        <p>Your payment was processed successfully.</p>
+                        <table style='border-collapse:collapse;'>
+                            <tr><td><strong>Service:</strong></td><td>{payment.ServiceName}</td></tr>
+                            <tr><td><strong>Amount:</strong></td><td>{amount} {request.Currency.ToUpper()}</td></tr>
+                            <tr><td><strong>Date:</strong></td><td>{payment.PaymentDate:dd/MM/yyyy}</td></tr>
+                            <tr><td><strong>Reference:</strong></td><td>#{payment.Id}</td></tr>
+                        </table>
+                        <br/>
+                        <p>Regards,<br/>The MYB team</p>" : $@"<h1>Paiement confirmé</h1>
                         <p>Votre paiement a été traité avec succès.</p>
                         <table style='border-collapse:collapse;'>
                             <tr><td><strong>Service :</strong></td><td>{payment.ServiceName}</td></tr>
-                            <tr><td><strong>Montant :</strong></td><td>{request.Amount} {request.Currency.ToUpper()}</td></tr>
+                            <tr><td><strong>Montant :</strong></td><td>{amount} {request.Currency.ToUpper()}</td></tr>
                             <tr><td><strong>Date :</strong></td><td>{payment.PaymentDate:dd/MM/yyyy}</td></tr>
                             <tr><td><strong>Référence :</strong></td><td>#{payment.Id}</td></tr>
-                        </table>
-                        <br/>
-                        <p>Cordialement,<br/>L'équipe MYB</p>",
+                        </table><br/><p>Cordialement,<br/>L'équipe MYB</p>",
                     Source = "payment-service"
                 });
             }
@@ -168,16 +178,27 @@ public class PaymentController : ControllerBase
             // Step 3: Send confirmation email
             if (!string.IsNullOrEmpty(request.ReceiptEmail))
             {
+                var english = IsEnglish(request.Language);
+                var amount = request.Amount.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
                 await _emailPublisher.PublishAsync(new EmailMessage
                 {
                     To = request.ReceiptEmail,
-                    Subject = "Confirmation de paiement de charge - MYB",
-                    HtmlBody = $@"<h1>Paiement de charge confirmé</h1>
+                    Subject = english ? "Charge payment confirmation - MYB" : "Confirmation de paiement de charge - MYB",
+                    Language = english ? "en" : "fr",
+                    HtmlBody = english ? $@"<h1>Charge payment confirmed</h1>
+                        <p>Your coproperty charge payment was processed successfully.</p>
+                        <table style='border-collapse:collapse;'>
+                            <tr><td><strong>Charge:</strong></td><td>{request.ChargeName}</td></tr>
+                            <tr><td><strong>Unit:</strong></td><td>{request.UnitNumber}</td></tr>
+                            <tr><td><strong>Amount:</strong></td><td>{amount} {(request.Currency ?? "EUR").ToUpper()}</td></tr>
+                            <tr><td><strong>Date:</strong></td><td>{payment.PaymentDate:dd/MM/yyyy}</td></tr>
+                            <tr><td><strong>Reference:</strong></td><td>#{payment.Id}</td></tr>
+                        </table><br/><p>Regards,<br/>The MYB team</p>" : $@"<h1>Paiement de charge confirmé</h1>
                         <p>Votre paiement de charge de copropriété a été traité avec succès.</p>
                         <table style='border-collapse:collapse;'>
                             <tr><td><strong>Charge :</strong></td><td>{request.ChargeName}</td></tr>
                             <tr><td><strong>Lot :</strong></td><td>{request.UnitNumber}</td></tr>
-                            <tr><td><strong>Montant :</strong></td><td>{request.Amount} {(request.Currency ?? "EUR").ToUpper()}</td></tr>
+                            <tr><td><strong>Montant :</strong></td><td>{amount} {(request.Currency ?? "EUR").ToUpper()}</td></tr>
                             <tr><td><strong>Date :</strong></td><td>{payment.PaymentDate:dd/MM/yyyy}</td></tr>
                             <tr><td><strong>Référence :</strong></td><td>#{payment.Id}</td></tr>
                         </table>
@@ -222,6 +243,9 @@ public class PaymentController : ControllerBase
             return StatusCode(500, "An error occurred while fetching charge payments.");
         }
     }
+
+    private static bool IsEnglish(string? language) =>
+        language?.StartsWith("en", StringComparison.OrdinalIgnoreCase) == true;
 }
 
 public class PaymentRequest
@@ -234,6 +258,7 @@ public class PaymentRequest
     public string ServiceName { get; set; }
     public string? PaymentMethod { get; set; }
     public bool IsRecurring { get; set; }
+    public string? Language { get; set; }
 }
 
 public class ChargePaymentRequest
@@ -246,4 +271,5 @@ public class ChargePaymentRequest
     public string? Currency { get; set; }
     public string? ReceiptEmail { get; set; }
     public string? PaymentMethod { get; set; }
+    public string? Language { get; set; }
 }

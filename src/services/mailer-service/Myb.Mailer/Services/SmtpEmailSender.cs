@@ -18,13 +18,18 @@ public class SmtpEmailSender : ISmtpEmailSender
 
     public async Task SendAsync(EmailMessage email)
     {
+        if (string.IsNullOrWhiteSpace(email.To))
+            throw new InvalidEmailAddressException($"Email has no recipient (To is empty). Subject: {email.Subject}");
+
         var smtp = _config.GetSection("Smtp");
 
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(
             smtp["FromName"] ?? "MYB Platform",
             smtp["FromAddress"] ?? "noreply@myb.com"));
-        message.To.Add(MailboxAddress.Parse(email.To));
+        if (!MailboxAddress.TryParse(email.To, out var toAddress))
+            throw new InvalidEmailAddressException($"Email recipient is not a valid address: '{email.To}'. Subject: {email.Subject}");
+        message.To.Add(toAddress);
         message.Subject = email.Subject;
 
         if (!string.IsNullOrEmpty(email.Cc))
@@ -33,7 +38,8 @@ public class SmtpEmailSender : ISmtpEmailSender
             message.ReplyTo.Add(MailboxAddress.Parse(email.ReplyTo));
 
         var brandName = smtp["BrandName"] ?? "MYB";
-        var renderedHtml = EmailTemplateRenderer.Render(email, brandName);
+        var applicationUrl = smtp["ApplicationUrl"] ?? "https://myb.com";
+        var renderedHtml = EmailTemplateRenderer.Render(email, brandName, applicationUrl);
         message.Body = new BodyBuilder
         {
             HtmlBody = renderedHtml,

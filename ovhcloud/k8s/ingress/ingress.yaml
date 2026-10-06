@@ -26,6 +26,23 @@ spec:
   - host: myb-platform.com
     http:
       paths:
+      # Development URL namespace (keep production as the default root)
+      - path: /dev/admin
+        pathType: Prefix
+        backend:
+          service:
+            name: myb-admin
+            port:
+              number: 80
+
+      - path: /dev
+        pathType: Prefix
+        backend:
+          service:
+            name: myb-client
+            port:
+              number: 80
+
       # Admin Frontend
       - path: /admin
         pathType: Prefix

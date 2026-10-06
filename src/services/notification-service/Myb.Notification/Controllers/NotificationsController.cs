@@ -23,14 +23,16 @@ public class NotificationsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] NotificationRequest req)
     {
-        await _notificationService.SendNotificationAsync(req.SenderId, req.ReceiverId, req.Message);
+        await _notificationService.SendNotificationAsync(
+            req.SenderId, req.ReceiverId, req.Message, req.CopropertyId);
         return Ok();
     }
     
     [HttpGet("{userId}")]
-    public async Task<IActionResult> GetByReceiverId(string userId)
+    public async Task<IActionResult> GetByReceiverId(
+        string userId, [FromQuery] string? copropertyId = null)
     {
-        var notifications = await _notificationService.GetNotificationsAsync(userId);
+        var notifications = await _notificationService.GetNotificationsAsync(userId, copropertyId);
         return Ok(notifications);
     }
 
@@ -38,7 +40,8 @@ public class NotificationsController : ControllerBase
     [Authorize]
     public async Task<IActionResult> SendEmail([FromBody] EmailNotificationRequest req)
     {
-        await _notificationService.SendEmailNotificationAsync(req.ToEmail, req.Subject, req.HtmlBody);
+        await _notificationService.SendEmailNotificationAsync(
+            req.ToEmail, req.Subject, req.HtmlBody, req.Language);
         return Ok(new { message = "Email queued successfully" });
     }
 
@@ -50,12 +53,15 @@ public class NotificationsController : ControllerBase
     }
 
     [HttpPut("read-all/{userId}")]
-    public async Task<IActionResult> MarkAllAsRead(string userId)
+    public async Task<IActionResult> MarkAllAsRead(
+        string userId, [FromQuery] string? copropertyId = null)
     {
-        await _notificationService.MarkAllAsReadAsync(userId);
+        await _notificationService.MarkAllAsReadAsync(userId, copropertyId);
         return Ok();
     }
 
-    public record NotificationRequest(string SenderId,string ReceiverId, string Message);
-    public record EmailNotificationRequest(string ToEmail, string Subject, string HtmlBody);
+    public record NotificationRequest(
+        string SenderId, string ReceiverId, string Message, string? CopropertyId = null);
+    public record EmailNotificationRequest(
+        string ToEmail, string Subject, string HtmlBody, string? Language = null);
 }

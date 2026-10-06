@@ -11,6 +11,7 @@ import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, finalize, switchMap } from 'rxjs/operators';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 @Component({
   selector: 'myb-maintenance-list',
@@ -25,6 +26,7 @@ export class MaintenanceListComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private activeCoproperty = inject(ActiveCopropertyService);
   requests = signal<MaintenanceRequestExtended[]>([]);
   coproperties = signal<Coproperty[]>([]);
   selectedCopropertyId = signal<string | null>(null);
@@ -48,10 +50,8 @@ export class MaintenanceListComponent implements OnInit {
     this.copropertyService.getCoproperties(managerId).subscribe({
       next: (data) => {
         this.coproperties.set(data);
-        // Auto-select first coproperty by default
-        if (data.length > 0 && !this.selectedCopropertyId()) {
-          this.onCopropertyChange(data[0].id);
-        }
+        const selectedId = this.activeCoproperty.selectAvailable(data, this.selectedCopropertyId());
+        if (selectedId) this.onCopropertyChange(selectedId);
       },
       error: (err) => {
         console.error('Error loading coproperties:', err);
@@ -105,37 +105,40 @@ export class MaintenanceListComponent implements OnInit {
 
   onCopropertyChange(copropertyId: string): void {
     this.selectedCopropertyId.set(copropertyId);
-    
-    if (!copropertyId || copropertyId === 'all') {
-      this.loadAllRequests();
-    } else {
-      this.loading.set(true);
-      this.maintenanceService.getMaintenanceByCoproperty(copropertyId)
-        .pipe(
-          takeUntilDestroyed(this.destroyRef),
-          finalize(() => this.loading.set(false))
-        )
-        .subscribe({
-          next: (requests) => {
-            const coproperty = this.coproperties().find(c => c.id === copropertyId);
-            const requestsWithCoproperty = requests.map(request => ({
-              ...request,
-              copropertyName: coproperty?.name || ''
-            } as any));
-            this.requests.set(requestsWithCoproperty);
-            this.loading.set(false);
-          },
-          error: (err) => {
-            console.error('Error loading maintenance requests:', err);
-            this.loading.set(false);
-          }
-        });
+    this.activeCoproperty.setActive(copropertyId);
+
+    if (!copropertyId) {
+      this.requests.set([]);
+      return;
     }
+
+    this.loading.set(true);
+    this.maintenanceService.getMaintenanceByCoproperty(copropertyId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false))
+      )
+      .subscribe({
+        next: (requests) => {
+          const coproperty = this.coproperties().find(c => c.id === copropertyId);
+          const requestsWithCoproperty = requests.map(request => ({
+            ...request,
+            copropertyName: coproperty?.name || ''
+          } as any));
+          this.requests.set(requestsWithCoproperty);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          console.error('Error loading maintenance requests:', err);
+          this.loading.set(false);
+        }
+      });
   }
 
-  onCopropertyFilterChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.onCopropertyChange(select.value);
+  getSelectedCopropertyName(): string {
+    const selectedId = this.selectedCopropertyId();
+    if (!selectedId) return '';
+    return this.coproperties().find(coproperty => coproperty.id === selectedId)?.name ?? '';
   }
 
   onStatusFilterChange(event: Event): void {

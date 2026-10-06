@@ -11,26 +11,8 @@
   <div class="card mb-4">
     <div class="card-body">
       <div class="row g-3">
-        <!-- Coproperty Filter -->
-        <div class="col-md-3">
-          <label for="copropertyFilter" class="form-label">
-            <i class="bi bi-building me-1"></i>
-            Copropriété
-          </label>
-          <select 
-            id="copropertyFilter" 
-            class="form-select"
-            [value]="selectedCopropertyId() || 'all'"
-            (change)="onCopropertyFilterChange($event)">
-            <option value="all">Toutes les copropriétés</option>
-            <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
-              {{ coproperty.name }}
-            </option>
-          </select>
-        </div>
-
         <!-- Status Filter -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="statusFilter" class="form-label">
             <i class="bi bi-flag me-1"></i>
             Statut
@@ -48,7 +30,7 @@
         </div>
 
         <!-- Priority Filter -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="priorityFilter" class="form-label">
             <i class="bi bi-exclamation-triangle me-1"></i>
             Priorité
@@ -84,7 +66,7 @@
         </div>
 
         <!-- Search -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="searchInput" class="form-label">
             <i class="bi bi-search me-1"></i>
             Recherche

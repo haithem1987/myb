@@ -1,4 +1,5 @@
 using Myb.Common.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Myb.Coproperty.Models;
 
@@ -43,6 +44,18 @@ public class Signalement : IEntity<Guid>
 
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    // Read-only reporter details resolved for the Syndic reports view. These
+    // values are hydrated from the owner/unit assignments and are not persisted
+    // on the report itself, so existing reports always show current contact data.
+    [NotMapped]
+    public string? ReporterEmail { get; set; }
+
+    [NotMapped]
+    public string? ReporterPhone { get; set; }
+
+    [NotMapped]
+    public IReadOnlyList<string> ReporterLots { get; set; } = Array.Empty<string>();
 
     // Navigation property
     public Coproperty Coproperty { get; set; } = null!;

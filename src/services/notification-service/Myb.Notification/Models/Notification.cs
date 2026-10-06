@@ -13,6 +13,8 @@ public class Notification: IEntity<string?>
     [Required]
     public string ReceiverId { get; set; }
 
+    public string? CopropertyId { get; set; }
+
     [Required]
     public string Message { get; set; }
 

@@ -1,0 +1,93 @@
+.select-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, rgba(118, 75, 162, 0.12), transparent 32rem),
+    #f7f8fc;
+}
+
+.select-header {
+  height: 72px;
+  padding: 0 clamp(20px, 4vw, 64px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+
+  .logo-image { height: 36px; width: auto; }
+}
+
+.select-screen {
+  max-width: 1180px;
+
+  .eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #667eea;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .coproperty-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18) !important;
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba(102, 126, 234, 0.35);
+      outline-offset: 3px;
+    }
+  }
+
+  .management-toolbar {
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 16px rgba(31, 41, 55, 0.05);
+
+    .input-group-text {
+      background: white;
+      border-right: 0;
+      color: #6b7280;
+    }
+
+    .form-control { border-left: 0; }
+  }
+
+  .card-actions button { position: relative; z-index: 1; }
+
+  .add-coproperty { white-space: nowrap; }
+
+  .stat-box {
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.07) 0%, rgba(16, 185, 129, 0.07) 100%);
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.35rem;
+    line-height: 1;
+    font-weight: 700;
+    color: #111827;
+  }
+}

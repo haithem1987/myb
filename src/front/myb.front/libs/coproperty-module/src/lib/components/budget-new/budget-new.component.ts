@@ -11,6 +11,7 @@ import { Coproperty } from '../../models/coproperty.models';
 import { KeycloakService } from '@myb-front/auth';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalService } from '@myb-front/shared-ui';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 @Component({
   selector: 'myb-budget-new',
@@ -36,6 +37,7 @@ export class BudgetNewComponent implements OnInit {
   private currencyService = inject(CurrencyService);
   private keycloakService = inject(KeycloakService);
   private modalService = inject(ModalService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   get currencySymbol(): string {
     const currency =
@@ -130,20 +132,14 @@ export class BudgetNewComponent implements OnInit {
         next: (data) => {
           this.coproperties.set(data);
           // If we have a coproperty ID from URL, find and set it
-          if (this.copropertyIdFromUrl) {
-            const coproperty = data.find(c => c.id === this.copropertyIdFromUrl);
-            if (coproperty) {
-              this.selectedCoproperty.set(coproperty);
-              this.budgetForm.patchValue({ copropertyId: coproperty.id });
-            }
-          } else if (data.some(c => c.isActive) && !this.budgetForm.get('copropertyId')?.value) {
-            // Auto-select first coproperty by default
-            this.selectedCoproperty.set(data[0]);
-            this.budgetForm.patchValue({ copropertyId: data.find(c => c.isActive)!.id });
-          } else {
-            const selected = data.find(c => c.id === this.budgetForm.get('copropertyId')?.value);
-            if (selected) this.selectedCoproperty.set(selected);
-          }
+          const selectedId = this.activeCoproperty.selectAvailable(
+            data,
+            this.copropertyIdFromUrl || this.budgetForm.get('copropertyId')?.value
+          );
+          const selected = data.find(c => c.id === selectedId) ?? null;
+          this.selectedCoproperty.set(selected);
+          this.budgetForm.patchValue({ copropertyId: selectedId });
+          this.budgetForm.get('copropertyId')?.disable({ emitEvent: false });
         },
         error: (err) => {
           console.error('Error loading coproperties:', err);
@@ -182,6 +178,7 @@ export class BudgetNewComponent implements OnInit {
     const copropertyId = select.value;
     const coproperty = this.coproperties().find(c => c.id === copropertyId);
     this.selectedCoproperty.set(coproperty || null);
+    this.activeCoproperty.setActive(copropertyId);
   }
 
   private checkEditMode(): void {
@@ -267,6 +264,7 @@ export class BudgetNewComponent implements OnInit {
         next: (result) => {
           this.saving.set(false);
           this.saveSuccess.set(true);
+          this.activeCoproperty.setActive(formValue.copropertyId);
 
           if (this.isEmbedded) {
             this.saved.emit(result);
@@ -276,7 +274,8 @@ export class BudgetNewComponent implements OnInit {
           this.router.navigate(['/coproperty/syndic/budgets'], {
             queryParams: {
               refresh: Date.now(),
-              year: formValue.frequency
+              year: formValue.frequency,
+              copropertyId: formValue.copropertyId
             }
           });
         },

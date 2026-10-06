@@ -93,6 +93,17 @@ public static class Configuration
             var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<NotificationContext>>();
             using var context = factory.CreateDbContext();
             context.Database.EnsureCreated();
+            if (context.Database.IsRelational())
+            {
+                // This service historically used EnsureCreated, so deployed
+                // databases may not have EF's migration-history table. Apply the
+                // additive notification scope change idempotently during rollout.
+                context.Database.ExecuteSqlRaw(
+                    "ALTER TABLE \"Notifications\" ADD COLUMN IF NOT EXISTS \"CopropertyId\" text;");
+                context.Database.ExecuteSqlRaw(
+                    "CREATE INDEX IF NOT EXISTS \"IX_Notifications_ReceiverId_CopropertyId_CreatedAt\" " +
+                    "ON \"Notifications\" (\"ReceiverId\", \"CopropertyId\", \"CreatedAt\");");
+            }
         }
 
         app.UseMybApiSecurity();

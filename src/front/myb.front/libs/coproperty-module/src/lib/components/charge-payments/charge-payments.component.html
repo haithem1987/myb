@@ -11,21 +11,7 @@
   <div class="card mb-4">
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        <div class="col-md-4">
-          <label for="copropertyFilter" class="form-label">
-            <i class="bi bi-building me-1"></i> {{ 'chargePayments.coproperty' | translate }}
-          </label>
-          <select
-            id="copropertyFilter"
-            class="form-select"
-            [value]="selectedCopropertyId()"
-            (change)="onCopropertyChange($any($event.target).value)">
-            <option value="">{{ 'chargePayments.selectCoproperty' | translate }}</option>
-            <option *ngFor="let c of coproperties()" [value]="c.id">{{ c.name }}</option>
-          </select>
-        </div>
-
-        <div class="col-md-3">
+        <div class="col-md-6">
           <label for="statusFilter" class="form-label">
             <i class="bi bi-funnel me-1"></i> {{ 'common.status' | translate }}
           </label>
@@ -41,7 +27,7 @@
           </select>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-6">
           <label for="search" class="form-label">
             <i class="bi bi-search me-1"></i> {{ 'common.search' | translate }}
           </label>
@@ -54,11 +40,6 @@
             (input)="onSearchInput($event)" />
         </div>
 
-        <div class="col-md-2">
-          <button class="btn btn-outline-primary w-100" (click)="refreshData()">
-            <i class="bi bi-arrow-clockwise me-1"></i> {{ 'chargePayments.refresh' | translate }}
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -152,10 +133,12 @@
         </div>
       </div>
 
-      <div *ngIf="!loading() && filteredSummaries.length === 0" class="text-center py-5">
-        <i class="bi bi-inbox display-1 text-muted"></i>
-        <p class="text-muted mt-3">{{ 'chargePayments.empty' | translate }}</p>
-      </div>
+      <myb-front-no-result
+        *ngIf="!loading() && filteredSummaries.length === 0"
+        icon="bi-receipt"
+        [compact]="true"
+        [title]="'chargePayments.empty' | translate">
+      </myb-front-no-result>
 
       <div *ngIf="!loading() && filteredSummaries.length > 0" class="table-responsive">
         <table class="table table-hover align-middle">

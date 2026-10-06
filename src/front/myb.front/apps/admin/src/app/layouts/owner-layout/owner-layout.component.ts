@@ -96,7 +96,7 @@ export class OwnerLayoutComponent implements OnInit {
   }
 
   switchToSyndicSpace(): void {
-    this.router.navigate(['/coproperty/syndic/dashboard']);
+    this.router.navigate(['/coproperty/select'], { queryParams: { space: 'syndic' } });
   }
   
   logout(): void {

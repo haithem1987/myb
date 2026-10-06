@@ -378,6 +378,8 @@ export class CopropertyService {
         .watchQuery<{ copropertyById: Coproperty }>({
         query: GET_COPROPERTY,
         variables: { id },
+        fetchPolicy: 'network-only',
+        nextFetchPolicy: 'network-only',
         context: { service: 'copropertyService' }
       })
       .valueChanges.pipe(

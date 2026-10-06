@@ -333,13 +333,6 @@
     }
   }
 
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #9ca3af;
-    i { font-size: 48px; color: #10b981; margin-bottom: 12px; display: block; }
-    p { margin: 0; font-size: 14px; }
-  }
 }
 
 // ── Recent invoices list ──
@@ -403,13 +396,6 @@
     &.overdue { background: #fee2e2; color: #991b1b; }
   }
 
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #9ca3af;
-    i { font-size: 36px; margin-bottom: 8px; display: block; }
-    p { margin: 0; font-size: 14px; }
-  }
 }
 
 // ── Actions list ──

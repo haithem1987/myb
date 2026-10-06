@@ -239,11 +239,19 @@ if [[ "$DRY_RUN" != "true" ]]; then
     --from-file=theme.properties="$PROJECT_ROOT/keycloak-theme/myb/email/theme.properties" \
     --from-file=messages_en.properties="$PROJECT_ROOT/keycloak-theme/myb/email/messages/messages_en.properties" \
     --from-file=messages_fr.properties="$PROJECT_ROOT/keycloak-theme/myb/email/messages/messages_fr.properties" \
+    --from-file=email-verification-html.ftl="$PROJECT_ROOT/keycloak-theme/myb/email/html/email-verification.ftl" \
+    --from-file=email-verification-text.ftl="$PROJECT_ROOT/keycloak-theme/myb/email/text/email-verification.ftl" \
     --dry-run=client -o yaml | kubectl apply -f -
 fi
 
 kubectl apply -f "$K8S_DIR/services/keycloak/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
-[[ "$DRY_RUN" != "true" ]] && wait_for_resource "deployment/keycloak" 300
+if [[ "$DRY_RUN" != "true" ]]; then
+    # ConfigMap volume contents update in-place, but Keycloak caches theme
+    # templates. Restart on every deployment so email-template fixes become
+    # effective immediately rather than waiting for an unrelated pod restart.
+    kubectl rollout restart deployment/keycloak -n "$NAMESPACE"
+    kubectl rollout status deployment/keycloak -n "$NAMESPACE" --timeout=300s
+fi
 
 # Step 6: Deploy Backend Services
 echo -e "\n${GREEN}========================================${NC}"
@@ -328,6 +336,8 @@ else
     echo -e "${GREEN}External IP: ${INGRESS_IP}${NC}"
     echo -e "\n${BLUE}Access URLs:${NC}"
     echo -e "  Admin: http://${INGRESS_IP}/admin"
+    echo -e "  Development: http://${INGRESS_IP}/dev"
+    echo -e "  Development admin: http://${INGRESS_IP}/dev/admin"
     echo -e "  Keycloak: http://${INGRESS_IP}/auth"
     echo -e "  Coproperty API: http://${INGRESS_IP}/api/coproperty"
     echo -e "  Invoice API: http://${INGRESS_IP}/api/invoice"

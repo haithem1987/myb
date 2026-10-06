@@ -7,6 +7,9 @@ export const GET_SIGNALEMENTS = gql`
       copropertyId
       reportedBy
       reporterName
+      reporterEmail
+      reporterPhone
+      reporterLots
       type
       zone
       description

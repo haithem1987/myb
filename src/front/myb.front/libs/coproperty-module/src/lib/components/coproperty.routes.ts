@@ -1,6 +1,6 @@
-import { Routes, UrlMatcher, UrlSegment } from '@angular/router';
+import { Routes, UrlMatcher, UrlSegment, Router, CanActivateFn } from '@angular/router';
+import { inject } from '@angular/core';
 import { CopropertyComponent } from './coproperty.component';
-import { CopropertyListComponent } from './coproperty-list.component';
 import { CopropertyDetailComponent } from './coproperty-detail.component';
 import { CopropertyDashboardComponent } from './dashboard/coproperty-dashboard.component';
 import { CopropertyNewComponent } from './coproperty-new/coproperty-new.component';
@@ -38,8 +38,22 @@ import { SyndicSettingsComponent } from './syndic-settings/settings.component';
 import { authGuard } from '@myb-front/auth';
 import { profileGuard } from '../guards/profile.guard';
 import { copropertyRedirectGuard } from './coproperty-redirect.guard';
+import { CopropertySelectComponent } from './coproperty-select/coproperty-select.component';
+import { CopropertyManagementLayoutComponent } from './coproperty-management-layout/coproperty-management-layout.component';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const COPROPERTY_MANAGER_ROLES = ['coproperty-syndic', 'coproperty-admin', 'system-admin'];
+
+const copropertyManagementRedirectGuard: CanActivateFn = () =>
+  inject(Router).createUrlTree(['/coproperty/select'], {
+    queryParams: { space: 'syndic', manage: 'true' }
+  });
+
+const legacyCopropertyNewRedirectGuard: CanActivateFn = () =>
+  inject(Router).createUrlTree(['/coproperty/manage/new']);
+
+const legacyCopropertyEditRedirectGuard: CanActivateFn = route =>
+  inject(Router).createUrlTree(['/coproperty/manage', route.paramMap.get('id'), 'edit']);
 
 /** Matches a single path segment only when it is a valid UUID. */
 const uuidMatcher: UrlMatcher = (segments: UrlSegment[]) => {
@@ -65,16 +79,33 @@ export const COPROPERTY_ROUTES: Routes = [
     children: [],
   },
   {
+    path: 'select',
+    component: CopropertySelectComponent,
+    canActivate: [authGuard],
+    data: { roles: ['coproperty-owner', 'coproperty-syndic', 'coproperty-admin', 'system-admin', 'coproperty-tenant'] },
+  },
+  {
+    path: 'manage',
+    component: CopropertyManagementLayoutComponent,
+    canActivate: [authGuard],
+    data: { roles: COPROPERTY_MANAGER_ROLES },
+    children: [
+      { path: 'new', component: CopropertyNewComponent },
+      { path: ':id/edit', component: CopropertyNewComponent },
+      { path: '', redirectTo: '/coproperty/select', pathMatch: 'full' },
+    ],
+  },
+  {
     path: 'syndic',
     component: SyndicLayoutComponent,
     canActivate: [authGuard],
-    data: { roles: ['coproperty-syndic', 'coproperty-admin', 'system-admin'] },
+    data: { roles: COPROPERTY_MANAGER_ROLES },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: SyndicDashboardComponent },
-      { path: 'coproperties', component: CopropertyListComponent },
-      { path: 'coproperties/new', component: CopropertyNewComponent },
-      { path: 'coproperties/:id/edit', component: CopropertyNewComponent },
+      { path: 'coproperties', canActivate: [copropertyManagementRedirectGuard], children: [] },
+      { path: 'coproperties/new', canActivate: [legacyCopropertyNewRedirectGuard], children: [] },
+      { path: 'coproperties/:id/edit', canActivate: [legacyCopropertyEditRedirectGuard], children: [] },
       { path: 'coproperties/:id', component: CopropertyDetailComponent },
       { path: 'budgets', component: ChargesListComponent },
       { path: 'budgets/new', component: BudgetNewComponent },
@@ -149,6 +180,8 @@ export const COPROPERTY_ROUTES: Routes = [
   {
     path: '',
     component: CopropertyComponent,
+    canActivate: [authGuard],
+    data: { roles: COPROPERTY_MANAGER_ROLES },
     children: [
       { matcher: uuidMatcher, component: CopropertyDetailComponent },
       { matcher: uuidEditMatcher, component: CopropertyNewComponent },

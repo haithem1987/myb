@@ -3,9 +3,6 @@ import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { provideRouter } from '@angular/router';
 import { COPROPERTY_ROUTES } from './coproperty.routes';
-import { CopropertyDashboardComponent } from './dashboard/coproperty-dashboard.component';
-import { CopropertyListComponent } from './coproperty-list.component';
-import { CopropertyDetailComponent } from './coproperty-detail.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
@@ -68,6 +65,30 @@ describe('COPROPERTY_ROUTES', () => {
     expect(COPROPERTY_ROUTES.find((r) => r.path === 'owner')).toBeDefined();
     expect(COPROPERTY_ROUTES.find((r) => r.path === 'council')).toBeDefined();
     expect(COPROPERTY_ROUTES.find((r) => r.path === 'accountant')).toBeDefined();
+  });
+
+  it('should expose standalone coproperty create and edit routes outside the syndic layout', () => {
+    const manageRoute = COPROPERTY_ROUTES.find((r) => r.path === 'manage');
+    expect(manageRoute?.component).toBeDefined();
+    expect(manageRoute?.data?.['roles']).toContain('coproperty-syndic');
+    expect(manageRoute?.data?.['roles']).not.toContain('coproperty-owner');
+    expect(manageRoute?.children?.find((r) => r.path === 'new')?.component).toBeDefined();
+    expect(manageRoute?.children?.find((r) => r.path === ':id/edit')?.component).toBeDefined();
+
+    const syndicRoute = COPROPERTY_ROUTES.find((r) => r.path === 'syndic');
+    expect(syndicRoute?.children?.find((r) => r.path === 'coproperties/new')?.component).toBeUndefined();
+    expect(syndicRoute?.children?.find((r) => r.path === 'coproperties/:id/edit')?.component).toBeUndefined();
+  });
+
+  it('should let owners select a coproperty without granting management access', () => {
+    const selectRoute = COPROPERTY_ROUTES.find((r) => r.path === 'select');
+    expect(selectRoute?.data?.['roles']).toContain('coproperty-owner');
+
+    const legacyCopropertyRoute = COPROPERTY_ROUTES.find(
+      (r) => r.path === '' && r.component === CopropertyComponent
+    );
+    expect(legacyCopropertyRoute?.data?.['roles']).toContain('coproperty-syndic');
+    expect(legacyCopropertyRoute?.data?.['roles']).not.toContain('coproperty-owner');
   });
 
   it('should expose dashboard component at the empty syndic child', () => {

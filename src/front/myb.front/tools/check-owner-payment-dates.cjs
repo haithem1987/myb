@@ -14,6 +14,10 @@ for (const file of ['libs/coproperty-module/src/lib/components/owner-portal/char
  const {OwnerChargesComponent} = load(file);
  const c = Object.create(OwnerChargesComponent.prototype);
  c.currencyService = { roundAmount: value => Math.round(value * 1000) / 1000 };
+ c.filterCopropertyId = () => '';
+ c.filterStatus = () => '';
+ c.filterYear = () => '';
+ c.searchTerm = () => '';
  const fc = {amount:50,payments:[{amount:30,validationStatus:'Pending'},{amount:10,validationStatus:'Pending'}]};
  c.fundCalls=()=>[fc];
  assert.equal(c.getFundCallPaidAmount(fc),0);

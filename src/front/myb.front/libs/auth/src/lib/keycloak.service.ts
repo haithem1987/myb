@@ -23,6 +23,7 @@ export class KeycloakService {
   public userId$: Observable<string | null> = this.userIdSubject.asObservable();
 
   private initialized = false;
+  private preferredLanguageSync: Promise<void> = Promise.resolve();
 
   constructor(private http: HttpClient, @Inject(ENVIRONMENT) private environment: any) {}
 
@@ -174,10 +175,16 @@ export class KeycloakService {
     );
     localStorage.setItem('language', locale);
     sessionStorage.setItem('language', locale);
-    this.keycloak.register({
+    const registrationUrl = new URL(this.keycloak.createRegisterUrl({
       redirectUri: uri,
       locale,
-    });
+    }));
+    // keycloak-js emits ui_locales, which is only a client preference. An
+    // explicit kc_locale is treated as the user's selection and is persisted
+    // on the newly registered user, so verification emails use that language.
+    registrationUrl.searchParams.set('ui_locales', locale);
+    registrationUrl.searchParams.set('kc_locale', locale);
+    window.location.assign(registrationUrl.toString());
   }
 
   /**
@@ -545,6 +552,40 @@ export class KeycloakService {
         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
       }
     }
+  }
+
+  /** Persist an authenticated user's explicit language choice for emails and notifications. */
+  syncPreferredLanguage(language: string): Promise<void> {
+    const normalized = this.normalizeLanguage(language);
+    localStorage.setItem('language', normalized);
+    sessionStorage.setItem('language', normalized);
+
+    if (!this.keycloak?.authenticated) {
+      return Promise.resolve();
+    }
+
+    // Serialize rapid switcher changes so the server always finishes with the
+    // most recently selected language rather than whichever request completes last.
+    this.preferredLanguageSync = this.preferredLanguageSync
+      .catch(() => undefined)
+      .then(async () => {
+        await this.updateToken();
+        const headers = new HttpHeaders({
+          Authorization: `Bearer ${this.currentUserToken}`,
+          'Content-Type': 'application/json',
+        });
+        const response: any = await firstValueFrom(this.http.post(this.getGraphqlUrl(), {
+          query: `mutation SyncEmailLanguage($language: String!) {
+            syncPreferredLanguage(language: $language)
+          }`,
+          variables: { language: normalized },
+        }, { headers }));
+        if (response?.errors?.length) {
+          throw new Error(response.errors[0].message);
+        }
+      });
+
+    return this.preferredLanguageSync;
   }
 
   /** Search the global directory specifically for the Add Owner workflow. */

@@ -53,10 +53,9 @@ export class AppsSectionComponent {
       name: 'COPROPERTY_MANAGEMENT',
       icon: 'building.png',
       description: 'COPROPERTY_MANAGEMENT_DESC',
-      route: '/coproperty/syndic/dashboard',
+      route: '/coproperty/select?space=syndic',
       price: 25,
       currency: 'USD',
     },
   ];
 }
-

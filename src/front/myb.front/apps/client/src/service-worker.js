@@ -1,4 +1,4 @@
-const CACHE_NAME = 'myb-app-v2';
+const CACHE_NAME = 'myb-app-v3';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -28,6 +28,10 @@ self.addEventListener('fetch', event => {
   // Authentication and application data must always go to the network.
   if (url.origin !== self.location.origin || request.headers.has('Authorization') ||
       /^\/(auth|api)(\/|$)/i.test(url.pathname) || /graphql/i.test(url.pathname)) return;
+
+  // Translation files change independently from hashed JS bundles. Always let
+  // the browser revalidate them so a stale dictionary cannot expose raw keys.
+  if (/\/assets\/i18n\/[^/]+\.json$/i.test(url.pathname)) return;
 
   // Cache only public, static assets. Never cache login pages or route HTML.
   const publicAsset = /^\/(admin\/)?assets\//.test(url.pathname) ||

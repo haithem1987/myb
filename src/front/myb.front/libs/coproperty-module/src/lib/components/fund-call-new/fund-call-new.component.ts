@@ -18,6 +18,7 @@ import {
 } from '../../models/fund-call.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 @Component({
   selector: 'myb-fund-call-new',
@@ -37,6 +38,7 @@ export class FundCallNewComponent implements OnInit {
   private activatedRoute = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
   private toastService = inject(ToastService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   fundCallForm!: FormGroup;
   paymentForm!: FormGroup;
@@ -134,8 +136,9 @@ export class FundCallNewComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.coproperties.set(data);
-          if (data.some(c => c.isActive) && !this.fundCallForm.get('copropertyId')?.value) {
-            this.fundCallForm.patchValue({ copropertyId: data.find(c => c.isActive)!.id });
+          if (!this.fundCallForm.get('copropertyId')?.value) {
+            const selectedId = this.activeCoproperty.selectAvailable(data);
+            if (selectedId) this.fundCallForm.patchValue({ copropertyId: selectedId });
           }
         },
         error: (err) => console.error('Error loading coproperties:', err),
@@ -193,7 +196,7 @@ export class FundCallNewComponent implements OnInit {
 
   saveFundCall(): void {
     const selected = this.coproperties().find(c => c.id === this.fundCallForm.getRawValue().copropertyId);
-    if (!this.isEditMode() && selected?.isActive === false) return;
+    if (selected?.isActive === false) return;
     if (this.fundCallForm.invalid) {
       this.toastService.show('Veuillez remplir tous les champs obligatoires', { classname: 'bg-warning text-dark', delay: 4000 });
       return;

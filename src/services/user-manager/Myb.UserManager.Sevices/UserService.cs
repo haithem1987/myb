@@ -48,6 +48,7 @@ namespace Myb.UserManager.Sevices
                 {
                     To = result.Entity.Username,
                     Subject = "Bienvenue sur MYB Platform",
+                    Language = "fr",
                     HtmlBody = $@"<h1>Bienvenue {result.Entity.Name} !</h1>
                         <p>Votre compte a été créé avec succès sur la plateforme MYB.</p>
                         <p>Vous pouvez maintenant vous connecter et accéder à tous nos services.</p>

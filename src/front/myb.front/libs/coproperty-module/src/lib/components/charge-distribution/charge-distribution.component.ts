@@ -11,6 +11,7 @@ import { OwnerService } from '../../services/owner.service';
 import { UnitService } from '../../services/unit.service';
 import { OwnerWithUnits } from '../../models/owner.model';
 import { CreateFundCallInput } from '../../models/fund-call.model';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 import { Coproperty } from '../../models/coproperty.models';
 import { KeycloakService } from '@myb-front/auth';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -44,8 +45,6 @@ enum DistributionMethod {
   Custom = 'custom',
 }
 
-const ACTIVE_COPROPERTY_STORAGE_KEY = 'activeCopropertyId';
-
 @Component({
   selector: 'myb-charge-distribution',
   standalone: true,
@@ -67,6 +66,7 @@ export class ChargeDistributionComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private toastService = inject(ToastService);
   private translateService = inject(TranslateService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   loadedOwners = signal<OwnerWithUnits[]>([]);
   /** IDs of charges that already have ChargeDistribution records (already distributed) */
@@ -102,6 +102,7 @@ export class ChargeDistributionComponent implements OnInit {
       year: [currentYear.toString(), Validators.required],
       description: [''],
     });
+    this.repartitionForm.get('copropertyId')?.disable({ emitEvent: false });
   }
 
   ngOnInit(): void {
@@ -136,9 +137,8 @@ export class ChargeDistributionComponent implements OnInit {
             const cop = data.find(c => c.id === currentId);
             if (cop) this.selectedCoproperty.set(cop);
             this.loadChargesForCoproperty(currentId);
-          } else if (data.some(c => c.isActive)) {
-            // Auto-select first coproperty by default
-            this.onCopropertyChange(data.find(c => c.isActive)!.id);
+          } else if (data.length > 0) {
+            this.onCopropertyChange(this.activeCoproperty.selectAvailable(data));
           }
         },
         error: (err) => {
@@ -152,9 +152,7 @@ export class ChargeDistributionComponent implements OnInit {
     const coproperty = this.coproperties().find(c => c.id === copropertyId);
     this.selectedCoproperty.set(coproperty || null);
     this.repartitionForm.patchValue({ copropertyId });
-    if (copropertyId) {
-      localStorage.setItem(ACTIVE_COPROPERTY_STORAGE_KEY, copropertyId);
-    }
+    this.activeCoproperty.setActive(copropertyId);
     if (copropertyId) {
       this.loadChargesForCoproperty(copropertyId);
     } else {
@@ -512,117 +510,114 @@ export class ChargeDistributionComponent implements OnInit {
     const baseDescription = this.repartitionForm.get('description')?.value || `Appel de fonds - Répartition ${year}`;
     const dueDate = new Date(`${year}-12-31T00:00:00`) as any;
 
-    // Step 1: Persist ChargeDistributions for each selected charge
-    const filteredCharges = this.getFilteredCharges().filter((c) => !!c.id);
-    const distributeRequests = filteredCharges.map((charge) =>
-      this.chargeService.calculateDistribution(charge.id!).pipe(
-        catchError((err) => {
-          console.error(`Error distributing charge ${charge.name}:`, err);
-          return of([]);
-        })
-      )
-    );
-
-    // Step 2: After ChargeDistributions are persisted, create FundCalls
-    forkJoin(distributeRequests.length > 0 ? distributeRequests : [of([])])
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.createFundCallsAfterDistribution(copropertyId, baseDescription, dueDate);
-      });
+    const chargeIds = this.getFilteredCharges()
+      .map((charge) => charge.id)
+      .filter((id): id is string => !!id);
+    this.createFundCallsAfterDistribution(copropertyId, chargeIds, baseDescription, dueDate);
   }
 
-  private createFundCallsAfterDistribution(copropertyId: string, baseDescription: string, dueDate: any): void {
+  private createFundCallsAfterDistribution(
+    copropertyId: string,
+    chargeIds: string[],
+    baseDescription: string,
+    dueDate: Date
+  ): void {
     // Query existing unpaid fund call totals per owner to avoid double-charging
     this.fundCallService.getExistingFundCallTotals(copropertyId).pipe(
-      catchError(() => of([] as { ownerId: string; remainingAmount: number }[])),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe((existingTotals) => {
-      const existingByOwner = new Map<string, number>();
-      existingTotals.forEach(t => existingByOwner.set(t.ownerId, t.remainingAmount));
+    ).subscribe({
+      next: (existingTotals) => {
+        const existingByOwner = new Map<string, number>();
+        existingTotals.forEach(t =>
+          existingByOwner.set(this.normalizeEntityId(t.ownerId), t.remainingAmount)
+        );
 
-      const fundCallEntries: { input: CreateFundCallInput; preview: DistributionPreview }[] = [];
-      const skipped: string[] = [];
+        const fundCalls: CreateFundCallInput[] = [];
+        const skipped: string[] = [];
 
-      this.distributionPreview.forEach((p) => {
-        const existing = existingByOwner.get(p.ownerId ?? '') || 0;
-        const adjustedAmount = Math.max(0, p.amount - existing);
+        this.distributionPreview.forEach((p) => {
+          const existing = existingByOwner.get(this.normalizeEntityId(p.ownerId)) || 0;
+          const adjustedAmount = Math.max(0, p.amount - existing);
 
-        if (adjustedAmount <= 0) {
-          skipped.push(p.ownerName);
-          return;
-        }
+          if (adjustedAmount <= 0) {
+            skipped.push(p.ownerName);
+            return;
+          }
 
-        fundCallEntries.push({
-          input: {
+          fundCalls.push({
             copropertyId,
             ownerId: p.ownerId ?? undefined,
             amount: adjustedAmount,
             dueDate,
             description: `${baseDescription} - ${p.ownerName} (Lot ${p.unitNumber})`,
             status: 'TO_PAY' as const,
-          },
-          preview: p,
+          });
         });
-      });
 
-      if (skipped.length > 0) {
-        this.toastService.show(
-          `${skipped.length} propriétaire(s) non facturé(s) (appels existants couvrent le montant): ${skipped.join(', ')}`,
-          { classname: 'bg-info text-white', delay: 5000 }
-        );
-      }
+        if (skipped.length > 0) {
+          this.toastService.show(
+            `${skipped.length} propriétaire(s) non facturé(s) (appels existants couvrent le montant): ${skipped.join(', ')}`,
+            { classname: 'bg-info text-white', delay: 5000 }
+          );
+        }
 
-      if (fundCallEntries.length === 0) {
+        if (fundCalls.length === 0) {
+          this.saving.set(false);
+          this.toastService.show(
+            'Aucun nouvel appel de fonds à créer — les appels existants couvrent tous les montants.',
+            { classname: 'bg-warning text-dark', delay: 5000 }
+          );
+          return;
+        }
+
+        this.chargeService.createDistribution({ copropertyId, chargeIds, fundCalls })
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: (created) => {
+              this.saving.set(false);
+              this.toastService.show(
+                this.translationOrFallback(
+                  'coproperty.distribution.createSuccess',
+                  `${created.length} appel(s) de fonds créé(s) avec succès`,
+                  { count: created.length }
+                ),
+                { classname: 'bg-success text-white', delay: 4000 }
+              );
+              this.saveSuccess.set(true);
+              setTimeout(() => {
+                this.saveSuccess.set(false);
+                this.router.navigate(['/coproperty/syndic/fund-calls']);
+              }, 2000);
+            },
+            error: () => {
+              this.saving.set(false);
+              this.toastService.show(
+                this.translationOrFallback(
+                  'coproperty.distribution.createError',
+                  'La création de la répartition a échoué. Aucune donnée partielle n\'a été enregistrée. Veuillez réessayer.'
+                ),
+                { classname: 'bg-danger text-white', delay: 7000 }
+              );
+            }
+          });
+      },
+      error: () => {
         this.saving.set(false);
         this.toastService.show(
-          'Aucun nouvel appel de fonds à créer — les appels existants couvrent tous les montants.',
-          { classname: 'bg-warning text-dark', delay: 5000 }
+          'Impossible de vérifier les appels de fonds existants. Aucune distribution n\'a été créée.',
+          { classname: 'bg-danger text-white', delay: 7000 }
         );
-        return;
       }
-
-      const createRequests = fundCallEntries.map(({ input, preview }) =>
-        this.fundCallService.createFundCall(input).pipe(
-          catchError((err) => {
-            const msg: string = err?.graphQLErrors?.[0]?.message ?? err?.message ?? '';
-            return of({ __error: msg, __preview: preview } as any);
-          })
-        )
-      );
-
-      forkJoin(createRequests)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((results: any[]) => {
-          const errors = results.filter((r) => r?.__error).map((r) => r.__error as string);
-          const created = results.filter((r) => !r?.__error);
-
-          this.saving.set(false);
-
-          if (created.length > 0) {
-            this.toastService.show(
-              `${created.length} appel(s) de fonds créé(s) avec succès`,
-              { classname: 'bg-success text-white', delay: 4000 }
-            );
-          }
-          if (errors.length > 0) {
-            const unique = [...new Set(errors)];
-            unique.forEach((msg) =>
-              this.toastService.show(msg, { classname: 'bg-danger text-white', delay: 6000 })
-            );
-          }
-          if (created.length > 0) {
-            this.saveSuccess.set(true);
-            setTimeout(() => {
-              this.saveSuccess.set(false);
-              this.router.navigate(['/coproperty/syndic/fund-calls']);
-            }, 2000);
-          }
-        });
     });
   }
 
   reset(): void {
     this.distributionPreview = [];
     this.showPreview = false;
+  }
+
+  private translationOrFallback(key: string, fallback: string, params?: Record<string, unknown>): string {
+    const translated = this.translateService.instant(key, params);
+    return translated && translated !== key ? translated : fallback;
   }
 }

@@ -274,10 +274,6 @@ export class OwnerChargesComponent implements OnInit {
       if (this.paymentForm.paymentMethod === 'Virement') {
         justificatifText = `[Virement] Banque: ${this.paymentForm.bankName.trim()}, RIB: ${this.paymentForm.rib.trim()}, Émetteur: ${this.paymentForm.senderName.trim()} — ${justificatifText}`;
       }
-      if (this.justificatifFile) {
-        justificatifText += ` [Fichier: ${this.justificatifFile.name}]`;
-      }
-
       // Parse date as local date to avoid UTC timezone shifting (e.g. 2026-05-21 → 2026-05-20)
       const [y, m, d] = this.paymentForm.paymentDate.split('-').map(Number);
       const localDate = new Date(y, m - 1, d, 12, 0, 0);

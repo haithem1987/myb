@@ -8,6 +8,7 @@ namespace Myb.Coproperty.Services
         Task<Owner> GetByIdAsync(Guid id);
         Task<Owner?> GetByUserIdAsync(Guid userId);
         Task<Owner> CreateAsync(Owner owner);
+        Task SendOwnerAccessEmailAsync(Owner owner);
         Task UpdateAsync(Owner owner);
         Task DeleteAsync(Guid id);
         Task<IEnumerable<Owner>> GetByCopropertyIdAsync(Guid copropertyId);

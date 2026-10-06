@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '@env/environment';
 
 interface Service {
@@ -78,7 +78,8 @@ export class PaymentComponent implements OnDestroy {
     private stripeService: StripeService,
     private http: HttpClient,
     private keycloakService: KeycloakService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private translateService: TranslateService
   ) {
     this.cardForm = this.fb.group({
       name: [''],
@@ -120,6 +121,7 @@ export class PaymentComponent implements OnDestroy {
               serviceName: this.service.serviceName,
               paymentMethod: 'Card',
               isRecurring: false,
+              language: this.translateService.currentLang || this.translateService.defaultLang || 'fr',
             };
 
             this.http

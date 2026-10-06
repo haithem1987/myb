@@ -11,6 +11,7 @@ WORKDIR /src
 COPY ["src/services/coproperty-management/Myb.Coproperty/Myb.Coproperty.csproj", "src/services/coproperty-management/Myb.Coproperty/"]
 COPY ["src/common/Myb.Common.Models/Myb.Common.Models.csproj", "src/common/Myb.Common.Models/"]
 COPY ["src/common/Myb.Common.Repositories/Myb.Common.Repositories.csproj", "src/common/Myb.Common.Repositories/"]
+COPY ["src/common/Myb.Common.Messaging/Myb.Common.Messaging.csproj", "src/common/Myb.Common.Messaging/"]
 COPY ["src/common/Myb.Common.Authentification/Myb.Common.Authentification.csproj", "src/common/Myb.Common.Authentification/"]
 COPY ["src/common/Myb.Common.GraphQL.Infra/Myb.Common.GraphQL.Infra.csproj", "src/common/Myb.Common.GraphQL.Infra/"]
 COPY ["src/common/Myb.Common.Utils/Myb.Common.Utils.csproj", "src/common/Myb.Common.Utils/"]

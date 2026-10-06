@@ -15,7 +15,7 @@ const SYNDIC_ROLES = ['coproperty-syndic', 'coproperty-admin', 'system-admin'] a
 function getDefaultRoute(keycloakService: KeycloakService): string {
   const roles = keycloakService.getUserRoles();
   const isSyndic = roles.some(r => (SYNDIC_ROLES as readonly string[]).includes(r));
-  return isSyndic ? '/coproperty/syndic/dashboard' : '/coproperty/owner/dashboard';
+  return isSyndic ? '/coproperty/select?space=syndic' : '/coproperty/select?space=owner';
 }
 
 /**
@@ -85,7 +85,7 @@ export const completeProfileGuard: CanActivateFn = async () => {
     if (owner) {
       // Profile already completed — the complete-profile flow is owner-only,
       // so always redirect to the owner dashboard.
-      return router.createUrlTree(['/coproperty/owner/dashboard']);
+      return router.createUrlTree(['/coproperty/select'], { queryParams: { space: 'owner' } });
     }
     return true; // authenticated, no profile yet → show the form
   } catch {
@@ -112,7 +112,7 @@ export const noProfileGuard: CanActivateFn = async () => {
     const owner = await firstValueFrom(ownerService.getOwnerByUserId(userId));
     if (owner) {
       // Already has a profile → redirect to owner dashboard
-      return router.createUrlTree(['/coproperty/owner/dashboard']);
+      return router.createUrlTree(['/coproperty/select'], { queryParams: { space: 'owner' } });
     }
     return true;
   } catch {

@@ -171,7 +171,7 @@ export class CopropertyDetailComponent implements OnInit {
 
   edit(): void {
     if (this.coproperty) {
-      this.router.navigate(['/coproperty/syndic/coproperties', this.coproperty.id, 'edit']);
+      this.router.navigate(['/coproperty/manage', this.coproperty.id, 'edit']);
     }
   }
 

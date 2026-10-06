@@ -58,6 +58,7 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
             copropertyName,
             unitNumber,
             unit.Coproperty?.ManagerId,
+            unit.CopropertyId,
             cancellationToken);
 
         await SendToOwnerAsync(
@@ -69,6 +70,7 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
             copropertyName,
             unitNumber,
             unit.Coproperty?.ManagerId,
+            unit.CopropertyId,
             cancellationToken);
     }
 
@@ -81,6 +83,7 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
         string copropertyName,
         string unitNumber,
         Guid? managerId,
+        Guid copropertyId,
         CancellationToken cancellationToken)
     {
         var english = await _keycloakAdminService.GetPreferredLanguageAsync(owner.UserId.ToString()) == "en";
@@ -94,6 +97,7 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
                 {
                     To = owner.Email,
                     Subject = subject,
+                    Language = english ? "en" : "fr",
                     Source = "Myb.Coproperty.ChangeUnitOwner",
                     HtmlBody = $"""
                         <html><body style="font-family:Arial,sans-serif;color:#333">
@@ -117,12 +121,15 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
         try
         {
             var client = _httpClientFactory.CreateClient("NotificationService");
+            client.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _keycloakAdminService.GetServiceAccessTokenAsync());
             var response = await client.PostAsJsonAsync(
                 "/api/Notifications",
                 new
                 {
                     SenderId = managerId?.ToString() ?? Guid.Empty.ToString(),
                     ReceiverId = owner.UserId.ToString(),
+                    CopropertyId = copropertyId.ToString(),
                     Message = message
                 },
                 cancellationToken);

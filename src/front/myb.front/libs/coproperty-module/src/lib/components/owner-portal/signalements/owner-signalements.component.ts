@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { SignalementService } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
-import { ToastService } from '@myb-front/shared-ui';
+import { NoResultComponent, ToastService } from '@myb-front/shared-ui';
 import {
   Signalement,
   SignalementStatus,
@@ -21,7 +21,7 @@ type Tab = 'en-cours' | 'resolus';
 @Component({
   selector: 'myb-coproperty-owner-signalements',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [CommonModule, RouterModule, TranslateModule, NoResultComponent],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
@@ -55,10 +55,12 @@ type Tab = 'en-cours' | 'resolus';
       </div>
 
       <!-- Empty -->
-      <div *ngIf="!loading() && displayedSignalements().length === 0" class="text-center py-5 text-muted">
-        <i class="bi bi-clipboard-check fs-1"></i>
-        <p class="mt-3">{{ (activeTab() === 'en-cours' ? 'ownerPortal.reports.noneInProgress' : 'ownerPortal.reports.noneResolved') | translate }}</p>
-      </div>
+      <myb-front-no-result
+        *ngIf="!loading() && displayedSignalements().length === 0"
+        icon="bi-clipboard-check"
+        [title]="(activeTab() === 'en-cours' ? 'ownerPortal.reports.noneInProgress' : 'ownerPortal.reports.noneResolved') | translate"
+        [message]="'ownerPortal.reports.subtitle' | translate">
+      </myb-front-no-result>
 
       <!-- Cards -->
       <div class="signalement-card" *ngFor="let s of displayedSignalements()" (click)="onCardClick(s)">

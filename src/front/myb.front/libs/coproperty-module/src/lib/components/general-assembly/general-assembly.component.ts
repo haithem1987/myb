@@ -6,6 +6,7 @@ import { ModalService, FileDownloadService, ToastService } from '@myb-front/shar
 import { AssemblyService, CopropertyService } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
 import { Assembly, AssemblyType, AssemblyStatus, CreateAssemblyInput, Coproperty } from '@myb-front/coproperty-module';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 interface GeneralAssembly {
   id: string;
@@ -49,25 +50,6 @@ interface GeneralAssembly {
           <small class="d-block text-danger mt-1" *ngIf="!copropertyId">
             Veuillez sélectionner une copropriété
           </small>
-        </div>
-      </div>
-
-      <!-- Coproperty Selector -->
-      <div class="row mb-4" *ngIf="!copropertyId || availableCoproperties().length > 1">
-        <div class="col-12">
-          <div class="alert alert-info">
-            <i class="bi bi-building me-2"></i>
-            <strong>Sélectionnez une copropriété :</strong>
-            <select 
-              class="form-select form-select-sm d-inline-block w-auto ms-3"
-              [(ngModel)]="selectedCopropertyId"
-              (change)="onCopropertyChange()">
-              <option value="">-- Sélectionner --</option>
-              <option *ngFor="let copro of availableCoproperties()" [value]="copro.id">
-                {{ copro.name }} - {{ copro.city }}
-              </option>
-            </select>
-          </div>
         </div>
       </div>
 
@@ -660,6 +642,7 @@ export class GeneralAssemblyComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   selectedStatus = 'all';
   selectedType = 'all';
@@ -713,13 +696,8 @@ export class GeneralAssemblyComponent implements OnInit {
     this.copropertyService.getCoproperties(managerId).subscribe({
       next: (coproperties) => {
         this.availableCoproperties.set(coproperties);
-        // Auto-select if only one exists and none selected yet
-        if (coproperties.length === 1 && !this.copropertyId) {
-          this.selectedCopropertyId = coproperties[0].id;
-          this.onCopropertyChange();
-        } else if (this.copropertyId) {
-          this.selectedCopropertyId = this.copropertyId;
-        }
+        this.selectedCopropertyId = this.activeCoproperty.selectAvailable(coproperties, this.copropertyId);
+        if (this.selectedCopropertyId && !this.copropertyId) this.onCopropertyChange();
       },
       error: (error) => {
         console.error('Error loading coproperties:', error);
@@ -730,6 +708,7 @@ export class GeneralAssemblyComponent implements OnInit {
 
   onCopropertyChange(): void {
     if (this.selectedCopropertyId) {
+      this.activeCoproperty.setActive(this.selectedCopropertyId);
       this.router.navigate([], {
         relativeTo: this.route,
         queryParams: { copropertyId: this.selectedCopropertyId },

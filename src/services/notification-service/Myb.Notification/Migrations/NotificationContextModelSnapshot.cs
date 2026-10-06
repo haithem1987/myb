@@ -30,6 +30,9 @@ namespace Myb.Notification.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("CopropertyId")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsRead")
                         .HasColumnType("boolean");
 
@@ -49,6 +52,8 @@ namespace Myb.Notification.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId", "CopropertyId", "CreatedAt");
 
                     b.ToTable("Notifications");
                 });

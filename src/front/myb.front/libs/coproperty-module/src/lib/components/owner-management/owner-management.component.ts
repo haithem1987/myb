@@ -8,10 +8,11 @@ import { UnitService, UnitExtended } from '../../services/unit.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { OwnerService } from '../../services/owner.service';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
-import { ModalService, NotificationService } from '@myb-front/shared-ui';
+import { ModalService, NotificationService, NoResultComponent } from '@myb-front/shared-ui';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { of, from, Subject, forkJoin } from 'rxjs';
 import { map, finalize, switchMap, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 interface Unit {
   id: string;
@@ -58,7 +59,7 @@ interface KeycloakUser {
 @Component({
   selector: 'myb-owner-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, NgbDropdownModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, NgbDropdownModule, NoResultComponent],
   templateUrl: './owner-management.component.html',
   styleUrls: ['./owner-management.component.scss'],
 })
@@ -74,8 +75,7 @@ export class OwnerManagementComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
-
-  private static readonly ACTIVE_COPROPERTY_STORAGE_KEY = 'activeCopropertyId';
+  private activeCoproperty = inject(ActiveCopropertyService);
   
   owners: Owner[] = [];
   availableUnits: Unit[] = [];
@@ -156,10 +156,10 @@ export class OwnerManagementComponent implements OnInit {
           next: (coproperties) => {
             this.coproperties.set(coproperties.map((c) => ({ id: c.id, name: c.name, isActive: c.isActive })));
 
-            if (coproperties.length > 0) {
-              this.copropertyId = (coproperties.find(c => c.isActive) ?? coproperties[0]).id;
+            const selectedId = this.activeCoproperty.selectAvailable(coproperties);
+            if (selectedId) {
+              this.copropertyId = selectedId;
               this.selectedCopropertyForFilter.set(this.copropertyId);
-              localStorage.setItem(OwnerManagementComponent.ACTIVE_COPROPERTY_STORAGE_KEY, this.copropertyId);
               this.loadOwners();
               this.loadAvailableUnits();
             }
@@ -175,7 +175,7 @@ export class OwnerManagementComponent implements OnInit {
 
     this.copropertyId = copropertyId;
     this.selectedCopropertyForFilter.set(copropertyId);
-    localStorage.setItem(OwnerManagementComponent.ACTIVE_COPROPERTY_STORAGE_KEY, copropertyId);
+    this.activeCoproperty.setActive(copropertyId);
 
     this.searchTerm = '';
     this.ownerUnitFilter = '';
@@ -187,15 +187,23 @@ export class OwnerManagementComponent implements OnInit {
     this.loadAvailableUnits();
   }
 
+  getSelectedCopropertyName(): string {
+    const selectedId = this.copropertyId;
+    if (!selectedId) return '';
+    return this.coproperties().find(coproperty => coproperty.id === selectedId)?.name ?? '';
+  }
+
   loadAvailableUnits(): void {
+    if (!this.copropertyId || this.copropertyId === 'all') {
+      this.allUnits = [];
+      this.availableUnits = [];
+      return;
+    }
+
     this.loading.set(true);
-    console.log('[Owner Management] Loading syndic units started');
+    console.log('[Owner Management] Loading coproperty units started');
     
-    // A syndic can assign any available lot from any coproperty they manage.
-    // Active ownership links are returned with the units so already assigned
-    // lots can be excluded before the form reaches the backend validation.
-    const managerId = this.keycloakService.getSyndicManagerId();
-    this.unitService.getAllUnitsBySyndic(managerId).pipe(
+    this.unitService.getUnitsByCoproperty(this.copropertyId).pipe(
       takeUntilDestroyed(this.destroyRef),
       finalize(() => {
         console.log('[Owner Management] Loading units finalized');
@@ -808,7 +816,7 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   openOwnershipTransfer(owner: Owner, ownerUnit: NonNullable<Owner['ownerUnits']>[number]): void {
-    if (!ownerUnit.unit) return;
+    if (!ownerUnit.unit || !this.isUnitInActiveCoproperty(ownerUnit.unit)) return;
     this.transferNewOwnerId.set('');
     this.ownershipTransfer.set({
       unitId: ownerUnit.unitId,
@@ -832,6 +840,11 @@ export class OwnerManagementComponent implements OnInit {
     const transfer = this.ownershipTransfer();
     const newOwner = this.owners.find(owner => owner.id === this.transferNewOwnerId());
     if (!transfer || !newOwner) return;
+    const unit = this.allUnits.find(candidate => candidate.id === transfer.unitId);
+    if (!unit || !this.isUnitInActiveCoproperty(unit)) {
+      this.cancelOwnershipTransfer();
+      return;
+    }
 
     const confirmed = await this.modalService.confirm({
       title: this.translateService.instant('coproperty.owner.confirmChangeTitle'),

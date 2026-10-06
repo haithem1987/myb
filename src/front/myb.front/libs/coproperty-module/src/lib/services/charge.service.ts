@@ -13,9 +13,17 @@ import {
   UPDATE_CHARGE,
   DELETE_CHARGE,
   CALCULATE_CHARGE_DISTRIBUTION,
+  CREATE_DISTRIBUTION,
   MARK_CHARGE_DISTRIBUTION_PAID,
 } from '../graphql/mutations/charge.mutation';
 import { Currency } from '../models/coproperty.models';
+import { CreateFundCallInput, FundCall } from '../models/fund-call.model';
+
+export interface CreateDistributionInput {
+  copropertyId: string;
+  chargeIds: string[];
+  fundCalls: CreateFundCallInput[];
+}
 
 export interface ChargeExtended {
   id?: string;
@@ -171,6 +179,16 @@ export class ChargeService {
         context: { service: 'copropertyService' },
       })
       .pipe(map((result) => result.data!.distributeCharge));
+  }
+
+  createDistribution(input: CreateDistributionInput): Observable<FundCall[]> {
+    return this.apollo
+      .mutate<{ createDistribution: FundCall[] }>({
+        mutation: CREATE_DISTRIBUTION,
+        variables: { input },
+        context: { service: 'copropertyService' },
+      })
+      .pipe(map((result) => result.data!.createDistribution));
   }
 
   getCopropertyChargeDistributions(copropertyId: string): Observable<ChargeDistributionPayment[]> {

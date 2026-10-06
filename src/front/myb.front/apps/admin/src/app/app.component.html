@@ -1,1 +1,7 @@
+<div *ngIf="routeLoading()" class="route-loading" role="status" aria-live="polite">
+  <div class="route-loading-card">
+    <span class="route-loading-spinner" aria-hidden="true"></span>
+    <span>{{ 'LOADING' | translate }}</span>
+  </div>
+</div>
 <router-outlet></router-outlet>

@@ -71,7 +71,7 @@ export class OwnerProfileCompletionComponent implements OnInit {
         .subscribe({
           next: (owner) => {
             if (owner) {
-              this.router.navigate(['/coproperty/owner/dashboard']);
+              this.router.navigate(['/coproperty/select'], { queryParams: { space: 'owner' } });
             }
           },
           error: () => {
@@ -99,7 +99,7 @@ export class OwnerProfileCompletionComponent implements OnInit {
   }
 
   private getDefaultRoute(): string {
-    return '/coproperty/owner/dashboard';
+    return '/coproperty/select?space=owner';
   }
 
   onSubmit(): void {
@@ -134,7 +134,7 @@ export class OwnerProfileCompletionComponent implements OnInit {
         next: () => {
           this.loading.set(false);
           this.successMessage.set('auth.register.profileSaved');
-          this.router.navigate([this.getDefaultRoute()]);
+          this.router.navigateByUrl(this.getDefaultRoute());
         },
         error: (err) => {
           this.loading.set(false);

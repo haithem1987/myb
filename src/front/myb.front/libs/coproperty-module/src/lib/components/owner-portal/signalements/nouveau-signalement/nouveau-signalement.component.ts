@@ -1,5 +1,5 @@
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -17,6 +17,7 @@ import {
 } from '../../../../models/signalement.model';
 import { take, catchError, map, switchMap } from 'rxjs/operators';
 import { forkJoin, of } from 'rxjs';
+import { ActiveCopropertyService } from '../../../../services/active-coproperty.service';
 
 interface DropdownOption { value: string; label: string; icon: string; }
 
@@ -44,20 +45,16 @@ interface DropdownOption { value: string; label: string; icon: string; }
         <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)">
       </div>
 
-      <!-- Type -->
+      <!-- Coproperty -->
       <div class="mb-3" *ngIf="assignedCoproperties().length > 0">
         <label class="form-label fw-semibold">{{ 'ownerFixes.coproperty' | translate }}</label>
-        <select
-          class="form-select"
-          [ngModel]="selectedCopropertyId()"
-          (ngModelChange)="selectedCopropertyId.set($event)">
-          <option *ngFor="let coproperty of assignedCoproperties()" [value]="coproperty.id">
-            {{ coproperty.name }}
-          </option>
-        </select>
+        <div class="form-control bg-light" aria-readonly="true">
+          <i class="bi bi-building me-2"></i>
+          {{ selectedCopropertyName() }}
+        </div>
       </div>
 
-      <div class="alert alert-warning" *ngIf="!contextLoading() && assignedCoproperties().length === 0">
+      <div class="alert alert-warning" *ngIf="!contextLoading() && activeAssignedCoproperties().length === 0">
         {{ 'ownerFixes.noActiveUnitIsAssignedToYouContactYour' | translate }}
       </div>
 
@@ -183,6 +180,7 @@ interface DropdownOption { value: string; label: string; icon: string; }
   `]
 })
 export class NouveauSignalementComponent implements OnInit {
+  private activeCoproperty = inject(ActiveCopropertyService);
   private signalementService = inject(SignalementService);
   private copropertyService = inject(CopropertyService);
   private ownerService = inject(OwnerService);
@@ -202,6 +200,8 @@ export class NouveauSignalementComponent implements OnInit {
   sending = signal(false);
 
   assignedCoproperties = signal<Coproperty[]>([]);
+  activeAssignedCoproperties = computed(() =>
+    this.assignedCoproperties().filter(coproperty => coproperty.isActive));
   selectedCopropertyId = signal('');
   contextLoading = signal(true);
   private userId = '';
@@ -253,7 +253,7 @@ export class NouveauSignalementComponent implements OnInit {
       catchError(() => of([] as Coproperty[]))
     ).subscribe(coproperties => {
       this.assignedCoproperties.set(coproperties);
-      this.selectedCopropertyId.set(coproperties[0]?.id ?? '');
+      this.selectedCopropertyId.set(this.activeCoproperty.selectAvailable(coproperties));
       this.contextLoading.set(false);
     });
   }
@@ -282,10 +282,17 @@ export class NouveauSignalementComponent implements OnInit {
   toggleZoneDropdown(): void { this.zoneDropOpen.update(v => !v); }
 
   isValid(): boolean {
-    return !!this.selectedCopropertyId() &&
+    return this.activeAssignedCoproperties().some(
+      coproperty => coproperty.id === this.selectedCopropertyId()) &&
       !!this.selectedType() &&
       !!this.selectedZone() &&
       this.description.trim().length > 0;
+  }
+
+  selectedCopropertyName(): string {
+    return this.assignedCoproperties().find(
+      coproperty => coproperty.id === this.selectedCopropertyId()
+    )?.name ?? '';
   }
 
   submit(): void {

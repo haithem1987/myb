@@ -5,6 +5,12 @@ namespace Myb.Coproperty.Services
     public interface IKeycloakAdminService
     {
         /// <summary>
+        /// Returns a client_credentials access token for this service's own Keycloak client,
+        /// used to authenticate outbound calls to other internal services (e.g. notification-service).
+        /// </summary>
+        Task<string> GetServiceAccessTokenAsync();
+
+        /// <summary>
         /// Returns all Keycloak users that have the configured manager role (coproperty-syndic by default).
         /// Creates the role if it does not yet exist.
         /// </summary>
@@ -33,6 +39,12 @@ namespace Myb.Coproperty.Services
         Task<string?> ConsumeActivationNotificationRecipientAsync(string userId);
 
         Task<bool> SetPreferredLanguageAsync(string userId, string language);
+
+        /// <summary>
+        /// Ask Keycloak to send its signed verification/required-actions link to
+        /// the user. Merely assigning VERIFY_EMAIL does not send an email.
+        /// </summary>
+        Task SendRequiredActionsEmailAsync(string userId);
 
         Task<string> GetPreferredLanguageAsync(string userId);
 

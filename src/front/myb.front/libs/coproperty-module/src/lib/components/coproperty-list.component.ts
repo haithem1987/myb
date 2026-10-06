@@ -7,13 +7,13 @@ import { Observable, ReplaySubject, firstValueFrom, combineLatest, of } from 'rx
 import { catchError, map, debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { CopropertyService } from '../services/coproperty.service';
 import { Coproperty } from '../models/coproperty.models';
-import { ModalService, ToastService } from '@myb-front/shared-ui';
+import { ModalService, ToastService, NoResultComponent } from '@myb-front/shared-ui';
 import { KeycloakService } from '@myb-front/auth';
 
 @Component({
   selector: 'myb-coproperty-list',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ReactiveFormsModule],
+  imports: [CommonModule, TranslateModule, ReactiveFormsModule, NoResultComponent],
   template: `
     <div class="container-fluid mt-4">
       <!-- Header Section -->
@@ -111,19 +111,19 @@ import { KeycloakService } from '@myb-front/auth';
                     (click)="distributeCharges(coproperty.id)" title="Calculate distribution">
                     <i class="bi bi-calculator"></i>
                   </button>
-                  <button type="button" class="btn btn-sm btn-outline-danger"
-                    (click)="deleteCoproperty(coproperty)" [title]="'coproperty.list.delete' | translate">
-                    <i class="bi bi-trash"></i>
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <ng-template #emptyState>
-          <div class="text-center py-5 text-muted">
-            <i class="bi bi-buildings display-4 d-block mb-3"></i>
-            <p>{{ 'coproperty.list.noCoproperties' | translate }}</p>
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <myb-front-no-result
+                icon="bi-buildings"
+                [title]="'coproperty.list.noCoproperties' | translate">
+              </myb-front-no-result>
+            </div>
           </div>
         </ng-template>
       </ng-container>
@@ -305,11 +305,11 @@ export class CopropertyListComponent {
   }
 
   editCoproperty(id: string): void {
-    this.router.navigate(['/coproperty/syndic/coproperties', id, 'edit']);
+    this.router.navigate(['/coproperty/manage', id, 'edit']);
   }
 
   addCoproperty(): void {
-    this.router.navigate(['/coproperty/syndic/coproperties/new']);
+    this.router.navigate(['/coproperty/manage/new']);
   }
 
   manageTravaux(id: string): void {

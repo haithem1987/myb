@@ -255,6 +255,46 @@
     justify-content: space-between;
     padding: 0 24px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    .active-coproperty {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+      margin-right: auto;
+      margin-left: 16px;
+    }
+
+    .btn-change-coproperty {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fff;
+      color: #4b5563;
+      font-weight: 600;
+      white-space: nowrap;
+
+      &:hover {
+        border-color: #667eea;
+        color: #667eea;
+        background: #f8f7ff;
+      }
+    }
+
+    .active-coproperty-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      color: #374151;
+      font-weight: 700;
+
+      i { color: #667eea; }
+      span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    }
     
     .btn-toggle-sidebar {
       width: 40px;
@@ -327,6 +367,14 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .main-content .header {
+    .active-coproperty { gap: 8px; margin-left: 8px; }
+    .btn-change-coproperty span { display: none; }
+    .active-coproperty-name { font-size: 0.875rem; }
   }
 }
 

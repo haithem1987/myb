@@ -23,6 +23,13 @@ namespace Myb.Coproperty.GraphQL.Mutations
             if (!Guid.TryParse(input.CopropertyId, out var copropertyId))
                 throw new InvalidOperationException("La copropriété du signalement est invalide.");
 
+            var coproperty = await copropertyService.GetByIdAsync(copropertyId);
+            if (coproperty == null)
+                throw new InvalidOperationException("La copropriété du signalement est introuvable.");
+            if (!coproperty.IsActive)
+                throw new InvalidOperationException(
+                    "Il est impossible de créer un signalement pour une copropriété inactive.");
+
             if (CopropertyAccessControl.IsOwner(user))
             {
                 var owner = await ownerService.GetByUserIdAsync(authenticatedUserId)

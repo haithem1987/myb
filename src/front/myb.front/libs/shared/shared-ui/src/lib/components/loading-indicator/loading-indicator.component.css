@@ -1,0 +1,17 @@
+.loading-state {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+.loading-state p {
+  margin: 0.75rem 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}

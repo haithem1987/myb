@@ -1,4 +1,6 @@
-<div class="text-center">
-  <i class="bi bi-emoji-frown" style="font-size: 2rem"></i>
-  <p class="mt-2">{{ 'NO_RESULTS_FOUND' | translate }}</p>
+<div class="empty-state" [class.empty-state--compact]="compact" role="status">
+  <i class="bi" [ngClass]="icon" aria-hidden="true"></i>
+  <h4>{{ title || ('NO_RESULTS_FOUND' | translate) }}</h4>
+  <p *ngIf="message">{{ message }}</p>
+  <div class="empty-state__actions"><ng-content></ng-content></div>
 </div>

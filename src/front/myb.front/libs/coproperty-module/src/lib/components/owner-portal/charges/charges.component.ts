@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { OwnerService, FundCallService, FundCallExtended, CurrencyService, FundCallPayment } from '../../../index';
 import { KeycloakService } from '@myb-front/auth';
-import { ToastService, ModalService, NotificationService } from '@myb-front/shared-ui';
+import { ToastService, ModalService, NoResultComponent, NotificationService } from '@myb-front/shared-ui';
 import { firstValueFrom, catchError, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ActiveCopropertyService } from '../../../services/active-coproperty.service';
 
 export interface PaymentReceipt {
   fundCallDescription: string;
@@ -34,7 +35,7 @@ export interface PaymentJustificationForm {
 @Component({
   selector: 'app-owner-charges',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
+  imports: [CommonModule, FormsModule, RouterLink, TranslateModule, NoResultComponent],
   templateUrl: './charges.component.html',
   styleUrls: ['./charges.component.scss']
 })
@@ -50,6 +51,7 @@ export class OwnerChargesComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
+  private activeCoproperty = inject(ActiveCopropertyService);
   private requestedPaymentHandled = false;
 
   fundCalls = signal<FundCallExtended[]>([]);
@@ -80,11 +82,11 @@ export class OwnerChargesComponent implements OnInit {
 
   // Computed stats
   get totalCharges(): number {
-    return this.fundCalls().reduce((sum, fc) => sum + fc.amount, 0);
+    return this.copropertyScopedFundCalls.reduce((sum, fc) => sum + fc.amount, 0);
   }
 
   get totalPaid(): number {
-    return this.fundCalls().reduce((sum, fc) => {
+    return this.copropertyScopedFundCalls.reduce((sum, fc) => {
       const paid = (fc.payments || [])
         .filter((p) => this.isPaymentApproved(p.validationStatus))
         .reduce((s, p) => s + p.amount, 0);
@@ -110,7 +112,7 @@ export class OwnerChargesComponent implements OnInit {
 
   private formatFundCallTotals(amountSelector: (fundCall: FundCallExtended) => number): string {
     const totals = new Map<string, number>();
-    for (const fundCall of this.fundCalls()) {
+    for (const fundCall of this.copropertyScopedFundCalls) {
       const currency = fundCall.currency ?? this.currencyService.current;
       totals.set(currency, (totals.get(currency) ?? 0) + amountSelector(fundCall));
     }
@@ -121,20 +123,16 @@ export class OwnerChargesComponent implements OnInit {
   }
 
   get unpaidFundCalls(): FundCallExtended[] {
-    if (this.filterStatus() === 'paid') return [];
     return this.fundCalls().filter(
       fc => (fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION') && this.matchesFilters(fc)
     );
   }
 
   get paidFundCalls(): FundCallExtended[] {
-    if (this.filterStatus() === 'unpaid') return [];
-    if (this.filterStatus() === 'cancelled') return [];
     return this.fundCalls().filter(fc => (fc.status === 'PAID' || fc.status === 'VALIDATED') && this.matchesFilters(fc));
   }
 
   get cancelledFundCalls(): FundCallExtended[] {
-    if (this.filterStatus() === 'unpaid' || this.filterStatus() === 'paid') return [];
     return this.fundCalls().filter(fc => fc.status === 'CANCELLED' && this.matchesFilters(fc));
   }
 
@@ -142,6 +140,36 @@ export class OwnerChargesComponent implements OnInit {
   searchTerm = signal<string>('');
   filterStatus = signal<string>('');
   filterYear = signal<string>('');
+  filterCopropertyId = signal<string>('');
+
+  get availableCoproperties(): Array<{ id: string; name: string }> {
+    const values = new Map<string, string>();
+    for (const fundCall of this.fundCalls()) {
+      if (fundCall.copropertyId) {
+        values.set(fundCall.copropertyId, fundCall.copropertyName || fundCall.copropertyId);
+      }
+    }
+    return [...values.entries()]
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  private get copropertyScopedFundCalls(): FundCallExtended[] {
+    return this.fundCalls().filter(fundCall => this.matchesFilters(fundCall));
+  }
+
+  private matchesSelectedStatus(fc: FundCallExtended): boolean {
+    switch (this.filterStatus()) {
+      case 'unpaid':
+        return fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION';
+      case 'paid':
+        return fc.status === 'PAID' || fc.status === 'VALIDATED';
+      case 'cancelled':
+        return fc.status === 'CANCELLED';
+      default:
+        return true;
+    }
+  }
 
   get availableYears(): number[] {
     const years = new Set<number>();
@@ -150,6 +178,12 @@ export class OwnerChargesComponent implements OnInit {
   }
 
   private matchesFilters(fc: FundCallExtended): boolean {
+    if (!this.matchesSelectedStatus(fc)) {
+      return false;
+    }
+    if (this.filterCopropertyId() && fc.copropertyId !== this.filterCopropertyId()) {
+      return false;
+    }
     if (this.filterYear() && new Date(fc.dueDate).getFullYear().toString() !== this.filterYear()) {
       return false;
     }
@@ -169,12 +203,29 @@ export class OwnerChargesComponent implements OnInit {
     this.filterStatus.set((event.target as HTMLSelectElement).value);
   }
 
+  onCopropertyFilterChange(copropertyId: string): void {
+    this.filterCopropertyId.set(copropertyId);
+    this.activeCoproperty.setActive(copropertyId);
+  }
+
   onYearFilterChange(event: Event): void {
     this.filterYear.set((event.target as HTMLSelectElement).value);
   }
 
+  clearFilters(): void {
+    this.searchTerm.set('');
+    this.filterStatus.set('');
+    this.filterYear.set('');
+  }
+
   get hasActiveFilters(): boolean {
     return !!this.searchTerm() || !!this.filterStatus() || !!this.filterYear();
+  }
+
+  getSelectedCopropertyName(): string {
+    const id = this.filterCopropertyId();
+    if (!id) return '';
+    return this.availableCoproperties.find(coproperty => coproperty.id === id)?.name ?? '';
   }
 
   /** True once every non-cancelled fund call has been paid/validated. */
@@ -244,6 +295,9 @@ export class OwnerChargesComponent implements OnInit {
 
       const loadedFundCalls = fundCalls || [];
       this.fundCalls.set(loadedFundCalls);
+      this.filterCopropertyId.set(
+        this.activeCoproperty.selectAvailable(this.availableCoproperties, this.filterCopropertyId())
+      );
       this.openRequestedPayment(loadedFundCalls);
     } catch (err: any) {
       console.error('[OwnerCharges] Error loading data:', err);
@@ -423,10 +477,6 @@ export class OwnerChargesComponent implements OnInit {
       if (this.paymentForm.paymentMethod === 'Virement') {
         justificatifText = `[Virement] Banque: ${this.paymentForm.bankName.trim()}, RIB: ${this.paymentForm.rib.trim()}, Émetteur: ${this.paymentForm.senderName.trim()} — ${justificatifText}`;
       }
-      if (this.justificatifFile) {
-        justificatifText += ` [Fichier: ${this.justificatifFile.name}]`;
-      }
-
       await firstValueFrom(
         this.fundCallService.addFundCallPayment(fc.id, {
           amount: this.paymentForm.amount,

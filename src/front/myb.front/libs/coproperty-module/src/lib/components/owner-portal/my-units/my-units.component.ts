@@ -7,6 +7,8 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CurrencyService } from '../../../services/currency.service';
+import { NoResultComponent } from '@myb-front/shared-ui';
+import { ActiveCopropertyService } from '../../../services/active-coproperty.service';
 
 interface UnitView {
   id: string;
@@ -23,7 +25,7 @@ interface UnitView {
 @Component({
   selector: 'app-owner-my-units',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule],
+  imports: [CommonModule, RouterLink, TranslateModule, NoResultComponent],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
@@ -110,11 +112,12 @@ interface UnitView {
         </div>
 
         <!-- Empty state -->
-        <div *ngIf="units().length === 0" class="text-center py-5">
-          <i class="bi bi-building display-1 text-muted"></i>
-          <p class="text-muted mt-3 mb-1 fs-5">{{ 'ownerPortal.myUnits.emptyTitle' | translate }}</p>
-          <p class="text-muted small">{{ 'ownerPortal.myUnits.emptyText' | translate }}</p>
-        </div>
+        <myb-front-no-result
+          *ngIf="units().length === 0"
+          icon="bi-building"
+          [title]="'ownerPortal.myUnits.emptyTitle' | translate"
+          [message]="'ownerPortal.myUnits.emptyText' | translate">
+        </myb-front-no-result>
 
         <!-- Units List -->
         <div class="row" *ngIf="units().length > 0">
@@ -351,6 +354,7 @@ export class OwnerMyUnitsComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
   private translate = inject(TranslateService);
   private currencyService = inject(CurrencyService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   units = signal<UnitView[]>([]);
   loading = signal<boolean>(true);
@@ -406,10 +410,15 @@ export class OwnerMyUnitsComponent implements OnInit {
       coproperties: this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([] as Coproperty[]))),
     }).subscribe({
       next: ({ units, coproperties }) => {
+        const accessibleIds = new Set(units.map(unit => unit.copropertyId));
+        const accessibleCoproperties = coproperties.filter(coproperty => accessibleIds.has(coproperty.id));
+        const selectedId = this.activeCoproperty.selectAvailable(accessibleCoproperties);
         const copropertyMap = new Map<string, string>(
-          coproperties.map((c) => [c.id, c.name])
+          accessibleCoproperties.map((c) => [c.id, c.name])
         );
-        this.units.set(units.map((u) => this.mapUnit(u, copropertyMap)));
+        this.units.set(units
+          .filter(unit => !!selectedId && unit.copropertyId === selectedId)
+          .map((unit) => this.mapUnit(unit, copropertyMap)));
         this.loading.set(false);
       },
       error: (err) => {

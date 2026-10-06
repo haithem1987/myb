@@ -24,7 +24,7 @@ const roleLandingGuard: CanActivateFn = () => {
     roles.includes('coproperty-admin') ||
     roles.includes('system-admin')
   ) {
-    return router.createUrlTree(['/coproperty/syndic/dashboard']);
+    return router.createUrlTree(['/coproperty/select'], { queryParams: { space: 'syndic' } });
   }
   if (roles.includes('coproperty-council')) {
     return router.createUrlTree(['/coproperty/council/dashboard']);
@@ -33,7 +33,7 @@ const roleLandingGuard: CanActivateFn = () => {
     return router.createUrlTree(['/coproperty/accountant/dashboard']);
   }
   if (roles.includes('coproperty-owner') || roles.includes('coproperty-tenant')) {
-    return router.createUrlTree(['/coproperty/owner/dashboard']);
+    return router.createUrlTree(['/coproperty/select'], { queryParams: { space: 'owner' } });
   }
 
   // Users without a recognized application role retain the service picker.

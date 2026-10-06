@@ -13,7 +13,7 @@ internal static partial class EmailTemplateRenderer
 {
     private const string TemplateMarker = "data-myb-email-template=\"standard-v1\"";
 
-    public static string Render(EmailMessage email, string brandName)
+    public static string Render(EmailMessage email, string brandName, string applicationUrl)
     {
         if (email.HtmlBody.Contains(TemplateMarker, StringComparison.OrdinalIgnoreCase))
         {
@@ -23,6 +23,11 @@ internal static partial class EmailTemplateRenderer
         var content = ExtractBody(email.HtmlBody);
         var encodedSubject = WebUtility.HtmlEncode(email.Subject);
         var encodedBrand = WebUtility.HtmlEncode(brandName);
+        var encodedRecipient = WebUtility.HtmlEncode(email.To);
+        var encodedApplicationUrl = WebUtility.HtmlEncode(NormalizeApplicationUrl(applicationUrl));
+        var english = string.Equals(email.Language, "en", StringComparison.OrdinalIgnoreCase);
+        var recipientLabel = english ? "Sent to" : "Envoyé à";
+        var openApplicationLabel = english ? "Open MYB" : "Accéder à MYB";
         var year = DateTime.UtcNow.Year;
 
         return $$"""
@@ -37,10 +42,13 @@ internal static partial class EmailTemplateRenderer
                   .myb-content h1, .myb-content h2 { color: #173b75 !important; line-height: 1.25; }
                   .myb-content p { line-height: 1.6; }
                   .myb-content table { max-width: 100%; }
+                  .myb-content img { max-width: 100% !important; height: auto !important; }
                   .myb-content a { color: #1d5fd1; }
                   @media only screen and (max-width: 680px) {
                     .myb-shell { width: 100% !important; border-radius: 0 !important; }
                     .myb-header, .myb-content, .myb-footer { padding-left: 22px !important; padding-right: 22px !important; }
+                    .myb-content table { width: 100% !important; display: block !important; overflow-x: auto !important; }
+                    .myb-content td, .myb-content th { white-space: normal !important; }
                   }
                 </style>
               </head>
@@ -63,6 +71,8 @@ internal static partial class EmailTemplateRenderer
                         </tr>
                         <tr>
                           <td class="myb-footer" style="padding:20px 36px;background:#f8fafc;border-top:1px solid #e5eaf2;text-align:center;color:#778398;font-size:12px;line-height:1.5;">
+                            <div style="margin-bottom:16px;"><a href="{{encodedApplicationUrl}}" style="display:inline-block;background:#1d5fd1;color:#ffffff;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:7px;">{{openApplicationLabel}}</a></div>
+                            <div style="overflow-wrap:anywhere;">{{recipientLabel}}: {{encodedRecipient}}</div>
                             <div>{{encodedBrand}} · Manage Your Business</div>
                             <div style="margin-top:4px;">© {{year}} {{encodedBrand}}</div>
                           </td>
@@ -94,6 +104,14 @@ internal static partial class EmailTemplateRenderer
 
         var bodyMatch = BodyRegex().Match(html);
         return bodyMatch.Success ? bodyMatch.Groups["content"].Value.Trim() : html.Trim();
+    }
+
+    private static string NormalizeApplicationUrl(string applicationUrl)
+    {
+        return Uri.TryCreate(applicationUrl, UriKind.Absolute, out var uri) &&
+               (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp)
+            ? uri.ToString()
+            : "https://myb-platform.com/";
     }
 
     [GeneratedRegex("<body\\b[^>]*>(?<content>[\\s\\S]*?)</body>", RegexOptions.IgnoreCase)]

@@ -185,6 +185,7 @@ public class FundCallReminderService : BackgroundService
                     Subject = english
                         ? $"Payment reminder - {totalRemainingText} remaining"
                         : $"Rappel de paiement - {totalRemainingText} restant",
+                    Language = english ? "en" : "fr",
                     HtmlBody = htmlBody,
                     Source = "coproperty-reminder"
                 });

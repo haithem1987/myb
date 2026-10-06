@@ -12,26 +12,8 @@
     <div class="card-body">
       <div class="row g-3 align-items-end">
 
-        <!-- Coproperty Filter -->
-        <div class="col-md-3">
-          <label for="copropertyFilter" class="form-label">
-            <i class="bi bi-buildings me-1" aria-hidden="true"></i>
-            {{ 'coproperty.fundCalls.filters.coproperty' | translate }}
-          </label>
-          <select
-            id="copropertyFilter"
-            class="form-select"
-            [ngModel]="selectedCopropertyId() || ''"
-            (ngModelChange)="onCopropertyChange($event)">
-            <option value="" disabled>{{ 'requestedFixes.selectCoproperty' | translate }}</option>
-            <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id">
-              {{ coproperty.name }}
-            </option>
-          </select>
-        </div>
-
         <!-- Owner Filter (derived from loaded fund calls) -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="ownerFilter" class="form-label">
             <i class="bi bi-people me-1" aria-hidden="true"></i>
             {{ 'coproperty.fundCalls.filters.owner' | translate }}
@@ -49,7 +31,7 @@
         </div>
 
         <!-- Year Filter (server-side) -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="yearFilter" class="form-label">
             <i class="bi bi-calendar3 me-1" aria-hidden="true"></i>
             {{ 'coproperty.fundCalls.filters.year' | translate }}
@@ -65,7 +47,7 @@
         </div>
 
         <!-- Status Filter (client-side) -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label for="statusFilter" class="form-label">
             <i class="bi bi-ui-checks me-1" aria-hidden="true"></i>
             {{ 'coproperty.fundCalls.filters.status' | translate }}
@@ -104,13 +86,8 @@
     </div>
   </div>
 
-  <div *ngIf="!loading() && !selectedCopropertyId()" class="alert alert-info" role="status">
-    <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
-    {{ 'requestedFixes.selectCopropertyForFundCalls' | translate }}
-  </div>
-
   <!-- Stats Cards -->
-  <div *ngIf="selectedCopropertyId()" class="row g-3 mb-4 stats-grid">
+  <div class="row g-3 mb-4 stats-grid">
     <!-- Montant Total Appelé -->
     <div class="col-sm-6 col-xl-3 d-flex">
       <div class="card stats-card h-100 flex-fill">
@@ -188,7 +165,7 @@
   </div>
 
   <!-- Fund Calls Table -->
-  <div *ngIf="selectedCopropertyId()" class="card">
+  <div class="card">
 
     <!-- Overdue Alert Banner -->
     <div *ngIf="getOverdueCount() > 0" class="overdue-alert alert alert-danger border-0 rounded-0 rounded-top mb-0 d-flex align-items-center justify-content-between" role="alert">
@@ -240,10 +217,10 @@
         <span class="badge bg-primary rounded-pill">{{ selectedCount }}</span>
         <span class="small text-primary fw-semibold">{{ 'coproperty.fundCalls.bulk.selected' | translate }}</span>
         <div class="vr mx-1"></div>
-        <button class="btn btn-sm btn-success" (click)="bulkChangeStatus('PAID')" [title]="'coproperty.fundCalls.bulk.markPaid' | translate">
+        <button class="btn btn-sm btn-success" (click)="bulkChangeStatus('PAID')" [disabled]="!isSelectedCopropertyActive()" [title]="'coproperty.fundCalls.bulk.markPaid' | translate">
           <i class="bi bi-check-circle-fill me-1"></i>{{ 'coproperty.fundCalls.bulk.markPaid' | translate }}
         </button>
-        <button class="btn btn-sm btn-warning" (click)="bulkChangeStatus('TO_PAY')" [title]="'coproperty.fundCalls.bulk.markToPay' | translate">
+        <button class="btn btn-sm btn-warning" (click)="bulkChangeStatus('TO_PAY')" [disabled]="!isSelectedCopropertyActive()" [title]="'coproperty.fundCalls.bulk.markToPay' | translate">
           <i class="bi bi-arrow-counterclockwise me-1"></i>{{ 'coproperty.fundCalls.bulk.markToPay' | translate }}
         </button>
         <div class="ms-auto d-flex gap-2">
@@ -367,6 +344,7 @@
                     <button *ngIf="canCancel(fundCall)"
                             ngbDropdownItem
                             class="text-warning"
+                            [disabled]="!isSelectedCopropertyActive()"
                             (click)="promptCancelFundCall(fundCall)">
                       <i class="bi bi-x-octagon me-2"></i>{{ 'coproperty.fundCalls.actions.cancel' | translate }}
                     </button>
@@ -456,7 +434,7 @@
         <button type="button" class="btn btn-sm btn-outline-primary"
                 (click)="togglePaymentForm()"
                 *ngIf="!isPaid(editingFundCall())"
-                [disabled]="isCancelled(editingFundCall()!)">
+                [disabled]="isCancelled(editingFundCall()!) || !isSelectedCopropertyActive()">
           <i class="bi" [ngClass]="showPaymentForm() ? 'bi-x-lg' : 'bi-plus-lg'"></i>
           {{ showPaymentForm() ? ('coproperty.fundCalls.payments.cancel' | translate) : ('coproperty.fundCalls.payments.add' | translate) }}
         </button>
@@ -674,7 +652,7 @@
       <!-- Actions -->
       <div class="d-flex gap-2">
         <button *ngIf="!isPaid(editingFundCall())" type="submit" class="btn btn-primary flex-fill"
-          [disabled]="editForm.invalid || savingEdit()">
+          [disabled]="editForm.invalid || savingEdit() || !isSelectedCopropertyActive()">
           <span *ngIf="!savingEdit()">
             <i class="bi bi-check-circle me-1"></i>{{ 'coproperty.fundCalls.editPanel.save' | translate }}
           </span>

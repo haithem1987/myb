@@ -26,6 +26,9 @@ export interface Signalement {
   copropertyId: string;
   reportedBy: string;
   reporterName: string;
+  reporterEmail?: string;
+  reporterPhone?: string;
+  reporterLots: string[];
   type: SignalementType;
   zone: SignalementZone;
   description: string;

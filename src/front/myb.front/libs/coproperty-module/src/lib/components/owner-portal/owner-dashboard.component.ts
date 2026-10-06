@@ -12,8 +12,9 @@ import { FundCallPaymentWithContext } from '../../models/fund-call.model';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take, switchMap } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '@myb-front/shared-ui';
+import { NoResultComponent, NotificationService } from '@myb-front/shared-ui';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 interface OwnerUnit {
   id: string;
@@ -54,7 +55,7 @@ interface RecentInvoice {
 @Component({
   selector: 'app-owner-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, TranslateModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule, NoResultComponent],
   templateUrl: './owner-dashboard.component.html',
   styleUrls: ['./owner-dashboard.component.scss']
 })
@@ -68,6 +69,7 @@ export class OwnerDashboardComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
   private router = inject(Router);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   myUnits = signal<OwnerUnit[]>([]);
   pendingInvoices = signal<PendingInvoice[]>([]);
@@ -75,7 +77,7 @@ export class OwnerDashboardComponent implements OnInit {
   totalDue = signal(0);
   totalPaid = signal(0);
   ownerFundCalls = signal<FundCallExtended[]>([]);
-  ownerCoproperties = signal<Array<{ id: string; name: string }>>([]);
+  ownerCoproperties = signal<Array<{ id: string; name: string; currency: string }>>([]);
   selectedCopropertyId = signal('');
   totalCharges = signal(0);
   totalDueDisplay = signal('');
@@ -86,6 +88,9 @@ export class OwnerDashboardComponent implements OnInit {
 
   totalShares = computed(() => this.myUnits().reduce((sum, u) => sum + u.shares, 0));
   totalSurface = computed(() => this.myUnits().reduce((sum, u) => sum + u.surface, 0));
+  selectedCurrency = computed(() =>
+    this.ownerCoproperties().find(coproperty => coproperty.id === this.selectedCopropertyId())?.currency ?? 'EUR'
+  );
   overdueFundCalls = computed(() => this.ownerFundCalls().filter(fc =>
     (!this.selectedCopropertyId() || fc.copropertyId === this.selectedCopropertyId()) &&
     (fc.status === 'TO_PAY' || fc.status === 'PENDING_VALIDATION') &&
@@ -116,12 +121,17 @@ export class OwnerDashboardComponent implements OnInit {
   }
 
   private formatCurrencyGroups(values: Array<{ amount: number; currency?: string }>): string {
+    const selectedCurrency = this.selectedCurrency();
+    if (this.selectedCopropertyId()) {
+      const total = values.reduce((sum, value) => sum + value.amount, 0);
+      return this.currencyService.formatAmount(total, selectedCurrency);
+    }
     const totals = new Map<string, number>();
     for (const value of values) {
       const currency = value.currency ?? this.currencyService.current;
       totals.set(currency, (totals.get(currency) ?? 0) + value.amount);
     }
-    if (totals.size === 0) return this.currencyService.formatAmount(0);
+    if (totals.size === 0) return this.currencyService.formatAmount(0, selectedCurrency);
     return [...totals.entries()]
       .map(([currency, amount]) => this.currencyService.formatAmount(amount, currency))
       .join(' · ');
@@ -175,14 +185,14 @@ export class OwnerDashboardComponent implements OnInit {
         const associatedCopropertyIds = new Set(units.map(unit => unit.copropertyId));
         const associatedCoproperties = coproperties
           .filter(coproperty => associatedCopropertyIds.has(coproperty.id))
-          .map(coproperty => ({ id: coproperty.id, name: coproperty.name }));
+          .map(coproperty => ({ id: coproperty.id, name: coproperty.name, currency: coproperty.currency }));
         this.ownerCoproperties.set(associatedCoproperties);
 
-        const selectedId = this.selectedCopropertyId();
-        if (!associatedCoproperties.some(coproperty => coproperty.id === selectedId)) {
-          this.selectedCopropertyId.set(associatedCoproperties[0]?.id ?? '');
-        }
+        this.selectedCopropertyId.set(
+          this.activeCoproperty.selectAvailable(associatedCoproperties, this.selectedCopropertyId())
+        );
         const activeCopropertyId = this.selectedCopropertyId();
+        const activeCurrency = associatedCoproperties.find(coproperty => coproperty.id === activeCopropertyId)?.currency ?? 'EUR';
         const scopedUnits = activeCopropertyId
           ? units.filter(unit => unit.copropertyId === activeCopropertyId)
           : units;
@@ -231,7 +241,7 @@ export class OwnerDashboardComponent implements OnInit {
           payableAmount: this.getPayableAmount(fc),
           dueDate: new Date(fc.dueDate),
           description: fc.description || 'Appel de fonds',
-          currency: fc.currency,
+          currency: activeCurrency,
         })));
 
         // Total due reflects only the amount that remains available to pay.
@@ -270,7 +280,7 @@ export class OwnerDashboardComponent implements OnInit {
               ? 'paid'
               : this.isPaymentRejected(p.validationStatus) ? 'rejected' : 'pending',
             paymentMethod: p.paymentMethod ?? '',
-            currency: p.fundCall?.currency ?? this.currencyService.current,
+            currency: activeCurrency,
           }));
         this.recentInvoices.set(recentReceipts);
 
@@ -286,7 +296,12 @@ export class OwnerDashboardComponent implements OnInit {
   onCopropertyChange(copropertyId: string): void {
     if (copropertyId === this.selectedCopropertyId()) return;
     this.selectedCopropertyId.set(copropertyId);
+    this.activeCoproperty.setActive(copropertyId);
     this.loadOwnerData();
+  }
+
+  getSelectedCopropertyName(): string {
+    return this.ownerCoproperties().find(coproperty => coproperty.id === this.selectedCopropertyId())?.name ?? '';
   }
 
   isOverdue(dueDate: Date): boolean {

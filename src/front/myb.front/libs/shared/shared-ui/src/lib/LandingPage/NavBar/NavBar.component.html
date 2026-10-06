@@ -58,10 +58,10 @@
           <a class="myb-mobile-link" routerLink="/profile" (click)="toggleMenu()">
             <i class="bi bi-person-circle me-2"></i>{{ 'navigation.profile' | translate }}
           </a>
-          <a class="myb-mobile-link" routerLink="/coproperty/owner/dashboard" (click)="toggleMenu()" *ngIf="keycloakService.hasRole('coproperty-owner')">
+          <a class="myb-mobile-link" routerLink="/coproperty/select" [queryParams]="{ space: 'owner' }" (click)="toggleMenu()" *ngIf="keycloakService.hasRole('coproperty-owner')">
             <i class="bi bi-building me-2"></i>{{ 'navigation.ownerSpace' | translate }}
           </a>
-          <a class="myb-mobile-link" routerLink="/coproperty/syndic/dashboard" (click)="toggleMenu()" *ngIf="keycloakService.hasAnyRole(['coproperty-syndic','coproperty-admin'])">
+          <a class="myb-mobile-link" routerLink="/coproperty/select" [queryParams]="{ space: 'syndic' }" (click)="toggleMenu()" *ngIf="keycloakService.hasAnyRole(['coproperty-syndic','coproperty-admin'])">
             <i class="bi bi-buildings me-2"></i>{{ 'navigation.syndicSpace' | translate }}
           </a>
           <hr class="myb-mobile-divider">

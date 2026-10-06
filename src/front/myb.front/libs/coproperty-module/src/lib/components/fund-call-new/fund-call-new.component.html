@@ -40,27 +40,11 @@
       </div>
       <div class="card-body">
 
-        <!-- Row 1: Coproperty + Owner -->
+        <!-- Row 1: Owner -->
         <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="copropertyId" class="form-label">
-              <i class="bi bi-building me-1"></i>
-              Copropriété <span class="text-danger">*</span>
-            </label>
-            <select
-              id="copropertyId"
-              class="form-select"
-              formControlName="copropertyId"
-              [class.is-invalid]="fundCallForm.get('copropertyId')?.invalid && fundCallForm.get('copropertyId')?.touched">
-              <option value="">Sélectionner une copropriété</option>
-              <option *ngFor="let coproperty of coproperties()" [value]="coproperty.id" [disabled]="!coproperty.isActive">
-                {{ coproperty.name }}{{ coproperty.isActive ? '' : ' (Inactive)' }}
-              </option>
-            </select>
-            <div class="invalid-feedback">Veuillez sélectionner une copropriété</div>
-          </div>
+          <input type="hidden" formControlName="copropertyId">
 
-          <div class="col-md-6">
+          <div class="col-12">
             <label for="ownerId" class="form-label">
               <i class="bi bi-person me-1"></i>
               Copropriétaire (optionnel)

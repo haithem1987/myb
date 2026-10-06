@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { NoResultComponent } from '@myb-front/shared-ui';
 import { SignalementService } from '../../../../services/signalement.service';
 import { KeycloakService } from '@myb-front/auth';
 import { CopropertyService } from '../../../../services/coproperty.service';
@@ -21,7 +22,7 @@ type Tab = 'en-cours' | 'resolus';
 @Component({
   selector: 'app-signalement-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NoResultComponent],
   template: `
     <div class="container-fluid py-4">
       <!-- Header -->
@@ -65,12 +66,12 @@ type Tab = 'en-cours' | 'resolus';
       </div>
 
       <!-- Empty state -->
-      <div *ngIf="!loading() && displayedSignalements().length === 0" class="empty-state text-center py-5">
-        <i class="bi bi-clipboard-check fs-1 text-muted"></i>
-        <p class="mt-3 text-muted">Aucun signalement
-          {{ activeTab() === 'en-cours' ? 'en cours' : 'résolu' }}
-        </p>
-      </div>
+      <myb-front-no-result
+        *ngIf="!loading() && displayedSignalements().length === 0"
+        icon="bi-clipboard-check"
+        [title]="activeTab() === 'en-cours' ? 'Aucun signalement en cours' : 'Aucun signalement résolu'"
+        message="Signalements">
+      </myb-front-no-result>
 
       <!-- Signalement cards -->
       <div class="signalement-card" *ngFor="let s of displayedSignalements()" (click)="onCardClick(s)">

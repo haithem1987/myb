@@ -90,6 +90,15 @@ public class EmailConsumerWorker : BackgroundService
                 await _channel.BasicAckAsync(ea.DeliveryTag, false);
                 _retryCounts.TryRemove(messageKey, out var _removed);
             }
+            catch (InvalidEmailAddressException ex)
+            {
+                // Permanent data error (no/invalid recipient) — retrying won't help, discard immediately.
+                _logger.LogError(ex,
+                    "Email message has no valid recipient, discarding without retry. Subject may be in: {Json}",
+                    json[..Math.Min(json.Length, 200)]);
+                await _channel.BasicAckAsync(ea.DeliveryTag, false);
+                _retryCounts.TryRemove(messageKey, out var _discarded);
+            }
             catch (Exception ex)
             {
                 var retryCount = _retryCounts.AddOrUpdate(messageKey, 1, (_, count) => count + 1);

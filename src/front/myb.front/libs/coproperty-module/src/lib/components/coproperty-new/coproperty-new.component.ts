@@ -171,7 +171,7 @@ export class CopropertyNewComponent implements OnInit {
         // Show success message then navigate to list after 2 seconds
         setTimeout(() => {
           this.saveSuccess.set(false);
-          this.router.navigate(['/coproperty/syndic/coproperties']);
+          this.router.navigate(['/coproperty/select'], { queryParams: { space: 'syndic', manage: 'true' } });
         }, 2000);
       },
       error: (error) => {
@@ -183,7 +183,7 @@ export class CopropertyNewComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/coproperty/syndic/coproperties']);
+    this.router.navigate(['/coproperty/select'], { queryParams: { space: 'syndic', manage: 'true' } });
   }
 
   get formTitle(): string {

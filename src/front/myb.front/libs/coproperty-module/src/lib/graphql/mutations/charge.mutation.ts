@@ -61,6 +61,20 @@ export const CALCULATE_CHARGE_DISTRIBUTION = gql`
   }
 `;
 
+export const CREATE_DISTRIBUTION = gql`
+  mutation CreateDistribution($input: CreateDistributionInput!) {
+    createDistribution(input: $input) {
+      id
+      copropertyId
+      ownerId
+      amount
+      dueDate
+      description
+      status
+    }
+  }
+`;
+
 export const MARK_CHARGE_DISTRIBUTION_PAID = gql`
   mutation MarkChargeDistributionPaid(
     $distributionId: UUID!

@@ -46,19 +46,28 @@ namespace Myb.Coproperty.Services
 
             var created = result.Entity;
 
-            if (!string.IsNullOrWhiteSpace(created.Email))
-            {
-                var portalUrl = System.Net.WebUtility.HtmlEncode(_keycloakOptions.OwnerPortalUrl);
-                var loginEmail = System.Net.WebUtility.HtmlEncode(created.Email);
-                var firstName = System.Net.WebUtility.HtmlEncode(created.FirstName);
-                var english = await _keycloakAdminService.GetPreferredLanguageAsync(created.UserId.ToString()) == "en";
-                var subject = english
-                    ? "Welcome to MYB – Your owner role has been assigned"
-                    : "Bienvenue sur MYB – Votre rôle propriétaire a été assigné";
-                await _emailPublisher.PublishAsync(new EmailMessage
+            await SendOwnerAccessEmailAsync(created);
+
+            return created;
+        }
+
+        public async Task SendOwnerAccessEmailAsync(Owner owner)
+        {
+            if (string.IsNullOrWhiteSpace(owner.Email))
+                return;
+
+            var portalUrl = System.Net.WebUtility.HtmlEncode(_keycloakOptions.OwnerPortalUrl);
+            var loginEmail = System.Net.WebUtility.HtmlEncode(owner.Email);
+            var firstName = System.Net.WebUtility.HtmlEncode(owner.FirstName);
+            var english = await _keycloakAdminService.GetPreferredLanguageAsync(owner.UserId.ToString()) == "en";
+            var subject = english
+                ? "Welcome to MYB – Your owner role has been assigned"
+                : "Bienvenue sur MYB – Votre rôle propriétaire a été assigné";
+            await _emailPublisher.PublishAsync(new EmailMessage
                 {
-                    To = created.Email,
+                    To = owner.Email,
                     Subject = subject,
+                    Language = english ? "en" : "fr",
                     HtmlBody = english ? $"""
                         <html><body style="font-family:Arial,sans-serif;color:#333">
                           <h2 style="color:#2c5282">Welcome to MYB, {firstName}!</h2>
@@ -86,9 +95,6 @@ namespace Myb.Coproperty.Services
                         </body></html>
                         """
                 });
-            }
-
-            return created;
         }
 
         public async Task DeleteAsync(Guid id)

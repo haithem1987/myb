@@ -1,10 +1,10 @@
 import { TranslateService } from '@ngx-translate/core';
 import { translateNotificationMessage } from '../utils/notification-message';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable, Optional } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { ToastService } from './toast.service';
-import { BehaviorSubject, Subject, map } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, from, map, switchMap } from 'rxjs';
 import { Notification } from '../models/notification.model';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { ENVIRONMENT } from 'libs/auth/src/lib/environment.token';
@@ -16,6 +16,7 @@ export class NotificationService {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private consistencyRefreshTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly apiUrl: string;
+  private selectedCopropertyId = '';
 
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
@@ -65,13 +66,15 @@ export class NotificationService {
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
-      this.hubConnection.on('ReceiveNotification', (message: string) => {
+      this.hubConnection.on('ReceiveNotification', (message: string, copropertyId?: string | null) => {
+        if (this.selectedCopropertyId && copropertyId !== this.selectedCopropertyId) return;
         this.toastService.show(translateNotificationMessage(message, this.translate), {
           classname: 'toast-success',
         });
         this.notifyDataChanged();
         this.getNotificationsByUserId(
-          this.keycloakService.getProfile()?.id || ''
+          this.keycloakService.getProfile()?.id || '',
+          this.selectedCopropertyId
         );
       });
 
@@ -116,22 +119,25 @@ export class NotificationService {
     this.reconnectTimer = null;
   }
 
-  public sendToUser({ senderId, receiverId, message }: any): void {
-    this.http
+  public sendToUser({ senderId, receiverId, message, copropertyId }: any): void {
+    this.authenticatedRequest(headers => this.http
       .post(`${this.apiUrl}/api/Notifications`, {
         senderId,
         receiverId,
         message,
-      })
+        copropertyId,
+      }, { headers }))
       .subscribe({
         next: () => console.log('Notification envoyée au manager'),
         error: (err) => console.error('Erreur envoi notification', err),
       });
   }
 
-  public getNotificationsByUserId(userId: string): void {
-    this.http
-      .get<Notification[]>(`${this.apiUrl}/api/Notifications/${userId}`)
+  public getNotificationsByUserId(userId: string, copropertyId = ''): void {
+    this.selectedCopropertyId = copropertyId;
+    const query = copropertyId ? `?copropertyId=${encodeURIComponent(copropertyId)}` : '';
+    this.authenticatedRequest(headers => this.http
+      .get<Notification[]>(`${this.apiUrl}/api/Notifications/${userId}${query}`, { headers }))
       .subscribe({
         next: (notifications) => this.notificationsSubject.next(notifications),
         error: (err) => console.error('Failed to fetch notifications', err),
@@ -139,8 +145,8 @@ export class NotificationService {
   }
 
   public markAsRead(notificationId: string): void {
-    this.http
-      .put(`${this.apiUrl}/api/Notifications/${notificationId}/read`, {})
+    this.authenticatedRequest(headers => this.http
+      .put(`${this.apiUrl}/api/Notifications/${notificationId}/read`, {}, { headers }))
       .subscribe({
         next: () => {
           const updated = this.notificationsSubject.value.map(n =>
@@ -152,9 +158,10 @@ export class NotificationService {
       });
   }
 
-  public markAllAsRead(userId: string): void {
-    this.http
-      .put(`${this.apiUrl}/api/Notifications/read-all/${userId}`, {})
+  public markAllAsRead(userId: string, copropertyId = this.selectedCopropertyId): void {
+    const query = copropertyId ? `?copropertyId=${encodeURIComponent(copropertyId)}` : '';
+    this.authenticatedRequest(headers => this.http
+      .put(`${this.apiUrl}/api/Notifications/read-all/${userId}${query}`, {}, { headers }))
       .subscribe({
         next: () => {
           const updated = this.notificationsSubject.value.map(n => ({ ...n, isRead: true }));
@@ -162,5 +169,17 @@ export class NotificationService {
         },
         error: (err) => console.error('Failed to mark all as read', err),
       });
+  }
+
+  private authenticatedRequest<T>(request: (headers: HttpHeaders) => Observable<T>): Observable<T> {
+    return from(this.keycloakService.updateToken()).pipe(
+      switchMap(() => {
+        const token = this.keycloakService.getToken();
+        const headers = token
+          ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+          : new HttpHeaders();
+        return request(headers);
+      })
+    );
   }
 }

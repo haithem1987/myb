@@ -10,6 +10,7 @@ import { Coproperty } from '../../models/coproperty.models';
 import { KeycloakService } from '@myb-front/auth';
 import { Intervention, CreateInterventionInput, UpdateInterventionInput } from '../../models/intervention.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 @Component({
   selector: 'myb-intervention-new',
@@ -28,6 +29,7 @@ export class InterventionNewComponent implements OnInit {
   private translateService = inject(TranslateService);
   private currencyService = inject(CurrencyService);
   private keycloakService = inject(KeycloakService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   get currencySymbol(): string {
     return this.currencyService.symbol;
@@ -116,12 +118,11 @@ export class InterventionNewComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.coproperties.set(data);
-          if (this.copropertyIdFromUrl) {
-            const coproperty = data.find(c => c.id === this.copropertyIdFromUrl);
-            if (coproperty) {
-              this.selectedCoproperty.set(coproperty);
-              this.interventionForm.patchValue({ copropertyId: coproperty.id });
-            }
+          const selectedId = this.activeCoproperty.selectAvailable(data, this.copropertyIdFromUrl);
+          const coproperty = data.find(c => c.id === selectedId);
+          if (coproperty && !this.isEditMode()) {
+            this.selectedCoproperty.set(coproperty);
+            this.interventionForm.patchValue({ copropertyId: coproperty.id });
           }
         },
         error: (err) => {
@@ -211,7 +212,12 @@ export class InterventionNewComponent implements OnInit {
     this.selectedCoproperty.set(coproperty || null);
   }
 
+  isSelectedCopropertyActive(): boolean {
+    return this.selectedCoproperty()?.isActive !== false;
+  }
+
   save(): void {
+    if (!this.isSelectedCopropertyActive()) return;
     if (this.interventionForm.invalid) {
       this.markFormGroupTouched(this.interventionForm);
       return;

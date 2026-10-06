@@ -9,8 +9,9 @@ import { FundCallService, FundCallExtended } from 'libs/coproperty-module/src/li
 import { KeycloakService } from '@myb-front/auth';
 import { forkJoin, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { take, timeout, catchError } from 'rxjs/operators';
+import { take, timeout, catchError, map, switchMap } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
 interface DashboardStats {
   totalCoproperties: number;
@@ -46,6 +47,7 @@ export class SyndicDashboardComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
   private destroyRef = inject(DestroyRef);
   private translate = inject(TranslateService);
+  private activeCoproperty = inject(ActiveCopropertyService);
   
   stats = signal<DashboardStats>({
     totalCoproperties: 0,
@@ -82,43 +84,62 @@ export class SyndicDashboardComponent implements OnInit {
       })
     );
     
-    const units$ = this.unitService.getAllUnitsBySyndic(managerId).pipe(
-      take(1),
-      timeout(10000),
-      catchError(err => {
-        console.error('[Dashboard] Error loading units:', err);
-        return of([]);
-      })
-    );
-    
-    const charges$ = this.chargeService.getAllCharges().pipe(
-      take(1),
-      timeout(10000),
-      catchError(err => {
-        console.error('[Dashboard] Error loading charges:', err);
-        return of([]);
-      })
-    );
+    coproperties$.pipe(
+      switchMap(coproperties => {
+        const selectedId = this.activeCoproperty.selectAvailable(coproperties);
+        const scopedCoproperties = coproperties.filter(coproperty => coproperty.id === selectedId);
 
-    const fundCalls$ = this.fundCallService.getAllFundCalls().pipe(
-      take(1),
-      timeout(10000),
-      catchError(err => {
-        console.error('[Dashboard] Error loading fund calls:', err);
-        return of([] as FundCallExtended[]);
-      })
-    );
-    
-    forkJoin({
-      coproperties: coproperties$,
-      units: units$,
-      charges: charges$,
-      fundCalls: fundCalls$
-    })
-    .pipe(takeUntilDestroyed(this.destroyRef))
+        if (!selectedId) {
+          return of({
+            coproperties: scopedCoproperties,
+            totalManagedCoproperties: coproperties.length,
+            units: [],
+            charges: [],
+            fundCalls: [] as FundCallExtended[]
+          });
+        }
+
+        return forkJoin({
+          units: this.unitService.getUnitsByCoproperty(selectedId).pipe(
+            take(1),
+            timeout(10000),
+            catchError(err => {
+              console.error('[Dashboard] Error loading units:', err);
+              return of([]);
+            })
+          ),
+          charges: this.chargeService.getChargesByCoproperty(selectedId).pipe(
+            take(1),
+            timeout(10000),
+            catchError(err => {
+              console.error('[Dashboard] Error loading charges:', err);
+              return of([]);
+            })
+          ),
+          fundCalls: this.fundCallService.getFundCallsByCoproperty(selectedId).pipe(
+            take(1),
+            timeout(10000),
+            catchError(err => {
+              console.error('[Dashboard] Error loading fund calls:', err);
+              return of([] as FundCallExtended[]);
+            })
+          )
+        }).pipe(map(data => ({
+          coproperties: scopedCoproperties,
+          totalManagedCoproperties: coproperties.length,
+          ...data
+        })));
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    )
     .subscribe({
-      next: ({ coproperties, units, charges, fundCalls }) => {
-        this.overdueFundCallsCount.set(fundCalls.filter(fundCall => {
+      next: ({ coproperties, totalManagedCoproperties, units, charges, fundCalls }) => {
+        const scopedCoproperties = coproperties;
+        const scopedUnits = units;
+        const scopedCharges = charges;
+        const scopedFundCalls = fundCalls;
+
+        this.overdueFundCallsCount.set(scopedFundCalls.filter(fundCall => {
           if (fundCall.status !== 'TO_PAY' && fundCall.status !== 'PENDING_VALIDATION') return false;
           const approved = (fundCall.payments ?? [])
             .filter(payment => String(payment.validationStatus ?? '').replace(/[_\s-]/g, '').toUpperCase() === 'APPROVED')
@@ -126,11 +147,11 @@ export class SyndicDashboardComponent implements OnInit {
           return Number(fundCall.amount || 0) > approved &&
             new Date(fundCall.dueDate).getTime() < Date.now();
         }).length);
-        const activeCharges = charges.filter(c => c.isActive);
+        const activeCharges = scopedCharges.filter(c => c.isActive);
         const totalsByCurrency = new Map<string, number>();
         for (const charge of activeCharges) {
           const currency = charge.currency
-            ?? coproperties.find(coproperty => coproperty.id === charge.copropertyId)?.currency
+            ?? scopedCoproperties.find(coproperty => coproperty.id === charge.copropertyId)?.currency
             ?? this.currencyService.current;
           totalsByCurrency.set(
             currency,
@@ -144,13 +165,13 @@ export class SyndicDashboardComponent implements OnInit {
                 .join(' · ')
             : this.formatAmount(0)
         );
-        const totalOwners = units.filter(u => u.isOccupied).length;
-        const totalUnits = units.length;
-        const activeUnits = units.filter(u => u.isOccupied).length;
+        const totalOwners = scopedUnits.filter(u => u.isOccupied).length;
+        const totalUnits = scopedUnits.length;
+        const activeUnits = scopedUnits.filter(u => u.isOccupied).length;
         const occupancyRate = totalUnits > 0 ? Math.round((activeUnits / totalUnits) * 100) : 0;
         
         this.stats.set({
-          totalCoproperties: coproperties.length,
+          totalCoproperties: totalManagedCoproperties,
           totalUnits,
           activeUnits,
           totalOwners,
@@ -160,7 +181,7 @@ export class SyndicDashboardComponent implements OnInit {
         
         // Create recent activities from latest charges
         const activities: RecentActivity[] = [];
-        const sortedCharges = [...charges]
+        const sortedCharges = [...scopedCharges]
           .sort((a, b) => {
             const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
             const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -169,7 +190,7 @@ export class SyndicDashboardComponent implements OnInit {
           .slice(0, 5);
         
         sortedCharges.forEach(charge => {
-          const coproperty = coproperties.find(c => c.id === charge.copropertyId);
+          const coproperty = scopedCoproperties.find(c => c.id === charge.copropertyId);
           const copropertyName = coproperty?.name || this.translate.instant('coproperty.syndicDashboard.unknownCoproperty');
           
           activities.push({

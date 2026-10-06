@@ -22,12 +22,14 @@ public class NotificationService : INotificationService
         _emailPublisher = emailPublisher;
     }
 
-    public async Task SendNotificationAsync(string senderId, string receiverId, string message)
+    public async Task SendNotificationAsync(
+        string senderId, string receiverId, string message, string? copropertyId = null)
     {
         var notification = new Models.Notification
         {
             SenderId = senderId,
             ReceiverId = receiverId,
+            CopropertyId = string.IsNullOrWhiteSpace(copropertyId) ? null : copropertyId,
             Message = message,
             IsRead = false,
             CreatedAt = DateTime.UtcNow
@@ -37,7 +39,8 @@ public class NotificationService : INotificationService
             using var context = _contextFactory.CreateDbContext();
             context.Set<Models.Notification>().Add(notification);
             await context.SaveChangesAsync();
-            await _hubContext.Clients.User(receiverId).SendAsync("ReceiveNotification", message);
+            await _hubContext.Clients.User(receiverId)
+                .SendAsync("ReceiveNotification", message, notification.CopropertyId);
         }
         catch (Exception e)
         {
@@ -46,21 +49,27 @@ public class NotificationService : INotificationService
         }
     }
 
-    public async Task<List<Models.Notification>> GetNotificationsAsync(string userId)
+    public async Task<List<Models.Notification>> GetNotificationsAsync(
+        string userId, string? copropertyId = null)
     {
         using var context = _contextFactory.CreateDbContext();
-        return await context.Set<Models.Notification>()
-            .Where(n => n.ReceiverId == userId)
+        var query = context.Set<Models.Notification>()
+            .Where(n => n.ReceiverId == userId);
+        if (!string.IsNullOrWhiteSpace(copropertyId))
+            query = query.Where(n => n.CopropertyId == copropertyId);
+        return await query
             .OrderByDescending(n => n.CreatedAt)
             .ToListAsync();
     }
 
-    public async Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody)
+    public async Task SendEmailNotificationAsync(
+        string receiverEmail, string subject, string htmlBody, string? language = null)
     {
         await _emailPublisher.PublishAsync(new EmailMessage
         {
             To = receiverEmail,
             Subject = subject,
+            Language = language?.StartsWith("en", StringComparison.OrdinalIgnoreCase) == true ? "en" : "fr",
             HtmlBody = htmlBody,
             Source = "notification-service"
         });
@@ -78,12 +87,14 @@ public class NotificationService : INotificationService
         }
     }
 
-    public async Task MarkAllAsReadAsync(string userId)
+    public async Task MarkAllAsReadAsync(string userId, string? copropertyId = null)
     {
         using var context = _contextFactory.CreateDbContext();
-        var unread = await context.Set<Models.Notification>()
-            .Where(n => n.ReceiverId == userId && !n.IsRead)
-            .ToListAsync();
+        var query = context.Set<Models.Notification>()
+            .Where(n => n.ReceiverId == userId && !n.IsRead);
+        if (!string.IsNullOrWhiteSpace(copropertyId))
+            query = query.Where(n => n.CopropertyId == copropertyId);
+        var unread = await query.ToListAsync();
         foreach (var n in unread)
         {
             n.IsRead = true;

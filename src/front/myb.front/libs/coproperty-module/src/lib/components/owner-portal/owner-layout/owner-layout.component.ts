@@ -5,10 +5,11 @@ import { KeycloakService } from '@myb-front/auth';
 import { OwnerService, InvoiceStatus, CopropertyService, CurrencyService, Currency } from '../../../index';
 import { ToastsContainerComponent, ModalContainerComponent, NotificationService, UserDropdownComponent } from '@myb-front/shared-ui';
 import { take, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
+import { ActiveCopropertyService } from '../../../services/active-coproperty.service';
 
 @Component({
   selector: 'app-owner-layout',
@@ -25,6 +26,7 @@ export class OwnerLayoutComponent implements OnInit {
   private router = inject(Router);
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
+  private activeCoproperty = inject(ActiveCopropertyService);
   
   // State signals
   pendingInvoices = signal(0);
@@ -32,6 +34,8 @@ export class OwnerLayoutComponent implements OnInit {
 
   // Dual-role flag: coproprietaire who is also syndic
   isSyndic = signal(false);
+  activeCopropertyName = signal('');
+  canChangeCoproperty = signal(false);
   
   // Sidebar state
   isMobileMenuOpen = signal(false);
@@ -51,9 +55,21 @@ export class OwnerLayoutComponent implements OnInit {
   }
 
   private initCurrency(): void {
-    this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([]))).subscribe(cops => {
-      if (cops.length > 0 && cops[0].currency) {
-        this.currencyService.setCurrency(cops[0].currency as Currency);
+    const userId = this.keycloakService.getUserId();
+    if (!userId) return;
+
+    forkJoin({
+      coproperties: this.copropertyService.getCoproperties().pipe(take(1), catchError(() => of([]))),
+      units: this.ownerService.getMyUnits(userId).pipe(take(1), catchError(() => of([])))
+    }).subscribe(({ coproperties, units }) => {
+      const accessibleIds = new Set(units.map(unit => unit.copropertyId));
+      const accessibleCoproperties = coproperties.filter(coproperty => accessibleIds.has(coproperty.id));
+      const selectedId = this.activeCoproperty.selectAvailable(accessibleCoproperties);
+      const selected = accessibleCoproperties.find(coproperty => coproperty.id === selectedId);
+      this.activeCopropertyName.set(selected?.name ?? '');
+      this.canChangeCoproperty.set(accessibleCoproperties.length > 1);
+      if (selected?.currency) {
+        this.currencyService.setCurrency(selected.currency as Currency);
       }
     });
   }
@@ -110,7 +126,11 @@ export class OwnerLayoutComponent implements OnInit {
 
   switchToSyndicSpace(): void {
     // Navigate to the admin app (deployed at /admin/) which contains syndic routes
-    window.location.href = '/admin/coproperty/syndic/dashboard';
+    window.location.href = '/admin/coproperty/select?space=syndic';
+  }
+
+  changeCoproperty(): void {
+    this.router.navigate(['/coproperty/select'], { queryParams: { space: 'owner' } });
   }
   
   logout(): void {

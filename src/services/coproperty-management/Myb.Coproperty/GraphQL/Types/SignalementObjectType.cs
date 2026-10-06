@@ -11,6 +11,9 @@ public class SignalementObjectType : ObjectType<Signalement>
         descriptor.Field(s => s.CopropertyId).Type<NonNullType<IdType>>();
         descriptor.Field(s => s.ReportedBy).Type<NonNullType<IdType>>();
         descriptor.Field(s => s.ReporterName);
+        descriptor.Field(s => s.ReporterEmail);
+        descriptor.Field(s => s.ReporterPhone);
+        descriptor.Field(s => s.ReporterLots).Type<NonNullType<ListType<NonNullType<StringType>>>>();
         descriptor.Field(s => s.Type).Type<NonNullType<EnumType<SignalementType>>>();
         descriptor.Field(s => s.Zone).Type<NonNullType<EnumType<SignalementZone>>>();
         descriptor.Field(s => s.Description);

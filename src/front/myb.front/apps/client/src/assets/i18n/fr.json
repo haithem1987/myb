@@ -450,6 +450,8 @@
       "noSharesForDistribution": "Impossible de répartir par tantièmes : le total des tantièmes est nul",
       "noAreaForDistribution": "Impossible de répartir par surface : la surface totale est nulle",
       "fundCallCreated": "Répartition enregistrée et appel de fonds créé avec succès",
+      "createSuccess": "{{count}} appel(s) de fonds créé(s) avec succès",
+      "createError": "La création de la répartition a échoué. Aucune donnée partielle n'a été enregistrée. Veuillez réessayer.",
       "alreadyDistributed": "Tous les budgets de cette année ont déjà été répartis",
       "roundingNote": "Des différences d'arrondi peuvent s'appliquer"
     },
@@ -1125,6 +1127,7 @@
     "messages": { "paymentRecorded": "Paiement fournisseur enregistré pour « {{charge}} »", "paymentError": "Erreur lors de l'enregistrement du paiement" }
   },
   "managerReports": {
+    "ownerLots": "Lot(s)",
     "title": "Signalements résidents",
     "subtitle": "Gérez les signalements soumis par les habitants",
     "allTypes": "Tous les types",
@@ -1263,6 +1266,25 @@
         "rejected": "Rejeté"
       }
     }
+  },
+  "copropertySelection": {
+    "eyebrow": "Espace copropriété",
+    "title": "Choisissez une copropriété",
+    "ownerSubtitle": "Sélectionnez la copropriété à ouvrir dans votre espace propriétaire.",
+    "syndicSubtitle": "Sélectionnez la copropriété à gérer dans votre espace syndic.",
+    "loadError": "Impossible de charger vos copropriétés.",
+    "userNotFound": "L’utilisateur connecté n’a pas pu être identifié.",
+    "retry": "Réessayer",
+    "emptyTitle": "Aucune copropriété disponible",
+    "emptyText": "Votre compte n’a encore accès à aucune copropriété dans cet espace.",
+    "continue": "Continuer vers le tableau de bord",
+    "units": "Lots",
+    "myUnits": "Mes lots",
+    "shares": "Tantièmes",
+    "active": "Active",
+    "inactive": "Inactive",
+    "back": "Copropriétés",
+    "change": "Changer de copropriété"
   },
   "navigation": {
     "adminSpace": "Espace Admin",
@@ -1449,6 +1471,8 @@
     "selectCopropertyForBudgetLines": "Sélectionnez une copropriété pour consulter ses lignes budgétaires.",
     "copropertyFilter": "Copropriété",
     "allCoproperties": "Toutes les copropriétés",
+    "results": "résultats",
+    "clearFilters": "Effacer les filtres",
     "totalOverdue": "Total en retard",
     "overdue": "En retard",
     "overdueFundCalls": "Appels de fonds en retard"

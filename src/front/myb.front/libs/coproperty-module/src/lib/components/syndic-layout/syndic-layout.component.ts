@@ -3,13 +3,24 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
 import { ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, NotificationService, UserDropdownComponent } from '@myb-front/shared-ui';
-import { CopropertyService, CurrencyService, Currency } from '@myb-front/coproperty-module';
-import { ChargeService } from '@myb-front/coproperty-module';
-import { UnitService } from '@myb-front/coproperty-module';
+import {
+  ChargeService,
+  CopropertyService,
+  Currency,
+  CurrencyService,
+  FundCallService,
+  InterventionService,
+  OwnerService,
+  SignalementService,
+  TenantService,
+  UnitService,
+} from '@myb-front/coproperty-module';
 import { Notification } from 'libs/shared/infra/models/notification.model';
 import { TranslateModule } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'myb-coproperty-syndic-layout',
@@ -24,9 +35,16 @@ export class SyndicLayoutComponent implements OnInit {
   private copropertyService = inject(CopropertyService);
   private chargeService = inject(ChargeService);
   private unitService = inject(UnitService);
+  private ownerService = inject(OwnerService);
+  private tenantService = inject(TenantService);
+  private fundCallService = inject(FundCallService);
+  private interventionService = inject(InterventionService);
+  private signalementService = inject(SignalementService);
   private notificationService = inject(NotificationService);
   private currencyService = inject(CurrencyService);
   private destroyRef = inject(DestroyRef);
+  private activeCoproperty = inject(ActiveCopropertyService);
+  private statisticsRequestId = 0;
   
   // State signals
   unpaidInvoices = signal(0);
@@ -49,6 +67,7 @@ export class SyndicLayoutComponent implements OnInit {
   
   // Dual-role flag: syndic who is also a coproprietaire
   isCoproprietaire = signal(false);
+  activeCopropertyName = signal(this.activeCoproperty.activeCoproperty()?.name ?? '');
 
   // Sidebar state: expanded by default on desktop (>992px), collapsed on mobile/tablet
   isSidebarCollapsed = signal(window.innerWidth <= 992);
@@ -68,7 +87,7 @@ export class SyndicLayoutComponent implements OnInit {
     await this.notificationService.startConnection();
     const userId = this.keycloakService.getProfile()?.id || '';
     if (userId) {
-      this.notificationService.getNotificationsByUserId(userId);
+      this.notificationService.getNotificationsByUserId(userId, this.activeCoproperty.activeId());
     }
     this.notificationService.notifications$.subscribe(notifications => {
       this.notifications.set(notifications);
@@ -85,7 +104,7 @@ export class SyndicLayoutComponent implements OnInit {
   onMarkAllAsRead(): void {
     const userId = this.keycloakService.getProfile()?.id || '';
     if (userId) {
-      this.notificationService.markAllAsRead(userId);
+      this.notificationService.markAllAsRead(userId, this.activeCoproperty.activeId());
     }
   }
   
@@ -111,55 +130,70 @@ export class SyndicLayoutComponent implements OnInit {
   
   private loadStatistics(): void {
     const managerId = this.keycloakService.getSyndicManagerId();
+    const requestId = ++this.statisticsRequestId;
 
-    // Keep the already-supported counts independent from the aggregate query.
-    // This matters during rolling/local upgrades where the frontend can start
-    // before the backend has exposed `syndicMenuCounts`.
-    this.copropertyService.getCoproperties(managerId).subscribe({
+    this.copropertyService.getCoproperties(managerId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: (coproperties) => {
-        this.managedCoproperties.set(coproperties.length);
-        if (coproperties.length > 0 && coproperties[0].currency) {
-          this.currencyService.setCurrency(coproperties[0].currency as Currency);
-        }
-      },
-      error: (err) => console.error('Error loading sidebar coproperties:', err)
-    });
+        if (requestId !== this.statisticsRequestId) return;
 
-    this.copropertyService.getSyndicMenuCounts().subscribe({
-      next: (counts) => {
-        this.managedCoproperties.set(counts.coproperties);
-        this.totalBudgets.set(counts.budgets);
-        this.totalUnits.set(counts.units);
-        this.totalOwners.set(counts.owners);
-        this.totalTenants.set(counts.tenants);
-        this.totalFundCalls.set(counts.fundCalls);
-        this.totalChargePayments.set(counts.chargePayments);
-        this.totalInterventions.set(counts.interventions);
-        this.totalSignalements.set(counts.signalements);
-        this.totalDiscussions.set(counts.discussions);
+        this.managedCoproperties.set(coproperties.length);
+        const selectedId = this.activeCoproperty.selectAvailable(coproperties);
+        const selected = coproperties.find(coproperty => coproperty.id === selectedId);
+        if (selected?.name) {
+          this.activeCopropertyName.set(selected.name);
+        }
+        if (selected?.currency) {
+          this.currencyService.setCurrency(selected.currency as Currency);
+        }
+
+        if (!selectedId) return;
+
+        const userId = this.keycloakService.getProfile()?.id || '';
+        if (userId) {
+          this.notificationService.getNotificationsByUserId(userId, selectedId);
+        }
+
+        this.loadScopedCount('budgets', this.chargeService.getChargesByCoproperty(selectedId), selectedId, requestId, items => this.totalBudgets.set(items.length));
+        this.loadScopedCount('units', this.unitService.getUnitsByCoproperty(selectedId), selectedId, requestId, items => this.totalUnits.set(items.length));
+        this.loadScopedCount('owners', this.ownerService.getAllOwners(selectedId), selectedId, requestId, items => this.totalOwners.set(items.length));
+        this.loadScopedCount('tenants', this.tenantService.getTenants(selectedId), selectedId, requestId, items => this.totalTenants.set(items.length));
+        this.loadScopedCount('fund calls', this.fundCallService.getFundCallsByCoproperty(selectedId), selectedId, requestId, items => this.totalFundCalls.set(items.length));
+        this.loadScopedCount(
+          'charge payments',
+          this.chargeService.getCopropertyChargeDistributions(selectedId),
+          selectedId,
+          requestId,
+          items => this.totalChargePayments.set(new Set(items.map(item => item.chargeId)).size)
+        );
+        this.loadScopedCount('interventions', this.interventionService.getInterventionsByCoproperty(selectedId), selectedId, requestId, items => this.totalInterventions.set(items.length));
+        this.loadScopedCount('signalements', this.signalementService.getSignalements(selectedId), selectedId, requestId, items => this.totalSignalements.set(items.length));
       },
       error: (err) => {
-        console.warn('Aggregate sidebar counts unavailable; using compatible fallbacks.', err);
-        this.loadCompatibleCountFallbacks(managerId);
+        if (requestId !== this.statisticsRequestId) return;
+        console.error('Error loading sidebar coproperties:', err);
       }
     });
   }
 
-  /** Counts supported by older coproperty backends during a rolling upgrade. */
-  private loadCompatibleCountFallbacks(managerId?: string): void {
-    this.chargeService.getAllCharges().subscribe({
-      next: (charges) => {
-        this.totalBudgets.set(charges.length);
-        // The charge-payment page aggregates the same budget lines. The new
-        // aggregate endpoint refines this to distributed lines only.
-        this.totalChargePayments.set(charges.length);
+  private loadScopedCount<T>(
+    label: string,
+    request: Observable<T[]>,
+    copropertyId: string,
+    requestId: number,
+    apply: (items: T[]) => void
+  ): void {
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: items => {
+        if (
+          requestId === this.statisticsRequestId &&
+          this.activeCoproperty.activeId() === copropertyId
+        ) {
+          apply(items);
+        }
       },
-      error: (err) => console.error('Error loading fallback budget count:', err)
-    });
-
-    this.unitService.getAllUnitsBySyndic(managerId).subscribe({
-      next: (units) => this.totalUnits.set(units.length),
-      error: (err) => console.error('Error loading fallback unit count:', err)
+      error: error => console.error(`Error loading sidebar ${label}:`, error)
     });
   }
   
@@ -168,8 +202,6 @@ export class SyndicLayoutComponent implements OnInit {
   }
 
   onNavItemClick(): void {
-    // Refresh after create/update/delete operations performed on the current page.
-    this.loadStatistics();
     // Collapse sidebar on mobile when a nav item is clicked
     if (window.innerWidth < 768) {
       this.isSidebarCollapsed.set(true);
@@ -177,7 +209,11 @@ export class SyndicLayoutComponent implements OnInit {
   }
 
   switchToOwnerSpace(): void {
-    this.router.navigate(['/coproperty/owner/dashboard']);
+    this.router.navigate(['/coproperty/select'], { queryParams: { space: 'owner' } });
+  }
+
+  changeCoproperty(): void {
+    this.router.navigate(['/coproperty/select'], { queryParams: { space: 'syndic', manage: 'true' } });
   }
   
   logout(): void {

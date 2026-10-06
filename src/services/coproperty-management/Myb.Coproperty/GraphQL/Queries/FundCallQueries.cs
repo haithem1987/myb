@@ -79,6 +79,20 @@ public class FundCallQueries
     }
 
     /// <summary>
+    /// Get the coproperty-wide overdue fund-call balance without exposing other
+    /// owners' fund-call or payment details to the owner portal.
+    /// </summary>
+    public async Task<decimal> GetCopropertyFundCallOverdueTotal(
+        Guid copropertyId,
+        ClaimsPrincipal? user,
+        [Service] IFundCallService fundCallService,
+        [Service] ICopropertyService copropertyService)
+    {
+        await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(user, copropertyId, copropertyService);
+        return await fundCallService.GetCopropertyOverdueTotalAsync(copropertyId);
+    }
+
+    /// <summary>
     /// Get all fund calls across all coproperties (unfiltered; filtering handled client-side).
     /// </summary>
     public async Task<List<FundCall>> GetAllFundCalls(

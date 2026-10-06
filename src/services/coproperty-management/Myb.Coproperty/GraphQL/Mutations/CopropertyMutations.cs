@@ -114,6 +114,7 @@ namespace Myb.Coproperty.GraphQL.Mutations
             }
             language = language?.StartsWith("en", StringComparison.OrdinalIgnoreCase) == true ? "en" : "fr";
             await keycloakAdminService.SetPreferredLanguageAsync(created.Id, language);
+            await keycloakAdminService.SendRequiredActionsEmailAsync(created.Id);
             var english = language == "en";
             var safeName = WebUtility.HtmlEncode(firstName);
             var safeEmail = WebUtility.HtmlEncode(created.Email);
@@ -123,6 +124,7 @@ namespace Myb.Coproperty.GraphQL.Mutations
             {
                 To = created.Email,
                 Subject = english ? "Welcome to your MYB account" : "Bienvenue dans votre compte MYB",
+                Language = english ? "en" : "fr",
                 HtmlBody = english
                     ? $"<h2>Welcome to MYB, {safeName}!</h2><p>Your account is ready.</p><p>Email: <strong>{safeEmail}</strong><br>Temporary password: <strong>{safePassword}</strong></p><p><a href=\"{url}\">Access your account</a></p><p>At first login, verify your email and choose a new password.</p>"
                     : $"<h2>Bienvenue sur MYB, {safeName} !</h2><p>Votre compte est prêt.</p><p>E-mail : <strong>{safeEmail}</strong><br>Mot de passe temporaire : <strong>{safePassword}</strong></p><p><a href=\"{url}\">Accéder à votre compte</a></p><p>À la première connexion, vérifiez votre adresse e-mail et choisissez un nouveau mot de passe.</p>"
@@ -185,6 +187,37 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 ?? "Le nouvel utilisateur";
             foreach (var activationRecord in activationRecords.Where(record => !record.SentAt.HasValue))
             {
+                // Claim the delivery before invoking external systems. This is an
+                // atomic compare-and-set, so concurrent app initialisation and a
+                // downstream timeout cannot emit the same activation event again
+                // on the next login.
+                var claimedAt = DateTime.UtcNow;
+                int claimed;
+                if (context.Database.IsRelational())
+                {
+                    claimed = await context.AccountActivationNotifications
+                        .Where(record => record.Id == activationRecord.Id && !record.SentAt.HasValue)
+                        .ExecuteUpdateAsync(setters => setters
+                            .SetProperty(record => record.SentAt, claimedAt));
+                }
+                else
+                {
+                    // The in-memory provider used by the focused service tests
+                    // cannot translate ExecuteUpdate. Preserve the same state
+                    // transition there so the delivery contract remains testable.
+                    if (activationRecord.SentAt.HasValue)
+                    {
+                        claimed = 0;
+                    }
+                    else
+                    {
+                        activationRecord.SentAt = claimedAt;
+                        await context.SaveChangesAsync();
+                        claimed = 1;
+                    }
+                }
+                if (claimed == 0) continue;
+
                 var managerId = activationRecord.RecipientUserId.ToString();
                 var recipient = await keycloakAdminService.GetUserByIdAsync(managerId)
                     ?? throw new InvalidOperationException("Activation notification recipient unavailable.");
@@ -194,22 +227,38 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 var message = english
                     ? $"{displayName} verified their email and accessed their MYB account."
                     : $"{displayName} a vérifié son adresse e-mail et accédé à son compte MYB.";
-                await emailPublisher.PublishAsync(new EmailMessage
+                try
                 {
-                    To = recipient.Email,
-                    Subject = english ? "MYB account activated" : "Compte MYB activé",
-                    HtmlBody = $"<p>{WebUtility.HtmlEncode(message)}</p>"
-                });
-                var client = httpClientFactory.CreateClient("NotificationService");
-                var response = await client.PostAsJsonAsync("/api/Notifications", new
+                    await emailPublisher.PublishAsync(new EmailMessage
+                    {
+                        To = recipient.Email,
+                        Subject = english ? "MYB account activated" : "Compte MYB activé",
+                        Language = english ? "en" : "fr",
+                        HtmlBody = $"<p>{WebUtility.HtmlEncode(message)}</p>"
+                    });
+                }
+                catch (Exception ex)
                 {
-                    SenderId = userId.ToString(),
-                    ReceiverId = managerId,
-                    Message = message
-                });
-                response.EnsureSuccessStatusCode();
-                activationRecord.SentAt = DateTime.UtcNow;
-                await context.SaveChangesAsync();
+                    Console.Error.WriteLine($"[AccountActivation] Email delivery failed after claim: {ex.Message}");
+                }
+
+                try
+                {
+                    var client = httpClientFactory.CreateClient("NotificationService");
+                    client.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await keycloakAdminService.GetServiceAccessTokenAsync());
+                    var response = await client.PostAsJsonAsync("/api/Notifications", new
+                    {
+                        SenderId = userId.ToString(),
+                        ReceiverId = managerId,
+                        Message = message
+                    });
+                    response.EnsureSuccessStatusCode();
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"[AccountActivation] In-app delivery failed after claim: {ex.Message}");
+                }
             }
             return true;
         }

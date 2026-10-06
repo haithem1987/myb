@@ -18,17 +18,6 @@
         <span class="nav-text">{{ 'navigation.dashboard' | translate }}</span>
       </a>
       
-      <a routerLink="/coproperty/syndic/coproperties" 
-         routerLinkActive="active" 
-         class="nav-item"
-         (click)="onNavItemClick()">
-        <i class="bi bi-building"></i>
-        <span class="nav-text">{{ 'navigation.coproperties' | translate }}</span>
-        <span class="badge" *ngIf="managedCoproperties() > 0">
-          {{ managedCoproperties() }}
-        </span>
-      </a>
-      
       <a routerLink="/coproperty/syndic/budgets" 
          routerLinkActive="active" 
          class="nav-item"
@@ -102,11 +91,14 @@
         <span class="badge" *ngIf="totalFundCalls() > 0">{{ totalFundCalls() }}</span>
       </a>
 
-      <span class="nav-item disabled" aria-disabled="true" title="Bientôt disponible">
+      <a routerLink="/coproperty/syndic/charge-payments"
+         routerLinkActive="active"
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-credit-card-2-front"></i>
         <span class="nav-text">{{ 'navigation.chargePayments' | translate }}</span>
         <span class="badge" *ngIf="totalChargePayments() > 0">{{ totalChargePayments() }}</span>
-      </span>
+      </a>
 
       <span class="nav-item disabled" aria-disabled="true" title="Bientôt disponible">
         <i class="bi bi-wrench-adjustable"></i>
@@ -195,6 +187,20 @@
         <i class="bi" [class.bi-list]="isSidebarCollapsed()" 
            [class.bi-x]="!isSidebarCollapsed()"></i>
       </button>
+
+      <div class="active-coproperty" *ngIf="activeCopropertyName()">
+        <button
+          type="button"
+          class="btn-change-coproperty"
+          (click)="changeCoproperty()"
+          [title]="'copropertySelection.change' | translate">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <div class="active-coproperty-name">
+          <i class="bi bi-building"></i>
+          <span>{{ activeCopropertyName() }}</span>
+        </div>
+      </div>
       
       <div class="header-actions">
         <myb-front-notification-dropdown

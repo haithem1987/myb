@@ -230,8 +230,7 @@ export class BudgetNewComponent implements OnInit {
   }
 
   saveBudget(): void {
-    const selected = this.coproperties().find(c => c.id === this.budgetForm.getRawValue().copropertyId);
-    if (!this.budgetId && selected?.isActive === false) return;
+    if (!this.isSelectedCopropertyActive()) return;
     if (this.budgetForm.invalid) {
       Object.keys(this.budgetForm.controls).forEach(key => {
         this.budgetForm.get(key)?.markAsTouched();
@@ -287,7 +286,7 @@ export class BudgetNewComponent implements OnInit {
   }
 
   async deleteBudget(): Promise<void> {
-    if (!this.budgetId) return;
+    if (!this.budgetId || !this.isSelectedCopropertyActive()) return;
 
     const budgetName = this.budgetForm.get('name')?.value;
     const confirmed = await this.modalService.confirm({
@@ -330,6 +329,10 @@ export class BudgetNewComponent implements OnInit {
     } else {
       this.router.navigate(['/coproperty/syndic/budgets']);
     }
+  }
+
+  isSelectedCopropertyActive(): boolean {
+    return this.selectedCoproperty()?.isActive === true;
   }
 
   calculateDistribution(): void {

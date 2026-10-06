@@ -43,7 +43,7 @@ interface GeneralAssembly {
           <button 
             class="btn btn-primary" 
             (click)="createAssembly()"
-            [disabled]="!copropertyId">
+            [disabled]="!copropertyId || !isSelectedCopropertyActive()">
             <i class="bi bi-plus-lg me-2"></i>
             Nouvelle AG
           </button>
@@ -196,7 +196,7 @@ interface GeneralAssembly {
                   <button 
                     type="submit" 
                     class="btn btn-success" 
-                    [disabled]="assemblyForm.invalid || loading() || !copropertyId">
+                    [disabled]="assemblyForm.invalid || loading() || !copropertyId || !isSelectedCopropertyActive()">
                     <i class="bi bi-{{ loading() ? 'hourglass-split' : 'save' }} me-1"></i>
                     {{ isEditing() ? 'Modifier' : 'Créer' }}
                   </button>
@@ -349,10 +349,10 @@ interface GeneralAssembly {
                 <button class="btn btn-sm btn-outline-primary me-2" (click)="viewAssembly(assembly.id)">
                   <i class="bi bi-eye"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-secondary me-2" (click)="editAssembly(assembly.id)">
+                <button class="btn btn-sm btn-outline-secondary me-2" (click)="editAssembly(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteAssembly(assembly.id)">
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteAssembly(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -411,12 +411,12 @@ interface GeneralAssembly {
             <div class="assembly-footer">
               <div class="action-buttons">
                 <button class="btn btn-sm btn-outline-primary" *ngIf="assembly.status === 'planned'" 
-                        (click)="sendConvocations(assembly.id)">
+                        (click)="sendConvocations(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
                   <i class="bi bi-send me-1"></i>
                   Envoyer convocations
                 </button>
                 <button class="btn btn-sm btn-outline-success" *ngIf="assembly.status === 'convened'" 
-                        (click)="startAssembly(assembly.id)">
+                        (click)="startAssembly(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
                   <i class="bi bi-play-circle me-1"></i>
                   Démarrer l'AG
                 </button>
@@ -429,7 +429,7 @@ interface GeneralAssembly {
                   <i class="bi bi-download me-1"></i>
                   Documents
                 </button>
-                <button class="btn btn-sm btn-outline-warning" (click)="manageResolutions(assembly.id)">
+                <button class="btn btn-sm btn-outline-warning" (click)="manageResolutions(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
                   <i class="bi bi-list-check me-1"></i>
                   Résolutions
                 </button>
@@ -838,6 +838,7 @@ export class GeneralAssemblyComponent implements OnInit {
   }
 
   createAssembly(): void {
+    if (!this.isSelectedCopropertyActive()) return;
     this.showAddForm();
   }
 
@@ -847,6 +848,7 @@ export class GeneralAssemblyComponent implements OnInit {
   }
 
   saveAssembly(): void {
+    if (!this.isSelectedCopropertyActive()) return;
     // Debug: log form status
     console.log('=== FORM DEBUG ===');
     console.log('Form valid:', this.assemblyForm.valid);
@@ -981,6 +983,7 @@ export class GeneralAssemblyComponent implements OnInit {
   }
 
   async editAssembly(id: string): Promise<void> {
+    if (!this.isSelectedCopropertyActive()) return;
     const assembly = this.assemblies().find(a => a.id === id);
     if (!assembly) return;
 
@@ -1005,6 +1008,7 @@ export class GeneralAssemblyComponent implements OnInit {
   }
 
   async deleteAssembly(id: string): Promise<void> {
+    if (!this.isSelectedCopropertyActive()) return;
     const assembly = this.assemblies().find(a => a.id === id);
     if (!assembly) return;
 
@@ -1032,6 +1036,7 @@ export class GeneralAssemblyComponent implements OnInit {
   }
 
   async sendConvocations(id: string): Promise<void> {
+    if (!this.isSelectedCopropertyActive()) return;
     const assembly = this.assemblies().find(a => a.id === id);
     if (!assembly) return;
 
@@ -1052,6 +1057,7 @@ export class GeneralAssemblyComponent implements OnInit {
   }
 
   async startAssembly(id: string): Promise<void> {
+    if (!this.isSelectedCopropertyActive()) return;
     const assembly = this.assemblies().find(a => a.id === id);
     if (!assembly) return;
 
@@ -1086,9 +1092,16 @@ export class GeneralAssemblyComponent implements OnInit {
   }
 
   async manageResolutions(id: string): Promise<void> {
+    if (!this.isSelectedCopropertyActive()) return;
     await this.modalService.alert(
       'Gestion des résolutions',
       'Interface de gestion des résolutions en cours de développement'
+    );
+  }
+
+  isSelectedCopropertyActive(): boolean {
+    return !!this.copropertyId && this.availableCoproperties().some(
+      coproperty => coproperty.id === this.copropertyId && coproperty.isActive
     );
   }
 }

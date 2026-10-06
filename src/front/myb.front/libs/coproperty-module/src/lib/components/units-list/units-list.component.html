@@ -282,7 +282,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-success" [disabled]="!unitForm.valid || loading()">
+          <button type="submit" class="btn btn-success" [disabled]="!unitForm.valid || loading() || !isSelectedCopropertyActive()">
             <i class="bi bi-save me-2"></i>
             {{ editingUnitId() ? ('common.update' | translate) : ('common.save' | translate) }}
           </button>

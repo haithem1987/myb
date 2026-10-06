@@ -15,6 +15,7 @@ import { take, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
+import { CopropertyService } from '../../services/coproperty.service';
 
 type Tab = 'en-cours' | 'resolus';
 
@@ -164,12 +165,12 @@ type Tab = 'en-cours' | 'resolus';
                 <!-- Actions -->
                 <div class="d-flex gap-2 flex-wrap mt-2" *ngIf="activeTab() === 'en-cours'">
                   <button class="btn btn-sm btn-outline-info"
-                          [disabled]="updating() === s.id"
+                          [disabled]="updating() === s.id || !selectedCopropertyActive()"
                           (click)="updateStatus(s, 'PRIS_EN_COMPTE')">
                     <i class="bi bi-check2 me-1"></i>{{ 'managerReports.acknowledge' | translate }}
                   </button>
                   <button class="btn btn-sm btn-outline-success"
-                          [disabled]="updating() === s.id"
+                          [disabled]="updating() === s.id || !selectedCopropertyActive()"
                           (click)="openResolveDialog(s)">
                     <i class="bi bi-check2-all me-1"></i>{{ 'managerReports.markResolved' | translate }}
                   </button>
@@ -193,7 +194,7 @@ type Tab = 'en-cours' | 'resolus';
                     [placeholder]="'managerReports.commentPlaceholder' | translate"></textarea>
           <div class="d-flex gap-2 justify-content-end">
             <button class="btn btn-outline-secondary" (click)="closeResolveDialog()">{{ 'common.cancel' | translate }}</button>
-            <button class="btn btn-success" [disabled]="updating() !== null" (click)="confirmResolve()">
+            <button class="btn btn-success" [disabled]="updating() !== null || !selectedCopropertyActive()" (click)="confirmResolve()">
               <span *ngIf="updating()" class="spinner-border spinner-border-sm me-1"></span>
               {{ 'managerReports.confirmResolved' | translate }}
             </button>
@@ -367,6 +368,7 @@ type Tab = 'en-cours' | 'resolus';
 export class SyndicSignalementsComponent implements OnInit {
   private signalementService = inject(SignalementService);
   private activeCoproperty = inject(ActiveCopropertyService);
+  private copropertyService = inject(CopropertyService);
   private toastService = inject(ToastService);
   private translate = inject(TranslateService);
 
@@ -379,6 +381,7 @@ export class SyndicSignalementsComponent implements OnInit {
   resolveComment = '';
   filterType = signal('');
   filterZone = signal('');
+  selectedCopropertyActive = signal(false);
 
   typeOptions = Object.keys(SIGNALEMENT_TYPE_LABELS).map(value => ({ value }));
   zoneOptions = Object.keys(SIGNALEMENT_ZONE_LABELS).map(value => ({ value }));
@@ -410,6 +413,11 @@ export class SyndicSignalementsComponent implements OnInit {
       return;
     }
 
+    this.selectedCopropertyActive.set(false);
+    this.copropertyService.getCoproperty(copropertyId)
+      .pipe(take(1), catchError(() => of(null)))
+      .subscribe(coproperty => this.selectedCopropertyActive.set(coproperty?.isActive === true));
+
     this.signalementService.getSignalements(copropertyId)
       .pipe(take(1), catchError(() => of([] as Signalement[])))
       .subscribe(signalements => {
@@ -425,6 +433,7 @@ export class SyndicSignalementsComponent implements OnInit {
   }
 
   updateStatus(s: Signalement, status: SignalementStatus): void {
+    if (!this.selectedCopropertyActive()) return;
     this.updating.set(s.id);
     this.signalementService.updateStatus(s.id, status)
       .pipe(take(1), catchError(() => of(null)))
@@ -440,6 +449,7 @@ export class SyndicSignalementsComponent implements OnInit {
   }
 
   openResolveDialog(s: Signalement): void {
+    if (!this.selectedCopropertyActive()) return;
     this.resolveTarget.set(s);
     this.resolveComment = '';
   }
@@ -450,6 +460,7 @@ export class SyndicSignalementsComponent implements OnInit {
   }
 
   confirmResolve(): void {
+    if (!this.selectedCopropertyActive()) return;
     const s = this.resolveTarget();
     if (!s) return;
     this.updating.set(s.id);

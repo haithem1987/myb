@@ -17,7 +17,7 @@
 
   <div class="management-header">
     <h2>{{ 'coproperty.owner.management' | translate }}</h2>
-    <button class="btn btn-primary btn-violet" (click)="openAddForm()" [disabled]="!hasActiveCoproperties()">
+    <button class="btn btn-primary btn-violet" (click)="openAddForm()" [disabled]="!isSelectedCopropertyActive()">
       <i class="bi bi-plus"></i>
       {{ 'coproperty.owner.addOwner' | translate }}
     </button>
@@ -193,7 +193,7 @@
             <i class="bi bi-exclamation-triangle me-1"></i>{{ createUserError() }}
           </div>
           <div class="d-flex gap-2 mt-3">
-            <button type="submit" class="btn btn-primary" [disabled]="creatingUser()">
+            <button type="submit" class="btn btn-primary" [disabled]="creatingUser() || !isSelectedCopropertyActive()">
               <span *ngIf="creatingUser()" class="spinner-border spinner-border-sm me-1"></span>
               {{ (creatingUser() ? 'coproperty.owner.creatingAccount' : 'coproperty.owner.createAccount') | translate }}
             </button>
@@ -299,7 +299,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-success" [disabled]="loading()">
+          <button type="submit" class="btn btn-success" [disabled]="loading() || !isSelectedCopropertyActive()">
             <span *ngIf="loading()" class="spinner-border spinner-border-sm me-1" role="status"></span>
             <i *ngIf="!loading()" class="bi bi-save me-1"></i>
             {{ 'common.save' | translate }}
@@ -333,7 +333,7 @@
       </select>
       <div class="d-flex gap-2">
         <button type="button" class="btn btn-warning"
-          [disabled]="!transferNewOwnerId() || loading()"
+          [disabled]="!transferNewOwnerId() || loading() || !isSelectedCopropertyActive()"
           (click)="confirmOwnershipTransfer()">
           <i class="bi bi-arrow-left-right me-1"></i>{{ 'coproperty.owner.changeOwner' | translate }}
         </button>
@@ -391,7 +391,7 @@
                   *ngIf="owner.hasOwnerRole"
                   class="btn btn-sm btn-outline-success"
                   (click)="toggleOwnerRole(owner)"
-                  [disabled]="assigningRole() === owner.userId"
+                  [disabled]="assigningRole() === owner.userId || !isSelectedCopropertyActive()"
                   [title]="'coproperty.owner.removeOwnerRole' | translate"
                 >
                   <span *ngIf="assigningRole() === owner.userId" class="spinner-border spinner-border-sm" role="status"></span>
@@ -402,7 +402,7 @@
                   *ngIf="!owner.hasOwnerRole"
                   class="btn btn-sm btn-outline-warning"
                   (click)="toggleOwnerRole(owner)"
-                  [disabled]="assigningRole() === owner.userId"
+                  [disabled]="assigningRole() === owner.userId || !isSelectedCopropertyActive()"
                   [title]="'coproperty.owner.assignOwnerRole' | translate"
                 >
                   <span *ngIf="assigningRole() === owner.userId" class="spinner-border spinner-border-sm" role="status"></span>
@@ -416,11 +416,11 @@
                     <i class="bi bi-three-dots-vertical"></i>
                   </button>
                   <div ngbDropdownMenu>
-                    <button ngbDropdownItem (click)="editOwner(owner)">
+                    <button ngbDropdownItem (click)="editOwner(owner)" [disabled]="!isSelectedCopropertyActive()">
                       <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
                     </button>
                     <div class="dropdown-divider"></div>
-                    <button ngbDropdownItem class="text-danger" (click)="deleteOwner(owner)">
+                    <button ngbDropdownItem class="text-danger" (click)="deleteOwner(owner)" [disabled]="!isSelectedCopropertyActive()">
                       <i class="bi bi-trash me-2"></i>{{ 'common.deleteAction' | translate }}
                     </button>
                   </div>

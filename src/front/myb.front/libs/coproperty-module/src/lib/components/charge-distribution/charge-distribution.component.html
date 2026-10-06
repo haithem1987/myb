@@ -230,7 +230,7 @@
 
       </div>
 
-      <button type="button" class="btn btn-violet mt-4" (click)="calculateDistribution($event)" [disabled]="!repartitionForm.valid || calculatedTotal() <= 0">
+      <button type="button" class="btn btn-violet mt-4" (click)="calculateDistribution($event)" [disabled]="!repartitionForm.valid || calculatedTotal() <= 0 || !isSelectedCopropertyActive()">
         <i class="bi bi-calculator me-2"></i>
         {{ 'coproperty.distribution.calculate' | translate }}
       </button>
@@ -313,7 +313,7 @@
       </div>
 
       <div class="preview-actions">
-        <button type="button" class="btn btn-violet" (click)="saveDistribution()" [disabled]="!repartitionForm.valid || saving()">
+        <button type="button" class="btn btn-violet" (click)="saveDistribution()" [disabled]="!repartitionForm.valid || saving() || !isSelectedCopropertyActive()">
           <span *ngIf="!saving()">
             <i class="bi bi-save me-2"></i>
             {{ 'common.save' | translate }}

@@ -59,10 +59,21 @@ namespace Myb.Coproperty.GraphQL.Mutations
             string id,
             SignalementStatus status,
             string? syndicComment,
-            [Service] ISignalementService signalementService)
+            ClaimsPrincipal? user,
+            [Service] ISignalementService signalementService,
+            [Service] ICopropertyService copropertyService)
         {
             if (!Guid.TryParse(id, out var guid))
                 throw new ArgumentException($"Invalid signalement id: {id}");
+
+            var signalement = await signalementService.GetByIdAsync(guid)
+                ?? throw new InvalidOperationException("Le signalement est introuvable.");
+            await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(
+                user, signalement.CopropertyId, copropertyService);
+            var coproperty = await copropertyService.GetByIdAsync(signalement.CopropertyId);
+            if (coproperty == null || !coproperty.IsActive)
+                throw new InvalidOperationException(
+                    "Les signalements d'une copropriété inactive sont en lecture seule.");
 
             return await signalementService.UpdateStatusAsync(guid, status, syndicComment);
         }
@@ -80,10 +91,21 @@ namespace Myb.Coproperty.GraphQL.Mutations
 
         public async Task<bool> DeleteSignalement(
             string id,
-            [Service] ISignalementService signalementService)
+            ClaimsPrincipal? user,
+            [Service] ISignalementService signalementService,
+            [Service] ICopropertyService copropertyService)
         {
             if (!Guid.TryParse(id, out var guid))
                 throw new ArgumentException($"Invalid signalement id: {id}");
+
+            var signalement = await signalementService.GetByIdAsync(guid)
+                ?? throw new InvalidOperationException("Le signalement est introuvable.");
+            await CopropertyAccessControl.EnsureCopropertyOwnershipAsync(
+                user, signalement.CopropertyId, copropertyService);
+            var coproperty = await copropertyService.GetByIdAsync(signalement.CopropertyId);
+            if (coproperty == null || !coproperty.IsActive)
+                throw new InvalidOperationException(
+                    "Les signalements d'une copropriété inactive sont en lecture seule.");
 
             await signalementService.DeleteAsync(guid);
             return true;

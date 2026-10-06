@@ -265,7 +265,8 @@
               *ngIf="isEditMode()"
               type="button" 
               class="btn btn-outline-danger"
-              (click)="deleteBudget()">
+              (click)="deleteBudget()"
+              [disabled]="!isSelectedCopropertyActive()">
               <i class="bi bi-trash me-2"></i>
               {{ 'coproperty.charges.deleteCharge' | translate }}
             </button>
@@ -281,7 +282,7 @@
             <button 
               type="submit" 
               class="btn btn-primary"
-              [disabled]="saving() || budgetForm.invalid">
+              [disabled]="saving() || budgetForm.invalid || !isSelectedCopropertyActive()">
               <span *ngIf="!saving()">
                 <i class="bi bi-save me-2"></i>
                 {{ 'coproperty.charges.save' | translate }}

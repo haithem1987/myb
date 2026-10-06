@@ -258,6 +258,7 @@ namespace Myb.Coproperty.GraphQL.Mutations
             CreateOwnerWithUnitsInput input,
             [Service] IDbContextFactory<CopropertyDbContext> contextFactory)
         {
+            await EnsureOwnerHasNoInactiveCopropertyAssignments(id, contextFactory);
             await EnsureUnitsAreAvailable(input.Units.Select(u => u.UnitId), id, contextFactory);
 
             await using var context = await contextFactory.CreateDbContextAsync();
@@ -381,16 +382,14 @@ namespace Myb.Coproperty.GraphQL.Mutations
         {
             var ids = unitIds.Distinct().ToArray();
             await using var context = contextFactory.CreateDbContext();
-            var inactiveNewAssignments = await context.Units
+            var inactiveAssignments = await context.Units
                 .Include(unit => unit.Coproperty)
                 .Where(unit => ids.Contains(unit.Id) && !unit.Coproperty.IsActive)
-                .Where(unit => !currentOwnerId.HasValue || !unit.OwnerUnits.Any(link =>
-                    link.OwnerId == currentOwnerId.Value && link.EndDate == null))
                 .Select(unit => unit.UnitNumber)
                 .ToListAsync();
-            if (inactiveNewAssignments.Count > 0)
+            if (inactiveAssignments.Count > 0)
                 throw new InvalidOperationException(
-                    $"New operations are not allowed for inactive coproperties: {string.Join(", ", inactiveNewAssignments)}.");
+                    $"New operations are not allowed for inactive coproperties: {string.Join(", ", inactiveAssignments)}.");
 
             var conflicts = await context.OwnerUnits
                 .Include(ou => ou.Owner)
@@ -408,6 +407,27 @@ namespace Myb.Coproperty.GraphQL.Mutations
                 throw new InvalidOperationException(
                     $"Lot(s) déjà affecté(s) : {details}. Utilisez l'action « Changer de propriétaire ».");
             }
+        }
+
+        private static async Task EnsureOwnerHasNoInactiveCopropertyAssignments(
+            Guid ownerId,
+            IDbContextFactory<CopropertyDbContext> contextFactory)
+        {
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var hasInactiveAssignment = await context.OwnerUnits
+                .Where(link => link.OwnerId == ownerId && link.EndDate == null)
+                .Join(context.Units,
+                    link => link.UnitId,
+                    unit => unit.Id,
+                    (_, unit) => unit.CopropertyId)
+                .Join(context.Coproperties,
+                    copropertyId => copropertyId,
+                    coproperty => coproperty.Id,
+                    (_, coproperty) => coproperty.IsActive)
+                .AnyAsync(isActive => !isActive);
+            if (hasInactiveAssignment)
+                throw new InvalidOperationException(
+                    "Les propriétaires d'une copropriété inactive sont en lecture seule.");
         }
 
         /// <summary>

@@ -111,7 +111,7 @@
         </div>
 
         <div class="form-actions">
-          <button class="btn btn-success" type="submit" [disabled]="saving()">
+          <button class="btn btn-success" type="submit" [disabled]="saving() || !isSelectedCopropertyActive()">
             <span *ngIf="saving()" class="spinner-border spinner-border-sm me-1"></span>
             <i *ngIf="!saving()" class="bi bi-save me-1"></i>
             {{ 'common.save' | translate }}

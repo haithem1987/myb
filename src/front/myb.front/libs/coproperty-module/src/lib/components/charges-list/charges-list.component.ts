@@ -235,6 +235,13 @@ export class ChargesListComponent implements OnInit {
     return this.coproperties().find(coproperty => coproperty.id === selectedId)?.name ?? '';
   }
 
+  isSelectedCopropertyActive(): boolean {
+    const selectedId = this.selectedCopropertyId();
+    return !!selectedId && this.coproperties().some(
+      coproperty => coproperty.id === selectedId && coproperty.isActive
+    );
+  }
+
   getTotalBudgetDisplay(): string {
     return this.formatCurrencyGroups(
       this.filteredCharges.map(charge => ({
@@ -317,7 +324,7 @@ export class ChargesListComponent implements OnInit {
   }
 
   async deleteCharge(charge: ChargeExtended): Promise<void> {
-    if (!charge.id) return;
+    if (!charge.id || !this.isSelectedCopropertyActive()) return;
 
     const confirmed = await this.modalService.confirm({
       title: this.translateService.instant('coproperty.charges.deleteCharge'),

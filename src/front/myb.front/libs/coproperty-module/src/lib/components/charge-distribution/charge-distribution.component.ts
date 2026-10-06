@@ -333,6 +333,7 @@ export class ChargeDistributionComponent implements OnInit {
   calculateDistribution(event?: Event): void {
     event?.preventDefault();
     event?.stopPropagation();
+    if (!this.isSelectedCopropertyActive()) return;
 
     const totalAmount = this.calculatedTotal();
     const assigned = this.assignedUnits;
@@ -514,6 +515,10 @@ export class ChargeDistributionComponent implements OnInit {
       .map((charge) => charge.id)
       .filter((id): id is string => !!id);
     this.createFundCallsAfterDistribution(copropertyId, chargeIds, baseDescription, dueDate);
+  }
+
+  isSelectedCopropertyActive(): boolean {
+    return this.selectedCoproperty()?.isActive === true;
   }
 
   private createFundCallsAfterDistribution(

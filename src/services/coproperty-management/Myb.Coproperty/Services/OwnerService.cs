@@ -106,6 +106,21 @@ namespace Myb.Coproperty.Services
             if (owner == null)
                 throw new InvalidOperationException($"Owner with ID {id} not found");
 
+            var activeUnitIds = owner.OwnerUnits
+                .Where(link => link.EndDate == null)
+                .Select(link => link.UnitId)
+                .ToArray();
+            var hasInactiveCoproperty = await context.Units
+                .Where(unit => activeUnitIds.Contains(unit.Id))
+                .Join(context.Coproperties,
+                    unit => unit.CopropertyId,
+                    coproperty => coproperty.Id,
+                    (_, coproperty) => coproperty.IsActive)
+                .AnyAsync(isActive => !isActive);
+            if (hasInactiveCoproperty)
+                throw new InvalidOperationException(
+                    "Les propriétaires d'une copropriété inactive sont en lecture seule.");
+
             var deletedAt = DateTime.UtcNow;
             owner.IsDeleted = true;
             owner.DeletedAt = deletedAt;

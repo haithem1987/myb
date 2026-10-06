@@ -89,17 +89,20 @@
         <span>{{ 'coproperty.syndicDashboard.addCoproperty' | translate }}</span>
       </a>
       
-      <a routerLink="/coproperty/syndic/units" class="action-card">
+      <a [routerLink]="selectedCopropertyActive() ? '/coproperty/syndic/units' : null" class="action-card"
+         [class.disabled]="!selectedCopropertyActive()" [attr.aria-disabled]="!selectedCopropertyActive()" [attr.tabindex]="selectedCopropertyActive() ? 0 : -1">
         <i class="bi bi-house-door"></i>
         <span>{{ 'coproperty.syndicDashboard.addUnit' | translate }}</span>
       </a>
       
-      <a routerLink="/coproperty/syndic/budgets/new" class="action-card">
+      <a [routerLink]="selectedCopropertyActive() ? '/coproperty/syndic/budgets/new' : null" class="action-card"
+         [class.disabled]="!selectedCopropertyActive()" [attr.aria-disabled]="!selectedCopropertyActive()" [attr.tabindex]="selectedCopropertyActive() ? 0 : -1">
         <i class="bi bi-plus-circle"></i>
         <span>{{ 'coproperty.syndicDashboard.addBudgetLine' | translate }}</span>
       </a>
       
-      <a routerLink="/coproperty/syndic/owners" class="action-card">
+      <a [routerLink]="selectedCopropertyActive() ? '/coproperty/syndic/owners' : null" class="action-card"
+         [class.disabled]="!selectedCopropertyActive()" [attr.aria-disabled]="!selectedCopropertyActive()" [attr.tabindex]="selectedCopropertyActive() ? 0 : -1">
         <i class="bi bi-person-plus"></i>
         <span>{{ 'coproperty.syndicDashboard.addOwner' | translate }}</span>
       </a>

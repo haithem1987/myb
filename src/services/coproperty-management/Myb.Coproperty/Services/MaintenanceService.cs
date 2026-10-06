@@ -1,19 +1,26 @@
 using Myb.Coproperty.Infrastructure.Repositories;
 using Myb.Coproperty.Models;
+using Microsoft.EntityFrameworkCore;
+using Myb.Coproperty.Infrastructure.Data;
 
 namespace Myb.Coproperty.Services
 {
     public class MaintenanceService : IMaintenanceService
     {
         private readonly IMaintenanceRepository _maintenanceRepository;
+        private readonly IDbContextFactory<CopropertyDbContext> _contextFactory;
 
-        public MaintenanceService(IMaintenanceRepository maintenanceRepository)
+        public MaintenanceService(
+            IMaintenanceRepository maintenanceRepository,
+            IDbContextFactory<CopropertyDbContext> contextFactory)
         {
             _maintenanceRepository = maintenanceRepository;
+            _contextFactory = contextFactory;
         }
 
         public async Task<MaintenanceRequest> CreateAsync(MaintenanceRequest request)
         {
+            await EnsureCopropertyIsActiveAsync(request.CopropertyId);
             var result = await _maintenanceRepository.InsertAsync(request);
             
             if (result.Errors != null && result.Errors.Any())
@@ -31,6 +38,9 @@ namespace Myb.Coproperty.Services
 
         public async Task DeleteAsync(Guid id)
         {
+            var request = _maintenanceRepository.GetById(id)
+                ?? throw new InvalidOperationException($"Maintenance request with ID {id} not found");
+            await EnsureCopropertyIsActiveAsync(request.CopropertyId);
             await _maintenanceRepository.DeleteAsync(id);
         }
 
@@ -53,7 +63,19 @@ namespace Myb.Coproperty.Services
 
         public async Task UpdateAsync(MaintenanceRequest request)
         {
+            var existing = _maintenanceRepository.GetById(request.Id)
+                ?? throw new InvalidOperationException($"Maintenance request with ID {request.Id} not found");
+            await EnsureCopropertyIsActiveAsync(existing.CopropertyId);
+            await EnsureCopropertyIsActiveAsync(request.CopropertyId);
             await _maintenanceRepository.UpdateAsync(request);
+        }
+
+        private async Task EnsureCopropertyIsActiveAsync(Guid copropertyId)
+        {
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            if (!await context.Coproperties.AnyAsync(c => c.Id == copropertyId && c.IsActive))
+                throw new InvalidOperationException(
+                    "Les interventions d'une copropriété inactive sont en lecture seule.");
         }
     }
 }

@@ -61,6 +61,7 @@ export class SyndicDashboardComponent implements OnInit {
   recentActivities = signal<RecentActivity[]>([]);
   totalBudgetDisplay = signal('');
   overdueFundCallsCount = signal(0);
+  selectedCopropertyActive = signal(false);
   loading = signal(true);
   
   ngOnInit(): void {
@@ -88,6 +89,9 @@ export class SyndicDashboardComponent implements OnInit {
       switchMap(coproperties => {
         const selectedId = this.activeCoproperty.selectAvailable(coproperties);
         const scopedCoproperties = coproperties.filter(coproperty => coproperty.id === selectedId);
+        this.selectedCopropertyActive.set(
+          scopedCoproperties.some(coproperty => coproperty.isActive)
+        );
 
         if (!selectedId) {
           return of({

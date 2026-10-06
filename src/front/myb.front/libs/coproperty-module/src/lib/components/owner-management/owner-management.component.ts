@@ -391,6 +391,7 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   openAddForm(): void {
+    if (!this.isSelectedCopropertyActive()) return;
     this.showAddForm = true;
     this.editingOwnerId = null;
     this.ownerForm.reset();
@@ -406,6 +407,7 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   editOwner(owner: Owner): void {
+    if (!this.isSelectedCopropertyActive()) return;
     this.editingOwnerId = owner.id;
     this.showAddForm = true;
     
@@ -439,6 +441,7 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   async deleteOwner(owner: Owner): Promise<void> {
+    if (!this.isSelectedCopropertyActive()) return;
     const activeUnits = (owner.ownerUnits ?? [])
       .filter(ownerUnit => !ownerUnit.endDate)
       .map(ownerUnit => ownerUnit.unit?.unitNumber)
@@ -489,6 +492,7 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   saveOwner(): void {
+    if (!this.isSelectedCopropertyActive()) return;
     const formValue = this.ownerForm.getRawValue(); // getRawValue to include disabled fields
     const selectedUnitIds: string[] = formValue.selectedUnits || [];
     const activeCopropertyIds = new Set(this.coproperties().filter(c => c.isActive).map(c => c.id));
@@ -587,8 +591,10 @@ export class OwnerManagementComponent implements OnInit {
     });
   }
 
-  hasActiveCoproperties(): boolean {
-    return this.coproperties().some(c => c.isActive);
+  isSelectedCopropertyActive(): boolean {
+    return !!this.copropertyId && this.coproperties().some(
+      coproperty => coproperty.id === this.copropertyId && coproperty.isActive
+    );
   }
 
   isUnitInActiveCoproperty(unit: Unit): boolean {
@@ -671,6 +677,7 @@ export class OwnerManagementComponent implements OnInit {
   }
 
   async createUserAccount(): Promise<void> {
+    if (!this.isSelectedCopropertyActive()) return;
     this.createUserError.set(null);
     if (this.createUserForm.invalid) {
       this.createUserForm.markAllAsTouched();
@@ -726,6 +733,7 @@ export class OwnerManagementComponent implements OnInit {
    * Toggle coproperty-owner role on/off for an existing owner in the table
    */
   async toggleOwnerRole(owner: Owner): Promise<void> {
+    if (!this.isSelectedCopropertyActive()) return;
     if (!owner.userId) return;
 
     if (owner.hasOwnerRole) {

@@ -134,7 +134,7 @@ type Tab = 'en-cours' | 'resolus';
 
                 <!-- Owner identification details -->
                 <div class="reporter-details mb-3" *ngIf="s.reporterLots.length || s.reporterPhone || s.reporterEmail">
-                  <div class="reporter-detail reporter-lots" *ngIf="s.reporterLots.length">
+                  <div class="reporter-detail" *ngIf="s.reporterLots.length">
                     <i class="bi bi-building" aria-hidden="true"></i>
                     <span class="detail-label">{{ 'managerReports.ownerLots' | translate }}</span>
                     <span class="detail-value">{{ s.reporterLots.join(', ') }}</span>

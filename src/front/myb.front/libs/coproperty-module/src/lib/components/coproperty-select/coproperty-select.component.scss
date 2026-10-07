@@ -69,6 +69,22 @@
 
   .add-coproperty { white-space: nowrap; }
 
+  .coproperty-address {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 0;
+    white-space: nowrap;
+
+    i { flex: 0 0 auto; }
+
+    span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
   .stat-box {
     text-align: center;
     padding: 10px;

@@ -2029,6 +2029,7 @@ After migrations:
 
 ## References
 
+- [Guide Utilisateur Copropriete FR/EN](./docs/USER_GUIDE_COPROPERTY_FR_EN.md)
 - [Complete Documentation](./myb-documentation.md)
 - [Architecture Details](./myb-architecture.txt)
 - [Contributing Guidelines](./CONTRIBUTING.md)

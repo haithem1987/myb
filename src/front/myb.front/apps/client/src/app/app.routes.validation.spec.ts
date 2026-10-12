@@ -164,6 +164,7 @@ describe('Admin Coproperty Routes Validation', () => {
         'subscriptions',
         'admin',
         'access-denied',
+        'docs',
       ];
 
       requiredPaths.forEach((path) => {

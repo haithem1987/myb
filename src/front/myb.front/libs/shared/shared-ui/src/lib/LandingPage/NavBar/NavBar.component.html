@@ -15,6 +15,11 @@
 
     <!-- Desktop Actions -->
     <div class="myb-navbar-actions">
+      <a routerLink="/" routerLinkActive="myb-docs-link--active" [routerLinkActiveOptions]="{ exact: true }" class="myb-docs-link">
+        <i class="bi bi-journal-text" aria-hidden="true"></i>
+        {{ 'NAV_DOCS' | translate }}
+      </a>
+
       <myb-front-language-switcher></myb-front-language-switcher>
 
       <a *ngIf="isAdminUser" [href]="adminPortalUrl" class="myb-btn-admin" title="{{ 'NAV_ADMIN' | translate }} Portal">
@@ -41,6 +46,10 @@
   <!-- Mobile Menu Drawer -->
   <div class="myb-mobile-menu" [class.myb-mobile-menu--open]="menuOpen" (click)="$event.stopPropagation()">
     <div class="myb-mobile-menu-inner">
+      <a class="myb-mobile-link myb-mobile-link--docs" routerLink="/" (click)="toggleMenu()">
+        <i class="bi bi-journal-text me-2" aria-hidden="true"></i>{{ 'NAV_DOCS' | translate }}
+      </a>
+
       <div class="myb-mobile-section">
         <myb-front-language-switcher></myb-front-language-switcher>
       </div>

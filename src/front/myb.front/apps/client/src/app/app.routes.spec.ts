@@ -57,6 +57,7 @@ describe('App Routes - Admin Coproperty Configuration', () => {
       'subscriptions',
       'admin',
       'access-denied',
+      'docs',
     ];
 
     requiredPaths.forEach((path) => {
@@ -111,5 +112,19 @@ describe('App Routes - Admin Coproperty Configuration', () => {
     );
     expect(accessDeniedRoute).toBeDefined();
     expect(accessDeniedRoute?.canActivate).toBeUndefined();
+  });
+
+  it('should expose the public documentation route without a guard', () => {
+    const docsRoute = appRoutes.find((r) => r.path === 'docs');
+    expect(docsRoute).toBeDefined();
+    expect(docsRoute?.loadComponent).toBeDefined();
+    expect(docsRoute?.canActivate).toBeUndefined();
+  });
+
+  it('should use documentation as the public initial route', () => {
+    const rootRoute = appRoutes.find((r) => r.path === '');
+    expect(rootRoute?.title).toBe('Documentation MYB');
+    expect(rootRoute?.loadComponent).toBeDefined();
+    expect(rootRoute?.canActivate).toBeUndefined();
   });
 });

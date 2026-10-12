@@ -1,0 +1,216 @@
+<div class="docs-page">
+  <myb-front-nav-bar></myb-front-nav-bar>
+
+  <main>
+    <section class="docs-hero" aria-labelledby="docs-title">
+      <div class="docs-shell docs-hero__grid">
+        <div class="docs-hero__copy">
+          <span class="docs-eyebrow"><i class="bi bi-stars" aria-hidden="true"></i>{{ content.kicker }}</span>
+          <h1 id="docs-title">{{ content.title }}</h1>
+          <p>{{ content.intro }}</p>
+          <div class="docs-hero__actions">
+            <button class="docs-button docs-button--primary" type="button" (click)="scrollTo('quick-start')">
+              {{ content.startButton }}
+              <i class="bi bi-arrow-down" aria-hidden="true"></i>
+            </button>
+            <button class="docs-button docs-button--secondary" type="button" (click)="scrollTo('tutorials')">
+              <i class="bi bi-play-circle" aria-hidden="true"></i>
+              {{ content.videoButton }}
+            </button>
+          </div>
+        </div>
+
+        <aside class="guide-card" aria-label="Guide complet">
+          <div class="guide-card__glow"></div>
+          <span class="guide-card__icon"><i class="bi bi-journal-bookmark-fill" aria-hidden="true"></i></span>
+          <div>
+            <span class="guide-card__version">MYB · v1.1</span>
+            <h2>{{ content.guideLink }}</h2>
+            <p>{{ content.guideLinkHint }}</p>
+          </div>
+          <button type="button" class="guide-card__link" (click)="scrollTo('role-guides')">
+            {{ content.guideAction }}
+            <i class="bi bi-arrow-down" aria-hidden="true"></i>
+          </button>
+        </aside>
+      </div>
+    </section>
+
+    <section id="quick-start" class="docs-section docs-section--quick">
+      <div class="docs-shell">
+        <div class="section-heading section-heading--center">
+          <h2>{{ content.quickTitle }}</h2>
+          <p>{{ content.quickIntro }}</p>
+        </div>
+        <div class="quick-grid">
+          <article class="quick-card" *ngFor="let item of content.quickItems; trackBy: trackByTitle">
+            <span class="quick-card__icon"><i class="bi" [ngClass]="item.icon" aria-hidden="true"></i></span>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-section docs-section--screenshot">
+      <div class="docs-shell">
+        <div class="section-heading section-heading--center screenshot-copy">
+          <span class="section-kicker">{{ content.screenshotEyebrow }}</span>
+          <h2>{{ content.screenshotTitle }}</h2>
+          <p>{{ content.screenshotDescription }}</p>
+        </div>
+        <div class="screenshot-gallery">
+          <figure class="guided-screenshot" *ngFor="let screenshot of content.screenshots; let index = index; trackBy: trackByTitle">
+            <div class="guided-screenshot__media">
+              <img [src]="screenshotSources[index]" [alt]="screenshot.alt" loading="lazy" />
+              <span class="guided-screenshot__marker" aria-hidden="true">
+                <i class="bi bi-cursor-fill"></i>
+                <strong>0{{ index + 1 }}</strong>
+              </span>
+            </div>
+            <figcaption>
+              <h3>{{ screenshot.title }}</h3>
+              <p>{{ screenshot.description }}</p>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="tutorials" class="docs-section docs-section--videos">
+      <div class="docs-shell">
+        <div class="section-heading">
+          <span class="section-kicker">{{ content.videosEyebrow }}</span>
+          <h2>{{ content.videosTitle }}</h2>
+          <p>{{ content.videosIntro }}</p>
+        </div>
+        <div class="video-grid">
+          <article class="video-card" *ngFor="let video of content.videos; let index = index; trackBy: trackByTitle">
+            <div class="video-card__media">
+              <video controls playsinline preload="metadata" [attr.aria-label]="content.videoPlayLabel + ': ' + video.title">
+                <source [src]="videoSources[index]" type="video/mp4" />
+              </video>
+              <span class="video-card__badge">{{ video.duration }}</span>
+            </div>
+            <div class="video-card__body">
+              <span class="video-card__number">0{{ index + 1 }}</span>
+              <div>
+                <h3>{{ video.title }}</h3>
+                <p>{{ video.description }}</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="role-guides" class="docs-section docs-section--journeys">
+      <div class="docs-shell">
+        <div class="section-heading section-heading--center">
+          <span class="section-kicker">{{ content.journeysEyebrow }}</span>
+          <h2>{{ content.journeysTitle }}</h2>
+          <p>{{ content.journeysIntro }}</p>
+        </div>
+
+        <div class="role-switch" role="tablist" [attr.aria-label]="content.journeysEyebrow">
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeRole === 'manager'"
+            [class.role-switch__button--active]="activeRole === 'manager'"
+            class="role-switch__button"
+            (click)="selectRole('manager')"
+          >
+            <span class="role-switch__icon"><i class="bi bi-buildings-fill" aria-hidden="true"></i></span>
+            <span><strong>{{ content.managerLabel }}</strong><small>{{ content.managerDescription }}</small></span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeRole === 'owner'"
+            [class.role-switch__button--active]="activeRole === 'owner'"
+            class="role-switch__button"
+            (click)="selectRole('owner')"
+          >
+            <span class="role-switch__icon"><i class="bi bi-house-heart-fill" aria-hidden="true"></i></span>
+            <span><strong>{{ content.ownerLabel }}</strong><small>{{ content.ownerDescription }}</small></span>
+          </button>
+        </div>
+
+        <div class="workflow-grid" role="tabpanel">
+          <details class="workflow-card" *ngFor="let workflow of activeWorkflows; let index = index; trackBy: trackByTitle" [open]="index === 0">
+            <summary>
+              <span class="workflow-card__icon"><i class="bi" [ngClass]="workflow.icon" aria-hidden="true"></i></span>
+              <span class="workflow-card__summary">
+                <strong>{{ workflow.title }}</strong>
+                <small>{{ workflow.description }}</small>
+              </span>
+              <i class="bi bi-chevron-down workflow-card__chevron" aria-hidden="true"></i>
+            </summary>
+            <div class="workflow-card__content">
+              <ol>
+                <li *ngFor="let step of workflow.steps">{{ step }}</li>
+              </ol>
+              <div class="workflow-result">
+                <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                <span><strong>{{ content.expectedResult }} :</strong> {{ workflow.result }}</span>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <aside class="practices-card">
+          <div class="practices-card__title">
+            <i class="bi bi-lightbulb-fill" aria-hidden="true"></i>
+            <h3>{{ content.practicesTitle }}</h3>
+          </div>
+          <ul>
+            <li *ngFor="let practice of content.practices">
+              <i class="bi bi-check2" aria-hidden="true"></i>{{ practice }}
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="docs-section docs-section--help">
+      <div class="docs-shell">
+        <div class="section-heading">
+          <span class="section-kicker">{{ content.helpEyebrow }}</span>
+          <h2>{{ content.helpTitle }}</h2>
+          <p>{{ content.helpIntro }}</p>
+        </div>
+        <div class="help-grid">
+          <article class="help-card" *ngFor="let item of content.troubleshooting; trackBy: trackByTitle">
+            <span><i class="bi" [ngClass]="item.icon" aria-hidden="true"></i></span>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+          </article>
+        </div>
+
+        <div class="faq-block">
+          <h2>{{ content.faqTitle }}</h2>
+          <div class="faq-list">
+            <details *ngFor="let faq of content.faqs">
+              <summary>{{ faq.question }}<i class="bi bi-plus-lg" aria-hidden="true"></i></summary>
+              <p>{{ faq.answer }}</p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-cta">
+      <div class="docs-shell docs-cta__inner">
+        <div>
+          <h2>{{ content.ctaTitle }}</h2>
+          <p>{{ content.ctaText }}</p>
+        </div>
+        <div class="docs-cta__actions">
+          <a class="docs-button docs-button--light" routerLink="/register">{{ content.ctaPrimary }} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+          <button class="docs-button docs-button--outline-light" type="button" (click)="scrollTo('quick-start')">{{ content.ctaSecondary }}</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

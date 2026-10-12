@@ -35,8 +35,10 @@ COPY ovhcloud/docker/client/nginx.conf /etc/nginx/nginx.conf
 # Copy built application from builder stage
 COPY --from=builder /app/dist/apps/client /usr/share/nginx/html/client
 
+# Ensure assets copied from local sources are readable by the NGINX worker.
 # Keep production at / and provide a path-aware copy for /dev.
-RUN cp -a /usr/share/nginx/html/client /usr/share/nginx/html/dev \
+RUN chmod -R a+rX /usr/share/nginx/html/client \
+    && cp -a /usr/share/nginx/html/client /usr/share/nginx/html/dev \
     && sed -i 's#<base href="/">#<base href="/dev/">#' /usr/share/nginx/html/dev/index.html
 
 # Add healthcheck

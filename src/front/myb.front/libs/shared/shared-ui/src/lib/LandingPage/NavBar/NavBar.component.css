@@ -65,6 +65,25 @@
   gap: 10px;
 }
 
+.myb-docs-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  color: #4c4761;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.myb-docs-link:hover,
+.myb-docs-link--active {
+  color: #6d36e8;
+  background: rgba(124, 58, 237, 0.07);
+}
+
 .myb-btn-ghost {
   background: transparent;
   border: 1.5px solid rgba(124, 58, 237, 0.25);
@@ -242,6 +261,11 @@
 
 .myb-mobile-link--danger {
   color: #dc2626;
+}
+
+.myb-mobile-link--docs {
+  color: #6333d2;
+  font-weight: 650;
 }
 
 .myb-mobile-link--danger:hover {

@@ -18,7 +18,7 @@
         <figure class="home-hero__visual">
           <img src="/assets/docs/myb-documents-overview.png" [alt]="'HOME.HERO.IMAGE_ALT' | translate" />
           <figcaption><i class="bi bi-play-circle-fill" aria-hidden="true"></i>{{ 'HOME.HERO.VIDEO_LABEL' | translate }}<span>01:00</span></figcaption>
-          <video controls playsinline preload="metadata" [attr.aria-label]="'HOME.HERO.VIDEO_LABEL' | translate">
+          <video controls playsinline preload="none" poster="/assets/docs/myb-documents-overview.png" [attr.aria-label]="'HOME.HERO.VIDEO_LABEL' | translate">
             <source src="/assets/docs/myb-s01-hook.mp4" type="video/mp4" />
           </video>
         </figure>

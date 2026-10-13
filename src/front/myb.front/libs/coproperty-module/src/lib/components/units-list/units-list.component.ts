@@ -226,13 +226,6 @@ export class UnitsListComponent implements OnInit {
     return this.coproperties().find(coproperty => coproperty.id === copropertyId)?.totalShares ?? null;
   }
 
-  viewUnit(unit: UnitExtended): void {
-    // Navigate to coproperty detail with units tab
-    this.router.navigate(['/coproperty/syndic/coproperties', unit.copropertyId], { 
-      queryParams: { tab: 'units' } 
-    });
-  }
-
   getUnitTypeBadgeClass(type: string): string {
     const typeMap: { [key: string]: string } = {
       'APARTMENT': 'bg-primary',

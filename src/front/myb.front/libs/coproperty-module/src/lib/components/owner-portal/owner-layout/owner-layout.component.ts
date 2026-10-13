@@ -124,6 +124,10 @@ export class OwnerLayoutComponent implements OnInit {
     this.isMobileMenuOpen.update(value => !value);
   }
 
+  ownerRoute(segment: string): string[] {
+    return this.activeCoproperty.route('owner', segment);
+  }
+
   switchToSyndicSpace(): void {
     // Navigate to the admin app (deployed at /admin/) which contains syndic routes
     window.location.href = '/admin/coproperty/select?space=syndic';

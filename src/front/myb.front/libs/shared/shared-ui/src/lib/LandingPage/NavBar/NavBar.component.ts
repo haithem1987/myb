@@ -80,6 +80,10 @@ export class NavBarComponent {
     this.router.navigate(['/register']);
   }
 
+  onWorkspace(): void {
+    this.router.navigate(['/coproperty/select']);
+  }
+
   onLogout(): void {
     this.keycloakService.logout();
   }

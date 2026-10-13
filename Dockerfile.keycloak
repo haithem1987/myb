@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:23.0.4
+FROM quay.io/keycloak/keycloak:26.0.7
 
 # Copy custom MYB theme into the Keycloak themes directory
 COPY keycloak-theme/ /opt/keycloak/themes/

@@ -61,52 +61,6 @@
   line-height: 1.5;
 }
 
-/* Google button */
-.btn-google {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 0.8rem 1rem;
-  border: 1.5px solid #dadce0;
-  border-radius: 10px;
-  background: #fff;
-  color: #3c4043;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: background 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-
-  &:hover {
-    background: #f8f9fa;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  }
-}
-
-.google-icon {
-  width: 20px;
-  height: 20px;
-}
-
-/* Divider */
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 1.25rem 0;
-  color: #94a3b8;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  &::before,
-  &::after {
-    content: '';
-    flex: 1;
-    border-top: 1px solid #e2e8f0;
-  }
-}
-
 /* Email button */
 .btn-email {
   display: flex;

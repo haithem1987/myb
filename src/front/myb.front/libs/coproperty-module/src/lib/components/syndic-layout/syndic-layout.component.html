@@ -10,7 +10,7 @@
     </div>
     
     <nav class="main-nav">
-      <a routerLink="/coproperty/syndic/dashboard" 
+      <a [routerLink]="syndicRoute('dashboard')"
          routerLinkActive="active" 
          class="nav-item"
          (click)="onNavItemClick()">
@@ -18,7 +18,7 @@
         <span class="nav-text">{{ 'navigation.dashboard' | translate }}</span>
       </a>
       
-      <a routerLink="/coproperty/syndic/budgets" 
+      <a [routerLink]="syndicRoute('budgets')"
          routerLinkActive="active" 
          class="nav-item"
          (click)="onNavItemClick()">
@@ -29,7 +29,7 @@
         </span>
       </a>
       
-      <a routerLink="/coproperty/syndic/units" 
+      <a [routerLink]="syndicRoute('units')"
          routerLinkActive="active" 
          class="nav-item"
          (click)="onNavItemClick()">
@@ -40,7 +40,7 @@
         </span>
       </a>
       
-      <a routerLink="/coproperty/syndic/owners" 
+      <a [routerLink]="syndicRoute('owners')"
          routerLinkActive="active" 
          class="nav-item"
          (click)="onNavItemClick()">
@@ -49,7 +49,7 @@
         <span class="badge" *ngIf="totalOwners() > 0">{{ totalOwners() }}</span>
       </a>
 
-      <a routerLink="/coproperty/syndic/tenants"
+      <a [routerLink]="syndicRoute('tenants')"
          routerLinkActive="active"
          class="nav-item"
          (click)="onNavItemClick()">
@@ -82,7 +82,7 @@
       </a>
       -->
       
-      <a routerLink="/coproperty/syndic/fund-calls" 
+      <a [routerLink]="syndicRoute('fund-calls')"
          routerLinkActive="active" 
          class="nav-item"
          (click)="onNavItemClick()">
@@ -91,7 +91,7 @@
         <span class="badge" *ngIf="totalFundCalls() > 0">{{ totalFundCalls() }}</span>
       </a>
 
-      <a routerLink="/coproperty/syndic/charge-payments"
+      <a [routerLink]="syndicRoute('charge-payments')"
          routerLinkActive="active"
          class="nav-item"
          (click)="onNavItemClick()">
@@ -106,7 +106,7 @@
         <span class="badge" *ngIf="totalInterventions() > 0">{{ totalInterventions() }}</span>
       </span>
 
-      <a routerLink="/coproperty/syndic/signalements"
+      <a [routerLink]="syndicRoute('signalements')"
          routerLinkActive="active"
          class="nav-item"
          (click)="onNavItemClick()">
@@ -121,7 +121,7 @@
         <span class="badge" *ngIf="totalDiscussions() > 0">{{ totalDiscussions() }}</span>
       </span>
 
-      <a routerLink="/coproperty/syndic/settings" 
+      <a [routerLink]="syndicRoute('settings')"
          routerLinkActive="active" 
          class="nav-item"
          (click)="onNavItemClick()">

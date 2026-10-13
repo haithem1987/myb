@@ -431,9 +431,6 @@
                     <i class="bi bi-three-dots-vertical"></i>
                   </button>
                   <div ngbDropdownMenu>
-                    <button ngbDropdownItem (click)="viewUnit(unit)">
-                      <i class="bi bi-eye me-2"></i>{{ 'common.viewAction' | translate }}
-                    </button>
                     <button ngbDropdownItem (click)="editUnit(unit)" [disabled]="!isSelectedCopropertyActive()">
                       <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
                     </button>

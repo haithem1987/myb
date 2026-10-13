@@ -4,9 +4,9 @@ import { noProfileGuard, completeProfileGuard } from 'libs/coproperty-module/src
 export const appRoutes: Route[] = [
   {
     path: '',
-    title: 'Documentation MYB',
+    title: 'MYB | Gestion de copropriété',
     loadComponent: () =>
-      import('@myb-front/shared-ui').then((c) => c.DocsPageComponent),
+      import('@myb-front/shared-ui').then((c) => c.HomePageComponent),
   },
 
   // ─── Owner Self-Registration Flow ───────────────────────────────────────────

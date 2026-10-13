@@ -252,11 +252,11 @@ export class ChargesListComponent implements OnInit {
     );
   }
 
-  viewCharge(charge: ChargeExtended): void {
-    // Navigate to coproperty detail with charges tab
-    this.router.navigate(['/coproperty/syndic/coproperties', charge.copropertyId], { 
-      queryParams: { tab: 'charges' } 
-    });
+  syndicRoute(...segments: Array<string | undefined>): string[] {
+    return this.activeCoproperty.route(
+      'syndic',
+      ...segments.filter((segment): segment is string => !!segment)
+    );
   }
 
   getChargeTypeBadgeClass(type: string): string {

@@ -11,7 +11,7 @@
       <button
         *ngIf="activeSection() === 'budget-lines'"
         class="btn btn-primary btn-violet"
-        routerLink="/coproperty/syndic/budgets/new"
+        [routerLink]="syndicRoute('budgets', 'new')"
         [queryParams]="{ copropertyId: selectedCopropertyId() }"
         [disabled]="!isSelectedCopropertyActive()">
         <i class="bi bi-plus-circle me-2"></i>
@@ -209,10 +209,7 @@
                       <i class="bi bi-three-dots-vertical"></i>
                     </button>
                     <div ngbDropdownMenu>
-                      <button ngbDropdownItem (click)="viewCharge(charge)">
-                        <i class="bi bi-eye me-2"></i>{{ 'common.viewAction' | translate }}
-                      </button>
-                      <button ngbDropdownItem [routerLink]="['/coproperty/syndic/budgets', charge.id, 'edit']" [disabled]="!isSelectedCopropertyActive()">
+                      <button ngbDropdownItem [routerLink]="syndicRoute('budgets', charge.id, 'edit')" [disabled]="!isSelectedCopropertyActive()">
                         <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
                       </button>
                       <div class="dropdown-divider"></div>

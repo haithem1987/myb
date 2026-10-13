@@ -20,9 +20,11 @@ spec:
     spec:
       securityContext:
         fsGroup: 1000
+      imagePullSecrets:
+      - name: harbor-registry-credentials
       containers:
       - name: keycloak
-        image: quay.io/keycloak/keycloak:26.0.7
+        image: 93pf2bi9.gra7.container-registry.ovh.net/myb/myb-keycloak:latest
         args: ["start", "--db=postgres", "--proxy-headers=xforwarded", "--http-enabled=true", "--transaction-xa-enabled=false"]
         ports:
         - containerPort: 8080

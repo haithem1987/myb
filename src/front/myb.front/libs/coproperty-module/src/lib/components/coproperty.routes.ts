@@ -40,6 +40,7 @@ import { profileGuard } from '../guards/profile.guard';
 import { copropertyRedirectGuard } from './coproperty-redirect.guard';
 import { CopropertySelectComponent } from './coproperty-select/coproperty-select.component';
 import { CopropertyManagementLayoutComponent } from './coproperty-management-layout/coproperty-management-layout.component';
+import { ActiveCopropertyService } from '../services/active-coproperty.service';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COPROPERTY_MANAGER_ROLES = ['coproperty-syndic', 'coproperty-admin', 'system-admin'];
@@ -54,6 +55,33 @@ const legacyCopropertyNewRedirectGuard: CanActivateFn = () =>
 
 const legacyCopropertyEditRedirectGuard: CanActivateFn = route =>
   inject(Router).createUrlTree(['/coproperty/manage', route.paramMap.get('id'), 'edit']);
+
+/** Synchronises the coproperty encoded in the canonical URL with page state. */
+const copropertyContextGuard: CanActivateFn = route => {
+  const copropertyId = route.paramMap.get('copropertyId');
+  if (!copropertyId || !UUID_REGEX.test(copropertyId)) {
+    return inject(Router).createUrlTree(['/coproperty/select']);
+  }
+
+  inject(ActiveCopropertyService).setActive(copropertyId);
+  return true;
+};
+
+/** Keeps existing bookmarks working while making the scoped URL canonical. */
+const legacySpaceRedirectGuard: CanActivateFn = (_route, state) => {
+  const router = inject(Router);
+  const copropertyId = inject(ActiveCopropertyService).activeId();
+  if (!copropertyId) {
+    const space = state.url.includes('/owner') ? 'owner' : 'syndic';
+    return router.createUrlTree(['/coproperty/select'], { queryParams: { space } });
+  }
+
+  const scopedUrl = state.url.replace(
+    /^\/coproperty\/(owner|syndic)/,
+    `/coproperty/${copropertyId}/$1`
+  );
+  return router.parseUrl(scopedUrl);
+};
 
 /** Matches a single path segment only when it is a valid UUID. */
 const uuidMatcher: UrlMatcher = (segments: UrlSegment[]) => {
@@ -70,6 +98,55 @@ const uuidEditMatcher: UrlMatcher = (segments: UrlSegment[]) => {
   }
   return null;
 };
+
+const SYNDIC_CHILDREN: Routes = [
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'dashboard', component: SyndicDashboardComponent },
+  { path: 'coproperties', canActivate: [copropertyManagementRedirectGuard], children: [] },
+  { path: 'coproperties/new', canActivate: [legacyCopropertyNewRedirectGuard], children: [] },
+  { path: 'coproperties/:id/edit', canActivate: [legacyCopropertyEditRedirectGuard], children: [] },
+  { path: 'coproperties/:id', component: CopropertyDetailComponent },
+  { path: 'budgets', component: ChargesListComponent },
+  { path: 'budgets/new', component: BudgetNewComponent },
+  { path: 'budgets/:id', component: BudgetNewComponent },
+  { path: 'budgets/:id/edit', component: BudgetNewComponent },
+  { path: 'charges', redirectTo: 'budgets', pathMatch: 'full' },
+  { path: 'maintenance', component: MaintenanceListComponent },
+  { path: 'interventions', component: InterventionListComponent },
+  { path: 'interventions/new', component: InterventionNewComponent },
+  { path: 'interventions/:id/edit', component: InterventionNewComponent },
+  { path: 'signalements', component: SyndicSignalementsComponent },
+  { path: 'discussions', component: DiscussionsComponent },
+  { path: 'units', component: UnitsListComponent },
+  { path: 'owners', component: OwnerManagementComponent },
+  { path: 'tenants', component: TenantManagementComponent },
+  { path: 'distribution', component: ChargesListComponent },
+  { path: 'fund-calls', component: FundCallsListComponent },
+  { path: 'fund-calls/new', component: FundCallNewComponent },
+  { path: 'fund-calls/:id', component: FundCallNewComponent },
+  { path: 'fund-calls/:id/edit', component: FundCallNewComponent },
+  { path: 'charge-payments', component: ChargePaymentsComponent },
+  { path: 'treasury', component: TreasuryDetailComponent },
+  { path: 'unpaid-payments', component: UnpaidPaymentsComponent },
+  { path: 'general-assembly', component: GeneralAssemblyComponent },
+  { path: 'reports', component: ReportsComponent },
+  { path: 'settings', component: SyndicSettingsComponent },
+];
+
+const OWNER_CHILDREN: Routes = [
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'dashboard', component: OwnerDashboardComponent },
+  { path: 'my-units', component: OwnerMyUnitsComponent },
+  { path: 'residence', component: OwnerResidenceComponent },
+  { path: 'invoices', component: OwnerInvoicesComponent },
+  { path: 'charges', component: OwnerChargesComponent },
+  { path: 'maintenance', component: OwnerMaintenanceComponent },
+  { path: 'documents', component: OwnerDocumentsComponent },
+  { path: 'general-assembly', component: OwnerGeneralAssemblyComponent },
+  { path: 'signalements', component: OwnerSignalementsComponent },
+  { path: 'signalements/nouveau', component: NouveauSignalementComponent },
+  { path: 'discussions', component: DiscussionsComponent },
+];
 
 export const COPROPERTY_ROUTES: Routes = [
   {
@@ -96,63 +173,30 @@ export const COPROPERTY_ROUTES: Routes = [
     ],
   },
   {
-    path: 'syndic',
+    path: ':copropertyId/syndic',
     component: SyndicLayoutComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, copropertyContextGuard],
     data: { roles: COPROPERTY_MANAGER_ROLES },
-    children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: SyndicDashboardComponent },
-      { path: 'coproperties', canActivate: [copropertyManagementRedirectGuard], children: [] },
-      { path: 'coproperties/new', canActivate: [legacyCopropertyNewRedirectGuard], children: [] },
-      { path: 'coproperties/:id/edit', canActivate: [legacyCopropertyEditRedirectGuard], children: [] },
-      { path: 'coproperties/:id', component: CopropertyDetailComponent },
-      { path: 'budgets', component: ChargesListComponent },
-      { path: 'budgets/new', component: BudgetNewComponent },
-      { path: 'budgets/:id', component: BudgetNewComponent },
-      { path: 'budgets/:id/edit', component: BudgetNewComponent },
-      { path: 'charges', redirectTo: 'budgets', pathMatch: 'full' },
-      { path: 'maintenance', component: MaintenanceListComponent },
-      { path: 'interventions', component: InterventionListComponent },
-      { path: 'interventions/new', component: InterventionNewComponent },
-      { path: 'interventions/:id/edit', component: InterventionNewComponent },
-      { path: 'signalements', component: SyndicSignalementsComponent },
-      { path: 'discussions', component: DiscussionsComponent },
-      { path: 'units', component: UnitsListComponent },
-      { path: 'owners', component: OwnerManagementComponent },
-      { path: 'tenants', component: TenantManagementComponent },
-      { path: 'distribution', component: ChargesListComponent },
-      { path: 'fund-calls', component: FundCallsListComponent },
-      { path: 'fund-calls/new', component: FundCallNewComponent },
-      { path: 'fund-calls/:id', component: FundCallNewComponent },
-      { path: 'fund-calls/:id/edit', component: FundCallNewComponent },
-      { path: 'charge-payments', component: ChargePaymentsComponent },
-      { path: 'treasury', component: TreasuryDetailComponent },
-      { path: 'unpaid-payments', component: UnpaidPaymentsComponent },
-      { path: 'general-assembly', component: GeneralAssemblyComponent },
-      { path: 'reports', component: ReportsComponent },
-      { path: 'settings', component: SyndicSettingsComponent },
-    ],
+    children: SYNDIC_CHILDREN,
+  },
+  {
+    path: ':copropertyId/owner',
+    component: OwnerLayoutComponent,
+    canActivate: [authGuard, profileGuard, copropertyContextGuard],
+    data: { roles: ['coproperty-owner', 'coproperty-syndic', 'coproperty-admin', 'system-admin', 'coproperty-tenant'] },
+    children: OWNER_CHILDREN,
+  },
+  {
+    path: 'syndic',
+    canActivate: [authGuard, legacySpaceRedirectGuard],
+    data: { roles: COPROPERTY_MANAGER_ROLES },
+    children: [{ path: '**', children: [] }],
   },
   {
     path: 'owner',
-    component: OwnerLayoutComponent,
-    canActivate: [authGuard, profileGuard],
+    canActivate: [authGuard, profileGuard, legacySpaceRedirectGuard],
     data: { roles: ['coproperty-owner', 'coproperty-syndic', 'coproperty-admin', 'system-admin', 'coproperty-tenant'] },
-    children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: OwnerDashboardComponent },
-      { path: 'my-units', component: OwnerMyUnitsComponent },
-      { path: 'residence', component: OwnerResidenceComponent },
-      { path: 'invoices', component: OwnerInvoicesComponent },
-      { path: 'charges', component: OwnerChargesComponent },
-      { path: 'maintenance', component: OwnerMaintenanceComponent },
-      { path: 'documents', component: OwnerDocumentsComponent },
-      { path: 'general-assembly', component: OwnerGeneralAssemblyComponent },
-      { path: 'signalements', component: OwnerSignalementsComponent },
-      { path: 'signalements/nouveau', component: NouveauSignalementComponent },
-      { path: 'discussions', component: DiscussionsComponent },
-    ],
+    children: [{ path: '**', children: [] }],
   },
   {
     path: 'council',

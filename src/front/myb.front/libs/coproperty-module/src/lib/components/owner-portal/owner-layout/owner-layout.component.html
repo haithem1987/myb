@@ -8,26 +8,26 @@
       </div>
 
       <nav class="main-nav">
-        <a routerLink="/coproperty/owner/dashboard" 
+        <a [routerLink]="ownerRoute('dashboard')"
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-house-door"></i>
           <span>{{ 'ownerPortal.navigation.dashboard' | translate }}</span>
         </a>
         
-        <a routerLink="/coproperty/owner/my-units" 
+        <a [routerLink]="ownerRoute('my-units')"
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-building"></i>
           <span>{{ 'ownerPortal.navigation.units' | translate }}</span>
         </a>
 
-        <a routerLink="/coproperty/owner/residence" routerLinkActive="active" class="nav-link">
+        <a [routerLink]="ownerRoute('residence')" routerLinkActive="active" class="nav-link">
           <i class="bi bi-buildings"></i>
           <span>{{ 'ownerPortal.navigation.residence' | translate }}</span>
         </a>
         
-        <a routerLink="/coproperty/owner/invoices" 
+        <a [routerLink]="ownerRoute('invoices')"
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-receipt"></i>
@@ -37,14 +37,14 @@
           </span>
         </a>
 
-        <a routerLink="/coproperty/owner/charges" 
+        <a [routerLink]="ownerRoute('charges')"
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-cash-stack"></i>
           <span>{{ 'ownerPortal.navigation.charges' | translate }}</span>
         </a>
 
-        <a routerLink="/coproperty/owner/signalements" 
+        <a [routerLink]="ownerRoute('signalements')"
            routerLinkActive="active" 
            class="nav-link">
           <i class="bi bi-megaphone"></i>
@@ -89,7 +89,7 @@
   
   <!-- Mobile Navigation -->
   <nav class="mobile-nav" [class.open]="isMobileMenuOpen()">
-    <a routerLink="/coproperty/owner/dashboard" 
+    <a [routerLink]="ownerRoute('dashboard')"
        routerLinkActive="active" 
        class="nav-link"
        (click)="toggleMobileMenu()">
@@ -97,7 +97,7 @@
       <span>{{ 'ownerPortal.navigation.dashboard' | translate }}</span>
     </a>
     
-    <a routerLink="/coproperty/owner/my-units" 
+    <a [routerLink]="ownerRoute('my-units')"
        routerLinkActive="active" 
        class="nav-link"
        (click)="toggleMobileMenu()">
@@ -105,12 +105,12 @@
       <span>{{ 'ownerPortal.navigation.units' | translate }}</span>
     </a>
 
-    <a routerLink="/coproperty/owner/residence" routerLinkActive="active" class="nav-link" (click)="toggleMobileMenu()">
+    <a [routerLink]="ownerRoute('residence')" routerLinkActive="active" class="nav-link" (click)="toggleMobileMenu()">
       <i class="bi bi-buildings"></i>
       <span>{{ 'ownerPortal.navigation.residence' | translate }}</span>
     </a>
     
-    <a routerLink="/coproperty/owner/invoices" 
+    <a [routerLink]="ownerRoute('invoices')"
        routerLinkActive="active" 
        class="nav-link"
        (click)="toggleMobileMenu()">
@@ -121,7 +121,7 @@
       </span>
     </a>
 
-    <a routerLink="/coproperty/owner/charges" 
+    <a [routerLink]="ownerRoute('charges')"
        routerLinkActive="active" 
        class="nav-link"
        (click)="toggleMobileMenu()">
@@ -129,7 +129,7 @@
       <span>{{ 'ownerPortal.navigation.charges' | translate }}</span>
     </a>
 
-    <a routerLink="/coproperty/owner/signalements" 
+    <a [routerLink]="ownerRoute('signalements')"
        routerLinkActive="active" 
        class="nav-link"
        (click)="toggleMobileMenu()">

@@ -1,0 +1,112 @@
+<div class="home-page">
+  <myb-front-nav-bar></myb-front-nav-bar>
+
+  <main>
+    <section #heroSection class="home-hero" aria-labelledby="home-title">
+      <div class="home-shell home-hero__grid">
+        <div class="home-hero__copy">
+          <span class="home-kicker"><i class="bi bi-house-heart" aria-hidden="true"></i>{{ 'HOME.HERO.KICKER' | translate }}</span>
+          <h1 id="home-title">{{ 'HOME.HERO.TITLE' | translate }}</h1>
+          <p>{{ 'HOME.HERO.TEXT' | translate }}</p>
+          <div class="home-actions">
+            <a class="home-button home-button--primary" routerLink="/register">{{ 'HOME.CTA.START' | translate }}<i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+            <span class="home-trial-note"><i class="bi bi-credit-card-2-front" aria-hidden="true"></i>{{ 'HOME.HERO.TRIAL_NOTE' | translate }}</span>
+          </div>
+          <div class="home-proof-line"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'HOME.HERO.REASSURANCE' | translate }}</div>
+        </div>
+
+        <figure class="home-hero__visual">
+          <img src="/assets/docs/myb-documents-overview.png" [alt]="'HOME.HERO.IMAGE_ALT' | translate" />
+          <figcaption><i class="bi bi-play-circle-fill" aria-hidden="true"></i>{{ 'HOME.HERO.VIDEO_LABEL' | translate }}<span>01:00</span></figcaption>
+          <video controls playsinline preload="metadata" [attr.aria-label]="'HOME.HERO.VIDEO_LABEL' | translate">
+            <source src="/assets/docs/myb-s01-hook.mp4" type="video/mp4" />
+          </video>
+        </figure>
+      </div>
+      <div class="home-hero__edge" aria-hidden="true"></div>
+    </section>
+
+    <section class="home-section home-problems" aria-labelledby="problems-title">
+      <div class="home-shell">
+        <div class="home-heading">
+          <span class="home-kicker">{{ 'HOME.PROBLEMS.KICKER' | translate }}</span>
+          <h2 id="problems-title">{{ 'HOME.PROBLEMS.TITLE' | translate }}</h2>
+        </div>
+        <div class="problem-grid">
+          <article class="problem-item" *ngFor="let item of problems; let index = index">
+            <span class="home-icon"><i class="bi" [ngClass]="item.icon" aria-hidden="true"></i></span>
+            <span class="problem-number">0{{ index + 1 }}</span>
+            <h3>{{ item.title | translate }}</h3>
+            <p>{{ item.text | translate }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="home-section home-solution" aria-labelledby="solution-title">
+      <div class="home-shell">
+        <div class="home-heading home-heading--split">
+          <div><span class="home-kicker">{{ 'HOME.SOLUTION.KICKER' | translate }}</span><h2 id="solution-title">{{ 'HOME.SOLUTION.TITLE' | translate }}</h2></div>
+          <p>{{ 'HOME.SOLUTION.INTRO' | translate }}</p>
+        </div>
+        <div class="solution-grid">
+          <article class="solution-item" *ngFor="let item of solutions; let index = index">
+            <div class="solution-item__image"><img [src]="item.image" [alt]="item.alt | translate" loading="lazy" /><span>0{{ index + 1 }}</span></div>
+            <div class="solution-item__copy"><i class="bi" [ngClass]="item.icon" aria-hidden="true"></i><h3>{{ item.title | translate }}</h3><p>{{ item.text | translate }}</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="home-section home-steps" aria-labelledby="steps-title">
+      <div class="home-shell">
+        <div class="home-heading home-heading--center"><span class="home-kicker">{{ 'HOME.STEPS.KICKER' | translate }}</span><h2 id="steps-title">{{ 'HOME.STEPS.TITLE' | translate }}</h2></div>
+        <div class="steps-grid">
+          <article class="step-item" *ngFor="let item of steps; let index = index">
+            <span class="step-number">0{{ index + 1 }}</span><i class="bi step-icon" [ngClass]="item.icon" aria-hidden="true"></i>
+            <h3>{{ item.title | translate }}</h3><p>{{ item.text | translate }}</p>
+          </article>
+        </div>
+        <a class="home-button home-button--dark" routerLink="/register">{{ 'HOME.CTA.TRY' | translate }}<i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      </div>
+    </section>
+
+    <section *ngIf="testimonials.length" class="home-section home-proof" aria-labelledby="proof-title">
+      <div class="home-shell"><div class="home-heading"><span class="home-kicker">{{ 'HOME.PROOF.KICKER' | translate }}</span><h2 id="proof-title">{{ 'HOME.PROOF.TITLE' | translate }}</h2></div>
+        <div class="proof-grid"><article *ngFor="let item of testimonials"><h3>{{ item.title | translate }}</h3><p>{{ item.text | translate }}</p></article></div>
+      </div>
+    </section>
+
+    <section id="pricing" class="home-section home-pricing" aria-labelledby="pricing-title">
+      <div class="home-shell">
+        <div class="home-heading home-heading--center"><span class="home-kicker">{{ 'HOME.PRICING.KICKER' | translate }}</span><h2 id="pricing-title">{{ 'HOME.PRICING.TITLE' | translate }}</h2><p>{{ 'HOME.PRICING.INTRO' | translate }}</p></div>
+        <div class="billing-switch" role="group" [attr.aria-label]="'HOME.PRICING.BILLING_LABEL' | translate">
+          <button type="button" [class.is-active]="!annualBilling" [attr.aria-pressed]="!annualBilling" (click)="setBillingPeriod(false)">{{ 'HOME.PRICING.MONTHLY' | translate }}</button>
+          <button type="button" [class.is-active]="annualBilling" [attr.aria-pressed]="annualBilling" (click)="setBillingPeriod(true)">{{ 'HOME.PRICING.YEARLY' | translate }}<span>{{ 'HOME.PRICING.YEARLY_NOTE' | translate }}</span></button>
+        </div>
+        <div class="pricing-grid">
+          <article class="price-plan"><span class="plan-label">{{ 'HOME.PRICING.ESSENTIALS_LABEL' | translate }}</span><h3>{{ 'HOME.PRICING.ESSENTIALS' | translate }}</h3><p>{{ 'HOME.PRICING.ESSENTIALS_TEXT' | translate }}</p><div class="plan-price"><strong>{{ annualBilling ? '228' : '19' }} €</strong><span>{{ annualBilling ? ('HOME.PRICING.PER_YEAR' | translate) : ('HOME.PRICING.PER_MONTH' | translate) }}</span></div><small>{{ 'HOME.PRICING.TAX_NOTE' | translate }}</small><a class="home-button home-button--outline" routerLink="/register">{{ 'HOME.PRICING.CHOOSE' | translate }}<i class="bi bi-arrow-right" aria-hidden="true"></i></a></article>
+          <article class="price-plan price-plan--featured"><span class="plan-label">{{ 'HOME.PRICING.COMFORT_LABEL' | translate }}</span><h3>{{ 'HOME.PRICING.COMFORT' | translate }}</h3><p>{{ 'HOME.PRICING.COMFORT_TEXT' | translate }}</p><div class="plan-price"><strong>{{ annualBilling ? '468' : '39' }} €</strong><span>{{ annualBilling ? ('HOME.PRICING.PER_YEAR' | translate) : ('HOME.PRICING.PER_MONTH' | translate) }}</span></div><small>{{ 'HOME.PRICING.TAX_NOTE' | translate }}</small><a class="home-button home-button--primary" routerLink="/register">{{ 'HOME.PRICING.CHOOSE' | translate }}<i class="bi bi-arrow-right" aria-hidden="true"></i></a></article>
+        </div>
+        <p class="pricing-trial"><i class="bi bi-stars" aria-hidden="true"></i>{{ 'HOME.PRICING.TRIAL_REMINDER' | translate }}</p>
+      </div>
+    </section>
+
+    <section class="home-section home-security" aria-labelledby="security-title">
+      <div class="home-shell home-security__layout"><div class="home-heading"><span class="home-kicker">{{ 'HOME.SECURITY.KICKER' | translate }}</span><h2 id="security-title">{{ 'HOME.SECURITY.TITLE' | translate }}</h2><p>{{ 'HOME.SECURITY.INTRO' | translate }}</p></div>
+        <div class="security-grid"><article *ngFor="let item of securityItems"><i class="bi" [ngClass]="item.icon" aria-hidden="true"></i><div><h3>{{ item.title | translate }}</h3><p>{{ item.text | translate }}</p></div></article></div>
+      </div>
+    </section>
+
+    <section id="faq" class="home-section home-faq" aria-labelledby="faq-title">
+      <div class="home-shell home-faq__layout"><div class="home-heading"><span class="home-kicker">{{ 'HOME.FAQ.KICKER' | translate }}</span><h2 id="faq-title">{{ 'HOME.FAQ.TITLE' | translate }}</h2><p>{{ 'HOME.FAQ.INTRO' | translate }}</p></div>
+        <div class="faq-list"><details *ngFor="let faq of faqs"><summary>{{ ('HOME.FAQ.' + faq + '_Q') | translate }}<i class="bi bi-plus-lg" aria-hidden="true"></i></summary><p>{{ ('HOME.FAQ.' + faq + '_A') | translate }}</p></details></div>
+      </div>
+    </section>
+
+    <section class="home-final" aria-labelledby="final-title"><div class="home-shell home-final__inner"><div><span class="home-kicker">{{ 'HOME.FINAL.KICKER' | translate }}</span><h2 id="final-title">{{ 'HOME.FINAL.TITLE' | translate }}</h2><p>{{ 'HOME.FINAL.TEXT' | translate }}</p></div><a class="home-button home-button--light" routerLink="/register">{{ 'HOME.CTA.START' | translate }}<i class="bi bi-arrow-right" aria-hidden="true"></i></a></div></section>
+  </main>
+
+  <footer class="home-footer"><div class="home-shell home-footer__inner"><a class="home-footer__brand" routerLink="/">MYB</a><nav [attr.aria-label]="'HOME.FOOTER.LEGAL' | translate"><a routerLink="/terms">{{ 'HOME.FOOTER.LEGAL' | translate }}</a><a routerLink="/privacy">{{ 'HOME.FOOTER.PRIVACY' | translate }}</a><a routerLink="/contact">{{ 'HOME.FOOTER.CONTACT' | translate }}</a><a routerLink="/docs">{{ 'HOME.FOOTER.GUIDE' | translate }}</a></nav><span>{{ 'HOME.FOOTER.COPYRIGHT' | translate }}</span></div></footer>
+  <a *ngIf="showMobileCta" class="home-mobile-cta" routerLink="/register">{{ 'HOME.CTA.START' | translate }}<i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+</div>

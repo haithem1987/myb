@@ -1306,6 +1306,8 @@
       "receipts": "Mes Reçus",
       "charges": "Mes Charges",
       "reports": "Signalements",
+      "interventions": "Interventions",
+      "discussions": "Discussions",
       "syndicSpace": "Espace Syndic"
     },
     "footer": {

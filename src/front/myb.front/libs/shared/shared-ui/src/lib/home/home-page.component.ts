@@ -3,6 +3,7 @@ import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { NavBarComponent } from '../LandingPage/NavBar/NavBar.component';
+import { KeycloakService } from '@myb-front/auth';
 
 interface HomeCard {
   icon: string;
@@ -28,10 +29,10 @@ export class HomePageComponent {
   ];
 
   readonly solutions: Array<HomeCard & { image: string; alt: string }> = [
-    { icon: 'bi-buildings', title: 'HOME.SOLUTION.UNITS_TITLE', text: 'HOME.SOLUTION.UNITS_TEXT', image: '/assets/docs/myb-documents-overview.png', alt: 'HOME.SOLUTION.UNITS_ALT' },
-    { icon: 'bi-folder2-open', title: 'HOME.SOLUTION.DOCUMENTS_TITLE', text: 'HOME.SOLUTION.DOCUMENTS_TEXT', image: '/assets/docs/myb-digital-transition.png', alt: 'HOME.SOLUTION.DOCUMENTS_ALT' },
-    { icon: 'bi-receipt', title: 'HOME.SOLUTION.FUNDS_TITLE', text: 'HOME.SOLUTION.FUNDS_TEXT', image: '/assets/docs/myb-documents-overview.png', alt: 'HOME.SOLUTION.FUNDS_ALT' },
-    { icon: 'bi-calendar2-check', title: 'HOME.SOLUTION.MEETINGS_TITLE', text: 'HOME.SOLUTION.MEETINGS_TEXT', image: '/assets/docs/myb-digital-transition.png', alt: 'HOME.SOLUTION.MEETINGS_ALT' },
+    { icon: 'bi-buildings', title: 'HOME.SOLUTION.UNITS_TITLE', text: 'HOME.SOLUTION.UNITS_TEXT', image: '/assets/screenshots/owner-management.png', alt: 'HOME.SOLUTION.UNITS_ALT' },
+    { icon: 'bi-folder2-open', title: 'HOME.SOLUTION.DOCUMENTS_TITLE', text: 'HOME.SOLUTION.DOCUMENTS_TEXT', image: '/assets/screenshots/syndic-dashboard.png', alt: 'HOME.SOLUTION.DOCUMENTS_ALT' },
+    { icon: 'bi-receipt', title: 'HOME.SOLUTION.FUNDS_TITLE', text: 'HOME.SOLUTION.FUNDS_TEXT', image: '/assets/screenshots/fund-calls.png', alt: 'HOME.SOLUTION.FUNDS_ALT' },
+    { icon: 'bi-calendar2-check', title: 'HOME.SOLUTION.MEETINGS_TITLE', text: 'HOME.SOLUTION.MEETINGS_TEXT', image: '/assets/screenshots/coproperty-selection.png', alt: 'HOME.SOLUTION.MEETINGS_ALT' },
   ];
 
   readonly steps: HomeCard[] = [
@@ -52,6 +53,8 @@ export class HomePageComponent {
   annualBilling = false;
   showMobileCta = false;
 
+  constructor(private readonly keycloakService: KeycloakService) {}
+
   @HostListener('window:scroll')
   onWindowScroll(): void {
     this.showMobileCta = this.heroSection.nativeElement.getBoundingClientRect().bottom <= 64;
@@ -59,5 +62,11 @@ export class HomePageComponent {
 
   setBillingPeriod(annual: boolean): void {
     this.annualBilling = annual;
+  }
+
+  onRegister(): void {
+    this.keycloakService.registerWithRedirect(
+      `${window.location.origin}/register/complete-profile`
+    );
   }
 }

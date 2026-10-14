@@ -4,11 +4,19 @@
   left: 0;
   right: 0;
   z-index: 1000;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+  box-shadow: 0 2px 20px rgba(79, 70, 229, 0.06);
+}
+
+/* backdrop-filter on .myb-navbar itself would make it the containing block of the fixed mobile drawer */
+.myb-navbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
-  box-shadow: 0 2px 20px rgba(79, 70, 229, 0.06);
 }
 
 .myb-navbar-inner {
@@ -182,19 +190,31 @@
 /* ── Mobile menu drawer ─────────────────────────────────── */
 .myb-mobile-menu {
   display: none;
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.3s ease;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  mwebkit-overflow-scrolling: touch;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
   background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-top: 1px solid rgba(124, 58, 237, 0.1);
 }
 
 .myb-mobile-menu--open {
-  max-height: 400px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .myb-mobile-menu-inner {
-  padding: 16px 20px;
+  min-height: calc(100dvh - 64px);
+  padding: 16px 20px calc(20px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -219,7 +239,9 @@
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: transparent;
+  background: rgba(15, 23, 42, 0.22);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
 }
 
 /* ── Mobile user card ────────────────────────────────────── */
@@ -284,4 +306,11 @@
   .myb-hamburger { display: flex; }
   .myb-mobile-menu { display: block; }
   .myb-navbar { z-index: 1000; }
+}
+
+@media (max-width: 420px) {
+  .myb-mobile-menu-inner {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
 }

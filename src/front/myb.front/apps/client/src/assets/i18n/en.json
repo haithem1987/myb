@@ -1356,6 +1356,8 @@
       "receipts": "My Receipts",
       "charges": "My Charges",
       "reports": "Reports",
+      "interventions": "Interventions",
+      "discussions": "Discussions",
       "syndicSpace": "Property Manager Space"
     },
     "footer": {

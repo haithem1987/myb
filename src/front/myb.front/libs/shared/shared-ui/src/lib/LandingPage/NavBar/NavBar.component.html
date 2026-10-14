@@ -47,33 +47,33 @@
   <!-- Mobile Menu Drawer -->
   <div class="myb-mobile-menu" [class.myb-mobile-menu--open]="menuOpen" (click)="$event.stopPropagation()">
     <div class="myb-mobile-menu-inner">
-      <a class="myb-mobile-link" href="/#features" (click)="toggleMenu()">{{ 'HOME.NAV.FEATURES' | translate }}</a>
-      <a class="myb-mobile-link" href="/#pricing" (click)="toggleMenu()">{{ 'HOME.NAV.PRICING' | translate }}</a>
-      <a class="myb-mobile-link" href="/#faq" (click)="toggleMenu()">{{ 'HOME.NAV.FAQ' | translate }}</a>
-      <a class="myb-mobile-link myb-mobile-link--docs" routerLink="/docs" (click)="toggleMenu()"><i class="bi bi-journal-text me-2" aria-hidden="true"></i>{{ 'NAV_DOCS' | translate }}</a>
+      <a class="myb-mobile-link" href="/#features" (click)="closeMenu()">{{ 'HOME.NAV.FEATURES' | translate }}</a>
+      <a class="myb-mobile-link" href="/#pricing" (click)="closeMenu()">{{ 'HOME.NAV.PRICING' | translate }}</a>
+      <a class="myb-mobile-link" href="/#faq" (click)="closeMenu()">{{ 'HOME.NAV.FAQ' | translate }}</a>
+      <a class="myb-mobile-link myb-mobile-link--docs" routerLink="/docs" (click)="closeMenu()"><i class="bi bi-journal-text me-2" aria-hidden="true"></i>{{ 'NAV_DOCS' | translate }}</a>
 
       <div class="myb-mobile-section">
         <myb-front-language-switcher></myb-front-language-switcher>
       </div>
 
       <ng-container *ngIf="!keycloakService.isAuthenticated(); else mobileUserDropDown">
-        <button class="myb-btn-ghost myb-mobile-btn" (click)="onLogin(); toggleMenu()">{{ 'NAV_LOGIN' | translate }}</button>
-        <button class="myb-btn-primary myb-mobile-btn" (click)="onRegister(); toggleMenu()">{{ 'HOME.CTA.START' | translate }}</button>
+        <button class="myb-btn-ghost myb-mobile-btn" (click)="onLogin(); closeMenu()">{{ 'NAV_LOGIN' | translate }}</button>
+        <button class="myb-btn-primary myb-mobile-btn" (click)="onRegister(); closeMenu()">{{ 'HOME.CTA.START' | translate }}</button>
       </ng-container>
       <ng-template #mobileUserDropDown>
         <ng-container *ngIf="profile$ | async as user">
-          <button class="myb-btn-primary myb-mobile-btn" (click)="onWorkspace(); toggleMenu()">{{ 'HOME.NAV.WORKSPACE' | translate }}</button>
+          <button class="myb-btn-primary myb-mobile-btn" (click)="onWorkspace(); closeMenu()">{{ 'HOME.NAV.WORKSPACE' | translate }}</button>
           <div class="myb-mobile-user">
             <myb-front-avatar [text]="user?.username?.toLocaleUpperCase()" [size]="32"></myb-front-avatar>
             <span class="myb-mobile-username">{{ user.username }}</span>
           </div>
-          <a class="myb-mobile-link" routerLink="/profile" (click)="toggleMenu()">
+          <a class="myb-mobile-link" routerLink="/profile" (click)="closeMenu()">
             <i class="bi bi-person-circle me-2"></i>{{ 'navigation.profile' | translate }}
           </a>
-          <a class="myb-mobile-link" routerLink="/coproperty/select" [queryParams]="{ space: 'owner' }" (click)="toggleMenu()" *ngIf="keycloakService.hasRole('coproperty-owner')">
+          <a class="myb-mobile-link" routerLink="/coproperty/select" [queryParams]="{ space: 'owner' }" (click)="closeMenu()" *ngIf="keycloakService.hasRole('coproperty-owner')">
             <i class="bi bi-building me-2"></i>{{ 'navigation.ownerSpace' | translate }}
           </a>
-          <a class="myb-mobile-link" routerLink="/coproperty/select" [queryParams]="{ space: 'syndic' }" (click)="toggleMenu()" *ngIf="keycloakService.hasAnyRole(['coproperty-syndic','coproperty-admin'])">
+          <a class="myb-mobile-link" routerLink="/coproperty/select" [queryParams]="{ space: 'syndic' }" (click)="closeMenu()" *ngIf="keycloakService.hasAnyRole(['coproperty-syndic','coproperty-admin'])">
             <i class="bi bi-buildings me-2"></i>{{ 'navigation.syndicSpace' | translate }}
           </a>
           <hr class="myb-mobile-divider">

@@ -45,6 +45,10 @@ export class NavBarComponent {
     this.menuOpen = !this.menuOpen;
   }
 
+  closeMenu(): void {
+    this.menuOpen = false;
+  }
+
   /** Returns the admin app URL (same host, port 4201 in dev / /admin path in prod) */
   get adminPortalUrl(): string {
     const origin = window.location.origin;
@@ -75,9 +79,11 @@ export class NavBarComponent {
     this.keycloakService.login();
   }
 
-  /** Navigate to the Angular registration page (Email / Google choice) */
+  /** Open Keycloak registration directly, without an intermediate MYB page. */
   onRegister(): void {
-    this.router.navigate(['/register']);
+    this.keycloakService.registerWithRedirect(
+      `${window.location.origin}/register/complete-profile`
+    );
   }
 
   onWorkspace(): void {

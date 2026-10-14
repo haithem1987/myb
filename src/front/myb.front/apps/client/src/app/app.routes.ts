@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
-import { noProfileGuard, completeProfileGuard } from 'libs/coproperty-module/src/lib/guards/profile.guard';
+import { completeProfileGuard, keycloakRegistrationGuard } from 'libs/coproperty-module/src/lib/guards/profile.guard';
 export const appRoutes: Route[] = [
   {
     path: '',
@@ -15,11 +15,9 @@ export const appRoutes: Route[] = [
     children: [
       {
         path: '',
-        canActivate: [noProfileGuard],
-        loadComponent: () =>
-          import('@myb-front/coproperty-module').then(
-            (m) => m.OwnerRegistrationComponent
-          ),
+        pathMatch: 'full',
+        canActivate: [keycloakRegistrationGuard],
+        children: [],
       },
       {
         path: 'complete-profile',

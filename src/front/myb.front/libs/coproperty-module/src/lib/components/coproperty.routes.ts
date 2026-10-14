@@ -4,11 +4,7 @@ import { CopropertyComponent } from './coproperty.component';
 import { CopropertyDetailComponent } from './coproperty-detail.component';
 import { CopropertyDashboardComponent } from './dashboard/coproperty-dashboard.component';
 import { CopropertyNewComponent } from './coproperty-new/coproperty-new.component';
-import { ChargesListComponent } from './charges-list/charges-list.component';
-import { BudgetNewComponent } from './budget-new/budget-new.component';
 import { MaintenanceListComponent } from './maintenance-list/maintenance-list.component';
-import { InterventionListComponent } from './intervention-list/intervention-list.component';
-import { InterventionNewComponent } from './intervention-new/intervention-new.component';
 import { UnitsListComponent } from './units-list/units-list.component';
 import { OwnerManagementComponent } from './owner-management/owner-management.component';
 import { TenantManagementComponent } from './tenant-management/tenant-management.component';
@@ -31,7 +27,6 @@ import { NouveauSignalementComponent } from './owner-portal/signalements/nouveau
 import { SyndicLayoutComponent } from './syndic-layout/syndic-layout.component';
 import { SyndicDashboardComponent } from './syndic-dashboard/syndic-dashboard.component';
 import { SyndicSignalementsComponent } from './syndic-signalements/syndic-signalements.component';
-import { DiscussionsComponent } from './discussions/discussions.component';
 import { GeneralAssemblyComponent } from './general-assembly/general-assembly.component';
 import { ReportsComponent } from './reports/reports.component';
 import { SyndicSettingsComponent } from './syndic-settings/settings.component';
@@ -41,6 +36,11 @@ import { copropertyRedirectGuard } from './coproperty-redirect.guard';
 import { CopropertySelectComponent } from './coproperty-select/coproperty-select.component';
 import { CopropertyManagementLayoutComponent } from './coproperty-management-layout/coproperty-management-layout.component';
 import { ActiveCopropertyService } from '../services/active-coproperty.service';
+
+const loadChargesList = () =>
+  import('./charges-list/charges-list.component').then(m => m.ChargesListComponent);
+const loadBudgetNew = () =>
+  import('./budget-new/budget-new.component').then(m => m.BudgetNewComponent);
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COPROPERTY_MANAGER_ROLES = ['coproperty-syndic', 'coproperty-admin', 'system-admin'];
@@ -106,21 +106,21 @@ const SYNDIC_CHILDREN: Routes = [
   { path: 'coproperties/new', canActivate: [legacyCopropertyNewRedirectGuard], children: [] },
   { path: 'coproperties/:id/edit', canActivate: [legacyCopropertyEditRedirectGuard], children: [] },
   { path: 'coproperties/:id', component: CopropertyDetailComponent },
-  { path: 'budgets', component: ChargesListComponent },
-  { path: 'budgets/new', component: BudgetNewComponent },
-  { path: 'budgets/:id', component: BudgetNewComponent },
-  { path: 'budgets/:id/edit', component: BudgetNewComponent },
+  { path: 'budgets', loadComponent: loadChargesList },
+  { path: 'budgets/new', loadComponent: loadBudgetNew },
+  { path: 'budgets/:id', loadComponent: loadBudgetNew },
+  { path: 'budgets/:id/edit', loadComponent: loadBudgetNew },
   { path: 'charges', redirectTo: 'budgets', pathMatch: 'full' },
   { path: 'maintenance', component: MaintenanceListComponent },
-  { path: 'interventions', component: InterventionListComponent },
-  { path: 'interventions/new', component: InterventionNewComponent },
-  { path: 'interventions/:id/edit', component: InterventionNewComponent },
+  { path: 'interventions', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'interventions/new', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'interventions/:id/edit', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'signalements', component: SyndicSignalementsComponent },
-  { path: 'discussions', component: DiscussionsComponent },
+  { path: 'discussions', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'units', component: UnitsListComponent },
   { path: 'owners', component: OwnerManagementComponent },
   { path: 'tenants', component: TenantManagementComponent },
-  { path: 'distribution', component: ChargesListComponent },
+  { path: 'distribution', loadComponent: loadChargesList },
   { path: 'fund-calls', component: FundCallsListComponent },
   { path: 'fund-calls/new', component: FundCallNewComponent },
   { path: 'fund-calls/:id', component: FundCallNewComponent },
@@ -141,11 +141,12 @@ const OWNER_CHILDREN: Routes = [
   { path: 'invoices', component: OwnerInvoicesComponent },
   { path: 'charges', component: OwnerChargesComponent },
   { path: 'maintenance', component: OwnerMaintenanceComponent },
+  { path: 'interventions', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'documents', component: OwnerDocumentsComponent },
   { path: 'general-assembly', component: OwnerGeneralAssemblyComponent },
   { path: 'signalements', component: OwnerSignalementsComponent },
   { path: 'signalements/nouveau', component: NouveauSignalementComponent },
-  { path: 'discussions', component: DiscussionsComponent },
+  { path: 'discussions', redirectTo: 'dashboard', pathMatch: 'full' },
 ];
 
 export const COPROPERTY_ROUTES: Routes = [

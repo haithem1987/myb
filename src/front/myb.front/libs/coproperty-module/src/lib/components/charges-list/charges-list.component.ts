@@ -1,9 +1,9 @@
-import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChargeService, ChargeExtended } from '../../services/charge.service';
 import { CopropertyService } from '../../services/coproperty.service';
 import { CurrencyService } from '../../services/currency.service';
@@ -18,9 +18,10 @@ import { ActiveCopropertyService } from '../../services/active-coproperty.servic
 @Component({
   selector: 'myb-charges-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, NgbDropdownModule, ChargeDistributionComponent, NoResultComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, NgbDropdownModule, NgbPaginationModule, ChargeDistributionComponent, NoResultComponent],
   templateUrl: './charges-list.component.html',
   styleUrls: ['./charges-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChargesListComponent implements OnInit {
   private chargeService = inject(ChargeService);
@@ -44,6 +45,8 @@ export class ChargesListComponent implements OnInit {
   filterType = signal<string>('');
   readonly currentYear = new Date().getFullYear().toString();
   filterFrequency = signal<string>(this.currentYear);
+  page = signal<number>(1);
+  readonly pageSize = 10;
 
   chargeTypes = ['CLEANING', 'MAINTENANCE', 'INSURANCE', 'ELEVATOR', 'HEATING', 'WATER', 'ELECTRICITY', 'GARDENING', 'SECURITY', 'OTHER'];
 
@@ -65,7 +68,7 @@ export class ChargesListComponent implements OnInit {
         }
 
         if (params['year']) {
-          this.filterFrequency.set(String(params['year']));
+          this.setFilterFrequency(String(params['year']));
         }
 
         if (params['refresh']) {
@@ -90,25 +93,51 @@ export class ChargesListComponent implements OnInit {
     });
   }
 
-  get frequencies(): string[] {
+  readonly frequencies = computed<string[]>(() => {
     const currentYear = new Date().getFullYear();
     const years = new Set<number>(
       Array.from({ length: 11 }, (_, index) => currentYear - index)
     );
 
     for (const charge of this.charges()) {
-      const frequencyYear = Number(charge.frequency);
-      const startDateYear = charge.startDate
-        ? new Date(charge.startDate).getFullYear()
-        : Number.NaN;
-
-      if (Number.isInteger(frequencyYear)) years.add(frequencyYear);
-      if (Number.isInteger(startDateYear)) years.add(startDateYear);
+      for (const year of this.chargeYears(charge)) years.add(year);
     }
 
     return [...years]
       .sort((a, b) => b - a)
       .map(String);
+  });
+
+  /** Years covered by a charge; `frequency` may hold a year or a label such as "Annual". */
+  private chargeYears(charge: ChargeExtended): number[] {
+    const years: number[] = [];
+    const frequencyYear = Number(charge.frequency);
+    if (Number.isInteger(frequencyYear) && frequencyYear > 0) {
+      return [frequencyYear];
+    }
+
+    const start = charge.startDate ? new Date(charge.startDate).getFullYear() : Number.NaN;
+    const end = charge.endDate ? new Date(charge.endDate).getFullYear() : start;
+    if (Number.isInteger(start)) {
+      const last = Number.isInteger(end) && end >= start ? end : start;
+      for (let year = start; year <= last; year++) years.push(year);
+    }
+    return years;
+  }
+
+  setFilterType(value: string): void {
+    this.filterType.set(value);
+    this.page.set(1);
+  }
+
+  setFilterFrequency(value: string): void {
+    this.filterFrequency.set(value);
+    this.page.set(1);
+  }
+
+  setSearchTerm(value: string): void {
+    this.searchTerm.set(value);
+    this.page.set(1);
   }
 
   loadCoproperties(): void {
@@ -181,12 +210,12 @@ export class ChargesListComponent implements OnInit {
       });
   }
 
-  get filteredCharges(): ChargeExtended[] {
+  readonly filteredCharges = computed<ChargeExtended[]>(() => {
     let filtered = this.charges();
 
-    // Filter by search term
-    if (this.searchTerm()) {
-      const term = this.searchTerm().toLowerCase();
+    const searchTerm = this.searchTerm();
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
       filtered = filtered.filter(charge => 
         charge.name.toLowerCase().includes(term) ||
         charge.description?.toLowerCase().includes(term) ||
@@ -194,14 +223,14 @@ export class ChargesListComponent implements OnInit {
       );
     }
 
-    // Filter by type
-    if (this.filterType()) {
-      filtered = filtered.filter(charge => charge.chargeType === this.filterType());
+    const type = this.filterType();
+    if (type) {
+      filtered = filtered.filter(charge => charge.chargeType === type);
     }
 
-    // Filter by frequency
-    if (this.filterFrequency()) {
-      filtered = filtered.filter(charge => charge.frequency === this.filterFrequency());
+    const year = Number(this.filterFrequency());
+    if (this.filterFrequency() && Number.isInteger(year)) {
+      filtered = filtered.filter(charge => this.chargeYears(charge).includes(year));
     }
 
     return [...filtered].sort((a, b) => {
@@ -214,14 +243,34 @@ export class ChargesListComponent implements OnInit {
       const fallbackB = b.startDate ? new Date(b.startDate).getTime() : 0;
       return fallbackB - fallbackA;
     });
-  }
+  });
 
-  getTotalBudgetAmount(): number {
-    return this.filteredCharges.reduce((sum, charge) => sum + (charge.totalAmount || 0), 0);
-  }
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredCharges().length / this.pageSize))
+  );
 
-  getActiveChargesCount(): number {
-    return this.filteredCharges.filter(charge => charge.isActive).length;
+  readonly pagedCharges = computed<ChargeExtended[]>(() => {
+    const page = Math.min(this.page(), this.totalPages());
+    const start = (page - 1) * this.pageSize;
+    return this.filteredCharges().slice(start, start + this.pageSize);
+  });
+
+  readonly activeChargesCount = computed(() =>
+    this.filteredCharges().filter(charge => charge.isActive).length
+  );
+
+  readonly totalBudgetDisplay = computed(() =>
+    this.formatCurrencyGroups(
+      this.filteredCharges().map(charge => ({
+        amount: charge.totalAmount || 0,
+        currency: charge.currency
+          ?? this.coproperties().find(c => c.id === charge.copropertyId)?.currency
+      }))
+    )
+  );
+
+  trackByChargeId(_: number, charge: ChargeExtended): string | undefined {
+    return charge.id;
   }
 
   get selectedCurrency(): string | undefined {
@@ -239,16 +288,6 @@ export class ChargesListComponent implements OnInit {
     const selectedId = this.selectedCopropertyId();
     return !!selectedId && this.coproperties().some(
       coproperty => coproperty.id === selectedId && coproperty.isActive
-    );
-  }
-
-  getTotalBudgetDisplay(): string {
-    return this.formatCurrencyGroups(
-      this.filteredCharges.map(charge => ({
-        amount: charge.totalAmount || 0,
-        currency: charge.currency
-          ?? this.coproperties().find(c => c.id === charge.copropertyId)?.currency
-      }))
     );
   }
 

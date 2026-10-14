@@ -16,6 +16,7 @@ import { ModalService } from '@myb-front/shared-ui';
 import { getUnitErrorTranslation } from '../../utils/unit-error.util';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 @Component({
   selector: 'myb-units-list',
   standalone: true,
@@ -273,7 +274,7 @@ export class UnitsListComponent implements OnInit {
 
   formatArea(area: number | undefined): string {
     if (!area) return '-';
-    return new Intl.NumberFormat('fr-FR', {
+    return new Intl.NumberFormat(currentIntlLocale(), {
       minimumFractionDigits: 0,
       maximumFractionDigits: 3
     }).format(area);

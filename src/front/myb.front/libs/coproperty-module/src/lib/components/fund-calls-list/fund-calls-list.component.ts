@@ -29,6 +29,7 @@ import { InvoiceDetails } from 'libs/invoice-module/src/lib/models/invoiceDetail
 import { FundCallModalService } from '../../components/fund-call-modals/fund-call-modal.service';
 import { CancellationReason } from '../../components/fund-call-modals/cancel-fund-call-modal/cancel-fund-call-modal.component';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 @Component({
   selector: 'myb-fund-calls-list',
   standalone: true,
@@ -1283,7 +1284,7 @@ export class FundCallsListComponent implements OnInit {
 
   formatDate(date: Date | string | undefined): string {
     if (!date) return '-';
-    return new Date(date).toLocaleDateString('fr-FR');
+    return new Date(date).toLocaleDateString(currentIntlLocale());
   }
 
   // ── Bulk selection helpers ────────────────────────────────────────────────

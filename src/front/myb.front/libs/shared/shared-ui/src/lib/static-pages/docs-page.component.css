@@ -40,14 +40,14 @@
   width: 280px;
   height: 280px;
   top: -140px;
-  left: 40%;
+  inset-inline-start: 40%;
   border: 1px solid rgba(124, 58, 237, 0.12);
 }
 
 .docs-hero::after {
   width: 420px;
   height: 420px;
-  right: -260px;
+  inset-inline-end: -260px;
   bottom: -300px;
   border: 70px solid rgba(255, 255, 255, 0.38);
 }
@@ -174,7 +174,7 @@
   position: absolute;
   width: 220px;
   height: 220px;
-  right: -90px;
+  inset-inline-end: -90px;
   top: -90px;
   background: rgba(255, 255, 255, 0.12);
   border-radius: 50%;
@@ -223,9 +223,9 @@
   padding-top: 20px;
   color: #fff;
   background: transparent;
-  border-right: 0;
+  border-inline-end: 0;
   border-bottom: 0;
-  border-left: 0;
+  border-inline-start: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
   font-size: 0.9rem;
   font-weight: 750;
@@ -244,8 +244,8 @@
 }
 
 .section-heading--center {
-  margin-right: auto;
-  margin-left: auto;
+  margin-inline-end: auto;
+  margin-inline-start: auto;
   text-align: center;
 }
 
@@ -291,7 +291,7 @@
   content: '';
   position: absolute;
   top: 0;
-  left: 28px;
+  inset-inline-start: 28px;
   width: 44px;
   height: 3px;
   background: linear-gradient(90deg, #7c3aed, #6366f1);
@@ -359,7 +359,7 @@
 
 .guided-screenshot__marker {
   position: absolute;
-  right: 18px;
+  inset-inline-end: 18px;
   bottom: 18px;
   display: inline-flex;
   align-items: center;
@@ -443,7 +443,7 @@
 .video-card__badge {
   position: absolute;
   top: 16px;
-  left: 16px;
+  inset-inline-start: 16px;
   padding: 6px 10px;
   color: #fff;
   background: rgba(16, 13, 48, 0.75);
@@ -506,7 +506,7 @@
   background: transparent;
   border: 1px solid transparent;
   border-radius: 13px;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -615,7 +615,7 @@
 
 .workflow-card__content ol {
   margin: 0 0 16px;
-  padding-left: 20px;
+  padding-inline-start: 20px;
   color: #686477;
   font-size: 0.84rem;
   line-height: 1.75;

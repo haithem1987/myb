@@ -194,7 +194,7 @@ interface ServiceCard {
       background: white;
       border-radius: 12px;
       padding: 2rem;
-      border-left: 4px solid;
+      border-inline-start: 4px solid;
       cursor: pointer;
       transition: all 0.3s;
       display: flex;

@@ -25,7 +25,7 @@
     margin: 0;
     color: #dc3545;
 
-    i { margin-right: 0.5rem; }
+    i { margin-inline-end: 0.5rem; }
   }
 }
 
@@ -124,14 +124,14 @@
 
   i {
     position: absolute;
-    left: 12px;
+    inset-inline-start: 12px;
     top: 50%;
     transform: translateY(-50%);
     color: #6c757d;
   }
 
   input {
-    padding-left: 36px;
+    padding-inline-start: 36px;
     border-radius: 8px;
     border: 1px solid #dee2e6;
 
@@ -165,7 +165,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   transition: all 0.3s ease;
-  border-left: 4px solid transparent;
+  border-inline-start: 4px solid transparent;
 
   &:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -251,7 +251,7 @@
   flex-shrink: 0;
 
   .amount-block {
-    text-align: right;
+    text-align: end;
 
     .amount-label {
       display: block;

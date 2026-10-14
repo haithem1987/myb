@@ -9,6 +9,7 @@ import { firstValueFrom } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 type ConversationKind = 'discussion' | 'annonce';
 interface ChatMessage { id: string; authorId: string; author: string; role: 'syndic' | 'owner'; body: string; sentAt: string; }
 interface Conversation { id: string; copropertyId: string; title: string; coproperty: string; kind: ConversationKind; participants: number; unread: number; pinned?: boolean; messages: ChatMessage[]; }
@@ -130,7 +131,7 @@ export class DiscussionsComponent implements OnInit {
   isMine(message: ChatMessage): boolean { return !!this.currentUserId && message.authorId === this.currentUserId; }
   displayAuthor(message: ChatMessage): string { return this.isMine(message) ? this.translate.instant('discussions.me') : message.author; }
   initials(name: string): string { return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase(); }
-  time(value: string): string { return new Date(value).toLocaleTimeString(this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR', { hour: '2-digit', minute: '2-digit' }); }
+  time(value: string): string { return new Date(value).toLocaleTimeString(currentIntlLocale(), { hour: '2-digit', minute: '2-digit' }); }
   lastMessage(c: Conversation): string { return c.messages[c.messages.length - 1]?.body || this.translate.instant('discussions.noMessagesYet'); }
   trackById(_: number, item: { id: string }): string { return item.id; }
 }

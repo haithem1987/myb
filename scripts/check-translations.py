@@ -1,67 +1,141 @@
 #!/usr/bin/env python3
+"""Check frontend translation files (fr / en / ar) for the client and admin apps.
+
+Checks per app:
+  - key parity between languages (error)
+  - empty values (error)
+  - interpolation parameters {{ x }} that differ from the French source (error)
+  - keys used in templates/code but absent from the files (error)
+  - Arabic values without any Arabic letters (warning)
+  - English values containing French accents/words (warning)
+  - FR == EN values (info, often legitimate: brand names, emails...)
+
+Usage: python scripts/check-translations.py [--verbose]
+Exit code 1 when an error is found.
+"""
 import json
+import os
+import re
 import sys
 
-def get_all_keys(d, prefix=''):
-    """Recursively get all keys from nested dict"""
-    keys = []
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FRONT = os.path.join(ROOT, 'src', 'front', 'myb.front')
+APPS = ['client', 'admin']
+LANGS = ['fr', 'en', 'ar']
+VERBOSE = '--verbose' in sys.argv
+
+PARAM_RE = re.compile(r'\{\{\s*([\w.]+)\s*\}\}')
+ARABIC_RE = re.compile(r'[؀-ۿ]')
+FRENCH_RE = re.compile(r"[éèêàçùûôî]|\b(le|les|des|votre|vous|avec|pour|une)\b", re.IGNORECASE)
+KEY_USE_RE = re.compile(
+    r"""['"`]([A-Za-z][\w-]*(?:\.[\w-]+)+)['"`]\s*\|\s*translate"""
+    r"""|(?:instant|get|stream)\(\s*['"`]([A-Z][\w-]*(?:\.[\w-]+)+)['"`]"""
+)
+# Arabic values may keep these untranslated (brand, units, codes).
+ARABIC_EXEMPT_RE = re.compile(r'^[\s\W\d]*$|^(MYB|PDF|Email|E-mail|ID|TND|EUR|USD|IBAN|RIB|SMS|OK)\b', re.IGNORECASE)
+
+
+def flatten(d, prefix=''):
+    out = {}
     for k, v in d.items():
-        full_key = f"{prefix}.{k}" if prefix else k
+        key = f'{prefix}.{k}' if prefix else k
         if isinstance(v, dict):
-            keys.extend(get_all_keys(v, full_key))
+            out.update(flatten(v, key))
         else:
-            keys.append(full_key)
-    return set(keys)
+            out[key] = v
+    return out
 
-# Read all files
-with open('src/front/myb.front/apps/admin/src/assets/i18n/fr.json', 'r', encoding='utf-8') as f:
-    admin_fr = json.load(f)
-with open('src/front/myb.front/apps/admin/src/assets/i18n/en.json', 'r', encoding='utf-8') as f:
-    admin_en = json.load(f)
-with open('src/front/myb.front/apps/client/src/assets/i18n/fr.json', 'r', encoding='utf-8') as f:
-    client_fr = json.load(f)
-with open('src/front/myb.front/apps/client/src/assets/i18n/en.json', 'r', encoding='utf-8') as f:
-    client_en = json.load(f)
 
-admin_fr_keys = get_all_keys(admin_fr)
-client_fr_keys = get_all_keys(client_fr)
-admin_en_keys = get_all_keys(admin_en)
-client_en_keys = get_all_keys(client_en)
+def used_keys():
+    keys = {}
+    for base in ('apps', 'libs'):
+        for dirpath, dirnames, filenames in os.walk(os.path.join(FRONT, base)):
+            dirnames[:] = [d for d in dirnames if d not in ('node_modules', 'dist', '.angular', 'assets')]
+            for name in filenames:
+                if not name.endswith(('.ts', '.html')) or name.endswith('.spec.ts'):
+                    continue
+                path = os.path.join(dirpath, name)
+                with open(path, encoding='utf-8') as f:
+                    for m in KEY_USE_RE.finditer(f.read()):
+                        keys.setdefault(m.group(1) or m.group(2), os.path.relpath(path, FRONT))
+    return keys
 
-print("=" * 70)
-print("TRANSLATION SYNC STATUS")
-print("=" * 70)
 
-print("\n📊 STATISTICS:")
-print(f"  Admin FR:  {len(admin_fr_keys)} keys")
-print(f"  Client FR: {len(client_fr_keys)} keys")
-print(f"  Admin EN:  {len(admin_en_keys)} keys")
-print(f"  Client EN: {len(client_en_keys)} keys")
+def report(title, items, limit=None):
+    if not items:
+        return
+    print(f'  {title}: {len(items)}')
+    shown = items if VERBOSE or limit is None else items[:limit]
+    for item in shown:
+        print(f'    - {item}')
+    if len(shown) < len(items):
+        print(f'    ... (+{len(items) - len(shown)}, use --verbose)')
 
-print("\n=== FRENCH (FR) ===")
-missing_fr = admin_fr_keys - client_fr_keys
-if missing_fr:
-    print(f"❌ Missing in client: {len(missing_fr)} keys")
-    for key in sorted(missing_fr)[:10]:
-        print(f"  - {key}")
-    if len(missing_fr) > 10:
-        print(f"  ... and {len(missing_fr) - 10} more")
-    sys.exit(1)
-else:
-    print("✅ All French keys synced!")
 
-print("\n=== ENGLISH (EN) ===")
-missing_en = admin_en_keys - client_en_keys
-if missing_en:
-    print(f"❌ Missing in client: {len(missing_en)} keys")
-    for key in sorted(missing_en)[:10]:
-        print(f"  - {key}")
-    if len(missing_en) > 10:
-        print(f"  ... and {len(missing_en) - 10} more")
-    sys.exit(1)
-else:
-    print("✅ All English keys synced!")
+def main():
+    usage = used_keys()
+    errors = 0
+    for app in APPS:
+        folder = os.path.join(FRONT, 'apps', app, 'src', 'assets', 'i18n')
+        data = {}
+        for lang in LANGS:
+            path = os.path.join(folder, f'{lang}.json')
+            if os.path.exists(path):
+                with open(path, encoding='utf-8') as f:
+                    data[lang] = flatten(json.load(f))
+        all_keys = set().union(*(d.keys() for d in data.values()))
+        print('=' * 70)
+        print(f'{app}: ' + ', '.join(f'{lang}={len(d)}' for lang, d in data.items()))
 
-print("\n" + "=" * 70)
-print("✅ ALL TRANSLATIONS IN SYNC!")
-print("=" * 70)
+        for lang, d in data.items():
+            missing = sorted(all_keys - d.keys())
+            empty = sorted(k for k, v in d.items() if v in ('', None))
+            errors += len(missing) + len(empty)
+            report(f'ERROR missing in {lang}', missing, 20)
+            report(f'ERROR empty in {lang}', empty, 20)
+
+        fr = data.get('fr', {})
+        for lang, d in data.items():
+            if lang == 'fr':
+                continue
+            bad = sorted(
+                k for k, v in d.items()
+                if k in fr and isinstance(v, str) and isinstance(fr[k], str)
+                and set(PARAM_RE.findall(v)) != set(PARAM_RE.findall(fr[k]))
+            )
+            errors += len(bad)
+            report(f'ERROR interpolation params differ from fr in {lang}', bad, 20)
+
+        absent = sorted(
+            f'{k}  <- {src}' for k, src in usage.items()
+            if k not in all_keys and not any(x.startswith(k + '.') for x in all_keys)
+        )
+        errors += len(absent)
+        report('ERROR used in code but absent', absent, 20)
+
+        if 'ar' in data:
+            report('WARN ar value without Arabic letters', sorted(
+                f'{k} = {v}' for k, v in data['ar'].items()
+                if isinstance(v, str) and not ARABIC_RE.search(v) and not ARABIC_EXEMPT_RE.search(v)
+            ), 20)
+        if 'en' in data:
+            report('WARN en value looks French', sorted(
+                f'{k} = {v}' for k, v in data['en'].items()
+                if isinstance(v, str) and FRENCH_RE.search(v)
+            ), 20)
+            same = sorted(
+                k for k, v in data['en'].items()
+                if isinstance(v, str) and fr.get(k) == v and re.search(r'[A-Za-z]{4,}', v)
+            )
+            print(f'  INFO identical fr/en values: {len(same)}')
+            if VERBOSE:
+                for k in same:
+                    print(f'    - {k} = {fr[k]}')
+
+    print('=' * 70)
+    print('OK' if errors == 0 else f'{errors} error(s)')
+    return 1 if errors else 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

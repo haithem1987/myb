@@ -230,7 +230,7 @@ import { NoResultComponent } from '@myb-front/shared-ui';
         align-items: center;
 
         .date {
-          margin-left: 12px;
+          margin-inline-start: 12px;
           color: rgba(0, 0, 0, 0.6);
           font-size: 14px;
         }

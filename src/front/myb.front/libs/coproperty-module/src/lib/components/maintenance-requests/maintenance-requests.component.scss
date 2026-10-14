@@ -200,11 +200,11 @@
 
               .btn-sm {
                 padding: 0.4rem 0.6rem;
-                margin-right: 0.5rem;
+                margin-inline-end: 0.5rem;
                 font-size: 0.8rem;
 
                 &:last-child {
-                  margin-right: 0;
+                  margin-inline-end: 0;
                 }
               }
             }
@@ -282,7 +282,7 @@
 
     &.alert-success {
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-      border-left: 4px solid #667eea;
+      border-inline-start: 4px solid #667eea;
       color: #5a67d8;
 
       i {
@@ -292,7 +292,7 @@
 
     &.alert-danger {
       background: linear-gradient(135deg, rgba(245, 101, 101, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
-      border-left: 4px solid #f56565;
+      border-inline-start: 4px solid #f56565;
       color: #c53030;
 
       i {
@@ -302,7 +302,7 @@
 
     &.alert-warning {
       background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
-      border-left: 4px solid #fbbf24;
+      border-inline-start: 4px solid #fbbf24;
       color: #92400e;
 
       i {
@@ -312,7 +312,7 @@
 
     &.alert-info {
       background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
-      border-left: 4px solid #3b82f6;
+      border-inline-start: 4px solid #3b82f6;
       color: #1e40af;
 
       i {

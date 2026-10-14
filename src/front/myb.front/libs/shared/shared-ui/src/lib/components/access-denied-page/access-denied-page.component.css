@@ -22,14 +22,14 @@
   height: 400px;
   background: radial-gradient(circle, #a78bfa, #7c3aed);
   top: -120px;
-  right: -80px;
+  inset-inline-end: -80px;
 }
 .ad-blob-2 {
   width: 280px;
   height: 280px;
   background: radial-gradient(circle, #818cf8, #4f46e5);
   bottom: -80px;
-  left: -60px;
+  inset-inline-start: -60px;
 }
 
 .access-denied-card {

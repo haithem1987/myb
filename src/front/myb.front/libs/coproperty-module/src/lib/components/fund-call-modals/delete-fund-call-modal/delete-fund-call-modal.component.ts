@@ -5,6 +5,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundCallExtended, FundCallService } from '../../../services/fund-call.service';
 import { ToastService } from '@myb-front/shared-ui';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 /**
  * Hard-delete confirmation modal for true drafts
  * (FRS-FCF-LCM-2026-001 §4.2.1). The user must TYPE the exact description of
@@ -89,7 +90,7 @@ export class DeleteFundCallModalComponent implements OnInit {
     if (typeof value === 'string') {
       value = parseFloat(value);
     }
-    return new Intl.NumberFormat('fr-FR', {
+    return new Intl.NumberFormat(currentIntlLocale(), {
       style: 'currency',
       currency: this.fundCall?.currency || 'EUR',
       minimumFractionDigits: 0,

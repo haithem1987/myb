@@ -19,12 +19,12 @@
 .hero-blob-1 {
   width: 500px; height: 500px;
   background: radial-gradient(circle, #a78bfa, #7c3aed);
-  top: -150px; right: -100px;
+  top: -150px; inset-inline-end: -100px;
 }
 .hero-blob-2 {
   width: 350px; height: 350px;
   background: radial-gradient(circle, #818cf8, #4f46e5);
-  bottom: -100px; left: -80px;
+  bottom: -100px; inset-inline-start: -80px;
 }
 
 .hero-inner {
@@ -236,11 +236,11 @@
   white-space: nowrap;
 }
 .dash-badge-top {
-  top: -16px; right: -20px;
+  top: -16px; inset-inline-end: -20px;
   animation: float 3s ease-in-out infinite;
 }
 .dash-badge-bottom {
-  bottom: -16px; left: -20px;
+  bottom: -16px; inset-inline-start: -20px;
   animation: float 3s 1.5s ease-in-out infinite;
 }
 .dash-badge-icon {

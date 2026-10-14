@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { UserDropdownComponent } from '../user-dropdown/user-dropdown.component';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 @Component({
   selector: 'myb-profile-page',
   standalone: true,
@@ -82,7 +83,7 @@ export class ProfilePageComponent implements OnInit {
     this.roles.set(meaningful.length > 0 ? meaningful : allRoles.slice(0, 5));
 
     // Authentication session date from token iat
-    const iat = tokenData.iat ? new Date(tokenData.iat * 1000).toLocaleDateString('fr-FR') : '';
+    const iat = tokenData.iat ? new Date(tokenData.iat * 1000).toLocaleDateString(currentIntlLocale()) : '';
     this.joinedDate.set(iat);
 
     this.profileForm.patchValue({ firstName, lastName, email });

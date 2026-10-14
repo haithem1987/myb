@@ -21,7 +21,7 @@ import { NgxStripeModule } from 'ngx-stripe';
 import { environment } from '../environments/environment';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http, '/assets/i18n/', '.json?v=20260929-distribution-hotfix');
+  return new TranslateHttpLoader(http, '/assets/i18n/', '.json?v=20261014-i18n-ar');
 }
 export function initializeKeycloak(keycloak: KeycloakService) {
   console.log('Initializing Keycloak...');

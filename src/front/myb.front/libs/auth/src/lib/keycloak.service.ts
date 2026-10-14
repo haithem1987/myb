@@ -51,17 +51,29 @@ export class KeycloakService {
     return id;
   }
 
-  private static readonly SUPPORTED_LANGUAGES = ['fr', 'en'];
+  /** UI languages of the Angular apps (mirrors APP_LANGUAGES in libs/shared/infra/services/language.service.ts). */
+  private static readonly APP_LANGUAGES = ['fr', 'en', 'ar'];
+  /** Languages available for Keycloak screens and server-side emails. */
+  private static readonly SERVER_LANGUAGES = ['fr', 'en'];
+  private static readonly SERVER_FALLBACK_LANGUAGE = 'fr';
 
   private normalizeLanguage(language: string | null | undefined): string {
-    const normalized = language?.trim().toLowerCase().split('-')[0];
-    return KeycloakService.SUPPORTED_LANGUAGES.includes(normalized ?? '') ? normalized! : 'en';
+    const normalized = language?.trim().toLowerCase().split('-')[0] ?? '';
+    return KeycloakService.APP_LANGUAGES.includes(normalized) ? normalized : 'en';
   }
 
+  /** UI language of the Angular apps (fr, en or ar). */
   private getPreferredLanguage(): string {
     const saved = localStorage.getItem('language') ?? sessionStorage.getItem('language');
     const docLang = typeof document !== 'undefined' ? document.documentElement.lang : null;
     return this.normalizeLanguage(saved ?? docLang);
+  }
+
+  /** Language sent to Keycloak and the backend; Arabic falls back until server templates exist. */
+  private toServerLanguage(language: string): string {
+    return KeycloakService.SERVER_LANGUAGES.includes(language)
+      ? language
+      : KeycloakService.SERVER_FALLBACK_LANGUAGE;
   }
 
   private withLanguageInRedirectUri(redirectUri: string, language: string): string {
@@ -160,7 +172,7 @@ export class KeycloakService {
     localStorage.setItem('language', locale);
     sessionStorage.setItem('language', locale);
     console.log('Redirecting to Keycloak login with redirectUri:', uri);
-    this.keycloak.login({ redirectUri: uri, locale });
+    this.keycloak.login({ redirectUri: uri, locale: this.toServerLanguage(locale) });
   }
 
   /**
@@ -175,15 +187,16 @@ export class KeycloakService {
     );
     localStorage.setItem('language', locale);
     sessionStorage.setItem('language', locale);
+    const serverLocale = this.toServerLanguage(locale);
     const registrationUrl = new URL(this.keycloak.createRegisterUrl({
       redirectUri: uri,
-      locale,
+      locale: serverLocale,
     }));
     // keycloak-js emits ui_locales, which is only a client preference. An
     // explicit kc_locale is treated as the user's selection and is persisted
     // on the newly registered user, so verification emails use that language.
-    registrationUrl.searchParams.set('ui_locales', locale);
-    registrationUrl.searchParams.set('kc_locale', locale);
+    registrationUrl.searchParams.set('ui_locales', serverLocale);
+    registrationUrl.searchParams.set('kc_locale', serverLocale);
     window.location.assign(registrationUrl.toString());
   }
 
@@ -202,7 +215,7 @@ export class KeycloakService {
     this.keycloak.login({
       idpHint: 'google',
       redirectUri: uri,
-      locale,
+      locale: this.toServerLanguage(locale),
     });
   }
 
@@ -505,7 +518,7 @@ export class KeycloakService {
         email: options.email,
         temporaryPassword: options.password,
         notifyOnActivation: options.notifyOnActivation ?? false,
-        language: this.getPreferredLanguage(),
+        language: this.toServerLanguage(this.getPreferredLanguage()),
       },
     };
     const response: any = await firstValueFrom(
@@ -524,7 +537,7 @@ export class KeycloakService {
         syncPreferredLanguage(language: $language)
         confirmCurrentUserActivation
       }`,
-      variables: { language: this.getPreferredLanguage() },
+      variables: { language: this.toServerLanguage(this.getPreferredLanguage()) },
     };
 
     // Activation delivery is idempotent on the server. Retry transient failures
@@ -578,7 +591,7 @@ export class KeycloakService {
           query: `mutation SyncEmailLanguage($language: String!) {
             syncPreferredLanguage(language: $language)
           }`,
-          variables: { language: normalized },
+          variables: { language: this.toServerLanguage(normalized) },
         }, { headers }));
         if (response?.errors?.length) {
           throw new Error(response.errors[0].message);

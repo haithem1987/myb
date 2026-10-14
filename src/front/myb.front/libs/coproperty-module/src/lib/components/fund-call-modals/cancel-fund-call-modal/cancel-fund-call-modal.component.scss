@@ -24,17 +24,17 @@
     }
 
     .alert {
-      border-left: 4px solid #0c63e4;
+      border-inline-start: 4px solid #0c63e4;
       background-color: rgba(13, 110, 253, 0.05);
       border-radius: 4px;
 
       &.alert-secondary {
-        border-left-color: #6c757d;
+        border-inline-start-color: #6c757d;
         background-color: rgba(108, 117, 125, 0.05);
 
         ul {
           margin-bottom: 0;
-          padding-left: 1.25rem;
+          padding-inline-start: 1.25rem;
 
           li {
             margin-bottom: 0.5rem;

@@ -1,0 +1,99 @@
+// Directional Bootstrap utilities compiled with CSS logical properties.
+// `ms-*`, `pe-*`, `text-start`, `start-0`, `border-end`, `rounded-start`, `float-end`...
+// keep their usual LTR rendering and flip automatically when <html dir="rtl">.
+//
+// Must be imported after Bootstrap's functions/variables and before "bootstrap":
+// Bootstrap merges its defaults into this pre-declared `$utilities` map.
+
+$_logical-radius-values: (
+  null: var(--#{$prefix}border-radius),
+  0: 0,
+  1: var(--#{$prefix}border-radius-sm),
+  2: var(--#{$prefix}border-radius),
+  3: var(--#{$prefix}border-radius-lg),
+  4: var(--#{$prefix}border-radius-xl),
+  5: var(--#{$prefix}border-radius-xxl),
+  circle: 50%,
+  pill: var(--#{$prefix}border-radius-pill)
+);
+
+$_logical-border-values: (
+  null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color),
+  0: 0,
+);
+
+$utilities: (
+  "float": (
+    responsive: true,
+    property: float,
+    values: (
+      start: inline-start,
+      end: inline-end,
+      none: none,
+    )
+  ),
+  "start": (
+    property: inset-inline-start,
+    class: start,
+    values: $position-values
+  ),
+  "end": (
+    property: inset-inline-end,
+    class: end,
+    values: $position-values
+  ),
+  "border-start": (
+    property: border-inline-start,
+    class: border-start,
+    values: $_logical-border-values
+  ),
+  "border-end": (
+    property: border-inline-end,
+    class: border-end,
+    values: $_logical-border-values
+  ),
+  "margin-start": (
+    responsive: true,
+    property: margin-inline-start,
+    class: ms,
+    values: map-merge($spacers, (auto: auto))
+  ),
+  "margin-end": (
+    responsive: true,
+    property: margin-inline-end,
+    class: me,
+    values: map-merge($spacers, (auto: auto))
+  ),
+  "padding-start": (
+    responsive: true,
+    property: padding-inline-start,
+    class: ps,
+    values: $spacers
+  ),
+  "padding-end": (
+    responsive: true,
+    property: padding-inline-end,
+    class: pe,
+    values: $spacers
+  ),
+  "text-align": (
+    responsive: true,
+    property: text-align,
+    class: text,
+    values: (
+      start: start,
+      end: end,
+      center: center,
+    )
+  ),
+  "rounded-start": (
+    property: border-start-start-radius border-end-start-radius,
+    class: rounded-start,
+    values: $_logical-radius-values
+  ),
+  "rounded-end": (
+    property: border-start-end-radius border-end-end-radius,
+    class: rounded-end,
+    values: $_logical-radius-values
+  ),
+);

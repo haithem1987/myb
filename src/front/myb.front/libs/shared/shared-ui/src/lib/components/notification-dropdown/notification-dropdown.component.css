@@ -33,7 +33,7 @@
 .notification-badge {
   position: absolute;
   top: 4px;
-  right: 4px;
+  inset-inline-end: 4px;
   background: #ef4444;
   color: white;
   font-size: 10px;
@@ -173,8 +173,8 @@
   .notification-panel {
     position: fixed !important;
     top: 56px !important;
-    right: 8px !important;
-    left: 8px !important;
+    inset-inline-end: 8px !important;
+    inset-inline-start: 8px !important;
     width: auto;
     max-width: none;
     max-height: calc(100dvh - 64px);

@@ -29,7 +29,7 @@
   width: 280px; height: 280px;
   background: radial-gradient(circle, #ede9fe, #e0e7ff);
   border-radius: 50%;
-  top: -40px; left: -60px;
+  top: -40px; inset-inline-start: -60px;
   z-index: 0;
   filter: blur(40px);
   opacity: 0.6;

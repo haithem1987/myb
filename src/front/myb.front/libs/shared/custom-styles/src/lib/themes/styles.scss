@@ -21,6 +21,9 @@ $theme-colors: map-merge($custom-theme-colors, $theme-colors);
 $body-color: #275556;
 $gray-900: #275556;
 
+// Directional utilities as CSS logical properties (LTR + RTL)
+@import "logical-utilities";
+
 // Import Bootstrap
 @import "../../../../../../node_modules/bootstrap/scss/bootstrap";
 
@@ -56,3 +59,6 @@ $gray-900: #275556;
     color: white;
   }
 }
+
+// Right-to-left (Arabic) overrides for Bootstrap components
+@import "rtl";

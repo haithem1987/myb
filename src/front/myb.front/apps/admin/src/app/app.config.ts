@@ -25,7 +25,7 @@ export function initializeKeycloak(keycloak: KeycloakService) {
 }
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json?v=20260904-shared-i18n');
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json?v=20261014-i18n-ar');
 }
 
 export const appConfig: ApplicationConfig = {

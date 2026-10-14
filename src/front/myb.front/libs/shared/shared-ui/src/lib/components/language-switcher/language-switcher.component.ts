@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { LanguageService } from 'libs/shared/infra/services/language.service';
+import { AppLanguage, LanguageService } from 'libs/shared/infra/services/language.service';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 @Component({
   selector: 'myb-front-language-switcher',
@@ -13,11 +13,14 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 })
 export class LanguageSwitcherComponent implements OnInit {
   selectedLanguage!: string;
+  readonly languages: readonly AppLanguage[];
 
   constructor(
     private languageService: LanguageService,
     private keycloakService: KeycloakService
-  ) {}
+  ) {
+    this.languages = this.languageService.languages;
+  }
 
   ngOnInit(): void {
     this.languageService.language$.subscribe((language) => {

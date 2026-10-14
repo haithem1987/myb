@@ -4,7 +4,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NxWelcomeComponent } from './nx-welcome.component';
-import { LanguageService } from 'libs/shared/infra/services/language.service';
+import {
+  DEFAULT_LANGUAGE,
+  LanguageService,
+  SUPPORTED_LANGUAGE_CODES,
+  normalizeLanguageCode,
+} from 'libs/shared/infra/services/language.service';
 
 @Component({
   standalone: true,
@@ -24,8 +29,8 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.watchRouteLoading();
     // Initialize supported languages
-    this.translate.addLangs(['fr', 'en']);
-    this.translate.setDefaultLang('fr');
+    this.translate.addLangs(SUPPORTED_LANGUAGE_CODES);
+    this.translate.setDefaultLang(DEFAULT_LANGUAGE);
 
     // Restore language from URL redirect params (Keycloak) if present,
     // otherwise fall back to the value persisted in localStorage/sessionStorage.
@@ -57,8 +62,7 @@ export class AppComponent implements OnInit {
   }
 
   private normalizeLanguage(lang: string | null): string {
-    const normalized = lang?.trim().toLowerCase().split('-')[0] ?? '';
-    return ['fr', 'en'].includes(normalized) ? normalized : 'fr';
+    return normalizeLanguageCode(lang) ?? DEFAULT_LANGUAGE;
   }
 
   private getLanguageFromRedirectParams(): string | null {
@@ -68,7 +72,6 @@ export class AppComponent implements OnInit {
       ?? params.get('kc_locale')
       ?? params.get('ui_locales')?.split(' ')[0]
       ?? null;
-    const normalized = redirectLang?.trim().toLowerCase().split('-')[0] ?? null;
-    return normalized && ['fr', 'en'].includes(normalized) ? normalized : null;
+    return normalizeLanguageCode(redirectLang);
   }
 }

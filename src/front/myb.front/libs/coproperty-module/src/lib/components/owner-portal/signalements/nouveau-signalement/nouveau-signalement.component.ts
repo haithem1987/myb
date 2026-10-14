@@ -158,8 +158,8 @@ interface DropdownOption { value: string; label: string; icon: string; }
     .custom-dropdown {
       position: absolute;
       top: calc(100% + 4px);
-      left: 0;
-      right: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
       background: #fff;
       border-radius: 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,.14);

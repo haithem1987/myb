@@ -8,6 +8,7 @@ import { KeycloakService } from '@myb-front/auth';
 import { Assembly, AssemblyType, AssemblyStatus, CreateAssemblyInput, Coproperty } from '@myb-front/coproperty-module';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 interface GeneralAssembly {
   id: string;
   title: string;
@@ -970,7 +971,7 @@ export class GeneralAssemblyComponent implements OnInit {
       message: `
         <div style="text-align: left; padding: 10px;">
           <p><strong>Type:</strong> ${assembly.type === 'ordinary' ? 'Ordinaire' : 'Extraordinaire'}</p>
-          <p><strong>Date:</strong> ${assembly.date.toLocaleDateString('fr-FR')}</p>
+          <p><strong>Date:</strong> ${assembly.date.toLocaleDateString(currentIntlLocale())}</p>
           <p><strong>Lieu:</strong> ${assembly.location}</p>
           <p><strong>Statut:</strong> ${this.getStatusLabel(assembly.status)}</p>
           <p><strong>Participants:</strong> ${assembly.attendees}/${assembly.totalUnits}</p>

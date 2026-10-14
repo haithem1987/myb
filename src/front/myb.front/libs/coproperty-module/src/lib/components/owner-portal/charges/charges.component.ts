@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActiveCopropertyService } from '../../../services/active-coproperty.service';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 export interface PaymentReceipt {
   fundCallDescription: string;
   amount: number;
@@ -638,6 +639,6 @@ export class OwnerChargesComponent implements OnInit {
   formatDate(date: Date | string): string {
     if (!date) return '-';
     const d = new Date(date);
-    return d.toLocaleDateString('fr-TN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return d.toLocaleDateString(currentIntlLocale(), { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 }

@@ -29,7 +29,7 @@
     align-items: center;
 
     i {
-      margin-right: 0.5rem;
+      margin-inline-end: 0.5rem;
     }
   }
 }
@@ -233,7 +233,7 @@
     }
 
     &.warning {
-      border-left: 4px solid #dc3545;
+      border-inline-start: 4px solid #dc3545;
     }
 
     .kpi-hint {

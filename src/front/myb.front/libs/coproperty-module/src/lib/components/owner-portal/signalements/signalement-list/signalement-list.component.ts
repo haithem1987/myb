@@ -17,6 +17,7 @@ import {
 import { take, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 type Tab = 'en-cours' | 'resolus';
 
 @Component({
@@ -183,7 +184,7 @@ type Tab = 'en-cours' | 'resolus';
     }
     .card-title-block { flex: 1; }
     .card-title { font-weight: 700; font-size: 15px; }
-    .card-date { font-size: 12px; color: #888; text-align: right; white-space: nowrap; }
+    .card-date { font-size: 12px; color: #888; text-align: end; white-space: nowrap; }
     .card-description {
       margin: 8px 0;
       color: #444;
@@ -301,10 +302,10 @@ export class SignalementListComponent implements OnInit {
   }
 
   formatDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    return new Date(iso).toLocaleDateString(currentIntlLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   formatTime(iso: string): string {
-    return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    return new Date(iso).toLocaleTimeString(currentIntlLocale(), { hour: '2-digit', minute: '2-digit' });
   }
 }

@@ -92,7 +92,7 @@
     <div class="card">
       <div class="card-header">
         <h2>{{ 'ownerPortal.dashboard.myUnits' | translate }}</h2>
-        <a routerLink="/coproperty/owner/my-units" class="btn-link">{{ 'ownerPortal.dashboard.viewAll' | translate }}</a>
+        <a [routerLink]="ownerRoute('my-units')" class="btn-link">{{ 'ownerPortal.dashboard.viewAll' | translate }}</a>
       </div>
       <div class="card-body">
         <div class="unit-list" *ngIf="!loading(); else loadingTemplate">
@@ -130,7 +130,7 @@
           <strong>{{ 'ownerPortal.dashboard.cancelledFundCallsCount' | translate:{count: cancelledFundCallsCount()} }}</strong>
           <p class="mb-0 small text-muted">{{ 'ownerPortal.dashboard.cancelledFundCallsNotice' | translate }}</p>
         </div>
-        <a routerLink="/coproperty/owner/charges" [queryParams]="{status: 'cancelled'}" class="btn btn-sm btn-outline-secondary ms-auto">{{ 'ownerPortal.dashboard.viewHistory' | translate }}</a>
+        <a [routerLink]="ownerRoute('charges')" [queryParams]="{status: 'cancelled'}" class="btn btn-sm btn-outline-secondary ms-auto">{{ 'ownerPortal.dashboard.viewHistory' | translate }}</a>
       </div>
     </div>
 
@@ -138,13 +138,13 @@
     <div class="card">
       <div class="card-header">
         <h2>{{ 'ownerPortal.dashboard.pendingPayments' | translate }}</h2>
-        <a routerLink="/coproperty/owner/charges" class="btn-link">{{ 'ownerPortal.dashboard.viewAll' | translate }}</a>
+        <a [routerLink]="ownerRoute('charges')" class="btn-link">{{ 'ownerPortal.dashboard.viewAll' | translate }}</a>
       </div>
       <div class="card-body">
         <div class="invoice-list" *ngIf="!loading(); else loadingTemplate">
           <div class="invoice-item" 
                *ngFor="let invoice of pendingInvoices()"
-               routerLink="/coproperty/owner/charges"
+               [routerLink]="ownerRoute('charges')"
                style="cursor: pointer"
                [class.overdue]="isOverdue(invoice.dueDate)">
             <div class="invoice-header">
@@ -184,7 +184,7 @@
     <div class="card">
       <div class="card-header">
         <h2>{{ 'ownerPortal.dashboard.recentReceipts' | translate }}</h2>
-        <a routerLink="/coproperty/owner/invoices" class="btn-link">{{ 'ownerPortal.dashboard.viewAll' | translate }}</a>
+        <a [routerLink]="ownerRoute('invoices')" class="btn-link">{{ 'ownerPortal.dashboard.viewAll' | translate }}</a>
       </div>
       <div class="card-body">
         <div class="recent-list" *ngIf="!loading(); else loadingTemplate">

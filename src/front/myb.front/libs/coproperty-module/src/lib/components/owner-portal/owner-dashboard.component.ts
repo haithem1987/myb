@@ -297,7 +297,12 @@ export class OwnerDashboardComponent implements OnInit {
     if (copropertyId === this.selectedCopropertyId()) return;
     this.selectedCopropertyId.set(copropertyId);
     this.activeCoproperty.setActive(copropertyId);
+    void this.router.navigate(this.activeCoproperty.route('owner', 'dashboard'), { replaceUrl: true });
     this.loadOwnerData();
+  }
+
+  ownerRoute(...segments: string[]): string[] {
+    return this.activeCoproperty.route('owner', ...segments);
   }
 
   getSelectedCopropertyName(): string {
@@ -322,7 +327,7 @@ export class OwnerDashboardComponent implements OnInit {
 
   payInvoice(event: Event, fundCallId: string): void {
     event.stopPropagation();
-    void this.router.navigate(['/coproperty/owner/charges'], {
+    void this.router.navigate(this.ownerRoute('charges'), {
       queryParams: { pay: fundCallId },
     });
   }

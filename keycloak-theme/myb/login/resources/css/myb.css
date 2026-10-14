@@ -1,0 +1,458 @@
+:root {
+  --myb-primary: #7c3aed;
+  --myb-primary-strong: #4f46e5;
+  --myb-ring: rgba(124, 58, 237, 0.16);
+  --myb-text: #1e1b4b;
+  --myb-muted: #646b7d;
+  --myb-border: #e4e1f4;
+  --myb-panel: #f4f0ff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html.login-pf,
+html.login-pf body {
+  min-height: 100%;
+}
+
+html.login-pf body,
+.login-pf body {
+  margin: 0;
+  background: linear-gradient(
+    135deg,
+    #f8f7ff 0%,
+    #f0edff 46%,
+    #e7ecff 100%
+  ) !important;
+  background-image: linear-gradient(
+    135deg,
+    #f8f7ff 0%,
+    #f0edff 46%,
+    #e7ecff 100%
+  ) !important;
+  color: var(--myb-text);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.login-pf-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 32px 20px;
+}
+
+#kc-header {
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+#kc-header-wrapper {
+  padding: 0 !important;
+  color: var(--myb-text) !important;
+  font-size: 2rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/*
+ * The parent Keycloak theme caps .card-pf at 500px. Our authentication
+ * content has two columns on desktop, so the cap must be overridden on the
+ * card itself. Otherwise the form column renders outside the white panel.
+ */
+.login-pf-page .card-pf {
+  width: min(100%, 960px);
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 34px 38px 30px !important;
+  overflow: hidden;
+  background: #fff !important;
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+  border-top: 4px solid var(--myb-primary) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 22px 60px rgba(79, 70, 229, 0.14) !important;
+}
+
+#kc-content {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+#kc-page-title {
+  margin: 0 0 26px !important;
+  color: var(--myb-text) !important;
+  font-size: clamp(1.7rem, 2.4vw, 2.15rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  text-align: center;
+}
+
+#kc-content-wrapper {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.82fr) minmax(0, 1.18fr);
+  gap: 22px 34px;
+  align-items: start;
+  width: 100%;
+  margin: 0;
+}
+
+#kc-content-wrapper::before {
+  content: "Manage your co-ownership\A without the daily stress.\A\A\2022  Track units and documents\A\2022  Keep owners informed\A\2022  Work in a simple, secure space";
+  grid-row: 1 / 4;
+  align-self: stretch;
+  min-height: 100%;
+  padding: 28px 26px;
+  white-space: pre-line;
+  background: linear-gradient(
+    155deg,
+    #faf9ff 0%,
+    var(--myb-panel) 62%,
+    #eae5ff 100%
+  );
+  border: 1px solid #ddd5ff;
+  border-radius: 15px;
+  box-shadow: 0 10px 28px rgba(79, 70, 229, 0.07);
+  color: #404166;
+  font-size: 1rem;
+  font-weight: 550;
+  line-height: 1.7;
+}
+
+html:lang(fr) #kc-content-wrapper::before {
+  content: "Gérez votre copropriété\A sans stress, au quotidien.\A\A\2022  Suivez les lots et les documents\A\2022  Informez les copropriétaires\A\2022  Profitez d'un espace simple et sécurisé";
+}
+
+#kc-form,
+#kc-info {
+  grid-column: 2;
+  min-width: 0;
+}
+
+#kc-content-wrapper > .pf-c-alert,
+#kc-content-wrapper > [class^="alert-"] {
+  grid-column: 2;
+  min-width: 0;
+  margin: 0;
+}
+
+.login-pf-header > .row {
+  margin: 0;
+}
+
+.login-pf-header > .row > [class*="col-"] {
+  float: none;
+  width: 100%;
+  margin-left: 0;
+  padding: 0;
+}
+
+.login-pf-header > .row > .subtitle {
+  margin: 0 0 6px;
+  color: var(--myb-muted);
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+#kc-form-wrapper,
+#kc-form-login,
+#kc-register-form {
+  width: 100%;
+  min-width: 0;
+  margin-top: 0;
+}
+
+#kc-form-login .form-group,
+#kc-register-form .form-group,
+.pf-c-form__group {
+  margin-bottom: 17px;
+}
+
+#kc-register-form.form-horizontal .form-group {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+#kc-register-form .form-group > [class*="col-"] {
+  float: none;
+  width: 100%;
+  margin-left: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+label,
+.control-label,
+.pf-c-form__label-text {
+  display: inline-block;
+  margin-bottom: 7px;
+  color: #414861;
+  font-size: 0.9rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.form-control,
+.pf-c-form-control,
+#kc-form-login input[type="text"],
+#kc-form-login input[type="email"],
+#kc-form-login input[type="password"],
+#kc-register-form input,
+#kc-register-form select {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 13px !important;
+  background: #fff !important;
+  border: 1.5px solid #dfe3ed !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  color: #22243a;
+  font-size: 1rem;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.form-control:hover,
+.pf-c-form-control:hover {
+  border-color: #c9c2ed !important;
+}
+
+.form-control:focus,
+.pf-c-form-control:focus {
+  border-color: var(--myb-primary) !important;
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--myb-ring) !important;
+}
+
+.input-group,
+.pf-c-input-group {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.input-group .form-control,
+.pf-c-input-group .pf-c-form-control {
+  flex: 1 1 auto;
+  width: 1%;
+  border-right: 0 !important;
+  border-radius: 10px 0 0 10px !important;
+}
+
+.input-group .btn,
+.input-group .pf-c-button,
+.pf-c-input-group .pf-c-button {
+  display: inline-flex;
+  flex: 0 0 48px;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 !important;
+  background: #fff !important;
+  border: 1.5px solid #dfe3ed !important;
+  border-left: 0 !important;
+  border-radius: 0 10px 10px 0 !important;
+  color: #4b5563 !important;
+  box-shadow: none !important;
+}
+
+.input-group:focus-within .btn,
+.input-group:focus-within .pf-c-button,
+.pf-c-input-group:focus-within .pf-c-button {
+  border-color: var(--myb-primary) !important;
+}
+
+#kc-form-options,
+.login-pf-settings {
+  margin: 2px 0 15px;
+}
+
+.login-pf-settings {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.login-pf-settings #kc-form-options {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.login-pf-settings > [class*="col-"] {
+  float: none;
+  width: auto;
+  margin-left: auto;
+  padding: 0;
+}
+
+#kc-form-options .checkbox,
+#kc-form-options .checkbox label,
+.pf-c-check__label {
+  color: var(--myb-muted);
+  font-weight: 500;
+}
+
+#kc-form-buttons {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.btn-primary,
+#kc-login,
+#kc-register,
+input#kc-login,
+input#kc-register,
+.pf-c-button.pf-m-primary {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 18px !important;
+  background: linear-gradient(
+    135deg,
+    var(--myb-primary),
+    var(--myb-primary-strong)
+  ) !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 22px rgba(124, 58, 237, 0.27) !important;
+  color: #fff !important;
+  font-size: 0.98rem;
+  font-weight: 700 !important;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.btn-primary:hover,
+#kc-login:hover,
+#kc-register:hover,
+.pf-c-button.pf-m-primary:hover {
+  filter: saturate(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 11px 26px rgba(124, 58, 237, 0.34) !important;
+}
+
+.btn-primary:focus-visible,
+.pf-c-button.pf-m-primary:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--myb-ring);
+  outline-offset: 3px;
+}
+
+a {
+  color: var(--myb-primary);
+  font-weight: 550;
+}
+
+a:hover {
+  color: var(--myb-primary-strong);
+}
+
+#kc-info {
+  width: 100%;
+  margin: 2px 0 0;
+}
+
+#kc-info-wrapper,
+.login-pf-signup {
+  margin: 0;
+  padding: 18px 0 0;
+  background: transparent !important;
+  border-top: 1px solid var(--myb-border);
+  color: var(--myb-muted);
+  text-align: center;
+}
+
+#kc-registration {
+  margin: 0;
+}
+
+#kc-registration span {
+  color: var(--myb-muted);
+}
+
+#kc-social-providers {
+  display: none !important;
+}
+
+.alert,
+.pf-c-alert {
+  border-radius: 10px;
+}
+
+@media (max-width: 800px) {
+  .login-pf-page {
+    justify-content: flex-start;
+    padding: 24px 16px;
+  }
+
+  #kc-header {
+    margin-bottom: 16px;
+  }
+
+  #kc-header-wrapper {
+    font-size: 1.75rem !important;
+  }
+
+  .login-pf-page .card-pf {
+    width: 100%;
+    max-width: 560px;
+    padding: 28px 28px 26px !important;
+    border-top: 4px solid var(--myb-primary) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 16px 42px rgba(79, 70, 229, 0.13) !important;
+  }
+
+  #kc-content-wrapper {
+    display: block;
+  }
+
+  #kc-content-wrapper::before {
+    display: none;
+  }
+
+  #kc-form,
+  #kc-info {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-pf-page {
+    padding: 18px 12px;
+  }
+
+  #kc-header-wrapper {
+    font-size: 1.55rem !important;
+  }
+
+  .login-pf-page .card-pf {
+    padding: 22px 18px 20px !important;
+    border-radius: 14px !important;
+  }
+
+  #kc-page-title {
+    margin-bottom: 20px !important;
+    font-size: 1.55rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

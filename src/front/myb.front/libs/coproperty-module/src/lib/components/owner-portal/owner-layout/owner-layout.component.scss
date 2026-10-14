@@ -101,6 +101,12 @@
         background: rgba(102, 126, 234, 0.08);
         color: #667eea;
       }
+
+      &.disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+        pointer-events: none;
+      }
     }
   }
   
@@ -312,6 +318,12 @@
     &.active {
       background: rgba(102, 126, 234, 0.08);
       color: #667eea;
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      pointer-events: none;
     }
   }
 }

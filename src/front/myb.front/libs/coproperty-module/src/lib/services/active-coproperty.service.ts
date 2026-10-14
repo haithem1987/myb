@@ -18,6 +18,14 @@ export class ActiveCopropertyService {
   readonly activeId = this.selectedId.asReadonly();
   readonly activeCoproperty = this.selectedCoproperty.asReadonly();
 
+  /** Builds a canonical, coproperty-scoped route for owner and syndic spaces. */
+  route(space: 'owner' | 'syndic', ...segments: string[]): string[] {
+    const copropertyId = this.selectedId();
+    return copropertyId
+      ? ['/coproperty', copropertyId, space, ...segments]
+      : ['/coproperty', 'select'];
+  }
+
   selectAvailable<T extends SelectableCoproperty>(
     coproperties: readonly T[],
     requestedId?: string | null

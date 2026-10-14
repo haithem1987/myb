@@ -71,6 +71,10 @@ export class SyndicDashboardComponent implements OnInit {
   formatAmount(amount: number, currency?: string): string {
     return this.currencyService.formatAmount(amount, currency);
   }
+
+  syndicRoute(...segments: string[]): string[] {
+    return this.activeCoproperty.route('syndic', ...segments);
+  }
   
   private loadDashboardData(): void {
     this.loading.set(true);

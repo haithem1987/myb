@@ -11,7 +11,7 @@
       <button
         *ngIf="activeSection() === 'budget-lines'"
         class="btn btn-primary btn-violet"
-        routerLink="/coproperty/syndic/budgets/new"
+        [routerLink]="syndicRoute('budgets', 'new')"
         [queryParams]="{ copropertyId: selectedCopropertyId() }"
         [disabled]="!isSelectedCopropertyActive()">
         <i class="bi bi-plus-circle me-2"></i>
@@ -56,7 +56,7 @@
             id="typeFilter" 
             class="form-select"
             [value]="filterType()"
-            (change)="filterType.set($any($event.target).value)">
+            (change)="setFilterType($any($event.target).value)">
             <option value="">{{ 'coproperty.charge.allTypes' | translate }}</option>
             <option *ngFor="let type of chargeTypes" [value]="type">
               {{ getChargeTypeTranslationKey(type) | translate }}
@@ -73,9 +73,9 @@
           <select 
             id="frequencyFilter" 
             class="form-select"
-            (change)="filterFrequency.set($any($event.target).value)">
+            (change)="setFilterFrequency($any($event.target).value)">
             <option value="" [selected]="filterFrequency() === ''">{{ 'coproperty.charge.allYears' | translate }}</option>
-            <option *ngFor="let freq of frequencies" [value]="freq" [selected]="filterFrequency() === freq">
+            <option *ngFor="let freq of frequencies()" [value]="freq" [selected]="filterFrequency() === freq">
               {{ freq }}
             </option>
           </select>
@@ -93,7 +93,7 @@
             class="form-control"
             [placeholder]="'common.searchPlaceholder' | translate"
             [value]="searchTerm()"
-            (input)="searchTerm.set($any($event.target).value)">
+            (input)="setSearchTerm($any($event.target).value)">
           </div>
         </div>
       </div>
@@ -110,7 +110,7 @@
               </div>
               <div class="ms-3">
                 <h6 class="text-muted mb-0">{{ 'coproperty.charge.totalBudgets' | translate }}</h6>
-                <h3 class="mb-0">{{ getTotalBudgetDisplay() }}</h3>
+                <h3 class="mb-0">{{ totalBudgetDisplay() }}</h3>
               </div>
             </div>
           </div>
@@ -125,7 +125,7 @@
               </div>
               <div class="ms-3">
                 <h6 class="text-muted mb-0">{{ 'coproperty.charge.activeBudgets' | translate }}</h6>
-                <h3 class="mb-0">{{ getActiveChargesCount() }}</h3>
+                <h3 class="mb-0">{{ activeChargesCount() }}</h3>
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@
       <div class="card-header">
         <h5 class="mb-0">
           <i class="bi bi-list-ul me-2"></i>
-          {{ 'coproperty.charge.budgetList' | translate }} ({{ filteredCharges.length }})
+          {{ 'coproperty.charge.budgetList' | translate }} ({{ filteredCharges().length }})
         </h5>
       </div>
       <div class="card-body">
@@ -149,14 +149,14 @@
         </div>
 
         <myb-front-no-result
-          *ngIf="!loading() && filteredCharges.length === 0"
+          *ngIf="!loading() && filteredCharges().length === 0"
           icon="bi-wallet2"
           [compact]="true"
           [title]="'coproperty.charge.noChargesFound' | translate"
           [message]="'coproperty.charge.noChargesMessage' | translate">
         </myb-front-no-result>
 
-        <div *ngIf="!loading() && filteredCharges.length > 0" class="table-responsive">
+        <div *ngIf="!loading() && filteredCharges().length > 0" class="table-responsive">
           <table class="table table-hover">
             <thead>
               <tr>
@@ -171,7 +171,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let charge of filteredCharges">
+              <tr *ngFor="let charge of pagedCharges(); trackBy: trackByChargeId">
                 <td>
                   <strong>{{ getCopropertyName(charge) }}</strong>
                 </td>
@@ -209,10 +209,7 @@
                       <i class="bi bi-three-dots-vertical"></i>
                     </button>
                     <div ngbDropdownMenu>
-                      <button ngbDropdownItem (click)="viewCharge(charge)">
-                        <i class="bi bi-eye me-2"></i>{{ 'common.viewAction' | translate }}
-                      </button>
-                      <button ngbDropdownItem [routerLink]="['/coproperty/syndic/budgets', charge.id, 'edit']" [disabled]="!isSelectedCopropertyActive()">
+                      <button ngbDropdownItem [routerLink]="syndicRoute('budgets', charge.id, 'edit')" [disabled]="!isSelectedCopropertyActive()">
                         <i class="bi bi-pencil me-2"></i>{{ 'common.editAction' | translate }}
                       </button>
                       <div class="dropdown-divider"></div>
@@ -226,11 +223,25 @@
             </tbody>
           </table>
         </div>
+
+        <div *ngIf="!loading() && filteredCharges().length > pageSize" class="d-flex justify-content-end mt-3">
+          <ngb-pagination
+            [collectionSize]="filteredCharges().length"
+            [pageSize]="pageSize"
+            [page]="page()"
+            [maxSize]="5"
+            [boundaryLinks]="true"
+            size="sm"
+            (pageChange)="page.set($event)">
+          </ngb-pagination>
+        </div>
       </div>
     </div>
   </ng-container>
 
   <ng-container *ngIf="activeSection() === 'allocation'">
-    <myb-charge-distribution></myb-charge-distribution>
+    @defer (on immediate) {
+      <myb-charge-distribution></myb-charge-distribution>
+    }
   </ng-container>
 </div>

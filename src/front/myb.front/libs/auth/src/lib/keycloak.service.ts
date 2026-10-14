@@ -298,7 +298,7 @@ export class KeycloakService {
     if (typeof window === 'undefined') {
       return false;
     }
-    return window.location.pathname.startsWith('/coproperty/syndic');
+    return /\/coproperty\/(?:[^/]+\/)?syndic(?:\/|$)/.test(window.location.pathname);
   }
 
   /**

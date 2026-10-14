@@ -208,6 +208,10 @@ export class SyndicLayoutComponent implements OnInit {
     }
   }
 
+  syndicRoute(segment: string): string[] {
+    return this.activeCoproperty.route('syndic', segment);
+  }
+
   switchToOwnerSpace(): void {
     this.router.navigate(['/coproperty/select'], { queryParams: { space: 'owner' } });
   }

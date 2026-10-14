@@ -191,9 +191,7 @@ export class CopropertySelectComponent {
   }
 
   private navigateToTargetDashboard(): void {
-    const path = this.targetSpace() === 'owner'
-      ? ['/coproperty/owner/dashboard']
-      : ['/coproperty/syndic/dashboard'];
+    const path = this.activeCoproperty.route(this.targetSpace(), 'dashboard');
     this.router.navigate(path);
   }
 }

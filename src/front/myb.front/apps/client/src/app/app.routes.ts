@@ -1,16 +1,12 @@
 import { Route } from '@angular/router';
 import { authGuard } from 'libs/auth/src/lib/auth.guard';
-import { noProfileGuard, completeProfileGuard } from 'libs/coproperty-module/src/lib/guards/profile.guard';
+import { completeProfileGuard, keycloakRegistrationGuard } from 'libs/coproperty-module/src/lib/guards/profile.guard';
 export const appRoutes: Route[] = [
-  // {
-  //   path: 'home',
-  //   canActivate: [authGuard],
-  //   component: LandingPageComponent,
-  // },
   {
     path: '',
+    title: 'MYB | Gestion de copropriété',
     loadComponent: () =>
-      import('@myb-front/shared-ui').then((c) => c.LandingPageComponent),
+      import('@myb-front/shared-ui').then((c) => c.HomePageComponent),
   },
 
   // ─── Owner Self-Registration Flow ───────────────────────────────────────────
@@ -19,11 +15,9 @@ export const appRoutes: Route[] = [
     children: [
       {
         path: '',
-        canActivate: [noProfileGuard],
-        loadComponent: () =>
-          import('@myb-front/coproperty-module').then(
-            (m) => m.OwnerRegistrationComponent
-          ),
+        pathMatch: 'full',
+        canActivate: [keycloakRegistrationGuard],
+        children: [],
       },
       {
         path: 'complete-profile',
@@ -128,6 +122,12 @@ export const appRoutes: Route[] = [
     path: 'privacy',
     loadComponent: () =>
       import('@myb-front/shared-ui').then((c) => c.PrivacyPageComponent),
+  },
+  {
+    path: 'docs',
+    title: 'Documentation MYB',
+    loadComponent: () =>
+      import('@myb-front/shared-ui').then((c) => c.DocsPageComponent),
   },
   // {
     // path:'folder/:id' , component:FolderDetailsComponent

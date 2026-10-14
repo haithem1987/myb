@@ -54,6 +54,10 @@ export class OwnerChargesComponent implements OnInit {
   private activeCoproperty = inject(ActiveCopropertyService);
   private requestedPaymentHandled = false;
 
+  ownerRoute(...segments: string[]): string[] {
+    return this.activeCoproperty.route('owner', ...segments);
+  }
+
   fundCalls = signal<FundCallExtended[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);

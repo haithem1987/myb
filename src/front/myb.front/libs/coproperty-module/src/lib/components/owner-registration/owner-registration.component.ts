@@ -20,17 +20,15 @@ export class OwnerRegistrationComponent implements OnInit {
     // If already authenticated, skip registration page
     if (this.keycloakService.isAuthenticated()) {
       this.router.navigate(['/register/complete-profile']);
+      return;
     }
+
+    // Skip the intermediate provider choice screen and go directly to Keycloak registration.
+    this.registerWithEmail();
   }
 
   registerWithEmail(): void {
     this.keycloakService.registerWithRedirect(
-      `${window.location.origin}/register/complete-profile`
-    );
-  }
-
-  continueWithGoogle(): void {
-    this.keycloakService.loginWithGoogle(
       `${window.location.origin}/register/complete-profile`
     );
   }

@@ -75,6 +75,8 @@ export * from './lib/components/profile-page/profile-page.component';
 export * from './lib/static-pages/contact-page.component';
 export * from './lib/static-pages/terms-page.component';
 export * from './lib/static-pages/privacy-page.component';
+export * from './lib/static-pages/docs-page.component';
+export * from './lib/home/home-page.component';
 
 export * from './lib/components/notification-dropdown/notification-dropdown.component';
 

@@ -520,7 +520,7 @@
           <button type="button" class="btn btn-outline-secondary" (click)="closePaymentModal()">
             <i class="bi bi-x-circle me-1"></i>{{ 'ownerFixes.close' | translate }}
           </button>
-          <a routerLink="/coproperty/owner/invoices" class="btn btn-primary" (click)="closePaymentModal()">
+          <a [routerLink]="ownerRoute('invoices')" class="btn btn-primary" (click)="closePaymentModal()">
             <i class="bi bi-receipt me-1"></i>{{ 'ownerFixes.myReceipts' | translate }}
           </a>
         </div>

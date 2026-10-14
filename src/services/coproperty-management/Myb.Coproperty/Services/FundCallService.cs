@@ -1055,7 +1055,7 @@ public class FundCallService : IFundCallService
                 : $"Reste à payer : {FormatAmount(remainingAfterPayment, coproperty.Currency)}";
             var statusColor = isPaidInFull ? "#16a34a" : "#d97706";
             var statusBg = isPaidInFull ? "#dcfce7" : "#fef3c7";
-            var fundCallUrl = $"{_frontendUrl}/admin/coproperty/syndic/fund-calls";
+            var fundCallUrl = $"{_frontendUrl}/admin/coproperty/{coproperty.Id}/syndic/fund-calls";
             var paymentReference = string.IsNullOrWhiteSpace(justificatif)
                 ? "-"
                 : justificatif;
@@ -1464,8 +1464,12 @@ public class FundCallService : IFundCallService
             return;
         }
 
-        var fundCallUrl = $"{_frontendUrl}/coproperty/owner/charges";
         var english = await _keycloakAdminService.GetPreferredLanguageAsync(owner.UserId.ToString()) == "en";
+        var coproperty = await context.Coproperties.FindAsync(copropertyId);
+        var copropertyName = string.IsNullOrWhiteSpace(coproperty?.Name)
+            ? (english ? "Coproperty" : "Copropriété")
+            : coproperty.Name;
+        var fundCallUrl = $"{_frontendUrl}/coproperty/{copropertyId}/owner/charges";
         if (!string.IsNullOrWhiteSpace(owner.Email))
         {
             try
@@ -1473,15 +1477,18 @@ public class FundCallService : IFundCallService
                 await _emailPublisher.PublishAsync(new EmailMessage
                 {
                     To = owner.Email,
-                    Subject = english ? "New call for funds" : $"Nouvel appel de fonds – {description}",
+                    Subject = english
+                        ? $"New call for funds – {copropertyName} – {description}"
+                        : $"Nouvel appel de fonds – {copropertyName} – {description}",
                     Language = english ? "en" : "fr",
                     HtmlBody = english ? $"""
                 <html><body style="font-family:Arial,sans-serif;color:#333">
-                  <h2 style="color:#2c5282">New call for funds</h2>
+                  <h2 style="color:#2c5282">New call for funds – {copropertyName}</h2>
                   <p>Hello {owner.FirstName} {owner.LastName},</p>
                   <p>A new call for funds has been issued for your coproperty.</p>
                   <table style="border-collapse:collapse;margin:16px 0">
                     <tr><td style="padding:4px 12px 4px 0"><strong>Description:</strong></td><td>{description}</td></tr>
+                    <tr><td style="padding:4px 12px 4px 0"><strong>Coproperty:</strong></td><td>{copropertyName}</td></tr>
                     <tr><td style="padding:4px 12px 4px 0"><strong>Amount:</strong></td><td>{FormatAmount(amount, currency)}</td></tr>
                     <tr><td style="padding:4px 12px 4px 0"><strong>Due date:</strong></td><td>{dueDate:dd/MM/yyyy}</td></tr>
                   </table>
@@ -1490,11 +1497,12 @@ public class FundCallService : IFundCallService
                 </body></html>
                 """ : $"""
                 <html><body style="font-family:Arial,sans-serif;color:#333">
-                  <h2 style="color:#2c5282">Nouvel appel de fonds</h2>
+                  <h2 style="color:#2c5282">Nouvel appel de fonds – {copropertyName}</h2>
                   <p>Bonjour {owner.FirstName} {owner.LastName},</p>
                   <p>Un nouvel appel de fonds a été émis pour votre copropriété.</p>
                   <table style="border-collapse:collapse;margin:16px 0">
                     <tr><td style="padding:4px 12px 4px 0"><strong>Description :</strong></td><td>{description}</td></tr>
+                    <tr><td style="padding:4px 12px 4px 0"><strong>Copropriété :</strong></td><td>{copropertyName}</td></tr>
                     <tr><td style="padding:4px 12px 4px 0"><strong>Montant :</strong></td><td>{FormatAmount(amount, currency)}</td></tr>
                     <tr><td style="padding:4px 12px 4px 0"><strong>Date d'échéance :</strong></td><td>{dueDate:dd/MM/yyyy}</td></tr>
                   </table>
@@ -1609,23 +1617,30 @@ public class FundCallService : IFundCallService
         var owner = await context.Owners.FindAsync(ownerId.Value);
         if (owner == null) return;
 
-        var fundCallUrl = $"{_frontendUrl}/coproperty/owner/charges";
+        var coproperty = await context.Coproperties.FindAsync(copropertyId);
         var english = await _keycloakAdminService.GetPreferredLanguageAsync(owner.UserId.ToString()) == "en";
+        var copropertyName = coproperty?.Name ?? (english ? "Coproperty" : "Copropriété");
+        var ownerDestination = approved ? "invoices" : "charges";
+        var fundCallUrl = $"{_frontendUrl}/coproperty/{copropertyId}/owner/{ownerDestination}";
         string subject, statusBanner, bodyContent;
 
         if (approved)
         {
-            subject = english ? "Payment approved – Call for funds" : $"Paiement validé – {description}";
+            subject = english
+                ? $"Payment approved – {copropertyName} – {description}"
+                : $"Paiement validé – {copropertyName} – {description}";
             statusBanner = english
                 ? """<td style="background:#22c55e;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">✅ Your payment was approved</p></td>"""
                 : """<td style="background:#22c55e;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">✅ Votre paiement a été validé</p></td>""";
             bodyContent = english
-                ? $"""<p>Your payment of <strong>{FormatAmount(amount, currency)}</strong> for your call for funds was <strong style="color:#16a34a">approved</strong> by your property manager.</p>"""
-                : $"""<p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#16a34a">validé</strong> par le syndic.</p>""";
+                ? $"""<p>Your payment of <strong>{FormatAmount(amount, currency)}</strong> for your call for funds was <strong style="color:#16a34a">approved</strong> by your property manager.</p><p>Your invoice is now available in <strong>My Receipts</strong>.</p>"""
+                : $"""<p>Votre paiement de <strong>{FormatAmount(amount, currency)}</strong> pour l'appel de fonds <strong>{description}</strong> a été <strong style="color:#16a34a">validé</strong> par le syndic.</p><p>Votre facture est désormais disponible dans <strong>Mes reçus</strong>.</p>""";
         }
         else
         {
-            subject = english ? "Payment rejected – Call for funds" : $"Paiement refusé – {description}";
+            subject = english
+                ? $"Payment rejected – {copropertyName} – {description}"
+                : $"Paiement refusé – {copropertyName} – {description}";
             statusBanner = english
                 ? """<td style="background:#ef4444;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">❌ Your payment was rejected</p></td>"""
                 : """<td style="background:#ef4444;padding:14px 40px;text-align:center;"><p style="color:#fff;margin:0;font-size:18px;font-weight:700;">❌ Votre paiement a été refusé</p></td>""";
@@ -1655,9 +1670,10 @@ public class FundCallService : IFundCallService
                     <tr>{statusBanner}</tr>
                     <tr><td style="padding:32px 40px;">
                       <p>{(english ? "Hello" : "Bonjour")} {owner.FirstName} {owner.LastName},</p>
+                      <p><strong>{(english ? "Coproperty" : "Copropriété")}:</strong> {copropertyName}</p>
                       {bodyContent}
                       <p style="margin:24px 0">
-                        <a href="{fundCallUrl}" style="background:#2c5282;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">{(english ? "View my calls for funds" : "Voir mes appels de fonds")}</a>
+                        <a href="{fundCallUrl}" style="background:#2c5282;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">{(approved ? (english ? "View My Receipts" : "Voir Mes reçus") : (english ? "View my calls for funds" : "Voir mes appels de fonds"))}</a>
                       </p>
                     </td></tr>
                     <tr><td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 40px;text-align:center;">

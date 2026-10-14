@@ -31,8 +31,8 @@ export const profileGuard: CanActivateFn = async (_route, _state) => {
   const isAuthenticated = keycloakService.isAuthenticated();
 
   if (!isAuthenticated) {
-    // Redirect to registration page — user can log in from there via the login link
-    return router.createUrlTree(['/register']);
+    keycloakService.login(window.location.href);
+    return false;
   }
 
   const userId = keycloakService.getUserId();
@@ -72,8 +72,8 @@ export const completeProfileGuard: CanActivateFn = async () => {
 
   const isAuthenticated = keycloakService.isAuthenticated();
   if (!isAuthenticated) {
-    // Send back to registration page — let the user pick Email or Google
-    return router.createUrlTree(['/register']);
+    keycloakService.login(`${window.location.origin}/register/complete-profile`);
+    return false;
   }
 
   // Already authenticated — check if profile exists
@@ -91,6 +91,25 @@ export const completeProfileGuard: CanActivateFn = async () => {
   } catch {
     return true; // error fetching → let user complete profile
   }
+};
+
+/**
+ * The public /register URL is kept only as a compatibility entry point.
+ * It never renders an intermediate MYB page: visitors are sent directly to
+ * Keycloak registration, while authenticated users continue profile setup.
+ */
+export const keycloakRegistrationGuard: CanActivateFn = () => {
+  const keycloakService = inject(KeycloakService);
+  const router = inject(Router);
+
+  if (keycloakService.isAuthenticated()) {
+    return router.createUrlTree(['/register/complete-profile']);
+  }
+
+  keycloakService.registerWithRedirect(
+    `${window.location.origin}/register/complete-profile`
+  );
+  return false;
 };
 
 /**

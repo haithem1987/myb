@@ -18,8 +18,10 @@ nupkg/
 !docs/*.md
 !docs/**/*.md
 
-# Visual Studio Code
-.vscode
+# Visual Studio Code (personal settings stay local; shared debug setup is versioned)
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
 
 # Rider
 .idea
@@ -51,3 +53,8 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+
+.env.test
+
+# Local Web Push test keys (scripts/push-local.sh)
+.env.push.local

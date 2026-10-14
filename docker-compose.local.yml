@@ -1,0 +1,66 @@
+# Full local stack on a developer machine (backend + both front-ends in Docker).
+#
+#   bash scripts/push-local.sh up        # builds the fronts, starts everything, sets up Keycloak
+#
+#   Owner space  (client app): http://localhost:4200
+#   Syndic space (admin app):  http://localhost:4201
+#
+# The fronts are the "pushdev" builds (localhost URLs, service worker on) produced by
+# `nx build <app> --configuration=pushdev --output-path=dist/local/<app>`, served by nginx.
+# Never use this file outside a developer machine. See docs/LOCAL_DOCKER_STACK.md.
+
+services:
+  # myb-payment has no database in docker-compose.yml and crashes on localhost:5432.
+  paymentDB:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD:-payment-pwd}
+      POSTGRES_DB: ${PAYMENT_DB_NAME:-paymentDB}
+      POSTGRES_USER: ${PAYMENT_DB_USER:-postgres}
+      PGDATA: /var/lib/postgresql/payment/data
+    ports:
+      - "5437:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres_payment_data:/var/lib/postgresql/payment/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PAYMENT_DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  myb-payment:
+    depends_on:
+      paymentDB:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__PaymentDBConnection=Host=paymentDB;Port=5432;Database=${PAYMENT_DB_NAME:-paymentDB};Username=${PAYMENT_DB_USER:-postgres};Password=${PAYMENT_DB_PASSWORD:-payment-pwd}
+
+  # The production front image (myb-front) serves only the admin app. Locally both apps run,
+  # on the ports the Keycloak client and the dev environments expect.
+  myb-client-local:
+    image: nginx:1.27-alpine
+    ports:
+      - "4200:80"
+    volumes:
+      - ./src/front/myb.front/dist/local/client:/usr/share/nginx/html:ro
+      - ./docker/local/nginx-client.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - my-network
+    restart: unless-stopped
+
+  myb-admin-local:
+    image: nginx:1.27-alpine
+    ports:
+      - "4201:80"
+    volumes:
+      - ./src/front/myb.front/dist/local/admin:/usr/share/nginx/html:ro
+      - ./docker/local/nginx-admin.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - my-network
+    restart: unless-stopped
+
+volumes:
+  postgres_payment_data:

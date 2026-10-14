@@ -1,0 +1,55 @@
+@if (mode === 'banner') {
+  @if (showBanner) {
+    <div class="push-banner" role="region" [attr.aria-label]="'notificationUi.push.bannerTitle' | translate">
+      <i class="bi bi-bell push-banner-icon" aria-hidden="true"></i>
+      <div class="push-banner-text">
+        @if (state() === 'ios-install-required') {
+          <strong>{{ 'notificationUi.push.iosInstallTitle' | translate }}</strong>
+          <span>{{ 'notificationUi.push.iosInstallText' | translate }}</span>
+        } @else {
+          <strong>{{ 'notificationUi.push.bannerTitle' | translate }}</strong>
+          <span>{{ 'notificationUi.push.bannerText' | translate }}</span>
+        }
+        @if (error()) {
+          <span class="push-error">{{ 'notificationUi.push.error' | translate }}</span>
+        }
+      </div>
+      <div class="push-banner-actions">
+        @if (state() === 'available') {
+          <button type="button" class="btn btn-primary btn-sm" [disabled]="busy()" (click)="enable()">
+            @if (busy()) { <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span> }
+            {{ 'notificationUi.push.enable' | translate }}
+          </button>
+        }
+        <button type="button" class="btn btn-link btn-sm" (click)="dismiss()">
+          {{ 'notificationUi.push.later' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+} @else {
+  <div class="push-setting">
+    <div class="push-setting-text">
+      <strong><i class="bi bi-bell me-2" aria-hidden="true"></i>{{ 'notificationUi.push.settingTitle' | translate }}</strong>
+      <span>{{ 'notificationUi.push.settingText' | translate }}</span>
+      @switch (state()) {
+        @case ('enabled') { <span class="push-status ok"><i class="bi bi-check-circle me-1"></i>{{ 'notificationUi.push.enabled' | translate }}</span> }
+        @case ('denied') { <span class="push-status warn">{{ 'notificationUi.push.denied' | translate }}</span> }
+        @case ('unsupported') { <span class="push-status muted">{{ 'notificationUi.push.unsupported' | translate }}</span> }
+        @case ('ios-install-required') { <span class="push-status muted">{{ 'notificationUi.push.iosInstallText' | translate }}</span> }
+      }
+      @if (error()) {
+        <span class="push-error">{{ 'notificationUi.push.error' | translate }}</span>
+      }
+    </div>
+    @if (state() === 'available') {
+      <button type="button" class="btn btn-primary btn-sm" [disabled]="busy()" (click)="enable()">
+        {{ 'notificationUi.push.enable' | translate }}
+      </button>
+    } @else if (state() === 'enabled') {
+      <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="busy()" (click)="disable()">
+        {{ 'notificationUi.push.disable' | translate }}
+      </button>
+    }
+  </div>
+}

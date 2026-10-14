@@ -2,7 +2,7 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
-import { ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, NotificationService, UserDropdownComponent } from '@myb-front/shared-ui';
+import { ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, NotificationService, UserDropdownComponent, PushOptInComponent } from '@myb-front/shared-ui';
 import {
   ChargeService,
   CopropertyService,
@@ -25,7 +25,7 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'myb-coproperty-syndic-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, UserDropdownComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ToastsContainerComponent, ModalContainerComponent, NotificationDropdownComponent, UserDropdownComponent, PushOptInComponent],
   templateUrl: './syndic-layout.component.html',
   styleUrls: ['./syndic-layout.component.scss']
 })

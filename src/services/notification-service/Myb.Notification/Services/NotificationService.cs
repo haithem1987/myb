@@ -11,19 +11,33 @@ public class NotificationService : INotificationService
     private readonly IDbContextFactory<NotificationContext> _contextFactory;
     private readonly IHubContext<NotificationHub> _hubContext;
     private readonly IEmailPublisher _emailPublisher;
+    private readonly IPushQueue _pushQueue;
+
+    public const string DefaultPushUrl = "/coproperty/select";
+    public const string PushTitle = "MYB";
 
     public NotificationService(
         IDbContextFactory<NotificationContext> contextFactory,
         IHubContext<NotificationHub> hubContext,
-        IEmailPublisher emailPublisher)
+        IEmailPublisher emailPublisher,
+        IPushQueue pushQueue)
     {
         _contextFactory = contextFactory;
         _hubContext = hubContext;
         _emailPublisher = emailPublisher;
+        _pushQueue = pushQueue;
     }
 
+    /// <summary>Only same-origin absolute paths are allowed, so a notification can never send
+    /// the user to another site.</summary>
+    public static string NormalizePushUrl(string? url) =>
+        !string.IsNullOrWhiteSpace(url) && url.StartsWith('/') && !url.StartsWith("//") && !url.Contains('\\')
+            ? url
+            : DefaultPushUrl;
+
     public async Task SendNotificationAsync(
-        string senderId, string receiverId, string message, string? copropertyId = null)
+        string senderId, string receiverId, string message, string? copropertyId = null,
+        bool push = false, string? url = null, PushUrgency urgency = PushUrgency.Normal)
     {
         var notification = new Models.Notification
         {
@@ -46,6 +60,13 @@ public class NotificationService : INotificationService
         {
             Console.WriteLine(e);
             throw new InvalidOperationException("Failed to send notification.");
+        }
+
+        if (push)
+        {
+            _pushQueue.Enqueue(new PushJob(
+                receiverId, notification.Id, PushTitle, message, NormalizePushUrl(url),
+                notification.CopropertyId, urgency));
         }
     }
 
@@ -75,16 +96,16 @@ public class NotificationService : INotificationService
         });
     }
 
-    public async Task MarkAsReadAsync(string notificationId)
+    public async Task<bool> MarkAsReadAsync(string notificationId, string? receiverId)
     {
         using var context = _contextFactory.CreateDbContext();
         var notification = await context.Set<Models.Notification>().FindAsync(notificationId);
-        if (notification != null)
-        {
-            notification.IsRead = true;
-            notification.UpdatedAt = DateTime.UtcNow;
-            await context.SaveChangesAsync();
-        }
+        if (notification == null || (receiverId != null && notification.ReceiverId != receiverId))
+            return false;
+        notification.IsRead = true;
+        notification.UpdatedAt = DateTime.UtcNow;
+        await context.SaveChangesAsync();
+        return true;
     }
 
     public async Task MarkAllAsReadAsync(string userId, string? copropertyId = null)

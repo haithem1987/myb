@@ -155,7 +155,8 @@ public class FundCallService : IFundCallService
     private readonly IKeycloakAdminService _keycloakAdminService;
     private readonly string _frontendUrl;
 
-    private async Task NotifyOwnerDataChangedAsync(Guid? ownerId, Guid copropertyId, string message)
+    private async Task NotifyOwnerDataChangedAsync(
+        Guid? ownerId, Guid copropertyId, string message, string? urgency = null)
     {
         if (!ownerId.HasValue) return;
 
@@ -174,17 +175,19 @@ public class FundCallService : IFundCallService
             SenderId = SystemNotificationSenderId,
             ReceiverId = ownerUserId.Value.ToString(),
             CopropertyId = copropertyId.ToString(),
-            Message = message
+            Message = message,
+            Url = NotificationLinks.OwnerPage(copropertyId, "charges"),
+            Urgency = urgency
         });
         response.EnsureSuccessStatusCode();
     }
 
     private async Task BestEffortNotifyOwnerDataChangedAsync(
-        Guid? ownerId, Guid copropertyId, string message)
+        Guid? ownerId, Guid copropertyId, string message, string? urgency = null)
     {
         try
         {
-            await NotifyOwnerDataChangedAsync(ownerId, copropertyId, message);
+            await NotifyOwnerDataChangedAsync(ownerId, copropertyId, message, urgency);
         }
         catch (Exception ex)
         {
@@ -1305,7 +1308,8 @@ public class FundCallService : IFundCallService
                         senderId = owner.UserId.ToString(),
                         receiverId = syndicUserId.Value.ToString(),
                         copropertyId = coproperty.Id.ToString(),
-                        message = $"💰 Paiement reçu : {ownerName} a versé {FormatAmount(paymentAmount, coproperty.Currency)} ({paymentMethod ?? "Virement"}) pour \"{fundCallDescription ?? "Appel de fonds"}\". {statusText}"
+                        message = $"💰 Paiement reçu : {ownerName} a versé {FormatAmount(paymentAmount, coproperty.Currency)} ({paymentMethod ?? "Virement"}) pour \"{fundCallDescription ?? "Appel de fonds"}\". {statusText}",
+                        url = NotificationLinks.SyndicPage(coproperty.Id, "fund-calls")
                     };
                     var content = new System.Net.Http.StringContent(
                         System.Text.Json.JsonSerializer.Serialize(notificationPayload),
@@ -1527,7 +1531,8 @@ public class FundCallService : IFundCallService
             copropertyId,
             english
                 ? $"The call for funds “{description ?? "Call for funds"}” was updated."
-                : $"L'appel de fonds « {description ?? "Appel de fonds"} » a été mis à jour.");
+                : $"L'appel de fonds « {description ?? "Appel de fonds"} » a été mis à jour.",
+            NotificationLinks.HighUrgency);
     }
 
     /// <summary>
@@ -1706,7 +1711,9 @@ public class FundCallService : IFundCallService
             senderId = SystemNotificationSenderId,
             receiverId = owner.UserId.ToString(),
             copropertyId = copropertyId.ToString(),
-            message = $"Votre paiement de {FormatAmount(amount, currency)} pour « {description ?? "Appel de fonds"} » a été {decision}.{reason}"
+            message = $"Votre paiement de {FormatAmount(amount, currency)} pour « {description ?? "Appel de fonds"} » a été {decision}.{reason}",
+            url = NotificationLinks.OwnerPage(copropertyId, approved ? "invoices" : "charges"),
+            urgency = approved ? null : NotificationLinks.HighUrgency
         };
         using var content = new System.Net.Http.StringContent(
             System.Text.Json.JsonSerializer.Serialize(notificationPayload),

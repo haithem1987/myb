@@ -62,6 +62,27 @@ spec:
             configMapKeyRef:
               name: app-config
               key: FRONTEND_URL
+        # Backend client allowed to notify any user (same client as coproperty's service account)
+        - name: NotificationSecurity__TrustedServiceClients__0
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: KEYCLOAK_SERVICE_CLIENT_ID
+        # Web Push (VAPID). Push stays disabled until the push-vapid secret exists.
+        - name: Push__VapidPublicKey
+          valueFrom:
+            secretKeyRef:
+              name: push-vapid
+              key: PUSH_VAPID_PUBLIC_KEY
+              optional: true
+        - name: Push__VapidPrivateKey
+          valueFrom:
+            secretKeyRef:
+              name: push-vapid
+              key: PUSH_VAPID_PRIVATE_KEY
+              optional: true
+        - name: Push__Subject
+          value: "mailto:support@myb-platform.com"
         resources:
           requests:
             memory: "256Mi"

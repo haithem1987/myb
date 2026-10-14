@@ -368,6 +368,12 @@ services:
       - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-MYB-client}
       - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
       - RabbitMq__Host=rabbitmq
+      # Backend client allowed to notify any user (must match coproperty's Keycloak__ServiceClientId)
+      - NotificationSecurity__TrustedServiceClients__0=${KEYCLOAK_SERVICE_CLIENT_ID:-myb-backend}
+      # Web Push (VAPID). Generate once: npx web-push generate-vapid-keys. Empty = push disabled.
+      - Push__VapidPublicKey=${PUSH_VAPID_PUBLIC_KEY:-}
+      - Push__VapidPrivateKey=${PUSH_VAPID_PRIVATE_KEY:-}
+      - Push__Subject=${PUSH_VAPID_SUBJECT:-mailto:support@myb-platform.com}
     restart: on-failure
 
   # Service dédié envoi de mails (consomme la queue RabbitMQ)

@@ -1,0 +1,49 @@
+{
+  // Attach to .NET services running in Docker (Debug images from docker-compose.debug.yml).
+  // Start them first: task « Docker: backend debug » or `bash scripts/push-local.sh up --debug`.
+  // See docs/DEBUG_DOCKER_LOCAL.md.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Docker: attach notification",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "1",
+      "justMyCode": true,
+      "pipeTransport": {
+        "pipeProgram": "docker",
+        "pipeArgs": ["compose", "exec", "-T", "myb-notification"],
+        "pipeCwd": "${workspaceFolder}",
+        "debuggerPath": "/vsdbg/vsdbg",
+        "quoteArgs": false
+      },
+      // The image builds the sources under /src (see the Dockerfile's WORKDIR).
+      "sourceFileMap": {
+        "/src": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Docker: attach coproperty",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "1",
+      "justMyCode": true,
+      "pipeTransport": {
+        "pipeProgram": "docker",
+        "pipeArgs": ["compose", "exec", "-T", "myb-coproperty"],
+        "pipeCwd": "${workspaceFolder}",
+        "debuggerPath": "/vsdbg/vsdbg",
+        "quoteArgs": false
+      },
+      "sourceFileMap": {
+        "/src": "${workspaceFolder}"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Docker: attach notification + coproperty",
+      "configurations": ["Docker: attach notification", "Docker: attach coproperty"]
+    }
+  ]
+}

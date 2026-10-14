@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { KeycloakService } from '@myb-front/auth';
 import { OwnerService, InvoiceStatus, CopropertyService, CurrencyService, Currency } from '../../../index';
-import { ToastsContainerComponent, ModalContainerComponent, NotificationService, UserDropdownComponent } from '@myb-front/shared-ui';
+import { ToastsContainerComponent, ModalContainerComponent, NotificationService, UserDropdownComponent, PushOptInComponent } from '@myb-front/shared-ui';
 import { take, catchError } from 'rxjs/operators';
 import { forkJoin, of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
@@ -14,7 +14,7 @@ import { ActiveCopropertyService } from '../../../services/active-coproperty.ser
 @Component({
   selector: 'app-owner-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ToastsContainerComponent, ModalContainerComponent, UserDropdownComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ToastsContainerComponent, ModalContainerComponent, UserDropdownComponent, PushOptInComponent],
   templateUrl: './owner-layout.component.html',
   styleUrls: ['./owner-layout.component.scss']
 })

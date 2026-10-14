@@ -59,6 +59,7 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
             unitNumber,
             unit.Coproperty?.ManagerId,
             unit.CopropertyId,
+            NotificationLinks.OwnerSpaceSelection,
             cancellationToken);
 
         await SendToOwnerAsync(
@@ -71,6 +72,7 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
             unitNumber,
             unit.Coproperty?.ManagerId,
             unit.CopropertyId,
+            NotificationLinks.OwnerPage(unit.CopropertyId, "my-units"),
             cancellationToken);
     }
 
@@ -84,6 +86,7 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
         string unitNumber,
         Guid? managerId,
         Guid copropertyId,
+        string url,
         CancellationToken cancellationToken)
     {
         var english = await _keycloakAdminService.GetPreferredLanguageAsync(owner.UserId.ToString()) == "en";
@@ -130,7 +133,8 @@ public sealed class OwnershipNotificationService : IOwnershipNotificationService
                     SenderId = managerId?.ToString() ?? Guid.Empty.ToString(),
                     ReceiverId = owner.UserId.ToString(),
                     CopropertyId = copropertyId.ToString(),
-                    Message = message
+                    Message = message,
+                    Url = url
                 },
                 cancellationToken);
             response.EnsureSuccessStatusCode();

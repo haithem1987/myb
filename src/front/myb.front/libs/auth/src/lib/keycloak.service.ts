@@ -24,6 +24,7 @@ export class KeycloakService {
 
   private initialized = false;
   private preferredLanguageSync: Promise<void> = Promise.resolve();
+  private readonly beforeLogoutHandlers = new Set<(accessToken: string | null) => void>();
 
   constructor(private http: HttpClient, @Inject(ENVIRONMENT) private environment: any) {}
 
@@ -218,7 +219,25 @@ export class KeycloakService {
     return this.keycloak?.authenticated ? this.keycloak.tokenParsed?.sub ?? null : null;
   }
 
+  /**
+   * Registers a synchronous callback run just before logout, while the access token is still
+   * available (e.g. to fire a keepalive request that detaches this device from the account).
+   * Returns a function that unregisters the callback.
+   */
+  onBeforeLogout(handler: (accessToken: string | null) => void): () => void {
+    this.beforeLogoutHandlers.add(handler);
+    return () => this.beforeLogoutHandlers.delete(handler);
+  }
+
   logout(redirectUri?: string): void {
+    const accessToken = this.keycloak?.token ?? null;
+    this.beforeLogoutHandlers.forEach(handler => {
+      try {
+        handler(accessToken);
+      } catch (error) {
+        console.warn('Before-logout handler failed', error);
+      }
+    });
     const target = redirectUri ?? window.location.origin;
     // Build the RP-initiated logout URL while the ID token is still available,
     // then clear all local authentication state before leaving this app. This

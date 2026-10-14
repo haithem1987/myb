@@ -38,6 +38,20 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "Myb.Coproperty.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+# Local debugging only (docker-compose.debug.yml builds with BUILD_CONFIGURATION=Debug and
+# target=debug): same app plus the vsdbg debugger, so VS Code / Visual Studio can attach.
+# Never built for production: the default target is "final" below.
+FROM base AS debug
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl unzip procps \
+    && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg \
+    && apt-get purge -y curl unzip && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+USER $APP_UID
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Myb.Coproperty.dll"]
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .

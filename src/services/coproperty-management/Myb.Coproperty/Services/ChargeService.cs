@@ -626,7 +626,8 @@ namespace Myb.Coproperty.Services
                             senderId = owner.UserId.ToString(),
                             receiverId = coproperty.ManagerId.Value.ToString(),
                             copropertyId = coproperty.Id.ToString(),
-                            message = $"💰 Paiement reçu : {ownerName} a payé {FormatAmount(paidAmount, coproperty.Currency)} pour la charge \"{charge?.Name}\" (Lot {unitNumber})"
+                            message = $"💰 Paiement reçu : {ownerName} a payé {FormatAmount(paidAmount, coproperty.Currency)} pour la charge \"{charge?.Name}\" (Lot {unitNumber})",
+                            url = NotificationLinks.SyndicPage(coproperty.Id, "charge-payments")
                         };
                         var content = new StringContent(
                             JsonSerializer.Serialize(notificationPayload),

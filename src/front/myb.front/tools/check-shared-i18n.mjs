@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 const sharedSourceRoot = 'libs/coproperty-module/src';
 const applications = ['client', 'admin'];
-const languages = ['en', 'fr'];
+const languages = ['en', 'fr', 'ar'];
 const translationPrefixes = ['coproperty.', 'ownerPortal.', 'common.'];
 const nonTranslationProperties = new Set(['coproperty.id', 'coproperty.description']);
 
@@ -48,9 +48,9 @@ for (const application of applications) {
 }
 
 if (missing.length > 0) {
-  console.error('Shared translations must exist in client/admin and en/fr:\n');
+  console.error('Shared translations must exist in client/admin and en/fr/ar:\n');
   console.error(missing.map(item => `  - ${item}`).join('\n'));
   process.exit(1);
 }
 
-console.log(`Shared i18n check passed (${referencedKeys.size} keys across client/admin and en/fr).`);
+console.log(`Shared i18n check passed (${referencedKeys.size} keys across client/admin and en/fr/ar).`);

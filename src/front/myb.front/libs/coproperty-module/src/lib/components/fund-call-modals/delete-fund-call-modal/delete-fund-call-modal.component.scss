@@ -19,7 +19,7 @@
     background-color: white;
 
     .alert {
-      border-left: 4px solid #dc3545;
+      border-inline-start: 4px solid #dc3545;
       background-color: rgba(220, 53, 69, 0.05);
       border-radius: 4px;
       margin-bottom: 1.5rem;
@@ -59,7 +59,7 @@
         cursor: pointer;
         user-select: none;
         font-size: 0.875rem;
-        padding-left: 0.5rem;
+        padding-inline-start: 0.5rem;
       }
     }
   }

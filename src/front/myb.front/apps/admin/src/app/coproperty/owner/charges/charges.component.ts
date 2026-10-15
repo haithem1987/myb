@@ -7,6 +7,7 @@ import { KeycloakService } from '@myb-front/auth';
 import { ToastService, ModalService } from '@myb-front/shared-ui';
 import { firstValueFrom, catchError, of } from 'rxjs';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 export interface PaymentReceipt {
   fundCallDescription: string;
   amount: number;
@@ -395,6 +396,6 @@ export class OwnerChargesComponent implements OnInit {
   formatDate(date: Date | string): string {
     if (!date) return '-';
     const d = new Date(date);
-    return d.toLocaleDateString('fr-TN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return d.toLocaleDateString(currentIntlLocale(), { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 }

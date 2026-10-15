@@ -14,6 +14,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { NoResultComponent } from '@myb-front/shared-ui';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 /** A charge (budget) aggregated from its distributions for the syndic supplier payment view */
 export interface ChargePaymentSummary {
   chargeId: string;
@@ -331,7 +332,7 @@ export class ChargePaymentsComponent implements OnInit {
 
   formatDate(date: string | null): string {
     if (!date) return '—';
-    return new Date(date).toLocaleDateString(this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR');
+    return new Date(date).toLocaleDateString(currentIntlLocale());
   }
 
   onSearchInput(event: Event): void {

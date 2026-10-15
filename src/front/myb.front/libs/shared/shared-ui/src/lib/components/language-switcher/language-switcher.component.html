@@ -1,14 +1,16 @@
 <div class="language-switcher">
   <div class="d-flex align-items-center justify-center me-2">
-    <i class="bi bi-translate me-1"></i>
+    <i class="bi bi-translate me-1" aria-hidden="true"></i>
     <select
       id="languageSelect"
       class="form-select language-select"
+      aria-label="Language"
       [(ngModel)]="selectedLanguage"
       (change)="switchLanguage(selectedLanguage)"
     >
-      <option value="en">English</option>
-      <option value="fr">Français</option>
+      <option *ngFor="let language of languages" [value]="language.code" [attr.lang]="language.code">
+        {{ language.label }}
+      </option>
     </select>
   </div>
 </div>

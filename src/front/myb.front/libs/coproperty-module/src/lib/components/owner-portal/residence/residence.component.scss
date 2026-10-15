@@ -1,7 +1,7 @@
 .residence-page { color: #243247; }
 .residence-filter { width: min(100%, 340px); }
 .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; }
-.summary-card { background: #fff; border-radius: 14px; padding: 1.25rem; box-shadow: 0 3px 14px rgba(23, 59, 117, .08); display: flex; align-items: center; gap: 1rem; border-left: 4px solid #3b82f6; }
+.summary-card { background: #fff; border-radius: 14px; padding: 1.25rem; box-shadow: 0 3px 14px rgba(23, 59, 117, .08); display: flex; align-items: center; gap: 1rem; border-inline-start: 4px solid #3b82f6; }
 .summary-card > i { font-size: 1.8rem; color: #3b82f6; }
 .summary-card div { min-width: 0; }
 .summary-card strong { display: block; font-size: 1.25rem; overflow-wrap: anywhere; }

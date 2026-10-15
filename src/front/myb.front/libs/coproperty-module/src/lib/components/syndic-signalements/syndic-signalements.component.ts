@@ -17,6 +17,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 import { CopropertyService } from '../../services/coproperty.service';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 type Tab = 'en-cours' | 'resolus';
 
 @Component({
@@ -357,7 +358,7 @@ type Tab = 'en-cours' | 'resolus';
     .photo-close {
       position: absolute;
       top: 20px;
-      right: 20px;
+      inset-inline-end: 20px;
       padding: 10px;
       border-radius: 50%;
       background-color: rgba(255,255,255,.9);
@@ -503,10 +504,10 @@ export class SyndicSignalementsComponent implements OnInit {
   }
 
   formatDate(iso: string): string {
-    return new Date(iso).toLocaleDateString(this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    return new Date(iso).toLocaleDateString(currentIntlLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   formatTime(iso: string): string {
-    return new Date(iso).toLocaleTimeString(this.translate.currentLang === 'en' ? 'en-US' : 'fr-FR', { hour: '2-digit', minute: '2-digit' });
+    return new Date(iso).toLocaleTimeString(currentIntlLocale(), { hour: '2-digit', minute: '2-digit' });
   }
 }

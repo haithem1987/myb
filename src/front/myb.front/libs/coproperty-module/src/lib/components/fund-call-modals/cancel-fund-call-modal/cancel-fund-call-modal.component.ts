@@ -6,6 +6,7 @@ import { FundCallExtended, FundCallService } from '../../../services/fund-call.s
 import { ToastService } from '@myb-front/shared-ui';
 import { FUND_CALL_STATUS_LABELS, FUND_CALL_STATUS_BADGE, FundCallStatus } from '../../../models/fund-call.model';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 /**
  * Result returned by the cancellation modal to the caller.
  * FRS-FCF-LCM-2026-001 §2.4 / §4.2.2.
@@ -142,7 +143,7 @@ export class CancelFundCallModalComponent implements OnInit {
 
   formatAmount(value: any): string {
     if (typeof value === 'string') value = parseFloat(value);
-    return new Intl.NumberFormat('fr-FR', {
+    return new Intl.NumberFormat(currentIntlLocale(), {
       style: 'currency',
       currency: this.fundCall?.currency || 'EUR',
       minimumFractionDigits: 0,

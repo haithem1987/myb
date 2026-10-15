@@ -5,6 +5,7 @@ import { ModalService, NoResultComponent, ToastService } from '@myb-front/shared
 import { OwnerService, MaintenanceRequest as BackendMaintenanceRequest, MaintenanceStatus, MaintenanceCategory, Priority, Unit, CurrencyService } from '../../../index';
 import { KeycloakService } from '@myb-front/auth';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 interface MaintenanceRequest {
   id: string;
   title: string;
@@ -379,7 +380,7 @@ interface MaintenanceRequest {
 
     .syndic-comments {
       background: #fff8e1;
-      border-left: 3px solid #ffc107;
+      border-inline-start: 3px solid #ffc107;
       padding: 12px;
       border-radius: 4px;
       margin-top: 16px;
@@ -675,7 +676,7 @@ export class OwnerMaintenanceComponent implements OnInit {
           <p><strong>Priorité:</strong> <span class="badge bg-${request.priority === 'urgent' ? 'danger' : request.priority === 'high' ? 'warning' : 'secondary'}">${priorityLabel}</span></p>
           <p><strong>Statut:</strong> <span class="badge bg-${request.status === 'completed' ? 'success' : request.status === 'in-progress' ? 'primary' : 'secondary'}">${statusLabel}</span></p>
           <p><strong>Lot:</strong> ${request.unitNumber}</p>
-          <p><strong>Date de soumission:</strong> ${request.submittedDate.toLocaleDateString('fr-FR')}</p>
+          <p><strong>Date de soumission:</strong> ${request.submittedDate.toLocaleDateString(currentIntlLocale())}</p>
           <hr/>
           <p><strong>Description:</strong></p>
           <p>${request.description}</p>

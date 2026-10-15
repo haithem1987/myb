@@ -22,7 +22,7 @@
   color: #333;
   
   i {
-    margin-right: 0.5rem;
+    margin-inline-end: 0.5rem;
     color: #0d6efd;
   }
 }
@@ -97,7 +97,7 @@ h3 {
 
     .btn {
       width: 100%;
-      text-align: left;
+      text-align: start;
     }
   }
 }

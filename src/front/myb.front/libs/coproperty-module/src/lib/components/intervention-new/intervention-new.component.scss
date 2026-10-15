@@ -126,7 +126,7 @@
     }
 
     .form-control {
-      border-left: none;
+      border-inline-start: none;
     }
   }
 
@@ -166,12 +166,12 @@
       margin-bottom: 0.5rem;
 
       &.me-2 {
-        margin-right: 0 !important;
+        margin-inline-end: 0 !important;
       }
     }
 
     .text-end {
-      text-align: left !important;
+      text-align: start !important;
 
       .btn {
         margin-bottom: 0.5rem;

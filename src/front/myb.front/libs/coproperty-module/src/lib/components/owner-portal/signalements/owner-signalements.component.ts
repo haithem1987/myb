@@ -16,6 +16,7 @@ import { take, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 type Tab = 'en-cours' | 'resolus';
 
 @Component({
@@ -101,7 +102,7 @@ type Tab = 'en-cours' | 'resolus';
     .type-icon-wrap { width:36px; height:36px; border-radius:8px; background:#f0f4ff; display:flex; align-items:center; justify-content:center; font-size:18px; color:#1a56db; flex-shrink:0; }
     .card-title-block { flex:1; }
     .card-title { font-weight:700; font-size:15px; }
-    .card-date { font-size:12px; color:#888; text-align:right; white-space:nowrap; }
+    .card-date { font-size:12px; color:#888; text-align:end; white-space:nowrap; }
     .card-description { margin:8px 0; color:#444; font-size:14px; line-height:1.5; }
     .card-footer-row { display:flex; align-items:center; flex-wrap:wrap; gap:4px; }
     .reporter-avatar { width:28px; height:28px; border-radius:50%; background:#c7d8ff; color:#1a56db; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
@@ -163,6 +164,6 @@ export class OwnerSignalementsComponent implements OnInit {
     return map[status] ?? '';
   }
   initials(name: string): string { return name.split(' ').map(n => n[0] ?? '').join('').slice(0, 2).toUpperCase(); }
-  formatDate(iso: string): string { return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }); }
-  formatTime(iso: string): string { return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); }
+  formatDate(iso: string): string { return new Date(iso).toLocaleDateString(currentIntlLocale(), { day: 'numeric', month: 'short', year: 'numeric' }); }
+  formatTime(iso: string): string { return new Date(iso).toLocaleTimeString(currentIntlLocale(), { hour: '2-digit', minute: '2-digit' }); }
 }

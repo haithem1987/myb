@@ -20,6 +20,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 @Component({
   selector: 'myb-fund-call-new',
   standalone: true,
@@ -312,7 +313,7 @@ export class FundCallNewComponent implements OnInit {
 
   formatDate(date: Date | string | undefined): string {
     if (!date) return '-';
-    return new Date(date).toLocaleDateString('fr-FR');
+    return new Date(date).toLocaleDateString(currentIntlLocale());
   }
 
   get currencySymbol(): string {

@@ -302,7 +302,7 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
         mat-radio-button {
           mat-icon {
             vertical-align: middle;
-            margin-right: 8px;
+            margin-inline-end: 8px;
           }
         }
       }
@@ -353,12 +353,12 @@ import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 
       button {
         mat-icon {
-          margin-right: 4px;
+          margin-inline-end: 4px;
         }
 
         mat-spinner {
           display: inline-block;
-          margin-right: 8px;
+          margin-inline-end: 8px;
         }
       }
     }

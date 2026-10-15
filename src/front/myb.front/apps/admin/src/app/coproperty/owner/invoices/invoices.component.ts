@@ -5,6 +5,7 @@ import { ModalService, FileDownloadService, ToastService } from '@myb-front/shar
 import { OwnerService, CopropertyInvoice, InvoiceStatus, Unit, CurrencyService, FundCallService, FundCallPaymentWithContext } from '@myb-front/coproperty-module';
 import { KeycloakService } from '@myb-front/auth';
 
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 interface Invoice {
   id: string;
   number: string;
@@ -367,7 +368,7 @@ interface Invoice {
     .invoice-modal {
       position: fixed;
       top: 0;
-      right: -680px;
+      inset-inline-end: -680px;
       width: 660px;
       max-width: 100vw;
       height: 100vh;
@@ -376,11 +377,11 @@ interface Invoice {
       display: flex;
       flex-direction: column;
       box-shadow: -6px 0 30px rgba(0, 0, 0, 0.18);
-      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .invoice-modal--open {
-      right: 0;
+      inset-inline-end: 0;
     }
 
     .invoice-modal-header {
@@ -448,7 +449,7 @@ interface Invoice {
     }
 
     .inv-meta {
-      text-align: right;
+      text-align: end;
     }
 
     .inv-title {
@@ -538,7 +539,7 @@ interface Invoice {
       margin-top: 1.5rem;
       padding: 0.75rem 1rem;
       background: #eff6ff;
-      border-left: 3px solid #3b82f6;
+      border-inline-start: 3px solid #3b82f6;
       border-radius: 0 0.375rem 0.375rem 0;
       font-size: 0.82rem;
       color: #4b5563;
@@ -553,8 +554,8 @@ interface Invoice {
       .stat-card { padding: 16px; }
       .stat-icon { width: 44px; height: 44px; font-size: 20px; }
       .stat-value { font-size: 22px; }
-      .invoice-modal { width: 480px; right: -480px; }
-      .invoice-modal--open { right: 0; }
+      .invoice-modal { width: 480px; inset-inline-end: -480px; }
+      .invoice-modal--open { inset-inline-end: 0; }
     }
 
     @media (max-width: 576px) {
@@ -569,9 +570,9 @@ interface Invoice {
 
       .invoice-modal {
         width: 100vw;
-        right: -100vw;
+        inset-inline-end: -100vw;
       }
-      .invoice-modal--open { right: 0; }
+      .invoice-modal--open { inset-inline-end: 0; }
 
       .invoice-modal-header { padding: 0.875rem 1rem; }
       .invoice-modal-body { padding: 1rem; }
@@ -583,7 +584,7 @@ interface Invoice {
       .invoice-modal-footer .btn { width: 100%; }
 
       .inv-header { flex-direction: column; gap: 0.75rem; }
-      .inv-meta { text-align: left; }
+      .inv-meta { text-align: start; }
       .inv-title { font-size: 1.2rem; }
       .inv-dates { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
     }
@@ -606,7 +607,7 @@ export class OwnerInvoicesComponent implements OnInit {
       .filter(i => i.paymentDate)
       .sort((a, b) => (b.paymentDate?.getTime() ?? 0) - (a.paymentDate?.getTime() ?? 0))[0];
     const lastPaymentDate = lastPayment?.paymentDate
-      ? lastPayment.paymentDate.toLocaleDateString('fr-FR') : '—';
+      ? lastPayment.paymentDate.toLocaleDateString(currentIntlLocale()) : '—';
 
     return { total, totalPaid, lastPaymentDate };
   });
@@ -804,7 +805,7 @@ export class OwnerInvoicesComponent implements OnInit {
     if (!invoice) return;
 
     const fmt = (v: number) => this.currencyService.formatAmount(v, invoice.currency);
-    const fmtD = (d: Date | undefined) => d ? d.toLocaleDateString('fr-FR') : '-';
+    const fmtD = (d: Date | undefined) => d ? d.toLocaleDateString(currentIntlLocale()) : '-';
     const owner = this.ownerName() || '—';
 
     const statusBadge = invoice.status === 'paid'

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { formatDistanceToNow } from 'date-fns';
-import { fr, enUS } from 'date-fns/locale';
+import { ar, enUS, fr } from 'date-fns/locale';
 import { Notification } from 'libs/shared/infra/models/notification.model';
 import { translateNotificationMessage } from 'libs/shared/infra/utils/notification-message';
 @Component({
@@ -26,7 +26,9 @@ export class NotificationDropdownComponent {
   }
 
   getDuration(dateStr: string): string {
-    return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: (this.translate.currentLang || this.translate.defaultLang || 'fr').startsWith('en') ? enUS : fr });
+    const language = this.translate.currentLang || this.translate.defaultLang || 'fr';
+    const locale = language.startsWith('en') ? enUS : language.startsWith('ar') ? ar : fr;
+    return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale });
   }
 
   onNotificationClick(notification: Notification): void {

@@ -29,7 +29,7 @@
     will-change: transform !important;
     transform: translate3d(0px, 0px, 0px) !important;
     top: auto !important;
-    left: auto !important;
+    inset-inline-start: auto !important;
     z-index: 1050; /* Ensure it appears above other elements */
   }
   

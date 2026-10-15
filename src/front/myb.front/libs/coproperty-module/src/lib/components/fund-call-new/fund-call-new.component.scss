@@ -25,7 +25,7 @@
 
   .alert {
     border: none;
-    border-left: 4px solid #10b981;
+    border-inline-start: 4px solid #10b981;
     animation: slideDown 0.3s ease-out;
 
     @keyframes slideDown {

@@ -103,13 +103,13 @@
     .input-group-text {
       background: #f8f9fa;
       border: 2px solid #e9ecef;
-      border-right: none;
+      border-inline-end: none;
       color: #667eea;
       font-weight: 600;
     }
 
     .form-control {
-      border-left: none;
+      border-inline-start: none;
 
       &:focus {
         border-color: #667eea;
@@ -425,7 +425,7 @@
   .modal {
     position: fixed;
     top: 0;
-    left: 0;
+    inset-inline-start: 0;
     z-index: 1050;
     width: 100%;
     height: 100%;
@@ -527,7 +527,7 @@
   .modal-backdrop {
     position: fixed;
     top: 0;
-    left: 0;
+    inset-inline-start: 0;
     z-index: 1040;
     width: 100vw;
     height: 100vh;
@@ -616,7 +616,7 @@
 
     &.alert-success {
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-      border-left: 4px solid #667eea;
+      border-inline-start: 4px solid #667eea;
       color: #5a67d8;
 
       i {
@@ -626,7 +626,7 @@
 
     &.alert-danger {
       background: linear-gradient(135deg, rgba(245, 101, 101, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
-      border-left: 4px solid #f56565;
+      border-inline-start: 4px solid #f56565;
       color: #c53030;
 
       i {
@@ -636,7 +636,7 @@
 
     &.alert-warning {
       background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
-      border-left: 4px solid #fbbf24;
+      border-inline-start: 4px solid #fbbf24;
       color: #92400e;
 
       i {
@@ -646,7 +646,7 @@
 
     &.alert-info {
       background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
-      border-left: 4px solid #3b82f6;
+      border-inline-start: 4px solid #3b82f6;
       color: #1e40af;
 
       i {

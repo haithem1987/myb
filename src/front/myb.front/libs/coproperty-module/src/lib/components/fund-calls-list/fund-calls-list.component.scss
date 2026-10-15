@@ -211,7 +211,7 @@
 .edit-panel {
   position: fixed;
   top: 0;
-  right: 0;
+  inset-inline-end: 0;
   height: 100%;
   width: 480px;
   max-width: 100vw;
@@ -225,6 +225,16 @@
   overflow: hidden;
 
   &--open {
+    transform: translateX(0);
+  }
+
+  // RTL: the panel is anchored to the left edge, so it slides in from the left.
+  :host-context([dir='rtl']) & {
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    transform: translateX(-100%);
+  }
+
+  :host-context([dir='rtl']) &.edit-panel--open {
     transform: translateX(0);
   }
 
@@ -303,7 +313,7 @@
 .invoice-modal {
   position: fixed;
   top: 0;
-  right: -680px;
+  inset-inline-end: -680px;
   width: 660px;
   max-width: 100vw;
   height: 100vh;
@@ -312,10 +322,10 @@
   display: flex;
   flex-direction: column;
   box-shadow: -6px 0 30px rgba(0, 0, 0, 0.18);
-  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &--open {
-    right: 0;
+    inset-inline-end: 0;
   }
 }
 
@@ -385,7 +395,7 @@
 }
 
 .inv-meta {
-  text-align: right;
+  text-align: end;
 }
 
 .inv-title {
@@ -475,7 +485,7 @@
   margin-top: 1.5rem;
   padding: 0.75rem 1rem;
   background: #eff6ff;
-  border-left: 3px solid #3b82f6;
+  border-inline-start: 3px solid #3b82f6;
   border-radius: 0 0.375rem 0.375rem 0;
   font-size: 0.82rem;
   color: #4b5563;
@@ -524,7 +534,7 @@
   .status-badge {
     max-width: 100%;
     white-space: normal;
-    text-align: left;
+    text-align: start;
     line-height: 1.2;
   }
 
@@ -571,7 +581,7 @@
   .invoice-modal { width: 100vw; }
   .invoice-modal-body { padding: 1rem; }
   .inv-header { flex-direction: column; gap: 0.75rem; }
-  .inv-meta { text-align: left; }
+  .inv-meta { text-align: start; }
   .inv-title { font-size: 1.2rem; }
   .inv-dates { grid-template-columns: 1fr 1fr; }
 
@@ -586,20 +596,20 @@
       min-width: 0;
 
       > .me-3 {
-        margin-right: 0.75rem !important;
+        margin-inline-end: 0.75rem !important;
       }
     }
 
     > .d-flex:last-child {
       align-self: flex-start;
-      margin-left: 0 !important;
+      margin-inline-start: 0 !important;
     }
   }
 }
 
 // ── Overdue row styling ──────────────────────────────────────────────
 .overdue-row {
-  border-left: 3px solid #dc3545 !important;
+  border-inline-start: 3px solid #dc3545 !important;
   animation: pulse-overdue 2s ease-in-out 1;
 }
 

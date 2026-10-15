@@ -252,7 +252,7 @@ interface OwnerAssembly {
     }
 
     .assembly-card.upcoming {
-      border-left: 4px solid #0d6efd;
+      border-inline-start: 4px solid #0d6efd;
     }
 
     .assembly-card.past {

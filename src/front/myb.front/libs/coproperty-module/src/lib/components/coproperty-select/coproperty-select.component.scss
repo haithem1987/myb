@@ -58,11 +58,11 @@
 
     .input-group-text {
       background: white;
-      border-right: 0;
+      border-inline-end: 0;
       color: #6b7280;
     }
 
-    .form-control { border-left: 0; }
+    .form-control { border-inline-start: 0; }
   }
 
   .card-actions button { position: relative; z-index: 1; }

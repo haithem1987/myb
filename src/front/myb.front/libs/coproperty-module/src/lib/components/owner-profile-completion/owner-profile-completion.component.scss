@@ -51,7 +51,7 @@
 /* Read-only inputs */
 .readonly-prefix {
   background: #f3f4f6;
-  border-right: none;
+  border-inline-end: none;
   color: #9ca3af;
 }
 
@@ -59,7 +59,7 @@
   background: #f9fafb !important;
   color: #6b7280 !important;
   cursor: default;
-  border-left: none;
+  border-inline-start: none;
 
   &:focus {
     box-shadow: none;
@@ -78,7 +78,7 @@
   font-size: 0.8rem;
   color: #64748b;
   background: #f0f4ff;
-  border-left: 3px solid #7c3aed;
+  border-inline-start: 3px solid #7c3aed;
   border-radius: 4px;
   padding: 0.6rem 0.75rem;
 }

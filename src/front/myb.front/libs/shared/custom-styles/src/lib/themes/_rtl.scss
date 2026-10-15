@@ -1,0 +1,214 @@
+// Right-to-left support (Arabic).
+// Utilities (ms-*, pe-*, text-start, start-0...) already use logical properties
+// (see _logical-utilities.scss). This file mirrors the Bootstrap components that
+// Bootstrap compiles with physical left/right values, plus icons and typography.
+
+// Arabic font: browsers only download the Arabic unicode range when Arabic text is rendered.
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap');
+
+html[lang='ar'] {
+  --bs-body-font-family: 'Noto Sans Arabic', 'Poppins', system-ui, sans-serif;
+}
+
+[dir='rtl'] {
+  // Values that must stay left-to-right inside Arabic text.
+  input[type='email'],
+  input[type='tel'],
+  input[type='url'],
+  .ltr-value {
+    direction: ltr;
+    text-align: end;
+  }
+
+  // Directional icons point the other way.
+  .bi-arrow-left,
+  .bi-arrow-right,
+  .bi-arrow-left-short,
+  .bi-arrow-right-short,
+  .bi-arrow-left-circle,
+  .bi-arrow-right-circle,
+  .bi-arrow-bar-left,
+  .bi-arrow-bar-right,
+  .bi-arrow-return-left,
+  .bi-arrow-return-right,
+  .bi-chevron-left,
+  .bi-chevron-right,
+  .bi-chevron-double-left,
+  .bi-chevron-double-right,
+  .bi-caret-left,
+  .bi-caret-right,
+  .bi-caret-left-fill,
+  .bi-caret-right-fill,
+  .bi-box-arrow-left,
+  .bi-box-arrow-right,
+  .bi-box-arrow-in-left,
+  .bi-box-arrow-in-right,
+  .bi-reply,
+  .bi-reply-fill,
+  .bi-send,
+  .bi-send-fill {
+    &::before {
+      transform: scaleX(-1);
+    }
+  }
+
+  // Dropdowns
+  .dropdown-toggle::after {
+    margin-left: 0;
+    margin-right: $caret-spacing;
+  }
+
+  .dropdown-menu-end[data-bs-popper] {
+    right: auto;
+    left: 0;
+  }
+
+  .dropdown-menu-start[data-bs-popper] {
+    left: auto;
+    right: 0;
+  }
+
+  // Forms
+  .form-select {
+    padding-right: $form-select-padding-x;
+    padding-left: $form-select-padding-x + $form-select-indicator-padding;
+    background-position: left $form-select-padding-x center;
+  }
+
+  .form-select[multiple],
+  .form-select[size]:not([size='1']) {
+    padding-left: $form-select-padding-x;
+  }
+
+  .form-check {
+    padding-left: 0;
+    padding-right: $form-check-padding-start;
+
+    .form-check-input {
+      float: right;
+      margin-left: 0;
+      margin-right: $form-check-padding-start * -1;
+    }
+  }
+
+  .form-switch {
+    padding-left: 0;
+    padding-right: $form-switch-padding-start;
+
+    .form-check-input {
+      margin-left: 0;
+      margin-right: $form-switch-padding-start * -1;
+      background-position: right center;
+
+      &:checked {
+        background-position: left center;
+      }
+    }
+  }
+
+  .form-check-inline {
+    margin-right: 0;
+    margin-left: $form-check-inline-margin-end;
+  }
+
+  .form-floating > label {
+    left: auto;
+    right: 0;
+  }
+
+  .input-group {
+    > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+      margin-left: 0;
+      margin-right: calc(-1 * #{$input-border-width});
+    }
+
+    > * {
+      border-radius: $input-border-radius !important;
+    }
+
+    > :not(:last-child):not(.dropdown-menu) {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+
+    > :not(:first-child):not(.dropdown-menu) {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+  }
+
+  // Close buttons inside headers and alerts
+  .modal-header .btn-close {
+    margin: calc(-.5 * var(--#{$prefix}modal-header-padding-y)) auto calc(-.5 * var(--#{$prefix}modal-header-padding-y)) calc(-.5 * var(--#{$prefix}modal-header-padding-x));
+  }
+
+  .offcanvas-header .btn-close {
+    margin: calc(-.5 * var(--#{$prefix}offcanvas-padding-y)) auto calc(-.5 * var(--#{$prefix}offcanvas-padding-y)) calc(-.5 * var(--#{$prefix}offcanvas-padding-x));
+  }
+
+  .toast-header .btn-close {
+    margin-right: var(--#{$prefix}toast-padding-x);
+    margin-left: calc(-.5 * var(--#{$prefix}toast-padding-x));
+  }
+
+  .alert-dismissible {
+    padding-right: var(--#{$prefix}alert-padding-x);
+    padding-left: $alert-dismissible-padding-r;
+
+    .btn-close {
+      right: auto;
+      left: 0;
+    }
+  }
+
+  // Offcanvas panels open from the mirrored side
+  .offcanvas.offcanvas-start {
+    left: auto;
+    right: 0;
+    border-right: 0;
+    border-left: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
+    transform: translateX(100%);
+  }
+
+  .offcanvas.offcanvas-end {
+    right: auto;
+    left: 0;
+    border-left: 0;
+    border-right: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
+    transform: translateX(-100%);
+  }
+
+  .offcanvas.showing,
+  .offcanvas.show:not(.hiding) {
+    transform: none;
+  }
+
+  // Navigation
+  .navbar-brand {
+    margin-right: 0;
+    margin-left: var(--#{$prefix}navbar-brand-margin-end);
+  }
+
+  .breadcrumb-item + .breadcrumb-item {
+    padding-left: 0;
+    padding-right: var(--#{$prefix}breadcrumb-item-padding-x);
+
+    &::before {
+      float: right;
+      padding-right: 0;
+      padding-left: var(--#{$prefix}breadcrumb-item-padding-x);
+    }
+  }
+
+  .accordion-button::after {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  .pagination {
+    .page-item:not(:first-child) .page-link {
+      margin-left: 0;
+      margin-right: $pagination-margin-start;
+    }
+  }
+}

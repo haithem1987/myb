@@ -9,7 +9,12 @@ import {
   NotificationService,
   ToastsContainerComponent,
 } from '@myb-front/shared-ui';
-import { LanguageService } from '@myb-front/shared-ui';
+import {
+  DEFAULT_LANGUAGE,
+  LanguageService,
+  SUPPORTED_LANGUAGE_CODES,
+  normalizeLanguageCode,
+} from '@myb-front/shared-ui';
 import { TranslateModule } from '@ngx-translate/core';
 @Component({
   standalone: true,
@@ -21,11 +26,8 @@ import { TranslateModule } from '@ngx-translate/core';
 export class AppComponent implements OnInit {
   title = 'client';
   routeLoading = signal(false);
-  private static readonly SUPPORTED_LANGUAGES = ['fr', 'en'];
-
   private normalizeLanguage(language: string | null): string {
-    const normalized = language?.trim().toLowerCase().split('-')[0] ?? '';
-    return AppComponent.SUPPORTED_LANGUAGES.includes(normalized) ? normalized : 'fr';
+    return normalizeLanguageCode(language) ?? DEFAULT_LANGUAGE;
   }
 
   constructor(
@@ -35,8 +37,8 @@ export class AppComponent implements OnInit {
     private router: Router,
     private destroyRef: DestroyRef
   ) {
-    this.translate.addLangs(['fr', 'en']);
-    this.translate.setDefaultLang('fr');
+    this.translate.addLangs(SUPPORTED_LANGUAGE_CODES);
+    this.translate.setDefaultLang(DEFAULT_LANGUAGE);
   }
 
   private getLanguageFromRedirectParams(): string | null {
@@ -46,8 +48,7 @@ export class AppComponent implements OnInit {
       ?? params.get('kc_locale')
       ?? params.get('ui_locales')?.split(' ')[0]
       ?? null;
-    const normalized = redirectLang?.trim().toLowerCase().split('-')[0] ?? null;
-    return AppComponent.SUPPORTED_LANGUAGES.includes(normalized ?? '') ? normalized : null;
+    return normalizeLanguageCode(redirectLang);
   }
 
   ngOnInit(): void {

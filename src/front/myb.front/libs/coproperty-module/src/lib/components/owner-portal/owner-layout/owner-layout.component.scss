@@ -85,7 +85,7 @@
         text-align: center;
         position: absolute;
         top: 5px;
-        right: 5px;
+        inset-inline-end: 5px;
         
         &.info {
           background: #3b82f6;
@@ -270,8 +270,8 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 70px;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   z-index: 99;
   max-height: 0;
   overflow: hidden;
@@ -416,7 +416,7 @@
 
     .user-section {
       gap: 6px;
-      margin-left: auto;
+      margin-inline-start: auto;
 
       .user-avatar {
         width: 32px;

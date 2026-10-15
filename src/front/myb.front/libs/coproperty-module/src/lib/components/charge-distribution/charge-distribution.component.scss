@@ -110,7 +110,7 @@ $violet-shadow: 0 8px 24px rgba(102, 126, 234, 0.22);
     .input-group-text {
       background: $violet-light;
       border: 2px solid #e0e7ff;
-      border-left: none;
+      border-inline-start: none;
       color: $violet-end;
       font-weight: 700;
       border-radius: 0 8px 8px 0;

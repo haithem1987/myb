@@ -30,7 +30,7 @@
   }
 
   .nav-link {
-    padding-right: 0;
+    padding-inline-end: 0;
   }
 
   .nav-link .ms-2 {

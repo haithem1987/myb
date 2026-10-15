@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Currency } from '../models/coproperty.model';
+import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   EUR: '€',
@@ -51,7 +52,7 @@ export class CurrencyService {
     if (isNaN(rawValue)) return '0 ' + this.getSymbol(currencyCode);
     const value = this.roundAmount(rawValue);
 
-    const locale = CURRENCY_LOCALES[currencyCode] ?? 'fr-FR';
+    const locale = this.getDisplayLocale(currencyCode);
     return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: currencyCode,
@@ -62,10 +63,21 @@ export class CurrencyService {
 
   formatNumber(value: number | string | undefined | null): string {
     const parsed = typeof value === 'string' ? Number(value) : Number(value ?? 0);
-    return new Intl.NumberFormat('fr-FR', {
+    return new Intl.NumberFormat(currentIntlLocale(), {
       minimumFractionDigits: 0,
       maximumFractionDigits: CurrencyService.MAX_DECIMAL_PLACES,
     }).format(this.roundAmount(Number.isFinite(parsed) ? parsed : 0));
+  }
+
+  /**
+   * French keeps the currency's regional convention (e.g. fr-TN shows "DT");
+   * other UI languages format with their own locale (en-GB, ar-TN).
+   */
+  private getDisplayLocale(currencyCode: string): string {
+    const uiLocale = currentIntlLocale();
+    if (!uiLocale.startsWith('fr')) return uiLocale;
+    const currencyLocale = CURRENCY_LOCALES[currencyCode];
+    return currencyLocale?.startsWith('fr') ? currencyLocale : uiLocale;
   }
 
   /** Keep arithmetic and form values out of IEEE-754 display artefacts. */

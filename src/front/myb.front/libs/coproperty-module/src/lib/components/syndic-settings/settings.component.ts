@@ -395,7 +395,7 @@ const SYNDIC_ROLE = 'coproperty-syndic';
       color: #fff;
       font-size: 0.7rem;
       font-weight: 700;
-      margin-left: 4px;
+      margin-inline-start: 4px;
     }
 
     /* ── Settings card ────────────────────────────────────────────────── */
@@ -444,7 +444,7 @@ const SYNDIC_ROLE = 'coproperty-syndic';
     .preview-label {
       font-size: 0.85rem;
       color: #6c757d;
-      margin-right: 0.5rem;
+      margin-inline-end: 0.5rem;
     }
 
     .preview-value {

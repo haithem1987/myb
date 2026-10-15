@@ -1,8 +1,8 @@
 .myb-navbar {
   position: fixed;
   top: 0;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   z-index: 1000;
   border-bottom: 1px solid rgba(124, 58, 237, 0.1);
   box-shadow: 0 2px 20px rgba(79, 70, 229, 0.06);
@@ -192,8 +192,8 @@
   display: none;
   position: fixed;
   top: 64px;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   bottom: 0;
   mwebkit-overflow-scrolling: touch;
   opacity: 0;
@@ -310,7 +310,7 @@
 
 @media (max-width: 420px) {
   .myb-mobile-menu-inner {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-inline-start: 14px;
+    padding-inline-end: 14px;
   }
 }

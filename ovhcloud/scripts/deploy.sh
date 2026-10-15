@@ -106,7 +106,10 @@ wait_for_resource() {
     local timeout=${2:-300}
     
     echo -e "${YELLOW}Waiting for ${resource} to be ready...${NC}"
-    if kubectl wait --for=condition=available --timeout="${timeout}s" "$resource" -n "$NAMESPACE" 2>/dev/null; then
+    # `kubectl wait --for=condition=available` can succeed while an old pod is
+    # still serving and the newly applied ReplicaSet is not ready yet. Rollout
+    # status ties readiness to the deployment generation we just applied.
+    if kubectl rollout status "$resource" --timeout="${timeout}s" -n "$NAMESPACE"; then
         echo -e "${GREEN}✓ ${resource} is ready${NC}"
         return 0
     else
@@ -114,6 +117,43 @@ wait_for_resource() {
         kubectl get pods -n "$NAMESPACE"
         return 1
     fi
+}
+
+# Keycloak is released independently from the application images. Preserve the
+# currently deployed immutable image instead of letting the checked-in `latest`
+# placeholder replace it (which may also point at the wrong CPU architecture).
+apply_keycloak_deployment() {
+    local manifest=$1
+    local current_image
+
+    current_image=$(kubectl get deployment keycloak -n "$NAMESPACE" \
+        -o jsonpath='{.spec.template.spec.containers[?(@.name=="keycloak")].image}' \
+        2>/dev/null || true)
+
+    if [[ -z "$current_image" ]]; then
+        kubectl apply -f "$manifest" "${KUBECTL_APPLY_ARGS[@]}"
+        return
+    fi
+
+    awk -v target_image="$current_image" '
+        $1 == "-" && $2 == "name:" && $3 == "keycloak" {
+            in_target_container = 1
+        }
+        in_target_container && $1 == "image:" {
+            match($0, /^[[:space:]]*/)
+            print substr($0, RSTART, RLENGTH) "image: " target_image
+            in_target_container = 0
+            replacements++
+            next
+        }
+        { print }
+        END {
+            if (replacements != 1) {
+                print "Error: expected exactly one Keycloak container image" > "/dev/stderr"
+                exit 1
+            }
+        }
+    ' "$manifest" | kubectl apply -f - "${KUBECTL_APPLY_ARGS[@]}"
 }
 
 # Apply every resource in a multi-document service manifest while replacing
@@ -244,7 +284,7 @@ if [[ "$DRY_RUN" != "true" ]]; then
     --dry-run=client -o yaml | kubectl apply -f -
 fi
 
-kubectl apply -f "$K8S_DIR/services/keycloak/deployment.yaml" "${KUBECTL_APPLY_ARGS[@]}"
+apply_keycloak_deployment "$K8S_DIR/services/keycloak/deployment.yaml"
 if [[ "$DRY_RUN" != "true" ]]; then
     # ConfigMap volume contents update in-place, but Keycloak caches theme
     # templates. Restart on every deployment so email-template fixes become

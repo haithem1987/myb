@@ -1,11 +1,12 @@
 :root {
   --myb-primary: #7c3aed;
   --myb-primary-strong: #4f46e5;
-  --myb-ring: rgba(124, 58, 237, 0.16);
+  --myb-ring: rgba(124, 58, 237, 0.18);
   --myb-text: #1e1b4b;
-  --myb-muted: #646b7d;
-  --myb-border: #e4e1f4;
-  --myb-panel: #f4f0ff;
+  --myb-muted: #64748b;
+  --myb-border: #e7e3f5;
+  --myb-surface: rgba(255, 255, 255, 0.96);
+  --myb-danger: #b42318;
 }
 
 *,
@@ -21,65 +22,245 @@ html.login-pf body {
 
 html.login-pf body,
 .login-pf body {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
-  background: linear-gradient(
-    135deg,
-    #f8f7ff 0%,
-    #f0edff 46%,
-    #e7ecff 100%
-  ) !important;
-  background-image: linear-gradient(
-    135deg,
-    #f8f7ff 0%,
-    #f0edff 46%,
-    #e7ecff 100%
-  ) !important;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #faf5ff 0%, #f0f4ff 60%, #e0e7ff 100%) !important;
+  background-image: linear-gradient(135deg, #faf5ff 0%, #f0f4ff 60%, #e0e7ff 100%) !important;
   color: var(--myb-text);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
+html.login-pf body::before,
+html.login-pf body::after {
+  position: fixed;
+  z-index: 0;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 50%;
+  content: "";
+  filter: blur(90px);
+  opacity: 0.24;
+  pointer-events: none;
+}
+
+html.login-pf body::before {
+  top: -13rem;
+  right: -9rem;
+  background: #a78bfa;
+}
+
+html.login-pf body::after {
+  bottom: -17rem;
+  left: -11rem;
+  background: #818cf8;
+}
+
 .login-pf-page {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: 100%;
   min-height: 100vh;
-  padding: 32px 20px;
+  min-height: 100dvh;
+  padding: 28px 24px 34px;
 }
 
+/* Brand header: the same four-tile mark and gradient wordmark as the landing page. */
 #kc-header {
-  margin: 0 0 20px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100%, 1100px);
+  margin: 0 auto 18px;
+  text-align: left;
 }
 
 #kc-header-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
   padding: 0 !important;
-  color: var(--myb-text) !important;
-  font-size: 2rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.08em;
-  line-height: 1.2;
-  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--myb-primary), var(--myb-primary-strong));
+  background-clip: text;
+  color: transparent !important;
+  font-size: 1.32rem !important;
+  font-weight: 850 !important;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-transform: none;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/*
- * The parent Keycloak theme caps .card-pf at 500px. Our authentication
- * content has two columns on desktop, so the cap must be overridden on the
- * card itself. Otherwise the form column renders outside the white panel.
- */
+#kc-header-wrapper::before {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  background: url("../img/myb-mark.svg") center / contain no-repeat;
+  content: "";
+  filter: drop-shadow(0 5px 10px rgba(124, 58, 237, 0.22));
+}
+
+.myb-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 13px;
+  background: rgba(255, 255, 255, 0.64);
+  border: 1px solid rgba(124, 58, 237, 0.16);
+  border-radius: 10px;
+  color: #5f5877;
+  font-size: 0.82rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.myb-home-link::before {
+  content: "←";
+  color: var(--myb-primary);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.myb-home-link:hover {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(124, 58, 237, 0.35);
+  color: var(--myb-primary);
+  transform: translateX(-1px);
+}
+
 .login-pf-page .card-pf {
-  width: min(100%, 960px);
-  max-width: 960px;
+  position: relative;
+  width: min(100%, 1100px);
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 34px 38px 30px !important;
+  padding: 0 !important;
   overflow: hidden;
+  background: var(--myb-surface) !important;
+  border: 1px solid rgba(124, 58, 237, 0.11) !important;
+  border-top: 1px solid rgba(124, 58, 237, 0.11) !important;
+  border-radius: 26px !important;
+  box-shadow: 0 28px 80px rgba(67, 56, 150, 0.16) !important;
+  isolation: isolate;
+}
+
+.login-pf-page .card-pf::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto 0 0;
+  width: 38%;
+  background:
+    radial-gradient(circle at 84% 10%, rgba(255, 255, 255, 0.2), transparent 27%),
+    radial-gradient(circle at 8% 92%, rgba(129, 140, 248, 0.55), transparent 32%),
+    linear-gradient(155deg, #7c3aed 0%, #5b3ee4 45%, #4338ca 100%);
+  content: "";
+}
+
+.login-pf-page .card-pf::after {
+  position: absolute;
+  z-index: 0;
+  bottom: 34px;
+  left: 36px;
+  width: calc(38% - 72px);
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.78);
+  content: "Sécurisé  •  Centralisé  •  Accessible";
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+html:lang(en) .login-pf-page .card-pf::after {
+  content: "Secure  •  Centralized  •  Accessible";
+}
+
+.login-pf-header {
+  position: relative;
+  min-height: 120px;
+  padding: 38px 44px 18px calc(38% + 48px);
+}
+
+.login-pf-header > .row {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  margin: 0;
+}
+
+.login-pf-header > .row > [class*="col-"] {
+  float: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#kc-page-title {
+  margin: 0 !important;
+  color: var(--myb-text) !important;
+  font-size: clamp(1.72rem, 2.5vw, 2.25rem) !important;
+  font-weight: 850 !important;
+  line-height: 1.13;
+  letter-spacing: -0.045em;
+  text-align: left;
+}
+
+.login-pf-header > .row > .subtitle,
+.login-pf-header .subtitle {
+  margin: 7px 0 0;
+  color: #8b88a0;
+  font-size: 0.76rem;
+  text-align: left;
+}
+
+#kc-locale {
+  position: absolute;
+  z-index: 3;
+  top: 22px;
+  right: 28px;
+}
+
+#kc-current-locale-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 7px 12px !important;
+  background: #f7f5ff !important;
+  border: 1px solid #ebe7fb !important;
+  border-radius: 9px !important;
+  color: #605b75 !important;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+#kc-locale-dropdown ul,
+.pf-c-dropdown__menu {
+  min-width: 170px;
+  padding: 7px !important;
   background: #fff !important;
-  border: 1px solid rgba(124, 58, 237, 0.12) !important;
-  border-top: 4px solid var(--myb-primary) !important;
-  border-radius: 18px !important;
-  box-shadow: 0 22px 60px rgba(79, 70, 229, 0.14) !important;
+  border: 1px solid var(--myb-border) !important;
+  border-radius: 11px !important;
+  box-shadow: 0 14px 34px rgba(30, 27, 75, 0.14) !important;
+}
+
+.pf-c-dropdown__menu-item {
+  padding: 9px 11px !important;
+  border-radius: 7px;
+  color: #4c4761 !important;
+}
+
+.pf-c-dropdown__menu-item:hover {
+  background: #f5f2ff !important;
+  color: var(--myb-primary) !important;
 }
 
 #kc-content {
@@ -88,107 +269,85 @@ html.login-pf body,
   margin: 0;
 }
 
-#kc-page-title {
-  margin: 0 0 26px !important;
-  color: var(--myb-text) !important;
-  font-size: clamp(1.7rem, 2.4vw, 2.15rem) !important;
-  font-weight: 800 !important;
-  line-height: 1.2;
-  letter-spacing: -0.035em;
-  text-align: center;
-}
-
 #kc-content-wrapper {
   display: grid;
-  grid-template-columns: minmax(250px, 0.82fr) minmax(0, 1.18fr);
-  gap: 22px 34px;
+  grid-template-columns: 38% minmax(0, 62%);
   align-items: start;
   width: 100%;
+  min-height: 420px;
   margin: 0;
 }
 
 #kc-content-wrapper::before {
-  content: "Manage your co-ownership\A without the daily stress.\A\A\2022  Track units and documents\A\2022  Keep owners informed\A\2022  Work in a simple, secure space";
-  grid-row: 1 / 4;
-  align-self: stretch;
-  min-height: 100%;
-  padding: 28px 26px;
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1 / 20;
+  align-self: start;
+  padding: 8px 36px 112px;
+  color: #fff;
+  content: "La copropriété,\A plus simple au quotidien.\A\A✓  Lots et documents centralisés\A✓  Copropriétaires toujours informés\A✓  Données accessibles et sécurisées";
+  font-size: 0.96rem;
+  font-weight: 520;
+  line-height: 1.75;
   white-space: pre-line;
-  background: linear-gradient(
-    155deg,
-    #faf9ff 0%,
-    var(--myb-panel) 62%,
-    #eae5ff 100%
-  );
-  border: 1px solid #ddd5ff;
-  border-radius: 15px;
-  box-shadow: 0 10px 28px rgba(79, 70, 229, 0.07);
-  color: #404166;
-  font-size: 1rem;
-  font-weight: 550;
-  line-height: 1.7;
 }
 
-html:lang(fr) #kc-content-wrapper::before {
-  content: "Gérez votre copropriété\A sans stress, au quotidien.\A\A\2022  Suivez les lots et les documents\A\2022  Informez les copropriétaires\A\2022  Profitez d'un espace simple et sécurisé";
+html:lang(en) #kc-content-wrapper::before {
+  content: "Co-ownership,\A made simpler every day.\A\A✓  Units and documents in one place\A✓  Owners always kept informed\A✓  Secure, accessible information";
 }
 
 #kc-form,
-#kc-info {
-  grid-column: 2;
-  min-width: 0;
-}
-
+#kc-info,
+#kc-register-form,
 #kc-content-wrapper > .pf-c-alert,
 #kc-content-wrapper > [class^="alert-"] {
   grid-column: 2;
   min-width: 0;
+}
+
+#kc-form,
+#kc-register-form {
+  width: auto;
+  min-width: 0;
   margin: 0;
-}
-
-.login-pf-header > .row {
-  margin: 0;
-}
-
-.login-pf-header > .row > [class*="col-"] {
-  float: none;
-  width: 100%;
-  margin-left: 0;
-  padding: 0;
-}
-
-.login-pf-header > .row > .subtitle {
-  margin: 0 0 6px;
-  color: var(--myb-muted);
-  font-size: 0.78rem;
-  text-align: right;
+  padding: 0 44px 42px;
 }
 
 #kc-form-wrapper,
-#kc-form-login,
-#kc-register-form {
+#kc-form-login {
   width: 100%;
   min-width: 0;
-  margin-top: 0;
+  margin: 0;
 }
 
 #kc-form-login .form-group,
 #kc-register-form .form-group,
 .pf-c-form__group {
-  margin-bottom: 17px;
+  margin-bottom: 16px;
 }
 
-#kc-register-form.form-horizontal .form-group {
+#kc-register-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 14px;
+}
+
+#kc-register-form > .form-group {
+  min-width: 0;
   margin-right: 0;
   margin-left: 0;
+}
+
+#kc-register-form > .form-group:nth-of-type(-n + 3),
+#kc-register-form > .form-group:last-child {
+  grid-column: 1 / -1;
 }
 
 #kc-register-form .form-group > [class*="col-"] {
   float: none;
   width: 100%;
-  margin-left: 0;
-  padding-right: 0;
-  padding-left: 0;
+  margin: 0;
+  padding: 0;
 }
 
 label,
@@ -196,10 +355,14 @@ label,
 .pf-c-form__label-text {
   display: inline-block;
   margin-bottom: 7px;
-  color: #414861;
-  font-size: 0.9rem;
-  font-weight: 650;
+  color: #41415a;
+  font-size: 0.88rem;
+  font-weight: 680;
   line-height: 1.35;
+}
+
+.required {
+  color: var(--myb-danger);
 }
 
 .form-control,
@@ -213,15 +376,15 @@ label,
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  min-height: 48px;
-  padding: 10px 13px !important;
+  min-height: 50px;
+  padding: 11px 14px !important;
   background: #fff !important;
   border: 1.5px solid #dfe3ed !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
+  border-radius: 11px !important;
+  box-shadow: 0 1px 2px rgba(30, 27, 75, 0.02) !important;
   color: #22243a;
   font-size: 1rem;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 .form-control:hover,
@@ -231,9 +394,15 @@ label,
 
 .form-control:focus,
 .pf-c-form-control:focus {
+  background: #fefeff !important;
   border-color: var(--myb-primary) !important;
   outline: 0;
-  box-shadow: 0 0 0 3px var(--myb-ring) !important;
+  box-shadow: 0 0 0 4px var(--myb-ring) !important;
+}
+
+.form-control[aria-invalid="true"],
+.pf-c-form-control[aria-invalid="true"] {
+  border-color: #d92d20 !important;
 }
 
 .input-group,
@@ -248,24 +417,24 @@ label,
   flex: 1 1 auto;
   width: 1%;
   border-right: 0 !important;
-  border-radius: 10px 0 0 10px !important;
+  border-radius: 11px 0 0 11px !important;
 }
 
 .input-group .btn,
 .input-group .pf-c-button,
 .pf-c-input-group .pf-c-button {
   display: inline-flex;
-  flex: 0 0 48px;
+  flex: 0 0 50px;
   align-items: center;
   justify-content: center;
-  min-width: 48px;
-  min-height: 48px;
+  min-width: 50px;
+  min-height: 50px;
   padding: 0 !important;
   background: #fff !important;
   border: 1.5px solid #dfe3ed !important;
   border-left: 0 !important;
-  border-radius: 0 10px 10px 0 !important;
-  color: #4b5563 !important;
+  border-radius: 0 11px 11px 0 !important;
+  color: #55576b !important;
   box-shadow: none !important;
 }
 
@@ -277,12 +446,12 @@ label,
 
 #kc-form-options,
 .login-pf-settings {
-  margin: 2px 0 15px;
+  margin: 3px 0 17px;
 }
 
 .login-pf-settings {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
   justify-content: space-between;
 }
@@ -303,7 +472,15 @@ label,
 #kc-form-options .checkbox label,
 .pf-c-check__label {
   color: var(--myb-muted);
+  font-size: 0.86rem;
   font-weight: 500;
+}
+
+#kc-form-options input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  margin-top: 1px;
+  accent-color: var(--myb-primary);
 }
 
 #kc-form-buttons {
@@ -316,43 +493,52 @@ label,
 #kc-register,
 input#kc-login,
 input#kc-register,
-.pf-c-button.pf-m-primary {
+.pf-c-button.pf-m-primary,
+#kc-register-form input[type="submit"] {
   width: 100%;
-  min-height: 48px;
-  padding: 11px 18px !important;
-  background: linear-gradient(
-    135deg,
-    var(--myb-primary),
-    var(--myb-primary-strong)
-  ) !important;
+  min-height: 50px;
+  padding: 12px 18px !important;
+  background: linear-gradient(135deg, var(--myb-primary), var(--myb-primary-strong)) !important;
   border: 0 !important;
-  border-radius: 10px !important;
-  box-shadow: 0 8px 22px rgba(124, 58, 237, 0.27) !important;
+  border-radius: 11px !important;
+  box-shadow: 0 9px 24px rgba(124, 58, 237, 0.3) !important;
   color: #fff !important;
   font-size: 0.98rem;
-  font-weight: 700 !important;
-  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  font-weight: 720 !important;
+  transition: transform 0.16s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .btn-primary:hover,
 #kc-login:hover,
 #kc-register:hover,
-.pf-c-button.pf-m-primary:hover {
+.pf-c-button.pf-m-primary:hover,
+#kc-register-form input[type="submit"]:hover {
   filter: saturate(1.08);
   transform: translateY(-1px);
-  box-shadow: 0 11px 26px rgba(124, 58, 237, 0.34) !important;
+  box-shadow: 0 13px 30px rgba(124, 58, 237, 0.38) !important;
+}
+
+.btn-primary:active,
+#kc-login:active,
+#kc-register:active,
+.pf-c-button.pf-m-primary:active {
+  transform: translateY(0);
 }
 
 .btn-primary:focus-visible,
-.pf-c-button.pf-m-primary:focus-visible,
-a:focus-visible {
+.pf-c-button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+button:focus-visible {
   outline: 3px solid var(--myb-ring);
   outline-offset: 3px;
 }
 
 a {
   color: var(--myb-primary);
-  font-weight: 550;
+  font-weight: 620;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 a:hover {
@@ -360,14 +546,15 @@ a:hover {
 }
 
 #kc-info {
-  width: 100%;
-  margin: 2px 0 0;
+  width: auto;
+  margin: 0;
+  padding: 0 44px 38px;
 }
 
 #kc-info-wrapper,
 .login-pf-signup {
   margin: 0;
-  padding: 18px 0 0;
+  padding: 20px 0 0;
   background: transparent !important;
   border-top: 1px solid var(--myb-border);
   color: var(--myb-muted);
@@ -388,63 +575,162 @@ a:hover {
 
 .alert,
 .pf-c-alert {
-  border-radius: 10px;
+  margin: 0 44px 20px;
+  border: 0 !important;
+  border-radius: 11px;
+  box-shadow: none !important;
 }
 
-@media (max-width: 800px) {
+.pf-c-form__helper-text.pf-m-error,
+.kc-feedback-text,
+.help-block {
+  color: var(--myb-danger) !important;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 880px) {
   .login-pf-page {
     justify-content: flex-start;
-    padding: 24px 16px;
+    padding: 22px 16px 30px;
   }
 
   #kc-header {
-    margin-bottom: 16px;
+    width: min(100%, 600px);
+    margin-bottom: 14px;
   }
 
   #kc-header-wrapper {
-    font-size: 1.75rem !important;
+    font-size: 1.2rem !important;
+  }
+
+  #kc-header-wrapper::before {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .myb-home-link {
+    min-height: 34px;
+    padding: 6px 10px;
   }
 
   .login-pf-page .card-pf {
     width: 100%;
-    max-width: 560px;
-    padding: 28px 28px 26px !important;
-    border-top: 4px solid var(--myb-primary) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 16px 42px rgba(79, 70, 229, 0.13) !important;
+    max-width: 600px;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 54px rgba(67, 56, 150, 0.14) !important;
   }
 
-  #kc-content-wrapper {
-    display: block;
-  }
-
+  .login-pf-page .card-pf::before,
+  .login-pf-page .card-pf::after,
   #kc-content-wrapper::before {
     display: none;
   }
 
-  #kc-form,
-  #kc-info {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .login-pf-page {
-    padding: 18px 12px;
-  }
-
-  #kc-header-wrapper {
-    font-size: 1.55rem !important;
-  }
-
-  .login-pf-page .card-pf {
-    padding: 22px 18px 20px !important;
-    border-radius: 14px !important;
+  .login-pf-header {
+    min-height: 0;
+    padding: 66px 30px 20px;
   }
 
   #kc-page-title {
-    margin-bottom: 20px !important;
+    font-size: 1.75rem !important;
+  }
+
+  #kc-locale {
+    top: 20px;
+    right: 24px;
+  }
+
+  #kc-content-wrapper {
+    display: block;
+    min-height: 0;
+  }
+
+  #kc-form,
+  #kc-register-form {
+    width: 100%;
+    padding: 0 30px 34px;
+  }
+
+  #kc-info {
+    width: 100%;
+    padding: 0 30px 30px;
+  }
+
+  .alert,
+  .pf-c-alert {
+    margin-right: 30px;
+    margin-left: 30px;
+  }
+}
+
+@media (max-width: 540px) {
+  .login-pf-page {
+    padding: 16px 10px 24px;
+  }
+
+  #kc-header {
+    padding: 0 6px;
+  }
+
+  .myb-home-link {
+    width: 36px;
+    justify-content: center;
+    padding: 0;
+    overflow: hidden;
+    color: transparent;
+    white-space: nowrap;
+  }
+
+  .myb-home-link::before {
+    flex: 0 0 auto;
+    color: var(--myb-primary);
+  }
+
+  .login-pf-page .card-pf {
+    border-radius: 17px !important;
+  }
+
+  .login-pf-header {
+    padding: 62px 20px 18px;
+  }
+
+  #kc-page-title {
     font-size: 1.55rem !important;
+  }
+
+  #kc-locale {
+    top: 17px;
+    right: 17px;
+  }
+
+  #kc-form,
+  #kc-register-form {
+    padding: 0 20px 28px;
+  }
+
+  #kc-register-form {
+    display: block;
+  }
+
+  #kc-info {
+    padding: 0 20px 26px;
+  }
+
+  .login-pf-settings {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .login-pf-settings > [class*="col-"] {
+    margin-left: 0;
+  }
+
+  .alert,
+  .pf-c-alert {
+    margin-right: 20px;
+    margin-left: 20px;
   }
 }
 

@@ -1,0 +1,52 @@
+// Development environment with the service worker enabled, to test Web Push locally.
+// Used by: nx serve client --configuration=pushdev
+export const environment = {
+  production: false,
+  // Registers the service worker outside production builds (see PushNotificationService).
+  pwaInDev: true,
+  apiBaseUrl: 'http://localhost:4200',
+
+  // App identity & cross-app URLs — easy to change for localhost or production
+  app: {
+    currentApp: 'client' as const,
+    adminUrl: 'http://localhost:4201',
+    clientUrl: 'http://localhost:4200',
+  },
+
+  // Service URLs - Use relative paths when possible for proxy routing
+  services: {
+    keycloak: {
+      url: 'http://localhost:8080',
+      realm: 'MYB',
+      clientId: 'MYB-client',
+    },
+    payment: {
+      baseUrl: 'http://localhost:8084',
+      apiPath: '/api/payment',
+    },
+    document: {
+      graphqlUrl: 'http://localhost:5117/graphql',
+      baseUrl: 'http://localhost:8086',
+    },
+    invoice: {
+      graphqlUrl: 'http://localhost:8083/invoice/graphql',
+      baseUrl: 'http://localhost:8083',
+    },
+    timesheet: {
+      baseUrl: 'http://localhost:8082',
+    },
+    notification: {
+      baseUrl: 'http://localhost:8085',
+    },
+    coproperty: {
+      baseUrl: 'http://localhost:8088',
+    },
+  },
+
+  // Development proxy paths
+  proxyPaths: {
+    payment: '/api/payment',
+    auth: '/auth',
+    admin: '/admin/realms',
+  },
+};

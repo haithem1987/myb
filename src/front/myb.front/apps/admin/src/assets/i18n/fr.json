@@ -1495,6 +1495,21 @@
     "overdueFundCalls": "Appels de fonds en retard"
   },
   "notificationUi": {
+    "push": {
+      "bannerTitle": "Recevez vos alertes sur ce téléphone",
+      "bannerText": "Appels de fonds, paiements validés ou refusés : soyez prévenu même quand MYB est fermé.",
+      "enable": "Activer les notifications",
+      "disable": "Désactiver",
+      "later": "Plus tard",
+      "enabled": "Notifications activées sur cet appareil",
+      "denied": "Les notifications sont bloquées. Autorisez-les dans les réglages du navigateur pour ce site.",
+      "unsupported": "Ce navigateur ne permet pas les notifications push.",
+      "iosInstallTitle": "Installez MYB pour recevoir les notifications",
+      "iosInstallText": "Sur iPhone, touchez Partager puis « Sur l'écran d'accueil », et ouvrez MYB depuis l'icône.",
+      "settingTitle": "Notifications push",
+      "settingText": "Recevoir les alertes MYB sur cet appareil, même quand l'application est fermée.",
+      "error": "Impossible d'activer les notifications pour le moment. Réessayez plus tard."
+    },
     "title": "Notifications",
     "markAllRead": "Tout lire",
     "empty": "Aucune notification",

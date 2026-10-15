@@ -1,0 +1,35 @@
+{
+  // Local Docker backend for debugging and Web Push tests (docs/DEBUG_DOCKER_LOCAL.md).
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Docker: backend debug",
+      "detail": "Debug images of notification + coproperty (with vsdbg), Keycloak set up",
+      "type": "shell",
+      "command": "bash scripts/push-local.sh up --debug",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: backend (normal images)",
+      "type": "shell",
+      "command": "bash scripts/push-local.sh up",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: send test push to owner",
+      "type": "shell",
+      "command": "bash scripts/push-local.sh send owner \"Notification de test MYB\"",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: stop backend",
+      "type": "shell",
+      "command": "bash scripts/push-local.sh down",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+# Local debugging overlay: Debug builds with the vsdbg debugger inside the containers.
+#
+#   bash scripts/push-local.sh up --debug
+#   (or) docker compose -f docker-compose.yml -f docker-compose.debug.yml up -d --build myb-notification myb-coproperty
+#
+# Then attach from VS Code (Run and Debug → "Docker: attach …") or Visual Studio
+# (Debug → Attach to Process → Connection type "Docker (Linux Container)").
+# See docs/DEBUG_DOCKER_LOCAL.md. Never use this file outside a developer machine.
+
+services:
+  myb-notification:
+    image: myb-myb-notification:debug
+    build:
+      target: debug
+      args:
+        BUILD_CONFIGURATION: Debug
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Logging__LogLevel__Myb.Notification=Debug
+    # A paused breakpoint must not be mistaken for a crash.
+    restart: "no"
+
+  myb-coproperty:
+    image: myb-myb-coproperty:debug
+    build:
+      target: debug
+      args:
+        BUILD_CONFIGURATION: Debug
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Logging__LogLevel__Myb.Coproperty=Debug
+    restart: "no"

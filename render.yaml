@@ -212,6 +212,14 @@ services:
         sync: false
       - key: Email__FromAddress
         value: noreply@myb.com
+      - key: NotificationSecurity__TrustedServiceClients__0
+        value: myb-backend
+      - key: Push__VapidPublicKey
+        sync: false
+      - key: Push__VapidPrivateKey
+        sync: false
+      - key: Push__Subject
+        value: mailto:support@myb-platform.com
 
   - env: docker
     type: web

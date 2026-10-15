@@ -4,11 +4,12 @@ import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, Validati
 import { RouterModule } from '@angular/router';
 import { KeycloakService } from 'libs/auth/src/lib/keycloak.service';
 import { UserDropdownComponent } from '../user-dropdown/user-dropdown.component';
+import { PushOptInComponent } from '../push-opt-in/push-opt-in.component';
 
 @Component({
   selector: 'myb-profile-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, UserDropdownComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, UserDropdownComponent, PushOptInComponent],
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.scss'],
 })

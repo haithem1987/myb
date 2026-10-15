@@ -251,7 +251,8 @@ namespace Myb.Coproperty.GraphQL.Mutations
                     {
                         SenderId = userId.ToString(),
                         ReceiverId = managerId,
-                        Message = message
+                        Message = message,
+                        Url = NotificationLinks.SyndicSpaceSelection
                     });
                     response.EnsureSuccessStatusCode();
                 }

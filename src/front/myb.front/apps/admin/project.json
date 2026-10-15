@@ -72,6 +72,25 @@
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true
+        },
+        "pushdev": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/admin/src/environments/environment.ts",
+              "with": "apps/admin/src/environments/environment.pushdev.ts"
+            }
+          ],
+          "assets": [
+            "apps/admin/src/favicon.ico",
+            { "glob": "service-worker.js", "input": "apps/client/src", "output": "/" },
+            "apps/admin/src/assets"
+          ]
         }
       },
       "defaultConfiguration": "production"
@@ -95,6 +114,9 @@
         },
         "development": {
           "buildTarget": "admin:build:development"
+        },
+        "pushdev": {
+          "buildTarget": "admin:build:pushdev"
         }
       },
       "defaultConfiguration": "development"

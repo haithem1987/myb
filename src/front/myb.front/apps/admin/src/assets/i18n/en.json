@@ -1603,6 +1603,21 @@
     "overdueFundCalls": "Overdue calls for funds"
   },
   "notificationUi": {
+    "push": {
+      "bannerTitle": "Get your alerts on this phone",
+      "bannerText": "Calls for funds, approved or rejected payments: be notified even when MYB is closed.",
+      "enable": "Enable notifications",
+      "disable": "Disable",
+      "later": "Later",
+      "enabled": "Notifications enabled on this device",
+      "denied": "Notifications are blocked. Allow them for this site in your browser settings.",
+      "unsupported": "This browser does not support push notifications.",
+      "iosInstallTitle": "Install MYB to receive notifications",
+      "iosInstallText": "On iPhone, tap Share then “Add to Home Screen”, and open MYB from the icon.",
+      "settingTitle": "Push notifications",
+      "settingText": "Receive MYB alerts on this device, even when the app is closed.",
+      "error": "Notifications could not be enabled right now. Please try again later."
+    },
     "title": "Notifications",
     "markAllRead": "Mark all as read",
     "empty": "No notifications",

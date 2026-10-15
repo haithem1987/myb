@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Myb.Common.Messaging;
 using Myb.Common.Authentification.Security;
 using Myb.Common.Repositories;
 using Myb.Notification.Hubs;
 using Myb.Notification.Providers;
+using Myb.Notification.Security;
 using Myb.Notification.Services;
 
 namespace Myb.Notification.Configuration;
@@ -79,6 +81,18 @@ public static class Configuration
 
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<IUserIdProvider, KeycloakUserIdProvider>();
+        builder.Services.Configure<NotificationSecurityOptions>(
+            builder.Configuration.GetSection(NotificationSecurityOptions.SectionName));
+
+        // Web Push: free browser push services authenticated with this deployment's VAPID keys.
+        builder.Services.Configure<PushOptions>(builder.Configuration.GetSection(PushOptions.SectionName));
+        builder.Services.AddHttpClient(WebPushSender.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(15));
+        builder.Services.AddSingleton<IPushSubscriptionStore, PushSubscriptionStore>();
+        builder.Services.AddSingleton<IWebPushSender, WebPushSender>();
+        builder.Services.AddSingleton<PushDispatcher>();
+        builder.Services.AddSingleton<IPushQueue>(sp => sp.GetRequiredService<PushDispatcher>());
+        builder.Services.AddHostedService(sp => sp.GetRequiredService<PushDispatcher>());
+
         builder.Services.AddScoped<INotificationService, NotificationService>();
         builder.Services.AddEmailPublisher();
         builder.Services.AddControllers();
@@ -103,8 +117,30 @@ public static class Configuration
                 context.Database.ExecuteSqlRaw(
                     "CREATE INDEX IF NOT EXISTS \"IX_Notifications_ReceiverId_CopropertyId_CreatedAt\" " +
                     "ON \"Notifications\" (\"ReceiverId\", \"CopropertyId\", \"CreatedAt\");");
+                context.Database.ExecuteSqlRaw(
+                    "CREATE TABLE IF NOT EXISTS \"PushSubscriptions\" (" +
+                    "\"Id\" text NOT NULL PRIMARY KEY, " +
+                    "\"UserId\" text NOT NULL, " +
+                    "\"Endpoint\" text NOT NULL, " +
+                    "\"P256dh\" text NOT NULL, " +
+                    "\"Auth\" text NOT NULL, " +
+                    "\"UserAgent\" text NULL, " +
+                    "\"CreatedAt\" timestamp with time zone NOT NULL, " +
+                    "\"LastSuccessAt\" timestamp with time zone NULL, " +
+                    "\"FailureCount\" integer NOT NULL DEFAULT 0);");
+                context.Database.ExecuteSqlRaw(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS \"IX_PushSubscriptions_Endpoint\" " +
+                    "ON \"PushSubscriptions\" (\"Endpoint\");");
+                context.Database.ExecuteSqlRaw(
+                    "CREATE INDEX IF NOT EXISTS \"IX_PushSubscriptions_UserId\" " +
+                    "ON \"PushSubscriptions\" (\"UserId\");");
             }
         }
+
+        var push = app.Services.GetRequiredService<IOptions<PushOptions>>().Value;
+        if (!push.IsConfigured)
+            app.Logger.LogWarning(
+                "[Notification] Web Push disabled: set Push__VapidPublicKey and Push__VapidPrivateKey to enable it.");
 
         app.UseMybApiSecurity();
         app.UseAuthentication();

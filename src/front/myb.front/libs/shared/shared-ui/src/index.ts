@@ -25,6 +25,8 @@ export * from '../../infra/services/functions-utils.service';
 export * from '../../infra/services/holiday.service';
 
 export * from '../../infra/services/notification.service';
+export * from '../../infra/services/push-notification.service';
+export * from './lib/components/push-opt-in/push-opt-in.component';
 
 export * from '../../infra/services/language.service';
 

@@ -111,7 +111,8 @@ namespace Myb.Coproperty.GraphQL.Mutations
                             SenderId = owner.UserId.ToString(),
                             ReceiverId = relation.ManagerId.ToString(),
                             CopropertyId = relation.copropertyId.ToString(),
-                            Message = $"{owner.FirstName} {owner.LastName} a mis à jour son profil."
+                            Message = $"{owner.FirstName} {owner.LastName} a mis à jour son profil.",
+                            Url = NotificationLinks.SyndicPage(relation.copropertyId, "owners")
                         });
                         response.EnsureSuccessStatusCode();
                     }

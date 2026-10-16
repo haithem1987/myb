@@ -14,12 +14,14 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "CopropertyId",
                 table: "Payments",
+                schema: "payment",
                 type: "text",
                 nullable: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_CopropertyId",
                 table: "Payments",
+                schema: "payment",
                 column: "CopropertyId");
         }
 
@@ -27,11 +29,13 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
         {
             migrationBuilder.DropIndex(
                 name: "IX_Payments_CopropertyId",
-                table: "Payments");
+                table: "Payments",
+                schema: "payment");
 
             migrationBuilder.DropColumn(
                 name: "CopropertyId",
-                table: "Payments");
+                table: "Payments",
+                schema: "payment");
         }
     }
 }

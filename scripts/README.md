@@ -56,6 +56,7 @@ docker compose up -d --build
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
+| `test-bank-reconciliation.ps1` | 🏦 E2E test for bank reconciliation (no Keycloak needed) | `.\scripts\test-bank-reconciliation.ps1` |
 | `setup-real-data.sh` | 🌟 Create test users & real database data | `./scripts/setup-real-data.sh [full\|keycloak-only\|db-only]` |
 | `generate-budgets.sh` | 🎯 Generate budgets & fund calls for coproperties | `./scripts/generate-budgets.sh` |
 | `keycloak-setup-roles-users.sh` | Setup Keycloak roles & initial users | `./scripts/keycloak-setup-roles-users.sh` |

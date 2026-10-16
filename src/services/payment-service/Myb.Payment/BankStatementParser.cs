@@ -91,7 +91,7 @@ public class BankStatementParser : IBankStatementParser
         return new BankTransaction
         {
             BankStatementId = statementId,
-            Date = date,
+            Date = DateTime.SpecifyKind(date, DateTimeKind.Utc),
             Amount = amount,
             Label = label.Trim(),
             Reference = reference?.Trim()

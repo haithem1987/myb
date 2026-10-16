@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Myb.Common.Authentification.Extensions;
 using Myb.Common.Authentification.Security;
 using Myb.Common.Messaging;
@@ -49,6 +50,14 @@ using (var scope = app.Services.CreateScope())
         // If no migrations exist, ensure the DB is created
         await db.Database.EnsureCreatedAsync();
     }
+}
+
+// Seed test data in Development (matches test-bank-statement.ofx amounts)
+if (app.Environment.IsDevelopment())
+{
+    await DevDataSeeder.SeedAsync(app.Services);
+    // Bypass Keycloak when header "X-Dev-Auth: bypass" is present
+    app.UseMiddleware<DevAuthMiddleware>();
 }
 
 app.UseHttpsRedirection();

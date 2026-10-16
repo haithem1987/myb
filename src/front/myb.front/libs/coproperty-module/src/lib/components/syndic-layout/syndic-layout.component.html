@@ -129,8 +129,16 @@
         <span class="badge" *ngIf="totalDiscussions() > 0">{{ totalDiscussions() }}</span>
       </span>
 
+      <a [routerLink]="syndicRoute('communication')"
+         routerLinkActive="active"
+         class="nav-item"
+         (click)="onNavItemClick()">
+        <i class="bi bi-chat-square-dots"></i>
+        <span class="nav-text">Communication</span>
+      </a>
+
       <a [routerLink]="syndicRoute('settings')"
-         routerLinkActive="active" 
+         routerLinkActive="active"
          class="nav-item"
          (click)="onNavItemClick()">
         <i class="bi bi-gear"></i>

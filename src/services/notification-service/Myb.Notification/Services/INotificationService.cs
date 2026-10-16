@@ -7,7 +7,8 @@ public interface INotificationService
     Task SendNotificationAsync(
         string senderId, string receiverId, string message, string? copropertyId = null,
         bool push = false, string? url = null, PushUrgency urgency = PushUrgency.Normal);
-    Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody, string? language = null);
+    Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody,
+        string? language = null, string? copropertyId = null, string? recipientId = null);
     Task<List<Models.Notification>> GetNotificationsAsync(string userId, string? copropertyId = null);
     /// <summary>Marks the notification as read when it belongs to <paramref name="receiverId"/>
     /// (any receiver when null). Returns false when no such notification exists.</summary>

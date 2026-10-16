@@ -94,6 +94,8 @@ public static class Configuration
         builder.Services.AddHostedService(sp => sp.GetRequiredService<PushDispatcher>());
 
         builder.Services.AddScoped<INotificationService, NotificationService>();
+        builder.Services.AddScoped<ICommunicationLogService, CommunicationLogService>();
+        builder.Services.AddScoped<ICampaignService, CampaignService>();
         builder.Services.AddEmailPublisher();
         builder.Services.AddControllers();
         builder.Services.AddHealthChecks();
@@ -134,6 +136,65 @@ public static class Configuration
                 context.Database.ExecuteSqlRaw(
                     "CREATE INDEX IF NOT EXISTS \"IX_PushSubscriptions_UserId\" " +
                     "ON \"PushSubscriptions\" (\"UserId\");");
+
+                // Communication Hub tables
+                context.Database.ExecuteSqlRaw("""
+                    CREATE TABLE IF NOT EXISTS "CommunicationLogs" (
+                        "Id" uuid NOT NULL PRIMARY KEY,
+                        "SenderId" text NULL,
+                        "SenderType" text NOT NULL DEFAULT 'system',
+                        "RecipientId" text NOT NULL,
+                        "RecipientEmail" text NULL,
+                        "CopropertyId" text NULL,
+                        "Channel" integer NOT NULL,
+                        "Subject" text NOT NULL,
+                        "Body" text NULL,
+                        "TemplateId" text NULL,
+                        "Status" integer NOT NULL DEFAULT 1,
+                        "FailureReason" text NULL,
+                        "EventType" text NULL,
+                        "RelatedEntityId" uuid NULL,
+                        "RelatedEntityType" text NULL,
+                        "CampaignId" uuid NULL,
+                        "SentAt" timestamp with time zone NOT NULL,
+                        "DeliveredAt" timestamp with time zone NULL,
+                        "ReadAt" timestamp with time zone NULL
+                    );
+                    """);
+                context.Database.ExecuteSqlRaw(
+                    "CREATE INDEX IF NOT EXISTS \"IX_CommunicationLogs_CopropertyId_SentAt\" " +
+                    "ON \"CommunicationLogs\" (\"CopropertyId\", \"SentAt\" DESC);");
+                context.Database.ExecuteSqlRaw(
+                    "CREATE INDEX IF NOT EXISTS \"IX_CommunicationLogs_RecipientId_SentAt\" " +
+                    "ON \"CommunicationLogs\" (\"RecipientId\", \"SentAt\" DESC);");
+                context.Database.ExecuteSqlRaw(
+                    "CREATE INDEX IF NOT EXISTS \"IX_CommunicationLogs_CampaignId\" " +
+                    "ON \"CommunicationLogs\" (\"CampaignId\") WHERE \"CampaignId\" IS NOT NULL;");
+
+                context.Database.ExecuteSqlRaw("""
+                    CREATE TABLE IF NOT EXISTS "Campaigns" (
+                        "Id" uuid NOT NULL PRIMARY KEY,
+                        "Name" text NOT NULL,
+                        "Description" text NULL,
+                        "CopropertyId" text NULL,
+                        "CreatedBy" text NOT NULL,
+                        "Status" integer NOT NULL DEFAULT 0,
+                        "ChannelsJson" text NOT NULL DEFAULT '[]',
+                        "RecipientIdsJson" text NOT NULL DEFAULT '[]',
+                        "Message" text NOT NULL,
+                        "Subject" text NULL,
+                        "ScheduledAt" timestamp with time zone NULL,
+                        "StartedAt" timestamp with time zone NULL,
+                        "CompletedAt" timestamp with time zone NULL,
+                        "TotalRecipients" integer NOT NULL DEFAULT 0,
+                        "SentCount" integer NOT NULL DEFAULT 0,
+                        "FailedCount" integer NOT NULL DEFAULT 0,
+                        "CreatedAt" timestamp with time zone NOT NULL
+                    );
+                    """);
+                context.Database.ExecuteSqlRaw(
+                    "CREATE INDEX IF NOT EXISTS \"IX_Campaigns_CopropertyId_CreatedAt\" " +
+                    "ON \"Campaigns\" (\"CopropertyId\", \"CreatedAt\" DESC);");
             }
         }
 

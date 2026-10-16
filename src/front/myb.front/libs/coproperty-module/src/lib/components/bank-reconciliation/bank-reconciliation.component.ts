@@ -88,14 +88,13 @@ export class BankReconciliationComponent {
       .subscribe({
         next: summary => {
           this.importSummary.set(summary);
-          this.toastService.show(
-            `Importé : ${summary.transactionCount} transactions — ${summary.autoMatched} rapprochées automatiquement`,
-            { classname: 'bg-success text-white' }
+          this.toastService.showSuccess(
+            `Importé : ${summary.transactionCount} transactions — ${summary.autoMatched} rapprochées automatiquement`
           );
           this.loadReconciliation(summary.statementId);
         },
         error: err => {
-          this.toastService.show(err?.error ?? 'Erreur lors de l\'import', { classname: 'bg-danger text-white' });
+          this.toastService.showError(err?.error ?? 'Erreur lors de l\'import');
         }
       });
 
@@ -113,7 +112,7 @@ export class BankReconciliationComponent {
       )
       .subscribe({
         next: data => this.rows.set(data.items),
-        error: () => this.toastService.show('Impossible de charger les détails du rapprochement', { classname: 'bg-danger text-white' })
+        error: () => this.toastService.showError('Impossible de charger les détails du rapprochement')
       });
   }
 
@@ -135,9 +134,9 @@ export class BankReconciliationComponent {
                 : r
             )
           );
-          this.toastService.show('Rapprochement validé', { classname: 'bg-success text-white' });
+          this.toastService.showSuccess('Rapprochement validé');
         },
-        error: () => this.toastService.show('Erreur lors de la validation', { classname: 'bg-danger text-white' })
+        error: () => this.toastService.showError('Erreur lors de la validation')
       });
   }
 

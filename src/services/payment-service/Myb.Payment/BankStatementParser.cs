@@ -134,14 +134,14 @@ public class BankStatementParser : IBankStatementParser
             var header = lines[0].Split(delimiter);
             for (int i = 0; i < header.Length; i++)
             {
-                var h = header[i].Trim('"', ' ').ToLowerInvariant();
+                var h = header[i].Trim('"', ' ', '\r', '\n').ToLowerInvariant();
                 if (h is "date" or "date opération" or "date operation") dateCol = i;
                 else if (h is "montant" or "amount" or "debit" or "credit" or "débit" or "crédit") amountCol = i;
                 else if (h is "libellé" or "libelle" or "label" or "description" or "motif") labelCol = i;
                 else if (h is "référence" or "reference" or "ref" or "numéro" or "numero") refCol = i;
             }
             // Skip header if first cell looks like a date field name
-            if (!DateTime.TryParse(header[dateCol].Trim('"', ' '), out _)) startRow = 1;
+            if (!DateTime.TryParse(header[dateCol].Trim('"', ' ', '\r', '\n'), out _)) startRow = 1;
         }
 
         for (int i = startRow; i < lines.Length; i++)

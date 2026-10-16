@@ -1,8 +1,10 @@
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Myb.Payment.EntityFrameWork.Infra;
 using Myb.Payment.Models;
+using UglyToad.PdfPig;
 
 namespace Myb.Payment;
 
@@ -36,15 +38,38 @@ public class BankStatementController : ControllerBase
         {
             "OFX" or "QFX" => "OFX",
             "CSV" => "CSV",
+            "PDF" => "PDF",
             _ => null
         };
 
         if (format is null)
-            return BadRequest("Unsupported file format. Please upload an OFX or CSV file.");
+            return BadRequest("Unsupported file format. Please upload an OFX, CSV, or PDF file.");
 
         string content;
-        using (var reader = new StreamReader(file.OpenReadStream()))
+        string parseFormat = format;
+        if (format == "PDF")
+        {
+            using var stream = file.OpenReadStream();
+            var sb = new System.Text.StringBuilder();
+            using var pdfDoc = PdfDocument.Open(stream);
+            foreach (var page in pdfDoc.GetPages())
+                sb.Append(page.Text);
+            // Split on date boundaries (YYYY-MM-DD;) to reconstruct CSV rows
+            var rawText = sb.ToString();
+            var header = Regex.Match(rawText, @"^(\w[^0-9\r\n]+?)\d{4}-\d{2}-\d{2}");
+            var result = new System.Text.StringBuilder();
+            if (header.Success)
+                result.AppendLine(header.Groups[1].Value.TrimEnd());
+            foreach (Match m in Regex.Matches(rawText, @"\d{4}-\d{2}-\d{2};[^\r\n]*?(?=\d{4}-\d{2}-\d{2}|$)"))
+                result.AppendLine(m.Value.TrimEnd());
+            content = result.ToString();
+            parseFormat = "CSV";
+        }
+        else
+        {
+            using var reader = new StreamReader(file.OpenReadStream());
             content = await reader.ReadToEndAsync();
+        }
 
         var userId = User.FindFirst("sub")?.Value
                   ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
@@ -64,7 +89,7 @@ public class BankStatementController : ControllerBase
         IReadOnlyList<BankTransaction> transactions;
         try
         {
-            transactions = _parser.Parse(content, format, statement.Id);
+            transactions = _parser.Parse(content, parseFormat, statement.Id);
         }
         catch (Exception ex)
         {

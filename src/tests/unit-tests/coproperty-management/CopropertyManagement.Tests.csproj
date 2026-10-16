@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <IsTestProject>true</IsTestProject>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,12 +15,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Moq" Version="4.20.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.11" />
     <PackageReference Include="Bogus" Version="35.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../services/coproperty-management/Myb.Coproperty/Myb.Coproperty.csproj" />
+    <ProjectReference Include="../../../services/coproperty-management/Myb.Coproperty/Myb.Coproperty.csproj" />
   </ItemGroup>
 
 </Project>

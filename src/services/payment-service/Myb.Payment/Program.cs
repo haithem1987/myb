@@ -21,7 +21,7 @@ builder.Services.AddControllers()
 builder.Services.AddDbContext<PaymentContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("PaymentDBConnection"),
-        npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "payment")));
+        npgsql => npgsql.MigrationsHistoryTable("__PaymentMigrationsHistory")));
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddEmailPublisher();
@@ -41,7 +41,6 @@ app.MapOpenApi();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PaymentContext>();
-    await db.Database.ExecuteSqlRawAsync("CREATE SCHEMA IF NOT EXISTS payment;");
     await db.Database.MigrateAsync();
 }
 

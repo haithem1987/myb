@@ -13,21 +13,18 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
         {
             migrationBuilder.RenameColumn(
                 name: "PaymentId",
-                table: "Payments",
-                schema: "payment",
+                table: "SubscriptionPayments",
                 newName: "Id");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAt",
-                table: "Payments",
-                schema: "payment",
+                table: "SubscriptionPayments",
                 type: "timestamp with time zone",
                 nullable: true);
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "UpdatedAt",
-                table: "Payments",
-                schema: "payment",
+                table: "SubscriptionPayments",
                 type: "timestamp with time zone",
                 nullable: true);
         }
@@ -37,18 +34,15 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "CreatedAt",
-                table: "Payments",
-                schema: "payment");
+                table: "SubscriptionPayments");
 
             migrationBuilder.DropColumn(
                 name: "UpdatedAt",
-                table: "Payments",
-                schema: "payment");
+                table: "SubscriptionPayments");
 
             migrationBuilder.RenameColumn(
                 name: "Id",
-                table: "Payments",
-                schema: "payment",
+                table: "SubscriptionPayments",
                 newName: "PaymentId");
         }
     }

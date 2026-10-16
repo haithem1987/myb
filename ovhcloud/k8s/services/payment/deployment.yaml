@@ -35,8 +35,8 @@ spec:
               key: ASPNETCORE_ENVIRONMENT
         - name: ASPNETCORE_URLS
           value: "http://+:8084"
-        # Payment tables and migration history live in the dedicated `payment`
-        # PostgreSQL schema, isolated from coproperty's public tables.
+        # Payment uses unique SubscriptionPayments and migration-history table
+        # names so it remains isolated from coproperty tables in the same DB.
         - name: ConnectionStrings__PaymentDBConnection
           valueFrom:
             secretKeyRef:

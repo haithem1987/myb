@@ -12,12 +12,8 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(
-                name: "payment");
-
             migrationBuilder.CreateTable(
-                name: "Payments",
-                schema: "payment",
+                name: "SubscriptionPayments",
                 columns: table => new
                 {
                     PaymentId = table.Column<int>(type: "integer", nullable: false)
@@ -42,8 +38,7 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Payments",
-                schema: "payment");
+                name: "SubscriptionPayments");
         }
     }
 }

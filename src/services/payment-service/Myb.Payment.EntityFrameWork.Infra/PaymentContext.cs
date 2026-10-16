@@ -33,9 +33,8 @@ public class PaymentContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.HasDefaultSchema("payment");
-
         modelBuilder.Entity<StripePayment>()
+            .ToTable("SubscriptionPayments")
             .HasIndex(payment => payment.CopropertyId);
     }
 }

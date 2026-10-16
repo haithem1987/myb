@@ -13,29 +13,25 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
         {
             migrationBuilder.AddColumn<string>(
                 name: "CopropertyId",
-                table: "Payments",
-                schema: "payment",
+                table: "SubscriptionPayments",
                 type: "text",
                 nullable: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payments_CopropertyId",
-                table: "Payments",
-                schema: "payment",
+                name: "IX_SubscriptionPayments_CopropertyId",
+                table: "SubscriptionPayments",
                 column: "CopropertyId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropIndex(
-                name: "IX_Payments_CopropertyId",
-                table: "Payments",
-                schema: "payment");
+                name: "IX_SubscriptionPayments_CopropertyId",
+                table: "SubscriptionPayments");
 
             migrationBuilder.DropColumn(
                 name: "CopropertyId",
-                table: "Payments",
-                schema: "payment");
+                table: "SubscriptionPayments");
         }
     }
 }

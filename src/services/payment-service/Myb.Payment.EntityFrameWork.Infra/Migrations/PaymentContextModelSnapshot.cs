@@ -18,8 +18,7 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasDefaultSchema("payment");
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
@@ -75,7 +74,7 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
 
                     b.HasIndex("CopropertyId");
 
-                    b.ToTable("Payments", "payment");
+                    b.ToTable("SubscriptionPayments");
                 });
 #pragma warning restore 612, 618
         }

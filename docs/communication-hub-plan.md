@@ -385,10 +385,27 @@ this.canSeeGlobalStats = this.keycloakService.hasRole('system-admin');
 - **system-admin** : sélecteur de copropriété sur toute la liste, vue stats globales
 - **MYB_MANAGER** : sélecteur limité à ses copropriétés, pas de stats cross-copropriétés
 
-### 9.5 Points à clarifier
+### 9.5 Décisions arrêtées ✅
 
-- [ ] Un gestionnaire peut-il voir les communications envoyées **par d'autres gestionnaires** de la même copropriété ?
-- [ ] Les campagnes d'un gestionnaire sont-elles visibles par les autres gestionnaires de la même copropriété ?
+- ✅ **Partage intra-copropriété** : les gestionnaires d'une même copropriété voient tous les logs et campagnes créés sur cette copropriété, quel que soit le gestionnaire qui les a créés.
+- ✅ **Ségrégation SaaS stricte** : une copropriété ne voit **jamais** les objets d'une autre copropriété. Le `CopropertyId` est la clé de ségrégation sur **tous** les objets du module (logs, campagnes, stats). Cette règle s'applique y compris pour `system-admin` au niveau de l'API — le filtre copropriété doit toujours être validé, jamais court-circuité.
+
+#### Règle d'implémentation à respecter partout
+
+```csharp
+// ❌ Jamais ça — même pour un system-admin
+_db.CommunicationLogs.ToListAsync();
+
+// ✅ Toujours filtrer par copropertyId validé
+_db.CommunicationLogs
+   .Where(l => l.CopropertyId == validatedCopropertyId)
+   .ToListAsync();
+```
+
+Le `IAccessScopeService` doit retourner, pour chaque appel :
+- `system-admin` + `copropertyId` en query param → valider que la copropriété existe, filtrer dessus
+- `system-admin` sans `copropertyId` → autoriser la vue agrégée (stats globales uniquement, jamais les données brutes sans filtre)
+- `MYB_MANAGER` → filtrer sur ses copropriétés **ET** vérifier que le `copropertyId` demandé lui appartient (rejeter 403 sinon)
 
 ---
 

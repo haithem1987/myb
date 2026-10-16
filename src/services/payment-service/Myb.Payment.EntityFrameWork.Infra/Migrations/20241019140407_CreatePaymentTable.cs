@@ -30,7 +30,7 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payments", x => x.PaymentId);
+                    table.PrimaryKey("PK_SubscriptionPayments", x => x.PaymentId);
                 });
         }
 

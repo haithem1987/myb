@@ -8,3 +8,18 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+
+@media print {
+  /* Hide everything except the reconciliation table */
+  body > *:not(myb-bank-reconciliation) { display: none !important; }
+
+  .btn, label[for], .d-flex.gap-2.mb-3 { display: none !important; }
+
+  .card { border: none !important; box-shadow: none !important; }
+
+  .table { font-size: 0.75rem; }
+
+  h2::before {
+    content: "Rapprochement bancaire — ";
+  }
+}

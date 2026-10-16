@@ -20,7 +20,7 @@ public class ReconciliationEngine : IReconciliationEngine
         Guid statementId)
     {
         var results = new List<ReconciliationResult>();
-        var usedPaymentIds = new HashSet<int>();
+        var usedPaymentIds = new HashSet<int?>();
 
         foreach (var tx in bankTransactions)
         {

@@ -9,7 +9,14 @@
       <p class="text-muted mb-0 mt-1">Importez un relevé OFX ou CSV pour vérifier automatiquement les paiements reçus</p>
     </div>
 
-    <label class="btn btn-primary" [class.disabled]="isUploading()">
+    <div class="d-flex gap-2 align-items-center">
+      <button *ngIf="importSummary()" class="btn btn-outline-secondary" (click)="downloadCsv()" title="Télécharger en CSV">
+        <i class="bi bi-filetype-csv me-1"></i>CSV
+      </button>
+      <button *ngIf="importSummary()" class="btn btn-outline-secondary" (click)="printPdf()" title="Imprimer / Enregistrer en PDF ou image">
+        <i class="bi bi-file-earmark-pdf me-1"></i>PDF / Image
+      </button>
+      <label class="btn btn-primary" [class.disabled]="isUploading()">
       <i class="bi bi-cloud-upload me-2"></i>
       <span *ngIf="!isUploading()">Importer un relevé</span>
       <span *ngIf="isUploading()">
@@ -17,6 +24,7 @@
       </span>
       <input type="file" accept=".ofx,.qfx,.csv" class="d-none" (change)="onFileSelected($event)" [disabled]="isUploading()">
     </label>
+    </div>
   </div>
 
   <!-- Summary cards -->

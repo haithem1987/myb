@@ -149,6 +149,20 @@ export class BankReconciliationComponent {
     }
   }
 
+  downloadCsv(): void {
+    const id = this.importSummary()?.statementId;
+    if (!id) return;
+    // Use a temporary anchor to trigger the browser download
+    const a = document.createElement('a');
+    a.href = `/api/bank-statements/${id}/export`;
+    a.download = '';
+    a.click();
+  }
+
+  printPdf(): void {
+    window.print();
+  }
+
   statusBadgeClass(status?: ReconciliationStatus): string {
     switch (status) {
       case 'AutoMatched': return 'badge bg-success';

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Myb.Payment.EntityFrameWork.Infra;
@@ -105,7 +106,7 @@ public class BankStatementController : ControllerBase
 
         var paymentIds = statement.Results
             .Where(r => r.MatchedPaymentId.HasValue)
-            .Select(r => r.MatchedPaymentId!.Value)
+            .Select(r => r.MatchedPaymentId)
             .Distinct()
             .ToHashSet();
 
@@ -116,8 +117,8 @@ public class BankStatementController : ControllerBase
         var items = statement.Transactions.Select(tx =>
         {
             var result = statement.Results.FirstOrDefault(r => r.BankTransactionId == tx.Id);
-            StripePayment? matched = result?.MatchedPaymentId.HasValue == true
-                ? payments.GetValueOrDefault(result.MatchedPaymentId!.Value)
+            StripePayment? matched = result?.MatchedPaymentId != null
+                ? payments.GetValueOrDefault(result.MatchedPaymentId)
                 : null;
 
             return new
@@ -158,6 +159,58 @@ public class BankStatementController : ControllerBase
             Items = items
         });
     }
+
+    /// <summary>GET /api/bank-statements/{id}/export — download reconciliation as CSV.</summary>
+    [HttpGet("{id:guid}/export")]
+    public async Task<IActionResult> Export(Guid id)
+    {
+        var statement = await _context.BankStatements
+            .Include(s => s.Transactions)
+            .Include(s => s.Results)
+            .FirstOrDefaultAsync(s => s.Id == id);
+
+        if (statement is null)
+            return NotFound();
+
+        var paymentIds = statement.Results
+            .Where(r => r.MatchedPaymentId != null)
+            .Select(r => r.MatchedPaymentId)
+            .Distinct()
+            .ToHashSet();
+
+        var payments = await _context.Payments
+            .Where(p => paymentIds.Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id);
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Date;Libellé;Référence;Montant;Statut;Paiement associé;Date paiement;Validé manuellement");
+
+        foreach (var tx in statement.Transactions)
+        {
+            var result = statement.Results.FirstOrDefault(r => r.BankTransactionId == tx.Id);
+            var matched = result?.MatchedPaymentId != null ? payments.GetValueOrDefault(result.MatchedPaymentId) : null;
+
+            sb.AppendLine(string.Join(";",
+                tx.Date.ToString("dd/MM/yyyy"),
+                CsvEscape(tx.Label),
+                CsvEscape(tx.Reference ?? ""),
+                tx.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),
+                result?.Status.ToString() ?? "N/A",
+                matched != null ? CsvEscape(matched.ServiceName) : "",
+                matched != null ? matched.PaymentDate.ToString("dd/MM/yyyy") : "",
+                result?.IsManuallyValidated.ToString() ?? "false"
+            ));
+        }
+
+        var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+        var fileName = $"rapprochement-{statement.ImportedAt:yyyyMMdd}.csv";
+        return File(bytes, "text/csv; charset=utf-8", fileName);
+    }
+
+    private static string CsvEscape(string value) =>
+        value.Contains(';') || value.Contains('"') || value.Contains('\n')
+            ? $"\"{value.Replace("\"", "\"\"")}\""
+            : value;
 
     /// <summary>POST /api/bank-statements/{statementId}/reconciliation/{resultId}/validate — manually validate a suggestion.</summary>
     [HttpPost("{statementId:guid}/reconciliation/{resultId:guid}/validate")]

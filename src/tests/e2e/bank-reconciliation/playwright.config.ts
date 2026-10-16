@@ -1,3 +1,11 @@
+/**
+ * Playwright e2e tests for bank-reconciliation Angular component.
+ *
+ * Run from src/front/myb.front (where @playwright/test is installed):
+ *   cd src/front/myb.front
+ *   npx playwright test --config=../../tests/e2e/bank-reconciliation/playwright.config.ts
+ *   npx playwright test --config=../../tests/e2e/bank-reconciliation/playwright.config.ts --ui
+ */
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({

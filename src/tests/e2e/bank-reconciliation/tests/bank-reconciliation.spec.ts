@@ -4,14 +4,13 @@ import {
   mockBankStatementsApi,
   COPROPERTY_ID,
   STATEMENT_ID,
-  RECONCILIATION_DETAIL,
   ACTIVE_FUND_CALLS,
 } from '../helpers/api-mock';
 
 const PAGE_URL = `http://localhost:4300/coproperty/${COPROPERTY_ID}/syndic/bank-reconciliation`;
 
 async function setupPage(page: Page): Promise<void> {
-  await mockKeycloak(page);
+  await mockKeycloak(page, COPROPERTY_ID);
   await mockBankStatementsApi(page);
 }
 
@@ -22,8 +21,8 @@ async function uploadFile(page: Page): Promise<void> {
     mimeType: 'application/pdf',
     buffer: Buffer.from('%PDF-1.4 fake pdf content'),
   });
-  // Wait for summary cards to appear
-  await page.waitForSelector('.summary-cards');
+  // Wait for summary cards to appear (upload → import API → summary rendered)
+  await page.waitForSelector('.summary-cards', { timeout: 10_000 });
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -33,6 +32,8 @@ test.describe('Bank Reconciliation', () => {
   test.beforeEach(async ({ page }) => {
     await setupPage(page);
     await page.goto(PAGE_URL);
+    // Wait for Angular to bootstrap and Keycloak auth to complete
+    await page.waitForSelector('h1', { timeout: 15_000 });
   });
 
   // ── Page layout ──────────────────────────────────────────────────────────
@@ -209,14 +210,14 @@ test.describe('Bank Reconciliation', () => {
     // Validate
     await unmatchedRow.locator('.btn-validate').click();
 
-    // Row should show "Enregistré" badge and green background
+    // Row should show "Enregistré" and green background
     await expect(unmatchedRow.locator('.fc-registered')).toContainText('Enregistré', { timeout: 5000 });
     await expect(unmatchedRow).toHaveClass(/row-registered/);
   });
 
   // ── Export ───────────────────────────────────────────────────────────────
 
-  test('affiche le bouton Exporter CSV après import', async ({ page }) => {
+  test('affiche le lien Exporter CSV après import', async ({ page }) => {
     await uploadFile(page);
 
     const exportLink = page.locator('.btn-export');
@@ -230,7 +231,7 @@ test.describe('Bank Reconciliation', () => {
   test('la zone d\'upload réagit au drag-over', async ({ page }) => {
     const uploadCard = page.locator('.upload-card');
 
-    await uploadCard.dispatchEvent('dragover', { dataTransfer: {} });
+    await uploadCard.dispatchEvent('dragover');
     await expect(uploadCard).toHaveClass(/drag-over/);
 
     await uploadCard.dispatchEvent('dragleave');

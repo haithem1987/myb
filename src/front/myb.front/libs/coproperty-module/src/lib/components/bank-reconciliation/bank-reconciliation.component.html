@@ -1,0 +1,150 @@
+<div class="container-fluid py-4">
+
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h2 class="mb-0 fw-bold">
+        <i class="bi bi-bank me-2 text-primary"></i>Rapprochement bancaire
+      </h2>
+      <p class="text-muted mb-0 mt-1">Importez un relevé OFX ou CSV pour vérifier automatiquement les paiements reçus</p>
+    </div>
+
+    <label class="btn btn-primary" [class.disabled]="isUploading()">
+      <i class="bi bi-cloud-upload me-2"></i>
+      <span *ngIf="!isUploading()">Importer un relevé</span>
+      <span *ngIf="isUploading()">
+        <span class="spinner-border spinner-border-sm me-1"></span>Import en cours…
+      </span>
+      <input type="file" accept=".ofx,.qfx,.csv" class="d-none" (change)="onFileSelected($event)" [disabled]="isUploading()">
+    </label>
+  </div>
+
+  <!-- Summary cards -->
+  <div *ngIf="importSummary() as summary" class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="fs-2 fw-bold text-primary">{{ summary.transactionCount }}</div>
+          <div class="text-muted small">Transactions</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="fs-2 fw-bold text-success">{{ summary.autoMatched }}</div>
+          <div class="text-muted small">Rapprochées auto</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="fs-2 fw-bold text-warning">{{ summary.manualSuggestions }}</div>
+          <div class="text-muted small">Suggestions manuelles</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="fs-2 fw-bold text-danger">{{ summary.unmatched }}</div>
+          <div class="text-muted small">Non rapprochées</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div *ngIf="rows().length > 0" class="d-flex gap-2 mb-3">
+    <button class="btn btn-sm" [class.btn-primary]="filterStatus()==='all'" [class.btn-outline-secondary]="filterStatus()!=='all'"
+            (click)="filterStatus.set('all')">Tout</button>
+    <button class="btn btn-sm" [class.btn-success]="filterStatus()==='AutoMatched'" [class.btn-outline-secondary]="filterStatus()!=='AutoMatched'"
+            (click)="filterStatus.set('AutoMatched')">Rapprochées</button>
+    <button class="btn btn-sm" [class.btn-warning]="filterStatus()==='ManualSuggestion'" [class.btn-outline-secondary]="filterStatus()!=='ManualSuggestion'"
+            (click)="filterStatus.set('ManualSuggestion')">Suggestions</button>
+    <button class="btn btn-sm" [class.btn-danger]="filterStatus()==='Unmatched'" [class.btn-outline-secondary]="filterStatus()!=='Unmatched'"
+            (click)="filterStatus.set('Unmatched')">Non rapprochées</button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading()" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+    <p class="text-muted mt-2">Chargement du rapprochement…</p>
+  </div>
+
+  <!-- Results table -->
+  <div *ngIf="!isLoading() && rows().length > 0" class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Date relevé</th>
+            <th>Libellé</th>
+            <th class="text-end">Montant</th>
+            <th>Référence</th>
+            <th>Statut</th>
+            <th>Paiement associé</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filteredRows">
+            <!-- Bank transaction -->
+            <td class="text-nowrap">{{ row.transaction.date | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <div class="fw-medium">{{ row.transaction.label }}</div>
+              <div *ngIf="row.transaction.reference" class="text-muted small">{{ row.transaction.reference }}</div>
+            </td>
+            <td class="text-end fw-bold" [class.text-success]="row.transaction.amount > 0" [class.text-danger]="row.transaction.amount < 0">
+              {{ row.transaction.amount | number:'1.2-2' }} €
+            </td>
+            <td class="text-muted small">{{ row.transaction.reference ?? '—' }}</td>
+
+            <!-- Reconciliation status -->
+            <td>
+              <span [class]="statusBadgeClass(row.reconciliation?.status)">
+                {{ statusLabel(row.reconciliation?.status) }}
+              </span>
+              <i *ngIf="row.reconciliation?.isManuallyValidated" class="bi bi-check-circle-fill text-success ms-1" title="Validé manuellement"></i>
+            </td>
+
+            <!-- Matched payment -->
+            <td>
+              <ng-container *ngIf="row.reconciliation?.matchedPayment as p">
+                <div class="small">
+                  <div class="fw-medium">{{ p.serviceName }}</div>
+                  <div class="text-muted">{{ p.paymentDate | date:'dd/MM/yyyy' }} — {{ p.price | number:'1.2-2' }} €</div>
+                  <div class="text-muted">Ref #{{ p.id }}</div>
+                </div>
+              </ng-container>
+              <span *ngIf="!row.reconciliation?.matchedPayment" class="text-muted">—</span>
+            </td>
+
+            <!-- Validate button for manual suggestions -->
+            <td>
+              <button
+                *ngIf="row.reconciliation?.status === 'ManualSuggestion' && !row.reconciliation?.isManuallyValidated"
+                class="btn btn-sm btn-outline-success"
+                (click)="validate(row)"
+                title="Valider ce rapprochement">
+                <i class="bi bi-check2-circle me-1"></i>Valider
+              </button>
+              <span *ngIf="row.reconciliation?.status === 'AutoMatched'" class="text-success small">
+                <i class="bi bi-check-circle-fill me-1"></i>Auto
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading() && !importSummary()" class="text-center py-5">
+    <i class="bi bi-bank2 display-4 text-muted"></i>
+    <h5 class="mt-3 text-muted">Aucun relevé importé</h5>
+    <p class="text-muted">Importez un fichier OFX ou CSV pour commencer le rapprochement bancaire.</p>
+  </div>
+
+</div>

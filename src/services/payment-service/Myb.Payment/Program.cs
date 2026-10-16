@@ -22,6 +22,8 @@ builder.Services.AddDbContext<PaymentContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PaymentDBConnection")));
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddSingleton<IBankStatementParser, BankStatementParser>();
+builder.Services.AddSingleton<IReconciliationEngine, ReconciliationEngine>();
 builder.Services.AddEmailPublisher();
 builder.AddKeycloakSettings();
 builder.AddKeycloakAuthorization();

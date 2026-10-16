@@ -128,6 +128,11 @@ const SYNDIC_CHILDREN: Routes = [
   { path: 'charge-payments', component: ChargePaymentsComponent },
   { path: 'treasury', component: TreasuryDetailComponent },
   { path: 'unpaid-payments', component: UnpaidPaymentsComponent },
+  {
+    path: 'bank-reconciliation',
+    loadComponent: () =>
+      import('./bank-reconciliation/bank-reconciliation.component').then(m => m.BankReconciliationComponent)
+  },
   { path: 'general-assembly', component: GeneralAssemblyComponent },
   { path: 'reports', component: ReportsComponent },
   { path: 'settings', component: SyndicSettingsComponent },

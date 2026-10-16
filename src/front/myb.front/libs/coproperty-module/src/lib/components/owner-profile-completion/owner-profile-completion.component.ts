@@ -53,6 +53,11 @@ export class OwnerProfileCompletionComponent implements OnInit {
       '',
       [Validators.required, Validators.pattern(/^\+?[0-9\s\-().]{6,20}$/)],
     ],
+    whatsappNumber: [
+      '',
+      [Validators.pattern(/^\+?[0-9\s\-().]{6,20}$/)],
+    ],
+    notifyViaWhatsApp: [false],
   });
 
   ngOnInit(): void {
@@ -98,6 +103,10 @@ export class OwnerProfileCompletionComponent implements OnInit {
     return this.profileForm.get('phone')!;
   }
 
+  get whatsappNumber(): AbstractControl {
+    return this.profileForm.get('whatsappNumber')!;
+  }
+
   private getDefaultRoute(): string {
     return '/coproperty/select?space=owner';
   }
@@ -120,6 +129,8 @@ export class OwnerProfileCompletionComponent implements OnInit {
       lastName: this.keycloakLastName,
       email: this.keycloakEmail,
       phone: this.phone.value,
+      whatsappNumber: this.whatsappNumber.value || undefined,
+      notifyViaWhatsApp: !!this.profileForm.get('notifyViaWhatsApp')!.value,
       units: [],
     };
 

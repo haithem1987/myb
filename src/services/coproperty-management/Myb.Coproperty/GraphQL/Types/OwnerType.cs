@@ -16,6 +16,8 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(o => o.LastName).Type<NonNullType<StringType>>();
             descriptor.Field(o => o.Email).Type<NonNullType<StringType>>();
             descriptor.Field(o => o.Phone).Type<StringType>();
+            descriptor.Field(o => o.WhatsAppNumber).Type<StringType>();
+            descriptor.Field(o => o.NotifyViaWhatsApp).Type<NonNullType<BooleanType>>();
             descriptor.Field(o => o.CreatedAt).Type<DateTimeType>();
             descriptor.Field(o => o.UpdatedAt).Type<DateTimeType>();
             

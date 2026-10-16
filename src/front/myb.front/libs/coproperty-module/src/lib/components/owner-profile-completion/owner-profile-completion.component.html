@@ -93,6 +93,42 @@
           </div>
         </div>
 
+        <!-- WhatsApp (optional) -->
+        <div class="mb-3">
+          <label for="whatsappNumber" class="form-label">
+            <i class="bi bi-whatsapp me-1 text-success"></i>
+            {{ 'common.whatsappNumber' | translate }}
+            <span class="text-muted ms-1">({{ 'common.optional' | translate }})</span>
+          </label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-whatsapp text-success"></i></span>
+            <input
+              id="whatsappNumber"
+              type="tel"
+              formControlName="whatsappNumber"
+              placeholder="+213 6 12 34 56 78"
+              class="form-control"
+              [class.is-invalid]="submitted() && whatsappNumber.invalid"
+            />
+          </div>
+          <div *ngIf="submitted() && whatsappNumber.errors" class="invalid-feedback d-block">
+            <span *ngIf="whatsappNumber.errors?.['pattern']">{{ 'validation.phoneInvalid' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="mb-4 form-check">
+          <input
+            id="notifyViaWhatsApp"
+            type="checkbox"
+            class="form-check-input"
+            formControlName="notifyViaWhatsApp"
+          />
+          <label for="notifyViaWhatsApp" class="form-check-label">
+            <i class="bi bi-whatsapp me-1 text-success"></i>
+            {{ 'auth.register.notifyViaWhatsApp' | translate }}
+          </label>
+        </div>
+
         <!-- Info note -->
         <div class="info-note mb-4">
           <i class="bi bi-info-circle me-2"></i>

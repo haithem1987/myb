@@ -75,7 +75,7 @@ export interface CreateCampaignDto {
   description?: string;
   copropertyId?: string;
   channels: string[];
-  targetCriteria: { mode: 'all' | 'managers_only' };
+  recipientIds: string[];
   message: string;
   subject?: string;
 }

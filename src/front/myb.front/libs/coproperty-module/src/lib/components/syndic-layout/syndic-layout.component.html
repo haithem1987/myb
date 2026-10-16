@@ -121,7 +121,7 @@
         <span class="badge" *ngIf="totalDiscussions() > 0">{{ totalDiscussions() }}</span>
       </span>
 
-      <a routerLink="/communication"
+      <a [routerLink]="syndicRoute('communication')"
          routerLinkActive="active"
          class="nav-item"
          (click)="onNavItemClick()">

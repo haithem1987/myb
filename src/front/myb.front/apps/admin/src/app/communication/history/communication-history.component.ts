@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommunicationService, CommunicationLogDto, LogFilter } from 'libs/shared/infra/services/communication.service';
+import { ActiveCopropertyService } from '@myb-front/coproperty-module';
 
 @Component({
   selector: 'app-communication-history',
@@ -119,6 +120,7 @@ import { CommunicationService, CommunicationLogDto, LogFilter } from 'libs/share
 })
 export class CommunicationHistoryComponent implements OnInit {
   private svc = inject(CommunicationService);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   logs = signal<CommunicationLogDto[]>([]);
   loading = signal(false);
@@ -131,7 +133,8 @@ export class CommunicationHistoryComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    this.svc.getLogs({ ...this.filter, page: this.page(), size: this.pageSize }).subscribe({
+    const copropertyId = this.activeCoproperty.activeId();
+    this.svc.getLogs({ ...this.filter, copropertyId: copropertyId ?? undefined, page: this.page(), size: this.pageSize }).subscribe({
       next: res => { this.logs.set(res.items); this.total.set(res.total); this.loading.set(false); },
       error: () => this.loading.set(false),
     });

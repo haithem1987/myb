@@ -10,13 +10,13 @@ type Tab = 'history' | 'campaigns';
   standalone: true,
   imports: [CommonModule, CommunicationHistoryComponent, CommunicationCampaignsComponent],
   template: `
-    <div class="container-fluid py-3">
-      <div class="d-flex align-items-center gap-2 mb-3">
+    <div class="page-content-inner">
+      <div class="d-flex align-items-center gap-2 mb-4">
         <i class="bi bi-chat-square-dots fs-4 text-primary"></i>
-        <h3 class="mb-0">Communication Hub</h3>
+        <h2 class="mb-0 fs-4 fw-semibold">Communication</h2>
       </div>
 
-      <ul class="nav nav-tabs mb-3">
+      <ul class="nav nav-tabs mb-4">
         <li class="nav-item">
           <button class="nav-link" [class.active]="activeTab() === 'history'" (click)="activeTab.set('history')">
             <i class="bi bi-clock-history me-1"></i>Historique

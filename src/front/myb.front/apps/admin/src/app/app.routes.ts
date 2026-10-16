@@ -8,7 +8,6 @@ import { environment } from '../environments/environment';
 import { KeycloakService } from '@myb-front/auth';
 
 import { noProfileGuard, completeProfileGuard } from '@myb-front/coproperty-module';
-import { communicationHubGuard } from './communication/communication-hub.guard';
 
 /**
  * Resolve the authenticated user's landing page before rendering the service
@@ -135,12 +134,6 @@ export const appRoutes: Route[] = [
     path: 'coproperty',
     canActivate: [authGuard],
     loadChildren: () => import('./coproperty/coproperty.routes').then(m => m.COPROPERTY_ROUTES),
-  },
-  {
-    path: 'communication',
-    canActivate: [authGuard, communicationHubGuard],
-    loadComponent: () =>
-      import('./communication/communication-hub.component').then(m => m.CommunicationHubComponent),
   },
   {
     path: 'access-denied',

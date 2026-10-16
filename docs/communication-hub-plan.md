@@ -278,13 +278,126 @@ Migration 2 : AddCommunicationCampaignsTable
 
 ---
 
-## 9. Points à clarifier avant de commencer
+## 9. Gestion des accès (RBAC)
+
+### 9.1 Rôles existants dans la plateforme
+
+| Rôle Keycloak | Description |
+|---|---|
+| `system-admin` | Administrateur système — accès total, toutes copropriétés |
+| `MYB_MANAGER` / `manager_myb` | Gestionnaire / syndic — accès à ses propres copropriétés |
+| `coproperty-owner` | Propriétaire — accès à ses données personnelles uniquement |
+| `Guest` | Invité — accès en lecture limité |
+
+### 9.2 Matrice des droits sur le Communication Hub
+
+| Action | `system-admin` | `MYB_MANAGER` | `coproperty-owner` |
+|---|:---:|:---:|:---:|
+| Voir l'historique **toutes copropriétés** | ✅ | ❌ | ❌ |
+| Voir l'historique **ses copropriétés** | ✅ | ✅ | ❌ |
+| Voir le détail d'un log | ✅ | ✅ (sa coprop.) | ❌ |
+| Voir les stats globales | ✅ | ❌ | ❌ |
+| Voir les stats **ses copropriétés** | ✅ | ✅ | ❌ |
+| Créer une campagne | ✅ | ✅ (sa coprop.) | ❌ |
+| Lancer / annuler une campagne | ✅ | ✅ (sa coprop.) | ❌ |
+| Voir toutes les campagnes | ✅ | ❌ | ❌ |
+| Voir ses campagnes | ✅ | ✅ | ❌ |
+
+> **Règle fondamentale :** un gestionnaire (`MYB_MANAGER`) ne voit **que les logs et campagnes liés aux copropriétés dont il est responsable** — filtre appliqué systématiquement côté API, jamais côté frontend seul.
+
+### 9.3 Implémentation backend — Contrôle d'accès
+
+#### Politique d'autorisation (ASP.NET Core)
+
+```csharp
+// Dans Program.cs / ServiceCollectionExtensions
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CommunicationReader", policy =>
+        policy.RequireRole("system-admin", "MYB_MANAGER"));
+
+    options.AddPolicy("CampaignManager", policy =>
+        policy.RequireRole("system-admin", "MYB_MANAGER"));
+
+    options.AddPolicy("CommunicationAdmin", policy =>
+        policy.RequireRole("system-admin"));
+});
+```
+
+#### Scoping automatique dans le Controller
+
+```csharp
+[Authorize(Policy = "CommunicationReader")]
+[HttpGet("logs")]
+public async Task<IActionResult> GetLogs([FromQuery] LogFilterDto filter)
+{
+    // Si system-admin → pas de filtre sur copropertyId
+    // Si MYB_MANAGER → injecter automatiquement ses copropertyIds depuis le token
+    var scopedFilter = await _accessScopeService.ApplyScopeAsync(filter, User);
+    return Ok(await _logService.QueryLogsAsync(scopedFilter));
+}
+```
+
+#### `IAccessScopeService` — service de scoping
+
+```csharp
+public interface IAccessScopeService
+{
+    // Retourne les copropertyIds autorisés pour l'utilisateur courant.
+    // Pour system-admin : null (pas de filtre).
+    // Pour MYB_MANAGER : liste de ses copropriétés.
+    Task<IEnumerable<Guid>?> GetAllowedCopropertyIdsAsync(ClaimsPrincipal user);
+
+    // Applique le scope sur un filtre de logs
+    Task<LogFilterDto> ApplyScopeAsync(LogFilterDto filter, ClaimsPrincipal user);
+}
+```
+
+### 9.4 Implémentation frontend — Guards & menus
+
+#### Guard Angular
+
+```typescript
+// communication-hub.guard.ts
+@Injectable({ providedIn: 'root' })
+export class CommunicationHubGuard implements CanActivate {
+  canActivate(): boolean {
+    return this.keycloakService.hasRole('system-admin')
+        || this.keycloakService.hasRole('MYB_MANAGER');
+  }
+}
+```
+
+#### Visibilité conditionnelle dans l'UI
+
+```typescript
+// Dans le composant de navigation admin
+this.canAccessCommunicationHub =
+  this.keycloakService.hasRole('system-admin') ||
+  this.keycloakService.hasRole('MYB_MANAGER');
+
+// Stats globales visibles uniquement pour system-admin
+this.canSeeGlobalStats = this.keycloakService.hasRole('system-admin');
+```
+
+#### Affichage dans la page Historique
+
+- **system-admin** : sélecteur de copropriété sur toute la liste, vue stats globales
+- **MYB_MANAGER** : sélecteur limité à ses copropriétés, pas de stats cross-copropriétés
+
+### 9.5 Points à clarifier
+
+- [ ] Un gestionnaire peut-il voir les communications envoyées **par d'autres gestionnaires** de la même copropriété ?
+- [ ] Les campagnes d'un gestionnaire sont-elles visibles par les autres gestionnaires de la même copropriété ?
+
+---
+
+## 10. Points à clarifier avant de commencer
 
 - [ ] **Rétention des logs** : conserver indéfiniment ou purge après X mois ?
 - [ ] **Corps des emails dans les logs** : stocker le HTML complet (lourd) ou seulement subject + templateId ?
-- [ ] **Ciblage des campagnes** : les critères sont-ils statiques (ex. : liste d'userId) ou dynamiques (ex. : "tous les non-payeurs") ? Si dynamiques, qui fournit la requête (le service coproperty ?)
-- [ ] **Droits d'accès** : seuls les gestionnaires/syndics voient le Communication Hub, ou aussi les administrateurs de copropriété ?
-- [ ] **Phase 3 prioritaire ?** : voulez-vous les campagnes dès v1 ou commencer par l'historique seul ?
+- [ ] **Ciblage des campagnes** : critères statiques (liste d'userId) ou dynamiques ("tous les non-payeurs") ? Si dynamiques, qui fournit la requête ?
+- [ ] **Phase 3 prioritaire ?** : campagnes dès v1 ou commencer par l'historique seul ?
 
 ---
 

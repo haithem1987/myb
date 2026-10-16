@@ -100,6 +100,14 @@
         <span class="badge" *ngIf="totalChargePayments() > 0">{{ totalChargePayments() }}</span>
       </a>
 
+      <a [routerLink]="syndicRoute('bank-reconciliation')"
+         routerLinkActive="active"
+         class="nav-item"
+         (click)="onNavItemClick()">
+        <i class="bi bi-bank"></i>
+        <span class="nav-text">Rapprochement bancaire</span>
+      </a>
+
       <span class="nav-item disabled" aria-disabled="true" title="Bientôt disponible">
         <i class="bi bi-wrench-adjustable"></i>
         <span class="nav-text">{{ 'navigation.interventions' | translate }}</span>

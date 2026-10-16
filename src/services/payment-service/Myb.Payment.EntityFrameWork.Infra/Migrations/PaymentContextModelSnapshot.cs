@@ -17,7 +17,7 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -75,6 +75,130 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
                     b.HasIndex("CopropertyId");
 
                     b.ToTable("SubscriptionPayments");
+                });
+
+            modelBuilder.Entity("Myb.Payment.Models.BankStatement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Format")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ImportedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ImportedByUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BankStatements");
+                });
+
+            modelBuilder.Entity("Myb.Payment.Models.BankTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BankStatementId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reference")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BankStatementId");
+
+                    b.ToTable("BankTransactions");
+                });
+
+            modelBuilder.Entity("Myb.Payment.Models.ReconciliationResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BankStatementId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BankTransactionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("MatchedPaymentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsManuallyValidated")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BankStatementId");
+
+                    b.HasIndex("BankTransactionId");
+
+                    b.ToTable("ReconciliationResults");
+                });
+
+            modelBuilder.Entity("Myb.Payment.Models.BankTransaction", b =>
+                {
+                    b.HasOne("Myb.Payment.Models.BankStatement", "BankStatement")
+                        .WithMany("Transactions")
+                        .HasForeignKey("BankStatementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BankStatement");
+                });
+
+            modelBuilder.Entity("Myb.Payment.Models.ReconciliationResult", b =>
+                {
+                    b.HasOne("Myb.Payment.Models.BankStatement", "BankStatement")
+                        .WithMany("Results")
+                        .HasForeignKey("BankStatementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Myb.Payment.Models.BankTransaction", "BankTransaction")
+                        .WithMany()
+                        .HasForeignKey("BankTransactionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BankStatement");
+                    b.Navigation("BankTransaction");
+                });
+
+            modelBuilder.Entity("Myb.Payment.Models.BankStatement", b =>
+                {
+                    b.Navigation("Transactions");
+                    b.Navigation("Results");
                 });
 #pragma warning restore 612, 618
         }

@@ -13,6 +13,7 @@ import { FundCallNewComponent } from './fund-call-new/fund-call-new.component';
 import { ChargePaymentsComponent } from './charge-payments/charge-payments.component';
 import { TreasuryDetailComponent } from './treasury-detail/treasury-detail.component';
 import { UnpaidPaymentsComponent } from './unpaid-payments/unpaid-payments.component';
+import { BankReconciliationComponent } from './bank-reconciliation/bank-reconciliation.component';
 import { OwnerLayoutComponent } from './owner-portal/owner-layout/owner-layout.component';
 import { OwnerDashboardComponent } from './owner-portal/owner-dashboard.component';
 import { OwnerMyUnitsComponent } from './owner-portal/my-units/my-units.component';
@@ -128,11 +129,7 @@ const SYNDIC_CHILDREN: Routes = [
   { path: 'charge-payments', component: ChargePaymentsComponent },
   { path: 'treasury', component: TreasuryDetailComponent },
   { path: 'unpaid-payments', component: UnpaidPaymentsComponent },
-  {
-    path: 'bank-reconciliation',
-    loadComponent: () =>
-      import('./bank-reconciliation/bank-reconciliation.component').then(m => m.BankReconciliationComponent)
-  },
+  { path: 'bank-reconciliation', component: BankReconciliationComponent },
   { path: 'general-assembly', component: GeneralAssemblyComponent },
   { path: 'reports', component: ReportsComponent },
   { path: 'settings', component: SyndicSettingsComponent },

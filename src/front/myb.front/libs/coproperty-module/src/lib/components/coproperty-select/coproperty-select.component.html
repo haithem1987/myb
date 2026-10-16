@@ -39,12 +39,22 @@
   </div>
 
   <div *ngIf="!loading() && !error() && coproperties().length === 0" class="card shadow-sm">
-    <div class="card-body text-center py-5">
+    <div *ngIf="!waitingForAssignment()" class="card-body text-center py-5">
       <i class="bi bi-buildings text-muted display-4 d-block mb-3"></i>
       <h5 class="mb-2">{{ 'copropertySelection.emptyTitle' | translate }}</h5>
-      <p class="text-muted mb-4">{{ 'copropertySelection.emptyText' | translate }}</p>
+      <p class="text-muted mb-4">
+        {{ (targetSpace() === 'owner' ? 'copropertySelection.ownerEmptyText' : 'copropertySelection.syndicEmptyText') | translate }}
+      </p>
       <button type="button" class="btn btn-violet" (click)="continueWithoutSelection()">
-        {{ 'copropertySelection.continue' | translate }}
+        {{ (targetSpace() === 'owner' ? 'copropertySelection.waitForAssignment' : 'coproperty.list.addCoproperty') | translate }}
+      </button>
+    </div>
+    <div *ngIf="waitingForAssignment()" class="card-body text-center py-5">
+      <i class="bi bi-hourglass-split text-primary display-4 d-block mb-3"></i>
+      <h5 class="mb-2">{{ 'copropertySelection.waitingTitle' | translate }}</h5>
+      <p class="text-muted mb-4">{{ 'copropertySelection.waitingText' | translate }}</p>
+      <button type="button" class="btn btn-outline-primary" (click)="retry()">
+        <i class="bi bi-arrow-clockwise me-2"></i>{{ 'copropertySelection.checkAssignment' | translate }}
       </button>
     </div>
   </div>

@@ -33,6 +33,9 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("CopropertyId")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("ExpiryDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -69,7 +72,9 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Payments");
+                    b.HasIndex("CopropertyId");
+
+                    b.ToTable("SubscriptionPayments");
                 });
 
             modelBuilder.Entity("Myb.Payment.Models.BankStatement", b =>

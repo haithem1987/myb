@@ -13,7 +13,7 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Payments",
+                name: "SubscriptionPayments",
                 columns: table => new
                 {
                     PaymentId = table.Column<int>(type: "integer", nullable: false)
@@ -30,7 +30,7 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payments", x => x.PaymentId);
+                    table.PrimaryKey("PK_SubscriptionPayments", x => x.PaymentId);
                 });
         }
 
@@ -38,7 +38,7 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Payments");
+                name: "SubscriptionPayments");
         }
     }
 }

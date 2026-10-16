@@ -19,6 +19,7 @@ resources:
   - ../services/admin
   - ../services/client
   - ../services/coproperty
+  - ../services/payment
   - ../services/invoice
   - ../services/mailer
   - ../services/notification

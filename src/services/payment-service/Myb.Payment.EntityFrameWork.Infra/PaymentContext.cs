@@ -35,6 +35,10 @@ public class PaymentContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<StripePayment>()
+            .ToTable("SubscriptionPayments")
+            .HasIndex(payment => payment.CopropertyId);
+
         modelBuilder.Entity<BankStatement>()
             .HasMany(s => s.Transactions)
             .WithOne(t => t.BankStatement)

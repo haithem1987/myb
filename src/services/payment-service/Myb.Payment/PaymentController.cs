@@ -6,12 +6,16 @@ using Myb.Common.Messaging.Models;
 namespace Myb.Payment;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/[controller]")]
 public class PaymentController : ControllerBase
 {
+    private const int TrialServiceId = 1;
+    private const int TrialDurationDays = 30;
     private readonly IPaymentService _paymentService;
     private readonly PaymentContext _context;
     private readonly IEmailPublisher _emailPublisher;
@@ -37,6 +41,7 @@ public class PaymentController : ControllerBase
             var payment = new StripePayment
             {
                 UserId = request.UserId,
+                CopropertyId = request.CopropertyId,
                 ServiceId = request.ServiceId,
                 ServiceName = request.ServiceName,
                 Price = request.Amount,
@@ -90,12 +95,92 @@ public class PaymentController : ControllerBase
             return StatusCode(500, "An error occurred while processing your payment.");
         }
     }
+
+    /// <summary>
+    /// Starts the card-free MYB trial for a newly-created residence. The call is
+    /// idempotent: a residence can never receive a second trial.
+    /// </summary>
+    [HttpPost("start-trial")]
+    public async Task<IActionResult> StartTrial([FromBody] StartTrialRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.UserId) ||
+            string.IsNullOrWhiteSpace(request.CopropertyId))
+        {
+            return BadRequest("UserId and CopropertyId are required.");
+        }
+
+        var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
+        if (string.IsNullOrWhiteSpace(authenticatedUserId)) return Unauthorized();
+        if (!string.Equals(authenticatedUserId, request.UserId, StringComparison.OrdinalIgnoreCase))
+            return Forbid();
+
+        var existing = await _context.Payments
+            .FirstOrDefaultAsync(payment =>
+                payment.CopropertyId == request.CopropertyId &&
+                payment.ServiceId != 0);
+
+        if (existing is not null)
+        {
+            if (!string.Equals(existing.UserId, authenticatedUserId, StringComparison.OrdinalIgnoreCase))
+                return Forbid();
+            return Ok(existing);
+        }
+
+        var now = DateTime.UtcNow;
+        var trial = new StripePayment
+        {
+            UserId = request.UserId,
+            CopropertyId = request.CopropertyId,
+            ServiceId = TrialServiceId,
+            ServiceName = "MYB Confort - Essai 30 jours",
+            Price = 0,
+            PaymentDate = now,
+            ExpiryDate = now.AddDays(TrialDurationDays),
+            PaymentStatus = "Trial",
+            PaymentMethod = "None",
+            IsRecurring = false,
+            CreatedAt = now
+        };
+
+        _context.Payments.Add(trial);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(
+            nameof(GetSubscriptionByCoproperty),
+            new { copropertyId = request.CopropertyId },
+            trial);
+    }
+
+    [HttpGet("subscriptions/coproperty/{copropertyId}")]
+    public async Task<IActionResult> GetSubscriptionByCoproperty(string copropertyId)
+    {
+        var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
+        if (string.IsNullOrWhiteSpace(authenticatedUserId)) return Unauthorized();
+
+        var subscription = await _context.Payments
+            .Where(payment =>
+                payment.CopropertyId == copropertyId &&
+                payment.UserId == authenticatedUserId &&
+                payment.ServiceId != 0)
+            .OrderByDescending(payment => payment.PaymentDate)
+            .FirstOrDefaultAsync();
+
+        return subscription is null ? NotFound() : Ok(subscription);
+    }
     
     [HttpGet("subscriptions/{userId}")]
     public async Task<IActionResult> GetPaymentsByUserId(string userId)
     {
         try
         {
+            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? User.FindFirstValue("sub");
+            if (string.IsNullOrWhiteSpace(authenticatedUserId)) return Unauthorized();
+            if (!string.Equals(authenticatedUserId, userId, StringComparison.OrdinalIgnoreCase))
+                return Forbid();
+
             var payments = await _paymentService.GetPaymentsByUserIdAsync(userId);
 
             if (payments.Count == 0)
@@ -119,6 +204,17 @@ public class PaymentController : ControllerBase
     [HttpDelete("unsubscribe/{userId}/{serviceId}")]
     public async Task<IActionResult> Unsubscribe(string userId, int serviceId)
     {
+        var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
+        if (string.IsNullOrWhiteSpace(authenticatedUserId)) return Unauthorized();
+        if (!string.Equals(authenticatedUserId, userId, StringComparison.OrdinalIgnoreCase))
+            return Forbid();
+
+        var subscription = await _context.Payments.FirstOrDefaultAsync(payment =>
+            payment.UserId == userId && payment.ServiceId == serviceId);
+        if (subscription?.PaymentStatus == "Trial")
+            return BadRequest("A free trial cannot be cancelled or restarted.");
+
         var success = await _paymentService.UnsubscribeAsync(userId, serviceId);
 
         if (!success)
@@ -254,11 +350,18 @@ public class PaymentRequest
     public string Currency { get; set; }
     public string ReceiptEmail { get; set; }
     public string UserId { get; set; }
+    public string? CopropertyId { get; set; }
     public int ServiceId { get; set; }
     public string ServiceName { get; set; }
     public string? PaymentMethod { get; set; }
     public bool IsRecurring { get; set; }
     public string? Language { get; set; }
+}
+
+public class StartTrialRequest
+{
+    public string UserId { get; set; } = "";
+    public string CopropertyId { get; set; } = "";
 }
 
 public class ChargePaymentRequest

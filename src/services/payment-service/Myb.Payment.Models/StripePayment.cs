@@ -5,6 +5,7 @@ namespace Myb.Payment.Models;
 public class StripePayment:BaseEntity
 { // Primary key
     public string UserId { get; set; }           // User making the payment
+    public string? CopropertyId { get; set; }    // Residence owning the subscription
     public int ServiceId { get; set; }           // ID of the subscribed service
     public string ServiceName { get; set; }      // Name of the subscribed service
     public decimal Price { get; set; }           // Price of the subscription

@@ -38,6 +38,7 @@ export class CopropertySelectComponent {
   readonly targetSpace = signal<TargetSpace>('syndic');
   readonly searchTerm = signal('');
   readonly statusFilter = signal<'all' | 'active' | 'inactive'>('all');
+  readonly waitingForAssignment = signal(false);
   readonly filteredCoproperties = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const status = this.statusFilter();
@@ -83,10 +84,15 @@ export class CopropertySelectComponent {
   }
 
   continueWithoutSelection(): void {
-    this.navigateToTargetDashboard();
+    if (this.targetSpace() === 'owner') {
+      this.waitingForAssignment.set(true);
+      return;
+    }
+    this.addCoproperty();
   }
 
   retry(): void {
+    this.waitingForAssignment.set(false);
     this.init();
   }
 

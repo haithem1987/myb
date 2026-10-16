@@ -74,6 +74,10 @@ build_and_push "coproperty" \
     "./src/services/coproperty-management/Myb.Coproperty/Dockerfile" \
     "."
 
+build_and_push "payment" \
+    "./src/services/payment-service/Myb.Payment/Dockerfile" \
+    "."
+
 build_and_push "notification" \
     "./src/services/notification-service/Myb.Notification/Dockerfile" \
     "."
@@ -106,6 +110,7 @@ echo -e "${GREEN}Build Summary${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo -e "Images built and pushed:"
 echo -e "  - ${REGISTRY}/myb-coproperty:${TAG}"
+echo -e "  - ${REGISTRY}/myb-payment:${TAG}"
 echo -e "  - ${REGISTRY}/myb-notification:${TAG}"
 echo -e "  - ${REGISTRY}/myb-invoice:${TAG}"
 echo -e "  - ${REGISTRY}/myb-mailer:${TAG}"

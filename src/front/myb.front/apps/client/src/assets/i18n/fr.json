@@ -1158,6 +1158,9 @@
     "trustBadges": "Inscription sécurisée • chiffrement SSL • confidentialité protégée",
     "step1of2": "Créer un compte",
     "step2of2": "Compléter le profil",
+    "step1of3": "Créer un compte",
+    "step2of3": "Compléter le profil",
+    "step3of3": "Choisir votre espace",
     "login": "Se connecter",
     "error": {
       "notAuthenticated": "Vous devez être connecté pour continuer."
@@ -1174,7 +1177,16 @@
       "unitsAssignedLater": "Vos lots seront attribués par l'administrateur après validation.",
       "saveProfile": "Finaliser l'inscription",
       "profileSaved": "Votre profil a été enregistré avec succès. Redirection...",
-      "profileError": "Une erreur est survenue lors de l'enregistrement de votre profil. Veuillez réessayer."
+      "profileError": "Une erreur est survenue lors de l'enregistrement de votre profil. Veuillez réessayer.",
+      "trialPill": "30 jours gratuits",
+      "choosePathTitle": "Comment souhaitez-vous utiliser MYB ?",
+      "choosePathSubtitle": "Choisissez votre parcours. Vous pourrez toujours changer d'espace plus tard.",
+      "createResidence": "Je gère une copropriété",
+      "createResidenceHelp": "Créez votre résidence et démarrez l'essai Confort de 30 jours.",
+      "joinResidence": "Je rejoins une copropriété",
+      "joinResidenceHelp": "Accédez à une résidence existante ou attendez l'affectation de votre syndic.",
+      "noCardTrial": "Aucune carte bancaire n'est demandée pendant l'essai.",
+      "pathError": "Impossible de préparer votre espace syndic. Veuillez réessayer."
     }
   },
   "HERO_BADGE": "Gérez votre entreprise",
@@ -1660,6 +1672,12 @@
     "retry": "Réessayer",
     "emptyTitle": "Aucune copropriété disponible",
     "emptyText": "Votre compte n’a encore accès à aucune copropriété dans cet espace.",
+    "ownerEmptyText": "Votre syndic doit encore vous affecter à un lot. Vous pouvez patienter et vérifier plus tard.",
+    "syndicEmptyText": "Créez votre première copropriété pour démarrer votre essai gratuit de 30 jours.",
+    "waitForAssignment": "J'attends mon affectation",
+    "waitingTitle": "Votre espace est prêt",
+    "waitingText": "Nous afficherons votre copropriété dès que votre syndic vous aura affecté à un lot. Aucun paiement ne vous est demandé.",
+    "checkAssignment": "Vérifier mon affectation",
     "continue": "Continuer vers le tableau de bord",
     "units": "Lots",
     "myUnits": "Mes lots",

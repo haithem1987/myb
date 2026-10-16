@@ -22,7 +22,7 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Myb.Payment.Models.Payment", b =>
+            modelBuilder.Entity("Myb.Payment.Models.StripePayment", b =>
                 {
                     b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,6 +32,9 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CopropertyId")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("ExpiryDate")
                         .HasColumnType("timestamp with time zone");
@@ -68,6 +71,8 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CopropertyId");
 
                     b.ToTable("Payments");
                 });

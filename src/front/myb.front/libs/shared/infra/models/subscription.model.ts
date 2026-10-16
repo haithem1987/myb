@@ -1,7 +1,12 @@
 export interface Subscription {
+  Id?: number;
+  UserId: string;
+  CopropertyId?: string;
   ServiceId: number;
   ServiceName: string;
   Price: number;
-  PaymentStatus: string;
-  ExpiryDate?: string; // Optional if not all subscriptions have an expiry date
+  PaymentStatus: 'Trial' | 'Paid' | 'Pending' | 'Failed' | string;
+  PaymentMethod: string;
+  ExpiryDate?: string;
+  IsRecurring: boolean;
 }

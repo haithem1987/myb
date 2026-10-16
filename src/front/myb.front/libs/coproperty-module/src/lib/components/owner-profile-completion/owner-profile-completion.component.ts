@@ -99,7 +99,7 @@ export class OwnerProfileCompletionComponent implements OnInit {
   }
 
   private getDefaultRoute(): string {
-    return '/coproperty/select?space=owner';
+    return '/register/choose-space';
   }
 
   onSubmit(): void {

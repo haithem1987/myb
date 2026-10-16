@@ -832,12 +832,24 @@
       "unitsAssignedLater": "Your units will be assigned by the administrator after validation.",
       "saveProfile": "Complete Registration",
       "profileSaved": "Your profile has been saved successfully. Redirecting...",
-      "profileError": "An error occurred while saving your profile. Please try again."
+      "profileError": "An error occurred while saving your profile. Please try again.",
+      "trialPill": "30-day free trial",
+      "choosePathTitle": "How would you like to use MYB?",
+      "choosePathSubtitle": "Choose your path. You can still switch spaces later.",
+      "createResidence": "I manage a residence",
+      "createResidenceHelp": "Create your residence and start a 30-day Confort trial.",
+      "joinResidence": "I am joining a residence",
+      "joinResidenceHelp": "Open an existing residence or wait for your property manager to assign you.",
+      "noCardTrial": "No payment card is required during the trial.",
+      "pathError": "We could not prepare your property manager space. Please try again."
     },
     "backToHome": "Back to Home",
     "trustBadges": "Secure registration • SSL encrypted • Privacy protected",
     "step1of2": "Create Account",
-    "step2of2": "Complete Profile"
+    "step2of2": "Complete Profile",
+    "step1of3": "Create Account",
+    "step2of3": "Complete Profile",
+    "step3of3": "Choose Your Space"
   },
   "intervention": {
     "list": {
@@ -1604,6 +1616,12 @@
     "retry": "Retry",
     "emptyTitle": "No residence available",
     "emptyText": "Your account does not have access to a residence in this space yet.",
+    "ownerEmptyText": "Your property manager still needs to assign you to a unit. You can wait and check again later.",
+    "syndicEmptyText": "Create your first residence to start your free 30-day trial.",
+    "waitForAssignment": "Wait for my assignment",
+    "waitingTitle": "Your space is ready",
+    "waitingText": "Your residence will appear as soon as your property manager assigns you to a unit. No payment is required from you.",
+    "checkAssignment": "Check my assignment",
     "continue": "Continue to the dashboard",
     "units": "Units",
     "myUnits": "My units",

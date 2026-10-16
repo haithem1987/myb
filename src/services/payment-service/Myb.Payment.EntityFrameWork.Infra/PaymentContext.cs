@@ -28,4 +28,12 @@ public class PaymentContext : DbContext
 
     // Define your DbSets here (e.g., tables)
     public DbSet<StripePayment> Payments { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<StripePayment>()
+            .HasIndex(payment => payment.CopropertyId);
+    }
 }

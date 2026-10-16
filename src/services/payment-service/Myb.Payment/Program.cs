@@ -29,6 +29,7 @@ builder.AddMybApiSecurity();
 builder.Services.AddServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 app.UseMybApiSecurity();
@@ -52,6 +53,7 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHealthChecks("/health").AllowAnonymous();
 app.MapControllers().RequireAuthorization();
 
 app.Run();

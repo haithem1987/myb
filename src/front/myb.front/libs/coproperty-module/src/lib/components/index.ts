@@ -21,6 +21,7 @@ export * from './owner-portal/invoice-payment-dialog.component';
 export * from './manager-multi-select/manager-multi-select.component';
 export * from './owner-registration/owner-registration.component';
 export * from './owner-profile-completion/owner-profile-completion.component';
+export * from './registration-path/registration-path.component';
 export * from './charge-payments/charge-payments.component';
 export * from './treasury-detail/treasury-detail.component';
 export * from './unpaid-payments/unpaid-payments.component';

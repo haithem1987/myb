@@ -2,7 +2,7 @@
 #
 # Build Angular first:
 #   cd src/front/myb.front
-#   npx nx build admin --configuration=production
+#   npx nx build admin --configuration=docker
 #
 # Then build this image from the repo root:
 #   docker compose -f docker-compose.dev.yml build myb-admin-front

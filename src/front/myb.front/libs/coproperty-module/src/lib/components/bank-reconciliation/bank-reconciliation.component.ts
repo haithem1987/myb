@@ -5,8 +5,8 @@ import { finalize } from 'rxjs/operators';
 import {
   BankReconciliationService,
   ImportSummary,
-  ReconciliationResult,
   ReconciliationDetail,
+  ReconciliationItem,
 } from '../../services/bank-reconciliation.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 
@@ -45,19 +45,19 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
       <!-- Import Summary -->
       <div class="summary-cards" *ngIf="summary()">
         <div class="summary-card total">
-          <div class="summary-value">{{ summary()!.transactionCount }}</div>
+          <div class="summary-value">{{ summary()!.TransactionCount }}</div>
           <div class="summary-label">Transactions</div>
         </div>
         <div class="summary-card matched">
-          <div class="summary-value">{{ summary()!.autoMatched }}</div>
+          <div class="summary-value">{{ summary()!.AutoMatched }}</div>
           <div class="summary-label">Rapprochés auto</div>
         </div>
         <div class="summary-card suggestion">
-          <div class="summary-value">{{ summary()!.manualSuggestions }}</div>
+          <div class="summary-value">{{ summary()!.ManualSuggestions }}</div>
           <div class="summary-label">Suggestions manuelles</div>
         </div>
         <div class="summary-card unmatched">
-          <div class="summary-value">{{ summary()!.unmatched }}</div>
+          <div class="summary-value">{{ summary()!.Unmatched }}</div>
           <div class="summary-label">Non rapprochés</div>
         </div>
       </div>
@@ -65,7 +65,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
       <!-- Reconciliation Table -->
       <div class="table-card" *ngIf="detail()">
         <div class="table-header">
-          <h2><i class="bi bi-table me-2"></i>{{ detail()!.fileName }}</h2>
+          <h2><i class="bi bi-table me-2"></i>{{ detail()!.FileName }}</h2>
           <a [href]="exportUrl()" class="btn-export" download>
             <i class="bi bi-download me-1"></i>Exporter CSV
           </a>
@@ -85,32 +85,32 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let row of detail()!.results">
-                <td>{{ formatDate(row.transactionDate) }}</td>
-                <td>{{ row.description }}</td>
-                <td class="text-muted">{{ row.reference || '—' }}</td>
-                <td class="text-end amount" [class.negative]="row.amount < 0">
-                  {{ formatAmount(row.amount) }}
+              <tr *ngFor="let item of detail()!.Items">
+                <td>{{ formatDate(item.Transaction.Date) }}</td>
+                <td>{{ item.Transaction.Label }}</td>
+                <td class="text-muted">{{ item.Transaction.Reference || '—' }}</td>
+                <td class="text-end amount" [class.negative]="item.Transaction.Amount < 0">
+                  {{ formatAmount(item.Transaction.Amount) }}
                 </td>
                 <td>
-                  <span class="badge" [ngClass]="statusClass(row.status)">
-                    {{ statusLabel(row.status) }}
+                  <span class="badge" [ngClass]="statusClass(item.Reconciliation.Status)">
+                    {{ statusLabel(item.Reconciliation.Status) }}
                   </span>
                 </td>
                 <td>
-                  <span *ngIf="row.matchedPayment">
-                    {{ formatAmount(row.matchedPayment.amount) }} — {{ formatDate(row.matchedPayment.paymentDate) }}
+                  <span *ngIf="item.Reconciliation.MatchedPayment">
+                    {{ formatAmount(item.Reconciliation.MatchedPayment!.Amount) }} — {{ formatDate(item.Reconciliation.MatchedPayment!.PaymentDate) }}
                   </span>
-                  <span *ngIf="!row.matchedPayment" class="text-muted">—</span>
+                  <span *ngIf="!item.Reconciliation.MatchedPayment" class="text-muted">—</span>
                 </td>
                 <td>
                   <button
-                    *ngIf="row.status === 'ManualSuggestion' || row.status === 'Unmatched'"
+                    *ngIf="item.Reconciliation.Status === 1 || item.Reconciliation.Status === 2"
                     class="btn-validate"
-                    [disabled]="validating() === row.id"
-                    (click)="validate(row)">
-                    <span *ngIf="validating() !== row.id">Valider</span>
-                    <span *ngIf="validating() === row.id" class="spinner-sm"></span>
+                    [disabled]="validating() === item.Reconciliation.Id"
+                    (click)="validate(item)">
+                    <span *ngIf="validating() !== item.Reconciliation.Id">Valider</span>
+                    <span *ngIf="validating() === item.Reconciliation.Id" class="spinner-sm"></span>
                   </button>
                 </td>
               </tr>
@@ -250,13 +250,13 @@ export class BankReconciliationComponent {
 
   isDragOver = signal(false);
   uploading = signal(false);
-  validating = signal<number | null>(null);
+  validating = signal<string | null>(null);
   summary = signal<ImportSummary | null>(null);
   detail = signal<ReconciliationDetail | null>(null);
 
   exportUrl(): string {
-    const s = this.summary();
-    return s ? this.service.getExportUrl(s.statementId) : '#';
+    const d = this.detail();
+    return d ? this.service.getExportUrl(d.Id) : '#';
   }
 
   onDragOver(event: DragEvent): void {
@@ -294,10 +294,10 @@ export class BankReconciliationComponent {
         next: (result) => {
           this.summary.set(result);
           this.toastService.show(
-            `Import réussi : ${result.transactionCount} transactions (${result.autoMatched} rapprochées automatiquement)`,
+            `Import réussi : ${result.TransactionCount} transactions (${result.AutoMatched} rapprochées automatiquement)`,
             { classname: 'bg-success text-white', delay: 5000 }
           );
-          this.loadDetail(result.statementId);
+          this.loadDetail(result.StatementId);
         },
         error: () => {
           this.toastService.show(
@@ -308,7 +308,7 @@ export class BankReconciliationComponent {
       });
   }
 
-  private loadDetail(statementId: number): void {
+  private loadDetail(statementId: string): void {
     this.service.getReconciliation(statementId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -322,12 +322,12 @@ export class BankReconciliationComponent {
       });
   }
 
-  validate(row: ReconciliationResult): void {
+  validate(item: ReconciliationItem): void {
     const s = this.summary();
     if (!s) return;
-    this.validating.set(row.id);
+    this.validating.set(item.Reconciliation.Id);
 
-    this.service.validate(s.statementId, row.id)
+    this.service.validate(s.StatementId, item.Reconciliation.Id)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.validating.set(null))
@@ -338,7 +338,7 @@ export class BankReconciliationComponent {
           if (d) {
             this.detail.set({
               ...d,
-              results: d.results.map(r => r.id === updated.id ? updated : r),
+              Items: d.Items.map(i => i.Reconciliation.Id === updated.Id ? { ...i, Reconciliation: updated } : i),
             });
           }
           this.toastService.show('Transaction validée.', { classname: 'bg-success text-white', delay: 3000 });
@@ -349,21 +349,18 @@ export class BankReconciliationComponent {
       });
   }
 
-  statusClass(status: string): Record<string, boolean> {
+  statusClass(status: number): Record<string, boolean> {
     return {
-      'badge-success': status === 'AutoMatched',
-      'badge-warning': status === 'ManualSuggestion',
-      'badge-danger': status === 'Unmatched',
+      'badge-success': status === 0,
+      'badge-warning': status === 1,
+      'badge-danger': status === 2,
     };
   }
 
-  statusLabel(status: string): string {
-    switch (status) {
-      case 'AutoMatched': return 'Rapproché';
-      case 'ManualSuggestion': return 'Suggestion';
-      case 'Unmatched': return 'Non rapproché';
-      default: return status;
-    }
+  statusLabel(status: number): string {
+    if (status === 0) return 'Rapproché';
+    if (status === 1) return 'Suggestion';
+    return 'Non rapproché';
   }
 
   formatDate(date: string): string {

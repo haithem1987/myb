@@ -1,62 +1,81 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { KeycloakService } from '@myb-front/auth';
 
 export interface ImportSummary {
-  statementId: number;
-  fileName: string;
-  transactionCount: number;
-  autoMatched: number;
-  manualSuggestions: number;
-  unmatched: number;
+  StatementId: string;
+  FileName: string;
+  TransactionCount: number;
+  AutoMatched: number;
+  ManualSuggestions: number;
+  Unmatched: number;
 }
 
 export interface MatchedPayment {
-  id: number;
-  amount: number;
-  paymentDate: string;
-  description: string;
+  Id: string;
+  Amount: number;
+  PaymentDate: string;
+  Description: string;
 }
 
-export interface ReconciliationResult {
-  id: number;
-  transactionDate: string;
-  description: string;
-  reference: string;
-  amount: number;
-  status: 'AutoMatched' | 'ManualSuggestion' | 'Unmatched';
-  matchedPayment: MatchedPayment | null;
+export interface BankTransaction {
+  Id: string;
+  Date: string;
+  Amount: number;
+  Label: string;
+  Reference: string | null;
+}
+
+export interface ReconciliationEntry {
+  Id: string;
+  Status: 0 | 1 | 2; // 0=AutoMatched, 1=ManualSuggestion, 2=Unmatched
+  Note: string | null;
+  IsManuallyValidated: boolean;
+  MatchedPayment: MatchedPayment | null;
+}
+
+export interface ReconciliationItem {
+  Transaction: BankTransaction;
+  Reconciliation: ReconciliationEntry;
 }
 
 export interface ReconciliationDetail {
-  statementId: number;
-  fileName: string;
-  results: ReconciliationResult[];
+  Id: string;
+  FileName: string;
+  Items: ReconciliationItem[];
 }
 
 @Injectable({ providedIn: 'root' })
 export class BankReconciliationService {
   private http = inject(HttpClient);
+  private keycloak = inject(KeycloakService);
   private readonly base = '/api/bank-statements';
+
+  private authHeaders(): HttpHeaders {
+    const token = this.keycloak.getToken();
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+  }
 
   importStatement(file: File): Observable<ImportSummary> {
     const form = new FormData();
     form.append('file', file, file.name);
-    return this.http.post<ImportSummary>(`${this.base}/import`, form);
+    return this.http.post<ImportSummary>(`${this.base}/import`, form, { headers: this.authHeaders() });
   }
 
-  getReconciliation(statementId: number): Observable<ReconciliationDetail> {
-    return this.http.get<ReconciliationDetail>(`${this.base}/${statementId}/reconciliation`);
+  getReconciliation(statementId: string): Observable<ReconciliationDetail> {
+    return this.http.get<ReconciliationDetail>(`${this.base}/${statementId}/reconciliation`, { headers: this.authHeaders() });
   }
 
-  validate(statementId: number, resultId: number): Observable<ReconciliationResult> {
-    return this.http.post<ReconciliationResult>(
-      `${this.base}/${statementId}/reconciliation/${resultId}/validate`,
-      {}
+  validate(statementId: string, reconciliationId: string): Observable<ReconciliationEntry> {
+    return this.http.post<ReconciliationEntry>(
+      `${this.base}/${statementId}/reconciliation/${reconciliationId}/validate`,
+      {},
+      { headers: this.authHeaders() }
     );
   }
 
-  getExportUrl(statementId: number): string {
+  getExportUrl(statementId: string): string {
     return `${this.base}/${statementId}/export`;
   }
 }

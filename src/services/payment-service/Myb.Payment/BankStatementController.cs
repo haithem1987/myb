@@ -15,16 +15,22 @@ public class BankStatementController : ControllerBase
     private readonly PaymentContext _context;
     private readonly IBankStatementParser _parser;
     private readonly IReconciliationEngine _engine;
+    private readonly IFundCallServiceClient _fundCallClient;
 
     public BankStatementController(
         PaymentContext context,
         IBankStatementParser parser,
-        IReconciliationEngine engine)
+        IReconciliationEngine engine,
+        IFundCallServiceClient fundCallClient)
     {
         _context = context;
         _parser = parser;
         _engine = engine;
+        _fundCallClient = fundCallClient;
     }
+
+    private string? GetBearerToken() =>
+        HttpContext.Request.Headers.Authorization.FirstOrDefault()?.Replace("Bearer ", "");
 
     /// <summary>POST /api/bank-statements/import</summary>
     [HttpPost("import")]
@@ -149,6 +155,8 @@ public class BankStatementController : ControllerBase
                     result.Status,
                     result.Note,
                     result.IsManuallyValidated,
+                    result.FundCallId,
+                    result.FundCallPaymentId,
                     MatchedPayment = matched is null ? null : new
                     {
                         matched.Id,
@@ -195,7 +203,7 @@ public class BankStatementController : ControllerBase
             .ToDictionaryAsync(p => p.Id);
 
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine("Date;Libelle;Reference;Montant;Statut;Paiement associe;Date paiement;Valide manuellement");
+        sb.AppendLine("Date;Libelle;Reference;Montant;Statut;Paiement associe;Date paiement;Valide manuellement;FundCallPaymentId");
 
         foreach (var tx in statement.Transactions)
         {
@@ -210,7 +218,8 @@ public class BankStatementController : ControllerBase
                 result?.Status.ToString() ?? "N/A",
                 matched != null ? CsvEscape(matched.ServiceName) : "",
                 matched != null ? matched.PaymentDate.ToString("dd/MM/yyyy") : "",
-                result?.IsManuallyValidated.ToString() ?? "false"
+                result?.IsManuallyValidated.ToString() ?? "false",
+                result?.FundCallPaymentId ?? ""
             ));
         }
 
@@ -223,6 +232,76 @@ public class BankStatementController : ControllerBase
         value.Contains(';') || value.Contains('"') || value.Contains('\n')
             ? $"\"{value.Replace("\"", "\"\"")}\""
             : value;
+
+    /// <summary>
+    /// POST /api/bank-statements/{statementId}/reconciliation/{resultId}/validate
+    ///
+    /// Validates a reconciliation result manually. When FundCallId is provided,
+    /// creates a FundCallPayment in coproperty-service.
+    /// </summary>
+    [HttpPost("{statementId:guid}/reconciliation/{resultId:guid}/validate")]
+    public async Task<IActionResult> Validate(
+        Guid statementId,
+        Guid resultId,
+        [FromBody] ValidateReconciliationRequest request)
+    {
+        var result = await _context.ReconciliationResults
+            .Include(r => r.BankTransaction)
+            .FirstOrDefaultAsync(r => r.Id == resultId && r.BankStatementId == statementId);
+
+        if (result is null)
+            return NotFound();
+
+        result.IsManuallyValidated = true;
+        if (request.MatchedPaymentId.HasValue)
+            result.MatchedPaymentId = request.MatchedPaymentId;
+        if (result.Status == ReconciliationStatus.ManualSuggestion || result.Status == ReconciliationStatus.Unmatched)
+            result.Status = ReconciliationStatus.AutoMatched;
+
+        // If a FundCallId is provided, register payment in coproperty-service
+        if (!string.IsNullOrWhiteSpace(request.FundCallId))
+        {
+            result.FundCallId = request.FundCallId;
+            var token = GetBearerToken();
+            if (token != null && result.BankTransaction != null)
+            {
+                var statement = await _context.BankStatements.FindAsync(statementId);
+                var created = await _fundCallClient.CreatePaymentFromBankAsync(
+                    request.FundCallId,
+                    result.BankTransaction.Amount,
+                    result.BankTransaction.Date,
+                    result.BankTransaction.Reference ?? result.BankTransaction.Id.ToString(),
+                    statement?.FileName,
+                    token);
+
+                if (created != null)
+                    result.FundCallPaymentId = created.PaymentId;
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(new
+        {
+            result.Id,
+            result.Status,
+            result.IsManuallyValidated,
+            result.FundCallId,
+            result.FundCallPaymentId,
+            result.Note
+        });
+    }
+
+    /// <summary>GET /api/bank-statements/fund-calls/active?copropertyId=...</summary>
+    [HttpGet("fund-calls/active")]
+    public async Task<IActionResult> GetActiveFundCalls([FromQuery] string copropertyId)
+    {
+        var token = GetBearerToken();
+        if (token == null)
+            return Unauthorized();
+
+        var fundCalls = await _fundCallClient.GetActiveFundCallsAsync(copropertyId, token);
+        return Ok(fundCalls);
+    }
 
     /// <summary>
     /// Extracts bank transactions from a PDF using PdfPig word-level extraction.
@@ -301,7 +380,7 @@ public class BankStatementController : ControllerBase
             var amounts = new List<(int idx, string raw)>();
             for (int i = dateIdx + 1; i < words.Count; i++)
             {
-                var w = words[i].Replace(" ", "").Trim();
+                var w = words[i].Replace(" ", "").Trim();
                 if (reAmount.IsMatch(w))
                     amounts.Add((i, w));
             }
@@ -353,29 +432,11 @@ public class BankStatementController : ControllerBase
 
         return sb.ToString();
     }
-
-    /// <summary>POST /api/bank-statements/{statementId}/reconciliation/{resultId}/validate</summary>
-    [HttpPost("{statementId:guid}/reconciliation/{resultId:guid}/validate")]
-    public async Task<IActionResult> Validate(Guid statementId, Guid resultId, [FromBody] ValidateReconciliationRequest request)
-    {
-        var result = await _context.ReconciliationResults
-            .FirstOrDefaultAsync(r => r.Id == resultId && r.BankStatementId == statementId);
-
-        if (result is null)
-            return NotFound();
-
-        result.IsManuallyValidated = true;
-        if (request.MatchedPaymentId.HasValue)
-            result.MatchedPaymentId = request.MatchedPaymentId;
-        if (result.Status == ReconciliationStatus.ManualSuggestion || result.Status == ReconciliationStatus.Unmatched)
-            result.Status = ReconciliationStatus.AutoMatched;
-
-        await _context.SaveChangesAsync();
-        return Ok(result);
-    }
 }
 
 public class ValidateReconciliationRequest
 {
     public int? MatchedPaymentId { get; set; }
+    /// <summary>Coproperty-service FundCall ID to link this transaction to.</summary>
+    public string? FundCallId { get; set; }
 }

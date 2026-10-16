@@ -25,6 +25,11 @@ builder.Services.AddDbContext<PaymentContext>(options =>
         npgsql => npgsql.MigrationsHistoryTable("__PaymentMigrationsHistory")));
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddHttpClient<IFundCallServiceClient, FundCallServiceClient>(client =>
+{
+    var url = builder.Configuration["Services:CopropertyUrl"] ?? "http://myb-coproperty:8085";
+    client.BaseAddress = new Uri(url);
+});
 builder.Services.AddSingleton<IBankStatementParser, BankStatementParser>();
 builder.Services.AddSingleton<IReconciliationEngine, ReconciliationEngine>();
 builder.Services.AddEmailPublisher();

@@ -33,6 +33,18 @@ export interface ReconciliationEntry {
   Note: string | null;
   IsManuallyValidated: boolean;
   MatchedPayment: MatchedPayment | null;
+  FundCallId: string | null;
+  FundCallPaymentId: string | null;
+}
+
+export interface FundCallSummary {
+  Id: string;
+  Description: string;
+  Amount: number;
+  DueDate: string;
+  Status: string;
+  OwnerName: string | null;
+  CopropertyNameSnapshot: string | null;
 }
 
 export interface ReconciliationItem {
@@ -67,10 +79,17 @@ export class BankReconciliationService {
     return this.http.get<ReconciliationDetail>(`${this.base}/${statementId}/reconciliation`, { headers: this.authHeaders() });
   }
 
-  validate(statementId: string, reconciliationId: string): Observable<ReconciliationEntry> {
+  validate(statementId: string, reconciliationId: string, fundCallId?: string): Observable<ReconciliationEntry> {
     return this.http.post<ReconciliationEntry>(
       `${this.base}/${statementId}/reconciliation/${reconciliationId}/validate`,
-      {},
+      { FundCallId: fundCallId ?? null },
+      { headers: this.authHeaders() }
+    );
+  }
+
+  getActiveFundCalls(copropertyId: string): Observable<FundCallSummary[]> {
+    return this.http.get<FundCallSummary[]>(
+      `${this.base}/fund-calls/active?copropertyId=${copropertyId}`,
       { headers: this.authHeaders() }
     );
   }

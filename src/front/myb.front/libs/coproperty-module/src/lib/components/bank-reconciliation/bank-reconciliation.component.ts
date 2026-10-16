@@ -1,19 +1,22 @@
 import { Component, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs/operators';
 import {
   BankReconciliationService,
+  FundCallSummary,
   ImportSummary,
   ReconciliationDetail,
   ReconciliationItem,
 } from '../../services/bank-reconciliation.service';
+import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
 
 @Component({
   selector: 'myb-bank-reconciliation',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="reconciliation-page">
       <div class="page-header">
@@ -80,12 +83,13 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
                 <th>Référence</th>
                 <th class="text-end">Montant</th>
                 <th>Statut</th>
-                <th>Paiement associé</th>
+                <th>Appel de fonds</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let item of detail()!.Items">
+              <tr *ngFor="let item of detail()!.Items"
+                  [class.row-registered]="item.Reconciliation.FundCallPaymentId">
                 <td>{{ formatDate(item.Transaction.Date) }}</td>
                 <td>{{ item.Transaction.Label }}</td>
                 <td class="text-muted">{{ item.Transaction.Reference || '—' }}</td>
@@ -96,20 +100,42 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
                   <span class="badge" [ngClass]="statusClass(item.Reconciliation.Status)">
                     {{ statusLabel(item.Reconciliation.Status) }}
                   </span>
+                  <i *ngIf="item.Reconciliation.IsManuallyValidated"
+                     class="bi bi-person-check ms-1" title="Validé manuellement"></i>
                 </td>
                 <td>
-                  <span *ngIf="item.Reconciliation.MatchedPayment">
-                    {{ formatAmount(item.Reconciliation.MatchedPayment!.Amount) }} — {{ formatDate(item.Reconciliation.MatchedPayment!.PaymentDate) }}
+                  <!-- Registered in coproperty-service -->
+                  <span *ngIf="item.Reconciliation.FundCallPaymentId" class="fc-registered">
+                    <i class="bi bi-check-circle-fill text-success me-1"></i>Enregistré
                   </span>
-                  <span *ngIf="!item.Reconciliation.MatchedPayment" class="text-muted">—</span>
+                  <!-- Selector for unvalidated rows -->
+                  <div *ngIf="!item.Reconciliation.FundCallPaymentId && item.Transaction.Amount > 0 && (item.Reconciliation.Status === 1 || item.Reconciliation.Status === 2)"
+                       class="fc-selector">
+                    <select class="fc-select"
+                            [(ngModel)]="pendingFundCallIds[item.Reconciliation.Id]"
+                            (focus)="loadFundCallsIfNeeded()">
+                      <option value="">— Lier à un appel de fonds —</option>
+                      <option *ngFor="let fc of availableFundCalls()" [value]="fc.Id">
+                        {{ fc.OwnerName || 'Inconnu' }} — {{ formatAmount(fc.Amount) }} ({{ fc.Status }})
+                      </option>
+                    </select>
+                  </div>
+                  <span *ngIf="!item.Reconciliation.FundCallPaymentId && item.Reconciliation.Status === 0 && !pendingFundCallIds[item.Reconciliation.Id]"
+                        class="text-muted small">—</span>
                 </td>
                 <td>
+                  <!-- Already validated and registered: nothing to do -->
+                  <span *ngIf="item.Reconciliation.FundCallPaymentId" class="text-muted small">✓</span>
+
+                  <!-- Validate button for ManualSuggestion / Unmatched -->
                   <button
-                    *ngIf="item.Reconciliation.Status === 1 || item.Reconciliation.Status === 2"
+                    *ngIf="!item.Reconciliation.FundCallPaymentId && (item.Reconciliation.Status === 1 || item.Reconciliation.Status === 2)"
                     class="btn-validate"
                     [disabled]="validating() === item.Reconciliation.Id"
                     (click)="validate(item)">
-                    <span *ngIf="validating() !== item.Reconciliation.Id">Valider</span>
+                    <span *ngIf="validating() !== item.Reconciliation.Id">
+                      {{ pendingFundCallIds[item.Reconciliation.Id] ? 'Valider + Enregistrer' : 'Valider' }}
+                    </span>
                     <span *ngIf="validating() === item.Reconciliation.Id" class="spinner-sm"></span>
                   </button>
                 </td>
@@ -121,7 +147,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     </div>
   `,
   styles: [`
-    .reconciliation-page { padding: 24px; max-width: 1200px; margin: 0 auto; }
+    .reconciliation-page { padding: 24px; max-width: 1400px; margin: 0 auto; }
 
     .page-header { margin-bottom: 24px; }
     .page-header h1 { font-size: 1.6rem; font-weight: 700; color: #1a202c; margin: 0 0 6px; }
@@ -219,6 +245,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
       vertical-align: middle;
     }
     .reconciliation-table tr:last-child td { border-bottom: none; }
+    .row-registered { background: #f0fdf4; }
     .text-end { text-align: right; }
     .text-muted { color: #a0aec0; }
     .amount { font-weight: 500; }
@@ -229,6 +256,19 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     .badge-warning  { background: #fef3c7; color: #92400e; }
     .badge-danger   { background: #fee2e2; color: #b91c1c; }
 
+    .fc-registered { font-size: 0.82rem; color: #15803d; font-weight: 500; }
+    .fc-selector { display: flex; align-items: center; gap: 6px; }
+    .fc-select {
+      font-size: 0.8rem;
+      padding: 3px 6px;
+      border: 1px solid #cbd5e0;
+      border-radius: 5px;
+      background: white;
+      color: #374151;
+      max-width: 280px;
+    }
+    .fc-select:focus { outline: none; border-color: #4f46e5; }
+
     .btn-validate {
       padding: 4px 12px;
       background: #4f46e5;
@@ -238,6 +278,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
       cursor: pointer;
       font-size: 0.8rem;
       display: inline-flex; align-items: center; gap: 4px;
+      white-space: nowrap;
     }
     .btn-validate:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-validate:not(:disabled):hover { background: #4338ca; }
@@ -247,12 +288,18 @@ export class BankReconciliationComponent {
   private service = inject(BankReconciliationService);
   private toastService = inject(ToastService);
   private destroyRef = inject(DestroyRef);
+  private activeCoproperty = inject(ActiveCopropertyService);
 
   isDragOver = signal(false);
   uploading = signal(false);
   validating = signal<string | null>(null);
   summary = signal<ImportSummary | null>(null);
   detail = signal<ReconciliationDetail | null>(null);
+  availableFundCalls = signal<FundCallSummary[]>([]);
+  fundCallsLoaded = false;
+
+  // Maps reconciliationId → selected FundCallId (for the dropdown)
+  pendingFundCallIds: Record<string, string> = {};
 
   exportUrl(): string {
     const d = this.detail();
@@ -280,10 +327,34 @@ export class BankReconciliationComponent {
     if (file) this.upload(file);
   }
 
+  loadFundCallsIfNeeded(): void {
+    if (this.fundCallsLoaded) return;
+    const copropertyId = this.activeCoproperty.activeId();
+    if (!copropertyId) return;
+
+    this.service.getActiveFundCalls(copropertyId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (list) => {
+          this.availableFundCalls.set(list);
+          this.fundCallsLoaded = true;
+        },
+        error: () => {
+          this.toastService.show(
+            'Impossible de charger les appels de fonds.',
+            { classname: 'bg-warning text-dark', delay: 4000 }
+          );
+        }
+      });
+  }
+
   private upload(file: File): void {
     this.uploading.set(true);
     this.summary.set(null);
     this.detail.set(null);
+    this.pendingFundCallIds = {};
+    this.fundCallsLoaded = false;
+    this.availableFundCalls.set([]);
 
     this.service.importStatement(file)
       .pipe(
@@ -325,9 +396,10 @@ export class BankReconciliationComponent {
   validate(item: ReconciliationItem): void {
     const s = this.summary();
     if (!s) return;
+    const fundCallId = this.pendingFundCallIds[item.Reconciliation.Id] || undefined;
     this.validating.set(item.Reconciliation.Id);
 
-    this.service.validate(s.StatementId, item.Reconciliation.Id)
+    this.service.validate(s.StatementId, item.Reconciliation.Id, fundCallId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.validating.set(null))
@@ -338,10 +410,15 @@ export class BankReconciliationComponent {
           if (d) {
             this.detail.set({
               ...d,
-              Items: d.Items.map(i => i.Reconciliation.Id === updated.Id ? { ...i, Reconciliation: updated } : i),
+              Items: d.Items.map(i =>
+                i.Reconciliation.Id === updated.Id ? { ...i, Reconciliation: updated } : i
+              ),
             });
           }
-          this.toastService.show('Transaction validée.', { classname: 'bg-success text-white', delay: 3000 });
+          const msg = updated.FundCallPaymentId
+            ? 'Transaction validée et paiement enregistré dans la copropriété.'
+            : 'Transaction validée.';
+          this.toastService.show(msg, { classname: 'bg-success text-white', delay: 4000 });
         },
         error: () => {
           this.toastService.show('Erreur lors de la validation.', { classname: 'bg-danger text-white', delay: 4000 });
@@ -368,6 +445,6 @@ export class BankReconciliationComponent {
   }
 
   formatAmount(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'TND' }).format(amount);
   }
 }

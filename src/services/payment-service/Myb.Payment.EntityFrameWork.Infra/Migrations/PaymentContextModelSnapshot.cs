@@ -157,6 +157,12 @@ namespace Myb.Payment.EntityFrameWork.Infra.Migrations
                     b.Property<bool>("IsManuallyValidated")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("FundCallId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FundCallPaymentId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BankStatementId");

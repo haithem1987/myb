@@ -8,6 +8,8 @@ public class NotificationContext : DbContext
 {
     public DbSet<Models.Notification> Notifications { get; set; } = null!;
     public DbSet<Models.WebPushSubscription> PushSubscriptions { get; set; } = null!;
+    public DbSet<Models.CommunicationLog> CommunicationLogs { get; set; } = null!;
+    public DbSet<Models.CommunicationCampaign> Campaigns { get; set; } = null!;
 
     public NotificationContext(DbContextOptions<NotificationContext> options)
         : base(options)
@@ -26,5 +28,15 @@ public class NotificationContext : DbContext
         push.HasKey(s => s.Id);
         push.HasIndex(s => s.Endpoint).IsUnique();
         push.HasIndex(s => s.UserId);
+
+        var log = modelBuilder.Entity<Models.CommunicationLog>();
+        log.HasKey(l => l.Id);
+        log.HasIndex(l => new { l.CopropertyId, l.SentAt });
+        log.HasIndex(l => new { l.RecipientId, l.SentAt });
+        log.HasIndex(l => l.CampaignId).HasFilter("\"CampaignId\" IS NOT NULL");
+
+        var campaign = modelBuilder.Entity<Models.CommunicationCampaign>();
+        campaign.HasKey(c => c.Id);
+        campaign.HasIndex(c => new { c.CopropertyId, c.CreatedAt });
     }
 }

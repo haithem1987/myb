@@ -6,7 +6,9 @@ import {
   CampaignDto,
   CreateCampaignDto,
 } from 'libs/shared/infra/services/communication.service';
-import { ActiveCopropertyService, OwnerService, OwnerWithUnits } from '@myb-front/coproperty-module';
+import { ActiveCopropertyService, OwnerService, OwnerWithUnits, TenantService, Tenant } from '@myb-front/coproperty-module';
+
+type RecipientTab = 'owners' | 'tenants';
 
 @Component({
   selector: 'app-communication-campaigns',
@@ -63,34 +65,82 @@ import { ActiveCopropertyService, OwnerService, OwnerWithUnits } from '@myb-fron
             <!-- Recipients -->
             <div class="col-12">
               <label class="form-label">Destinataires <span class="text-danger">*</span></label>
-              <div class="mb-2 d-flex gap-2 flex-wrap">
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="selectAllOwners()">
-                  <i class="bi bi-check-all me-1"></i>Tous ({{ owners().length }})
+
+              <!-- Tabs owners / tenants -->
+              <ul class="nav nav-tabs mb-2">
+                <li class="nav-item">
+                  <button class="nav-link py-1 px-3"
+                          [class.active]="recipientTab() === 'owners'"
+                          (click)="recipientTab.set('owners')">
+                    <i class="bi bi-person-fill me-1"></i>Propriétaires ({{ owners().length }})
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link py-1 px-3"
+                          [class.active]="recipientTab() === 'tenants'"
+                          (click)="recipientTab.set('tenants')">
+                    <i class="bi bi-people-fill me-1"></i>Locataires ({{ tenants().length }})
+                  </button>
+                </li>
+              </ul>
+
+              <div class="mb-2 d-flex gap-2 align-items-center flex-wrap">
+                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="selectAllCurrent()">
+                  <i class="bi bi-check-all me-1"></i>Tous
                 </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clearRecipients()">
+                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clearAllCurrent()">
                   <i class="bi bi-x me-1"></i>Aucun
                 </button>
-                <span class="align-self-center small text-muted">
-                  {{ selectedRecipients().length }} sélectionné(s)
-                </span>
+                <button type="button" class="btn btn-outline-primary btn-sm" (click)="selectAllBoth()">
+                  <i class="bi bi-check2-all me-1"></i>Tous (proprio + locataires)
+                </button>
+                <span class="small text-muted ms-1">{{ selectedRecipients().length }} sélectionné(s)</span>
               </div>
-              <div *ngIf="loadingOwners()" class="text-center py-2">
-                <div class="spinner-border spinner-border-sm text-primary"></div>
+
+              <!-- Owners list -->
+              <div *ngIf="recipientTab() === 'owners'">
+                <div *ngIf="loadingOwners()" class="text-center py-2">
+                  <div class="spinner-border spinner-border-sm text-primary"></div>
+                </div>
+                <div *ngIf="!loadingOwners() && owners().length === 0" class="text-muted small py-2">
+                  Aucun propriétaire dans cette copropriété.
+                </div>
+                <div *ngIf="!loadingOwners() && owners().length > 0"
+                     class="border rounded p-2" style="max-height:200px;overflow-y:auto">
+                  <div class="form-check" *ngFor="let owner of owners()">
+                    <input class="form-check-input" type="checkbox"
+                           [id]="'owner-' + owner.userId"
+                           [checked]="selectedRecipients().includes(owner.userId)"
+                           (change)="toggleRecipient(owner.userId)">
+                    <label class="form-check-label" [for]="'owner-' + owner.userId">
+                      {{ owner.firstName }} {{ owner.lastName }}
+                      <span class="text-muted small ms-1">{{ owner.email }}</span>
+                    </label>
+                  </div>
+                </div>
               </div>
-              <div *ngIf="!loadingOwners() && owners().length === 0" class="text-muted small">
-                Aucun propriétaire dans cette copropriété.
-              </div>
-              <div *ngIf="!loadingOwners() && owners().length > 0"
-                   class="border rounded p-2" style="max-height:200px;overflow-y:auto">
-                <div class="form-check" *ngFor="let owner of owners()">
-                  <input class="form-check-input" type="checkbox"
-                         [id]="'owner-' + owner.userId"
-                         [checked]="selectedRecipients().includes(owner.userId)"
-                         (change)="toggleRecipient(owner.userId)">
-                  <label class="form-check-label" [for]="'owner-' + owner.userId">
-                    {{ owner.firstName }} {{ owner.lastName }}
-                    <span class="text-muted small ms-1">{{ owner.email }}</span>
-                  </label>
+
+              <!-- Tenants list -->
+              <div *ngIf="recipientTab() === 'tenants'">
+                <div *ngIf="loadingTenants()" class="text-center py-2">
+                  <div class="spinner-border spinner-border-sm text-primary"></div>
+                </div>
+                <div *ngIf="!loadingTenants() && tenants().length === 0" class="text-muted small py-2">
+                  Aucun locataire dans cette copropriété.
+                </div>
+                <div *ngIf="!loadingTenants() && tenants().length > 0"
+                     class="border rounded p-2" style="max-height:200px;overflow-y:auto">
+                  <div class="form-check" *ngFor="let tenant of tenants()">
+                    <input class="form-check-input" type="checkbox"
+                           [id]="'tenant-' + tenant.id"
+                           [checked]="selectedRecipients().includes(tenant.id)"
+                           (change)="toggleRecipient(tenant.id)">
+                    <label class="form-check-label" [for]="'tenant-' + tenant.id">
+                      {{ tenant.firstName }} {{ tenant.lastName }}
+                      <span class="text-muted small ms-1">{{ tenant.email }}</span>
+                      <span class="badge bg-info text-dark ms-1 small">Locataire</span>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -161,25 +211,30 @@ export class CommunicationCampaignsComponent implements OnInit {
   private svc = inject(CommunicationService);
   private activeCoproperty = inject(ActiveCopropertyService);
   private ownerService = inject(OwnerService);
+  private tenantService = inject(TenantService);
 
   campaigns = signal<CampaignDto[]>([]);
   owners = signal<OwnerWithUnits[]>([]);
+  tenants = signal<Tenant[]>([]);
   loading = signal(false);
   loadingOwners = signal(false);
+  loadingTenants = signal(false);
   showForm = signal(false);
   saving = signal(false);
   formError = signal('');
   selectedRecipients = signal<string[]>([]);
+  recipientTab = signal<RecipientTab>('owners');
 
   activeCopropertyName = computed(() => this.activeCoproperty.activeCoproperty()?.name ?? 'Copropriété active');
 
   availableChannels = ['InApp', 'Push', 'Email'];
 
-  draft: Omit<CreateCampaignDto, 'targetCriteria' | 'recipientIds'> & { description?: string } = this.emptyDraft();
+  draft: Omit<CreateCampaignDto, 'recipientIds'> & { description?: string } = this.emptyDraft();
 
   ngOnInit(): void {
     this.load();
     this.loadOwners();
+    this.loadTenants();
   }
 
   load(): void {
@@ -201,6 +256,16 @@ export class CommunicationCampaignsComponent implements OnInit {
     });
   }
 
+  loadTenants(): void {
+    const copropertyId = this.activeCoproperty.activeId();
+    if (!copropertyId) return;
+    this.loadingTenants.set(true);
+    this.tenantService.getTenants(copropertyId).subscribe({
+      next: tenants => { this.tenants.set(tenants); this.loadingTenants.set(false); },
+      error: () => this.loadingTenants.set(false),
+    });
+  }
+
   emptyDraft() {
     return { name: '', channels: [] as string[], message: '', subject: '', description: '' };
   }
@@ -210,6 +275,7 @@ export class CommunicationCampaignsComponent implements OnInit {
     this.draft = this.emptyDraft();
     this.selectedRecipients.set([]);
     this.formError.set('');
+    this.recipientTab.set('owners');
   }
 
   toggleChannel(ch: string): void {
@@ -218,18 +284,36 @@ export class CommunicationCampaignsComponent implements OnInit {
     else this.draft.channels.push(ch);
   }
 
-  toggleRecipient(userId: string): void {
+  toggleRecipient(id: string): void {
     this.selectedRecipients.update(list =>
-      list.includes(userId) ? list.filter(id => id !== userId) : [...list, userId]
+      list.includes(id) ? list.filter(x => x !== id) : [...list, id]
     );
   }
 
-  selectAllOwners(): void {
-    this.selectedRecipients.set(this.owners().map(o => o.userId).filter(Boolean));
+  selectAllCurrent(): void {
+    if (this.recipientTab() === 'owners') {
+      const ownerIds = this.owners().map(o => o.userId).filter(Boolean);
+      this.selectedRecipients.update(list => [...new Set([...list, ...ownerIds])]);
+    } else {
+      const tenantIds = this.tenants().map(t => t.id).filter(Boolean);
+      this.selectedRecipients.update(list => [...new Set([...list, ...tenantIds])]);
+    }
   }
 
-  clearRecipients(): void {
-    this.selectedRecipients.set([]);
+  clearAllCurrent(): void {
+    if (this.recipientTab() === 'owners') {
+      const ownerIds = new Set(this.owners().map(o => o.userId));
+      this.selectedRecipients.update(list => list.filter(id => !ownerIds.has(id)));
+    } else {
+      const tenantIds = new Set(this.tenants().map(t => t.id));
+      this.selectedRecipients.update(list => list.filter(id => !tenantIds.has(id)));
+    }
+  }
+
+  selectAllBoth(): void {
+    const ownerIds = this.owners().map(o => o.userId).filter(Boolean);
+    const tenantIds = this.tenants().map(t => t.id).filter(Boolean);
+    this.selectedRecipients.set([...new Set([...ownerIds, ...tenantIds])]);
   }
 
   createCampaign(): void {

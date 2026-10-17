@@ -489,8 +489,6 @@ export class BankReconciliationComponent {
     this.detail.set(null);
     this.pendingFundCallIds = {};
     this.ownerSearch = {};
-    this.fundCallsLoaded = false;
-    this.availableFundCalls.set([]);
 
     this.service.importStatement(file)
       .pipe(

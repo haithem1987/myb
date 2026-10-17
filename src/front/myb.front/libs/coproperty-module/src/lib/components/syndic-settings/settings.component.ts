@@ -7,8 +7,9 @@ import { KeycloakService } from '@myb-front/auth';
 import { take } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
+import { CommunicationService, WhatsAppConfigDto } from 'libs/shared/infra/services/communication.service';
 
-type ActiveTab = 'currency' | 'syndics';
+type ActiveTab = 'currency' | 'syndics' | 'whatsapp';
 
 interface KeycloakSearchUser {
   id: string;
@@ -52,6 +53,14 @@ const SYNDIC_ROLE = 'coproperty-syndic';
           <i class="bi bi-shield-person me-2"></i>{{ 'coproperty.syndicSettings.syndicsTab' | translate }}
           <span class="tab-badge" *ngIf="currentSyndics().length > 0">
             {{ currentSyndics().length }}
+          </span>
+        </button>
+        <button class="settings-tab"
+                [class.active]="activeTab() === 'whatsapp'"
+                (click)="setTab('whatsapp')">
+          <i class="bi bi-whatsapp me-2 text-success"></i>{{ 'coproperty.syndicSettings.whatsappTab' | translate }}
+          <span class="tab-badge bg-success" *ngIf="whatsAppEnabled()">
+            <i class="bi bi-check-lg" style="font-size:0.6rem"></i>
           </span>
         </button>
       </div>
@@ -343,6 +352,100 @@ const SYNDIC_ROLE = 'coproperty-syndic';
           </div>
         </div>
       </div>
+
+      <!-- ─── TAB: WhatsApp Business ────────────────────────────────── -->
+      <div *ngIf="!loading() && activeTab() === 'whatsapp'" class="row">
+        <div class="col-md-8">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon bg-success-subtle text-success">
+                <i class="bi bi-whatsapp"></i>
+              </div>
+              <div>
+                <h5 class="mb-0">{{ 'coproperty.syndicSettings.whatsappTitle' | translate }}</h5>
+                <small class="text-muted">{{ 'coproperty.syndicSettings.whatsappSubtitle' | translate }}</small>
+              </div>
+            </div>
+            <div class="settings-card-body">
+              <div *ngIf="loadingWhatsApp()" class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-success me-2"></div>
+                <span class="text-muted">{{ 'coproperty.syndicSettings.loading' | translate }}</span>
+              </div>
+              <form *ngIf="!loadingWhatsApp()" (ngSubmit)="saveWhatsApp()">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold required-label">
+                    {{ 'coproperty.syndicSettings.whatsappPhoneNumberId' | translate }}
+                  </label>
+                  <input type="text" class="form-control font-monospace"
+                         [(ngModel)]="waPhoneNumberId" name="waPhoneNumberId"
+                         placeholder="e.g. 1463837753469965" required>
+                  <div class="form-text">{{ 'coproperty.syndicSettings.whatsappPhoneNumberIdHelp' | translate }}</div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold required-label">
+                    {{ 'coproperty.syndicSettings.whatsappAccessToken' | translate }}
+                  </label>
+                  <input type="password" class="form-control font-monospace"
+                         [(ngModel)]="waAccessToken" name="waAccessToken"
+                         [placeholder]="waHasConfig ? ('coproperty.syndicSettings.whatsappTokenPlaceholder' | translate) : ''"
+                         [required]="!waHasConfig">
+                  <div class="form-text">{{ 'coproperty.syndicSettings.whatsappAccessTokenHelp' | translate }}</div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">
+                    {{ 'coproperty.syndicSettings.whatsappBusinessAccountId' | translate }}
+                  </label>
+                  <input type="text" class="form-control font-monospace"
+                         [(ngModel)]="waBusinessAccountId" name="waBusinessAccountId"
+                         placeholder="e.g. 123456789">
+                </div>
+                <div class="mb-4 form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="waEnabled"
+                         [(ngModel)]="waEnabledModel" name="waEnabled">
+                  <label class="form-check-label" for="waEnabled">
+                    {{ 'coproperty.syndicSettings.whatsappEnabled' | translate }}
+                  </label>
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-success" [disabled]="savingWhatsApp()">
+                    <span *ngIf="savingWhatsApp()" class="spinner-border spinner-border-sm me-1"></span>
+                    <i *ngIf="!savingWhatsApp()" class="bi bi-check-lg me-1"></i>
+                    {{ 'coproperty.syndicSettings.save' | translate }}
+                  </button>
+                  <button type="button" class="btn btn-outline-danger" *ngIf="waHasConfig"
+                          (click)="deleteWhatsApp()" [disabled]="savingWhatsApp()">
+                    <i class="bi bi-trash me-1"></i>
+                    {{ 'coproperty.syndicSettings.whatsappDelete' | translate }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon bg-info-subtle text-info"><i class="bi bi-info-circle"></i></div>
+              <div>
+                <h5 class="mb-0">{{ 'coproperty.syndicSettings.whatsappHowToTitle' | translate }}</h5>
+              </div>
+            </div>
+            <div class="settings-card-body">
+              <ol class="ps-3 small text-muted">
+                <li class="mb-2">{{ 'coproperty.syndicSettings.whatsappStep1' | translate }}</li>
+                <li class="mb-2">{{ 'coproperty.syndicSettings.whatsappStep2' | translate }}</li>
+                <li class="mb-2">{{ 'coproperty.syndicSettings.whatsappStep3' | translate }}</li>
+                <li>{{ 'coproperty.syndicSettings.whatsappStep4' | translate }}</li>
+              </ol>
+              <a href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started"
+                 target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary w-100 mt-2">
+                <i class="bi bi-box-arrow-up-right me-1"></i>
+                {{ 'coproperty.syndicSettings.whatsappDocs' | translate }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -516,6 +619,7 @@ export class SyndicSettingsComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
   private translate = inject(TranslateService);
   private activeCoproperty = inject(ActiveCopropertyService);
+  private communicationService = inject(CommunicationService);
 
   // ── State signals ──────────────────────────────────────────────────────────
   activeTab = signal<ActiveTab>('currency');
@@ -536,6 +640,16 @@ export class SyndicSettingsComponent implements OnInit {
   searchPerformed = signal(false);
   /** Set of user IDs currently being processed (assign / revoke in flight) */
   private processingIds = signal<Set<string>>(new Set());
+
+  // WhatsApp tab
+  loadingWhatsApp = signal(false);
+  savingWhatsApp = signal(false);
+  waHasConfig = false;
+  waPhoneNumberId = '';
+  waAccessToken = '';
+  waBusinessAccountId = '';
+  waEnabledModel = true;
+  whatsAppEnabled = signal(false);
 
   readonly currencies = [
     { code: 'EUR', symbol: '€',   labelKey: 'coproperty.syndicSettings.currencies.EUR' },
@@ -570,9 +684,8 @@ export class SyndicSettingsComponent implements OnInit {
   // ── Tab helpers ────────────────────────────────────────────────────────────
   setTab(tab: ActiveTab): void {
     this.activeTab.set(tab);
-    if (tab === 'syndics') {
-      this.loadCurrentSyndics();
-    }
+    if (tab === 'syndics') this.loadCurrentSyndics();
+    if (tab === 'whatsapp') this.loadWhatsAppConfig();
   }
 
   // ── Currency tab methods ───────────────────────────────────────────────────
@@ -764,6 +877,88 @@ export class SyndicSettingsComponent implements OnInit {
     } finally {
       this.removeProcessing(user.id);
     }
+  }
+
+  // ── WhatsApp tab methods ───────────────────────────────────────────────────
+
+  loadWhatsAppConfig(): void {
+    if (!this.selectedCopropertyId) return;
+    this.loadingWhatsApp.set(true);
+    this.communicationService.getWhatsAppConfig(this.selectedCopropertyId).pipe(take(1)).subscribe({
+      next: (cfg) => {
+        this.waHasConfig = true;
+        this.waPhoneNumberId = cfg.phoneNumberId;
+        this.waBusinessAccountId = cfg.businessAccountId;
+        this.waEnabledModel = cfg.enabled;
+        this.waAccessToken = '';
+        this.whatsAppEnabled.set(cfg.enabled);
+        this.loadingWhatsApp.set(false);
+      },
+      error: () => {
+        this.waHasConfig = false;
+        this.waPhoneNumberId = '';
+        this.waAccessToken = '';
+        this.waBusinessAccountId = '';
+        this.waEnabledModel = true;
+        this.whatsAppEnabled.set(false);
+        this.loadingWhatsApp.set(false);
+      },
+    });
+  }
+
+  saveWhatsApp(): void {
+    if (!this.selectedCopropertyId) return;
+    if (!this.waPhoneNumberId) return;
+    if (!this.waHasConfig && !this.waAccessToken) return;
+
+    this.savingWhatsApp.set(true);
+    this.communicationService.upsertWhatsAppConfig(this.selectedCopropertyId, {
+      phoneNumberId: this.waPhoneNumberId,
+      accessToken: this.waAccessToken,
+      businessAccountId: this.waBusinessAccountId,
+      enabled: this.waEnabledModel,
+    }).pipe(take(1)).subscribe({
+      next: () => {
+        this.waHasConfig = true;
+        this.waAccessToken = '';
+        this.whatsAppEnabled.set(this.waEnabledModel);
+        this.savingWhatsApp.set(false);
+        this.toastService.show(
+          this.translate.instant('coproperty.syndicSettings.whatsappSaved'),
+          { classname: 'toast-success' }
+        );
+      },
+      error: () => {
+        this.savingWhatsApp.set(false);
+        this.toastService.show(
+          this.translate.instant('coproperty.syndicSettings.whatsappSaveError'),
+          { classname: 'toast-danger' }
+        );
+      },
+    });
+  }
+
+  deleteWhatsApp(): void {
+    if (!this.selectedCopropertyId) return;
+    this.savingWhatsApp.set(true);
+    this.communicationService.deleteWhatsAppConfig(this.selectedCopropertyId).pipe(take(1)).subscribe({
+      next: () => {
+        this.waHasConfig = false;
+        this.waPhoneNumberId = '';
+        this.waAccessToken = '';
+        this.waBusinessAccountId = '';
+        this.waEnabledModel = true;
+        this.whatsAppEnabled.set(false);
+        this.savingWhatsApp.set(false);
+        this.toastService.show(
+          this.translate.instant('coproperty.syndicSettings.whatsappDeleted'),
+          { classname: 'toast-success' }
+        );
+      },
+      error: () => {
+        this.savingWhatsApp.set(false);
+      },
+    });
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────

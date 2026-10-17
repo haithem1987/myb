@@ -14,9 +14,14 @@ public enum WhatsAppTemplate
 
 public interface IWhatsAppSender
 {
-    /// <summary>Sends a pre-approved WhatsApp template message. Returns false when WhatsApp is
-    /// not configured or the API call fails (best-effort, never throws).</summary>
+    /// <summary>Sends using the global (env-var) config. Returns false when not configured or on failure.</summary>
     Task<bool> SendTemplateAsync(
+        string toPhone, WhatsAppTemplate template, string[] parameters,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Sends using per-coproperty credentials (overrides global config).</summary>
+    Task<bool> SendTemplateAsync(
+        string phoneNumberId, string accessToken, string apiVersion,
         string toPhone, WhatsAppTemplate template, string[] parameters,
         CancellationToken cancellationToken = default);
 }
@@ -48,11 +53,21 @@ public class WhatsAppSender : IWhatsAppSender
         _logger = logger;
     }
 
-    public async Task<bool> SendTemplateAsync(
+    public Task<bool> SendTemplateAsync(
         string toPhone, WhatsAppTemplate template, string[] parameters,
         CancellationToken cancellationToken = default)
     {
-        if (!_options.IsConfigured) return false;
+        if (!_options.IsConfigured) return Task.FromResult(false);
+        return SendTemplateAsync(
+            _options.PhoneNumberId, _options.AccessToken, _options.ApiVersion,
+            toPhone, template, parameters, cancellationToken);
+    }
+
+    public async Task<bool> SendTemplateAsync(
+        string phoneNumberId, string accessToken, string apiVersion,
+        string toPhone, WhatsAppTemplate template, string[] parameters,
+        CancellationToken cancellationToken = default)
+    {
         if (string.IsNullOrWhiteSpace(toPhone)) return false;
 
         var bodyComponents = parameters.Length > 0
@@ -81,9 +96,9 @@ public class WhatsAppSender : IWhatsAppSender
 
         var client = _httpClientFactory.CreateClient(HttpClientName);
         client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", _options.AccessToken);
+            new AuthenticationHeaderValue("Bearer", accessToken);
 
-        var url = $"https://graph.facebook.com/{_options.ApiVersion}/{_options.PhoneNumberId}/messages";
+        var url = $"https://graph.facebook.com/{apiVersion}/{phoneNumberId}/messages";
         var content = new StringContent(
             JsonSerializer.Serialize(payload, JsonOptions),
             System.Text.Encoding.UTF8, "application/json");

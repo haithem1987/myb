@@ -10,6 +10,7 @@ public class NotificationContext : DbContext
     public DbSet<Models.WebPushSubscription> PushSubscriptions { get; set; } = null!;
     public DbSet<Models.CommunicationLog> CommunicationLogs { get; set; } = null!;
     public DbSet<Models.CommunicationCampaign> Campaigns { get; set; } = null!;
+    public DbSet<Models.CopropertyWhatsAppConfig> CopropertyWhatsAppConfigs { get; set; } = null!;
 
     public NotificationContext(DbContextOptions<NotificationContext> options)
         : base(options)
@@ -38,5 +39,9 @@ public class NotificationContext : DbContext
         var campaign = modelBuilder.Entity<Models.CommunicationCampaign>();
         campaign.HasKey(c => c.Id);
         campaign.HasIndex(c => new { c.CopropertyId, c.CreatedAt });
+
+        var waConfig = modelBuilder.Entity<Models.CopropertyWhatsAppConfig>();
+        waConfig.HasKey(c => c.CopropertyId);
+        waConfig.ToTable("CopropertyWhatsAppConfigs");
     }
 }

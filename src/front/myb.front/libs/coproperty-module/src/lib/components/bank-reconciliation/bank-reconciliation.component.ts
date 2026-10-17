@@ -1,4 +1,4 @@
-import { Component, signal, inject, DestroyRef } from '@angular/core';
+import { Component, signal, inject, DestroyRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -135,20 +135,15 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
                         class="text-muted small fc-debit" title="Les débits ne sont pas liés à un appel de fonds">
                     <i class="bi bi-dash-circle me-1"></i>Débit
                   </span>
-                  <!-- Step 1 + 2: owner search then fund call select for credits -->
+                  <!-- Step 1 + 2: owner select then fund call select for credits -->
                   <div *ngIf="!item.Reconciliation.FundCallPaymentId && item.Transaction.Amount > 0 && (item.Reconciliation.Status === 1 || item.Reconciliation.Status === 2)"
                        class="fc-selector">
-                    <!-- Step 1: search owner -->
-                    <input class="fc-search"
-                           type="text"
-                           list="fc-owners-list"
-                           [(ngModel)]="ownerSearch[item.Reconciliation.Id]"
-                           (focus)="loadFundCallsIfNeeded()"
-                           placeholder="Copropriétaire…"
-                           autocomplete="off">
-                    <datalist id="fc-owners-list">
-                      <option *ngFor="let o of distinctOwners()" [value]="o"></option>
-                    </datalist>
+                    <!-- Step 1: pick owner from dropdown -->
+                    <select class="fc-search"
+                            [(ngModel)]="ownerSearch[item.Reconciliation.Id]">
+                      <option value="">— Copropriétaire —</option>
+                      <option *ngFor="let o of distinctOwners()" [value]="o">{{ o }}</option>
+                    </select>
                     <!-- Step 2: fund calls for selected owner -->
                     <select *ngIf="ownerSearch[item.Reconciliation.Id]?.trim()"
                             class="fc-select"
@@ -388,6 +383,13 @@ export class BankReconciliationComponent {
   detail = signal<ReconciliationDetail | null>(null);
   availableFundCalls = signal<FundCallSummary[]>([]);
   fundCallsLoaded = false;
+
+  constructor() {
+    effect(() => {
+      const id = this.activeCoproperty.activeId();
+      if (id) this.loadFundCallsIfNeeded();
+    });
+  }
 
   // Maps reconciliationId → selected FundCallId (for the dropdown)
   pendingFundCallIds: Record<string, string> = {};

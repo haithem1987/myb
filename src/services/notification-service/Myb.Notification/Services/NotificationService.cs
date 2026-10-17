@@ -12,6 +12,7 @@ public class NotificationService : INotificationService
     private readonly IHubContext<NotificationHub> _hubContext;
     private readonly IEmailPublisher _emailPublisher;
     private readonly IPushQueue _pushQueue;
+    private readonly IWhatsAppSender _whatsApp;
 
     public const string DefaultPushUrl = "/coproperty/select";
     public const string PushTitle = "MYB";
@@ -20,12 +21,14 @@ public class NotificationService : INotificationService
         IDbContextFactory<NotificationContext> contextFactory,
         IHubContext<NotificationHub> hubContext,
         IEmailPublisher emailPublisher,
-        IPushQueue pushQueue)
+        IPushQueue pushQueue,
+        IWhatsAppSender whatsApp)
     {
         _contextFactory = contextFactory;
         _hubContext = hubContext;
         _emailPublisher = emailPublisher;
         _pushQueue = pushQueue;
+        _whatsApp = whatsApp;
     }
 
     /// <summary>Only same-origin absolute paths are allowed, so a notification can never send
@@ -82,6 +85,9 @@ public class NotificationService : INotificationService
             .OrderByDescending(n => n.CreatedAt)
             .ToListAsync();
     }
+
+    public Task<bool> SendWhatsAppAsync(string toPhone, WhatsAppTemplate template, params string[] parameters)
+        => _whatsApp.SendTemplateAsync(toPhone, template, parameters);
 
     public async Task SendEmailNotificationAsync(
         string receiverEmail, string subject, string htmlBody, string? language = null)

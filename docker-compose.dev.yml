@@ -281,6 +281,10 @@ services:
       - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
       - SendGrid__ApiKey=${SENDGRID_API_KEY:-sg_test_dummy_key}
       - Email__FromAddress=${EMAIL_FROM_ADDRESS:-noreply@myb.com}
+      - WhatsApp__Enabled=${WHATSAPP_ENABLED:-false}
+      - WhatsApp__PhoneNumberId=${WHATSAPP_PHONE_NUMBER_ID:-REPLACE_WITH_PHONE_NUMBER_ID}
+      - WhatsApp__AccessToken=${WHATSAPP_ACCESS_TOKEN:-REPLACE_WITH_ACCESS_TOKEN}
+      - WhatsApp__WebhookVerifyToken=${WHATSAPP_WEBHOOK_VERIFY_TOKEN:-myb-webhook-verify-2026}
     restart: on-failure
 
   # Coproperty Management service

@@ -8,6 +8,9 @@ public interface INotificationService
         string senderId, string receiverId, string message, string? copropertyId = null,
         bool push = false, string? url = null, PushUrgency urgency = PushUrgency.Normal);
     Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody, string? language = null);
+    /// <summary>Sends a pre-approved WhatsApp template message (best effort — never throws).
+    /// Returns false when WhatsApp is not configured or the API call fails.</summary>
+    Task<bool> SendWhatsAppAsync(string toPhone, WhatsAppTemplate template, params string[] parameters);
     Task<List<Models.Notification>> GetNotificationsAsync(string userId, string? copropertyId = null);
     /// <summary>Marks the notification as read when it belongs to <paramref name="receiverId"/>
     /// (any receiver when null). Returns false when no such notification exists.</summary>

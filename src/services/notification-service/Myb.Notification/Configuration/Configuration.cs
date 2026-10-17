@@ -91,7 +91,7 @@ public static class Configuration
         // WhatsApp Business (Meta Cloud API)
         builder.Services.Configure<WhatsAppOptions>(builder.Configuration.GetSection(WhatsAppOptions.SectionName));
         builder.Services.AddHttpClient(WhatsAppSender.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(15));
-        builder.Services.AddScoped<IWhatsAppSender, WhatsAppSender>();
+        builder.Services.AddSingleton<IWhatsAppSender, WhatsAppSender>();
         builder.Services.AddSingleton<IPushSubscriptionStore, PushSubscriptionStore>();
         builder.Services.AddSingleton<IWebPushSender, WebPushSender>();
         builder.Services.AddSingleton<PushDispatcher>();

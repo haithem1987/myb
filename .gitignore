@@ -58,3 +58,6 @@ msbuild.wrn
 
 # Local Web Push test keys (scripts/push-local.sh)
 .env.push.local
+
+# WhatsApp sandbox credentials (never commit real tokens)
+.env.whatsapp

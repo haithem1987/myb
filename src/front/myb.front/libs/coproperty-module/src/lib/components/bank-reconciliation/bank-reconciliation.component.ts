@@ -74,6 +74,26 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
           </a>
         </div>
 
+        <!-- Filters -->
+        <div class="filters-bar">
+          <input class="filter-search"
+                 type="text"
+                 [(ngModel)]="filterText"
+                 placeholder="Rechercher libellé, référence, copropriétaire…"
+                 autocomplete="off">
+          <div class="filter-group">
+            <button class="filter-btn" [class.active]="filterType === 'all'"   (click)="filterType = 'all'">Tous</button>
+            <button class="filter-btn credit" [class.active]="filterType === 'credit'" (click)="filterType = 'credit'">Crédits</button>
+            <button class="filter-btn debit"  [class.active]="filterType === 'debit'"  (click)="filterType = 'debit'">Débits</button>
+          </div>
+          <div class="filter-group">
+            <button class="filter-btn" [class.active]="filterStatus === 'all'"        (click)="filterStatus = 'all'">Tous statuts</button>
+            <button class="filter-btn" [class.active]="filterStatus === 'matched'"    (click)="filterStatus = 'matched'">Rapprochés</button>
+            <button class="filter-btn" [class.active]="filterStatus === 'suggestion'" (click)="filterStatus = 'suggestion'">Suggestions</button>
+            <button class="filter-btn" [class.active]="filterStatus === 'unmatched'"  (click)="filterStatus = 'unmatched'">Non rapprochés</button>
+          </div>
+        </div>
+
         <div class="table-responsive">
           <table class="reconciliation-table">
             <thead>
@@ -88,7 +108,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let item of detail()!.Items"
+              <tr *ngFor="let item of filteredItems()"
                   [class.row-registered]="item.Reconciliation.FundCallPaymentId">
                 <td>{{ formatDate(item.Transaction.Date) }}</td>
                 <td>{{ item.Transaction.Label }}</td>
@@ -147,16 +167,23 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
                   <span *ngIf="item.Reconciliation.FundCallPaymentId" class="text-muted small">✓</span>
 
                   <!-- Validate button for ManualSuggestion / Unmatched -->
-                  <button
-                    *ngIf="!item.Reconciliation.FundCallPaymentId && (item.Reconciliation.Status === 1 || item.Reconciliation.Status === 2)"
-                    class="btn-validate"
-                    [disabled]="validating() === item.Reconciliation.Id"
-                    (click)="validate(item)">
-                    <span *ngIf="validating() !== item.Reconciliation.Id">
-                      {{ pendingFundCallIds[item.Reconciliation.Id] ? 'Valider + Enregistrer' : 'Valider' }}
+                  <ng-container *ngIf="!item.Reconciliation.FundCallPaymentId && (item.Reconciliation.Status === 1 || item.Reconciliation.Status === 2)">
+                    <!-- Credit: require a fund call to be selected -->
+                    <span *ngIf="item.Transaction.Amount > 0 && !pendingFundCallIds[item.Reconciliation.Id]"
+                          class="fc-required-hint">
+                      <i class="bi bi-exclamation-circle me-1"></i>Sélectionnez un appel de fonds
                     </span>
-                    <span *ngIf="validating() === item.Reconciliation.Id" class="spinner-sm"></span>
-                  </button>
+                    <button
+                      *ngIf="item.Transaction.Amount < 0 || pendingFundCallIds[item.Reconciliation.Id]"
+                      class="btn-validate"
+                      [disabled]="validating() === item.Reconciliation.Id"
+                      (click)="validate(item)">
+                      <span *ngIf="validating() !== item.Reconciliation.Id">
+                        {{ pendingFundCallIds[item.Reconciliation.Id] ? 'Valider + Enregistrer' : 'Valider' }}
+                      </span>
+                      <span *ngIf="validating() === item.Reconciliation.Id" class="spinner-sm"></span>
+                    </button>
+                  </ng-container>
                 </td>
               </tr>
             </tbody>
@@ -313,6 +340,39 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     }
     .btn-validate:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-validate:not(:disabled):hover { background: #4338ca; }
+
+    .filters-bar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fafbfc;
+    }
+    .filter-search {
+      flex: 1; min-width: 200px;
+      padding: 6px 12px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      background: white;
+    }
+    .filter-search:focus { outline: none; border-color: #4f46e5; }
+    .filter-group { display: flex; gap: 4px; }
+    .filter-btn {
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      border: 1px solid #cbd5e0;
+      border-radius: 5px;
+      background: white;
+      cursor: pointer;
+      color: #4a5568;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { background: #f1f5f9; }
+    .filter-btn.active { background: #4f46e5; color: white; border-color: #4f46e5; }
+    .filter-btn.credit.active { background: #15803d; border-color: #15803d; }
+    .filter-btn.debit.active  { background: #b91c1c; border-color: #b91c1c; }
+
+    .fc-required-hint { font-size: 0.78rem; color: #d97706; white-space: nowrap; }
   `],
 })
 export class BankReconciliationComponent {
@@ -333,6 +393,30 @@ export class BankReconciliationComponent {
   pendingFundCallIds: Record<string, string> = {};
   // Per-row: the owner name typed in the first step of the fund-call selector
   ownerSearch: Record<string, string> = {};
+
+  // Filter state
+  filterText = '';
+  filterType: 'all' | 'credit' | 'debit' = 'all';
+  filterStatus: 'all' | 'matched' | 'suggestion' | 'unmatched' = 'all';
+
+  filteredItems() {
+    const items = this.detail()?.Items ?? [];
+    const q = this.filterText.trim().toLowerCase();
+    return items.filter(item => {
+      const t = item.Transaction;
+      const r = item.Reconciliation;
+      if (this.filterType === 'credit' && t.Amount <= 0) return false;
+      if (this.filterType === 'debit'  && t.Amount >= 0) return false;
+      if (this.filterStatus === 'matched'    && r.Status !== 0) return false;
+      if (this.filterStatus === 'suggestion' && r.Status !== 1) return false;
+      if (this.filterStatus === 'unmatched'  && r.Status !== 2) return false;
+      if (!q) return true;
+      const ownerName = (this.availableFundCalls().find(fc => fc.Id === r.FundCallId)?.OwnerName ?? '').toLowerCase();
+      return (t.Label ?? '').toLowerCase().includes(q)
+          || (t.Reference ?? '').toLowerCase().includes(q)
+          || ownerName.includes(q);
+    });
+  }
 
   distinctOwners(): string[] {
     return [...new Set(

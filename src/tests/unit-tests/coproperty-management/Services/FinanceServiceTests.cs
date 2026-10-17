@@ -444,9 +444,9 @@ public class FinanceServiceTests
 
     #region Helper Methods
 
-    private Models.Coproperty CreateSampleCoproperty()
+    private Myb.Coproperty.Models.Coproperty CreateSampleCoproperty()
     {
-        return new Models.Coproperty
+        return new Myb.Coproperty.Models.Coproperty
         {
             Id = Guid.NewGuid(),
             Name = "Test Coproperty",

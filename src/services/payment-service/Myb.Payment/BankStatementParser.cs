@@ -127,6 +127,8 @@ public class BankStatementParser : IBankStatementParser
 
         // Detect header row and column indices
         int dateCol = 0, amountCol = 1, labelCol = 2, refCol = -1;
+        // Separate debit/credit columns (French bank exports often split them)
+        int debitCol = -1, creditCol = -1;
         int startRow = 0;
 
         if (lines.Length > 0)
@@ -136,7 +138,9 @@ public class BankStatementParser : IBankStatementParser
             {
                 var h = header[i].Trim('"', ' ', '\r', '\n').ToLowerInvariant();
                 if (h is "date" or "date opération" or "date operation") dateCol = i;
-                else if (h is "montant" or "amount" or "debit" or "credit" or "débit" or "crédit") amountCol = i;
+                else if (h is "montant" or "amount") amountCol = i;
+                else if (h is "debit" or "débit") debitCol = i;
+                else if (h is "credit" or "crédit") creditCol = i;
                 else if (h is "libellé" or "libelle" or "label" or "description" or "motif") labelCol = i;
                 else if (h is "référence" or "reference" or "ref" or "numéro" or "numero") refCol = i;
             }
@@ -147,10 +151,31 @@ public class BankStatementParser : IBankStatementParser
         for (int i = startRow; i < lines.Length; i++)
         {
             var cols = SplitCsvLine(lines[i], delimiter);
-            if (cols.Length <= Math.Max(dateCol, amountCol)) continue;
+            if (cols.Length <= dateCol) continue;
 
             var dateStr = cols[dateCol].Trim('"', ' ');
-            var amountStr = cols[amountCol].Trim('"', ' ').Replace(" ", "").Replace(",", ".");
+
+            // Resolve amount: prefer separate debit/credit columns over single amount column
+            string amountStr;
+            if (debitCol >= 0 || creditCol >= 0)
+            {
+                var debitStr  = debitCol  >= 0 && debitCol  < cols.Length ? cols[debitCol].Trim('"', ' ')  : "";
+                var creditStr = creditCol >= 0 && creditCol < cols.Length ? cols[creditCol].Trim('"', ' ') : "";
+                // Credits are positive; debits are negative (negate if not already signed)
+                if (!string.IsNullOrWhiteSpace(creditStr))
+                    amountStr = creditStr;
+                else if (!string.IsNullOrWhiteSpace(debitStr) && !debitStr.StartsWith('-'))
+                    amountStr = "-" + debitStr;
+                else
+                    amountStr = debitStr;
+            }
+            else
+            {
+                if (cols.Length <= amountCol) continue;
+                amountStr = cols[amountCol].Trim('"', ' ');
+            }
+
+            amountStr = amountStr.Replace(" ", "").Replace(",", ".");
             var label = labelCol < cols.Length ? cols[labelCol].Trim('"', ' ') : "";
             var reference = refCol >= 0 && refCol < cols.Length ? cols[refCol].Trim('"', ' ') : null;
 

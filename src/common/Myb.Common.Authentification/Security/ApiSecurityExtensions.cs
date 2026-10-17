@@ -26,7 +26,7 @@ public static class ApiSecurityExtensions
         if (origins.Length == 0)
         {
             origins = builder.Environment.IsDevelopment()
-                ? ["http://localhost:4200", "http://localhost:4201"]
+                ? ["http://localhost:4200", "http://localhost:4201", "http://localhost:4300"]
                 : ["https://myb-platform.com", "https://www.myb-platform.com"];
         }
 

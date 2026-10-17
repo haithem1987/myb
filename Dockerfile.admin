@@ -1,0 +1,25 @@
+# Admin app Docker image (prebuilt approach)
+#
+# Build Angular first:
+#   cd src/front/myb.front
+#   npx nx build admin --configuration=docker
+#
+# Then build this image from the repo root:
+#   docker compose -f docker-compose.dev.yml build myb-admin-front
+
+FROM nginx:alpine
+
+RUN rm -rf /usr/share/nginx/html/*
+
+# Prebuilt dist (path relative to docker-compose build context = repo root)
+COPY src/front/myb.front/dist/apps/admin /usr/share/nginx/html
+
+# nginx config with API proxy rules
+COPY src/front/myb.front/nginx.admin.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost/index.html || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

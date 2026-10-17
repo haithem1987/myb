@@ -287,6 +287,22 @@ services:
       - WhatsApp__WebhookVerifyToken=${WHATSAPP_WEBHOOK_VERIFY_TOKEN:-myb-webhook-verify-2026}
     restart: on-failure
 
+  # RabbitMQ — required by coproperty and payment services
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   # Coproperty Management service
   myb-coproperty:
     build:
@@ -310,8 +326,27 @@ services:
       - Keycloak__ClientSecret=${KEYCLOAK_CLIENT_SECRET:-f4umyKKCMYgaipA3f3MndHeTg8ubvyD2}
     restart: on-failure
 
-  # NOTE: Frontend (myb-front) is NOT included in this dev compose file
-  # Run it locally with: npm run start or nx serve
+  # Admin frontend — prebuilt nginx image
+  # Build Angular first: cd src/front/myb.front && npx nx build admin --configuration=production
+  myb-admin-front:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.admin
+    ports:
+      - "4300:80"
+    networks:
+      - my-network
+    depends_on:
+      - keycloak
+      - myb-payment
+      - myb-coproperty
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/index.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 networks:
   my-network:

@@ -11,3 +11,4 @@ export * from './payment-api.service';
 export * from './currency.service';
 export * from './intervention.service';
 export * from './signalement.service';
+export * from './bank-reconciliation.service';

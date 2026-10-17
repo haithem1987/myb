@@ -25,6 +25,7 @@ export * from './registration-path/registration-path.component';
 export * from './charge-payments/charge-payments.component';
 export * from './treasury-detail/treasury-detail.component';
 export * from './unpaid-payments/unpaid-payments.component';
+export * from './bank-reconciliation/bank-reconciliation.component';
 export * from './intervention-list/intervention-list.component';
 export * from './intervention-new/intervention-new.component';
 export * from './intervention-management/intervention-management.component';

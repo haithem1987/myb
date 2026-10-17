@@ -3,6 +3,7 @@ using Moq;
 using Myb.Coproperty.Services;
 using Myb.Coproperty.Infrastructure.Data;
 using Myb.Coproperty.Models;
+using Myb.Common.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;

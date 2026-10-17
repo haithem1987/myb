@@ -227,8 +227,7 @@ app.UseAuthorization();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
     .AllowAnonymous();
 
-// GraphQL only - no REST controllers needed
-// app.MapControllers();
+app.MapControllers();
 
 app.MapGraphQL();
 app.MapGraphQL("/coproperty/graphql"); // Support legacy path for backward compatibility

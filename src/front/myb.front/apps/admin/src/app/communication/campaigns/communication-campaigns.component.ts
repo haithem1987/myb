@@ -16,20 +16,21 @@ type RecipientTab = 'owners' | 'tenants';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="communication-campaigns">
-      <div class="page-header d-flex align-items-center justify-content-between mb-4">
-        <h4 class="mb-0"><i class="bi bi-megaphone me-2"></i>Campagnes</h4>
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div></div>
         <button class="btn btn-primary btn-sm" (click)="showForm.set(true)" *ngIf="!showForm()">
           <i class="bi bi-plus-lg me-1"></i>Nouvelle campagne
         </button>
       </div>
 
       <!-- New campaign form -->
-      <div class="card mb-4" *ngIf="showForm()">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-send me-2"></i>Nouvelle campagne</span>
+      <div class="settings-card mb-4" *ngIf="showForm()">
+        <div class="settings-card-header">
+          <div class="settings-icon"><i class="bi bi-send"></i></div>
+          <div class="flex-grow-1 fw-semibold">Nouvelle campagne</div>
           <button type="button" class="btn-close" (click)="cancelForm()"></button>
         </div>
-        <div class="card-body">
+        <div class="settings-card-body">
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Nom <span class="text-danger">*</span></label>
@@ -195,13 +196,15 @@ type RecipientTab = 'owners' | 'tenants';
         <div class="spinner-border spinner-border-sm text-primary"></div>
       </div>
 
-      <div *ngIf="!loading() && campaigns().length === 0" class="text-center py-5 text-muted">
-        <i class="bi bi-megaphone fs-2 d-block mb-2"></i>
-        Aucune campagne
+      <div *ngIf="!loading() && campaigns().length === 0" class="settings-card">
+        <div class="settings-card-body text-center py-5 text-muted">
+          <i class="bi bi-megaphone fs-2 d-block mb-2"></i>
+          Aucune campagne
+        </div>
       </div>
 
-      <div *ngFor="let c of campaigns()" class="card mb-3">
-        <div class="card-body">
+      <div *ngFor="let c of campaigns()" class="settings-card mb-3">
+        <div class="settings-card-body">
           <div class="d-flex align-items-start justify-content-between">
             <div class="flex-grow-1">
               <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
@@ -239,6 +242,25 @@ type RecipientTab = 'owners' | 'tenants';
       </div>
     </div>
   `,
+  styles: [`
+    .settings-card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden; margin-bottom: 1.5rem;
+    }
+    .settings-card-header {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid #f0f0f0;
+      background: #fafbfc;
+    }
+    .settings-card-body { padding: 1.5rem; }
+    .settings-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: #e8f0fe; color: #1a73e8;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; flex-shrink: 0;
+    }
+  `]
 })
 export class CommunicationCampaignsComponent implements OnInit {
   private svc = inject(CommunicationService);

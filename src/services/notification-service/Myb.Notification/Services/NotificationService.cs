@@ -14,6 +14,7 @@ public class NotificationService : INotificationService
     private readonly IEmailPublisher _emailPublisher;
     private readonly IPushQueue _pushQueue;
     private readonly IWhatsAppSender _whatsApp;
+    private readonly IWhatsAppConfigService _whatsAppConfig;
     private readonly ICommunicationLogService? _commLog;
 
     public const string DefaultPushUrl = "/coproperty/select";
@@ -25,6 +26,7 @@ public class NotificationService : INotificationService
         IEmailPublisher emailPublisher,
         IPushQueue pushQueue,
         IWhatsAppSender whatsApp,
+        IWhatsAppConfigService whatsAppConfig,
         ICommunicationLogService? commLog = null)
     {
         _contextFactory = contextFactory;
@@ -32,6 +34,7 @@ public class NotificationService : INotificationService
         _emailPublisher = emailPublisher;
         _pushQueue = pushQueue;
         _whatsApp = whatsApp;
+        _whatsAppConfig = whatsAppConfig;
         _commLog = commLog;
     }
 
@@ -108,8 +111,14 @@ public class NotificationService : INotificationService
             .ToListAsync();
     }
 
-    public Task<bool> SendWhatsAppAsync(string toPhone, WhatsAppTemplate template, params string[] parameters)
-        => _whatsApp.SendTemplateAsync(toPhone, template, parameters);
+    public async Task<bool> SendWhatsAppAsync(string copropertyId, string toPhone, WhatsAppTemplate template, params string[] parameters)
+    {
+        var config = await _whatsAppConfig.GetAsync(copropertyId);
+        if (config is not { Enabled: true }) return false;
+        return await _whatsApp.SendTemplateAsync(
+            config.PhoneNumberId, config.AccessToken, config.ApiVersion,
+            toPhone, template, parameters);
+    }
 
     public async Task SendEmailNotificationAsync(
         string receiverEmail, string subject, string htmlBody, string? language = null,

@@ -79,6 +79,16 @@ public static class Configuration
                 .RequireAuthenticatedUser()
                 .Build());
 
+        // Data Protection — keys must survive container restarts.
+        // Mount a persistent volume at the path set by DataProtection__KeysPath
+        // (e.g. /run/secrets/dp-keys). Falls back to ./dp-keys for local dev.
+        var dpKeysPath = builder.Configuration["DataProtection:KeysPath"]
+            ?? Path.Combine(AppContext.BaseDirectory, "dp-keys");
+        builder.Services
+            .AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(dpKeysPath))
+            .SetApplicationName("myb-notification");
+
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<IUserIdProvider, KeycloakUserIdProvider>();
         builder.Services.Configure<NotificationSecurityOptions>(
@@ -99,6 +109,7 @@ public static class Configuration
         builder.Services.AddHostedService(sp => sp.GetRequiredService<PushDispatcher>());
 
         builder.Services.AddScoped<INotificationService, NotificationService>();
+        builder.Services.AddScoped<IWhatsAppConfigService, WhatsAppConfigService>();
         builder.Services.AddScoped<ICommunicationLogService, CommunicationLogService>();
         builder.Services.AddScoped<ICampaignService, CampaignService>();
         builder.Services.AddEmailPublisher();
@@ -200,6 +211,18 @@ public static class Configuration
                 context.Database.ExecuteSqlRaw(
                     "CREATE INDEX IF NOT EXISTS \"IX_Campaigns_CopropertyId_CreatedAt\" " +
                     "ON \"Campaigns\" (\"CopropertyId\", \"CreatedAt\" DESC);");
+
+                context.Database.ExecuteSqlRaw("""
+                    CREATE TABLE IF NOT EXISTS "CopropertyWhatsAppConfigs" (
+                        "CopropertyId" text NOT NULL PRIMARY KEY,
+                        "PhoneNumberId" text NOT NULL,
+                        "AccessToken" text NOT NULL,
+                        "BusinessAccountId" text NOT NULL DEFAULT '',
+                        "ApiVersion" text NOT NULL DEFAULT 'v19.0',
+                        "Enabled" boolean NOT NULL DEFAULT true,
+                        "UpdatedAt" timestamp with time zone NOT NULL
+                    );
+                    """);
             }
         }
 

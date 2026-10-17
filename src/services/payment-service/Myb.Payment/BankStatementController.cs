@@ -307,18 +307,20 @@ public class BankStatementController : ControllerBase
     /// Extracts bank transactions from a PDF using PdfPig word-level extraction.
     /// Returns CSV with columns: date;libelle;montant;reference
     ///
-    /// Handles bank statement table layout: Date | Label | [Debit] | [Credit] | Balance
-    ///   - The LAST (rightmost) numeric token on each row is the running balance -> skipped.
-    ///   - The SECOND-TO-LAST is the transaction amount.
-    ///   - When two transaction amounts are found (separate debit/credit columns),
-    ///     the rightmost non-zero is taken as credit (positive); otherwise debit (negative).
-    /// Supports DD/MM/YYYY and YYYY-MM-DD date formats.
+    /// Sign detection strategy (applied in order per row):
+    ///   1. Two tx amounts on the row → leftmost = debit (negate), rightmost = credit.
+    ///   2. Balance delta: sign(currentBalance - prevBalance) gives the transaction sign.
+    ///      Requires either a "Solde précédent" opening-balance line or a prior row.
+    ///   3. Column-header proximity: detect "Débit"/"Crédit" header X positions in the
+    ///      PDF and classify the amount by which header it is closest to.
+    ///   4. Last resort: amount closer to balance column (gap < 60 pt) → credit, else debit.
     /// </summary>
     private static string ExtractCsvFromPdf(Stream pdfStream)
     {
         using var pdfDoc = PdfDocument.Open(pdfStream);
 
         var wordsByLine = new SortedDictionary<int, List<(double x, string text)>>();
+        double? debitHeaderX = null, creditHeaderX = null;
 
         foreach (var page in pdfDoc.GetPages())
         {
@@ -327,114 +329,160 @@ public class BankStatementController : ControllerBase
                 var yBucket = (int)Math.Round(page.Height - word.BoundingBox.Bottom, 0);
                 var existing = wordsByLine.Keys.FirstOrDefault(k => Math.Abs(k - yBucket) <= 3);
                 if (existing != 0 && wordsByLine.ContainsKey(existing))
-                {
                     wordsByLine[existing].Add((word.BoundingBox.Left, word.Text));
-                }
                 else
                 {
                     if (!wordsByLine.ContainsKey(yBucket))
                         wordsByLine[yBucket] = new List<(double, string)>();
                     wordsByLine[yBucket].Add((word.BoundingBox.Left, word.Text));
                 }
+
+                // Detect "Débit" / "Crédit" column headers to use as fallback (option 2).
+                var t = word.Text.Trim();
+                if (debitHeaderX is null &&
+                    (t.Equals("Débit", StringComparison.OrdinalIgnoreCase) ||
+                     t.Equals("Debit", StringComparison.OrdinalIgnoreCase)))
+                    debitHeaderX = word.BoundingBox.Left;
+                else if (creditHeaderX is null &&
+                    (t.Equals("Crédit", StringComparison.OrdinalIgnoreCase) ||
+                     t.Equals("Credit", StringComparison.OrdinalIgnoreCase)))
+                    creditHeaderX = word.BoundingBox.Left;
             }
         }
 
-        var reDateDMY = new Regex(@"^\d{1,2}/\d{1,2}/\d{4}$");
-        var reDateISO = new Regex(@"^\d{4}-\d{2}-\d{2}$");
-        var reAmount  = new Regex(@"^-?\d{1,3}(?:[,.\s]\d{3})*[,.\s]\d{2}$|^-?\d+[,.]\d{2}$");
+        var reDateDMY  = new Regex(@"^\d{1,2}/\d{1,2}/\d{4}$");
+        var reDateISO  = new Regex(@"^\d{4}-\d{2}-\d{2}$");
+        var reAmount   = new Regex(@"^-?\d{1,3}(?:[,.\s]\d{3})*[,.\s]\d{2}$|^-?\d+[,.]\d{2}$");
+        var reSolde    = new Regex(@"\bsolde\b|\bancien\b|\bpr[eé]c[eé]dent\b|\breport\b",
+                                   RegexOptions.IgnoreCase);
 
         static string NormaliseAmt(string raw)
         {
             var s = raw.Replace(",", ".").Replace(" ", "");
             var dot = s.LastIndexOf('.');
-            if (dot >= 0)
-                s = s[..dot].Replace(".", "") + "." + s[(dot + 1)..];
+            if (dot >= 0) s = s[..dot].Replace(".", "") + "." + s[(dot + 1)..];
             return s;
         }
 
-        var rows = new List<(string date, string label, string amount)>();
+        static bool TryDec(string norm, out decimal v) =>
+            decimal.TryParse(norm, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out v);
+
+        // ── Pass 1: collect raw rows and try to find the opening balance ──────
+        decimal? openingBalance = null;
+        var rawRows = new List<(string isoDate, string label, List<(double x, string norm)> txAmts, double balX, string balNorm)>();
 
         foreach (var kv in wordsByLine)
         {
             var wordsX = kv.Value.OrderBy(w => w.x).ToList();
             var words  = wordsX.Select(w => w.text).ToList();
+            if (words.Count < 2) continue;
+
+            var lineText = string.Join(" ", words);
+
+            // Opening-balance line: "Solde précédent", "Ancien solde", etc. — no date prefix.
+            if (openingBalance is null && reSolde.IsMatch(lineText))
+            {
+                bool hasDate = words.Take(3).Any(w => reDateDMY.IsMatch(w) || reDateISO.IsMatch(w));
+                if (!hasDate)
+                {
+                    for (int i = words.Count - 1; i >= 0; i--)
+                    {
+                        var w = words[i].Replace(" ", "").Trim();
+                        if (reAmount.IsMatch(w) && TryDec(NormaliseAmt(w), out var ob))
+                        {
+                            openingBalance = ob;
+                            break;
+                        }
+                    }
+                    continue;
+                }
+            }
+
             if (words.Count < 3) continue;
 
-            string? dateToken = null;
-            int dateIdx = -1;
+            // Transaction row: starts with a date.
+            string? dateToken = null; int dateIdx = -1;
             for (int i = 0; i < Math.Min(3, words.Count); i++)
             {
                 if (reDateDMY.IsMatch(words[i]) || reDateISO.IsMatch(words[i]))
-                {
-                    dateToken = words[i];
-                    dateIdx = i;
-                    break;
-                }
+                { dateToken = words[i]; dateIdx = i; break; }
             }
             if (dateToken is null) continue;
 
             string isoDate = reDateDMY.IsMatch(dateToken)
-                ? string.Join("-", dateToken.Split('/').Reverse())
-                : dateToken;
+                ? string.Join("-", dateToken.Split('/').Reverse()) : dateToken;
 
-            // Collect all numeric tokens after the date, preserving order (left to right = x order)
-            // Also track x position to distinguish debit column (left) from credit column (right)
-            var amounts = new List<(int idx, double x, string raw)>();
+            var amounts = new List<(int idx, double x, string norm)>();
             for (int i = dateIdx + 1; i < words.Count; i++)
             {
                 var w = words[i].Replace(" ", "").Trim();
-                if (reAmount.IsMatch(w))
-                    amounts.Add((i, wordsX[i].x, w));
+                if (reAmount.IsMatch(w)) amounts.Add((i, wordsX[i].x, NormaliseAmt(w)));
             }
-
-            // Need at least 2 numbers: transaction amount + running balance
             if (amounts.Count < 2) continue;
 
-            // Last number = running balance (solde) -> skip it
-            var txAmounts = amounts.Take(amounts.Count - 1).ToList();
+            var txAmts = amounts.Take(amounts.Count - 1).Select(a => (a.x, a.norm)).ToList();
+            var bal    = amounts[^1];
+            var labelWords = words.Skip(dateIdx + 1).Take(amounts[0].idx - dateIdx - 1).ToList();
+            if (labelWords.Count == 0) continue;
+
+            rawRows.Add((isoDate, string.Join(" ", labelWords).Trim(), txAmts, bal.x, bal.norm));
+        }
+
+        if (rawRows.Count == 0) return "date;libelle;montant;reference\n";
+
+        // ── Pass 2: sign each transaction ─────────────────────────────────────
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("date;libelle;montant;reference");
+
+        decimal prevBalance  = openingBalance ?? 0m;
+        bool hasPrevBalance  = openingBalance.HasValue;
+
+        foreach (var (isoDate, label, txAmts, balX, balNorm) in rawRows)
+        {
+            if (!TryDec(balNorm, out var currentBalance)) continue;
 
             string amountToken;
-            int firstAmtIdx;
 
-            if (txAmounts.Count == 1)
+            if (txAmts.Count >= 2)
             {
-                var norm = NormaliseAmt(txAmounts[0].raw);
-                var txX  = txAmounts[0].x;
-                var balX = amounts[^1].x;
-                // Credit column is adjacent to the balance column (gap < ~60pt on A4).
-                // Debit column is further left — negate it.
-                amountToken = (balX - txX) > 60 ? "-" + norm : norm;
-                firstAmtIdx = txAmounts[0].idx;
+                // Explicit two-column layout: leftmost = debit, rightmost = credit.
+                var right = txAmts[^1].norm;
+                var left  = txAmts[0].norm;
+                amountToken = (TryDec(right, out var rv) && rv != 0)
+                    ? right
+                    : (TryDec(left, out var lv) && lv > 0 ? "-" + left : left);
+            }
+            else if (hasPrevBalance)
+            {
+                // Option 1 — balance delta: sign is mathematically exact.
+                var delta = currentBalance - prevBalance;
+                amountToken = delta.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+            else if (debitHeaderX.HasValue || creditHeaderX.HasValue)
+            {
+                // Option 2 — column-header proximity.
+                var txX  = txAmts[0].x;
+                var norm = txAmts[0].norm;
+                bool isDebit = debitHeaderX.HasValue && creditHeaderX.HasValue
+                    ? Math.Abs(txX - debitHeaderX.Value) < Math.Abs(txX - creditHeaderX.Value)
+                    : debitHeaderX.HasValue ? txX <= debitHeaderX.Value + 10
+                                            : txX <  creditHeaderX!.Value;
+                amountToken = (isDebit && TryDec(norm, out var dv) && dv > 0) ? "-" + norm : norm;
             }
             else
             {
-                // Two columns: leftmost = debit, rightmost = credit
-                // Use the rightmost non-zero value (credit); if zero, use leftmost as negative (debit)
-                var rightNorm = NormaliseAmt(txAmounts[^1].raw);
-                var leftNorm  = NormaliseAmt(txAmounts[0].raw);
-                firstAmtIdx   = txAmounts[0].idx;
-
-                if (decimal.TryParse(rightNorm, System.Globalization.NumberStyles.Any,
-                        System.Globalization.CultureInfo.InvariantCulture, out var rv) && rv != 0)
-                    amountToken = rightNorm;
-                else
-                    amountToken = "-" + leftNorm;
+                // Option 3 — last resort: proximity to balance column.
+                var txX  = txAmts[0].x;
+                var norm = txAmts[0].norm;
+                amountToken = (balX - txX) > 60 ? "-" + norm : norm;
             }
 
-            var labelWords = words.Skip(dateIdx + 1).Take(firstAmtIdx - dateIdx - 1).ToList();
-            if (labelWords.Count == 0) continue;
-            var label = string.Join(" ", labelWords).Trim();
+            prevBalance    = currentBalance;
+            hasPrevBalance = true;
 
-            rows.Add((isoDate, label, amountToken));
+            sb.AppendLine($"{isoDate};{label.Replace(";", " ")};{amountToken};");
         }
-
-        if (rows.Count == 0)
-            return "date;libelle;montant;reference\n";
-
-        var sb = new System.Text.StringBuilder();
-        sb.AppendLine("date;libelle;montant;reference");
-        foreach (var (date, label, amount) in rows)
-            sb.AppendLine($"{date};{label.Replace(";", " ")};{amount};");
 
         return sb.ToString();
     }

@@ -127,6 +127,14 @@ export const appRoutes: Route[] = [
             (m) => m.OwnerProfileCompletionComponent
           ),
       },
+      {
+        path: 'choose-space',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('@myb-front/coproperty-module').then(
+            (m) => m.RegistrationPathComponent
+          ),
+      },
     ],
   },
   // ────────────────────────────────────────────────────────────────────────────

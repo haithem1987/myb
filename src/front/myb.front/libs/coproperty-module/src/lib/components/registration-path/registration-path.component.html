@@ -1,0 +1,44 @@
+<myb-auth-layout [currentStep]="3" [totalSteps]="3">
+  <section class="path-card" aria-labelledby="registration-path-title">
+    <div class="path-header">
+      <span class="trial-pill">
+        <i class="bi bi-stars" aria-hidden="true"></i>
+        {{ 'auth.register.trialPill' | translate }}
+      </span>
+      <h1 id="registration-path-title">{{ 'auth.register.choosePathTitle' | translate }}</h1>
+      <p>{{ 'auth.register.choosePathSubtitle' | translate }}</p>
+    </div>
+
+    <div *ngIf="error()" class="alert alert-danger" role="alert">
+      {{ 'auth.register.pathError' | translate }}
+    </div>
+
+    <div class="path-grid">
+      <button type="button" class="path-option" (click)="createResidence()" [disabled]="loading()">
+        <span class="path-icon path-icon--primary"><i class="bi bi-building-add"></i></span>
+        <span class="path-copy">
+          <strong>{{ 'auth.register.createResidence' | translate }}</strong>
+          <small>{{ 'auth.register.createResidenceHelp' | translate }}</small>
+        </span>
+        <span class="path-action">
+          <span *ngIf="loading()" class="spinner-border spinner-border-sm" role="status"></span>
+          <i *ngIf="!loading()" class="bi bi-arrow-right"></i>
+        </span>
+      </button>
+
+      <button type="button" class="path-option" (click)="joinResidence()" [disabled]="loading()">
+        <span class="path-icon"><i class="bi bi-person-check"></i></span>
+        <span class="path-copy">
+          <strong>{{ 'auth.register.joinResidence' | translate }}</strong>
+          <small>{{ 'auth.register.joinResidenceHelp' | translate }}</small>
+        </span>
+        <span class="path-action"><i class="bi bi-arrow-right"></i></span>
+      </button>
+    </div>
+
+    <p class="no-card-note">
+      <i class="bi bi-credit-card-2-front" aria-hidden="true"></i>
+      {{ 'auth.register.noCardTrial' | translate }}
+    </p>
+  </section>
+</myb-auth-layout>

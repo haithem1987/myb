@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Myb.Common.Messaging;
 using Myb.Common.Messaging.Models;
 using Myb.Notification.Hubs;
+using Myb.Notification.Models;
 
 namespace Myb.Notification.Services;
 
@@ -13,6 +14,7 @@ public class NotificationService : INotificationService
     private readonly IEmailPublisher _emailPublisher;
     private readonly IPushQueue _pushQueue;
     private readonly IWhatsAppSender _whatsApp;
+    private readonly ICommunicationLogService? _commLog;
 
     public const string DefaultPushUrl = "/coproperty/select";
     public const string PushTitle = "MYB";
@@ -22,13 +24,15 @@ public class NotificationService : INotificationService
         IHubContext<NotificationHub> hubContext,
         IEmailPublisher emailPublisher,
         IPushQueue pushQueue,
-        IWhatsAppSender whatsApp)
+        IWhatsAppSender whatsApp,
+        ICommunicationLogService? commLog = null)
     {
         _contextFactory = contextFactory;
         _hubContext = hubContext;
         _emailPublisher = emailPublisher;
         _pushQueue = pushQueue;
         _whatsApp = whatsApp;
+        _commLog = commLog;
     }
 
     /// <summary>Only same-origin absolute paths are allowed, so a notification can never send
@@ -71,6 +75,24 @@ public class NotificationService : INotificationService
                 receiverId, notification.Id, PushTitle, message, NormalizePushUrl(url),
                 notification.CopropertyId, urgency));
         }
+
+        _ = WriteLogAsync(new CommunicationLog
+        {
+            SenderId = senderId,
+            SenderType = "system",
+            RecipientId = receiverId,
+            CopropertyId = string.IsNullOrWhiteSpace(copropertyId) ? null : copropertyId,
+            Channel = push ? CommunicationChannel.Push : CommunicationChannel.InApp,
+            Subject = message,
+            Status = DeliveryStatus.Sent,
+        });
+    }
+
+    private async Task WriteLogAsync(CommunicationLog entry)
+    {
+        if (_commLog is null) return;
+        try { await _commLog.LogAsync(entry); }
+        catch (Exception ex) { Console.Error.WriteLine($"[CommLog] {ex.Message}"); }
     }
 
     public async Task<List<Models.Notification>> GetNotificationsAsync(
@@ -90,7 +112,8 @@ public class NotificationService : INotificationService
         => _whatsApp.SendTemplateAsync(toPhone, template, parameters);
 
     public async Task SendEmailNotificationAsync(
-        string receiverEmail, string subject, string htmlBody, string? language = null)
+        string receiverEmail, string subject, string htmlBody, string? language = null,
+        string? copropertyId = null, string? recipientId = null)
     {
         await _emailPublisher.PublishAsync(new EmailMessage
         {
@@ -99,6 +122,17 @@ public class NotificationService : INotificationService
             Language = language?.StartsWith("en", StringComparison.OrdinalIgnoreCase) == true ? "en" : "fr",
             HtmlBody = htmlBody,
             Source = "notification-service"
+        });
+
+        _ = WriteLogAsync(new CommunicationLog
+        {
+            SenderType = "system",
+            RecipientId = recipientId ?? receiverEmail,
+            RecipientEmail = receiverEmail,
+            CopropertyId = copropertyId,
+            Channel = CommunicationChannel.Email,
+            Subject = subject,
+            Status = DeliveryStatus.Sent,
         });
     }
 

@@ -68,15 +68,36 @@ namespace Myb.Coproperty.GraphQL.Mutations
         public async Task<bool> AssignUserClientRole(
             string userId,
             string roleName,
-            [Service] IKeycloakAdminService keycloakAdminService) =>
-            await keycloakAdminService.AssignClientRoleAsync(userId, roleName);
+            ClaimsPrincipal? user,
+            [Service] IKeycloakAdminService keycloakAdminService)
+        {
+            var callerId = CopropertyAccessControl.GetUserId(user)?.ToString();
+            var isSelfServiceSyndicOnboarding =
+                string.Equals(callerId, userId, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(roleName, "coproperty-syndic", StringComparison.Ordinal);
+
+            if (!isSelfServiceSyndicOnboarding &&
+                !CopropertyAccessControl.IsSyndicOnly(user) &&
+                !CopropertyAccessControl.IsAdmin(user))
+            {
+                throw new InvalidOperationException("Accès refusé : attribution de rôle non autorisée.");
+            }
+
+            return await keycloakAdminService.AssignClientRoleAsync(userId, roleName);
+        }
 
         /// <summary>Remove a Keycloak client role from a user (uses backend service account).</summary>
         public async Task<bool> UnassignUserClientRole(
             string userId,
             string roleName,
-            [Service] IKeycloakAdminService keycloakAdminService) =>
-            await keycloakAdminService.UnassignClientRoleAsync(userId, roleName);
+            ClaimsPrincipal? user,
+            [Service] IKeycloakAdminService keycloakAdminService)
+        {
+            if (!CopropertyAccessControl.IsSyndicOnly(user) && !CopropertyAccessControl.IsAdmin(user))
+                throw new InvalidOperationException("Accès refusé : retrait de rôle non autorisé.");
+
+            return await keycloakAdminService.UnassignClientRoleAsync(userId, roleName);
+        }
 
         /// <summary>Create a login account that can immediately be selected in Add Owner.</summary>
         public async Task<KeycloakUserSearchDto> CreateOwnerUserAccount(

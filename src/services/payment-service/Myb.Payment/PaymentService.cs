@@ -8,26 +8,24 @@ namespace Myb.Payment
 {
     public class PaymentService : IPaymentService
     {
-        private readonly string _secretKey;
+        private readonly string? _secretKey;
         private readonly PaymentContext _context;
 
         public PaymentService(IConfiguration configuration, PaymentContext context)
         {
-            // Properly retrieve the Stripe secret key from the configuration
             _secretKey = configuration.GetValue<string>("Stripe:SecretKey");
-            
-            if (string.IsNullOrEmpty(_secretKey))
-            {
-                throw new Exception("Stripe secret key is missing in the configuration.");
-            }
-
-            // Set the API key for Stripe
-            StripeConfiguration.ApiKey = _secretKey; 
             _context = context; 
         }
 
         public async Task<string> CreatePaymentIntentAsync(decimal amount, string currency, string receiptEmail)
         {
+            // A Stripe key is required only when the user deliberately enters
+            // the paid checkout. Card-free trials must work without Stripe.
+            if (string.IsNullOrWhiteSpace(_secretKey))
+                throw new InvalidOperationException("Stripe secret key is missing in the configuration.");
+
+            StripeConfiguration.ApiKey = _secretKey;
+
             var options = new PaymentIntentCreateOptions
             {
                 Amount = (long)(amount * 100), // Stripe requires the amount to be in cents

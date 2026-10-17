@@ -302,6 +302,10 @@ echo -e "${YELLOW}Deploying Coproperty Service...${NC}"
 apply_service_deployment "coproperty" "coproperty" \
     "$K8S_DIR/services/coproperty/deployment.yaml"
 
+echo -e "${YELLOW}Deploying Payment Service...${NC}"
+apply_service_deployment "payment" "payment" \
+    "$K8S_DIR/services/payment/deployment.yaml"
+
 echo -e "${YELLOW}Deploying Invoice Service...${NC}"
 apply_service_deployment "invoice" "invoice" \
     "$K8S_DIR/services/invoice/deployment.yaml"
@@ -316,6 +320,7 @@ apply_service_deployment "notification" "notification" \
 
 if [[ "$DRY_RUN" != "true" ]]; then
     wait_for_resource "deployment/myb-coproperty" 180
+    wait_for_resource "deployment/myb-payment" 180
     wait_for_resource "deployment/myb-invoice" 180
     wait_for_resource "deployment/myb-mailer" 180
     wait_for_resource "deployment/myb-notification" 180
@@ -380,6 +385,7 @@ else
     echo -e "  Development admin: http://${INGRESS_IP}/dev/admin"
     echo -e "  Keycloak: http://${INGRESS_IP}/auth"
     echo -e "  Coproperty API: http://${INGRESS_IP}/api/coproperty"
+    echo -e "  Payment API: http://${INGRESS_IP}/api/payment"
     echo -e "  Invoice API: http://${INGRESS_IP}/api/invoice"
 fi
 

@@ -3,3 +3,4 @@
 export * from './services';
 export * from './models';
 export { profileGuard, noProfileGuard, completeProfileGuard } from './guards/profile.guard';
+export { RegistrationPathComponent } from './components/registration-path/registration-path.component';

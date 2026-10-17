@@ -55,7 +55,8 @@ internal sealed class RecordingNotificationService : INotificationService
         return Task.CompletedTask;
     }
 
-    public Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody, string? language = null)
+    public Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody,
+        string? language = null, string? copropertyId = null, string? recipientId = null)
     {
         EmailsSent++;
         return Task.CompletedTask;

@@ -1,3 +1,4 @@
+export * from './active-coproperty.service';
 export * from './coproperty.service';
 export * from './unit.service';
 export * from './charge.service';

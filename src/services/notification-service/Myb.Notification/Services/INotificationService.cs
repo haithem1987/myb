@@ -7,7 +7,8 @@ public interface INotificationService
     Task SendNotificationAsync(
         string senderId, string receiverId, string message, string? copropertyId = null,
         bool push = false, string? url = null, PushUrgency urgency = PushUrgency.Normal);
-    Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody, string? language = null);
+    Task SendEmailNotificationAsync(string receiverEmail, string subject, string htmlBody,
+        string? language = null, string? copropertyId = null, string? recipientId = null);
     /// <summary>Sends a pre-approved WhatsApp template message (best effort — never throws).
     /// Returns false when WhatsApp is not configured or the API call fails.</summary>
     Task<bool> SendWhatsAppAsync(string toPhone, WhatsAppTemplate template, params string[] parameters);

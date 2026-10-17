@@ -7,8 +7,9 @@ import { CopropertyService } from '../../services/coproperty.service';
 import { CreateCopropertyInput, Coproperty, Currency } from '../../models/coproperty.model';
 import { KeycloakService } from '@myb-front/auth';
 import { Observable, of } from 'rxjs';
-import { map, catchError, debounceTime, first } from 'rxjs/operators';
+import { map, catchError, debounceTime, first, switchMap } from 'rxjs/operators';
 import { ToastService } from '@myb-front/shared-ui';
+import { SubscriptionService } from 'libs/shared/infra/services/subscription.service';
 
 @Component({
   selector: 'myb-coproperty-new',
@@ -30,6 +31,7 @@ export class CopropertyNewComponent implements OnInit {
   private keycloakService = inject(KeycloakService);
   private toastService = inject(ToastService);
   private translateService = inject(TranslateService);
+  private subscriptionService = inject(SubscriptionService);
 
   activeTab = signal<string>('info');
   copropertyForm!: FormGroup;
@@ -163,7 +165,25 @@ export class CopropertyNewComponent implements OnInit {
       ? this.copropertyService.updateCoproperty(this.copropertyId()!, payload)
       : this.copropertyService.createCoproperty(payload);
 
-    save$.subscribe({
+    save$.pipe(
+      switchMap(coproperty => {
+        if (this.isEditMode()) return of(coproperty);
+
+        const userId = this.keycloakService.getUserId();
+        if (!userId) return of(coproperty);
+
+        // Trial provisioning must never send the user to Stripe or ask for a
+        // card. A temporary payment-service outage must not lose the residence
+        // that was just created; the idempotent endpoint can be retried later.
+        return this.subscriptionService.startTrial(userId, coproperty.id).pipe(
+          map(() => coproperty),
+          catchError(error => {
+            console.error('Failed to provision the free trial', error);
+            return of(coproperty);
+          })
+        );
+      })
+    ).subscribe({
       next: (coproperty) => {
         this.saving.set(false);
         this.saveSuccess.set(true);

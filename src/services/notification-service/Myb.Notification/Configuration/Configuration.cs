@@ -79,6 +79,16 @@ public static class Configuration
                 .RequireAuthenticatedUser()
                 .Build());
 
+        // Data Protection — keys must survive container restarts.
+        // Mount a persistent volume at the path set by DataProtection__KeysPath
+        // (e.g. /run/secrets/dp-keys). Falls back to ./dp-keys for local dev.
+        var dpKeysPath = builder.Configuration["DataProtection:KeysPath"]
+            ?? Path.Combine(AppContext.BaseDirectory, "dp-keys");
+        builder.Services
+            .AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(dpKeysPath))
+            .SetApplicationName("myb-notification");
+
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<IUserIdProvider, KeycloakUserIdProvider>();
         builder.Services.Configure<NotificationSecurityOptions>(

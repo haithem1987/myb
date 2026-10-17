@@ -356,7 +356,8 @@ public class BankStatementController : ControllerBase
 
         foreach (var kv in wordsByLine)
         {
-            var words = kv.Value.OrderBy(w => w.x).Select(w => w.text).ToList();
+            var wordsX = kv.Value.OrderBy(w => w.x).ToList();
+            var words  = wordsX.Select(w => w.text).ToList();
             if (words.Count < 3) continue;
 
             string? dateToken = null;
@@ -377,12 +378,13 @@ public class BankStatementController : ControllerBase
                 : dateToken;
 
             // Collect all numeric tokens after the date, preserving order (left to right = x order)
-            var amounts = new List<(int idx, string raw)>();
+            // Also track x position to distinguish debit column (left) from credit column (right)
+            var amounts = new List<(int idx, double x, string raw)>();
             for (int i = dateIdx + 1; i < words.Count; i++)
             {
                 var w = words[i].Replace(" ", "").Trim();
                 if (reAmount.IsMatch(w))
-                    amounts.Add((i, w));
+                    amounts.Add((i, wordsX[i].x, w));
             }
 
             // Need at least 2 numbers: transaction amount + running balance
@@ -396,8 +398,12 @@ public class BankStatementController : ControllerBase
 
             if (txAmounts.Count == 1)
             {
-                // Single column (debit-only or credit-only row) -> treat as credit (positive)
-                amountToken = NormaliseAmt(txAmounts[0].raw);
+                var norm = NormaliseAmt(txAmounts[0].raw);
+                var txX  = txAmounts[0].x;
+                var balX = amounts[^1].x;
+                // Credit column is adjacent to the balance column (gap < ~60pt on A4).
+                // Debit column is further left — negate it.
+                amountToken = (balX - txX) > 60 ? "-" + norm : norm;
                 firstAmtIdx = txAmounts[0].idx;
             }
             else

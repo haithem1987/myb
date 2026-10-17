@@ -70,6 +70,23 @@ export interface CampaignFilter {
   size?: number;
 }
 
+export interface WhatsAppConfigDto {
+  copropertyId: string;
+  phoneNumberId: string;
+  businessAccountId: string;
+  apiVersion: string;
+  enabled: boolean;
+  updatedAt: string;
+}
+
+export interface UpsertWhatsAppConfigDto {
+  phoneNumberId: string;
+  accessToken: string;
+  businessAccountId: string;
+  apiVersion?: string;
+  enabled: boolean;
+}
+
 export interface CreateCampaignDto {
   name: string;
   description?: string;
@@ -152,6 +169,24 @@ export class CommunicationService {
   cancelCampaign(id: string): Observable<void> {
     return this.authenticatedRequest(headers =>
       this.http.post<void>(`${this.apiUrl}/api/communication/campaigns/${id}/cancel`, {}, { headers })
+    );
+  }
+
+  getWhatsAppConfig(copropertyId: string): Observable<WhatsAppConfigDto> {
+    return this.authenticatedRequest(headers =>
+      this.http.get<WhatsAppConfigDto>(`${this.apiUrl}/api/coproperty/${copropertyId}/whatsapp-config`, { headers })
+    );
+  }
+
+  upsertWhatsAppConfig(copropertyId: string, dto: UpsertWhatsAppConfigDto): Observable<void> {
+    return this.authenticatedRequest(headers =>
+      this.http.put<void>(`${this.apiUrl}/api/coproperty/${copropertyId}/whatsapp-config`, dto, { headers })
+    );
+  }
+
+  deleteWhatsAppConfig(copropertyId: string): Observable<void> {
+    return this.authenticatedRequest(headers =>
+      this.http.delete<void>(`${this.apiUrl}/api/coproperty/${copropertyId}/whatsapp-config`, { headers })
     );
   }
 

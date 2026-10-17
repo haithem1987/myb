@@ -93,8 +93,10 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
                 <td>{{ formatDate(item.Transaction.Date) }}</td>
                 <td>{{ item.Transaction.Label }}</td>
                 <td class="text-muted">{{ item.Transaction.Reference || '—' }}</td>
-                <td class="text-end amount" [class.negative]="item.Transaction.Amount < 0">
-                  {{ formatAmount(item.Transaction.Amount) }}
+                <td class="text-end amount"
+                    [class.positive]="item.Transaction.Amount > 0"
+                    [class.negative]="item.Transaction.Amount < 0">
+                  {{ item.Transaction.Amount > 0 ? '+' : '' }}{{ formatAmount(item.Transaction.Amount) }}
                 </td>
                 <td>
                   <span class="badge" [ngClass]="statusClass(item.Reconciliation.Status)">
@@ -108,19 +110,36 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
                   <span *ngIf="item.Reconciliation.FundCallPaymentId" class="fc-registered">
                     <i class="bi bi-check-circle-fill text-success me-1"></i>Enregistré
                   </span>
-                  <!-- Selector for unvalidated rows -->
+                  <!-- Debit: cannot be reconciled with a fund call -->
+                  <span *ngIf="!item.Reconciliation.FundCallPaymentId && item.Transaction.Amount < 0"
+                        class="text-muted small fc-debit" title="Les débits ne sont pas liés à un appel de fonds">
+                    <i class="bi bi-dash-circle me-1"></i>Débit
+                  </span>
+                  <!-- Step 1 + 2: owner search then fund call select for credits -->
                   <div *ngIf="!item.Reconciliation.FundCallPaymentId && item.Transaction.Amount > 0 && (item.Reconciliation.Status === 1 || item.Reconciliation.Status === 2)"
                        class="fc-selector">
-                    <select class="fc-select"
-                            [(ngModel)]="pendingFundCallIds[item.Reconciliation.Id]"
-                            (focus)="loadFundCallsIfNeeded()">
-                      <option value="">— Lier à un appel de fonds —</option>
-                      <option *ngFor="let fc of availableFundCalls()" [value]="fc.Id">
-                        {{ fc.OwnerName || 'Inconnu' }} — {{ formatAmount(fc.Amount) }} ({{ fc.Status }})
+                    <!-- Step 1: search owner -->
+                    <input class="fc-search"
+                           type="text"
+                           list="fc-owners-list"
+                           [(ngModel)]="ownerSearch[item.Reconciliation.Id]"
+                           (focus)="loadFundCallsIfNeeded()"
+                           placeholder="Copropriétaire…"
+                           autocomplete="off">
+                    <datalist id="fc-owners-list">
+                      <option *ngFor="let o of distinctOwners()" [value]="o"></option>
+                    </datalist>
+                    <!-- Step 2: fund calls for selected owner -->
+                    <select *ngIf="ownerSearch[item.Reconciliation.Id]?.trim()"
+                            class="fc-select"
+                            [(ngModel)]="pendingFundCallIds[item.Reconciliation.Id]">
+                      <option value="">— Appel de fonds —</option>
+                      <option *ngFor="let fc of fundCallsForOwner(ownerSearch[item.Reconciliation.Id])" [value]="fc.Id">
+                        {{ fc.Description || fc.OwnerName }} — {{ formatAmount(fc.Amount) }}
                       </option>
                     </select>
                   </div>
-                  <span *ngIf="!item.Reconciliation.FundCallPaymentId && item.Reconciliation.Status === 0 && !pendingFundCallIds[item.Reconciliation.Id]"
+                  <span *ngIf="!item.Reconciliation.FundCallPaymentId && item.Transaction.Amount > 0 && item.Reconciliation.Status === 0"
                         class="text-muted small">—</span>
                 </td>
                 <td>
@@ -248,7 +267,8 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     .row-registered { background: #f0fdf4; }
     .text-end { text-align: right; }
     .text-muted { color: #a0aec0; }
-    .amount { font-weight: 500; }
+    .amount { font-weight: 600; }
+    .amount.positive { color: #16a34a; }
     .amount.negative { color: #dc2626; }
 
     .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
@@ -257,7 +277,18 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     .badge-danger   { background: #fee2e2; color: #b91c1c; }
 
     .fc-registered { font-size: 0.82rem; color: #15803d; font-weight: 500; }
-    .fc-selector { display: flex; align-items: center; gap: 6px; }
+    .fc-debit { font-size: 0.8rem; color: #9ca3af; }
+    .fc-selector { display: flex; flex-direction: column; gap: 4px; min-width: 200px; }
+    .fc-search {
+      font-size: 0.8rem;
+      padding: 3px 8px;
+      border: 1px solid #cbd5e0;
+      border-radius: 5px;
+      background: white;
+      color: #374151;
+      width: 100%;
+    }
+    .fc-search:focus { outline: none; border-color: #4f46e5; }
     .fc-select {
       font-size: 0.8rem;
       padding: 3px 6px;
@@ -300,6 +331,24 @@ export class BankReconciliationComponent {
 
   // Maps reconciliationId → selected FundCallId (for the dropdown)
   pendingFundCallIds: Record<string, string> = {};
+  // Per-row: the owner name typed in the first step of the fund-call selector
+  ownerSearch: Record<string, string> = {};
+
+  distinctOwners(): string[] {
+    return [...new Set(
+      this.availableFundCalls()
+        .map(fc => fc.OwnerName ?? '')
+        .filter(n => n.length > 0)
+    )].sort();
+  }
+
+  fundCallsForOwner(ownerName: string): FundCallSummary[] {
+    if (!ownerName.trim()) return [];
+    const q = ownerName.trim().toLowerCase();
+    return this.availableFundCalls().filter(fc =>
+      (fc.OwnerName ?? '').toLowerCase().includes(q)
+    );
+  }
 
   exportUrl(): string {
     const d = this.detail();
@@ -353,6 +402,7 @@ export class BankReconciliationComponent {
     this.summary.set(null);
     this.detail.set(null);
     this.pendingFundCallIds = {};
+    this.ownerSearch = {};
     this.fundCallsLoaded = false;
     this.availableFundCalls.set([]);
 

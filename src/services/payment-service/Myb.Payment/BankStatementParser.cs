@@ -161,8 +161,13 @@ public class BankStatementParser : IBankStatementParser
             {
                 var debitStr  = debitCol  >= 0 && debitCol  < cols.Length ? cols[debitCol].Trim('"', ' ')  : "";
                 var creditStr = creditCol >= 0 && creditCol < cols.Length ? cols[creditCol].Trim('"', ' ') : "";
-                // Use whichever is non-empty; debit values may already carry their sign
-                amountStr = !string.IsNullOrWhiteSpace(creditStr) ? creditStr : debitStr;
+                // Credits are positive; debits are negative (negate if not already signed)
+                if (!string.IsNullOrWhiteSpace(creditStr))
+                    amountStr = creditStr;
+                else if (!string.IsNullOrWhiteSpace(debitStr) && !debitStr.StartsWith('-'))
+                    amountStr = "-" + debitStr;
+                else
+                    amountStr = debitStr;
             }
             else
             {

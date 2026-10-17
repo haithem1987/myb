@@ -10,13 +10,21 @@ import { ActiveCopropertyService } from '@myb-front/coproperty-module';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="communication-history">
-      <div class="page-header mb-4">
-        <h4 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historique des communications</h4>
-      </div>
 
-      <!-- Filters -->
-      <div class="card mb-3">
-        <div class="card-body py-2">
+      <!-- Filters card -->
+      <div class="settings-card mb-3">
+        <div class="settings-card-header">
+          <div class="settings-icon">
+            <i class="bi bi-funnel"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold">Filtres</div>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm" (click)="resetFilter()">
+            <i class="bi bi-x-circle me-1"></i>Réinitialiser
+          </button>
+        </div>
+        <div class="settings-card-body py-2">
           <div class="row g-2 align-items-end">
             <div class="col-md-2">
               <label class="form-label small mb-1">De</label>
@@ -46,18 +54,22 @@ import { ActiveCopropertyService } from '@myb-front/coproperty-module';
                 <option value="Read">Lu</option>
               </select>
             </div>
-            <div class="col-md-2">
-              <button class="btn btn-outline-secondary btn-sm" (click)="resetFilter()">
-                <i class="bi bi-x-circle me-1"></i>Réinitialiser
-              </button>
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- Table -->
-      <div class="card">
-        <div class="card-body p-0">
+      <!-- Results card -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-icon">
+            <i class="bi bi-table"></i>
+          </div>
+          <div>
+            <div class="fw-semibold">Historique des envois</div>
+            <div class="text-muted small" *ngIf="total() > 0">{{ total() }} résultat(s)</div>
+          </div>
+        </div>
+        <div class="p-0">
           <div *ngIf="loading()" class="text-center py-4">
             <div class="spinner-border spinner-border-sm text-primary"></div>
           </div>
@@ -98,7 +110,7 @@ import { ActiveCopropertyService } from '@myb-front/coproperty-module';
         </div>
 
         <!-- Pagination -->
-        <div *ngIf="total() > pageSize" class="card-footer d-flex align-items-center justify-content-between py-2">
+        <div *ngIf="total() > pageSize" class="settings-card-footer d-flex align-items-center justify-content-between">
           <small class="text-muted">{{ total() }} résultats</small>
           <nav>
             <ul class="pagination pagination-sm mb-0">
@@ -117,6 +129,30 @@ import { ActiveCopropertyService } from '@myb-front/coproperty-module';
       </div>
     </div>
   `,
+  styles: [`
+    .settings-card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden; margin-bottom: 1.5rem;
+    }
+    .settings-card-header {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid #f0f0f0;
+      background: #fafbfc;
+    }
+    .settings-card-body { padding: 1.5rem; }
+    .settings-card-footer {
+      padding: 0.625rem 1.5rem; border-top: 1px solid #f0f0f0;
+      background: #fafbfc;
+    }
+    .settings-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: #e8f0fe; color: #1a73e8;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; flex-shrink: 0;
+    }
+    .py-2.settings-card-body { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+  `]
 })
 export class CommunicationHistoryComponent implements OnInit {
   private svc = inject(CommunicationService);
@@ -151,7 +187,7 @@ export class CommunicationHistoryComponent implements OnInit {
   totalPages(): number { return Math.ceil(this.total() / this.pageSize) || 1; }
 
   channelBadge(ch: string): string {
-    return { InApp: 'bg-primary', Push: 'bg-purple text-white', Email: 'bg-warning text-dark' }[ch] ?? 'bg-secondary';
+    return { InApp: 'bg-primary', Push: 'bg-info text-dark', Email: 'bg-warning text-dark' }[ch] ?? 'bg-secondary';
   }
 
   channelIcon(ch: string): string {

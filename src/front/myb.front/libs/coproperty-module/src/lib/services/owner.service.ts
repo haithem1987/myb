@@ -22,6 +22,8 @@ const GET_ALL_OWNERS = gql`
       lastName
       email
       phone
+      whatsappNumber
+      notifyViaWhatsApp
       createdAt
       updatedAt
       ownerUnits {
@@ -50,6 +52,8 @@ const GET_OWNER_BY_ID = gql`
       lastName
       email
       phone
+      whatsappNumber
+      notifyViaWhatsApp
       createdAt
       updatedAt
       ownerUnits {
@@ -78,6 +82,8 @@ const GET_OWNER_BY_USER_ID = gql`
       lastName
       email
       phone
+      whatsappNumber
+      notifyViaWhatsApp
       createdAt
       updatedAt
       ownerUnits {

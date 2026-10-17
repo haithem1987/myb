@@ -17,6 +17,8 @@ export interface Owner {
   lastName: string;
   email: string;
   phone?: string;
+  whatsappNumber?: string;
+  notifyViaWhatsApp?: boolean;
   ownerUnits?: OwnerUnit[];
   createdAt?: Date;
   updatedAt?: Date;
@@ -54,6 +56,8 @@ export interface CreateOwnerWithUnitsInput {
   lastName: string;
   email: string;
   phone?: string;
+  whatsappNumber?: string;
+  notifyViaWhatsApp?: boolean;
   units: OwnerUnitInput[];
 }
 

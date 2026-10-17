@@ -13,6 +13,7 @@ public class NotificationService : INotificationService
     private readonly IHubContext<NotificationHub> _hubContext;
     private readonly IEmailPublisher _emailPublisher;
     private readonly IPushQueue _pushQueue;
+    private readonly IWhatsAppSender _whatsApp;
     private readonly ICommunicationLogService? _commLog;
 
     public const string DefaultPushUrl = "/coproperty/select";
@@ -23,12 +24,14 @@ public class NotificationService : INotificationService
         IHubContext<NotificationHub> hubContext,
         IEmailPublisher emailPublisher,
         IPushQueue pushQueue,
+        IWhatsAppSender whatsApp,
         ICommunicationLogService? commLog = null)
     {
         _contextFactory = contextFactory;
         _hubContext = hubContext;
         _emailPublisher = emailPublisher;
         _pushQueue = pushQueue;
+        _whatsApp = whatsApp;
         _commLog = commLog;
     }
 
@@ -104,6 +107,9 @@ public class NotificationService : INotificationService
             .OrderByDescending(n => n.CreatedAt)
             .ToListAsync();
     }
+
+    public Task<bool> SendWhatsAppAsync(string toPhone, WhatsAppTemplate template, params string[] parameters)
+        => _whatsApp.SendTemplateAsync(toPhone, template, parameters);
 
     public async Task SendEmailNotificationAsync(
         string receiverEmail, string subject, string htmlBody, string? language = null,

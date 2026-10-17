@@ -13,6 +13,8 @@ public class Owner : IEntity<Guid>
     public string LastName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string? Phone { get; set; }
+    public string? WhatsAppNumber { get; set; }
+    public bool NotifyViaWhatsApp { get; set; } = false;
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     public bool IsDeleted { get; set; }

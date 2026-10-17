@@ -87,6 +87,11 @@ public static class Configuration
         // Web Push: free browser push services authenticated with this deployment's VAPID keys.
         builder.Services.Configure<PushOptions>(builder.Configuration.GetSection(PushOptions.SectionName));
         builder.Services.AddHttpClient(WebPushSender.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(15));
+
+        // WhatsApp Business (Meta Cloud API)
+        builder.Services.Configure<WhatsAppOptions>(builder.Configuration.GetSection(WhatsAppOptions.SectionName));
+        builder.Services.AddHttpClient(WhatsAppSender.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(15));
+        builder.Services.AddSingleton<IWhatsAppSender, WhatsAppSender>();
         builder.Services.AddSingleton<IPushSubscriptionStore, PushSubscriptionStore>();
         builder.Services.AddSingleton<IWebPushSender, WebPushSender>();
         builder.Services.AddSingleton<PushDispatcher>();
@@ -202,6 +207,11 @@ public static class Configuration
         if (!push.IsConfigured)
             app.Logger.LogWarning(
                 "[Notification] Web Push disabled: set Push__VapidPublicKey and Push__VapidPrivateKey to enable it.");
+
+        var whatsApp = app.Services.GetRequiredService<IOptions<WhatsAppOptions>>().Value;
+        if (!whatsApp.IsConfigured)
+            app.Logger.LogWarning(
+                "[Notification] WhatsApp disabled: set WhatsApp__Enabled=true, WhatsApp__PhoneNumberId and WhatsApp__AccessToken to enable it.");
 
         app.UseMybApiSecurity();
         app.UseAuthentication();

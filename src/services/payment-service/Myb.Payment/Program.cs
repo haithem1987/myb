@@ -27,7 +27,7 @@ builder.Services.AddDbContext<PaymentContext>(options =>
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddHttpClient<IFundCallServiceClient, FundCallServiceClient>(client =>
 {
-    var url = builder.Configuration["Services:CopropertyUrl"] ?? "http://myb-coproperty:8085";
+    var url = builder.Configuration["Services:CopropertyUrl"] ?? "http://myb-coproperty:8080";
     client.BaseAddress = new Uri(url);
 });
 builder.Services.AddSingleton<IBankStatementParser, BankStatementParser>();

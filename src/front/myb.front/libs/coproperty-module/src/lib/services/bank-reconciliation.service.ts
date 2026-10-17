@@ -12,6 +12,17 @@ export interface ImportSummary {
   Unmatched: number;
 }
 
+export interface StatementListItem {
+  Id: string;
+  FileName: string;
+  Format: string;
+  ImportedAt: string;
+  TransactionCount: number;
+  AutoMatched: number;
+  ManualSuggestions: number;
+  Unmatched: number;
+}
+
 export interface MatchedPayment {
   Id: string;
   Amount: number;
@@ -69,10 +80,21 @@ export class BankReconciliationService {
     return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
   }
 
-  importStatement(file: File): Observable<ImportSummary> {
+  listStatements(copropertyId: string): Observable<StatementListItem[]> {
+    return this.http.get<StatementListItem[]>(
+      `${this.base}?copropertyId=${copropertyId}`,
+      { headers: this.authHeaders() }
+    );
+  }
+
+  importStatement(file: File, copropertyId: string): Observable<ImportSummary> {
     const form = new FormData();
     form.append('file', file, file.name);
-    return this.http.post<ImportSummary>(`${this.base}/import`, form, { headers: this.authHeaders() });
+    return this.http.post<ImportSummary>(
+      `${this.base}/import?copropertyId=${copropertyId}`,
+      form,
+      { headers: this.authHeaders() }
+    );
   }
 
   getReconciliation(statementId: string): Observable<ReconciliationDetail> {

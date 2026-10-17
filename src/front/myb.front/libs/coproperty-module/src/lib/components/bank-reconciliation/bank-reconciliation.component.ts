@@ -1,6 +1,7 @@
 import { Component, signal, inject, DestroyRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs/operators';
 import {
@@ -9,6 +10,7 @@ import {
   ImportSummary,
   ReconciliationDetail,
   ReconciliationItem,
+  StatementListItem,
 } from '../../services/bank-reconciliation.service';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
 import { ToastService } from 'libs/shared/infra/services/toast.service';
@@ -16,7 +18,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
 @Component({
   selector: 'myb-bank-reconciliation',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div class="reconciliation-page">
       <div class="page-header">
@@ -45,6 +47,21 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
         </div>
       </div>
 
+      <!-- Feature 5: Previous imports list -->
+      <div class="prev-imports" *ngIf="!detail() && previousImports().length > 0">
+        <h3><i class="bi bi-clock-history me-2"></i>Imports précédents</h3>
+        <div class="prev-list">
+          <div class="prev-item" *ngFor="let s of previousImports()" (click)="loadPreviousImport(s)">
+            <div class="prev-file"><i class="bi bi-file-earmark-text me-1"></i>{{ s.FileName }}</div>
+            <div class="prev-meta">
+              {{ formatDate(s.ImportedAt) }}
+              <span class="prev-badge matched">{{ s.AutoMatched }} rapprochés</span>
+              <span class="prev-badge unmatched" *ngIf="s.Unmatched > 0">{{ s.Unmatched }} non rapprochés</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Import Summary -->
       <div class="summary-cards" *ngIf="summary()">
         <div class="summary-card total">
@@ -59,8 +76,9 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
           <div class="summary-value">{{ summary()!.ManualSuggestions }}</div>
           <div class="summary-label">Suggestions manuelles</div>
         </div>
+        <!-- Feature 1: live counter -->
         <div class="summary-card unmatched">
-          <div class="summary-value">{{ summary()!.Unmatched }}</div>
+          <div class="summary-value">{{ liveUnmatched() }}</div>
           <div class="summary-label">Non rapprochés</div>
         </div>
       </div>
@@ -92,6 +110,14 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
             <button class="filter-btn" [class.active]="filterStatus === 'suggestion'" (click)="filterStatus = 'suggestion'">Suggestions</button>
             <button class="filter-btn" [class.active]="filterStatus === 'unmatched'"  (click)="filterStatus = 'unmatched'">Non rapprochés</button>
           </div>
+          <!-- Feature 3: bulk validate debits -->
+          <button class="btn-bulk-debit"
+                  *ngIf="unmatchedDebits().length > 0 && filterStatus === 'unmatched'"
+                  [disabled]="bulkValidating()"
+                  (click)="validateAllDebits()">
+            <span *ngIf="!bulkValidating()"><i class="bi bi-check2-all me-1"></i>Valider tous les débits ({{ unmatchedDebits().length }})</span>
+            <span *ngIf="bulkValidating()" class="spinner-sm"></span>
+          </button>
         </div>
 
         <div class="table-responsive">
@@ -126,8 +152,15 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
                      class="bi bi-person-check ms-1" title="Validé manuellement"></i>
                 </td>
                 <td>
-                  <!-- Registered in coproperty-service -->
-                  <span *ngIf="item.Reconciliation.FundCallPaymentId" class="fc-registered">
+                  <!-- Feature 4: link to fund call when registered -->
+                  <a *ngIf="item.Reconciliation.FundCallPaymentId && item.Reconciliation.FundCallId"
+                     [routerLink]="fundCallRoute(item.Reconciliation.FundCallId!)"
+                     class="fc-registered-link">
+                    <i class="bi bi-check-circle-fill text-success me-1"></i>
+                    {{ fundCallLabel(item.Reconciliation.FundCallId!) }}
+                  </a>
+                  <span *ngIf="item.Reconciliation.FundCallPaymentId && !item.Reconciliation.FundCallId"
+                        class="fc-registered">
                     <i class="bi bi-check-circle-fill text-success me-1"></i>Enregistré
                   </span>
                   <!-- Debit: cannot be reconciled with a fund call -->
@@ -171,7 +204,7 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
                     <button
                       *ngIf="item.Transaction.Amount < 0 || pendingFundCallIds[item.Reconciliation.Id]"
                       class="btn-validate"
-                      [disabled]="validating() === item.Reconciliation.Id"
+                      [disabled]="validating() === item.Reconciliation.Id || bulkValidating()"
                       (click)="validate(item)">
                       <span *ngIf="validating() !== item.Reconciliation.Id">
                         {{ pendingFundCallIds[item.Reconciliation.Id] ? 'Valider + Enregistrer' : 'Valider' }}
@@ -237,6 +270,25 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .prev-imports { margin-bottom: 24px; }
+    .prev-imports h3 { font-size: 1rem; font-weight: 600; color: #374151; margin: 0 0 10px; }
+    .prev-list { display: flex; flex-direction: column; gap: 6px; }
+    .prev-item {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+      padding: 10px 16px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .prev-item:hover { border-color: #4f46e5; background: #f5f3ff; }
+    .prev-file { font-size: 0.875rem; font-weight: 500; color: #374151; }
+    .prev-meta { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: #9ca3af; }
+    .prev-badge { padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .prev-badge.matched { background: #dcfce7; color: #15803d; }
+    .prev-badge.unmatched { background: #fee2e2; color: #b91c1c; }
+
     .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
     .summary-card {
       flex: 1; min-width: 120px;
@@ -299,6 +351,11 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     .badge-danger   { background: #fee2e2; color: #b91c1c; }
 
     .fc-registered { font-size: 0.82rem; color: #15803d; font-weight: 500; }
+    .fc-registered-link {
+      font-size: 0.82rem; color: #4f46e5; font-weight: 500;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 2px;
+    }
+    .fc-registered-link:hover { text-decoration: underline; }
     .fc-debit { font-size: 0.8rem; color: #9ca3af; }
     .fc-selector { display: flex; flex-direction: column; gap: 4px; min-width: 200px; }
     .fc-search {
@@ -335,6 +392,21 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     }
     .btn-validate:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-validate:not(:disabled):hover { background: #4338ca; }
+
+    .btn-bulk-debit {
+      padding: 5px 14px;
+      background: #b91c1c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: inline-flex; align-items: center; gap: 4px;
+      white-space: nowrap;
+      margin-left: auto;
+    }
+    .btn-bulk-debit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-bulk-debit:not(:disabled):hover { background: #991b1b; }
 
     .filters-bar {
       display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
@@ -379,27 +451,49 @@ export class BankReconciliationComponent {
   isDragOver = signal(false);
   uploading = signal(false);
   validating = signal<string | null>(null);
+  bulkValidating = signal(false);
   summary = signal<ImportSummary | null>(null);
   detail = signal<ReconciliationDetail | null>(null);
   availableFundCalls = signal<FundCallSummary[]>([]);
   fundCallsLoaded = false;
+  // Feature 5: previous imports
+  previousImports = signal<StatementListItem[]>([]);
 
   constructor() {
     effect(() => {
       const id = this.activeCoproperty.activeId();
-      if (id) this.loadFundCallsIfNeeded();
+      if (id) {
+        this.loadFundCallsIfNeeded();
+        this.loadPreviousImports(id);
+      }
     });
   }
 
-  // Maps reconciliationId → selected FundCallId (for the dropdown)
   pendingFundCallIds: Record<string, string> = {};
-  // Per-row: the owner name typed in the first step of the fund-call selector
   ownerSearch: Record<string, string> = {};
 
-  // Filter state
   filterText = '';
   filterType: 'all' | 'credit' | 'debit' = 'all';
   filterStatus: 'all' | 'matched' | 'suggestion' | 'unmatched' = 'all';
+
+  // Feature 1: live unmatched count derived from detail()
+  liveUnmatched(): number {
+    const d = this.detail();
+    if (!d) return this.summary()?.Unmatched ?? 0;
+    return d.Items.filter(i => i.Reconciliation.Status !== 0 && !i.Reconciliation.FundCallPaymentId
+      && (i.Reconciliation.Status === 1 || i.Reconciliation.Status === 2)).length;
+  }
+
+  // Feature 3: unmatched debits for bulk action
+  unmatchedDebits(): ReconciliationItem[] {
+    const d = this.detail();
+    if (!d) return [];
+    return d.Items.filter(i =>
+      i.Transaction.Amount < 0 &&
+      !i.Reconciliation.FundCallPaymentId &&
+      (i.Reconciliation.Status === 1 || i.Reconciliation.Status === 2)
+    );
+  }
 
   filteredItems() {
     const items = this.detail()?.Items ?? [];
@@ -434,6 +528,17 @@ export class BankReconciliationComponent {
     return this.availableFundCalls().filter(fc =>
       (fc.OwnerName ?? '').toLowerCase().includes(q)
     );
+  }
+
+  // Feature 4: build route to fund call detail
+  fundCallRoute(fundCallId: string): string[] {
+    const copropertyId = this.activeCoproperty.activeId() ?? '';
+    return ['/coproperty', copropertyId, 'syndic', 'fund-calls', fundCallId];
+  }
+
+  fundCallLabel(fundCallId: string): string {
+    const fc = this.availableFundCalls().find(f => f.Id === fundCallId);
+    return fc ? (fc.Description || 'Appel de fonds') : 'Enregistré';
   }
 
   exportUrl(): string {
@@ -483,14 +588,37 @@ export class BankReconciliationComponent {
       });
   }
 
+  // Feature 5: load previous imports
+  private loadPreviousImports(copropertyId: string): void {
+    this.service.listStatements(copropertyId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: (list) => this.previousImports.set(list) });
+  }
+
+  loadPreviousImport(s: StatementListItem): void {
+    this.summary.set({
+      StatementId: s.Id,
+      FileName: s.FileName,
+      TransactionCount: s.TransactionCount,
+      AutoMatched: s.AutoMatched,
+      ManualSuggestions: s.ManualSuggestions,
+      Unmatched: s.Unmatched,
+    });
+    this.pendingFundCallIds = {};
+    this.ownerSearch = {};
+    this.loadDetail(s.Id);
+  }
+
   private upload(file: File): void {
+    const copropertyId = this.activeCoproperty.activeId();
+    if (!copropertyId) return;
     this.uploading.set(true);
     this.summary.set(null);
     this.detail.set(null);
     this.pendingFundCallIds = {};
     this.ownerSearch = {};
 
-    this.service.importStatement(file)
+    this.service.importStatement(file, copropertyId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.uploading.set(false))
@@ -503,6 +631,7 @@ export class BankReconciliationComponent {
             { classname: 'bg-success text-white', delay: 5000 }
           );
           this.loadDetail(result.StatementId);
+          this.loadPreviousImports(copropertyId);
         },
         error: () => {
           this.toastService.show(
@@ -517,7 +646,11 @@ export class BankReconciliationComponent {
     this.service.getReconciliation(statementId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (d) => this.detail.set(d),
+        next: (d) => {
+          this.detail.set(d);
+          // Feature 2: auto-detect owner from transaction label after detail loads
+          this.autoDetectOwners(d);
+        },
         error: () => {
           this.toastService.show(
             'Erreur lors du chargement des détails.',
@@ -525,6 +658,27 @@ export class BankReconciliationComponent {
           );
         },
       });
+  }
+
+  // Feature 2: pre-select owner based on label keywords
+  private autoDetectOwners(d: ReconciliationDetail): void {
+    const owners = this.distinctOwners();
+    if (!owners.length) return;
+    for (const item of d.Items) {
+      if (item.Transaction.Amount <= 0) continue;
+      if (item.Reconciliation.Status === 0) continue;
+      if (this.ownerSearch[item.Reconciliation.Id]) continue;
+      const labelNorm = this.normalizeText(item.Transaction.Label);
+      const matched = owners.find(owner => {
+        const words = this.normalizeText(owner).split(/\s+/).filter(w => w.length >= 3);
+        return words.some(w => labelNorm.includes(w));
+      });
+      if (matched) this.ownerSearch[item.Reconciliation.Id] = matched;
+    }
+  }
+
+  private normalizeText(s: string): string {
+    return s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
   }
 
   validate(item: ReconciliationItem): void {
@@ -540,15 +694,7 @@ export class BankReconciliationComponent {
       )
       .subscribe({
         next: (updated) => {
-          const d = this.detail();
-          if (d) {
-            this.detail.set({
-              ...d,
-              Items: d.Items.map(i =>
-                i.Reconciliation.Id === updated.Id ? { ...i, Reconciliation: updated } : i
-              ),
-            });
-          }
+          this.applyValidationResult(updated);
           const msg = updated.FundCallPaymentId
             ? 'Transaction validée et paiement enregistré dans la copropriété.'
             : 'Transaction validée.';
@@ -558,6 +704,38 @@ export class BankReconciliationComponent {
           this.toastService.show('Erreur lors de la validation.', { classname: 'bg-danger text-white', delay: 4000 });
         },
       });
+  }
+
+  // Feature 3: validate all unmatched debits sequentially
+  async validateAllDebits(): Promise<void> {
+    const s = this.summary();
+    if (!s || this.bulkValidating()) return;
+    this.bulkValidating.set(true);
+    const debits = this.unmatchedDebits();
+    let count = 0;
+    for (const item of debits) {
+      try {
+        const updated = await this.service.validate(s.StatementId, item.Reconciliation.Id).toPromise();
+        if (updated) { this.applyValidationResult(updated); count++; }
+      } catch { /* continue */ }
+    }
+    this.bulkValidating.set(false);
+    this.toastService.show(
+      `${count} débit(s) validé(s).`,
+      { classname: 'bg-success text-white', delay: 4000 }
+    );
+  }
+
+  private applyValidationResult(updated: ReconciliationItem['Reconciliation']): void {
+    const d = this.detail();
+    if (d) {
+      this.detail.set({
+        ...d,
+        Items: d.Items.map(i =>
+          i.Reconciliation.Id === updated.Id ? { ...i, Reconciliation: updated } : i
+        ),
+      });
+    }
   }
 
   statusClass(status: number): Record<string, boolean> {

@@ -285,6 +285,9 @@ services:
       - WhatsApp__PhoneNumberId=${WHATSAPP_PHONE_NUMBER_ID:-REPLACE_WITH_PHONE_NUMBER_ID}
       - WhatsApp__AccessToken=${WHATSAPP_ACCESS_TOKEN:-REPLACE_WITH_ACCESS_TOKEN}
       - WhatsApp__WebhookVerifyToken=${WHATSAPP_WEBHOOK_VERIFY_TOKEN:-myb-webhook-verify-2026}
+      - DataProtection__KeysPath=/run/dp-keys
+    volumes:
+      - notification-dp-keys:/run/dp-keys
     restart: on-failure
 
   # RabbitMQ — required by coproperty and payment services
@@ -359,3 +362,4 @@ volumes:
   postgres_document_data:
   postgres_invoice_data:
   postgres_coproperty_data:
+  notification-dp-keys:

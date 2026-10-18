@@ -110,6 +110,33 @@ public class BankStatementController : ControllerBase
         });
     }
 
+    /// <summary>GET /api/bank-statements?copropertyId=...</summary>
+    [HttpGet]
+    public async Task<IActionResult> List([FromQuery] string? copropertyId)
+    {
+        var query = _context.BankStatements.AsQueryable();
+        if (!string.IsNullOrEmpty(copropertyId))
+            query = query.Where(s => s.CopropertyId == copropertyId);
+
+        var statements = await query
+            .OrderByDescending(s => s.ImportedAt)
+            .Take(20)
+            .Select(s => new
+            {
+                s.Id,
+                s.FileName,
+                s.Format,
+                s.ImportedAt,
+                TransactionCount = s.Transactions.Count,
+                AutoMatched = s.Results.Count(r => r.Status == ReconciliationStatus.AutoMatched),
+                ManualSuggestions = s.Results.Count(r => r.Status == ReconciliationStatus.ManualSuggestion),
+                Unmatched = s.Results.Count(r => r.Status == ReconciliationStatus.Unmatched)
+            })
+            .ToListAsync();
+
+        return Ok(statements);
+    }
+
     /// <summary>GET /api/bank-statements/{id}/reconciliation</summary>
     [HttpGet("{id:guid}/reconciliation")]
     public async Task<IActionResult> GetReconciliation(Guid id)
@@ -494,3 +521,4 @@ public class ValidateReconciliationRequest
     /// <summary>Coproperty-service FundCall ID to link this transaction to.</summary>
     public string? FundCallId { get; set; }
 }
+

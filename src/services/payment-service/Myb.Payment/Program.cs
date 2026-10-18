@@ -22,7 +22,8 @@ builder.Services.AddControllers()
 builder.Services.AddDbContext<PaymentContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("PaymentDBConnection"),
-        npgsql => npgsql.MigrationsHistoryTable("__PaymentMigrationsHistory")));
+        npgsql => npgsql.MigrationsHistoryTable("__PaymentMigrationsHistory"))
+        .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddHttpClient<IFundCallServiceClient, FundCallServiceClient>(client =>

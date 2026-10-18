@@ -108,11 +108,14 @@
         <span class="nav-text">Rapprochement bancaire</span>
       </a>
 
-      <span class="nav-item disabled" aria-disabled="true" title="Bientôt disponible">
+      <a [routerLink]="syndicRoute('interventions')"
+         routerLinkActive="active"
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-wrench-adjustable"></i>
         <span class="nav-text">{{ 'navigation.interventions' | translate }}</span>
         <span class="badge" *ngIf="totalInterventions() > 0">{{ totalInterventions() }}</span>
-      </span>
+      </a>
 
       <a [routerLink]="syndicRoute('signalements')"
          routerLinkActive="active"
@@ -123,11 +126,14 @@
         <span class="badge" *ngIf="totalSignalements() > 0">{{ totalSignalements() }}</span>
       </a>
 
-      <span class="nav-item disabled" aria-disabled="true" title="Bientôt disponible">
+      <a [routerLink]="syndicRoute('discussions')"
+         routerLinkActive="active"
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-chat-square-text"></i>
         <span class="nav-text">{{ 'navigation.discussions' | translate }}</span>
         <span class="badge" *ngIf="totalDiscussions() > 0">{{ totalDiscussions() }}</span>
-      </span>
+      </a>
 
       <a [routerLink]="syndicRoute('communication')"
          routerLinkActive="active"

@@ -8,7 +8,7 @@
       </h2>
       <p class="text-muted">{{ 'intervention.list.subtitle' | translate }}</p>
     </div>
-    <div class="col-md-4 text-end">
+    <div class="col-md-4 text-end" *ngIf="isSyndicMode">
       <button class="btn btn-primary btn-violet" (click)="createNew()" [disabled]="!isSelectedCopropertyActive()">
         <i class="bi bi-plus-circle me-2"></i>
         {{ 'intervention.list.add' | translate }}
@@ -115,7 +115,7 @@
             <th>{{ 'intervention.table.status' | translate }}</th>
             <th>{{ 'intervention.table.provider' | translate }}</th>
             <th>{{ 'intervention.table.cost' | translate }}</th>
-            <th>{{ 'intervention.table.actions' | translate }}</th>
+            <th *ngIf="isSyndicMode">{{ 'intervention.table.actions' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -140,7 +140,7 @@
               <span *ngIf="item.estimatedCost">{{ formatAmount(item.estimatedCost) }}</span>
               <span *ngIf="!item.estimatedCost" class="text-muted">-</span>
             </td>
-            <td>
+            <td *ngIf="isSyndicMode">
               <div ngbDropdown container="body" placement="bottom-end">
                 <button class="btn btn-sm btn-outline-secondary" ngbDropdownToggle>
                   <i class="bi bi-three-dots-vertical"></i>

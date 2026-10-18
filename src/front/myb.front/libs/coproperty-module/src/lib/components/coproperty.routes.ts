@@ -25,6 +25,9 @@ import { OwnerDocumentsComponent } from './owner-portal/documents/documents.comp
 import { OwnerGeneralAssemblyComponent } from './owner-portal/general-assembly/general-assembly.component';
 import { OwnerSignalementsComponent } from './owner-portal/signalements/owner-signalements.component';
 import { NouveauSignalementComponent } from './owner-portal/signalements/nouveau-signalement/nouveau-signalement.component';
+import { InterventionListComponent } from './intervention-list/intervention-list.component';
+import { InterventionNewComponent } from './intervention-new/intervention-new.component';
+import { DiscussionsComponent } from './discussions/discussions.component';
 import { SyndicLayoutComponent } from './syndic-layout/syndic-layout.component';
 import { SyndicDashboardComponent } from './syndic-dashboard/syndic-dashboard.component';
 import { SyndicSignalementsComponent } from './syndic-signalements/syndic-signalements.component';
@@ -113,11 +116,11 @@ const SYNDIC_CHILDREN: Routes = [
   { path: 'budgets/:id/edit', loadComponent: loadBudgetNew },
   { path: 'charges', redirectTo: 'budgets', pathMatch: 'full' },
   { path: 'maintenance', component: MaintenanceListComponent },
-  { path: 'interventions', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'interventions/new', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'interventions/:id/edit', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'interventions', component: InterventionListComponent },
+  { path: 'interventions/new', component: InterventionNewComponent },
+  { path: 'interventions/:id/edit', component: InterventionNewComponent },
   { path: 'signalements', component: SyndicSignalementsComponent },
-  { path: 'discussions', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'discussions', component: DiscussionsComponent },
   { path: 'units', component: UnitsListComponent },
   { path: 'owners', component: OwnerManagementComponent },
   { path: 'tenants', component: TenantManagementComponent },
@@ -143,12 +146,12 @@ const OWNER_CHILDREN: Routes = [
   { path: 'invoices', component: OwnerInvoicesComponent },
   { path: 'charges', component: OwnerChargesComponent },
   { path: 'maintenance', component: OwnerMaintenanceComponent },
-  { path: 'interventions', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'interventions', component: InterventionListComponent },
   { path: 'documents', component: OwnerDocumentsComponent },
   { path: 'general-assembly', component: OwnerGeneralAssemblyComponent },
   { path: 'signalements', component: OwnerSignalementsComponent },
   { path: 'signalements/nouveau', component: NouveauSignalementComponent },
-  { path: 'discussions', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'discussions', component: DiscussionsComponent },
 ];
 
 export const COPROPERTY_ROUTES: Routes = [

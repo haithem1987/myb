@@ -51,15 +51,15 @@
           <span>{{ 'ownerPortal.navigation.reports' | translate }}</span>
         </a>
 
-        <span class="nav-link disabled" aria-disabled="true" title="Bientôt disponible">
+        <a [routerLink]="ownerRoute('interventions')" routerLinkActive="active" class="nav-link">
           <i class="bi bi-wrench-adjustable"></i>
           <span>{{ 'ownerPortal.navigation.interventions' | translate }}</span>
-        </span>
+        </a>
 
-        <span class="nav-link disabled" aria-disabled="true" title="Bientôt disponible">
+        <a [routerLink]="ownerRoute('discussions')" routerLinkActive="active" class="nav-link">
           <i class="bi bi-chat-square-text"></i>
           <span>{{ 'ownerPortal.navigation.discussions' | translate }}</span>
-        </span>
+        </a>
       </nav>
       
       <div class="user-section">
@@ -147,15 +147,15 @@
       <span>{{ 'ownerPortal.navigation.reports' | translate }}</span>
     </a>
 
-    <span class="nav-link disabled" aria-disabled="true" title="Bientôt disponible">
+    <a [routerLink]="ownerRoute('interventions')" routerLinkActive="active" class="nav-link" (click)="toggleMobileMenu()">
       <i class="bi bi-wrench-adjustable"></i>
       <span>{{ 'ownerPortal.navigation.interventions' | translate }}</span>
-    </span>
+    </a>
 
-    <span class="nav-link disabled" aria-disabled="true" title="Bientôt disponible">
+    <a [routerLink]="ownerRoute('discussions')" routerLinkActive="active" class="nav-link" (click)="toggleMobileMenu()">
       <i class="bi bi-chat-square-text"></i>
       <span>{{ 'ownerPortal.navigation.discussions' | translate }}</span>
-    </span>
+    </a>
   </nav>
   
   <!-- Main Content -->

@@ -20,6 +20,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+# Load .env so shell variables (KEYCLOAK_ADMIN_PASSWORD etc.) are available to the script,
+# not just to docker compose.
+if [ -f .env ]; then
+  set -o allexport; source .env; set +o allexport
+fi
+
 KC_URL="${KC_URL:-http://localhost:8080}"
 NOTIFICATION_URL="${NOTIFICATION_URL:-http://localhost:8085}"
 COPROPERTY_URL="${COPROPERTY_URL:-http://localhost:8088}"

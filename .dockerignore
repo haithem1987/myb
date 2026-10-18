@@ -36,10 +36,8 @@ README.md
 deployment.log
 src/tests/
 **/test-results/
-src/front/myb.front/tmp/
-src/front/myb.front/.nx/
-src/front/myb.front/.angular/
-src/front/myb.front/coverage/
+src/front/
+.claude/
 src/services/mailer-service/Myb.Mailer/appsettings.Production.json
 .DS_Store
 *.sh

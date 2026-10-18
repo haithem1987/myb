@@ -31,6 +31,8 @@ export class InterventionListComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private activeCoproperty = inject(ActiveCopropertyService);
 
+  readonly isSyndicMode = this.router.url.includes('/syndic/');
+
   // Data
   readonly interventions = signal<Intervention[]>([]);
   readonly filteredInterventions = signal<Intervention[]>([]);
@@ -69,6 +71,12 @@ export class InterventionListComponent implements OnInit, OnDestroy {
 
   private loadData(): void {
     this.isLoading.set(true);
+
+    if (!this.isSyndicMode) {
+      this.selectedCopropertyId = this.activeCoproperty.activeId() ?? '';
+      this.loadSelectedInterventions();
+      return;
+    }
 
     const managerId = this.keycloakService.getSyndicManagerId();
     this.copropertyService.getCoproperties(managerId)

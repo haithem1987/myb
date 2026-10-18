@@ -821,7 +821,9 @@
     "userNotFound": "Aucun utilisateur trouvé avec ce nom ou cet e-mail",
     "keycloakUser": "Utilisateur Keycloak",
     "registeredUsers": "Utilisateurs inscrits",
-    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par nom ou e-mail..."
+    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par nom ou e-mail...",
+    "whatsappNumber": "Numéro WhatsApp",
+    "optional": "Optionnel"
   },
   "validation": {
     "NAME_REQUIRED": "est requis",

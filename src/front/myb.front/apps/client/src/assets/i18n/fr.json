@@ -437,7 +437,27 @@
         "CAD": "Dollar canadien",
         "AED": "Dirham des EAU",
         "MAD": "Dirham marocain"
-      }
+      },
+      "whatsappTab": "WhatsApp",
+      "whatsappTitle": "Configuration WhatsApp",
+      "whatsappSubtitle": "Configurer la messagerie WhatsApp pour cette copropriété",
+      "whatsappPhoneNumberId": "ID du numéro de téléphone",
+      "whatsappPhoneNumberIdHelp": "L'ID du numéro de téléphone WhatsApp Business de votre compte Meta",
+      "whatsappAccessToken": "Jeton d'accès",
+      "whatsappTokenPlaceholder": "Entrez votre jeton d'accès WhatsApp",
+      "whatsappAccessTokenHelp": "Jeton d'accès permanent depuis votre compte Meta Business",
+      "whatsappBusinessAccountId": "ID du compte Business",
+      "whatsappEnabled": "Activer les notifications WhatsApp",
+      "whatsappDelete": "Supprimer la configuration WhatsApp",
+      "whatsappHowToTitle": "Comment configurer WhatsApp",
+      "whatsappStep1": "Créez un compte Meta Business sur business.facebook.com",
+      "whatsappStep2": "Configurez une application WhatsApp Business dans le portail développeur Meta",
+      "whatsappStep3": "Copiez votre ID de numéro de téléphone et votre ID de compte Business",
+      "whatsappStep4": "Générez un jeton d'accès permanent",
+      "whatsappDocs": "Consulter la documentation Meta",
+      "whatsappSaved": "Configuration WhatsApp enregistrée avec succès",
+      "whatsappSaveError": "Impossible d'enregistrer la configuration WhatsApp",
+      "whatsappDeleted": "Configuration WhatsApp supprimée"
     },
     "list": {
       "title": "Gestion des copropriétés",
@@ -1139,7 +1159,9 @@
     "userNotFound": "Aucun utilisateur trouvé avec ce nom ou cet e-mail",
     "keycloakUser": "Utilisateur Keycloak",
     "registeredUsers": "Utilisateurs inscrits",
-    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par nom ou e-mail..."
+    "searchKeycloakUsers": "Rechercher un utilisateur inscrit par nom ou e-mail...",
+    "whatsappNumber": "Numéro WhatsApp",
+    "optional": "Optionnel"
   },
   "validation": {
     "NAME_REQUIRED": "est requis",

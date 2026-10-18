@@ -61,3 +61,4 @@ msbuild.wrn
 
 # WhatsApp sandbox credentials (never commit real tokens)
 .env.whatsapp
+.env

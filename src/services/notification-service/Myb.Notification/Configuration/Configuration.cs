@@ -35,6 +35,7 @@ public static class Configuration
                 "[Notification] No configured PostgreSQL database; using the in-memory staging store.");
 
         builder.AddMybApiSecurity();
+        builder.Services.AddTransient<Microsoft.AspNetCore.Authentication.IClaimsTransformation, Myb.Notification.Services.KeycloakRoleClaimsTransformation>();
 
         // JWT Bearer authentication for Keycloak
         var keycloakSection = builder.Configuration.GetSection("Keycloak");

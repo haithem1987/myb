@@ -434,7 +434,27 @@
         "CAD": "دولار كندي",
         "AED": "درهم إماراتي",
         "MAD": "درهم مغربي"
-      }
+      },
+      "whatsappTab": "واتساب",
+      "whatsappTitle": "إعداد واتساب",
+      "whatsappSubtitle": "تكوين رسائل واتساب لهذه الملكية المشتركة",
+      "whatsappPhoneNumberId": "معرف رقم الهاتف",
+      "whatsappPhoneNumberIdHelp": "معرف رقم هاتف واتساب للأعمال من حساب Meta الخاص بك",
+      "whatsappAccessToken": "رمز الوصول",
+      "whatsappTokenPlaceholder": "أدخل رمز وصول واتساب",
+      "whatsappAccessTokenHelp": "رمز وصول دائم من حساب Meta Business الخاص بك",
+      "whatsappBusinessAccountId": "معرف حساب الأعمال",
+      "whatsappEnabled": "تفعيل إشعارات واتساب",
+      "whatsappDelete": "حذف إعداد واتساب",
+      "whatsappHowToTitle": "كيفية إعداد واتساب",
+      "whatsappStep1": "أنشئ حساب Meta Business على business.facebook.com",
+      "whatsappStep2": "أعد تطبيق WhatsApp Business في بوابة مطوري Meta",
+      "whatsappStep3": "انسخ معرف رقم هاتفك ومعرف حساب الأعمال",
+      "whatsappStep4": "أنشئ رمز وصول دائمًا",
+      "whatsappDocs": "عرض وثائق Meta",
+      "whatsappSaved": "تم حفظ إعداد واتساب بنجاح",
+      "whatsappSaveError": "تعذر حفظ إعداد واتساب",
+      "whatsappDeleted": "تم حذف إعداد واتساب"
     },
     "list": {
       "title": "إدارة الملكيات المشتركة",
@@ -1136,7 +1156,9 @@
     "userNotFound": "لم يتم العثور على أي مستخدم بهذا الاسم أو البريد الإلكتروني",
     "keycloakUser": "مستخدم Keycloak",
     "registeredUsers": "المستخدمون المسجّلون",
-    "searchKeycloakUsers": "البحث عن مستخدم مسجّل بالاسم أو البريد الإلكتروني..."
+    "searchKeycloakUsers": "البحث عن مستخدم مسجّل بالاسم أو البريد الإلكتروني...",
+    "whatsappNumber": "رقم واتساب",
+    "optional": "اختياري"
   },
   "validation": {
     "NAME_REQUIRED": "مطلوب",

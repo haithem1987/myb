@@ -821,7 +821,9 @@
     "keycloakUser": "Keycloak User",
     "registeredUsers": "Registered Users",
     "searchKeycloakUsers": "Search registered user by name or email...",
-    "update": "Update"
+    "update": "Update",
+    "whatsappNumber": "WhatsApp Number",
+    "optional": "Optional"
   },
   "validation": {
     "NAME_REQUIRED": "is required",

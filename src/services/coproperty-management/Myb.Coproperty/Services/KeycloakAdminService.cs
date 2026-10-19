@@ -405,17 +405,9 @@ namespace Myb.Coproperty.Services
                     }
                     var body = await assignResponse.Content.ReadAsStringAsync();
                     _logger.LogWarning("Could not assign role '{Role}' to user '{User}': {Status} {Body}", roleName, userId, assignResponse.StatusCode, body);
-                    if (assignResponse.StatusCode == HttpStatusCode.NotFound)
-                        throw new InvalidOperationException(
-                            $"L'utilisateur (id={userId}) n'existe pas dans Keycloak. " +
-                            "Relancez le script seed-ellyssa.ps1 (sans -SkipKeycloak) pour recréer les comptes.");
                     return false;
                 }
                 return true;
-            }
-            catch (InvalidOperationException)
-            {
-                throw;
             }
             catch (Exception ex)
             {

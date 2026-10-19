@@ -770,12 +770,7 @@ export class OwnerManagementComponent implements OnInit {
       }
     } catch (err: any) {
       console.error('[Owner Management] Role toggle error:', err);
-      const detail = err?.message && err.message !== 'Role assignment failed' ? err.message : null;
-      if (detail) {
-        this.showAlert('danger', detail);
-      } else {
-        this.translateService.get('coproperty.messages.error').subscribe(msg => this.showAlert('danger', msg));
-      }
+      this.translateService.get('coproperty.messages.error').subscribe(msg => this.showAlert('danger', msg));
     } finally {
       this.assigningRole.set(null);
     }

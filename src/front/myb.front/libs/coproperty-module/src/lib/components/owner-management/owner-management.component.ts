@@ -768,7 +768,7 @@ export class OwnerManagementComponent implements OnInit {
         owner.hasOwnerRole = true;
         this.translateService.get('common.roleAssigned').subscribe(msg => this.showAlert('success', msg));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('[Owner Management] Role toggle error:', err);
       this.translateService.get('coproperty.messages.error').subscribe(msg => this.showAlert('danger', msg));
     } finally {

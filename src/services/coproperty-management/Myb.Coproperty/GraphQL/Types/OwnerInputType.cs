@@ -19,7 +19,7 @@ namespace Myb.Coproperty.GraphQL.Types
             descriptor.Field(o => o.LastName).Type<NonNullType<StringType>>();
             descriptor.Field(o => o.Email).Type<NonNullType<StringType>>();
             descriptor.Field(o => o.Phone).Type<StringType>();
-            descriptor.Field(o => o.WhatsAppNumber).Type<StringType>();
+            descriptor.Field(o => o.WhatsAppNumber).Name("whatsappNumber").Type<StringType>();
             descriptor.Field(o => o.NotifyViaWhatsApp).Type<BooleanType>().DefaultValue(false);
         }
     }

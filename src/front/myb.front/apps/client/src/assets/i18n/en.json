@@ -436,7 +436,27 @@
         "CAD": "Canadian Dollar",
         "AED": "UAE Dirham",
         "MAD": "Moroccan Dirham"
-      }
+      },
+      "whatsappTab": "WhatsApp",
+      "whatsappTitle": "WhatsApp Configuration",
+      "whatsappSubtitle": "Configure WhatsApp messaging for this coproperty",
+      "whatsappPhoneNumberId": "Phone Number ID",
+      "whatsappPhoneNumberIdHelp": "The WhatsApp Business phone number ID from your Meta account",
+      "whatsappAccessToken": "Access Token",
+      "whatsappTokenPlaceholder": "Enter your WhatsApp access token",
+      "whatsappAccessTokenHelp": "Permanent access token from your Meta Business account",
+      "whatsappBusinessAccountId": "Business Account ID",
+      "whatsappEnabled": "Enable WhatsApp notifications",
+      "whatsappDelete": "Delete WhatsApp Configuration",
+      "whatsappHowToTitle": "How to set up WhatsApp",
+      "whatsappStep1": "Create a Meta Business account at business.facebook.com",
+      "whatsappStep2": "Set up a WhatsApp Business app in Meta Developer Portal",
+      "whatsappStep3": "Copy your Phone Number ID and Business Account ID",
+      "whatsappStep4": "Generate a permanent access token",
+      "whatsappDocs": "View Meta documentation",
+      "whatsappSaved": "WhatsApp configuration saved successfully",
+      "whatsappSaveError": "Could not save WhatsApp configuration",
+      "whatsappDeleted": "WhatsApp configuration deleted"
     },
     "list": {
       "title": "Residence Management",
@@ -1138,7 +1158,9 @@
     "keycloakUser": "Keycloak User",
     "registeredUsers": "Registered Users",
     "searchKeycloakUsers": "Search registered user by name or email...",
-    "update": "Update"
+    "update": "Update",
+    "whatsappNumber": "WhatsApp Number",
+    "optional": "Optional"
   },
   "validation": {
     "NAME_REQUIRED": "is required",

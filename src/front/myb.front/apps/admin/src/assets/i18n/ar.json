@@ -821,7 +821,9 @@
     "userNotFound": "لم يتم العثور على أي مستخدم بهذا الاسم أو البريد الإلكتروني",
     "keycloakUser": "مستخدم Keycloak",
     "registeredUsers": "المستخدمون المسجّلون",
-    "searchKeycloakUsers": "البحث عن مستخدم مسجّل بالاسم أو البريد الإلكتروني..."
+    "searchKeycloakUsers": "البحث عن مستخدم مسجّل بالاسم أو البريد الإلكتروني...",
+    "whatsappNumber": "رقم واتساب",
+    "optional": "اختياري"
   },
   "validation": {
     "NAME_REQUIRED": "مطلوب",

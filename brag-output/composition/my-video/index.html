@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1280, height=720" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1280px; height: 720px; overflow: hidden; font-family: 'Poppins', sans-serif; background: #55A697; }
+      #root { width: 1280px; height: 720px; position: relative; overflow: hidden; }
+
+      .clip { position: absolute; width: 1280px; height: 720px; top: 0; left: 0; overflow: hidden; }
+
+      .grad-bg {
+        background: linear-gradient(135deg, #55A697 0%, #8e50a3 100%);
+        position: absolute; inset: 0;
+      }
+
+      /* ── Scene 1: Hook ── */
+      #scene-hook { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+      #hook-logo { width: 130px; opacity: 0; position: relative; z-index: 1; }
+      #hook-headline { color: #fff; font-size: 54px; font-weight: 700; letter-spacing: -0.02em; text-align: center; opacity: 0; position: relative; z-index: 1; }
+      #hook-sub { color: #fff; font-size: 16px; font-weight: 400; opacity: 0; letter-spacing: 0.1em; text-transform: uppercase; position: relative; z-index: 1; }
+
+      /* ── Shared app shell ── */
+      .app-shell {
+        background: #f4f6f9;
+        position: absolute; inset: 0;
+        display: flex;
+        flex-direction: row;
+      }
+      .sidebar {
+        width: 220px;
+        background: #1e2a38;
+        display: flex;
+        flex-direction: column;
+        padding: 24px 0;
+        flex-shrink: 0;
+      }
+      .sidebar-logo {
+        padding: 0 20px 24px;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        opacity: 0.9;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .nav-section-title {
+        padding: 0 20px 6px;
+        font-size: 9px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.65);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255,255,255,0.80);
+        cursor: pointer;
+        border-inline-start: 3px solid transparent;
+      }
+      .nav-item.active {
+        color: #fff;
+        background: rgba(255,255,255,0.08);
+        border-inline-start-color: #55A697;
+      }
+      .nav-item-icon { font-size: 15px; width: 18px; text-align: center; }
+
+      .main-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .topbar {
+        height: 56px;
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        padding: 0 28px;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+      .topbar-title { font-size: 17px; font-weight: 700; color: #1a202c; }
+      .topbar-badge {
+        background: #f3e8ff;
+        color: #7c3aed;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 10px;
+        border-radius: 20px;
+      }
+      .content-area { flex: 1; padding: 24px 28px; overflow: hidden; }
+
+      /* ── Scene 2: Relances & Paiements ── */
+      #scene-relances .topbar-title { }
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+        opacity: 0;
+      }
+      .stat-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 18px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      }
+      .stat-card-label { font-size: 11px; font-weight: 500; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+      .stat-card-value { font-size: 28px; font-weight: 700; color: #1a202c; }
+      .stat-card-value.danger { color: #dc2626; }
+      .stat-card-value.warning { color: #d97706; }
+      .stat-card-value.success { color: #16a34a; }
+      .stat-card-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+      .relance-table {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        overflow: hidden;
+        opacity: 0;
+      }
+      .table-header {
+        display: grid;
+        grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr;
+        padding: 10px 18px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .th { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.07em; }
+      .table-row {
+        display: grid;
+        grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr;
+        padding: 12px 18px;
+        border-bottom: 1px solid #f3f4f6;
+        align-items: center;
+        opacity: 0;
+        transform: translateX(-16px);
+      }
+      .td { font-size: 13px; color: #374151; }
+      .td-name { font-weight: 600; color: #1a202c; }
+      .td-amount { font-weight: 700; color: #1a202c; }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .badge-danger { background: #fee2e2; color: #b91c1c; }
+      .badge-warning { background: #fef3c7; color: #92400e; }
+      .badge-info { background: #dbeafe; color: #1d4ed8; }
+      .badge-success { background: #dcfce7; color: #15803d; }
+
+      /* ── Scene 3: Communication ── */
+      #scene-comm .content-area { padding: 0; display: flex; }
+      .comm-list {
+        width: 320px;
+        border-right: 1px solid #e5e7eb;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .comm-search {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f3f4f6;
+      }
+      .comm-search-bar {
+        background: #f4f6f9;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 13px;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .comm-thread {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #f3f4f6;
+        cursor: pointer;
+        opacity: 0;
+        transform: translateX(-20px);
+        overflow: hidden;
+        width: 320px;
+      }
+      .comm-thread.unread { background: #f0fdf4; }
+      .comm-avatar {
+        width: 38px; height: 38px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; font-weight: 700;
+        flex-shrink: 0;
+        color: #fff;
+      }
+      .comm-thread-body { flex: 1; min-width: 0; overflow: hidden; }
+      .comm-thread-name { font-size: 13px; font-weight: 600; color: #1a202c; }
+      .comm-thread-preview { font-size: 12px; color: #4b5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+      .comm-thread-time { font-size: 11px; color: #9ca3af; flex-shrink: 0; }
+      .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: #55A697; margin-top: 4px; }
+
+      .comm-detail {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #f8fafb;
+        opacity: 0;
+      }
+      .comm-detail-header {
+        padding: 16px 20px;
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .comm-detail-name { font-size: 15px; font-weight: 700; color: #1a202c; }
+      .comm-detail-subject { font-size: 12px; color: #6b7280; margin-top: 2px; }
+      .comm-messages { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+      .msg-bubble {
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .msg-in { background: #fff; color: #374151; box-shadow: 0 1px 4px rgba(0,0,0,0.07); align-self: flex-start; border-bottom-left-radius: 4px; }
+      .msg-out { background: linear-gradient(135deg, #55A697, #3d8f82); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+      .msg-in .msg-time { font-size: 10px; color: #6b7280; margin-top: 3px; }
+      .msg-out .msg-time { font-size: 10px; color: rgba(255,255,255,0.85); margin-top: 3px; }
+      .comm-input-bar {
+        padding: 12px 16px;
+        background: #fff;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .comm-input-field {
+        flex: 1;
+        background: #f4f6f9;
+        border-radius: 20px;
+        padding: 9px 16px;
+        font-size: 13px;
+        color: #374151;
+      }
+      .send-btn {
+        width: 36px; height: 36px;
+        background: linear-gradient(135deg, #55A697, #3d8f82);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      /* ── Scene 4: Interventions ── */
+      .intervention-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        opacity: 0;
+      }
+      .intervention-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 18px 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      .intervention-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .intervention-type {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .intervention-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1a202c;
+        margin-top: 2px;
+      }
+      .intervention-meta {
+        display: flex;
+        gap: 14px;
+        font-size: 12px;
+        color: #6b7280;
+      }
+      .intervention-meta span { display: flex; align-items: center; gap: 4px; }
+      .priority-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+      .priority-haute { background: #fee2e2; color: #b91c1c; }
+      .priority-normale { background: #fef3c7; color: #92400e; }
+      .priority-basse { background: #dcfce7; color: #15803d; }
+
+      .progress-row { display: flex; flex-direction: column; gap: 4px; }
+      .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; }
+      .progress-bar { height: 5px; background: #f3f4f6; border-radius: 3px; overflow: hidden; }
+      .progress-fill { height: 100%; border-radius: 3px; }
+
+      /* ── Scene 5: Outro ── */
+      #scene-outro { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+      #outro-logo { width: 120px; opacity: 0; transform: scale(0.85); position: relative; z-index: 1; }
+      #outro-title { font-size: 44px; font-weight: 700; color: #fff; text-align: center; opacity: 0; letter-spacing: -0.01em; position: relative; z-index: 1; }
+      #outro-sub { font-size: 18px; font-weight: 400; color: #e0e0e0; text-align: center; opacity: 0; position: relative; z-index: 1; }
+      #outro-tag { font-size: 13px; font-weight: 500; color: #ccc; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0; position: relative; z-index: 1; }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-ondt" id="root" data-composition-id="main" data-start="0" data-duration="20" data-width="1280" data-height="720">
+
+      <!-- ══ AUDIO ══ -->
+      <audio data-hf-id="hf-t30g" id="bg-music" class="clip" data-start="0" data-duration="20" data-track-index="10" data-volume="0.28" src="assets/music/happy-beats-business-moves-vol-11-by-ende-dot-app.mp3"></audio>
+      <audio data-hf-id="hf-aa78" id="sfx-hook"  class="clip" data-start="0.2"  data-duration="0.11" data-track-index="11" data-volume="0.65" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio data-hf-id="hf-0v78" id="sfx-card1" class="clip" data-start="3.0"  data-duration="0.59" data-track-index="12" data-volume="0.65" src="assets/sfx/casino/card-slide-2.ogg"></audio>
+      <audio data-hf-id="hf-cxe8" id="sfx-card2" class="clip" data-start="3.5"  data-duration="0.60" data-track-index="13" data-volume="0.65" src="assets/sfx/casino/card-slide-3.ogg"></audio>
+      <audio data-hf-id="hf-yt3n" id="sfx-card3" class="clip" data-start="4.0"  data-duration="0.46" data-track-index="14" data-volume="0.65" src="assets/sfx/casino/card-slide-4.ogg"></audio>
+      <audio data-hf-id="hf-mfc8" id="sfx-bell1" class="clip" data-start="8.0"  data-duration="1.48" data-track-index="15" data-volume="0.70" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+      <audio data-hf-id="hf-j3z2" id="sfx-bell2" class="clip" data-start="15.4" data-duration="0.66" data-track-index="16" data-volume="0.72" src="assets/sfx/impact/impactBell_heavy_003.ogg"></audio>
+
+      <!-- ══ SCENE 1: Hook (0 → 2.5s) ══ -->
+      <div data-hf-id="hf-mebx" id="scene-hook" class="clip" data-start="0" data-duration="2.5" data-track-index="0">
+        <div data-hf-id="hf-ayrd" class="grad-bg" id="hook-bg"></div>
+        <img data-hf-id="hf-cglp" id="hook-logo" src="assets/images/myb-logo.png" alt="MYB" />
+        <h1 data-hf-id="hf-33ic" id="hook-headline">Gérez votre copropriété.</h1>
+        <p data-hf-id="hf-a4bj" id="hook-sub">MYB Platform</p>
+      </div>
+
+      <!-- ══ SCENE 2: Relances & Paiements (2.5 → 7.5s) ══ -->
+      <div data-hf-id="hf-tc4p" id="scene-relances" class="clip" data-start="2.5" data-duration="5" data-track-index="1">
+        <div data-hf-id="hf-4acs" class="app-shell">
+          <div data-hf-id="hf-96rw" class="sidebar">
+            <div data-hf-id="hf-qfzm" class="sidebar-logo">🏢 MYB</div>
+            <div data-hf-id="hf-d18u" class="nav-section-title">Finance</div>
+            <div data-hf-id="hf-29qs" class="nav-item active"><span data-hf-id="hf-ygwv" class="nav-item-icon">💰</span>Relances</div>
+            <div data-hf-id="hf-gtg9" class="nav-item"><span data-hf-id="hf-0ur1" class="nav-item-icon">📊</span>Paiements</div>
+            <div data-hf-id="hf-dr54" class="nav-item"><span data-hf-id="hf-6f1f" class="nav-item-icon">📄</span>Factures</div>
+            <div data-hf-id="hf-krh3" style="margin-top:16px;"></div>
+            <div data-hf-id="hf-meqj" class="nav-section-title">Gestion</div>
+            <div data-hf-id="hf-x54l" class="nav-item"><span data-hf-id="hf-5yja" class="nav-item-icon">🔧</span>Interventions</div>
+            <div data-hf-id="hf-zpyz" class="nav-item"><span data-hf-id="hf-qisb" class="nav-item-icon">💬</span>Communication</div>
+            <div data-hf-id="hf-9216" class="nav-item"><span data-hf-id="hf-taxi" class="nav-item-icon">💧</span>Eau</div>
+          </div>
+          <div data-hf-id="hf-63nn" class="main-area">
+            <div data-hf-id="hf-mndw" class="topbar">
+              <span data-hf-id="hf-owqk" class="topbar-title">Gestion des relances</span>
+              <span data-hf-id="hf-r9ji" class="topbar-badge">Résidence Ellyssa</span>
+            </div>
+            <div data-hf-id="hf-fz43" class="content-area">
+              <div data-hf-id="hf-8ioi" id="stats-row" class="stats-row">
+                <div data-hf-id="hf-57ph" class="stat-card">
+                  <div data-hf-id="hf-7hq4" class="stat-card-label">En attente</div>
+                  <div data-hf-id="hf-zddt" class="stat-card-value danger">12</div>
+                  <div data-hf-id="hf-jg39" class="stat-card-sub">copropriétaires</div>
+                </div>
+                <div data-hf-id="hf-yjdl" class="stat-card">
+                  <div data-hf-id="hf-ap5f" class="stat-card-label">Total dû</div>
+                  <div data-hf-id="hf-2j9x" class="stat-card-value danger">8 450 DT</div>
+                  <div data-hf-id="hf-3faw" class="stat-card-sub">charges impayées</div>
+                </div>
+                <div data-hf-id="hf-3s9s" class="stat-card">
+                  <div data-hf-id="hf-87nx" class="stat-card-label">Relances envoyées</div>
+                  <div data-hf-id="hf-xp3e" class="stat-card-value warning">34</div>
+                  <div data-hf-id="hf-z11s" class="stat-card-sub">ce mois</div>
+                </div>
+                <div data-hf-id="hf-3dyr" class="stat-card">
+                  <div data-hf-id="hf-s2ze" class="stat-card-label">Taux de recouvrement</div>
+                  <div data-hf-id="hf-fbqm" class="stat-card-value success">78%</div>
+                  <div data-hf-id="hf-3h9q" class="stat-card-sub">+4% vs mois dernier</div>
+                </div>
+              </div>
+              <div data-hf-id="hf-o2go" id="relance-table" class="relance-table">
+                <div data-hf-id="hf-67pi" class="table-header">
+                  <div data-hf-id="hf-lrc4" class="th">Copropriétaire</div>
+                  <div data-hf-id="hf-men7" class="th">Lot</div>
+                  <div data-hf-id="hf-za6o" class="th">Montant dû</div>
+                  <div data-hf-id="hf-3jjr" class="th">Statut</div>
+                  <div data-hf-id="hf-gs1x" class="th">Relances</div>
+                </div>
+                <div data-hf-id="hf-0pgs" id="row1" class="table-row">
+                  <div data-hf-id="hf-o1pj" class="td td-name">Ben Salah Mohamed</div>
+                  <div data-hf-id="hf-owy4" class="td">Lot A-12</div>
+                  <div data-hf-id="hf-zxuy" class="td td-amount">1 200 DT</div>
+                  <div data-hf-id="hf-kwaw" class="td"><span data-hf-id="hf-nwqy" class="badge badge-danger">En retard</span></div>
+                  <div data-hf-id="hf-yh6q" class="td">3×</div>
+                </div>
+                <div data-hf-id="hf-9dcn" id="row2" class="table-row">
+                  <div data-hf-id="hf-31u4" class="td td-name">Trabelsi Amira</div>
+                  <div data-hf-id="hf-1r7x" class="td">Lot B-07</div>
+                  <div data-hf-id="hf-99wi" class="td td-amount">850 DT</div>
+                  <div data-hf-id="hf-32f4" class="td"><span data-hf-id="hf-r6el" class="badge badge-warning">2e relance</span></div>
+                  <div data-hf-id="hf-c6sb" class="td">2×</div>
+                </div>
+                <div data-hf-id="hf-5f8m" id="row3" class="table-row">
+                  <div data-hf-id="hf-03fr" class="td td-name">Chaabane Youssef</div>
+                  <div data-hf-id="hf-yoh8" class="td">Lot C-03</div>
+                  <div data-hf-id="hf-1ok3" class="td td-amount">640 DT</div>
+                  <div data-hf-id="hf-1vi1" class="td"><span data-hf-id="hf-5ime" class="badge badge-info">1re relance</span></div>
+                  <div data-hf-id="hf-ltac" class="td">1×</div>
+                </div>
+                <div data-hf-id="hf-a15d" id="row4" class="table-row">
+                  <div data-hf-id="hf-1567" class="td td-name">Mejri Sonia</div>
+                  <div data-hf-id="hf-8tv8" class="td">Lot A-05</div>
+                  <div data-hf-id="hf-yr2k" class="td td-amount">320 DT</div>
+                  <div data-hf-id="hf-29t2" class="td"><span data-hf-id="hf-4t76" class="badge badge-success">Réglé</span></div>
+                  <div data-hf-id="hf-u9x8" class="td">1×</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SCENE 3: Communication (7.5 → 12.5s) ══ -->
+      <div data-hf-id="hf-8yuq" id="scene-comm" class="clip" data-start="7.5" data-duration="5" data-track-index="2">
+        <div data-hf-id="hf-kf0k" class="app-shell">
+          <div data-hf-id="hf-3yqs" class="sidebar">
+            <div data-hf-id="hf-6zhy" class="sidebar-logo">🏢 MYB</div>
+            <div data-hf-id="hf-wa6q" class="nav-section-title">Finance</div>
+            <div data-hf-id="hf-ckik" class="nav-item"><span data-hf-id="hf-u0f3" class="nav-item-icon">💰</span>Relances</div>
+            <div data-hf-id="hf-fvu5" class="nav-item"><span data-hf-id="hf-00o1" class="nav-item-icon">📊</span>Paiements</div>
+            <div data-hf-id="hf-hv6f" style="margin-top:16px;"></div>
+            <div data-hf-id="hf-jntn" class="nav-section-title">Gestion</div>
+            <div data-hf-id="hf-laax" class="nav-item"><span data-hf-id="hf-tt6i" class="nav-item-icon">🔧</span>Interventions</div>
+            <div data-hf-id="hf-yimb" class="nav-item active"><span data-hf-id="hf-ynyz" class="nav-item-icon">💬</span>Communication</div>
+            <div data-hf-id="hf-xhse" class="nav-item"><span data-hf-id="hf-bfy2" class="nav-item-icon">💧</span>Eau</div>
+          </div>
+          <div data-hf-id="hf-1gg3" class="main-area">
+            <div data-hf-id="hf-qwf0" class="topbar">
+              <span data-hf-id="hf-d9p8" class="topbar-title">Communication</span>
+              <span data-hf-id="hf-qb9p" class="topbar-badge">5 non lus</span>
+            </div>
+            <div data-hf-id="hf-xx4z" class="content-area">
+              <div data-hf-id="hf-rp99" class="comm-list">
+                <div data-hf-id="hf-x3ml" class="comm-search">
+                  <div data-hf-id="hf-j0q2" class="comm-search-bar">🔍 Rechercher un message…</div>
+                </div>
+                <div data-hf-id="hf-ydpp" id="thread1" class="comm-thread unread">
+                  <div data-hf-id="hf-9qzc" class="comm-avatar" style="background:#1e40af;">BS</div>
+                  <div data-hf-id="hf-pr92" class="comm-thread-body">
+                    <div data-hf-id="hf-py1i" class="comm-thread-name">Ben Salah Mohamed</div>
+                    <div data-hf-id="hf-5teo" class="comm-thread-preview">Facture charges Q3 — précisions…</div>
+                  </div>
+                  <div data-hf-id="hf-idm8" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                    <div data-hf-id="hf-wfmc" class="comm-thread-time">10:24</div>
+                    <div data-hf-id="hf-9fbb" class="unread-dot"></div>
+                  </div>
+                </div>
+                <div data-hf-id="hf-2btq" id="thread2" class="comm-thread unread">
+                  <div data-hf-id="hf-b0qv" class="comm-avatar" style="background:#0891b2;">TA</div>
+                  <div data-hf-id="hf-rxqy" class="comm-thread-body">
+                    <div data-hf-id="hf-d9of" class="comm-thread-name">Trabelsi Amira</div>
+                    <div data-hf-id="hf-60nk" class="comm-thread-preview">Fuite d'eau au niveau du parking…</div>
+                  </div>
+                  <div data-hf-id="hf-n7ew" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                    <div data-hf-id="hf-5gix" class="comm-thread-time">09:47</div>
+                    <div data-hf-id="hf-t1wn" class="unread-dot"></div>
+                  </div>
+                </div>
+                <div data-hf-id="hf-3rx6" id="thread3" class="comm-thread">
+                  <div data-hf-id="hf-ao80" class="comm-avatar" style="background:#6366f1;">CY</div>
+                  <div data-hf-id="hf-sc1z" class="comm-thread-body">
+                    <div data-hf-id="hf-9hl0" class="comm-thread-name">Chaabane Youssef</div>
+                    <div data-hf-id="hf-7r3c" class="comm-thread-preview">Merci pour le compte rendu AG ✓</div>
+                  </div>
+                  <div data-hf-id="hf-hh2a" class="comm-thread-time" style="margin-top:2px;">Hier</div>
+                </div>
+                <div data-hf-id="hf-l07h" id="thread4" class="comm-thread">
+                  <div data-hf-id="hf-1cwt" class="comm-avatar" style="background:#d97706;">MS</div>
+                  <div data-hf-id="hf-sqd0" class="comm-thread-body">
+                    <div data-hf-id="hf-d8ky" class="comm-thread-name">Mejri Sonia</div>
+                    <div data-hf-id="hf-zjd4" class="comm-thread-preview">Quand aura lieu la prochaine AG ?</div>
+                  </div>
+                  <div data-hf-id="hf-ny0t" class="comm-thread-time" style="margin-top:2px;">Lun</div>
+                </div>
+              </div>
+              <div data-hf-id="hf-fvb6" id="comm-detail" class="comm-detail">
+                <div data-hf-id="hf-lw9w" class="comm-detail-header">
+                  <div data-hf-id="hf-9dun" class="comm-detail-name">Ben Salah Mohamed — Lot A-12</div>
+                  <div data-hf-id="hf-tqh7" class="comm-detail-subject">Objet : Facture charges Q3 2025</div>
+                </div>
+                <div data-hf-id="hf-u6zh" class="comm-messages">
+                  <div data-hf-id="hf-h8nm" class="msg-bubble msg-in">
+                    Bonjour, j'aimerais avoir des précisions sur le montant de mes charges ce trimestre.
+                    <div data-hf-id="hf-iuva" class="msg-time">10:20</div>
+                  </div>
+                  <div data-hf-id="hf-aegw" class="msg-bubble msg-out">
+                    Bonjour M. Ben Salah. Votre relevé du T3 est de 1 200 DT incluant les charges communes et l'eau.
+                    <div data-hf-id="hf-jnhc" class="msg-time">10:22</div>
+                  </div>
+                  <div data-hf-id="hf-aua1" class="msg-bubble msg-in">
+                    D'accord. Je règle ça avant vendredi. Merci !
+                    <div data-hf-id="hf-h9n6" class="msg-time">10:24</div>
+                  </div>
+                </div>
+                <div data-hf-id="hf-ve27" class="comm-input-bar">
+                  <div data-hf-id="hf-3sfz" class="comm-input-field">Répondre…</div>
+                  <div data-hf-id="hf-502v" class="send-btn">➤</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SCENE 4: Interventions & Eau (12.5 → 17s) ══ -->
+      <div data-hf-id="hf-wgsh" id="scene-interv" class="clip" data-start="12.5" data-duration="4.5" data-track-index="3">
+        <div data-hf-id="hf-j83h" class="app-shell">
+          <div data-hf-id="hf-2rtp" class="sidebar">
+            <div data-hf-id="hf-7dsz" class="sidebar-logo">🏢 MYB</div>
+            <div data-hf-id="hf-wohr" class="nav-section-title">Finance</div>
+            <div data-hf-id="hf-rhsk" class="nav-item"><span data-hf-id="hf-tm42" class="nav-item-icon">💰</span>Relances</div>
+            <div data-hf-id="hf-h2r8" class="nav-item"><span data-hf-id="hf-17l4" class="nav-item-icon">📊</span>Paiements</div>
+            <div data-hf-id="hf-hgve" style="margin-top:16px;"></div>
+            <div data-hf-id="hf-j9im" class="nav-section-title">Gestion</div>
+            <div data-hf-id="hf-850d" class="nav-item active"><span data-hf-id="hf-u7hj" class="nav-item-icon">🔧</span>Interventions</div>
+            <div data-hf-id="hf-rcor" class="nav-item"><span data-hf-id="hf-y9ny" class="nav-item-icon">💬</span>Communication</div>
+            <div data-hf-id="hf-xw3f" class="nav-item"><span data-hf-id="hf-bu93" class="nav-item-icon">💧</span>Eau</div>
+          </div>
+          <div data-hf-id="hf-1252" class="main-area">
+            <div data-hf-id="hf-pphx" class="topbar">
+              <span data-hf-id="hf-6efp" class="topbar-title">Gestion des interventions</span>
+              <span data-hf-id="hf-1yb2" class="topbar-badge">4 en cours</span>
+            </div>
+            <div data-hf-id="hf-xity" class="content-area">
+              <div data-hf-id="hf-5wj3" id="interv-grid" class="intervention-grid">
+                <div data-hf-id="hf-ik4d" id="ic1" class="intervention-card">
+                  <div data-hf-id="hf-emwq" class="intervention-head">
+                    <div data-hf-id="hf-yeow">
+                      <div data-hf-id="hf-swsf" class="intervention-type">Plomberie</div>
+                      <div data-hf-id="hf-tzeb" class="intervention-title">Fuite tuyauterie sous-sol</div>
+                    </div>
+                    <span data-hf-id="hf-7ly1" class="badge priority-badge priority-haute">Haute</span>
+                  </div>
+                  <div data-hf-id="hf-o30b" class="intervention-meta">
+                    <span data-hf-id="hf-psa4">📅 20/10/2026</span>
+                    <span data-hf-id="hf-37eu">👷 Hamouda SARL</span>
+                  </div>
+                  <div data-hf-id="hf-zmga" class="progress-row">
+                    <div data-hf-id="hf-rwig" class="progress-label"><span data-hf-id="hf-w219">Avancement</span><span data-hf-id="hf-2jb3">65%</span></div>
+                    <div data-hf-id="hf-7gch" class="progress-bar"><div data-hf-id="hf-d4z1" class="progress-fill" style="width:65%;background:#3b82f6;"></div></div>
+                  </div>
+                  <span data-hf-id="hf-boq9" class="badge badge-info">En cours</span>
+                </div>
+                <div data-hf-id="hf-mi8e" id="ic2" class="intervention-card">
+                  <div data-hf-id="hf-3jmm" class="intervention-head">
+                    <div data-hf-id="hf-y7yw">
+                      <div data-hf-id="hf-ebqx" class="intervention-type">Électricité</div>
+                      <div data-hf-id="hf-uvs2" class="intervention-title">Remplacement éclairage couloirs</div>
+                    </div>
+                    <span data-hf-id="hf-ncq9" class="badge priority-badge priority-normale">Normale</span>
+                  </div>
+                  <div data-hf-id="hf-46bf" class="intervention-meta">
+                    <span data-hf-id="hf-rp3a">📅 22/10/2026</span>
+                    <span data-hf-id="hf-fke1">👷 ElecPro TN</span>
+                  </div>
+                  <div data-hf-id="hf-17ou" class="progress-row">
+                    <div data-hf-id="hf-kzhs" class="progress-label"><span data-hf-id="hf-xpc1">Avancement</span><span data-hf-id="hf-k7an">100%</span></div>
+                    <div data-hf-id="hf-bogl" class="progress-bar"><div data-hf-id="hf-tlam" class="progress-fill" style="width:100%;background:#16a34a;"></div></div>
+                  </div>
+                  <span data-hf-id="hf-xkf3" class="badge badge-success">Terminé</span>
+                </div>
+                <div data-hf-id="hf-qgcf" id="ic3" class="intervention-card">
+                  <div data-hf-id="hf-3xxn" class="intervention-head">
+                    <div data-hf-id="hf-x11t">
+                      <div data-hf-id="hf-9jt8" class="intervention-type">Eau — Compteur</div>
+                      <div data-hf-id="hf-h4bc" class="intervention-title">Relevé compteurs eau lot A</div>
+                    </div>
+                    <span data-hf-id="hf-ebz9" class="badge priority-badge priority-normale">Normale</span>
+                  </div>
+                  <div data-hf-id="hf-3s0e" class="intervention-meta">
+                    <span data-hf-id="hf-f1tb">📅 18/10/2026</span>
+                    <span data-hf-id="hf-j4tc">💧 100 lots · 10 000 m³</span>
+                  </div>
+                  <div data-hf-id="hf-1lzv" class="progress-row">
+                    <div data-hf-id="hf-jskp" class="progress-label"><span data-hf-id="hf-yw94">Avancement</span><span data-hf-id="hf-7y96">82%</span></div>
+                    <div data-hf-id="hf-cvdo" class="progress-bar"><div data-hf-id="hf-zlcr" class="progress-fill" style="width:82%;background:#0891b2;"></div></div>
+                  </div>
+                  <span data-hf-id="hf-a8nl" class="badge badge-warning">En cours</span>
+                </div>
+                <div data-hf-id="hf-uegg" id="ic4" class="intervention-card">
+                  <div data-hf-id="hf-4c8o" class="intervention-head">
+                    <div data-hf-id="hf-xfcu">
+                      <div data-hf-id="hf-88t0" class="intervention-type">Espaces verts</div>
+                      <div data-hf-id="hf-owd7" class="intervention-title">Entretien jardin — trimestre</div>
+                    </div>
+                    <span data-hf-id="hf-c56p" class="badge priority-badge priority-basse">Basse</span>
+                  </div>
+                  <div data-hf-id="hf-3dpd" class="intervention-meta">
+                    <span data-hf-id="hf-s677">📅 25/10/2026</span>
+                    <span data-hf-id="hf-jaz6">👷 GardenPlus</span>
+                  </div>
+                  <div data-hf-id="hf-20aw" class="progress-row">
+                    <div data-hf-id="hf-k6vq" class="progress-label"><span data-hf-id="hf-yhy3">Avancement</span><span data-hf-id="hf-tzpu">0%</span></div>
+                    <div data-hf-id="hf-ch2n" class="progress-bar"><div data-hf-id="hf-20em" class="progress-fill" style="width:0%;background:#d97706;"></div></div>
+                  </div>
+                  <span data-hf-id="hf-pweu" class="badge badge-warning">Planifié</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SCENE 5: Outro (17 → 20s) ══ -->
+      <div data-hf-id="hf-bib5" id="scene-outro" class="clip" data-start="17" data-duration="3" data-track-index="4">
+        <div data-hf-id="hf-80dk" class="grad-bg"></div>
+        <img data-hf-id="hf-pzsv" id="outro-logo" src="assets/images/myb-logo.png" alt="MYB" />
+        <h2 data-hf-id="hf-ydvn" id="outro-title">MYB Platform</h2>
+        <p data-hf-id="hf-f5t4" id="outro-sub">Plateforme d'Administration</p>
+        <p data-hf-id="hf-qhfq" id="outro-tag">En production.</p>
+      </div>
+
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Scene 1: Hook
+      tl.to("#hook-logo",     { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.1);
+      tl.fromTo("#hook-headline", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.25);
+      tl.to("#hook-sub",      { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.65);
+
+      // Scene 2: Relances — S2 starts at 2.5s
+      const S2 = 2.5;
+      tl.to("#stats-row",     { opacity: 1, duration: 0.5, ease: "power2.out" }, S2 + 0.3);
+      tl.to("#relance-table", { opacity: 1, duration: 0.3, ease: "power2.out" }, S2 + 0.7);
+      tl.fromTo("#row1", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S2 + 0.5);
+      tl.fromTo("#row2", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S2 + 0.9);
+      tl.fromTo("#row3", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S2 + 1.3);
+      tl.fromTo("#row4", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S2 + 1.73);
+
+      // Scene 3: Communication — starts at 7.5s
+      const S3 = 7.5;
+      tl.fromTo("#thread1", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S3 + 0.3);
+      tl.fromTo("#thread2", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S3 + 0.55);
+      tl.fromTo("#thread3", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S3 + 0.80);
+      tl.fromTo("#thread4", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S3 + 1.05);
+      tl.fromTo("#comm-detail", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, S3 + 0.6);
+
+      // Scene 4: Interventions — starts at 12.5s
+      const S4 = 12.5;
+      tl.to("#interv-grid", { opacity: 1, duration: 0.3 }, S4 + 0.2);
+      tl.fromTo("#ic1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, S4 + 0.3);
+      tl.fromTo("#ic2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, S4 + 0.5);
+      tl.fromTo("#ic3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, S4 + 0.7);
+      tl.fromTo("#ic4", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, S4 + 0.9);
+
+      // Scene 5: Outro — starts at 17s
+      const S5 = 17;
+      tl.fromTo("#outro-logo",  { opacity: 0, scale: 0.82 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, S5 + 0.4);
+      tl.fromTo("#outro-title", { opacity: 0, y: 12 },       { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, S5 + 0.85);
+      tl.fromTo("#outro-sub",   { opacity: 0 },              { opacity: 1, duration: 0.4, ease: "power2.out" }, S5 + 1.3);
+      tl.fromTo("#outro-tag",   { opacity: 0 },              { opacity: 1, duration: 0.4, ease: "power2.out" }, S5 + 1.75);
+      tl.to("#root", { opacity: 0, duration: 0.6, ease: "power1.in" }, 19.4);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

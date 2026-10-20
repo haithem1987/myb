@@ -1,0 +1,809 @@
+{
+  "ok": false,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 6,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "duplicate_media_discovery_risk",
+        "severity": "warning",
+        "message": "Detected 2 matching img entries with the same source/start/duration.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Avoid duplicated media nodes that can be discovered twice during compilation."
+      },
+      {
+        "code": "gsap_infinite_repeat",
+        "severity": "warning",
+        "message": "GSAP tween uses `repeat: -1` (infinite), but the composition declares a finite 20s window. HyperFrames clips deterministic seeking and export to that explicit duration.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Keep the explicit finite composition `data-duration`. Use a finite repeat count only when the loop itself must end before the composition does."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"scene-hook\"> is a timeline element that contains nested <div id=\"hook-bg\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#scene-hook",
+        "dataAttributes": {},
+        "sourceFile": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"scene-hook\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"scene-picker\"> is a timeline element that contains nested <div id=\"picker-header\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#scene-picker",
+        "dataAttributes": {},
+        "sourceFile": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"scene-picker\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"scene-copro\"> is a timeline element that contains nested <div id=\"copro-header\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#scene-copro",
+        "dataAttributes": {},
+        "sourceFile": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"scene-copro\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"scene-outro\"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#scene-outro",
+        "dataAttributes": {},
+        "sourceFile": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"scene-outro\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      }
+    ],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 6,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-hook\" is 0.11s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.11s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "20",
+          "data-width": "1280",
+          "data-height": "720"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-card1\" is 0.59s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.59s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "20",
+          "data-width": "1280",
+          "data-height": "720"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-card2\" is 0.60s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.60s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "20",
+          "data-width": "1280",
+          "data-height": "720"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-card3\" is 0.46s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.46s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "20",
+          "data-width": "1280",
+          "data-height": "720"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-copro\" is 1.48s but its slot (data-duration) is 2.00s — the slot is shortened to the media length when rendered. Set data-duration to ~1.48s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "20",
+          "data-width": "1280",
+          "data-height": "720"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-outro\" is 0.66s but its slot (data-duration) is 2.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.66s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "main",
+          "data-start": "0",
+          "data-duration": "20",
+          "data-width": "1280",
+          "data-height": "720"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "time": 0
+      }
+    ]
+  },
+  "layout": {
+    "ok": false,
+    "errorCount": 1,
+    "warningCount": 0,
+    "infoCount": 2,
+    "findings": [
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 16.667,
+        "selector": "#outro-sub",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 514.75,
+          "top": 435.91,
+          "right": 765.25,
+          "bottom": 460.91,
+          "width": 250.5,
+          "height": 25
+        },
+        "containerSelector": "#scene-outro > div:nth-of-type(1)",
+        "text": "Plateforme d'Administration",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 514.75,
+          "y": 435.91,
+          "width": 250.5,
+          "height": 25
+        },
+        "firstSeen": 16.667,
+        "lastSeen": 18.889,
+        "occurrences": 2,
+        "heldMs": 0,
+        "times": [
+          16.667,
+          18.889
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 1.111,
+        "selector": "#hook-sub",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 569.88,
+          "top": 478.05,
+          "right": 710.11,
+          "bottom": 503.05,
+          "width": 140.23,
+          "height": 25
+        },
+        "containerSelector": "#hook-bg",
+        "text": "MYB Platform",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 569.88,
+          "y": 478.05,
+          "width": 140.23,
+          "height": 25
+        },
+        "firstSeen": 1.111,
+        "lastSeen": 1.111,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          1.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 18.889,
+        "selector": "#outro-tag",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 579.02,
+          "top": 477.91,
+          "right": 700.98,
+          "bottom": 496.91,
+          "width": 121.97,
+          "height": 19
+        },
+        "containerSelector": "#scene-outro > div:nth-of-type(1)",
+        "text": "En production.",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 579.02,
+          "y": 477.91,
+          "width": 121.97,
+          "height": 19
+        },
+        "firstSeen": 18.889,
+        "lastSeen": 18.889,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          18.889
+        ]
+      }
+    ],
+    "duration": 20,
+    "samples": [
+      1.111,
+      3.333,
+      5.556,
+      7.778,
+      10,
+      12.222,
+      14.444,
+      16.667,
+      18.889
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 3,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 16,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 3.35:1; WCAG AA requires 4.5:1.",
+        "text": "MYB Platform",
+        "fg": "rgb(221,220,231)",
+        "bg": "rgb(118,113,157)",
+        "ratio": 3.35,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(4,4,5)",
+        "large": false,
+        "selector": "#hook-sub",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 569.875,
+          "y": 477.046875,
+          "width": 140.234375,
+          "height": 27
+        },
+        "time": 1.111,
+        "times": [
+          1.111
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.47:1; WCAG AA requires 4.5:1.",
+        "text": "→",
+        "fg": "rgb(209,213,219)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 1.47,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(116,119,122)",
+        "large": false,
+        "selector": "div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(3)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1152,
+          "y": 269.5,
+          "width": 20,
+          "height": 30
+        },
+        "time": 5.556,
+        "times": [
+          5.556
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.47:1; WCAG AA requires 4.5:1.",
+        "text": "→",
+        "fg": "rgb(209,213,219)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 1.47,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(116,119,122)",
+        "large": false,
+        "selector": "div > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(3)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1152,
+          "y": 393.5,
+          "width": 20,
+          "height": 30
+        },
+        "time": 5.556,
+        "times": [
+          5.556
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.47:1; WCAG AA requires 4.5:1.",
+        "text": "→",
+        "fg": "rgb(209,213,219)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 1.47,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(116,119,122)",
+        "large": false,
+        "selector": "div > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(3)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1152,
+          "y": 517.5,
+          "width": 20,
+          "height": 30
+        },
+        "time": 5.556,
+        "times": [
+          5.556
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.54:1; WCAG AA requires 4.5:1.",
+        "text": "📍 Jardin de Carthage, Tunis",
+        "fg": "rgb(156,163,175)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 2.54,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(114,119,128)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 102,
+          "y": 232,
+          "width": 181.625,
+          "height": 18
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 3:1; WCAG AA requires 4.5:1.",
+        "text": "Active",
+        "fg": "rgb(22,163,74)",
+        "bg": "rgb(220,252,231)",
+        "ratio": 3,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(17,129,59)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 538.15625,
+          "y": 199,
+          "width": 57.84375,
+          "height": 23
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.54:1; WCAG AA requires 4.5:1.",
+        "text": "Lots",
+        "fg": "rgb(156,163,175)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 2.54,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(114,119,128)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 102,
+          "y": 266,
+          "width": 47.046875,
+          "height": 17
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.54:1; WCAG AA requires 4.5:1.",
+        "text": "Tantièmes",
+        "fg": "rgb(156,163,175)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 2.54,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(114,119,128)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 181.046875,
+          "y": 266,
+          "width": 89.5,
+          "height": 17
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 3.3:1; WCAG AA requires 4.5:1.",
+        "text": "✏ Modifier",
+        "fg": "rgb(255,255,255)",
+        "bg": "rgb(73,155,141)",
+        "ratio": 3.3,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(39,39,39)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > button",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 102,
+          "y": 343,
+          "width": 109.875,
+          "height": 40
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.54:1; WCAG AA requires 4.5:1.",
+        "text": "📍 Jardins de Carthage, Tunis",
+        "fg": "rgb(156,163,175)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 2.54,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(114,119,128)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 684,
+          "y": 232,
+          "width": 181.625,
+          "height": 18
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 3:1; WCAG AA requires 4.5:1.",
+        "text": "Active",
+        "fg": "rgb(22,163,74)",
+        "bg": "rgb(220,252,231)",
+        "ratio": 3,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(17,129,59)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1120.15625,
+          "y": 199,
+          "width": 57.84375,
+          "height": 23
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.54:1; WCAG AA requires 4.5:1.",
+        "text": "Lots",
+        "fg": "rgb(156,163,175)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 2.54,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(114,119,128)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 684,
+          "y": 266,
+          "width": 29.890625,
+          "height": 17
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.54:1; WCAG AA requires 4.5:1.",
+        "text": "Tantièmes",
+        "fg": "rgb(156,163,175)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 2.54,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(114,119,128)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 745.890625,
+          "y": 266,
+          "width": 71.234375,
+          "height": 17
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 3.3:1; WCAG AA requires 4.5:1.",
+        "text": "✏ Modifier",
+        "fg": "rgb(255,255,255)",
+        "bg": "rgb(73,155,141)",
+        "ratio": 3.3,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(39,39,39)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > button",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 684,
+          "y": 343,
+          "width": 109.875,
+          "height": 40
+        },
+        "time": 14.444,
+        "times": [
+          14.444
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 3.52:1; WCAG AA requires 4.5:1.",
+        "text": "Plateforme d'Administration",
+        "fg": "rgb(228,227,236)",
+        "bg": "rgb(119,114,158)",
+        "ratio": 3.52,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(6,6,6)",
+        "large": false,
+        "selector": "#outro-sub",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 514.75,
+          "y": 434.90625,
+          "width": 250.5,
+          "height": 27
+        },
+        "time": 18.889,
+        "times": [
+          18.889
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.51:1; WCAG AA requires 4.5:1.",
+        "text": "En production.",
+        "fg": "rgb(194,191,211)",
+        "bg": "rgb(120,113,158)",
+        "ratio": 2.51,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(5,5,6)",
+        "large": false,
+        "selector": "#outro-tag",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 579.015625,
+          "y": 477.90625,
+          "width": 121.96875,
+          "height": 20
+        },
+        "time": 18.889,
+        "times": [
+          18.889
+        ]
+      }
+    ],
+    "enabled": true,
+    "samples": [
+      1.111,
+      5.556,
+      10,
+      14.444,
+      18.889
+    ],
+    "checked": 41,
+    "passed": 25
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

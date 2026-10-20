@@ -1,0 +1,6 @@
+Built MYB — a full coproperty management platform with role-aware spaces for syndics, owners, councils, and accountants. Auth, real data, live backend. Everything you see is running.
+
+Stack: Angular 17 · .NET · Keycloak · Docker · PostgreSQL
+Status: En production.
+
+#buildinpublic #saas #proptech #angular #dotnet

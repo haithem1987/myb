@@ -97,9 +97,16 @@ if (-not $SkipBuild) {
 
 # ── 5. Start stack ────────────────────────────────────────────────────────────
 Step "Docker — démarrage du stack complet"
-# myb-front (docker-compose.yml) is replaced by myb-client-local/myb-admin-local in docker-compose.local.yml
-# and its Dockerfile requires a nginx.conf that only exists in a production build context.
-docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --scale myb-front=0
+# Explicit service list — mirrors push-local.sh; excludes myb-front whose Dockerfile
+# requires a production nginx.conf that doesn't exist locally.
+$services = @(
+    "keycloak-db","keycloak","mailhog","rabbitmq",
+    "notificationDB","copropertyDB","timesheetDB","documentDB","invoiceDB","paymentDB",
+    "myb-notification","myb-coproperty","myb-mailer","myb-usermanager",
+    "myb-timesheet","myb-docmanager","myb-invoice","myb-payment",
+    "myb-client-local","myb-admin-local"
+)
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d @services
 OK "Stack démarré"
 
 # ── 6. Wait for Keycloak ──────────────────────────────────────────────────────

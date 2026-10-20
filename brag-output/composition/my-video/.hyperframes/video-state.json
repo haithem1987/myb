@@ -1,7 +1,7 @@
 {
   "version": 1,
   "historyId": "7a4c3c3c-f03f-4373-bc5b-3741bbe64697",
-  "currentRevision": "e885f584-3af5-4fca-960d-e22abce99103",
+  "currentRevision": "3a1d9532-36aa-493c-8401-f6618ac59c5f",
   "pendingChanges": false,
   "files": {
     "AGENTS.md": {
@@ -45,8 +45,8 @@
       "content": "C:\\Users\\haith\\.cache\\hyperframes\\history\\7a4c3c3c-f03f-4373-bc5b-3741bbe64697\\blobs\\53\\53dbce1e19aa713cbb12ee0bc4d206143b45ab15e6ffbfcaa8f69572d4d24d50"
     },
     "index.html": {
-      "hash": "568b7ffeeab49c1d929bed994cd4abd365938dee3175dd16249a17c7405a98d2",
-      "content": "C:\\Users\\haith\\.cache\\hyperframes\\history\\7a4c3c3c-f03f-4373-bc5b-3741bbe64697\\blobs\\56\\568b7ffeeab49c1d929bed994cd4abd365938dee3175dd16249a17c7405a98d2"
+      "hash": "bc88926f21c5fddfcd6a613d93cf2440bfafdfaff0f7a7ea36c725fd4dda500d",
+      "content": "C:\\Users\\haith\\.cache\\hyperframes\\history\\7a4c3c3c-f03f-4373-bc5b-3741bbe64697\\blobs\\bc\\bc88926f21c5fddfcd6a613d93cf2440bfafdfaff0f7a7ea36c725fd4dda500d"
     },
     "meta.json": {
       "hash": "a0b8e0f5183a34d8841c8db3d38c30be3048392188da830259ef8d37d0920294",
@@ -151,19 +151,48 @@
           "after": "C:\\Users\\haith\\.cache\\hyperframes\\history\\7a4c3c3c-f03f-4373-bc5b-3741bbe64697\\blobs\\56\\568b7ffeeab49c1d929bed994cd4abd365938dee3175dd16249a17c7405a98d2"
         }
       }
+    },
+    "29afcdcc-7e91-4d4a-88db-a92f5384ff32": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792486903813,
+      "endedAt": 1792486905819,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\haith\\.cache\\hyperframes\\history\\7a4c3c3c-f03f-4373-bc5b-3741bbe64697\\blobs\\56\\568b7ffeeab49c1d929bed994cd4abd365938dee3175dd16249a17c7405a98d2",
+          "after": "C:\\Users\\haith\\.cache\\hyperframes\\history\\7a4c3c3c-f03f-4373-bc5b-3741bbe64697\\blobs\\d8\\d852fe0850545b1f7c6cb4d82cc0fb12cc684c193202a21aa6e0f866c358d7fe"
+        }
+      }
+    },
+    "3a1d9532-36aa-493c-8401-f6618ac59c5f": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792486927490,
+      "endedAt": 1792486929501,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\haith\\.cache\\hyperframes\\history\\7a4c3c3c-f03f-4373-bc5b-3741bbe64697\\blobs\\d8\\d852fe0850545b1f7c6cb4d82cc0fb12cc684c193202a21aa6e0f866c358d7fe",
+          "after": "C:\\Users\\haith\\.cache\\hyperframes\\history\\7a4c3c3c-f03f-4373-bc5b-3741bbe64697\\blobs\\bc\\bc88926f21c5fddfcd6a613d93cf2440bfafdfaff0f7a7ea36c725fd4dda500d"
+        }
+      }
     }
   },
   "checks": {
     "latest": {
-      "revision": "194b66c8-91e5-4d1e-97ec-73ef771fa429",
-      "id": "44309d03-b98f-4029-b79e-e1194116946e"
+      "revision": "3a1d9532-36aa-493c-8401-f6618ac59c5f",
+      "id": "af756129-e69d-4461-87e4-97d510045111"
     },
     "revisions": {
       "a2b6c4a1-e783-4b98-9033-8360522634e9": [
         {
           "id": "f3cb4fce-2ef7-4ba0-84e7-c7d4eca98ebd",
           "scope": "project",
-          "report": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\.hyperframes\\artifacts\\checks\\f3cb4fce-2ef7-4ba0-84e7-c7d4eca98ebd.json",
           "metadata": {
             "ok": true,
             "browserSkipped": false,
@@ -185,7 +214,9 @@
           "revision": "a2b6c4a1-e783-4b98-9033-8360522634e9",
           "inputFingerprint": "fe3f391ec92e43fd7f4babf86a328c45e9701e0fc9bd7a8cfbf174fcd70acd54",
           "inputScope": "local-project-files",
-          "attribution": "recorded-revision"
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "b4493674-f2f8-4bec-9863-db7261d01d8b"
         }
       ],
       "e34bd89f-4f87-4873-b63f-0cd785ea2fa3": [
@@ -362,6 +393,65 @@
           "inputScope": "local-project-files",
           "attribution": "recorded-revision"
         }
+      ],
+      "29afcdcc-7e91-4d4a-88db-a92f5384ff32": [
+        {
+          "id": "4104f7db-c70d-4626-a36c-8a522114ef88",
+          "scope": "project",
+          "metadata": {
+            "ok": false,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 3000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1792486921074,
+          "contentHash": "76cd3a3b47a93a1f3f7a6fe2db258de07485f395827bd7ce80fde235da549f2b",
+          "revision": "29afcdcc-7e91-4d4a-88db-a92f5384ff32",
+          "inputFingerprint": "6bc89c8948e38824fb20dc17e13f12557e5dc9078c1d7ac10c825aca37ed1ac8",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "b4493674-f2f8-4bec-9863-db7261d01d8b"
+        }
+      ],
+      "3a1d9532-36aa-493c-8401-f6618ac59c5f": [
+        {
+          "id": "af756129-e69d-4461-87e4-97d510045111",
+          "scope": "project",
+          "report": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\.hyperframes\\artifacts\\checks\\af756129-e69d-4461-87e4-97d510045111.json",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 3000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1792486941454,
+          "contentHash": "d6a6f3360b46c3c97cc51ac683342d5adef9e05e06afefacdff2c899795923fe",
+          "revision": "3a1d9532-36aa-493c-8401-f6618ac59c5f",
+          "inputFingerprint": "7fd2324b538494a83f3df28070b60f639530d2809d3acfd65b8420baf4148d4b",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
       ]
     },
     "unversioned": [
@@ -401,15 +491,15 @@
   },
   "renders": {
     "latest": {
-      "id": "3beee095-be0a-45ce-95c6-a083932e2886",
-      "completedAt": 1792484742710,
-      "output": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\renders\\my-video_2026-10-20_10-25-04.mp4",
+      "id": "b4493674-f2f8-4bec-9863-db7261d01d8b",
+      "completedAt": 1792486977439,
+      "output": "C:\\DEV\\REPOS\\myb\\brag-output\\composition\\my-video\\renders\\my-video_2026-10-20_11-02-34.mp4",
       "status": "completed",
-      "revision": "194b66c8-91e5-4d1e-97ec-73ef771fa429"
+      "revision": "3a1d9532-36aa-493c-8401-f6618ac59c5f"
     },
     "retainedRevisions": [
-      "194b66c8-91e5-4d1e-97ec-73ef771fa429",
-      "a2b6c4a1-e783-4b98-9033-8360522634e9"
+      "3a1d9532-36aa-493c-8401-f6618ac59c5f",
+      "194b66c8-91e5-4d1e-97ec-73ef771fa429"
     ]
   },
   "pendingArtifactCleanup": []

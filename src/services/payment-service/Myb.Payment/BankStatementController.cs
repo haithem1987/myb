@@ -34,7 +34,7 @@ public class BankStatementController : ControllerBase
 
     /// <summary>POST /api/bank-statements/import</summary>
     [HttpPost("import")]
-    public async Task<IActionResult> Import(IFormFile file)
+    public async Task<IActionResult> Import(IFormFile file, [FromQuery] string? copropertyId)
     {
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded.");
@@ -73,7 +73,8 @@ public class BankStatementController : ControllerBase
             FileName = file.FileName,
             Format = format,
             ImportedAt = DateTime.UtcNow,
-            ImportedByUserId = userId
+            ImportedByUserId = userId,
+            CopropertyId = copropertyId
         };
 
         _context.BankStatements.Add(statement);
@@ -151,7 +152,7 @@ public class BankStatementController : ControllerBase
 
         var paymentIds = statement.Results
             .Where(r => r.MatchedPaymentId.HasValue)
-            .Select(r => r.MatchedPaymentId)
+            .Select(r => (int?)r.MatchedPaymentId!.Value)
             .Distinct()
             .ToHashSet();
 
@@ -221,7 +222,7 @@ public class BankStatementController : ControllerBase
 
         var paymentIds = statement.Results
             .Where(r => r.MatchedPaymentId != null)
-            .Select(r => r.MatchedPaymentId)
+            .Select(r => (int?)r.MatchedPaymentId!.Value)
             .Distinct()
             .ToHashSet();
 

@@ -23,8 +23,8 @@ interface ServiceCard {
     <div class="admin-home">
       <header class="header">
         <div class="header-content">
-          <h1>MYB Administration Platform</h1>
-          <p class="subtitle">Welcome, {{ userName() }}</p>
+          <h1>MYB Plateforme d'Administration</h1>
+          <p class="subtitle">Bienvenue, {{ userName() }}</p>
           <div class="user-roles">
             <span class="role-badge" *ngFor="let role of userRoles()">
               {{ formatRole(role) }}
@@ -38,8 +38,8 @@ interface ServiceCard {
       </header>
 
       <main class="main-content">
-        <h2>Available Services</h2>
-        <p class="info-text">Select a service to get started. Services are displayed based on your assigned roles.</p>
+        <h2>Services disponibles</h2>
+        <p class="info-text">Sélectionnez un service pour commencer. Les services affichés dépendent de vos rôles.</p>
 
         <div class="services-grid">
           <div 
@@ -68,12 +68,12 @@ interface ServiceCard {
 
         <div class="no-services" *ngIf="availableServices().length === 0">
           <i class="bi bi-exclamation-circle"></i>
-          <h3>No Services Available</h3>
-          <p>You don't have access to any services. Please contact your administrator.</p>
+          <h3>Aucun service disponible</h3>
+          <p>Vous n'avez accès à aucun service. Contactez votre administrateur.</p>
         </div>
 
         <div class="unavailable-services" *ngIf="unavailableServices().length > 0">
-          <h3>Services Requiring Additional Access</h3>
+          <h3>Services nécessitant un accès supplémentaire</h3>
           <div class="services-grid disabled">
             <div 
               *ngFor="let service of unavailableServices()" 
@@ -104,7 +104,7 @@ interface ServiceCard {
   styles: [`
     .admin-home {
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-secondary) 100%);
       padding: 0;
     }
 
@@ -137,7 +137,7 @@ interface ServiceCard {
     }
 
     .role-badge {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-secondary) 100%);
       color: white;
       padding: 0.25rem 0.75rem;
       border-radius: 12px;
@@ -146,7 +146,7 @@ interface ServiceCard {
     }
 
     .btn-logout {
-      background: #ef4444;
+      background: var(--bs-danger);
       color: white;
       border: none;
       padding: 0.75rem 1.5rem;
@@ -161,7 +161,7 @@ interface ServiceCard {
     }
 
     .btn-logout:hover {
-      background: #dc2626;
+      background: #bb2d3b;
     }
 
     .main-content {
@@ -363,8 +363,8 @@ export class AdminHomeComponent implements OnInit {
     },
     {
       id: 'documents',
-      title: 'Document Management',
-      description: 'Organize and manage documents, contracts, and important files.',
+      title: 'Gestion des documents',
+      description: 'Organisez et gérez les documents, contrats et fichiers importants.',
       icon: 'bi bi-file-earmark-text',
       route: '/documents',
       requiredRoles: ['document-manager', 'system-admin'],
@@ -373,8 +373,8 @@ export class AdminHomeComponent implements OnInit {
     },
     {
       id: 'invoices',
-      title: 'Invoice Management',
-      description: 'Create, track, and manage invoices and payments.',
+      title: 'Gestion des factures',
+      description: 'Créez, suivez et gérez les factures et paiements.',
       icon: 'bi bi-receipt',
       route: '/invoices',
       requiredRoles: ['invoice-manager', 'coproperty-syndic', 'system-admin'],
@@ -383,8 +383,8 @@ export class AdminHomeComponent implements OnInit {
     },
     {
       id: 'timesheets',
-      title: 'Timesheet Management',
-      description: 'Track work hours, projects, and employee time.',
+      title: 'Gestion des feuilles de temps',
+      description: 'Suivez les heures de travail, projets et temps des employés.',
       icon: 'bi bi-clock-history',
       route: '/timesheets',
       requiredRoles: ['timesheet-manager', 'employee', 'system-admin'],
@@ -393,8 +393,8 @@ export class AdminHomeComponent implements OnInit {
     },
     {
       id: 'payments',
-      title: 'Payment Processing',
-      description: 'Process payments, manage transactions, and financial operations.',
+      title: 'Traitement des paiements',
+      description: 'Traitez les paiements et gérez les transactions financières.',
       icon: 'bi bi-credit-card',
       route: '/payments',
       requiredRoles: ['payment-manager', 'coproperty-accountant', 'system-admin'],
@@ -403,8 +403,8 @@ export class AdminHomeComponent implements OnInit {
     },
     {
       id: 'users',
-      title: 'User Management',
-      description: 'Manage users, roles, and permissions across the platform.',
+      title: 'Gestion des utilisateurs',
+      description: 'Gérez les utilisateurs, rôles et permissions sur la plateforme.',
       icon: 'bi bi-people',
       route: '/users',
       requiredRoles: ['system-admin'],

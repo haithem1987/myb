@@ -93,6 +93,7 @@
     <div class="col-md-6 col-xl-4" *ngFor="let coproperty of filteredCoproperties()">
       <div
         class="card h-100 shadow-sm coproperty-card text-start w-100"
+        data-cy="coproperty-card"
         role="button"
         tabindex="0"
         (click)="selectAndEnter(coproperty.id)"
@@ -139,6 +140,7 @@
             <button
               type="button"
               class="btn btn-sm btn-violet w-100"
+              data-cy="edit-coproperty"
               (click)="editCoproperty($event, coproperty.id)">
               <i class="bi bi-pencil-square me-2"></i>
               {{ 'coproperty.list.edit' | translate }}

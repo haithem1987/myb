@@ -1,13 +1,7 @@
-import { getGreeting } from '../support/app.po';
-
-describe('admin-e2e', () => {
-  beforeEach(() => cy.visit('/'));
-
-  it('should display welcome message', () => {
-    // Custom command example, see `../support/commands.ts` file
-    cy.login('my-email@something.com', 'myPassword');
-
-    // Function helper example, see `../support/app.po.ts` file
-    getGreeting().contains(/Welcome/);
+describe('admin-e2e smoke', () => {
+  it('should load the app after login', () => {
+    cy.loginAsSyndic();
+    cy.visit('/coproperty/select');
+    cy.url({ timeout: 15000 }).should('include', 'coproperty');
   });
 });

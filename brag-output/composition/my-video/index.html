@@ -9,602 +9,215 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { width: 1280px; height: 720px; overflow: hidden; font-family: 'Poppins', sans-serif; background: #55A697; }
       #root { width: 1280px; height: 720px; position: relative; overflow: hidden; }
-
       .clip { position: absolute; width: 1280px; height: 720px; top: 0; left: 0; overflow: hidden; }
-
       .grad-bg { background: linear-gradient(135deg, #55A697 0%, #8e50a3 100%); position: absolute; inset: 0; }
 
-      /* ── Scene 1: Hook ── */
+      /* ── Scene screenshot ── */
+      .scene-img { width: 1280px; height: 720px; object-fit: cover; display: block; }
+
+      /* ── Label overlay ── */
+      .scene-label {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        padding: 18px 32px;
+        background: linear-gradient(transparent, rgba(0,0,0,0.55));
+        display: flex; align-items: flex-end; justify-content: space-between;
+      }
+      .scene-label-title { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.01em; text-shadow: 0 1px 6px rgba(0,0,0,0.4); }
+      .scene-label-badge { font-size: 12px; font-weight: 600; color: #fff; background: rgba(85,166,151,0.85); padding: 4px 14px; border-radius: 20px; }
+
+      /* ── Hook ── */
       #scene-hook { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
       #hook-logo { width: 130px; opacity: 0; position: relative; z-index: 1; }
       #hook-headline { color: #fff; font-size: 54px; font-weight: 700; letter-spacing: -0.02em; text-align: center; opacity: 0; position: relative; z-index: 1; }
-      #hook-sub { color: #fff; font-size: 16px; font-weight: 400; opacity: 0; letter-spacing: 0.1em; text-transform: uppercase; position: relative; z-index: 1; }
+      #hook-sub { color: #fff; font-size: 16px; font-weight: 500; opacity: 0; letter-spacing: 0.1em; text-transform: uppercase; position: relative; z-index: 1; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
 
-      /* ── App shell (shared) ── */
-      .app-shell { background: #f4f6f9; position: absolute; inset: 0; display: flex; flex-direction: row; }
-      .sidebar { width: 220px; background: #1e2a38; display: flex; flex-direction: column; padding: 24px 0; flex-shrink: 0; }
-      .sidebar-logo { padding: 0 20px 24px; color: #fff; font-size: 16px; font-weight: 700; letter-spacing: 0.04em; opacity: 0.9; display: flex; align-items: center; gap: 10px; }
-      .nav-section-title { padding: 0 20px 6px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 0.12em; }
-      .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.80); border-inline-start: 3px solid transparent; }
-      .nav-item.active { color: #fff; background: rgba(255,255,255,0.08); border-inline-start-color: #55A697; }
-      .nav-item-icon { font-size: 15px; width: 18px; text-align: center; }
-      .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-      .topbar { height: 56px; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; padding: 0 28px; gap: 12px; flex-shrink: 0; }
-      .topbar-title { font-size: 17px; font-weight: 700; color: #1a202c; }
-      .topbar-badge { background: #f3e8ff; color: #7c3aed; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; }
-      .content-area { flex: 1; padding: 24px 28px; overflow: hidden; }
-
-      /* ── Sidebar nav (reused across scenes) ── */
-      .nav-finance .relances  { }
-      .nav-finance .rapproch  { }
-
-      /* ── Scene 2: Relances & Paiements ── */
-      .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; opacity: 0; }
-      .stat-card { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-      .stat-card-label { font-size: 11px; font-weight: 500; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-      .stat-card-value { font-size: 28px; font-weight: 700; color: #1a202c; }
-      .stat-card-value.danger { color: #dc2626; }
-      .stat-card-value.warning { color: #d97706; }
-      .stat-card-value.success { color: #16a34a; }
-      .stat-card-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
-
-      .relance-table { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; opacity: 0; }
-      .table-header { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr; padding: 10px 18px; background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
-      .th { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.07em; }
-      .table-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr; padding: 12px 18px; border-bottom: 1px solid #f3f4f6; align-items: center; opacity: 0; transform: translateX(-16px); }
-      .td { font-size: 13px; color: #374151; }
-      .td-name { font-weight: 600; color: #1a202c; }
-      .td-amount { font-weight: 700; color: #1a202c; }
-      .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-      .badge-danger  { background: #fee2e2; color: #b91c1c; }
-      .badge-warning { background: #fef3c7; color: #92400e; }
-      .badge-info    { background: #dbeafe; color: #1d4ed8; }
-      .badge-success { background: #dcfce7; color: #15803d; }
-      .badge-purple  { background: #f3e8ff; color: #7c3aed; }
-
-      /* ── Scene 3: Rapprochement bancaire ── */
-      .rapproch-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; height: 100%; }
-
-      .bank-summary { display: flex; flex-direction: column; gap: 14px; opacity: 0; }
-      .bank-period-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-      .bank-period-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-      .bank-amounts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-      .bank-amt-block { display: flex; flex-direction: column; gap: 3px; }
-      .bank-amt-label { font-size: 11px; color: #6b7280; }
-      .bank-amt-value { font-size: 22px; font-weight: 700; }
-      .bank-amt-value.credit { color: #16a34a; }
-      .bank-amt-value.debit  { color: #dc2626; }
-      .bank-amt-value.ecart  { color: #d97706; }
-      .bank-status-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f3f4f6; }
-      .bank-status-label { font-size: 12px; color: #6b7280; }
-      .ecart-pill { background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 700; padding: 3px 12px; border-radius: 20px; }
-      .ecart-pill.ok { background: #dcfce7; color: #15803d; }
-
-      .rapproch-table-panel { display: flex; flex-direction: column; gap: 10px; opacity: 0; }
-      .rapproch-table-title { font-size: 13px; font-weight: 700; color: #1a202c; }
-      .rapproch-table { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
-      .rapproch-table .table-header { grid-template-columns: 1fr 1.5fr 1fr 0.7fr; }
-      .rapproch-row { display: grid; grid-template-columns: 1fr 1.5fr 1fr 0.7fr; padding: 10px 16px; border-bottom: 1px solid #f3f4f6; align-items: center; opacity: 0; transform: translateY(10px); }
-      .rapproch-row:last-child { border-bottom: none; }
-      .check-icon { font-size: 14px; }
-
-      /* ── Scene 4: Communication ── */
-      .comm-list { width: 300px; border-right: 1px solid #e5e7eb; background: #fff; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
-      .comm-search { padding: 14px 16px; border-bottom: 1px solid #f3f4f6; }
-      .comm-search-bar { background: #f4f6f9; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #6b7280; display: flex; align-items: center; gap: 6px; }
-      .comm-thread { display: flex; align-items: flex-start; gap: 10px; padding: 13px 16px; border-bottom: 1px solid #f3f4f6; opacity: 0; transform: translateX(-20px); overflow: hidden; width: 300px; }
-      .comm-thread.unread { background: #f0fdf4; }
-      .comm-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; color: #fff; }
-      .comm-thread-body { flex: 1; min-width: 0; overflow: hidden; }
-      .comm-thread-name { font-size: 13px; font-weight: 600; color: #1a202c; }
-      .comm-thread-preview { font-size: 12px; color: #4b5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-      .comm-thread-time { font-size: 11px; color: #9ca3af; flex-shrink: 0; }
-      .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: #55A697; margin-top: 4px; }
-      .comm-detail { flex: 1; display: flex; flex-direction: column; background: #f8fafb; opacity: 0; }
-      .comm-detail-header { padding: 16px 20px; background: #fff; border-bottom: 1px solid #e5e7eb; }
-      .comm-detail-name { font-size: 15px; font-weight: 700; color: #1a202c; }
-      .comm-detail-subject { font-size: 12px; color: #6b7280; margin-top: 2px; }
-      .comm-messages { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
-      .msg-bubble { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
-      .msg-in  { background: #fff; color: #374151; box-shadow: 0 1px 4px rgba(0,0,0,0.07); align-self: flex-start; border-bottom-left-radius: 4px; }
-      .msg-out { background: linear-gradient(135deg, #55A697, #3d8f82); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-      .msg-in  .msg-time { font-size: 10px; color: #6b7280; margin-top: 3px; }
-      .msg-out .msg-time { font-size: 10px; color: rgba(255,255,255,0.85); margin-top: 3px; }
-      .comm-input-bar { padding: 12px 16px; background: #fff; border-top: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px; }
-      .comm-input-field { flex: 1; background: #f4f6f9; border-radius: 20px; padding: 9px 16px; font-size: 13px; color: #374151; }
-      .send-btn { width: 36px; height: 36px; background: linear-gradient(135deg, #55A697, #3d8f82); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; flex-shrink: 0; }
-
-      /* ── Scene 5: Interventions ── */
-      .intervention-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; opacity: 0; }
-      .intervention-card { background: #fff; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); display: flex; flex-direction: column; gap: 10px; opacity: 0; transform: translateY(20px); }
-      .intervention-head { display: flex; justify-content: space-between; align-items: flex-start; }
-      .intervention-type { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; }
-      .intervention-title { font-size: 14px; font-weight: 700; color: #1a202c; margin-top: 2px; }
-      .intervention-meta { display: flex; gap: 14px; font-size: 12px; color: #6b7280; }
-      .intervention-meta span { display: flex; align-items: center; gap: 4px; }
-      .priority-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
-      .priority-haute  { background: #fee2e2; color: #b91c1c; }
-      .priority-normale{ background: #fef3c7; color: #92400e; }
-      .priority-basse  { background: #dcfce7; color: #15803d; }
-      .progress-row { display: flex; flex-direction: column; gap: 4px; }
-      .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; }
-      .progress-bar { height: 5px; background: #f3f4f6; border-radius: 3px; overflow: hidden; }
-      .progress-fill { height: 100%; border-radius: 3px; }
-
-      /* ── Scene 6: Outro ── */
+      /* ── Outro ── */
       #scene-outro { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
       #outro-logo  { width: 120px; opacity: 0; transform: scale(0.85); position: relative; z-index: 1; }
       #outro-title { font-size: 44px; font-weight: 700; color: #fff; text-align: center; opacity: 0; letter-spacing: -0.01em; position: relative; z-index: 1; }
-      #outro-sub   { font-size: 18px; font-weight: 400; color: #e0e0e0; text-align: center; opacity: 0; position: relative; z-index: 1; }
-      #outro-tag   { font-size: 13px; font-weight: 500; color: #ccc; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0; position: relative; z-index: 1; }
+      #outro-sub   { font-size: 18px; font-weight: 400; color: #fff; text-align: center; opacity: 0; position: relative; z-index: 1; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+      #outro-tag   { font-size: 13px; font-weight: 500; color: #ccc; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0; position: relative; z-index: 1; }
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="25" data-width="1280" data-height="720">
+  <div id="root" data-composition-id="main" data-start="0" data-duration="46" data-width="1280" data-height="720">
 
-      <!-- ══ AUDIO ══ -->
-      <audio id="bg-music" class="clip" data-start="0" data-duration="25" data-track-index="10" data-volume="0.28" src="assets/music/happy-beats-business-moves-vol-11-by-ende-dot-app.mp3"></audio>
-      <audio id="sfx-hook"  class="clip" data-start="0.2"  data-duration="0.11" data-track-index="11" data-volume="0.65" src="assets/sfx/interface/drop_001.ogg"></audio>
-      <audio id="sfx-card1" class="clip" data-start="3.0"  data-duration="0.59" data-track-index="12" data-volume="0.65" src="assets/sfx/casino/card-slide-2.ogg"></audio>
-      <audio id="sfx-card2" class="clip" data-start="3.5"  data-duration="0.60" data-track-index="13" data-volume="0.65" src="assets/sfx/casino/card-slide-3.ogg"></audio>
-      <audio id="sfx-card3" class="clip" data-start="4.0"  data-duration="0.46" data-track-index="14" data-volume="0.65" src="assets/sfx/casino/card-slide-4.ogg"></audio>
-      <audio id="sfx-bell1" class="clip" data-start="7.2"  data-duration="1.48" data-track-index="15" data-volume="0.68" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
-      <audio id="sfx-bell2" class="clip" data-start="20.4" data-duration="0.66" data-track-index="16" data-volume="0.72" src="assets/sfx/impact/impactBell_heavy_003.ogg"></audio>
+    <!-- ══ AUDIO ══ -->
+    <audio id="bg-music" class="clip" data-start="0" data-duration="46" data-track-index="10" data-volume="0.26" src="assets/music/happy-beats-business-moves-vol-11-by-ende-dot-app.mp3"></audio>
+    <audio id="sfx-hook"  class="clip" data-start="0.2"  data-duration="0.11" data-track-index="11" data-volume="0.60" src="assets/sfx/interface/drop_001.ogg"></audio>
+    <audio id="sfx-c1"   class="clip" data-start="6.8"  data-duration="0.59" data-track-index="12" data-volume="0.60" src="assets/sfx/casino/card-slide-2.ogg"></audio>
+    <audio id="sfx-c2"   class="clip" data-start="7.3"  data-duration="0.60" data-track-index="13" data-volume="0.60" src="assets/sfx/casino/card-slide-3.ogg"></audio>
+    <audio id="sfx-c3"   class="clip" data-start="7.8"  data-duration="0.46" data-track-index="14" data-volume="0.60" src="assets/sfx/casino/card-slide-4.ogg"></audio>
+    <audio id="sfx-bell1" class="clip" data-start="10.2" data-duration="1.48" data-track-index="15" data-volume="0.65" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+    <audio id="sfx-bell2" class="clip" data-start="37.4" data-duration="0.66" data-track-index="16" data-volume="0.70" src="assets/sfx/impact/impactBell_heavy_003.ogg"></audio>
 
-      <!-- ══ SCENE 1: Hook (0 → 2.5s) ══ -->
-      <div id="scene-hook" class="clip" data-start="0" data-duration="2.5" data-track-index="0">
-        <div class="grad-bg"></div>
-        <img id="hook-logo" src="assets/images/myb-logo.png" alt="MYB" />
-        <h1 id="hook-headline">Gérez votre copropriété.</h1>
-        <p id="hook-sub">MYB Platform</p>
-      </div>
-
-      <!-- ══ SCENE 2: Relances & Paiements (2.5 → 7s) ══ -->
-      <div id="scene-relances" class="clip" data-start="2.5" data-duration="4.5" data-track-index="1">
-        <div class="app-shell">
-          <div class="sidebar">
-            <div class="sidebar-logo">🏢 MYB</div>
-            <div class="nav-section-title">Finance</div>
-            <div class="nav-item active"><span class="nav-item-icon">💰</span>Relances</div>
-            <div class="nav-item"><span class="nav-item-icon">📊</span>Rapprochement</div>
-            <div class="nav-item"><span class="nav-item-icon">📄</span>Factures</div>
-            <div style="margin-top:14px;"></div>
-            <div class="nav-section-title">Gestion</div>
-            <div class="nav-item"><span class="nav-item-icon">🔧</span>Interventions</div>
-            <div class="nav-item"><span class="nav-item-icon">💬</span>Communication</div>
-            <div class="nav-item"><span class="nav-item-icon">💧</span>Eau</div>
-          </div>
-          <div class="main-area">
-            <div class="topbar">
-              <span class="topbar-title">Gestion des relances</span>
-              <span class="topbar-badge">Résidence Ellyssa</span>
-            </div>
-            <div class="content-area">
-              <div id="stats-row" class="stats-row">
-                <div class="stat-card">
-                  <div class="stat-card-label">En attente</div>
-                  <div class="stat-card-value danger">12</div>
-                  <div class="stat-card-sub">copropriétaires</div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-card-label">Total dû</div>
-                  <div class="stat-card-value danger">8 450 DT</div>
-                  <div class="stat-card-sub">charges impayées</div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-card-label">Relances envoyées</div>
-                  <div class="stat-card-value warning">34</div>
-                  <div class="stat-card-sub">ce mois</div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-card-label">Recouvrement</div>
-                  <div class="stat-card-value success">78%</div>
-                  <div class="stat-card-sub">+4% vs mois dernier</div>
-                </div>
-              </div>
-              <div id="relance-table" class="relance-table">
-                <div class="table-header">
-                  <div class="th">Copropriétaire</div>
-                  <div class="th">Lot</div>
-                  <div class="th">Montant dû</div>
-                  <div class="th">Statut</div>
-                  <div class="th">Relances</div>
-                </div>
-                <div id="row1" class="table-row">
-                  <div class="td td-name">Ben Salah Mohamed</div>
-                  <div class="td">Lot A-12</div>
-                  <div class="td td-amount">1 200 DT</div>
-                  <div class="td"><span class="badge badge-danger">En retard</span></div>
-                  <div class="td">3×</div>
-                </div>
-                <div id="row2" class="table-row">
-                  <div class="td td-name">Trabelsi Amira</div>
-                  <div class="td">Lot B-07</div>
-                  <div class="td td-amount">850 DT</div>
-                  <div class="td"><span class="badge badge-warning">2e relance</span></div>
-                  <div class="td">2×</div>
-                </div>
-                <div id="row3" class="table-row">
-                  <div class="td td-name">Chaabane Youssef</div>
-                  <div class="td">Lot C-03</div>
-                  <div class="td td-amount">640 DT</div>
-                  <div class="td"><span class="badge badge-info">1re relance</span></div>
-                  <div class="td">1×</div>
-                </div>
-                <div id="row4" class="table-row">
-                  <div class="td td-name">Mejri Sonia</div>
-                  <div class="td">Lot A-05</div>
-                  <div class="td td-amount">320 DT</div>
-                  <div class="td"><span class="badge badge-success">Réglé</span></div>
-                  <div class="td">1×</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ SCENE 3: Rapprochement bancaire (7 → 11.5s) ══ -->
-      <div id="scene-rapproch" class="clip" data-start="7" data-duration="4.5" data-track-index="2">
-        <div class="app-shell">
-          <div class="sidebar">
-            <div class="sidebar-logo">🏢 MYB</div>
-            <div class="nav-section-title">Finance</div>
-            <div class="nav-item"><span class="nav-item-icon">💰</span>Relances</div>
-            <div class="nav-item active"><span class="nav-item-icon">📊</span>Rapprochement</div>
-            <div class="nav-item"><span class="nav-item-icon">📄</span>Factures</div>
-            <div style="margin-top:14px;"></div>
-            <div class="nav-section-title">Gestion</div>
-            <div class="nav-item"><span class="nav-item-icon">🔧</span>Interventions</div>
-            <div class="nav-item"><span class="nav-item-icon">💬</span>Communication</div>
-            <div class="nav-item"><span class="nav-item-icon">💧</span>Eau</div>
-          </div>
-          <div class="main-area">
-            <div class="topbar">
-              <span class="topbar-title">Rapprochement bancaire</span>
-              <span class="topbar-badge">Octobre 2026</span>
-            </div>
-            <div class="content-area">
-              <div class="rapproch-layout">
-
-                <div id="bank-summary" class="bank-summary">
-                  <div class="bank-period-card">
-                    <div class="bank-period-label">Solde du compte — BNA Tunis</div>
-                    <div class="bank-amounts">
-                      <div class="bank-amt-block">
-                        <div class="bank-amt-label">Solde banque</div>
-                        <div class="bank-amt-value credit">42 180 DT</div>
-                      </div>
-                      <div class="bank-amt-block">
-                        <div class="bank-amt-label">Solde comptable</div>
-                        <div class="bank-amt-value credit">41 955 DT</div>
-                      </div>
-                      <div class="bank-amt-block">
-                        <div class="bank-amt-label">Écart</div>
-                        <div class="bank-amt-value ecart">225 DT</div>
-                      </div>
-                      <div class="bank-amt-block">
-                        <div class="bank-amt-label">Écriture en attente</div>
-                        <div class="bank-amt-value warning">3</div>
-                      </div>
-                    </div>
-                    <div class="bank-status-row">
-                      <span class="bank-status-label">Statut du rapprochement</span>
-                      <span class="ecart-pill">Écart à corriger</span>
-                    </div>
-                  </div>
-                  <div class="bank-period-card">
-                    <div class="bank-period-label">Mouvements du mois</div>
-                    <div class="bank-amounts">
-                      <div class="bank-amt-block">
-                        <div class="bank-amt-label">Total encaissements</div>
-                        <div class="bank-amt-value credit">+18 640 DT</div>
-                      </div>
-                      <div class="bank-amt-block">
-                        <div class="bank-amt-label">Total décaissements</div>
-                        <div class="bank-amt-value debit">−12 310 DT</div>
-                      </div>
-                    </div>
-                    <div class="bank-status-row">
-                      <span class="bank-status-label">Opérations rapprochées</span>
-                      <span class="ecart-pill ok">47 / 50 ✓</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div id="rapproch-panel" class="rapproch-table-panel">
-                  <div class="rapproch-table-title">Écritures non rapprochées</div>
-                  <div class="rapproch-table">
-                    <div class="table-header rapproch-table" style="display:grid;grid-template-columns:1fr 1.5fr 1fr 0.7fr;padding:10px 16px;background:#f9fafb;border-bottom:1px solid #e5e7eb;">
-                      <div class="th">Date</div>
-                      <div class="th">Libellé</div>
-                      <div class="th">Montant</div>
-                      <div class="th">Statut</div>
-                    </div>
-                    <div id="rr1" class="rapproch-row">
-                      <div class="td">14/10/2026</div>
-                      <div class="td">Virement STEG</div>
-                      <div class="td td-amount" style="color:#dc2626;">−980 DT</div>
-                      <div class="td"><span class="check-icon">⏳</span></div>
-                    </div>
-                    <div id="rr2" class="rapproch-row">
-                      <div class="td">16/10/2026</div>
-                      <div class="td">Encaissement lot B-03</div>
-                      <div class="td td-amount" style="color:#16a34a;">+450 DT</div>
-                      <div class="td"><span class="check-icon">⏳</span></div>
-                    </div>
-                    <div id="rr3" class="rapproch-row">
-                      <div class="td">19/10/2026</div>
-                      <div class="td">Prestataire jardinage</div>
-                      <div class="td td-amount" style="color:#dc2626;">−245 DT</div>
-                      <div class="td"><span class="check-icon">⏳</span></div>
-                    </div>
-                    <div id="rr4" class="rapproch-row" style="background:#f0fdf4;">
-                      <div class="td">20/10/2026</div>
-                      <div class="td">Charges lot A-12</div>
-                      <div class="td td-amount" style="color:#16a34a;">+1 200 DT</div>
-                      <div class="td"><span class="check-icon" style="color:#16a34a;">✓</span></div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ SCENE 4: Communication (11.5 → 15.5s) ══ -->
-      <div id="scene-comm" class="clip" data-start="11.5" data-duration="4" data-track-index="3">
-        <div class="app-shell">
-          <div class="sidebar">
-            <div class="sidebar-logo">🏢 MYB</div>
-            <div class="nav-section-title">Finance</div>
-            <div class="nav-item"><span class="nav-item-icon">💰</span>Relances</div>
-            <div class="nav-item"><span class="nav-item-icon">📊</span>Rapprochement</div>
-            <div style="margin-top:14px;"></div>
-            <div class="nav-section-title">Gestion</div>
-            <div class="nav-item"><span class="nav-item-icon">🔧</span>Interventions</div>
-            <div class="nav-item active"><span class="nav-item-icon">💬</span>Communication</div>
-            <div class="nav-item"><span class="nav-item-icon">💧</span>Eau</div>
-          </div>
-          <div class="main-area">
-            <div class="topbar">
-              <span class="topbar-title">Communication</span>
-              <span class="topbar-badge">5 non lus</span>
-            </div>
-            <div class="content-area" style="padding:0;display:flex;">
-              <div class="comm-list">
-                <div class="comm-search">
-                  <div class="comm-search-bar">🔍 Rechercher…</div>
-                </div>
-                <div id="thread1" class="comm-thread unread">
-                  <div class="comm-avatar" style="background:#1e40af;">BS</div>
-                  <div class="comm-thread-body">
-                    <div class="comm-thread-name">Ben Salah Mohamed</div>
-                    <div class="comm-thread-preview">Charges Q3 — précisions</div>
-                  </div>
-                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-                    <div class="comm-thread-time">10:24</div>
-                    <div class="unread-dot"></div>
-                  </div>
-                </div>
-                <div id="thread2" class="comm-thread unread">
-                  <div class="comm-avatar" style="background:#0891b2;">TA</div>
-                  <div class="comm-thread-body">
-                    <div class="comm-thread-name">Trabelsi Amira</div>
-                    <div class="comm-thread-preview">Fuite d'eau parking…</div>
-                  </div>
-                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-                    <div class="comm-thread-time">09:47</div>
-                    <div class="unread-dot"></div>
-                  </div>
-                </div>
-                <div id="thread3" class="comm-thread">
-                  <div class="comm-avatar" style="background:#6366f1;">CY</div>
-                  <div class="comm-thread-body">
-                    <div class="comm-thread-name">Chaabane Youssef</div>
-                    <div class="comm-thread-preview">Merci pour le CR AG ✓</div>
-                  </div>
-                  <div class="comm-thread-time" style="margin-top:2px;">Hier</div>
-                </div>
-                <div id="thread4" class="comm-thread">
-                  <div class="comm-avatar" style="background:#d97706;">MS</div>
-                  <div class="comm-thread-body">
-                    <div class="comm-thread-name">Mejri Sonia</div>
-                    <div class="comm-thread-preview">Date prochaine AG ?</div>
-                  </div>
-                  <div class="comm-thread-time" style="margin-top:2px;">Lun</div>
-                </div>
-              </div>
-              <div id="comm-detail" class="comm-detail">
-                <div class="comm-detail-header">
-                  <div class="comm-detail-name">Ben Salah Mohamed — Lot A-12</div>
-                  <div class="comm-detail-subject">Objet : Facture charges Q3 2026</div>
-                </div>
-                <div class="comm-messages">
-                  <div class="msg-bubble msg-in">
-                    Bonjour, précisions sur le montant des charges ce trimestre.
-                    <div class="msg-time">10:20</div>
-                  </div>
-                  <div class="msg-bubble msg-out">
-                    Bonjour M. Ben Salah. Votre relevé T3 est 1 200 DT (charges + eau).
-                    <div class="msg-time">10:22</div>
-                  </div>
-                  <div class="msg-bubble msg-in">
-                    D'accord, je règle avant vendredi. Merci !
-                    <div class="msg-time">10:24</div>
-                  </div>
-                </div>
-                <div class="comm-input-bar">
-                  <div class="comm-input-field">Répondre…</div>
-                  <div class="send-btn">➤</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ SCENE 5: Interventions & Eau (15.5 → 20s) ══ -->
-      <div id="scene-interv" class="clip" data-start="15.5" data-duration="4.5" data-track-index="4">
-        <div class="app-shell">
-          <div class="sidebar">
-            <div class="sidebar-logo">🏢 MYB</div>
-            <div class="nav-section-title">Finance</div>
-            <div class="nav-item"><span class="nav-item-icon">💰</span>Relances</div>
-            <div class="nav-item"><span class="nav-item-icon">📊</span>Rapprochement</div>
-            <div style="margin-top:14px;"></div>
-            <div class="nav-section-title">Gestion</div>
-            <div class="nav-item active"><span class="nav-item-icon">🔧</span>Interventions</div>
-            <div class="nav-item"><span class="nav-item-icon">💬</span>Communication</div>
-            <div class="nav-item"><span class="nav-item-icon">💧</span>Eau</div>
-          </div>
-          <div class="main-area">
-            <div class="topbar">
-              <span class="topbar-title">Gestion des interventions</span>
-              <span class="topbar-badge">4 en cours</span>
-            </div>
-            <div class="content-area">
-              <div id="interv-grid" class="intervention-grid">
-                <div id="ic1" class="intervention-card">
-                  <div class="intervention-head">
-                    <div>
-                      <div class="intervention-type">Plomberie</div>
-                      <div class="intervention-title">Fuite tuyauterie sous-sol</div>
-                    </div>
-                    <span class="badge priority-badge priority-haute">Haute</span>
-                  </div>
-                  <div class="intervention-meta">
-                    <span>📅 20/10/2026</span><span>👷 Hamouda SARL</span>
-                  </div>
-                  <div class="progress-row">
-                    <div class="progress-label"><span>Avancement</span><span>65%</span></div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:65%;background:#3b82f6;"></div></div>
-                  </div>
-                  <span class="badge badge-info">En cours</span>
-                </div>
-                <div id="ic2" class="intervention-card">
-                  <div class="intervention-head">
-                    <div>
-                      <div class="intervention-type">Électricité</div>
-                      <div class="intervention-title">Remplacement éclairage couloirs</div>
-                    </div>
-                    <span class="badge priority-badge priority-normale">Normale</span>
-                  </div>
-                  <div class="intervention-meta">
-                    <span>📅 22/10/2026</span><span>👷 ElecPro TN</span>
-                  </div>
-                  <div class="progress-row">
-                    <div class="progress-label"><span>Avancement</span><span>100%</span></div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#16a34a;"></div></div>
-                  </div>
-                  <span class="badge badge-success">Terminé</span>
-                </div>
-                <div id="ic3" class="intervention-card">
-                  <div class="intervention-head">
-                    <div>
-                      <div class="intervention-type">Eau — Compteurs</div>
-                      <div class="intervention-title">Relevé compteurs eau lot A</div>
-                    </div>
-                    <span class="badge priority-badge priority-normale">Normale</span>
-                  </div>
-                  <div class="intervention-meta">
-                    <span>📅 18/10/2026</span><span>💧 100 lots</span>
-                  </div>
-                  <div class="progress-row">
-                    <div class="progress-label"><span>Avancement</span><span>82%</span></div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:82%;background:#0891b2;"></div></div>
-                  </div>
-                  <span class="badge badge-warning">En cours</span>
-                </div>
-                <div id="ic4" class="intervention-card">
-                  <div class="intervention-head">
-                    <div>
-                      <div class="intervention-type">Espaces verts</div>
-                      <div class="intervention-title">Entretien jardin — trimestre</div>
-                    </div>
-                    <span class="badge priority-badge priority-basse">Basse</span>
-                  </div>
-                  <div class="intervention-meta">
-                    <span>📅 25/10/2026</span><span>👷 GardenPlus</span>
-                  </div>
-                  <div class="progress-row">
-                    <div class="progress-label"><span>Avancement</span><span>0%</span></div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#d97706;"></div></div>
-                  </div>
-                  <span class="badge badge-warning">Planifié</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ SCENE 6: Outro (20 → 25s) ══ -->
-      <div id="scene-outro" class="clip" data-start="20" data-duration="5" data-track-index="5">
-        <div class="grad-bg"></div>
-        <img id="outro-logo" src="assets/images/myb-logo.png" alt="MYB" />
-        <h2 id="outro-title">MYB Platform</h2>
-        <p id="outro-sub">Plateforme d'Administration</p>
-        <p id="outro-tag">En production.</p>
-      </div>
-
+    <!-- ══ S1: Hook (0-2.5s) ══ -->
+    <div id="s-hook" class="clip" data-start="0" data-duration="2.5" data-track-index="0">
+      <div class="grad-bg"></div>
+      <img id="hook-logo" src="assets/images/myb-logo.png" alt="MYB" />
+      <h1 id="hook-headline">Gérez votre copropriété.</h1>
+      <p id="hook-sub">MYB Platform</p>
     </div>
 
-    <script>
-      window.__timelines = window.__timelines || {};
-      const tl = gsap.timeline({ paused: true });
+    <!-- ══ S2: Dashboard (2.5-6.5s) ══ -->
+    <div id="s-dash" class="clip" data-start="2.5" data-duration="4" data-track-index="1">
+      <img id="img-dash" class="scene-img" src="assets/screenshots/syndic_01_dashboard.jpg" alt="Dashboard Syndic" style="opacity:0;" />
+      <div id="lbl-dash" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Dashboard Syndic</span>
+        <span class="scene-label-badge">Vue d'ensemble</span>
+      </div>
+    </div>
 
-      // Scene 1: Hook (0-2.5s)
-      tl.to("#hook-logo",     { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.1);
-      tl.fromTo("#hook-headline", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.25);
-      tl.to("#hook-sub",      { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.65);
+    <!-- ══ S3: Relances & Paiements (6.5-10.5s) ══ -->
+    <div id="s-relances" class="clip" data-start="6.5" data-duration="4" data-track-index="2">
+      <img id="img-relances" class="scene-img" src="assets/screenshots/syndic_02_relances.jpg" alt="Relances" style="opacity:0;" />
+      <div id="lbl-relances" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Relances & Paiements</span>
+        <span class="scene-label-badge">Recouvrement automatisé</span>
+      </div>
+    </div>
 
-      // Scene 2: Relances (2.5-7s)
-      const S2 = 2.5;
-      tl.to("#stats-row",     { opacity: 1, duration: 0.5 }, S2 + 0.3);
-      tl.to("#relance-table", { opacity: 1, duration: 0.3 }, S2 + 0.6);
-      tl.fromTo("#row1", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S2 + 0.5);
-      tl.fromTo("#row2", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S2 + 0.9);
-      tl.fromTo("#row3", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S2 + 1.3);
-      tl.fromTo("#row4", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S2 + 1.7);
+    <!-- ══ S4: Rapprochement + Trésorerie (10.5-14.5s) ══ -->
+    <div id="s-rapproch" class="clip" data-start="10.5" data-duration="4" data-track-index="3">
+      <img id="img-rapproch" class="scene-img" src="assets/screenshots/syndic_05_bank_reconciliation.jpg" alt="Rapprochement bancaire" style="opacity:0;" />
+      <div id="lbl-rapproch" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Rapprochement Bancaire</span>
+        <span class="scene-label-badge">Comptabilité en temps réel</span>
+      </div>
+    </div>
 
-      // Scene 3: Rapprochement bancaire (7-11.5s)
-      const S3 = 7;
-      tl.fromTo("#bank-summary",  { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, S3 + 0.3);
-      tl.fromTo("#rapproch-panel",{ opacity: 0, x:  20 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, S3 + 0.5);
-      tl.fromTo("#rr1", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, S3 + 0.8);
-      tl.fromTo("#rr2", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, S3 + 1.1);
-      tl.fromTo("#rr3", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, S3 + 1.4);
-      tl.fromTo("#rr4", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, S3 + 1.7);
+    <!-- ══ S5: Appels de fonds (14.5-18.5s) ══ -->
+    <div id="s-fonds" class="clip" data-start="14.5" data-duration="4" data-track-index="4">
+      <img id="img-fonds" class="scene-img" src="assets/screenshots/syndic_04_fund_calls.jpg" alt="Appels de fonds" style="opacity:0;" />
+      <div id="lbl-fonds" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Appels de Fonds</span>
+        <span class="scene-label-badge">Suivi par lot</span>
+      </div>
+    </div>
 
-      // Scene 4: Communication (11.5-15.5s)
-      const S4 = 11.5;
-      tl.fromTo("#thread1", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S4 + 0.3);
-      tl.fromTo("#thread2", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S4 + 0.55);
-      tl.fromTo("#thread3", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S4 + 0.80);
-      tl.fromTo("#thread4", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, S4 + 1.05);
-      tl.fromTo("#comm-detail", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, S4 + 0.6);
+    <!-- ══ S6: Budget & Charges (18.5-22.5s) ══ -->
+    <div id="s-budget" class="clip" data-start="18.5" data-duration="4" data-track-index="5">
+      <img id="img-budget" class="scene-img" src="assets/screenshots/syndic_07_budgets.jpg" alt="Budget" style="opacity:0;" />
+      <div id="lbl-budget" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Budget & Charges</span>
+        <span class="scene-label-badge">Exercice 2026</span>
+      </div>
+    </div>
 
-      // Scene 5: Interventions (15.5-20s)
-      const S5 = 15.5;
-      tl.to("#interv-grid", { opacity: 1, duration: 0.3 }, S5 + 0.2);
-      tl.fromTo("#ic1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, S5 + 0.3);
-      tl.fromTo("#ic2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, S5 + 0.5);
-      tl.fromTo("#ic3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, S5 + 0.7);
-      tl.fromTo("#ic4", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, S5 + 0.9);
+    <!-- ══ S7: Signalements & Maintenance (22.5-26.5s) ══ -->
+    <div id="s-signal" class="clip" data-start="22.5" data-duration="4" data-track-index="6">
+      <img id="img-signal" class="scene-img" src="assets/screenshots/syndic_09_signalements.jpg" alt="Signalements" style="opacity:0;" />
+      <div id="lbl-signal" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Signalements</span>
+        <span class="scene-label-badge">Traitement prioritaire</span>
+      </div>
+    </div>
 
-      // Scene 6: Outro (20-25s)
-      const S6 = 20;
-      tl.fromTo("#outro-logo",  { opacity: 0, scale: 0.82 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, S6 + 0.4);
-      tl.fromTo("#outro-title", { opacity: 0, y: 12 },       { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" },       S6 + 0.85);
-      tl.fromTo("#outro-sub",   { opacity: 0 },              { opacity: 1, duration: 0.4, ease: "power2.out" },               S6 + 1.3);
-      tl.fromTo("#outro-tag",   { opacity: 0 },              { opacity: 1, duration: 0.4, ease: "power2.out" },               S6 + 1.75);
-      tl.to("#root", { opacity: 0, duration: 0.7, ease: "power1.in" }, 24.3);
+    <!-- ══ S8: Assemblée Générale (26.5-30.5s) ══ -->
+    <div id="s-ag" class="clip" data-start="26.5" data-duration="4" data-track-index="7">
+      <img id="img-ag" class="scene-img" src="assets/screenshots/syndic_08_general_assembly.jpg" alt="Assemblée Générale" style="opacity:0;" />
+      <div id="lbl-ag" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Assemblée Générale</span>
+        <span class="scene-label-badge">Convocation & votes</span>
+      </div>
+    </div>
 
-      window.__timelines["main"] = tl;
-      tl.seek(0);
-    </script>
+    <!-- ══ S9: Communication (30.5-34s) ══ -->
+    <div id="s-comm" class="clip" data-start="30.5" data-duration="3.5" data-track-index="8">
+      <img id="img-comm" class="scene-img" src="assets/screenshots/syndic_12_discussions.jpg" alt="Communication" style="opacity:0;" />
+      <div id="lbl-comm" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Communication & Discussions</span>
+        <span class="scene-label-badge">Messagerie intégrée</span>
+      </div>
+    </div>
+
+    <!-- ══ S10: Interventions (34-38s) ══ -->
+    <div id="s-interv" class="clip" data-start="34" data-duration="4" data-track-index="9">
+      <img id="img-interv" class="scene-img" src="assets/screenshots/syndic_11_interventions.jpg" alt="Interventions" style="opacity:0;" />
+      <div id="lbl-interv" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Interventions & Maintenance</span>
+        <span class="scene-label-badge">Suivi prestataires</span>
+      </div>
+    </div>
+
+    <!-- ══ S11: Gestion des lots (38-42s) ══ -->
+    <div id="s-lots" class="clip" data-start="38" data-duration="4" data-track-index="9">
+      <img id="img-lots" class="scene-img" src="assets/screenshots/syndic_13_units.jpg" alt="Lots" style="opacity:0;" />
+      <div id="lbl-lots" class="scene-label" style="opacity:0;">
+        <span class="scene-label-title">Gestion des Lots</span>
+        <span class="scene-label-badge">100 lots · 10 000 tantièmes</span>
+      </div>
+    </div>
+
+    <!-- ══ S12: Outro (42-46s) ══ -->
+    <div id="scene-outro" class="clip" data-start="42" data-duration="4" data-track-index="10">
+      <div class="grad-bg"></div>
+      <img id="outro-logo" src="assets/images/myb-logo.png" alt="MYB" />
+      <h2 id="outro-title">MYB Platform</h2>
+      <p id="outro-sub">Plateforme d'Administration</p>
+      <p id="outro-tag">En production.</p>
+    </div>
+
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+
+    // S1 Hook
+    tl.to("#hook-logo",    { opacity:1, duration:0.4, ease:"power2.out" }, 0.1);
+    tl.fromTo("#hook-headline", {opacity:0,y:18},{opacity:1,y:0,duration:0.5,ease:"power3.out"}, 0.25);
+    tl.to("#hook-sub",     { opacity:1, duration:0.4, ease:"power2.out" }, 0.65);
+
+    // S2 Dashboard
+    tl.fromTo("#img-dash",  {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.6,ease:"power2.out"}, 2.7);
+    tl.to("#lbl-dash",  { opacity:1, duration:0.4 }, 3.2);
+
+    // S3 Relances
+    tl.fromTo("#img-relances", {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.5,ease:"power2.out"}, 6.7);
+    tl.to("#lbl-relances", { opacity:1, duration:0.4 }, 7.2);
+
+    // S4 Rapprochement
+    tl.fromTo("#img-rapproch", {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.5,ease:"power2.out"}, 10.7);
+    tl.to("#lbl-rapproch", { opacity:1, duration:0.4 }, 11.2);
+
+    // S5 Appels de fonds
+    tl.fromTo("#img-fonds", {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.5,ease:"power2.out"}, 14.7);
+    tl.to("#lbl-fonds", { opacity:1, duration:0.4 }, 15.2);
+
+    // S6 Budget
+    tl.fromTo("#img-budget", {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.5,ease:"power2.out"}, 18.7);
+    tl.to("#lbl-budget", { opacity:1, duration:0.4 }, 19.2);
+
+    // S7 Signalements
+    tl.fromTo("#img-signal", {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.5,ease:"power2.out"}, 22.7);
+    tl.to("#lbl-signal", { opacity:1, duration:0.4 }, 23.2);
+
+    // S8 AG
+    tl.fromTo("#img-ag", {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.5,ease:"power2.out"}, 26.7);
+    tl.to("#lbl-ag", { opacity:1, duration:0.4 }, 27.2);
+
+    // S9 Communication
+    tl.fromTo("#img-comm", {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.5,ease:"power2.out"}, 30.7);
+    tl.to("#lbl-comm", { opacity:1, duration:0.4 }, 31.2);
+
+    // S10 Interventions
+    tl.fromTo("#img-interv", {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.5,ease:"power2.out"}, 34.2);
+    tl.to("#lbl-interv", { opacity:1, duration:0.4 }, 34.7);
+
+    // S11 Lots
+    tl.fromTo("#img-lots", {opacity:0,scale:1.04},{opacity:1,scale:1,duration:0.5,ease:"power2.out"}, 38.2);
+    tl.to("#lbl-lots", { opacity:1, duration:0.4 }, 38.7);
+
+    // S12 Outro
+    tl.fromTo("#outro-logo", {opacity:0,scale:0.82},{opacity:1,scale:1,duration:0.5,ease:"back.out(1.4)"}, 42.4);
+    tl.fromTo("#outro-title",{opacity:0,y:12},      {opacity:1,y:0,duration:0.45,ease:"power2.out"},       42.85);
+    tl.fromTo("#outro-sub",  {opacity:0},            {opacity:1,duration:0.4,ease:"power2.out"},             43.3);
+    tl.fromTo("#outro-tag",  {opacity:0},            {opacity:1,duration:0.4,ease:"power2.out"},             43.75);
+    tl.to("#root", { opacity:0, duration:0.6, ease:"power1.in" }, 45.4);
+
+    window.__timelines["main"] = tl;
+    tl.seek(0);
+  </script>
   </body>
 </html>

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MYB Platform — Prospectus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; color: #1a202c; background: #fff; }
+
+    /* ── Layout ── */
+    .page { max-width: 820px; margin: 0 auto; padding: 0; }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #55A697 0%, #8e50a3 100%);
+      padding: 48px 56px 40px;
+      color: #fff;
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+    .logo-block { display: flex; flex-direction: column; gap: 4px; }
+    .logo-name { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
+    .logo-tag  { font-size: 12px; font-weight: 400; opacity: 0.85; letter-spacing: 0.1em; text-transform: uppercase; }
+    .badge-live { background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.35); color: #fff; font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: 20px; letter-spacing: 0.08em; }
+    .header-headline { font-size: 38px; font-weight: 700; line-height: 1.18; letter-spacing: -0.02em; margin-bottom: 14px; }
+    .header-sub { font-size: 16px; font-weight: 400; opacity: 0.90; line-height: 1.6; max-width: 560px; }
+
+    /* ── Sections ── */
+    .section { padding: 40px 56px; border-bottom: 1px solid #f0f0f0; }
+    .section:last-child { border-bottom: none; }
+    .section-label { font-size: 10px; font-weight: 700; color: #55A697; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; }
+    .section-title { font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 6px; }
+    .section-body  { font-size: 14px; color: #4b5563; line-height: 1.75; }
+
+    /* ── Value props ── */
+    .props { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+    .prop { background: #f8fafb; border-radius: 10px; padding: 18px 20px; border-left: 4px solid #55A697; }
+    .prop-icon { font-size: 22px; margin-bottom: 8px; }
+    .prop-title { font-size: 14px; font-weight: 700; color: #1a202c; margin-bottom: 4px; }
+    .prop-body  { font-size: 13px; color: #6b7280; line-height: 1.55; }
+
+    /* ── Modules grid ── */
+    .modules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+    .mod { background: #f8fafb; border-radius: 8px; padding: 14px 16px; }
+    .mod-icon  { font-size: 18px; margin-bottom: 6px; }
+    .mod-title { font-size: 13px; font-weight: 600; color: #1a202c; }
+    .mod-desc  { font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.45; }
+
+    /* ── Stats bar ── */
+    .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 20px; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+    .stat { padding: 20px 16px; text-align: center; border-right: 1px solid #e5e7eb; }
+    .stat:last-child { border-right: none; }
+    .stat-val  { font-size: 26px; font-weight: 700; color: #55A697; }
+    .stat-label{ font-size: 11px; color: #6b7280; margin-top: 3px; }
+
+    /* ── Roles ── */
+    .roles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 20px; }
+    .role { border-radius: 10px; padding: 20px 18px; }
+    .role-syndic  { background: #eff6ff; border-left: 4px solid #1e40af; }
+    .role-owner   { background: #ecfdf5; border-left: 4px solid #0891b2; }
+    .role-council { background: #faf5ff; border-left: 4px solid #6366f1; }
+    .role-title { font-size: 13px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
+    .role-list  { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .role-list li { font-size: 12px; color: #4b5563; display: flex; align-items: flex-start; gap: 6px; }
+    .role-list li::before { content: "✓"; color: #55A697; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Tech stack ── */
+    .stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .chip { background: #f3f4f6; color: #374151; font-size: 12px; font-weight: 500; padding: 4px 14px; border-radius: 20px; }
+    .chip.teal   { background: #d1fae5; color: #065f46; }
+    .chip.blue   { background: #dbeafe; color: #1d4ed8; }
+    .chip.purple { background: #f3e8ff; color: #7c3aed; }
+
+    /* ── CTA ── */
+    .cta-block {
+      background: linear-gradient(135deg, #55A697 0%, #8e50a3 100%);
+      padding: 40px 56px;
+      color: #fff;
+      text-align: center;
+    }
+    .cta-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+    .cta-sub   { font-size: 14px; opacity: 0.90; margin-bottom: 24px; }
+    .cta-contact { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
+    .contact-item { font-size: 13px; opacity: 0.95; display: flex; align-items: center; gap: 7px; }
+
+    /* ── Footer ── */
+    .footer { padding: 20px 56px; background: #1e2a38; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; }
+    .footer-name  { font-size: 13px; font-weight: 700; color: #fff; }
+    .footer-legal { font-size: 11px; color: rgba(255,255,255,0.55); }
+
+    /* ── Print ── */
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .header, .cta-block { -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-block">
+        <div class="logo-name">MYB Platform</div>
+        <div class="logo-tag">Gestion de copropriété</div>
+      </div>
+      <div class="badge-live">En production</div>
+    </div>
+    <div class="header-headline">La plateforme numérique<br>de votre copropriété.</div>
+    <div class="header-sub">MYB centralise la gestion syndic, la comptabilité, la communication et les interventions — dans un seul outil, accessible partout, pour tous les acteurs de la copropriété.</div>
+  </div>
+
+  <!-- Chiffres clés -->
+  <div class="section" style="padding-bottom:32px;">
+    <div class="section-label">En quelques chiffres</div>
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-val">100%</div><div class="stat-label">Fonctionnel en production</div></div>
+      <div class="stat"><div class="stat-val">12+</div><div class="stat-label">Modules métier intégrés</div></div>
+      <div class="stat"><div class="stat-val">3</div><div class="stat-label">Espaces rôles distincts</div></div>
+      <div class="stat"><div class="stat-val">0</div><div class="stat-label">Dépendance papier</div></div>
+    </div>
+  </div>
+
+  <!-- Pourquoi MYB -->
+  <div class="section">
+    <div class="section-label">Pourquoi MYB</div>
+    <div class="section-title">Pensé pour les syndics modernes</div>
+    <div class="section-body">La gestion d'une copropriété repose encore trop souvent sur des tableurs, des échanges de mails non structurés et un suivi manuel des impayés. MYB remplace tout cela par une plateforme unifiée, en temps réel, accessible depuis n'importe quel appareil.</div>
+    <div class="props">
+      <div class="prop">
+        <div class="prop-icon">💰</div>
+        <div class="prop-title">Recouvrement automatisé</div>
+        <div class="prop-body">Relances multi-niveaux, suivi des impayés en temps réel et appels de fonds dématérialisés. Zéro relance manuelle.</div>
+      </div>
+      <div class="prop">
+        <div class="prop-icon">🏦</div>
+        <div class="prop-title">Comptabilité intégrée</div>
+        <div class="prop-body">Rapprochement bancaire, suivi de trésorerie, budget prévisionnel et factures — tout dans un seul écran.</div>
+      </div>
+      <div class="prop">
+        <div class="prop-icon">💬</div>
+        <div class="prop-title">Communication centralisée</div>
+        <div class="prop-body">Messagerie directe syndic ↔ copropriétaires, gestion des signalements et suivi des interventions en un seul espace.</div>
+      </div>
+      <div class="prop">
+        <div class="prop-icon">🗳</div>
+        <div class="prop-title">Assemblées générales</div>
+        <div class="prop-body">Convocation, gestion des pouvoirs, suivi du quorum et archivage des résolutions — dématérialisés de bout en bout.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Espaces rôles -->
+  <div class="section">
+    <div class="section-label">Accès rôles</div>
+    <div class="section-title">Un espace dédié à chaque acteur</div>
+    <div class="section-body">MYB s'adapte au profil de chaque utilisateur. Chacun accède uniquement aux fonctionnalités dont il a besoin.</div>
+    <div class="roles">
+      <div class="role role-syndic">
+        <div class="role-title">🏢 Espace Syndic</div>
+        <ul class="role-list">
+          <li>Tableau de bord global</li>
+          <li>Relances & recouvrement</li>
+          <li>Appels de fonds</li>
+          <li>Rapprochement bancaire</li>
+          <li>Trésorerie & budget</li>
+          <li>Gestion des interventions</li>
+          <li>AG dématérialisée</li>
+          <li>Gestion des lots</li>
+        </ul>
+      </div>
+      <div class="role role-owner">
+        <div class="role-title">👤 Espace Copropriétaire</div>
+        <ul class="role-list">
+          <li>Suivi de mes charges</li>
+          <li>Consultation des documents</li>
+          <li>Signalements & suivi</li>
+          <li>Messagerie syndic</li>
+          <li>Historique des paiements</li>
+          <li>Votes AG en ligne</li>
+        </ul>
+      </div>
+      <div class="role role-council">
+        <div class="role-title">⚖️ Conseil Syndical</div>
+        <ul class="role-list">
+          <li>Consultation comptable</li>
+          <li>Validation budgets</li>
+          <li>Rapport de gestion</li>
+          <li>Suivi des résolutions AG</li>
+          <li>Accès documents légaux</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modules -->
+  <div class="section">
+    <div class="section-label">Modules disponibles</div>
+    <div class="section-title">12 modules, une plateforme</div>
+    <div class="modules">
+      <div class="mod"><div class="mod-icon">📊</div><div class="mod-title">Dashboard</div><div class="mod-desc">Vue d'ensemble : KPIs, échéances, alertes</div></div>
+      <div class="mod"><div class="mod-icon">💰</div><div class="mod-title">Relances & Paiements</div><div class="mod-desc">Impayés, relances automatiques, recouvrement</div></div>
+      <div class="mod"><div class="mod-icon">📋</div><div class="mod-title">Appels de fonds</div><div class="mod-desc">Émission, suivi et encaissement par lot</div></div>
+      <div class="mod"><div class="mod-icon">🏦</div><div class="mod-title">Rapprochement bancaire</div><div class="mod-desc">Lettrage automatique, contrôle d'écarts</div></div>
+      <div class="mod"><div class="mod-icon">💼</div><div class="mod-title">Budget & Trésorerie</div><div class="mod-desc">Prévisionnel, réalisé, mouvements de fonds</div></div>
+      <div class="mod"><div class="mod-icon">🗳</div><div class="mod-title">Assemblée Générale</div><div class="mod-desc">Convocation, quorum, résolutions, PV</div></div>
+      <div class="mod"><div class="mod-icon">🔔</div><div class="mod-title">Signalements</div><div class="mod-desc">Tickets copropriétaires, suivi et clôture</div></div>
+      <div class="mod"><div class="mod-icon">🔧</div><div class="mod-title">Interventions</div><div class="mod-desc">Prestataires, avancement, validation</div></div>
+      <div class="mod"><div class="mod-icon">💬</div><div class="mod-title">Communication</div><div class="mod-desc">Messagerie directe syndic ↔ copropriétaire</div></div>
+      <div class="mod"><div class="mod-icon">💧</div><div class="mod-title">Gestion de l'eau</div><div class="mod-desc">Relevés de compteurs, consommations, alertes</div></div>
+      <div class="mod"><div class="mod-icon">🏠</div><div class="mod-title">Gestion des lots</div><div class="mod-desc">Propriétaires, locataires, tantièmes, surfaces</div></div>
+      <div class="mod"><div class="mod-icon">📂</div><div class="mod-title">Documents & Rapports</div><div class="mod-desc">Archivage, partage sécurisé, rapports légaux</div></div>
+    </div>
+  </div>
+
+  <!-- Stack technique -->
+  <div class="section">
+    <div class="section-label">Technologie</div>
+    <div class="section-title">Une architecture robuste et sécurisée</div>
+    <div class="section-body">MYB est construit sur un stack moderne, conçu pour la montée en charge et la sécurité des données — hébergeable on-premise ou en cloud privé selon vos contraintes.</div>
+    <div class="stack">
+      <span class="chip teal">Angular 17</span>
+      <span class="chip blue">.NET / C#</span>
+      <span class="chip purple">Keycloak (SSO)</span>
+      <span class="chip blue">PostgreSQL</span>
+      <span class="chip">Docker</span>
+      <span class="chip">API REST sécurisée</span>
+      <span class="chip">Authentification multi-rôles</span>
+      <span class="chip teal">Temps réel</span>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <div class="cta-title">Découvrez MYB en démonstration</div>
+    <div class="cta-sub">Nous organisons des démos personnalisées adaptées à votre contexte et à la taille de votre parc immobilier.</div>
+    <div class="cta-contact">
+      <div class="contact-item">✉️ haithem.khalifa@forlink-group.com</div>
+      <div class="contact-item">🌐 MYB Platform</div>
+      <div class="contact-item">📍 Tunisie</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-inner">
+      <div class="footer-name">MYB Platform — Forlink Group</div>
+      <div class="footer-legal">Document confidentiel · Octobre 2026</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

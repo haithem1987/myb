@@ -52,29 +52,45 @@ The convenience methods (`showSuccess`, `showError`, `showInfo`) were added — 
 
 ---
 
-## Full local dev startup sequence
+## Full local dev startup sequence — use the script
+
+`scripts/start-local.ps1` handles everything: branch checkout, clean build, Keycloak reset, full docker-compose stack, redirect URI patch, optional seed.
 
 ```powershell
-# 1. Start PostgreSQL for payment service (if not already running)
-docker run -d --name myb-payment-pg -e POSTGRES_PASSWORD=payment-pwd -e POSTGRES_DB=paymentDB -p 5432:5432 postgres:16.2
+# Normal start (stay on current branch, reuse last build)
+.\scripts\start-local.ps1 -SkipBuild
 
-# 2. Start Keycloak (from MAIN REPO directory)
-docker-compose -f C:\DEV\REPOS\myb\docker-compose.yml up keycloak keycloak-db -d
+# Clean start on a branch (build fronts, keep Keycloak data)
+.\scripts\start-local.ps1 -Branch feature/my-branch
 
-# 3. Start the payment service (applies migrations automatically)
-cd src/services/payment-service/Myb.Payment
-dotnet run
+# Full reset: clean Keycloak + build + seed demo data
+.\scripts\start-local.ps1 -Branch main -CleanKeycloak -Seed
 
-# 4. Install frontend deps (once)
+# After stack is up, start Angular dev server on port 4300
+cd src/front/myb.front
+npx nx serve admin --port 4300
+# Then open http://localhost:4300
+```
+
+### Manual sequence (if script won't run)
+
+```powershell
+# 1. Stop old containers
+docker compose -f docker-compose.yml -f docker-compose.local.yml down
+
+# 2. Build front
 cd src/front/myb.front
 npm install --legacy-peer-deps
+npx nx build admin --configuration=pushdev --output-path=dist/local/admin
+npx nx build client --configuration=pushdev --output-path=dist/local/client
 
-# 5. Start Angular dev server on port 4300 (4200 is taken by nginx docker)
+# 3. Start full stack
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
+
+# 4. Patch Keycloak redirect URI (see §4 above)
+
+# 5. Start Angular dev server on port 4300
 npx nx serve admin --port 4300
-
-# 6. If this is the first run on a new port, add redirect URI to Keycloak (see §4 above)
-
-# 7. Open http://localhost:4300 and log in
 ```
 
 ## Validating API endpoints without login

@@ -11,8 +11,9 @@
           <i class="bi bi-x me-2"></i>
           {{ 'common.cancel' | translate }}
         </button>
-        <button 
-          class="btn btn-primary" 
+        <button
+          class="btn btn-primary"
+          data-cy="submit-coproperty"
           (click)="saveCoproperty()"
           [disabled]="saving() || !copropertyForm.valid"
         >
@@ -68,9 +69,10 @@
                   {{ 'coproperty.form.nameLabel' | translate }}
                   <span class="text-danger">*</span>
                 </label>
-                <input 
-                  type="text" 
-                  class="form-control" 
+                <input
+                  type="text"
+                  class="form-control"
+                  data-cy="coproperty-name"
                   formControlName="name"
                   [placeholder]="'coproperty.form.namePlaceholder' | translate"
                   [class.is-invalid]="copropertyForm.get('name')?.invalid && copropertyForm.get('name')?.touched"
@@ -94,9 +96,10 @@
                   {{ 'coproperty.form.addressLabel' | translate }}
                   <span class="text-danger">*</span>
                 </label>
-                <input 
-                  type="text" 
-                  class="form-control" 
+                <input
+                  type="text"
+                  class="form-control"
+                  data-cy="coproperty-address"
                   formControlName="address"
                   [placeholder]="'coproperty.form.addressPlaceholder' | translate"
                   [class.is-invalid]="copropertyForm.get('address')?.invalid && copropertyForm.get('address')?.touched"
@@ -182,9 +185,10 @@
                   {{ 'coproperty.form.totalSharesLabel' | translate }}
                   <span class="text-danger">*</span>
                 </label>
-                <input 
-                  type="number" 
-                  class="form-control" 
+                <input
+                  type="number"
+                  class="form-control"
+                  data-cy="coproperty-total-shares"
                   formControlName="totalShares"
                   min="1"
                   [class.is-invalid]="copropertyForm.get('totalShares')?.invalid && copropertyForm.get('totalShares')?.touched"

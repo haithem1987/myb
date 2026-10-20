@@ -1,0 +1,16 @@
+{
+  "syndic_a": { "email": "syn-a@test.com", "password": "Test1234!" },
+  "syndic_b": { "email": "syn-b@test.com", "password": "Test1234!" },
+  "copro_a": { "id": "copro-a-id", "name": "COPRO-A" },
+  "copro_b": { "id": "copro-b-id", "name": "COPRO-B" },
+  "folder_a": { "id": 1, "name": "Dossier Administratif", "coproId": "copro-a-id" },
+  "folder_b": { "id": 2, "name": "Dossier Comptabilité", "coproId": "copro-b-id" },
+  "document_a": {
+    "id": 1,
+    "name": "Contrat-2024.pdf",
+    "documentType": "CONTRACT",
+    "documentStatus": "ACTIVE",
+    "folderId": 1,
+    "size": 12345
+  }
+}

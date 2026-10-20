@@ -1,0 +1,17 @@
+{
+  "name": "coproperty-module",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/coproperty-module/src",
+  "prefix": "myb-front",
+  "tags": [],
+  "projectType": "library",
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/coproperty-module/jest.config.ts"
+      }
+    }
+  }
+}

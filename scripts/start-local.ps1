@@ -97,7 +97,9 @@ if (-not $SkipBuild) {
 
 # ── 5. Start stack ────────────────────────────────────────────────────────────
 Step "Docker — démarrage du stack complet"
-docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
+# myb-front (docker-compose.yml) is replaced by myb-client-local/myb-admin-local in docker-compose.local.yml
+# and its Dockerfile requires a nginx.conf that only exists in a production build context.
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --scale myb-front=0
 OK "Stack démarré"
 
 # ── 6. Wait for Keycloak ──────────────────────────────────────────────────────

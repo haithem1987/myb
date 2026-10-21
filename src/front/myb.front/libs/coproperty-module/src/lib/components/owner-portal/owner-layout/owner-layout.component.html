@@ -56,6 +56,11 @@
           <span>{{ 'ownerPortal.navigation.interventions' | translate }}</span>
         </a>
 
+        <a [routerLink]="ownerRoute('general-assembly')" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-people-fill"></i>
+          <span>Assemblées Générales</span>
+        </a>
+
         <a [routerLink]="ownerRoute('discussions')" routerLinkActive="active" class="nav-link">
           <i class="bi bi-chat-square-text"></i>
           <span>{{ 'ownerPortal.navigation.discussions' | translate }}</span>
@@ -150,6 +155,11 @@
     <a [routerLink]="ownerRoute('interventions')" routerLinkActive="active" class="nav-link" (click)="toggleMobileMenu()">
       <i class="bi bi-wrench-adjustable"></i>
       <span>{{ 'ownerPortal.navigation.interventions' | translate }}</span>
+    </a>
+
+    <a [routerLink]="ownerRoute('general-assembly')" routerLinkActive="active" class="nav-link" (click)="toggleMobileMenu()">
+      <i class="bi bi-people-fill"></i>
+      <span>Assemblées Générales</span>
     </a>
 
     <a [routerLink]="ownerRoute('discussions')" routerLinkActive="active" class="nav-link" (click)="toggleMobileMenu()">

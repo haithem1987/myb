@@ -7,7 +7,6 @@ import { AssemblyService, CopropertyService } from '@myb-front/coproperty-module
 import { KeycloakService } from '@myb-front/auth';
 import { Assembly, AssemblyType, AssemblyStatus, CreateAssemblyInput, Coproperty } from '@myb-front/coproperty-module';
 import { ActiveCopropertyService } from '../../services/active-coproperty.service';
-
 import { currentIntlLocale } from 'libs/shared/infra/services/language.service';
 interface GeneralAssembly {
   id: string;
@@ -30,606 +29,568 @@ interface GeneralAssembly {
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
   template: `
-    <div class="container-fluid py-4">
-      <!-- Header -->
-      <div class="row mb-4">
-        <div class="col-md-8">
-          <h2 class="mb-1">
-            <i class="bi bi-people-fill me-2"></i>
-            Assemblées Générales
-          </h2>
-          <p class="text-muted">Gestion des AG et convocations</p>
+    <div class="ag-page">
+      <!-- Page Header -->
+      <div class="ag-page-header">
+        <div class="ag-page-header-left">
+          <div class="ag-page-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div>
+            <h1 class="ag-page-title">Assemblées Générales</h1>
+            <p class="ag-page-subtitle">Planification, convocations et suivi des AG</p>
+          </div>
         </div>
-        <div class="col-md-4 text-end">
-          <button 
-            class="btn btn-primary" 
-            (click)="createAssembly()"
-            [disabled]="!copropertyId || !isSelectedCopropertyActive()">
-            <i class="bi bi-plus-lg me-2"></i>
-            Nouvelle AG
-          </button>
-          <small class="d-block text-danger mt-1" *ngIf="!copropertyId">
-            Veuillez sélectionner une copropriété
-          </small>
+        <button
+          class="btn-ag-new"
+          (click)="createAssembly()"
+          [disabled]="!copropertyId || !isSelectedCopropertyActive()">
+          <i class="bi bi-plus-lg"></i>
+          Nouvelle AG
+        </button>
+      </div>
+
+      <!-- Statistics -->
+      <div class="ag-stats">
+        <div class="ag-stat-card ag-stat-primary">
+          <i class="bi bi-calendar-event ag-stat-icon"></i>
+          <div class="ag-stat-value">{{ stats().upcoming }}</div>
+          <div class="ag-stat-label">À venir</div>
+        </div>
+        <div class="ag-stat-card ag-stat-success">
+          <i class="bi bi-check-circle ag-stat-icon"></i>
+          <div class="ag-stat-value">{{ stats().held }}</div>
+          <div class="ag-stat-label">Réalisées</div>
+        </div>
+        <div class="ag-stat-card ag-stat-warning">
+          <i class="bi bi-file-earmark-check ag-stat-icon"></i>
+          <div class="ag-stat-value">{{ stats().resolutions }}</div>
+          <div class="ag-stat-label">Résolutions</div>
+        </div>
+        <div class="ag-stat-card ag-stat-info">
+          <i class="bi bi-person-check ag-stat-icon"></i>
+          <div class="ag-stat-value">{{ stats().avgAttendance }}%</div>
+          <div class="ag-stat-label">Taux présence</div>
         </div>
       </div>
 
       <!-- Create/Edit Form -->
-      <div class="row mb-4" *ngIf="showForm()">
-        <div class="col-12">
-          <!-- Warning si pas de coproperty -->
-          <div class="alert alert-danger mb-3" *ngIf="!copropertyId">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            <strong>Erreur:</strong> Aucune copropriété sélectionnée. Veuillez sélectionner une copropriété d'abord.
-          </div>
-
-          <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-              <h5 class="mb-0">
-                <i class="bi me-2" [ngClass]="isEditing() ? 'bi-pencil' : 'bi-plus-circle'"></i>
-                {{ isEditing() ? 'Modifier l\'Assemblée Générale' : 'Nouvelle Assemblée Générale' }}
-              </h5>
-            </div>
-            <div class="card-body">
-              <form [formGroup]="assemblyForm" (ngSubmit)="saveAssembly()">
-                <div class="row">
-                  <!-- Title -->
-                  <div class="col-md-8 mb-3">
-                    <label for="title" class="form-label">
-                      Titre de l'AG <span class="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="title"
-                      formControlName="title"
-                      placeholder="Ex: Assemblée Générale Ordinaire 2026"
-                      [class.is-invalid]="assemblyForm.get('title')?.invalid && assemblyForm.get('title')?.touched"
-                    />
-                    <div class="invalid-feedback">
-                      Le titre est requis (minimum 3 caractères)
-                    </div>
-                  </div>
-
-                  <!-- Type -->
-                  <div class="col-md-4 mb-3">
-                    <label for="assemblyType" class="form-label">
-                      Type <span class="text-danger">*</span>
-                    </label>
-                    <select class="form-select" id="assemblyType" formControlName="assemblyType">
-                      <option value="Ordinary">AG Ordinaire</option>
-                      <option value="Extraordinary">AG Extraordinaire</option>
-                    </select>
-                  </div>
-
-                  <!-- Date -->
-                  <div class="col-md-4 mb-3">
-                    <label for="meetingDate" class="form-label">
-                      Date <span class="text-danger">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      class="form-control"
-                      id="meetingDate"
-                      formControlName="meetingDate"
-                      [class.is-invalid]="assemblyForm.get('meetingDate')?.invalid && assemblyForm.get('meetingDate')?.touched"
-                    />
-                    <div class="invalid-feedback">
-                      La date est requise
-                    </div>
-                  </div>
-
-                  <!-- Time -->
-                  <div class="col-md-4 mb-3">
-                    <label for="meetingTime" class="form-label">
-                      Heure <span class="text-danger">*</span>
-                    </label>
-                    <input
-                      type="time"
-                      class="form-control"
-                      id="meetingTime"
-                      formControlName="meetingTime"
-                      [class.is-invalid]="assemblyForm.get('meetingTime')?.invalid && assemblyForm.get('meetingTime')?.touched"
-                    />
-                    <div class="invalid-feedback">
-                      L'heure est requise
-                    </div>
-                  </div>
-
-                  <!-- Location -->
-                  <div class="col-md-4 mb-3">
-                    <label for="location" class="form-label">
-                      Lieu <span class="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="location"
-                      formControlName="location"
-                      placeholder="Ex: Salle polyvalente"
-                      [class.is-invalid]="assemblyForm.get('location')?.invalid && assemblyForm.get('location')?.touched"
-                    />
-                    <div class="invalid-feedback">
-                      Le lieu est requis
-                    </div>
-                  </div>
-
-                  <!-- Agenda -->
-                  <div class="col-12 mb-3">
-                    <label for="agenda" class="form-label">
-                      Ordre du jour
-                    </label>
-                    <textarea
-                      class="form-control"
-                      id="agenda"
-                      formControlName="agenda"
-                      rows="4"
-                      placeholder="Détails de l'ordre du jour..."
-                    ></textarea>
-                  </div>
-                </div>
-
-                <!-- Validation Errors -->
-                <div *ngIf="assemblyForm.invalid && assemblyForm.dirty" class="alert alert-warning mb-3">
-                  <i class="bi bi-exclamation-triangle me-2"></i>
-                  <strong>Veuillez remplir tous les champs requis :</strong>
-                  <ul class="mb-0 mt-2 ms-3">
-                    <li *ngIf="assemblyForm.get('title')?.invalid && assemblyForm.get('title')?.touched">
-                      Titre requis (minimum 3 caractères)
-                    </li>
-                    <li *ngIf="assemblyForm.get('meetingDate')?.invalid && assemblyForm.get('meetingDate')?.touched">
-                      Date requise
-                    </li>
-                    <li *ngIf="assemblyForm.get('meetingTime')?.invalid && assemblyForm.get('meetingTime')?.touched">
-                      Heure requise
-                    </li>
-                    <li *ngIf="assemblyForm.get('location')?.invalid && assemblyForm.get('location')?.touched">
-                      Lieu requis
-                    </li>
-                    <li *ngIf="assemblyForm.get('assemblyType')?.invalid">
-                      Type d'assemblée requis
-                    </li>
-                  </ul>
-                </div>
-
-                <!-- Actions -->
-                <div class="d-flex gap-2">
-                  <button 
-                    type="submit" 
-                    class="btn btn-success" 
-                    [disabled]="assemblyForm.invalid || loading() || !copropertyId || !isSelectedCopropertyActive()">
-                    <i class="bi bi-{{ loading() ? 'hourglass-split' : 'save' }} me-1"></i>
-                    {{ isEditing() ? 'Modifier' : 'Créer' }}
-                  </button>
-                  <button type="button" class="btn btn-secondary" (click)="cancelForm()" [disabled]="loading()">
-                    <i class="bi bi-x me-1"></i>
-                    Annuler
-                  </button>
-                  <button type="button" class="btn btn-info btn-sm" (click)="debugForm()">
-                    <i class="bi bi-bug me-1"></i>
-                    Debug
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+      <div class="ag-form-panel" *ngIf="showForm()">
+        <div class="ag-form-header">
+          <i class="bi" [ngClass]="isEditing() ? 'bi-pencil-square' : 'bi-calendar-plus'"></i>
+          {{ isEditing() ? 'Modifier l\'Assemblée Générale' : 'Nouvelle Assemblée Générale' }}
+          <button type="button" class="ag-form-close" (click)="cancelForm()" [disabled]="loading()">
+            <i class="bi bi-x-lg"></i>
+          </button>
         </div>
-      </div>
+        <div class="ag-form-body">
+          <form [formGroup]="assemblyForm" (ngSubmit)="saveAssembly()">
+            <div class="ag-form-grid">
+              <div class="ag-form-field ag-field-wide">
+                <label for="title">Titre <span class="required">*</span></label>
+                <input type="text" id="title" formControlName="title"
+                  placeholder="Ex: Assemblée Générale Ordinaire 2026"
+                  [class.is-invalid]="assemblyForm.get('title')?.invalid && assemblyForm.get('title')?.touched"/>
+                <div class="invalid-feedback">Titre requis (min. 3 caractères)</div>
+              </div>
 
-      <!-- Statistics -->
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon bg-primary">
-              <i class="bi bi-calendar-event"></i>
+              <div class="ag-form-field">
+                <label for="assemblyType">Type <span class="required">*</span></label>
+                <select id="assemblyType" formControlName="assemblyType">
+                  <option value="Ordinary">AG Ordinaire</option>
+                  <option value="Extraordinary">AG Extraordinaire</option>
+                </select>
+              </div>
+
+              <div class="ag-form-field">
+                <label for="meetingDate">Date <span class="required">*</span></label>
+                <input type="date" id="meetingDate" formControlName="meetingDate"
+                  [class.is-invalid]="assemblyForm.get('meetingDate')?.invalid && assemblyForm.get('meetingDate')?.touched"/>
+                <div class="invalid-feedback">Date requise</div>
+              </div>
+
+              <div class="ag-form-field">
+                <label for="meetingTime">Heure <span class="required">*</span></label>
+                <input type="time" id="meetingTime" formControlName="meetingTime"
+                  [class.is-invalid]="assemblyForm.get('meetingTime')?.invalid && assemblyForm.get('meetingTime')?.touched"/>
+                <div class="invalid-feedback">Heure requise</div>
+              </div>
+
+              <div class="ag-form-field">
+                <label for="location">Lieu <span class="required">*</span></label>
+                <input type="text" id="location" formControlName="location"
+                  placeholder="Ex: Salle polyvalente"
+                  [class.is-invalid]="assemblyForm.get('location')?.invalid && assemblyForm.get('location')?.touched"/>
+                <div class="invalid-feedback">Lieu requis</div>
+              </div>
+
+              <div class="ag-form-field ag-field-full">
+                <label for="agenda">Ordre du jour</label>
+                <textarea id="agenda" formControlName="agenda" rows="3"
+                  placeholder="Points à aborder lors de cette assemblée..."></textarea>
+              </div>
             </div>
-            <div class="stat-content">
-              <div class="stat-value">{{ stats().upcoming }}</div>
-              <div class="stat-label">AG à venir</div>
+
+            <div class="ag-form-actions">
+              <button type="submit" class="btn-ag-save"
+                [disabled]="assemblyForm.invalid || loading() || !copropertyId || !isSelectedCopropertyActive()">
+                <i class="bi" [ngClass]="loading() ? 'bi-hourglass-split' : 'bi-check-lg'"></i>
+                {{ isEditing() ? 'Enregistrer' : 'Créer l\'AG' }}
+              </button>
+              <button type="button" class="btn-ag-cancel" (click)="cancelForm()" [disabled]="loading()">
+                Annuler
+              </button>
             </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon bg-success">
-              <i class="bi bi-check-circle"></i>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value">{{ stats().held }}</div>
-              <div class="stat-label">AG réalisées</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon bg-warning">
-              <i class="bi bi-file-earmark-text"></i>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value">{{ stats().resolutions }}</div>
-              <div class="stat-label">Résolutions</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon bg-info">
-              <i class="bi bi-person-check"></i>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value">{{ stats().avgAttendance }}%</div>
-              <div class="stat-label">Taux présence</div>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
 
       <!-- Filters -->
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <select class="form-select" [(ngModel)]="selectedStatus" (change)="filterAssemblies()">
+      <div class="ag-filters">
+        <div class="ag-filter-group">
+          <i class="bi bi-funnel ag-filter-icon"></i>
+          <select [(ngModel)]="selectedStatus" (change)="filterAssemblies()">
             <option value="all">Tous les statuts</option>
             <option value="planned">Planifiées</option>
             <option value="convened">Convoquées</option>
             <option value="held">Tenues</option>
             <option value="cancelled">Annulées</option>
           </select>
-        </div>
-        <div class="col-md-3">
-          <select class="form-select" [(ngModel)]="selectedType" (change)="filterAssemblies()">
+          <select [(ngModel)]="selectedType" (change)="filterAssemblies()">
             <option value="all">Tous les types</option>
             <option value="ordinary">AG Ordinaires</option>
             <option value="extraordinary">AG Extraordinaires</option>
           </select>
-        </div>
-        <div class="col-md-3">
-          <select class="form-select" [(ngModel)]="selectedYear" (change)="filterAssemblies()">
+          <select [(ngModel)]="selectedYear" (change)="filterAssemblies()">
             <option value="2026">2026</option>
             <option value="2025">2025</option>
             <option value="2024">2024</option>
           </select>
         </div>
-        <div class="col-md-3">
-          <input 
-            type="text" 
-            class="form-control" 
-            placeholder="Rechercher..."
-            [(ngModel)]="searchTerm"
-            (input)="filterAssemblies()">
+        <div class="ag-search">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Rechercher une AG..."
+            [(ngModel)]="searchTerm" (input)="filterAssemblies()"/>
         </div>
       </div>
 
-      <!-- Assemblies List -->
-      <div class="row">
-        <!-- Empty State -->
-        <div class="col-12" *ngIf="filteredAssemblies().length === 0 && !loading()">
-          <div class="empty-state">
-            <i class="bi bi-calendar-x"></i>
-            <h4>Aucune assemblée générale</h4>
-            <p *ngIf="!copropertyId">Veuillez sélectionner une copropriété</p>
-            <p *ngIf="copropertyId">Créez votre première assemblée générale pour commencer</p>
-            <button class="btn btn-primary" *ngIf="copropertyId" (click)="createAssembly()">
-              <i class="bi bi-plus-lg me-2"></i>
-              Créer une AG
-            </button>
-          </div>
-        </div>
-
-        <!-- Loading State -->
-        <div class="col-12 text-center py-5" *ngIf="loading()">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Chargement...</span>
-          </div>
-          <p class="mt-3 text-muted">Chargement des assemblées...</p>
-        </div>
-
-        <!-- Assemblies Cards -->
-        <div class="col-12" *ngFor="let assembly of filteredAssemblies()">
-          <div class="assembly-card mb-3">
-            <div class="assembly-header">
-              <div class="assembly-info">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="assembly-type" [class.ordinary]="assembly.type === 'ordinary'" 
-                       [class.extraordinary]="assembly.type === 'extraordinary'">
-                    {{ assembly.type === 'ordinary' ? 'AG Ordinaire' : 'AG Extraordinaire' }}
-                  </div>
-                  <h5 class="mb-0">{{ assembly.title }}</h5>
-                  <span class="badge" 
-                        [class.bg-info]="assembly.status === 'planned'"
-                        [class.bg-primary]="assembly.status === 'convened'"
-                        [class.bg-success]="assembly.status === 'held'"
-                        [class.bg-secondary]="assembly.status === 'cancelled'">
-                    {{ getStatusLabel(assembly.status) }}
-                  </span>
-                </div>
-                <div class="text-muted mt-1">
-                  <i class="bi bi-building me-2"></i>{{ assembly.copropertyName }}
-                </div>
-              </div>
-              <div class="assembly-actions">
-                <button class="btn btn-sm btn-outline-primary me-2" (click)="viewAssembly(assembly.id)">
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-secondary me-2" (click)="editAssembly(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteAssembly(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="assembly-body">
-              <div class="row">
-                <div class="col-md-3">
-                  <div class="info-item">
-                    <i class="bi bi-calendar3 text-primary"></i>
-                    <div>
-                      <div class="info-label">Date</div>
-                      <div class="info-value">{{ assembly.date | date:'dd/MM/yyyy HH:mm' }}</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="info-item">
-                    <i class="bi bi-geo-alt text-danger"></i>
-                    <div>
-                      <div class="info-label">Lieu</div>
-                      <div class="info-value">{{ assembly.location }}</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="info-item">
-                    <i class="bi bi-people text-success"></i>
-                    <div>
-                      <div class="info-label">Présence</div>
-                      <div class="info-value">{{ assembly.attendees }}/{{ assembly.totalUnits }}</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="info-item">
-                    <i class="bi bi-file-text text-warning"></i>
-                    <div>
-                      <div class="info-label">Résolutions</div>
-                      <div class="info-value">{{ assembly.resolutions }}</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="info-item">
-                    <i class="bi bi-paperclip text-info"></i>
-                    <div>
-                      <div class="info-label">Documents</div>
-                      <div class="info-value">{{ assembly.documentsCount }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="assembly-footer">
-              <div class="action-buttons">
-                <button class="btn btn-sm btn-outline-primary" *ngIf="assembly.status === 'planned'" 
-                        (click)="sendConvocations(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
-                  <i class="bi bi-send me-1"></i>
-                  Envoyer convocations
-                </button>
-                <button class="btn btn-sm btn-outline-success" *ngIf="assembly.status === 'convened'" 
-                        (click)="startAssembly(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
-                  <i class="bi bi-play-circle me-1"></i>
-                  Démarrer l'AG
-                </button>
-                <button class="btn btn-sm btn-outline-info" *ngIf="assembly.status === 'held'" 
-                        (click)="viewMinutes(assembly.id)">
-                  <i class="bi bi-file-earmark-text me-1"></i>
-                  Voir PV
-                </button>
-                <button class="btn btn-sm btn-outline-secondary" (click)="downloadDocuments(assembly.id)">
-                  <i class="bi bi-download me-1"></i>
-                  Documents
-                </button>
-                <button class="btn btn-sm btn-outline-warning" (click)="manageResolutions(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
-                  <i class="bi bi-list-check me-1"></i>
-                  Résolutions
-                </button>
-              </div>
-              <div class="progress-info" *ngIf="assembly.status === 'convened'">
-                <small class="text-muted">
-                  <i class="bi bi-clock me-1"></i>
-                  {{ getDaysUntil(assembly.date) }}
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Loading -->
+      <div class="ag-loading" *ngIf="loading()">
+        <div class="spinner-border text-primary" role="status"></div>
+        <span>Chargement des assemblées...</span>
       </div>
 
       <!-- Empty State -->
-      <div class="empty-state" *ngIf="filteredAssemblies().length === 0">
+      <div class="ag-empty" *ngIf="filteredAssemblies().length === 0 && !loading()">
         <i class="bi bi-calendar-x"></i>
         <h4>Aucune assemblée générale</h4>
-        <p>Créez votre première AG pour commencer</p>
-        <button class="btn btn-primary" (click)="createAssembly()">
-          <i class="bi bi-plus-lg me-2"></i>
-          Créer une AG
+        <p>{{ copropertyId ? 'Créez votre première AG pour commencer' : 'Veuillez sélectionner une copropriété' }}</p>
+        <button class="btn-ag-new" *ngIf="copropertyId && isSelectedCopropertyActive()" (click)="createAssembly()">
+          <i class="bi bi-plus-lg"></i> Créer une AG
         </button>
+      </div>
+
+      <!-- Assembly Cards -->
+      <div class="ag-list" *ngIf="!loading()">
+        <div class="ag-card" *ngFor="let assembly of filteredAssemblies()">
+          <div class="ag-card-accent" [attr.data-type]="assembly.type"></div>
+
+          <div class="ag-card-header">
+            <div class="ag-card-meta">
+              <span class="ag-type-badge" [attr.data-type]="assembly.type">
+                {{ assembly.type === 'ordinary' ? 'Ordinaire' : 'Extraordinaire' }}
+              </span>
+              <span class="ag-status-badge" [attr.data-status]="assembly.status">
+                <i class="bi" [ngClass]="{
+                  'bi-clock': assembly.status === 'planned',
+                  'bi-envelope-check': assembly.status === 'convened',
+                  'bi-check-circle-fill': assembly.status === 'held',
+                  'bi-x-circle': assembly.status === 'cancelled'
+                }"></i>
+                {{ getStatusLabel(assembly.status) }}
+              </span>
+            </div>
+            <div class="ag-card-actions">
+              <button class="ag-icon-btn" title="Voir" (click)="viewAssembly(assembly.id)">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="ag-icon-btn" title="Modifier" (click)="editAssembly(assembly.id)"
+                [disabled]="!isSelectedCopropertyActive()">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="ag-icon-btn ag-icon-btn-danger" title="Supprimer"
+                (click)="deleteAssembly(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <h3 class="ag-card-title">{{ assembly.title }}</h3>
+          <p class="ag-card-coproperty" *ngIf="assembly.copropertyName">
+            <i class="bi bi-building"></i> {{ assembly.copropertyName }}
+          </p>
+
+          <div class="ag-card-info">
+            <div class="ag-info-item">
+              <i class="bi bi-calendar3"></i>
+              <span>{{ assembly.date | date:'dd/MM/yyyy' }}</span>
+              <span class="ag-info-time">{{ assembly.date | date:'HH:mm' }}</span>
+            </div>
+            <div class="ag-info-item">
+              <i class="bi bi-geo-alt"></i>
+              <span>{{ assembly.location }}</span>
+            </div>
+            <div class="ag-info-item" *ngIf="assembly.totalUnits > 0">
+              <i class="bi bi-people"></i>
+              <span>{{ assembly.attendees }}/{{ assembly.totalUnits }} présents</span>
+            </div>
+          </div>
+
+          <div class="ag-card-footer">
+            <div class="ag-card-workflow">
+              <button class="btn-ag-action btn-convoke" *ngIf="assembly.status === 'planned'"
+                (click)="sendConvocations(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
+                <i class="bi bi-send"></i> Envoyer convocations
+              </button>
+              <button class="btn-ag-action btn-start" *ngIf="assembly.status === 'convened'"
+                (click)="startAssembly(assembly.id)" [disabled]="!isSelectedCopropertyActive()">
+                <i class="bi bi-play-circle"></i> Démarrer l'AG
+              </button>
+              <button class="btn-ag-action btn-pv" *ngIf="assembly.status === 'held'"
+                (click)="viewMinutes(assembly.id)">
+                <i class="bi bi-file-earmark-text"></i> Voir le PV
+              </button>
+              <button class="btn-ag-action btn-docs" (click)="downloadDocuments(assembly.id)">
+                <i class="bi bi-download"></i> Documents
+              </button>
+            </div>
+            <div class="ag-countdown" *ngIf="assembly.status === 'convened'">
+              <i class="bi bi-clock"></i> {{ getDaysUntil(assembly.date) }}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   `,
   styles: [`
-    .stat-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
+    :host { display: block; }
+
+    /* ── Page layout ── */
+    .ag-page {
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
       display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Header ── */
+    .ag-page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
-    .stat-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .ag-page-header-left { display: flex; align-items: center; gap: 16px; }
+    .ag-page-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
       font-size: 24px;
-      color: white;
+      flex-shrink: 0;
     }
+    .ag-page-title { font-size: 22px; font-weight: 700; margin: 0; color: #111827; }
+    .ag-page-subtitle { font-size: 13px; color: #6b7280; margin: 2px 0 0; }
 
-    .stat-content {
-      flex: 1;
+    /* ── New AG button ── */
+    .btn-ag-new {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s, transform .15s;
+      white-space: nowrap;
     }
+    .btn-ag-new:hover:not(:disabled) { opacity: .9; transform: translateY(-1px); }
+    .btn-ag-new:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
-    .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      line-height: 1;
-      margin-bottom: 4px;
+    /* ── Stats ── */
+    .ag-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
     }
-
-    .stat-label {
-      font-size: 14px;
-      color: #6c757d;
+    .ag-stat-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+      border-left: 4px solid transparent;
+      transition: transform .15s;
     }
+    .ag-stat-card:hover { transform: translateY(-2px); }
+    .ag-stat-primary  { border-color: #4f46e5; }
+    .ag-stat-success  { border-color: #059669; }
+    .ag-stat-warning  { border-color: #d97706; }
+    .ag-stat-info     { border-color: #0891b2; }
+    .ag-stat-icon { font-size: 22px; }
+    .ag-stat-primary  .ag-stat-icon { color: #4f46e5; }
+    .ag-stat-success  .ag-stat-icon { color: #059669; }
+    .ag-stat-warning  .ag-stat-icon { color: #d97706; }
+    .ag-stat-info     .ag-stat-icon { color: #0891b2; }
+    .ag-stat-value { font-size: 28px; font-weight: 800; color: #111827; line-height: 1; }
+    .ag-stat-label { font-size: 12px; color: #6b7280; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
 
-    .assembly-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    /* ── Form panel ── */
+    .ag-form-panel {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
       overflow: hidden;
-      transition: transform 0.2s, box-shadow 0.2s;
     }
-
-    .assembly-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    .ag-form-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 24px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #fff;
+      font-size: 15px; font-weight: 600;
     }
-
-    .assembly-header {
-      padding: 20px;
-      border-bottom: 1px solid #e9ecef;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+    .ag-form-close {
+      margin-left: auto;
+      background: rgba(255,255,255,.2);
+      border: none; border-radius: 8px;
+      color: #fff; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background .15s;
     }
-
-    .assembly-type {
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
+    .ag-form-close:hover { background: rgba(255,255,255,.35); }
+    .ag-form-body { padding: 24px; }
+    .ag-form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
-
-    .assembly-type.ordinary {
-      background: #e3f2fd;
-      color: #1976d2;
+    .ag-field-wide  { grid-column: span 2; }
+    .ag-field-full  { grid-column: 1 / -1; }
+    .ag-form-field { display: flex; flex-direction: column; gap: 6px; }
+    .ag-form-field label { font-size: 13px; font-weight: 600; color: #374151; }
+    .ag-form-field input,
+    .ag-form-field select,
+    .ag-form-field textarea {
+      padding: 9px 12px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px; color: #111827;
+      transition: border-color .15s;
+      background: #fff;
     }
-
-    .assembly-type.extraordinary {
-      background: #fff3e0;
-      color: #f57c00;
+    .ag-form-field input:focus,
+    .ag-form-field select:focus,
+    .ag-form-field textarea:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79,70,229,.1);
     }
-
-    .assembly-actions {
-      display: flex;
-      gap: 8px;
+    .ag-form-field input.is-invalid,
+    .ag-form-field select.is-invalid { border-color: #ef4444; }
+    .required { color: #ef4444; }
+    .invalid-feedback { font-size: 12px; color: #ef4444; }
+    .ag-form-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-ag-save {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 24px;
+      background: #059669; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: opacity .15s;
     }
-
-    .assembly-body {
-      padding: 20px;
-      background: #f8f9fa;
+    .btn-ag-save:hover:not(:disabled) { opacity: .9; }
+    .btn-ag-save:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-ag-cancel {
+      padding: 10px 20px;
+      background: #f3f4f6; color: #374151;
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
     }
+    .btn-ag-cancel:hover:not(:disabled) { background: #e5e7eb; }
 
-    .info-item {
-      display: flex;
+    /* ── Filters ── */
+    .ag-filters {
+      display: flex; align-items: center; justify-content: space-between;
       gap: 12px;
-      align-items: flex-start;
-    }
-
-    .info-item i {
-      font-size: 20px;
-      margin-top: 2px;
-    }
-
-    .info-label {
-      font-size: 12px;
-      color: #6c757d;
-      margin-bottom: 2px;
-    }
-
-    .info-value {
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .assembly-footer {
-      padding: 16px 20px;
-      background: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #e9ecef;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      background: white;
+      background: #fff;
       border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .ag-filter-group { display: flex; align-items: center; gap: 10px; }
+    .ag-filter-icon { color: #6b7280; font-size: 16px; }
+    .ag-filter-group select,
+    .ag-search input {
+      padding: 7px 12px;
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      font-size: 13px; color: #374151;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .ag-filter-group select:focus,
+    .ag-search input:focus { outline: none; border-color: #4f46e5; }
+    .ag-search {
+      display: flex; align-items: center;
+      gap: 8px;
+      background: #f9fafb;
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      padding: 0 12px;
+    }
+    .ag-search i { color: #9ca3af; }
+    .ag-search input { border: none; background: transparent; padding: 7px 0; }
+    .ag-search input:focus { box-shadow: none; }
+
+    /* ── Loading / Empty ── */
+    .ag-loading {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      padding: 60px;
+      color: #6b7280;
+    }
+    .ag-empty {
+      text-align: center;
+      padding: 80px 24px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .ag-empty i { font-size: 56px; color: #d1d5db; display: block; margin-bottom: 16px; }
+    .ag-empty h4 { font-size: 18px; color: #374151; margin-bottom: 6px; }
+    .ag-empty p { color: #6b7280; margin-bottom: 20px; }
+
+    /* ── Assembly cards ── */
+    .ag-list { display: flex; flex-direction: column; gap: 16px; }
+    .ag-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      position: relative;
+      padding: 0 20px 20px;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .ag-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.1); transform: translateY(-1px); }
+    .ag-card-accent {
+      position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    }
+    .ag-card-accent[data-type="ordinary"]     { background: linear-gradient(90deg, #4f46e5, #7c3aed); }
+    .ag-card-accent[data-type="extraordinary"] { background: linear-gradient(90deg, #d97706, #f59e0b); }
+
+    .ag-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 20px; margin-bottom: 10px;
+    }
+    .ag-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .ag-type-badge {
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+    }
+    .ag-type-badge[data-type="ordinary"]      { background: #ede9fe; color: #5b21b6; }
+    .ag-type-badge[data-type="extraordinary"] { background: #fef3c7; color: #92400e; }
+
+    .ag-status-badge {
+      display: flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .ag-status-badge[data-status="planned"]   { background: #dbeafe; color: #1d4ed8; }
+    .ag-status-badge[data-status="convened"]  { background: #e0e7ff; color: #4338ca; }
+    .ag-status-badge[data-status="held"]      { background: #d1fae5; color: #065f46; }
+    .ag-status-badge[data-status="cancelled"] { background: #f3f4f6; color: #6b7280; }
+
+    .ag-card-actions { display: flex; gap: 6px; }
+    .ag-icon-btn {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      background: #fff; color: #374151;
+      cursor: pointer; font-size: 14px;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .ag-icon-btn:hover:not(:disabled)           { background: #f3f4f6; border-color: #d1d5db; }
+    .ag-icon-btn-danger:hover:not(:disabled)    { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+    .ag-icon-btn:disabled                       { opacity: .4; cursor: not-allowed; }
+
+    .ag-card-title {
+      font-size: 16px; font-weight: 700; color: #111827;
+      margin: 0 0 4px;
+    }
+    .ag-card-coproperty {
+      font-size: 13px; color: #6b7280; margin: 0 0 12px;
+      display: flex; align-items: center; gap: 6px;
     }
 
-    .empty-state i {
-      font-size: 64px;
-      color: #dee2e6;
-      margin-bottom: 20px;
+    .ag-card-info {
+      display: flex; flex-wrap: wrap; gap: 16px;
+      padding: 12px 0;
+      border-top: 1px solid #f3f4f6;
+      border-bottom: 1px solid #f3f4f6;
+      margin-bottom: 14px;
     }
-
-    .empty-state h4 {
-      color: #495057;
-      margin-bottom: 8px;
+    .ag-info-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #374151;
     }
+    .ag-info-item i { color: #9ca3af; }
+    .ag-info-time { color: #6b7280; margin-left: 2px; }
 
-    .empty-state p {
-      color: #6c757d;
-      margin-bottom: 24px;
+    .ag-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px;
     }
+    .ag-card-workflow { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-ag-action {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn-ag-action:hover:not(:disabled) { opacity: .85; transform: translateY(-1px); }
+    .btn-ag-action:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .btn-convoke { background: #ede9fe; color: #5b21b6; border-color: #c4b5fd; }
+    .btn-start   { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+    .btn-pv      { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+    .btn-docs    { background: #f3f4f6; color: #374151; border-color: #e5e7eb; }
+    .ag-countdown { font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 5px; }
 
+    /* ── Responsive ── */
     @media (max-width: 992px) {
-      .stat-card { padding: 16px; }
-      .stat-icon { width: 44px; height: 44px; font-size: 20px; }
-      .stat-value { font-size: 22px; }
+      .ag-stats { grid-template-columns: repeat(2, 1fr); }
+      .ag-form-grid { grid-template-columns: repeat(2, 1fr); }
+      .ag-field-wide { grid-column: span 1; }
     }
-
+    @media (max-width: 768px) {
+      .ag-page { padding: 16px; gap: 16px; }
+      .ag-page-title { font-size: 18px; }
+      .ag-page-subtitle { display: none; }
+      .ag-filters { flex-direction: column; align-items: stretch; }
+      .ag-filter-group { flex-wrap: wrap; }
+      .ag-search { width: 100%; }
+    }
     @media (max-width: 576px) {
-      .stat-card { padding: 14px; gap: 12px; }
-      .stat-icon { width: 40px; height: 40px; font-size: 18px; }
-      .stat-value { font-size: 20px; }
-      .stat-label { font-size: 12px; }
-
-      .assembly-header { padding: 14px; flex-direction: column; gap: 10px; }
-      .assembly-body { padding: 14px; }
-
-      .assembly-footer {
-        padding: 12px 14px;
-        flex-direction: column;
-        gap: 8px;
-        align-items: stretch;
-      }
-      .action-buttons { width: 100%; }
-      .action-buttons .btn { flex: 1; }
-
-      .empty-state { padding: 40px 16px; }
-      .empty-state i { font-size: 48px; }
+      .ag-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .ag-stat-value { font-size: 22px; }
+      .ag-form-grid { grid-template-columns: 1fr; }
+      .ag-field-wide { grid-column: span 1; }
+      .ag-card-footer { flex-direction: column; align-items: flex-start; }
     }
   `]
 })
@@ -740,6 +701,7 @@ export class GeneralAssemblyComponent implements OnInit {
   }
 
   transformAssembly(assembly: Assembly): GeneralAssembly {
+    const coproperty = this.availableCoproperties().find(c => c.id === assembly.copropertyId);
     return {
       id: assembly.id,
       title: assembly.title,
@@ -747,11 +709,11 @@ export class GeneralAssemblyComponent implements OnInit {
       date: new Date(assembly.meetingDate),
       status: this.mapStatus(assembly.status),
       copropertyId: assembly.copropertyId,
-      copropertyName: '', // Will be populated from coproperty data
+      copropertyName: coproperty?.name ?? '',
       location: assembly.location || 'Non défini',
       attendees: assembly.attendances?.filter(a => a.isPresent).length || 0,
       totalUnits: assembly.attendances?.length || 0,
-      resolutions: 0, // Will be added later
+      resolutions: 0,
       votesRequired: 0,
       documentsCount: 0
     };
@@ -850,14 +812,6 @@ export class GeneralAssemblyComponent implements OnInit {
 
   saveAssembly(): void {
     if (!this.isSelectedCopropertyActive()) return;
-    // Debug: log form status
-    console.log('=== FORM DEBUG ===');
-    console.log('Form valid:', this.assemblyForm.valid);
-    console.log('Form value:', this.assemblyForm.value);
-    console.log('CopropertyId:', this.copropertyId);
-    console.log('Form errors:', this.getFormValidationErrors());
-    console.log('=================');
-    
     if (this.assemblyForm.invalid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.assemblyForm.controls).forEach(key => {
@@ -920,46 +874,6 @@ export class GeneralAssemblyComponent implements OnInit {
     const [hours, minutes] = timeStr.split(':');
     date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
     return date;
-  }
-
-  getFormValidationErrors(): any {
-    const errors: any = {};
-    Object.keys(this.assemblyForm.controls).forEach(key => {
-      const control = this.assemblyForm.get(key);
-      if (control && control.errors) {
-        errors[key] = {
-          errors: control.errors,
-          value: control.value,
-          valid: control.valid,
-          touched: control.touched,
-          dirty: control.dirty
-        };
-      }
-    });
-    return errors;
-  }
-
-  debugForm(): void {
-    console.log('=== FORM DEBUG (Manual) ===');
-    console.log('Form valid:', this.assemblyForm.valid);
-    console.log('Form invalid:', this.assemblyForm.invalid);
-    console.log('Form value:', this.assemblyForm.value);
-    console.log('CopropertyId:', this.copropertyId);
-    console.log('All controls status:');
-    Object.keys(this.assemblyForm.controls).forEach(key => {
-      const control = this.assemblyForm.get(key);
-      console.log(`  ${key}:`, {
-        value: control?.value,
-        valid: control?.valid,
-        errors: control?.errors,
-        touched: control?.touched,
-        dirty: control?.dirty
-      });
-    });
-    console.log('Form errors:', this.getFormValidationErrors());
-    console.log('==========================');
-    
-    alert('Check console for debug info');
   }
 
   viewAssembly(id: string): void {
@@ -1043,18 +957,23 @@ export class GeneralAssemblyComponent implements OnInit {
 
     const confirmed = await this.modalService.confirm({
       title: 'Envoyer les convocations',
-      message: `Envoyer les convocations à tous les copropriétaires pour "${assembly.title}"?`,
+      message: `Envoyer les convocations à tous les copropriétaires pour "${assembly.title}" ?`,
       confirmButtonText: 'Envoyer'
     });
 
-    if (confirmed) {
-      assembly.status = 'convened';
-      this.assemblies.set([...this.assemblies()]);
-      this.toastService.show(
-        `${assembly.totalUnits} convocations envoyées par email`,
-        { classname: 'toast-success' }
-      );
-    }
+    if (!confirmed) return;
+
+    this.loading.set(true);
+    this.assemblyService.updateAssemblyStatus(id, AssemblyStatus.IN_PROGRESS).subscribe({
+      next: () => {
+        this.toastService.show('Convocations envoyées', { classname: 'toast-success' });
+        this.loadAssemblies();
+      },
+      error: () => {
+        this.toastService.show('Erreur lors de l\'envoi des convocations', { classname: 'toast-danger' });
+        this.loading.set(false);
+      }
+    });
   }
 
   async startAssembly(id: string): Promise<void> {
@@ -1062,12 +981,25 @@ export class GeneralAssemblyComponent implements OnInit {
     const assembly = this.assemblies().find(a => a.id === id);
     if (!assembly) return;
 
-    assembly.status = 'held';
-    this.assemblies.set([...this.assemblies()]);
-    this.toastService.show(
-      'Session de vote ouverte',
-      { classname: 'toast-info' }
-    );
+    const confirmed = await this.modalService.confirm({
+      title: 'Démarrer l\'assemblée',
+      message: `Confirmer le démarrage de "${assembly.title}" ? Cette action marque l'AG comme tenue.`,
+      confirmButtonText: 'Démarrer'
+    });
+
+    if (!confirmed) return;
+
+    this.loading.set(true);
+    this.assemblyService.updateAssemblyStatus(id, AssemblyStatus.COMPLETED).subscribe({
+      next: () => {
+        this.toastService.show('Assemblée démarrée', { classname: 'toast-success' });
+        this.loadAssemblies();
+      },
+      error: () => {
+        this.toastService.show('Erreur lors du démarrage', { classname: 'toast-danger' });
+        this.loading.set(false);
+      }
+    });
   }
 
   viewMinutes(id: string): void {

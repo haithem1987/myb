@@ -151,15 +151,14 @@
         <span class="nav-text">{{ 'navigation.settings' | translate }}</span>
       </a>
       
-      <!-- Hidden: Assemblées Générales
-      <a routerLink="/coproperty/syndic/general-assembly" 
-         routerLinkActive="active" 
-         class="nav-item">
+      <a [routerLink]="syndicRoute('general-assembly')"
+         routerLinkActive="active"
+         class="nav-item"
+         (click)="onNavItemClick()">
         <i class="bi bi-people-fill"></i>
         <span class="nav-text">Assemblées Générales</span>
       </a>
-      -->
-      
+
       <!-- Hidden: Rapports
       <a routerLink="/coproperty/syndic/reports" 
          routerLinkActive="active" 

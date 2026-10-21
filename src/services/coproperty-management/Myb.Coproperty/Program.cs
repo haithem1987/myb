@@ -193,6 +193,8 @@ if (app.Environment.IsDevelopment())
             using var dbContext = contextFactory.CreateDbContext();
             await dbContext.Database.MigrateAsync();
             app.Logger.LogInformation("Database migration completed successfully.");
+            await SeedData.SeedAsync(dbContext);
+            app.Logger.LogInformation("Seed data completed.");
             break;
         }
         catch (Exception ex)

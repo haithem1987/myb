@@ -99,7 +99,8 @@ public class InternalFundCallController : ControllerBase
                 fc.Amount,
                 fc.DueDate,
                 Status = fc.Status.ToString(),
-                OwnerName = fc.OwnerNameSnapshot,
+                OwnerName = fc.OwnerNameSnapshot
+                    ?? (fc.Owner != null ? $"{fc.Owner.FirstName} {fc.Owner.LastName}".Trim() : null),
                 fc.CopropertyNameSnapshot
             });
 

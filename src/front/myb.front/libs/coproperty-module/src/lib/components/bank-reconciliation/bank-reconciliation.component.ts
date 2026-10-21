@@ -51,12 +51,21 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
       <div class="prev-imports" *ngIf="!detail() && previousImports().length > 0">
         <h3><i class="bi bi-clock-history me-2"></i>Imports précédents</h3>
         <div class="prev-list">
-          <div class="prev-item" *ngFor="let s of previousImports()" (click)="loadPreviousImport(s)">
-            <div class="prev-file"><i class="bi bi-file-earmark-text me-1"></i>{{ s.FileName }}</div>
+          <div class="prev-item" *ngFor="let s of previousImports()">
+            <div class="prev-file" (click)="loadPreviousImport(s)">
+              <i class="bi bi-file-earmark-text me-1"></i>{{ s.FileName }}
+            </div>
             <div class="prev-meta">
-              {{ formatDate(s.ImportedAt) }}
-              <span class="prev-badge matched">{{ s.AutoMatched }} rapprochés</span>
-              <span class="prev-badge unmatched" *ngIf="s.Unmatched > 0">{{ s.Unmatched }} non rapprochés</span>
+              <span (click)="loadPreviousImport(s)" style="cursor:pointer">{{ formatDate(s.ImportedAt) }}</span>
+              <span class="prev-badge matched" (click)="loadPreviousImport(s)" style="cursor:pointer">{{ s.AutoMatched }} rapprochés</span>
+              <span class="prev-badge unmatched" *ngIf="s.Unmatched > 0" (click)="loadPreviousImport(s)" style="cursor:pointer">{{ s.Unmatched }} non rapprochés</span>
+              <button class="btn-delete-import"
+                      [disabled]="deletingId() === s.Id"
+                      (click)="$event.stopPropagation(); deleteStatement(s)"
+                      title="Supprimer cet import">
+                <span *ngIf="deletingId() !== s.Id"><i class="bi bi-trash3"></i></span>
+                <span *ngIf="deletingId() === s.Id" class="spinner-sm"></span>
+              </button>
             </div>
           </div>
         </div>
@@ -168,24 +177,18 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
                         class="text-muted small fc-debit" title="Les débits ne sont pas liés à un appel de fonds">
                     <i class="bi bi-dash-circle me-1"></i>Débit
                   </span>
-                  <!-- Step 1 + 2: owner select then fund call select for credits -->
+                  <!-- Modal trigger for credits needing a fund call -->
                   <div *ngIf="!item.Reconciliation.FundCallPaymentId && item.Transaction.Amount > 0 && (item.Reconciliation.Status === 1 || item.Reconciliation.Status === 2)"
                        class="fc-selector">
-                    <!-- Step 1: pick owner from dropdown -->
-                    <select class="fc-search"
-                            [(ngModel)]="ownerSearch[item.Reconciliation.Id]">
-                      <option value="">— Copropriétaire —</option>
-                      <option *ngFor="let o of distinctOwners()" [value]="o">{{ o }}</option>
-                    </select>
-                    <!-- Step 2: fund calls for selected owner -->
-                    <select *ngIf="ownerSearch[item.Reconciliation.Id]?.trim()"
-                            class="fc-select"
-                            [(ngModel)]="pendingFundCallIds[item.Reconciliation.Id]">
-                      <option value="">— Appel de fonds —</option>
-                      <option *ngFor="let fc of fundCallsForOwner(ownerSearch[item.Reconciliation.Id])" [value]="fc.Id">
-                        {{ fc.Description || fc.OwnerName }} — {{ formatAmount(fc.Amount) }}
-                      </option>
-                    </select>
+                    <button class="btn-pick-fc"
+                            [class.has-selection]="pendingFundCallIds[item.Reconciliation.Id]"
+                            (click)="openFcModal(item.Reconciliation.Id)">
+                      <i class="bi" [class.bi-search]="!pendingFundCallIds[item.Reconciliation.Id]"
+                                    [class.bi-check-circle]="pendingFundCallIds[item.Reconciliation.Id]"></i>
+                      {{ pendingFundCallIds[item.Reconciliation.Id]
+                           ? fundCallLabel(pendingFundCallIds[item.Reconciliation.Id])
+                           : 'Sélectionner un appel de fonds' }}
+                    </button>
                   </div>
                   <span *ngIf="!item.Reconciliation.FundCallPaymentId && item.Transaction.Amount > 0 && item.Reconciliation.Status === 0"
                         class="text-muted small">—</span>
@@ -217,6 +220,53 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- Fund Call picker modal -->
+    <div class="modal-backdrop" *ngIf="fcModalOpen()" (click)="closeFcModal()"></div>
+    <div class="fc-modal" *ngIf="fcModalOpen()" role="dialog" aria-modal="true">
+      <div class="fc-modal-header">
+        <h3><i class="bi bi-card-checklist me-2"></i>Sélectionner un appel de fonds</h3>
+        <button class="fc-modal-close" (click)="closeFcModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="fc-modal-search">
+        <input type="text" class="filter-search" [(ngModel)]="fcModalSearch"
+               placeholder="Rechercher par copropriétaire, description…" autocomplete="off">
+      </div>
+      <div class="fc-modal-body">
+        <div *ngIf="availableFundCalls().length === 0" class="fc-empty">
+          <i class="bi bi-inbox" style="font-size:2.5rem;color:#a0aec0"></i>
+          <p class="mt-2" style="color:#6c757d">Aucun appel de fonds disponible.</p>
+          <p style="font-size:.85rem;color:#9ca3af">Créez des appels de fonds dans la section <strong>Appels de fonds</strong> pour pouvoir les lier aux transactions.</p>
+          <a [routerLink]="['/coproperty', activeCopropertyId(), 'syndic', 'fund-calls']"
+             class="btn-validate mt-2" style="text-decoration:none;display:inline-flex" (click)="closeFcModal()">
+            <i class="bi bi-plus-circle me-1"></i>Créer des appels de fonds
+          </a>
+        </div>
+        <div *ngIf="availableFundCalls().length > 0 && fcModalFiltered().length === 0" class="fc-empty">
+          <i class="bi bi-search" style="font-size:1.5rem;color:#a0aec0"></i>
+          <p class="mt-2" style="color:#6c757d">Aucun résultat pour « {{ fcModalSearch }} »</p>
+        </div>
+        <div *ngFor="let fc of fcModalFiltered()"
+             class="fc-modal-item"
+             [class.fc-modal-item-selected]="pendingFundCallIds[fcModalReconciliationId()] === fc.Id"
+             (click)="selectFcInModal(fc.Id)">
+          <div class="fc-modal-item-top">
+            <span class="fc-modal-item-name"><i class="bi bi-person me-1"></i>{{ fc.OwnerName || '—' }}</span>
+            <span class="fc-modal-amount">{{ formatAmount(fc.Amount) }}</span>
+          </div>
+          <div class="fc-modal-item-bottom">
+            <span style="color:#6c757d;font-size:.82rem">{{ fc.Description }}</span>
+            <span class="fc-modal-due">Éch. {{ formatDate(fc.DueDate) }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="fc-modal-footer">
+        <button class="btn-validate" (click)="confirmFcModal()" [disabled]="!pendingFundCallIds[fcModalReconciliationId()]">
+          Confirmer
+        </button>
+        <button class="fc-modal-cancel" (click)="closeFcModal()">Annuler</button>
       </div>
     </div>
   `,
@@ -440,6 +490,97 @@ import { ToastService } from 'libs/shared/infra/services/toast.service';
     .filter-btn.debit.active  { background: #b91c1c; border-color: #b91c1c; }
 
     .fc-required-hint { font-size: 0.78rem; color: #d97706; white-space: nowrap; }
+
+    /* Fund call picker button */
+    .btn-pick-fc {
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      background: #f1f5f9;
+      border: 1px dashed #cbd5e0;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #4a5568;
+      display: inline-flex; align-items: center; gap: 5px;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .btn-pick-fc:hover { background: #e8edf7; border-color: #4f46e5; color: #4f46e5; }
+    .btn-pick-fc.has-selection { background: #ede9fe; border-color: #7c3aed; color: #5b21b6; border-style: solid; }
+
+    /* Delete import button */
+    .btn-delete-import {
+      padding: 2px 7px;
+      background: transparent;
+      border: 1px solid #fca5a5;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #dc2626;
+      font-size: 0.78rem;
+      transition: all 0.15s;
+    }
+    .btn-delete-import:hover:not(:disabled) { background: #fee2e2; }
+    .btn-delete-import:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 1000;
+    }
+    .fc-modal {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1001;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      width: min(560px, 95vw);
+      display: flex; flex-direction: column;
+      max-height: 80vh;
+    }
+    .fc-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .fc-modal-header h3 { font-size: 1rem; font-weight: 600; margin: 0; }
+    .fc-modal-close {
+      background: none; border: none; cursor: pointer;
+      color: #9ca3af; font-size: 1rem; padding: 4px;
+      border-radius: 4px; transition: color 0.15s;
+    }
+    .fc-modal-close:hover { color: #374151; }
+    .fc-modal-search { padding: 12px 20px; border-bottom: 1px solid #f0f0f0; }
+    .fc-modal-body { overflow-y: auto; flex: 1; padding: 8px 0; }
+    .fc-empty { text-align: center; padding: 32px 24px; }
+    .fc-modal-item {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 1px solid #f8fafc;
+      transition: background 0.1s;
+    }
+    .fc-modal-item:hover { background: #f5f3ff; }
+    .fc-modal-item-selected { background: #ede9fe !important; }
+    .fc-modal-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+    .fc-modal-item-name { font-weight: 500; font-size: 0.875rem; color: #1a202c; }
+    .fc-modal-item-bottom { display: flex; justify-content: space-between; }
+    .fc-modal-amount { font-weight: 600; font-size: 0.875rem; color: #4f46e5; }
+    .fc-modal-due { font-size: 0.78rem; color: #9ca3af; }
+    .fc-modal-footer {
+      display: flex; gap: 8px; justify-content: flex-end;
+      padding: 12px 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .fc-modal-cancel {
+      padding: 6px 16px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .fc-modal-cancel:hover { background: #e2e8f0; }
   `],
 })
 export class BankReconciliationComponent {
@@ -452,6 +593,9 @@ export class BankReconciliationComponent {
   uploading = signal(false);
   validating = signal<string | null>(null);
   bulkValidating = signal(false);
+  deletingId = signal<string | null>(null);
+
+  activeCopropertyId = () => this.activeCoproperty.activeId() ?? '';
   summary = signal<ImportSummary | null>(null);
   detail = signal<ReconciliationDetail | null>(null);
   availableFundCalls = signal<FundCallSummary[]>([]);
@@ -471,6 +615,40 @@ export class BankReconciliationComponent {
 
   pendingFundCallIds: Record<string, string> = {};
   ownerSearch: Record<string, string> = {};
+
+  // Modal state
+  private _fcModalRecId = signal<string | null>(null);
+  fcModalOpen = signal(false);
+  fcModalSearch = '';
+  fcModalReconciliationId = () => this._fcModalRecId() ?? '';
+
+  fcModalFiltered(): FundCallSummary[] {
+    const q = this.fcModalSearch.trim().toLowerCase();
+    if (!q) return this.availableFundCalls();
+    return this.availableFundCalls().filter(fc =>
+      (fc.OwnerName ?? '').toLowerCase().includes(q) ||
+      (fc.Description ?? '').toLowerCase().includes(q)
+    );
+  }
+
+  openFcModal(reconciliationId: string): void {
+    this._fcModalRecId.set(reconciliationId);
+    this.fcModalSearch = '';
+    this.fcModalOpen.set(true);
+  }
+
+  closeFcModal(): void {
+    this.fcModalOpen.set(false);
+  }
+
+  selectFcInModal(fundCallId: string): void {
+    const id = this._fcModalRecId();
+    if (id) this.pendingFundCallIds[id] = fundCallId;
+  }
+
+  confirmFcModal(): void {
+    this.fcModalOpen.set(false);
+  }
 
   filterText = '';
   filterType: 'all' | 'credit' | 'debit' = 'all';
@@ -754,6 +932,25 @@ export class BankReconciliationComponent {
 
   formatDate(date: string): string {
     return new Date(date).toLocaleDateString('fr-FR');
+  }
+
+  deleteStatement(s: StatementListItem): void {
+    this.deletingId.set(s.Id);
+    this.service.deleteStatement(s.Id)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.deletingId.set(null)))
+      .subscribe({
+        next: () => {
+          this.previousImports.update(list => list.filter(x => x.Id !== s.Id));
+          if (this.summary()?.StatementId === s.Id) {
+            this.summary.set(null);
+            this.detail.set(null);
+          }
+          this.toastService.show('Import supprimé.', { classname: 'bg-success text-white', delay: 3000 });
+        },
+        error: () => {
+          this.toastService.show('Erreur lors de la suppression.', { classname: 'bg-danger text-white', delay: 4000 });
+        },
+      });
   }
 
   formatAmount(amount: number): string {

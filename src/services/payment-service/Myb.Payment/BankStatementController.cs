@@ -115,7 +115,7 @@ public class BankStatementController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] string? copropertyId)
     {
-        var query = _context.BankStatements.AsQueryable();
+        var query = _context.BankStatements.Where(s => !s.IsDeleted).AsQueryable();
         if (!string.IsNullOrEmpty(copropertyId))
             query = query.Where(s => s.CopropertyId == copropertyId);
 
@@ -136,6 +136,20 @@ public class BankStatementController : ControllerBase
             .ToListAsync();
 
         return Ok(statements);
+    }
+
+    /// <summary>DELETE /api/bank-statements/{id} — soft delete, keeps data for audit</summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var statement = await _context.BankStatements.FindAsync(id);
+        if (statement == null) return NotFound();
+        if (statement.IsDeleted) return NoContent();
+
+        statement.IsDeleted = true;
+        statement.DeletedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return NoContent();
     }
 
     /// <summary>GET /api/bank-statements/{id}/reconciliation</summary>

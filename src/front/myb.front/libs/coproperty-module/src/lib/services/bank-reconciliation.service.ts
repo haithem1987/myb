@@ -116,6 +116,10 @@ export class BankReconciliationService {
     );
   }
 
+  deleteStatement(statementId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${statementId}`, { headers: this.authHeaders() });
+  }
+
   getExportUrl(statementId: string): string {
     return `${this.base}/${statementId}/export`;
   }

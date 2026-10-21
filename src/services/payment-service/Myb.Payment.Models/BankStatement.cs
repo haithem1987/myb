@@ -8,6 +8,8 @@ public class BankStatement
     public DateTime ImportedAt { get; set; } = DateTime.UtcNow;
     public string ImportedByUserId { get; set; } = "";
     public string? CopropertyId { get; set; }
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedAt { get; set; }
     public List<BankTransaction> Transactions { get; set; } = [];
     public List<ReconciliationResult> Results { get; set; } = [];
 }
